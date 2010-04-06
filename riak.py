@@ -21,6 +21,7 @@ under the License.
 # Import libraries.
 import sys, random, logging, base64, urllib, re
 from cStringIO import StringIO
+import types
 
 # Use pycurl as first choice, httplib as second choice.
 try:
@@ -53,6 +54,16 @@ specific language governing permissions and limitations
 under the License.    
 """
 
+MD_CTYPE    = "content-type"
+MD_CHARSET  = "charset"
+MD_ENCODING = "content-encoding"
+MD_VTAG     = "vtag"
+MD_LINKS    = "links"
+MD_LASTMOD  = "lastmod"
+MD_LASTMOD_USECS = "lastmod-usecs"
+MD_USERMETA = "usermeta"
+
+
 """
 The Riak API for Python allows you to connect to a Riak instance,
 create, modify, and delete Riak objects, add and remove links from
@@ -71,7 +82,8 @@ class RiakClient:
         Riak. The Riak API uses HTTP, so there is no persistent
         connection, and the RiakClient object is extremely lightweight.
         """
-        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', mapred_prefix='mapred'):
+        def __init__(self, host='127.0.0.1', port=8098, **kwargs):
+                # , prefix='riak', mapred_prefix='mapred'
                 """
                 Construct a new RiakClient object.
                 @param string host - Hostname or IP address (default '127.0.0.1')
@@ -79,15 +91,18 @@ class RiakClient:
                 @param string prefix - Interface prefix (default 'riak')
                 @param string mapred_prefix - MapReduce prefix (default 'mapred')
                 """
-                self._host = host
-                self._port = port
-                self._prefix = prefix
-                self._mapred_prefix = mapred_prefix
-                self._client_id = 'php_' + base64.b64encode(str(random.randint(1, 1073741824)))
+                self._transport = RiakHttpTransport(**kwargs)
                 self._r = 2
                 self._w = 2
-                self._dw = 2
+                self._dw = 0
+                self._rw = 2
                 return None
+
+        def get_transport(self):
+                """
+                Get a transport object
+                """
+                return self._transport;
 
         def get_r(self):
                 """
@@ -141,13 +156,30 @@ class RiakClient:
                 """
                 self._dw = dw
                 return self
+
+        def get_rw(self):
+                """
+                Get the RW-value for this ClientObject. (default 2)
+                @return integer
+                """
+                return self._rw
+        
+        def set_rw(self, rw):
+                """
+                Set the RW-value for this RiakClient. See set_r(...) for a
+                description of how these values are used.
+                @param integer rw - The RW value.
+                @return self
+                """
+                self._rw = rw
+                return self
         
         def get_client_id(self):
                 """
                 Get the client_id for this RiakClient.
                 @return string
                 """
-                return self._client_id
+                return self._transport.get_client_id()
         
         def set_client_id(self, client_id):
                 """
@@ -156,7 +188,7 @@ class RiakClient:
                 @param string client_id - The new client_id.
                 @return self
                 """
-                self._client_id = client_id
+                self._transport.set_client_id(client_id)
                 return self
 
         def bucket(self, name):
@@ -172,9 +204,8 @@ class RiakClient:
                 Check if the Riak server for this RiakClient is alive.
                 @return boolean
                 """
-                response = RiakUtils.http_request('GET', self._host, self._port, '/ping')
-                return(response != None) and (response[1] == 'OK')
-        
+                return self._transport.ping()
+
         def add(self, *args):
                 """
                 Start assembling a Map/Reduce operation.
@@ -570,6 +601,8 @@ class RiakBucket :
                 self._r = None
                 self._w = None
                 self._dw = None
+                self._rw = None
+                self._props = None
                 return None
 
         def get_name(self):
@@ -640,6 +673,27 @@ class RiakBucket :
                 @return self
                 """
                 self._dw = dw
+                return self
+                                                         
+        def get_rw(self, rw):
+                """
+                Get the RW-value for this bucket, if it is set, otherwise return
+                the RW-value for the client.
+                @return integer
+                """
+                if (rw != None):
+                        return rw
+                if (self._rw != None):
+                        return self._rw
+                return self._client.get_rw()
+                                                         
+        def set_rw(self, rw):
+                """
+                Set the RW-value for this bucket. See set_r(...) for more information.
+                @param integer rw - The new RW-value
+                @return self
+                """
+                self._rw = rw
                 return self
                                                          
         def new(self, key, data=None):
@@ -755,44 +809,18 @@ class RiakBucket :
                 used if you know what you are doing.
                 @param array props - An associative array of key:value.        
                 """
-
-                #Construct the URL, Headers, and Content...
-                host, port, url = RiakUtils.build_rest_path(self._client, self)
-                headers = {'Content-Type' : 'application/json'}
-                content = json.dumps({'props' : props})
-	
-                #Run the request...
-                response = RiakUtils.http_request('PUT', host, port, url, headers, content)
-
-                # Handle the response...
-                if (response == None):
-                        raise Exception('Error setting bucket properties.')
-        
-                # Check the response value...
-                status = response[0]['http_code']
-                if (status != 204):
-                        raise Exception('Error setting bucket properties.')
+                t = self._client.get_transport()
+                t.set_bucket_props(self, props)
+                return None
 
         def get_properties(self):
                 """
                 Retrieve an associative array of all bucket properties.
                 @return Array		
                 """
-                
-                # Run the request...
-                params = {'props' : 'True', 'keys' : 'False'}
-                host, port, url = RiakUtils.build_rest_path(self._client, self, None, None, params)
-                response = RiakUtils.http_request('GET', host, port, url)
-                
-                # Use a RiakObject to interpret the response, we are just interested in the value.
-                obj = RiakObject(self._client, self, None)
-                obj.populate(response, [200])
-                if (not obj.exists()):
-                        raise Exception('Error getting bucket properties.')
-
-                props = obj.get_data()
-                props = props['props']
-                return props
+                t = self._client.get_transport()
+                return t.get_bucket_props(self)
+               
 
 class RiakObject :
         """
@@ -813,7 +841,9 @@ class RiakObject :
                 self._bucket = bucket
                 self._key = key
                 self._jsonize = True
-                self._headers = {}
+                self._vclock = None
+                self._data = None
+                self._metadata = {}
                 self._links = []
                 self._siblings = []
                 self._exists = False
@@ -853,13 +883,43 @@ class RiakObject :
                 """
                 self._data = data
                 return self
-                
-        def status(self):
+  
+        def get_encoded_data(self):
                 """
-                Get the HTTP status from the last operation on this object.
-                @return integer
+                Get the data encoded for storing	
                 """
-                return self._headers['http_code']
+                if self._jsonize == True:
+                        return json.dumps(self._data)
+                else:
+                        return self._data
+ 
+        def set_encoded_data(self, data):
+                """
+                Get the data encoded for storing	
+                """
+                if self._jsonize == True:
+                        self._data = json.loads(data)
+                else:
+                        self._data = data
+                return self
+      
+         
+        def get_metadata(self):
+                """
+                Get the metadata stored in this object. Will return a associative
+                array
+                @return dict
+                """
+                return self._data
+        
+        def set_metadata(self, metadata):
+                """
+                Set the metadata stored in this object. 
+                @param dict metadata - The data to store.
+                @return data		
+                """
+                self._metadata = metadata
+                return self
         
         def exists(self):
                 """
@@ -875,7 +935,7 @@ class RiakObject :
                 the provided content type if the object was created via new_binary(...).
                 @return string
                 """
-                return self._headers['content-type']
+                return self._metadata[MD_CTYPE]
         
         def set_content_type(self, content_type):
                 """
@@ -883,7 +943,7 @@ class RiakObject :
                 @param string content_type - The new content type.
                 @return self		
                 """
-                self._headers['content-type'] = content_type
+                self._metadata[MD_CTYPE] = content_type
                 return self
         
         def add_link(self, obj, tag=None):
@@ -950,38 +1010,18 @@ class RiakObject :
                 """
                 # Use defaults if not specified...
                 w = self._bucket.get_w(w)
-                dw = self._bucket.get_dw(dw)
+                dw = self._bucket.get_dw(w)
                 
-                # Construct the URL...
-                params = {'returnbody' : 'true', 'w' : w, 'dw' : dw}
-                host, port, url = RiakUtils.build_rest_path(self._client, self._bucket, self._key, None, params)
-                
-                # Construct the headers...
-                headers = {'Accept' : 'text/plain, */*; q=0.5',
-                           'Content-Type' : self.get_content_type(),
-                           'X-Riak-ClientId' : self._client.get_client_id()}
-                
-                # Add the vclock if it exists...
-                if (self.vclock() != None):
-                        headers['X-Riak-Vclock'] = self.vclock()
-                        
-                # Add the Links...
-                headers['Link'] = ''
-                for link in self._links:
-                        if headers['Link'] != '': headers['Link'] += ', '
-                        headers['Link'] += link.to_link_header(self._client)
-                        
-                if (self._jsonize):
-                        content = json.dumps(self.get_data())
-                else:
-                        content = self.get_data()
-                
-                # Run the operation.
-                response = RiakUtils.http_request('PUT', host, port, url, headers, content)
-                self.populate(response, [200, 300])
+                # Issue the get over our transport
+                t = self._client.get_transport()
+                Result = t.put(self, w, dw)
+                if Result != None:
+                        self.populate(Result)
+
                 return self
 
-        def reload(self, r=None):
+
+        def reload(self, r=None, vtag=None):
                 """
                 Reload the object from Riak. When this operation completes, the
                 object could contain new metadata and a new value, if the object
@@ -992,35 +1032,28 @@ class RiakObject :
                 """
                 # Do the request...
                 r = self._bucket.get_r(r)
-                params = {'r' : r}
-                host, port, url = RiakUtils.build_rest_path(self._client, self._bucket, self._key, None, params)
-                response = RiakUtils.http_request('GET', host, port, url)
-                self.populate(response, [200, 300, 404])
-                                
-                # If there are siblings, load the data for the first one by default...
-                if (self.has_siblings()):
-                        obj = self.get_sibling(0)
-                        self.set_data(obj.get_data())
-                        
+                t = self._client.get_transport()
+                Result = t.get(self, r, vtag)
+
+                self.clear()
+                if Result != None:
+                        self.populate(Result)
+
                 return self
 
-        def delete(self, dw=None):
+
+        def delete(self, rw=None):
                 """
                 Delete this object from Riak.
-                @param integer dw - DW-value. Wait until this many partitions have
+                @param integer rw - RW-value. Wait until this many partitions have
                 deleted the object before responding.
                 @return self		
                 """
                 # Use defaults if not specified...
-                dw = self._bucket.get_dw(dw)
-                
-                # Construct the URL...
-                params = {'dw' : dw}
-                host, port, url = RiakUtils.build_rest_path(self._client, self._bucket, self._key, None, params)
-                
-                # Run the operation...
-                response = RiakUtils.http_request('DELETE', host, port, url)
-                self.populate(response, [204, 404])
+                rw = self._bucket.get_rw(rw)
+                t = self._client.get_transport()
+                Result = t.delete(self, rw)
+                self.clear()
                 return self
                         
         def clear(self) :
@@ -1040,67 +1073,37 @@ class RiakObject :
                 Get the vclock of this object.
                 @return string		
                 """
-                if ('x-riak-vclock' in self._headers.keys()):
-                        return self._headers['x-riak-vclock']
-                else:
-                        return None
+                return self._vclock
 
-        def populate(self, response, expected_statuses):
+        def populate(self, Result) :
                 """
-                Given the output of RiakUtils.http_request and a list of
-                statuses, populate the object. Only for use by the Riak client
-                library.
-                @return self		
+                Populate the object based on the return from get.
+                If None returned, then object is not found
+                If a tuple of vclock, contents then one or more
+                whole revisions of the key were found
+                If a list of vtags is returned there are multiple
+                sibling that need to be retrieved with get.
                 """
-                self.clear()
-                                
-                # If no response given, then return.
-                if (response == None):
+                self.clear()                
+                if Result == None:
                         return self
-                
-                # Update the object...
-                self._headers = response[0]
-                self._data = response[1]
-                status = self.status()
-                                
-                # Check if the server is down(status==0)
-                if (status == 0):
-                        m = 'Could not contact Riak Server: http://' + self._client._host + ':' + str(self._client._port) + '!'
-                        raise Exception(m)
-
-                # Verify that we got one of the expected statuses. Otherwise, raise an exception.
-                if (not status in expected_statuses):
-                        m = 'Expected status ' + str(expected_statuses) + ', received ' + str(status)
-                        raise Exception(m)
-
-                # If 404(Not Found), then clear the object.
-                if (status == 404):
-                        self.clear()
-                        return self
-                        
-                # If we are here, then the object exists...
-                self._exists = True
-	
-                # Parse the link header...
-                if ('link' in self._headers.keys()):
-                        self.populate_links(self._headers['link'])
-
-                # If 300(Siblings), then load the first sibling, and
-                # store the rest.
-                if (status == 300):
-                        siblings = self._data.strip().split('\n')
-                        siblings.pop(0)
-
-                        # Get rid of 'Siblings:' string.
-                        self._siblings = siblings
+                elif type(Result) == types.ListType:
+                        self.set_siblings(Result)
+                elif type(Result) == types.TupleType:
+                        (vclock, contents) = Result
+                        (metadata, data) = contents.pop(0)
+                        self._vclock = vclock
                         self._exists = True
-                        return self
-
-                # Possibly json_decode...
-                if (status == 200 and self._jsonize):
-                        self._data = json.loads(self._data)
-        
-                return self
+                        self.set_metadata(metadata)
+                        self.set_encoded_data(data)
+                        # Create objects for all siblings
+                        siblings = [self]
+                        for (metadata, data) in contents:
+                                sibling = copy.copy(self)
+                                sibling.set_metadata(metadata)
+                                sibling.set_data(data)
+                        for sibling in siblings:
+                                sibling.set_siblings(siblings)
 
         def populate_links(self, linkHeaders) :
                 """
@@ -1137,20 +1140,18 @@ class RiakObject :
                 have responded before returning to client.
                 @return RiakObject.		
                 """
-                # Use defaults if not specified.
-                r = self._bucket.get_r(r)
+                if isinstance(self._siblings[i], RiakObject):
+                        return self._siblings[i]
+                else:
+                        # Use defaults if not specified.
+                        r = self._bucket.get_r(r)
                 
-                # Run the request...
-                vtag = self._siblings[i]
-                params = {'r' : r, 'vtag' : vtag}
-                host, port, url = RiakUtils.build_rest_path(self._client, self._bucket, self._key, None, params)
-                response = RiakUtils.http_request('GET', host, port, url)
-                
-                # Respond with a new object...
-                obj = RiakObject(self._client, self._bucket, self._key)
-                obj._jsonize = self._jsonize
-                obj.populate(response, [200])
-                return obj
+                        # Run the request...
+                        vtag = self._siblings[i]
+                        obj = RiakObject(self._client, self._bucket, self._key)
+                        obj.reload(r, vtag)
+                        self._siblings[i] = obj
+                        return obj
 
         def get_siblings(self, r=None):
                 """
@@ -1159,11 +1160,30 @@ class RiakObject :
                 responded before returning to client.
                 @return array of RiakObject		
                 """
-                a = []
+                a = [self]
                 for i in range(self.get_sibling_count()):
                         a.append(self.get_sibling(i, r))
                 return a
                 
+        def set_siblings(self, siblings):
+                """
+                Set the array of siblings - used internally
+                Make sure this object is at index 0 so get_siblings(0) always returns
+                the current object
+                """
+                try:
+                        i = siblings.index(self)
+                        if i != 0:
+                                siblings.pop(i)
+                                siblings.insert(0, self)
+                except ValueError:
+                        pass
+
+                if len(siblings) > 1:
+                        self._siblings = siblings
+                else:
+                        self._siblings = []
+
         def add(self, *args):
                 """
                 Start assembling a Map/Reduce operation.
@@ -1216,15 +1236,306 @@ class RiakUtils :
                 else:
                         return defaultValue
 		
+                       
+
+class RiakError(Exception) :
+        def __init__(self, value):
+                self.value = value
+        def __str__(self):
+                return repr(self.value)
+ 
+class RiakTransport :
+        """
+        Class to encapsulate transport details
+        """
+        
+        def ping(self):
+                """
+                Ping the remote server
+                @return boolean
+                """
+                raise RiakError("not implemented")
+        
+        def get(self, robj, r = None, vtag = None):
+                """
+                Serialize get request and deserialize response
+                @return (vclock=None, [(metadata, value)]=None)
+                """
+                raise RiakError("not implemented")
+        
+        def put(self, robj, w = None, dw = None):
+                """
+                Serialize put request and deserialize response - if 'content'
+                is true, retrieve the updated metadata/content
+                @return (vclock=None, [(metadata, value)]=None)
+                """
+                raise RiakError("not implemented")
+        
+        def delete(self, robj, rw = None):
+                """
+                Serialize delete request and deserialize response
+                @return true
+                """
+                raise RiakError("not implemented")
+        
+        def get_bucket_props(self, bucket) :
+                """
+                Serialize get bucket property request and deserialize response
+                @return dict()
+                """
+                raise RiakError("not implemented")
+        
+        def set_bucket_props(self, bucket, props) :
+                """
+                Serialize set bucket property request and deserialize response
+                bucket = bucket object
+                props = dictionary of properties
+                @return boolean
+                """
+                raise RiakError("not implemented")
+        
+        def mapred(self, inputs, query) :
+                """
+                Serialize map/reduce request
+                """
+                raise RiakError("not implemented")
+        
+class RiakHttpTransport(RiakTransport) :
+        """
+        The RiakHttpTransport object holds information necessary to connect to
+        Riak. The Riak API uses HTTP, so there is no persistent
+        connection, and the RiakClient object is extremely lightweight.
+        """
+        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', mapred_prefix='mapred'):
+                """
+                Construct a new RiakClient object.
+                @param string host - Hostname or IP address (default '127.0.0.1')
+                @param int port - Port number (default 8098)
+                @param string prefix - Interface prefix (default 'riak')
+                @param string mapred_prefix - MapReduce prefix (default 'mapred')
+                """
+                self._host = host
+                self._port = port
+                self._prefix = prefix
+                self._mapred_prefix = mapred_prefix
+                self._client_id = 'php_' + base64.b64encode(str(random.randint(1, 1073741824)))
+                return None
+
+        """
+        Check server is alive over HTTP
+        """
+        def ping(self) :
+                response = self.http_request('GET', self._host, self._port, '/ping')
+                return(response != None) and (response[1] == 'OK')
+
+        """
+        Get a bucket/key from the server
+        """
+        def get(self, robj, r, vtag = None) :
+                params = {'r' : r}
+                if vtag != None:
+                        params['vtag'] = vtag
+                host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+                                                       None, params)
+                response = self.http_request('GET', host, port, url)
+                return self.parse_body(response, [200, 300, 404])
+
+        def put(self, robj, w = None, dw = None):
+                """
+                Serialize put request and deserialize response
+                """
+               # Construct the URL...
+                params = {'returnbody' : 'true', 'w' : w, 'dw' : dw}
+                host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+                                                       None, params)
+                
+                # Construct the headers...
+                headers = {'Accept' : 'text/plain, */*; q=0.5',
+                           'Content-Type' : robj.get_content_type(),
+                           'X-Riak-ClientId' : self._client_id}
+                
+                # Add the vclock if it exists...
+                if (robj.vclock() != None):
+                        headers['X-Riak-Vclock'] = robj.vclock()
+                        
+                # Create the header from metadata
+                links = robj.get_links()
+                if links != []:
+                        headers['Link'] = ''
+                        for link in links:
+                                if headers['Link'] != '': headers['Link'] += ', '
+                                headers['Link'] += self.to_link_header(link)
+
+                content = robj.get_encoded_data()
+
+                # Run the operation.
+                response = self.http_request('PUT', host, port, url, headers, content)
+                return self.parse_body(response, [200, 300])
+
+        def delete(self, robj, rw):
+                # Construct the URL...
+                params = {'rw' : rw}
+                host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+                                                       None, params)
+                # Run the operation..
+                response = self.http_request('DELETE', host, port, url)
+                self.check_http_code(response, [204, 404])
+                return self
+
+
+        def get_bucket_props(self, bucket):
+                # Run the request...
+                params = {'props' : 'True', 'keys' : 'False'}
+                host, port, url = self.build_rest_path(bucket, None, None, params)
+                response = self.http_request('GET', host, port, url)
+                
+                headers = response[0]
+                encoded_props = response[1]
+                if (headers['http_code'] == 200):
+                        props = json.loads(encoded_props)
+                        return props['props']
+                else:
+                        raise Exception('Error getting bucket properties.')
+
+
+        def set_bucket_props(self, bucket, props):
+                """
+                Set the properties on the bucket object given
+                """
+                host, port, url = self.build_rest_path(bucket)
+                headers = {'Content-Type' : 'application/json'}
+                content = json.dumps({'props' : props})
+	
+                #Run the request...
+                response = self.http_request('PUT', host, port, url, headers, content)
+
+                # Handle the response...
+                if (response == None):
+                        raise Exception('Error setting bucket properties.')
+        
+                # Check the response value...
+                status = response[0]['http_code']
+                if (status != 204):
+                        raise Exception('Error setting bucket properties.')
+
+    
+        def check_http_code(self, response, expected_statuses):
+                status = response[0]['http_code']
+                if (not status in expected_statuses):
+                        m = 'Expected status ' + str(expected_statuses) + ', received ' + str(status)
+                        raise Exception(m)
+                
+        def parse_body(self, response, expected_statuses):
+                """
+                Given the output of RiakUtils.http_request and a list of
+                statuses, populate the object. Only for use by the Riak client
+                library.
+                @return self		
+                """
+                # If no response given, then return.
+                if (response == None):
+                        return self
+
+                # Make sure expected code came back
+                self.check_http_code(response, expected_statuses)
+
+                # Update the object...
+                headers = response[0]
+                data = response[1]
+                status = headers['http_code']
+          
+                # Check if the server is down(status==0)
+                if (status == 0):
+                        m = 'Could not contact Riak Server: http://' + self._client._host + ':' + str(self._client._port) + '!'
+                        raise RiakError(m)
+
+                # Verify that we got one of the expected statuses. Otherwise, raise an exception.
+                if (not status in expected_statuses):
+                        m = 'Expected status ' + str(expected_statuses) + ', received ' + str(status)
+                        raise RiakError(m)
+
+                # If 404(Not Found), then clear the object.
+                if (status == 404):
+                        return None
+
+                # If 300(Siblings), then return the list of siblings
+                elif (status == 300):
+                        # Parse and get rid of 'Siblings:' string in element 0
+                        siblings = data.strip().split('\n')
+                        siblings.pop(0)
+                        return siblings
+                      
+                # Parse the headers...
+                vclock = None
+                metadata = {}
+                links = []
+                for header, value in headers.iteritems():
+                        if header == 'content-type':
+                                metadata[MD_CTYPE] = value
+                        elif header == 'charset':
+                                metadata[MD_CHARSET] = value
+                        elif header == 'content-encoding':
+                                metadata[MD_CTYPE] = value
+                        elif header == 'etag':
+                                metadata[MD_VTAG] = value
+                        elif header =='link':
+                                self.parse_links(links, headers['link'])
+                        elif header == 'last-modified':
+                                metadata[MD_LASTMOD] = value
+                        elif header.startswith('x-riak-meta-'):
+                                metadata[MD_USERMETA][header] = value
+                        elif header == 'x-riak-vclock':
+                                vclock = value
+                if links != []:
+                        metadata[MD_LINKS] = links
+
+                return (vclock, [(metadata, data)])
+
+        def to_link_header(self, link):
+                """
+                Convert this RiakLink object to a link header string. Used internally.
+                """
+                header = ''
+                header += '</'
+                header += client._prefix + '/'
+                header += urllib.quote_plus(link.get_bucket()) + '/'
+                header += urllib.quote_plus(link.get_key()) + '>; riaktag="'
+                header += urllib.quote_plus(link.get_tag()) + '"'
+                return link
+
+        def parse_links(self, links, linkHeaders) :
+                """
+                Private.
+                @return self		
+                """
+                for linkHeader in linkHeaders.strip().split(','):
+                        linkHeader = linkHeader.strip()
+                        matches = re.match("\<\/([^\/]+)\/([^\/]+)\/([^\/]+)\>; ?riaktag=\"([^\']+)\"", linkHeader)
+                        if (matches != None):
+                                link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
+                                links.append(link)
+                return self
+
+
+        """
+        Utility functions used by Riak library.
+        @package RiakUtils	
+        """
         @classmethod
-        def build_rest_path(self, client, bucket, key=None, spec=None, params=None) :
+        def get_value(self, key, array, defaultValue) :
+                if (key in array):
+                        return array[key]
+                else:
+                        return defaultValue
+		
+        def build_rest_path(self, bucket, key=None, spec=None, params=None) :
                 """
                 Given a RiakClient, RiakBucket, Key, LinkSpec, and Params,
                 construct and return a URL.		
                 """
                 # Build 'http://hostname:port/prefix/bucket'
                 path = ''
-		path += '/' + client._prefix
+		path += '/' + self._prefix
 		path += '/' + urllib.quote_plus(bucket._name)
 
                 # Add '.../key'
@@ -1240,7 +1551,7 @@ class RiakUtils :
                         path += '?' + s
 
                 # Return.
-                return client._host, client._port, path
+                return self._host, self._port, path
 
         @classmethod
         def http_request(self, method, host, port, url, headers = {}, obj = '') :
@@ -1354,4 +1665,4 @@ class RiakUtils :
                         else:
                                 retVal[key] = value
                 return retVal
-                        
+        

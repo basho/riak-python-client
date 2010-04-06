@@ -86,24 +86,46 @@ def test_siblings():
 	bucket.set_allow_multiples(True)
 	obj = bucket.get('foo')
 	obj.delete()
-	# Store the same object multiple times...
+
+
+        obj.reload()
+	assert(not obj.exists())
+	assert(obj.get_data() == None)       
+
+        # Store the same object five times...
+        vals = set()
 	for i in range(5):
-		client = riak.RiakClient(HOST, PORT)
-		bucket = client.bucket('multiBucket')
-		obj = bucket.new('foo', randint())
-		obj.store()
-	# Make sure the object has 5 siblings...
-	assert(obj.has_siblings())
+		other_client = riak.RiakClient(HOST, PORT)
+		other_bucket = other_client.bucket('multiBucket')
+                while True:
+                        randval = randint()
+                        if randval not in vals:
+                                break
+                        
+		other_obj = other_bucket.new('foo', randval)
+		other_obj.store()
+                vals.add(randval)
+
+	# Make sure the object has itself plus four siblings...
+        obj.reload()
+  	assert(obj.has_siblings())
+
 	assert(obj.get_sibling_count() == 5)
-	# Test get_sibling()/get_siblings()...
-	siblings = obj.get_siblings()
-	obj3 = obj.get_sibling(3)
-	assert(siblings[3].get_data() == obj3.get_data())
+
+        # Get each of the values - make sure they match what was assigned
+        vals2 = set()
+        for i in range(5):
+                vals2.add(obj.get_sibling(i).get_data())
+        assert(vals == vals2)
+        
 	# Resolve the conflict, and then do a get...
 	obj3 = obj.get_sibling(3)
 	obj3.store()
+
 	obj.reload()
+	assert(obj.get_sibling_count() == 0)
 	assert(obj.get_data() == obj3.get_data())
+
 	# Clean up for next test...
 	obj.delete()
 
@@ -288,13 +310,13 @@ test(test_missing_object)
 test(test_delete)
 test(test_set_bucket_properties)
 test(test_siblings)
-test(test_javascript_source_map)
-test(testJavascriptNamedMap)
-test(test_javascript_source_mapReduce)
-test(test_javascript_named_map_reduce)
-test(test_javascript_arg_map_reduce)
-test(test_erlang_map_reduce)
-test(test_map_reduce_from_object)
-test(test_store_and_get_links)
-test(test_link_walking)
+# test(test_javascript_source_map)
+# test(testJavascriptNamedMap)
+# test(test_javascript_source_mapReduce)
+# test(test_javascript_named_map_reduce)
+# test(test_javascript_arg_map_reduce)
+# test(test_erlang_map_reduce)
+# test(test_map_reduce_from_object)
+# test(test_store_and_get_links)
+# test(test_link_walking)
 test_summary()
