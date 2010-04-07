@@ -373,20 +373,9 @@ class RiakMapReduce:
                         if phase._keep: keep_flag = True
                         query.append(phase.to_array())
 
-                # Construct the job, optionally set the timeout...
-                job = {'inputs':self._inputs, 'query':query}
-                if timeout != None:
-                        job['timeout'] = timeout
+                t = self._client.get_transport()
+                result = t.mapred(self._inputs, query)
 
-                content = json.dumps(job)
-
-                # Do the request...
-                host = self._client._host
-                port = self._client._port
-                url = "/" + self._client._mapred_prefix
-                response = RiakUtils.http_request('POST', host, port, url, {}, content)
-                result = json.loads(response[1])
-                
                 # If the last phase is NOT a link phase, then return the result.
                 lastIsLink = isinstance(self._phases[-1], RiakLinkPhase)
                 if not lastIsLink:
@@ -910,7 +899,7 @@ class RiakObject :
                 array
                 @return dict
                 """
-                return self._data
+                return self._metadata
         
         def set_metadata(self, metadata):
                 """
@@ -960,7 +949,8 @@ class RiakObject :
                         newlink = RiakLink(obj._bucket._name, obj._key, tag)
                         
                 self.remove_link(newlink)
-                self._links.append(newlink)
+                links = self._metadata[MD_LINKS]
+                links.append(newlink)
                 return self
                 
         def remove_link(self, obj, tag=None):
@@ -979,11 +969,12 @@ class RiakObject :
                         oldlink = RiakLink(obj._bucket._name, obj._key, tag)
                         
                 a = []
-                for link in self._links:
+                links = self._metadata[MD_LINKS] if MD_LINKS in self._metadata else []
+                for link in links:
                         if not link.isEqual(oldlink):
                                 a.append(link)
 
-                self._links = a
+                self._metadata[MD_LINKS] = a
                 return self
 
         def get_links(self):
@@ -992,9 +983,13 @@ class RiakObject :
                 @return array()		
                 """
                 # Set the clients before returning...
-                for link in self._links:
-                        link._client = self._client
-                return self._links
+                if MD_LINKS in self._metadata:
+                        links = self._metadata[MD_LINKS]
+                        for link in links:
+                                link._client = self._client
+                        return links
+                else:
+                        return []
                         
         def store(self, w=None, dw=None):
                 """
@@ -1294,7 +1289,7 @@ class RiakTransport :
                 """
                 raise RiakError("not implemented")
         
-        def mapred(self, inputs, query) :
+        def mapred(self, inputs, query, timeout = None) :
                 """
                 Serialize map/reduce request
                 """
@@ -1418,7 +1413,23 @@ class RiakHttpTransport(RiakTransport) :
                 if (status != 204):
                         raise Exception('Error setting bucket properties.')
 
-    
+        def mapred(self, inputs, query, timeout=None):
+                # Construct the job, optionally set the timeout...
+                job = {'inputs':inputs, 'query':query}
+                if timeout != None:
+                        job['timeout'] = timeout
+
+                content = json.dumps(job)
+
+                # Do the request...
+                host = self._host
+                port = self._port
+                url = "/" + self._mapred_prefix
+                response = self.http_request('POST', host, port, url, {}, content)
+                result = json.loads(response[1])
+                return result
+                
+
         def check_http_code(self, response, expected_statuses):
                 status = response[0]['http_code']
                 if (not status in expected_statuses):
@@ -1497,11 +1508,11 @@ class RiakHttpTransport(RiakTransport) :
                 """
                 header = ''
                 header += '</'
-                header += client._prefix + '/'
+                header += self._prefix + '/'
                 header += urllib.quote_plus(link.get_bucket()) + '/'
                 header += urllib.quote_plus(link.get_key()) + '>; riaktag="'
                 header += urllib.quote_plus(link.get_tag()) + '"'
-                return link
+                return header
 
         def parse_links(self, links, linkHeaders) :
                 """
