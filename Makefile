@@ -1,5 +1,9 @@
 foo:
-	@echo 'Usage: make {docs|test}'
+	@echo 'Usage: make {pb|docs|test}'
+
+pb:
+	test -f riakclient.proto || ln -s ../../apps/riak_kv/src/riakclient.proto
+	protoc --python_out=. riakclient.proto
 
 docs:
 	mkdir -p docs

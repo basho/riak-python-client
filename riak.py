@@ -22,6 +22,9 @@ under the License.
 import sys, random, logging, base64, urllib, re
 from cStringIO import StringIO
 import types
+import riakclient_pb2
+import socket, struct, copy
+
 
 # Use pycurl as first choice, httplib as second choice.
 try:
@@ -82,16 +85,21 @@ class RiakClient:
         Riak. The Riak API uses HTTP, so there is no persistent
         connection, and the RiakClient object is extremely lightweight.
         """
-        def __init__(self, host='127.0.0.1', port=8098, **kwargs):
-                # , prefix='riak', mapred_prefix='mapred'
+        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', mapred_prefix='mapred',
+                     transport=None):
                 """
                 Construct a new RiakClient object.
                 @param string host - Hostname or IP address (default '127.0.0.1')
                 @param int port - Port number (default 8098)
                 @param string prefix - Interface prefix (default 'riak')
                 @param string mapred_prefix - MapReduce prefix (default 'mapred')
+                @param RiakTranposrt transport - transport class to use
                 """
-                self._transport = RiakHttpTransport(**kwargs)
+                if transport == None:
+                        self._transport = RiakHttpTransport(host, port, prefix, mapred_prefix)
+                else:
+                        self._transport = transport
+
                 self._r = 2
                 self._w = 2
                 self._dw = 0
@@ -769,7 +777,7 @@ class RiakBucket :
                 Retrieve the 'allow multiples' setting.
                 @return Boolean
                 """
-                return self.get_property('allow_mult') == True
+                return self.get_bool_property('allow_mult')
 
         def set_property(self, key, value):
                 """
@@ -779,6 +787,17 @@ class RiakBucket :
                 @param mixed value - Property value.                                                         
                 """
                 return self.set_properties({key : value})
+
+        def get_bool_property(self, key):
+                """
+                Get a boolean bucket property.  Converts to a True/False value
+                @param string key - Property to set.
+                """
+                prop = self.get_property(key)
+                if prop == True or prop > 0:
+                        return True
+                else:
+                        return False
 
         def get_property(self, key):
                 """
@@ -991,7 +1010,7 @@ class RiakObject :
                 else:
                         return []
                         
-        def store(self, w=None, dw=None):
+        def store(self, w=None, dw=None, return_body=True):
                 """
                 Store the object in Riak. When this operation completes, the
                 object could contain new metadata and possibly new data if Riak
@@ -1001,6 +1020,7 @@ class RiakObject :
                 before returning to client.
                 @param integer dw - DW-value, wait for this many partitions to
                 confirm the write before returning to client.
+                @param bool return_body - if the newly stored object should be retrieved
                 @return self		
                 """
                 # Use defaults if not specified...
@@ -1009,7 +1029,7 @@ class RiakObject :
                 
                 # Issue the get over our transport
                 t = self._client.get_transport()
-                Result = t.put(self, w, dw)
+                Result = t.put(self, w, dw, return_body)
                 if Result != None:
                         self.populate(Result)
 
@@ -1086,20 +1106,24 @@ class RiakObject :
                         self.set_siblings(Result)
                 elif type(Result) == types.TupleType:
                         (vclock, contents) = Result
-                        (metadata, data) = contents.pop(0)
                         self._vclock = vclock
-                        self._exists = True
-                        self.set_metadata(metadata)
-                        self.set_encoded_data(data)
-                        # Create objects for all siblings
-                        siblings = [self]
-                        for (metadata, data) in contents:
-                                sibling = copy.copy(self)
-                                sibling.set_metadata(metadata)
-                                sibling.set_data(data)
-                        for sibling in siblings:
-                                sibling.set_siblings(siblings)
-
+                        if len(contents) > 0:
+                                (metadata, data) = contents.pop(0)
+                                self._exists = True
+                                self.set_metadata(metadata)
+                                self.set_encoded_data(data)
+                                # Create objects for all siblings
+                                siblings = [self]
+                                for (metadata, data) in contents:
+                                        sibling = copy.copy(self)
+                                        sibling.set_metadata(metadata)
+                                        sibling.set_encoded_data(data)
+                                        siblings.append(sibling)
+                                for sibling in siblings:
+                                        sibling.set_siblings(siblings)
+                else:
+                        raise RiakError("do not know how to handle type " + str(type(Result)))
+                       
         def populate_links(self, linkHeaders) :
                 """
                 Private.
@@ -1145,7 +1169,10 @@ class RiakObject :
                         vtag = self._siblings[i]
                         obj = RiakObject(self._client, self._bucket, self._key)
                         obj.reload(r, vtag)
+                        
+                        # And make sure it knows who it's siblings are
                         self._siblings[i] = obj
+                        obj.set_siblings(self._siblings)
                         return obj
 
         def get_siblings(self, r=None):
@@ -1258,7 +1285,7 @@ class RiakTransport :
                 """
                 raise RiakError("not implemented")
         
-        def put(self, robj, w = None, dw = None):
+        def put(self, robj, w = None, dw = None, return_body = True):
                 """
                 Serialize put request and deserialize response - if 'content'
                 is true, retrieve the updated metadata/content
@@ -1316,6 +1343,9 @@ class RiakHttpTransport(RiakTransport) :
                 self._client_id = 'php_' + base64.b64encode(str(random.randint(1, 1073741824)))
                 return None
 
+        def __copy__(self):
+                return RiakHttpTransport(self._host, self._port, self._prefix, self._mapred_prefix)
+
         """
         Check server is alive over HTTP
         """
@@ -1335,7 +1365,7 @@ class RiakHttpTransport(RiakTransport) :
                 response = self.http_request('GET', host, port, url)
                 return self.parse_body(response, [200, 300, 404])
 
-        def put(self, robj, w = None, dw = None):
+        def put(self, robj, w = None, dw = None, return_body = True):
                 """
                 Serialize put request and deserialize response
                 """
@@ -1412,6 +1442,7 @@ class RiakHttpTransport(RiakTransport) :
                 status = response[0]['http_code']
                 if (status != 204):
                         raise Exception('Error setting bucket properties.')
+                return True
 
         def mapred(self, inputs, query, timeout=None):
                 # Construct the job, optionally set the timeout...
@@ -1677,3 +1708,441 @@ class RiakHttpTransport(RiakTransport) :
                                 retVal[key] = value
                 return retVal
         
+
+## Protocol codes
+MSG_CODE_ERROR_RESP = 0
+MSG_CODE_HELLO_REQ  = 1
+MSG_CODE_HELLO_RESP = 2
+MSG_CODE_PING_REQ   = 3
+MSG_CODE_PING_RESP  = 4
+MSG_CODE_GET_REQ    = 5
+MSG_CODE_GET_RESP   = 6
+MSG_CODE_PUT_REQ    = 7
+MSG_CODE_PUT_RESP   = 8
+MSG_CODE_DEL_REQ    = 9
+MSG_CODE_DEL_RESP   = 10
+MSG_CODE_GET_BUCKET_PROPS_REQ = 11
+MSG_CODE_GET_BUCKET_PROPS_RESP = 12
+MSG_CODE_SET_BUCKET_PROPS_REQ = 13
+MSG_CODE_SET_BUCKET_PROPS_RESP = 14
+MSG_CODE_LIST_BUCKETS_REQ = 15
+MSG_CODE_LIST_BUCKETS_RESP = 16
+MSG_CODE_LIST_KEYS_REQ = 17
+MSG_CODE_LIST_KEYS_RESP = 18
+MSG_CODE_MAPRED_REQ = 19
+MSG_CODE_MAPRED_RESP = 20
+        
+## RpbTerm types
+RPB_TERM_INT = 1
+RPB_TERM_BOOL = 2
+RPB_TERM_STRING = 3
+RPB_TERM_OBJECT = 5
+RPB_TERM_ARRAY = 6
+
+class RiakPbcTransport :
+        """
+        The RiakPbcTransport object holds a connection to the protocol buffers interface
+        on the riak server.
+        """
+        def __init__(self, host='127.0.0.1', port=8087):
+                """
+                Construct a new RiakPbcTransport object.
+                @param string host - Hostname or IP address (default '127.0.0.1')
+                @param int port - Port number (default 8087)
+                """
+                self._host = host
+                self._port = port
+                self._sock = None
+                self._hello = None
+                return None
+
+        def __copy__(self):
+                return RiakPbcTransport(self._host, self._port)
+
+        def ping(self):
+                """
+                Ping the remote server
+                @return boolean
+                """
+                self.maybe_connect()
+                self.send_msg_code(MSG_CODE_PING_REQ)
+                msg_code, msg = self.recv_msg()
+                if msg_code == MSG_CODE_PING_RESP:
+                        return 1
+                else:
+                        return 0
+
+        def get(self, robj, r = None, vtag = None):
+                """
+                Serialize get request and deserialize response
+                """
+                if vtag != None:
+                        raise RiakError("PB transport does not support vtags")
+
+                bucket = robj.get_bucket()
+
+                req = riakclient_pb2.RpbGetReq()
+                req.options.r = r
+ 
+                req.bucket = bucket.get_name()
+                req.key = robj.get_key()
+
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_GET_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code == MSG_CODE_GET_RESP:
+                        contents = []
+                        for c in resp.content:
+                                contents.append(self.decode_content(c))
+                        return (resp.vclock, contents)
+                else:
+                        return 0
+                
+                return 0
+
+        def put(self, robj, w = None, dw = None, return_body = True):
+                """
+                Serialize get request and deserialize response
+                """
+                bucket = robj.get_bucket()
+
+                req = riakclient_pb2.RpbPutReq()
+                req.options.w = w
+                req.options.dw = dw
+                if return_body == True:
+                        req.options.return_body = 1
+ 
+                req.bucket = bucket.get_name()
+                req.key = robj.get_key()
+                vclock = robj.vclock()
+                if vclock != None:
+                        req.vclock = vclock
+
+                self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content) 
+
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_PUT_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code != MSG_CODE_PUT_RESP:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code) 
+                if resp != None:
+                        contents = []
+                        for c in resp.contents:
+                                contents.append(self.decode_content(c))
+                        return (resp.vclock, contents)
+                else:
+                        return None
+
+        def delete(self, robj, rw = None):
+                """
+                Serialize get request and deserialize response
+                """
+                bucket = robj.get_bucket()
+
+                req = riakclient_pb2.RpbDelReq()
+                req.options.rw = rw
+ 
+                req.bucket = bucket.get_name()
+                req.key = robj.get_key()
+
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_DEL_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code != MSG_CODE_DEL_RESP:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code) 
+                return self
+                
+        def get_bucket_props(self, bucket) :
+                req = riakclient_pb2.RpbGetBucketPropsReq()
+                req.bucket = bucket.get_name()
+                
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_GET_BUCKET_PROPS_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code == MSG_CODE_GET_BUCKET_PROPS_RESP:
+                        return self.pyify_rpbterm(resp.properties)
+                else:
+                        raise RiakError('Error getting bucket properties.')
+                
+        def set_bucket_props(self, bucket, props) :
+                req = riakclient_pb2.RpbSetBucketPropsReq()
+                req.bucket = bucket.get_name()
+                self.pbify_rpbterm(props, req.properties)
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_SET_BUCKET_PROPS_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code == MSG_CODE_SET_BUCKET_PROPS_RESP:
+                        return True
+                else:
+                        raise Exception('Error setting bucket properties.')
+
+                
+        def mapred(self, inputs, query, timeout=None) :
+                req = riakclient_pb2.RpbMapRedReq()
+
+                # inputs is either a bucket name or a list of bucket/keys
+                if type(inputs) != types.ListType:
+                        req.input_bucket = inputs
+                else:
+                        for i in inputs:# list of RiakObjects
+                                pb_i = req.input_keys.add()
+                                self.pbify_mapred_input(i, pb_i)
+
+                for p in query: # list of mapred phases
+                        pb_p = req.phases.add()
+                        self.pbify_mapred_phase(p, pb_p)
+                self.send_msg(MSG_CODE_MAPRED_REQ, req)
+                
+                result = []
+                while True:
+                        msg_code, resp = self.recv_msg()
+                        if msg_code == MSG_CODE_MAPRED_RESP:
+                                # Combine the incoming data with the current result
+                                if resp.HasField("data"):
+                                        result.append(self.pyify_rpbterm(resp.data))
+                                if resp.HasField("done") and resp.done == True:
+                                        break
+                        else:
+                                return Exception("unexpected message")
+
+                return result[-1]
+                        
+
+        def maybe_connect(self):
+                if self._sock is None:
+                        self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        s.connect((self._host, self._port))
+                        req = riakclient_pb2.RpbHelloReq()
+                        req.proto_major = 1
+                        self.send_msg(MSG_CODE_HELLO_REQ, req)
+                        msg_code, hello = self.recv_msg()
+                        self._hello = hello
+                return None
+
+        def send_msg_code(self, msg_code):
+                pkt = struct.pack("!iB", 1, msg_code)
+                self._sock.send(pkt)
+                return None
+
+        def encode_msg(self, msg_code, msg):
+                str = msg.SerializeToString()
+                slen = len(str)
+                hdr = struct.pack("!iB", 1 + slen, msg_code)
+                return hdr + str
+
+        def send_msg(self, msg_code, msg):
+                pkt = self.encode_msg(msg_code, msg)
+                self._sock.send(pkt)
+                return None
+
+        def recv_msg(self):
+                self.recv_pkt()
+                msg_code, = struct.unpack("B", self._inbuf[:1])
+                if msg_code == MSG_CODE_ERROR_RESP:
+                        msg = riakclient_pb2.RpbErrorResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                        raise Exception(msg.errmsg)
+                elif msg_code == MSG_CODE_HELLO_RESP:
+                        msg = riakclient_pb2.RpbHelloResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                elif msg_code == MSG_CODE_PING_RESP:
+                        msg = None
+                elif msg_code == MSG_CODE_GET_RESP:
+                        msg = riakclient_pb2.RpbGetResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                elif msg_code == MSG_CODE_PUT_RESP:
+                        msg = riakclient_pb2.RpbPutResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                elif msg_code == MSG_CODE_DEL_RESP:
+                        msg = None
+                elif msg_code == MSG_CODE_GET_BUCKET_PROPS_RESP:
+                        msg = riakclient_pb2.RpbGetBucketPropsResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                elif msg_code == MSG_CODE_SET_BUCKET_PROPS_RESP:
+                        msg = None
+                elif msg_code == MSG_CODE_MAPRED_RESP:
+                        msg = riakclient_pb2.RpbMapRedResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                else:
+                        raise Exception("unknown msg code {0}".format(msg_code))
+                return msg_code, msg
+               
+
+        def recv_pkt(self):
+                # read 32-
+                nmsglen = self._sock.recv(4)
+                msglen, = struct.unpack('!i', nmsglen)
+                self._inbuf_len = msglen
+                self._inbuf = ''
+                while len(self._inbuf) < msglen:
+                        recv_len = min(8192, msglen - len(self._inbuf))
+                        self._inbuf += self._sock.recv(recv_len)
+                return None
+                        
+        def decode_contents(self, rpb_contents):
+                contents = []
+                for rpb_c in rpb_contents:
+                        contents.append(self.decode_content(rpb_c))
+                return contents
+        
+        def decode_content(self, rpb_content):
+                if rpb_content.HasField("metadata"):
+                        metadata = self.pyify_rpbterm(rpb_content.metadata)
+                else:   
+                        metadata = {}
+
+                if rpb_content.HasField("content_type"):
+                        metadata[MD_CTYPE] = rpb_content.content_type
+                if rpb_content.HasField("charset"):
+                        metadata[MD_CHARSET] = rpb_content.charset
+                if rpb_content.HasField("content_encoding"):
+                        metadata[MD_ENCODING] = rpb_content.content_encoding
+                if rpb_content.HasField("vtag"):
+                        metadata[MD_VTAG] = rpb_content.vtag
+                links = []
+                for link in rpb_content.links:
+                        links.append(RiakLink(link.bucket if link.HasField("bucket") else None, 
+                                              link.key if link.HasField("key") else None, 
+                                              link.tag if link.HasField("tag") else None))
+                if links != []:
+                        metadata[MD_LINKS] = links
+                if rpb_content.HasField("last_mod"):
+                        metadata[MD_LASTMOD] = rpb_content.last_mod
+                if rpb_content.HasField("last_mod_usecs"):
+                        metadata[MD_LASTMOD_USECS] = rpb_content.last_mod_usecs
+                usermeta = {}
+                for usermd in rpb_content.usermeta:
+                        usermeta[usermd.key] = usermd.value
+                if len(usermeta) > 0:
+                        metadata[MD_USERMETA] = usermeta
+                return (metadata, rpb_content.value)
+        
+        def pbify_content(self, metadata, data, rpb_content) :
+                pbmetadata = {}
+                # Convert the broken out fields, building up
+                # pbmetadata for any unknown ones
+                for k,v in metadata.iteritems():
+                        if k == MD_CTYPE:
+                                rpb_content.content_type = v
+                        elif k == MD_CHARSET:
+                                rpb_content.charset = v
+                        elif k == MD_ENCODING:
+                                rpb_content.charset = v
+                        elif k == MD_USERMETA:
+                                for uk, uv in v:
+                                        pair = rpb_content.usermeta.add()
+                                        pair.key = uk
+                                        pair.value = uv
+                        elif k == MD_LINKS:
+                                for link in v:
+                                        pb_link = rpb_content.links.add()
+                                        pb_link.bucket = link.get_bucket()
+                                        pb_link.key = link.get_key()
+                                        pb_link.tag = link.get_tag()
+                        elif k != MD_VTAG and \
+                             k != MD_LASTMOD and \
+                             k != MD_LASTMOD_USECS:
+                                # Encode any unknown metadata for the server
+                                pbmetadata[k] = v
+                                
+                # Add any unknown fields as an rpbterm
+                if (len(pbmetadata) > 0):
+                        self.pbify_rpbterm(pbmetadata, rpb_content.metadata)
+                
+                rpb_content.value = data
+                
+        def pbify_mapred_input(self, i, pb_i) :
+                [bucket, key, data] = i
+                pb_i.bucket = bucket
+                pb_i.key = key
+                if data != None:
+                        self.pbify_rpbterm(data, pb_i.data)
+                return None
+
+        def pbify_mapred_phase(self, p, pb_p) :
+                if 'link' in p:
+                        v = p['link']
+                        pb_p.type = 'link'
+                        pb_p.bucket = v['bucket']
+                        pb_p.tag = v['tag']
+                        pb_p.keep = v['keep']
+                else:
+                        if 'map' in p:
+                                v = p['map']
+                                pb_p.type = 'map'
+                        elif 'reduce' in p:
+                                v = p['reduce']
+                                pb_p.type = 'reduce'
+                        else:
+                                raise Exception("unknown phase type")
+
+                        if 'language' in v:
+                                pb_p.language = v['language']
+                        if 'source' in v:
+                                pb_p.source = v['source']
+                        if 'bucket' in v:
+                                pb_p.bucket = v['bucket']
+                        if 'key' in v:
+                                pb_p.key = v['key']
+                        if 'module' in v:
+                                pb_p.module = v['module']
+                        if 'function' in v:
+                                pb_p.function = v['function']
+                        if 'name' in v:
+                                pb_p.function = v['name'] # use function for both types of names
+                        if 'keep' in v:
+                                pb_p.keep = v['keep']
+                        if 'tag' in v:
+                                pb_p.tag = v['tag']
+                        if 'arg' in v and v['arg'] != None:
+                                pb_p.arg = self.pbify_rpbterm(v['arg'])
+
+                return None
+
+        def pyify_rpbterm(self, rpb_term) :
+                """
+                Convert RpbTerm to python built in types
+                """
+                if rpb_term.type == RPB_TERM_INT:
+                        return rpb_term.int_value
+                if rpb_term.type == RPB_TERM_BOOL:
+                        return True if rpb_term.int_value > 0 else False
+                elif rpb_term.type == RPB_TERM_STRING:
+                        return rpb_term.string_value
+                elif rpb_term.type == RPB_TERM_OBJECT:
+                        d = {}
+                        for oe in rpb_term.object_entries:
+                                d[oe.name] = self.pyify_rpbterm(oe.value)
+                        return d
+                elif rpb_term.type == RPB_TERM_ARRAY:
+                        a = []
+                        for ae in rpb_term.array_values:
+                                a.append(self.pyify_rpbterm(ae))
+                        return a
+                else:
+                        raise Exception("Unknown rpb term type: {0}".format(rpb_term.type))
+                
+                
+        def pbify_rpbterm(self, py_term, rpb_term) :
+                py_type = type(py_term)
+                if py_type == types.IntType or py_type == types.LongType:
+                        rpb_term.type = RPB_TERM_INT
+                        rpb_term.int_value = py_term
+                elif py_type == types.BooleanType:
+                        rpb_term.type = RPB_TERM_BOOL
+                        rpb_term.int_value = 1 if py_term == True else 0
+                elif py_type == types.DictType:
+                        rpb_term.type = RPB_TERM_OBJECT
+                        for k, v in py_term.iteritems():
+                                oe = rpb_term.object_entries.add()
+                                oe.name = str(k)
+                                self.pbify_rpbterm(v, oe.value)
+                elif py_type == types.ListType:
+                        rpb_term.type = RPB_TERM_ARRAY
+                        for v in py_term.iteritems():
+                                av = rpb_term.array_values.add()
+                                self.pbify_rpbterm(v, av)
+                else:
+                        rpb_term.type = RPB_TERM_STRING
+                        rpb_term.string_value = str(py_term)
+                return rpb_term
