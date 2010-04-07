@@ -231,8 +231,8 @@ def test_erlang_map_reduce():
             .add("bucket", "foo") \
             .add("bucket", "bar") \
             .add("bucket", "baz") \
-            .map(["riak_mapreduce", "map_object_value"]) \
-            .reduce(["riak_mapreduce", "reduce_set_union"]) \
+            .map(["riak_kv_mapreduce", "map_object_value"]) \
+            .reduce(["riak_kv_mapreduce", "reduce_set_union"]) \
             .run()
 	assert(len(result) == 2)
 
@@ -315,7 +315,7 @@ test(testJavascriptNamedMap)
 test(test_javascript_source_mapReduce)
 test(test_javascript_named_map_reduce)
 test(test_javascript_arg_map_reduce)
-# #test(test_erlang_map_reduce)
+test(test_erlang_map_reduce)
 test(test_map_reduce_from_object)
 test(test_store_and_get_links)
 test(test_link_walking)
