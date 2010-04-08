@@ -1,0 +1,37 @@
+                        Python Client for Riak
+                        ======================
+
+
+This is the Python client for Riak.
+
+Table of Contents
+=================
+1 Documentation 
+2 Repositories 
+
+
+1 Documentation 
+~~~~~~~~~~~~~~~~
+
+  Documentation for the Python library can be found in the docs
+  subdirectory here.
+
+  Documentation for use of Riak clients in general can be found at
+
+  [https://wiki.basho.com/display/RIAK/Client+Libraries]
+
+2 Repositories 
+~~~~~~~~~~~~~~~
+
+  The official source code for this client can be retrieved from
+
+  [http://bitbucket.org/basho/riak-python-client]
+
+  Riak can be obtained pre-built from
+
+  [http://downloads.basho.com/riak/]
+
+  or as source from
+
+  [http://bitbucket.org/basho/riak]
+
