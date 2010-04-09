@@ -7,6 +7,8 @@ except ImportError:
         import simplejson as json
 import random
 import copy
+import cPickle
+import fractions # class that JSON module will not serialize for custom encoder/decoder tests
 
 HOST = 'localhost'
 HTTP_PORT = 8098
@@ -46,6 +48,41 @@ def test_binary_store_and_get(transport):
 	obj.store()
 	obj = bucket.get_binary('foo2')
 	assert(data == json.loads(obj.get_data()))
+
+
+def test_custom_bucket_encoder_decoder(transport):
+        # Teach the bucket how to pickle
+	client = riak.RiakClient(transport=transport)
+	bucket = client.bucket("picklin_bucket")
+        bucket.set_encoder('application/x-pickle', cPickle.dumps)
+        bucket.set_decoder('application/x-pickle', cPickle.loads)
+        data = {'array':[1, 2, 3], 'badforjson':fractions.Fraction(1,3)}
+	obj = bucket.new("foo", data, 'application/x-pickle').store()
+        obj.store()
+        obj2 = bucket.get("foo")
+        assert(data == obj2.get_data())
+
+def test_custom_client_encoder_decoder(transport):
+        # Teach the bucket how to pickle
+	client = riak.RiakClient(transport=transport)
+	bucket = client.bucket("picklin_client")
+        client.set_encoder('application/x-pickle', cPickle.dumps)
+        client.set_decoder('application/x-pickle', cPickle.loads)
+        data = {'array':[1, 2, 3], 'badforjson':fractions.Fraction(1,3)}
+	obj = bucket.new("foo", data, 'application/x-pickle').store()
+        obj.store()
+        obj2 = bucket.get("foo")
+        assert(data == obj2.get_data())
+
+def test_unknown_content_type_encoder_decoder(transport):
+        # Teach the bucket how to pickle
+	client = riak.RiakClient(transport=transport)
+	bucket = client.bucket("unknown_contenttype")
+        data = "some funny data"
+	obj = bucket.new("foo", data, 'application/x-frobnicator').store()
+        obj.store()
+        obj2 = bucket.get("foo")
+        assert(data == obj2.get_data())
 
 def test_missing_object(transport):
 	client = riak.RiakClient(transport=transport)
@@ -272,6 +309,8 @@ def test_link_walking(transport):
 	assert(len(results) == 3)
 	results = obj.link("bucket", "tag").run()
 	assert(len(results) == 1)
+        
+
 
 test_pass = 0
 test_fail = 0
@@ -314,6 +353,9 @@ print("Starting Unit Tests\n---\n")
 test(test_is_alive)
 test(test_store_and_get)
 test(test_binary_store_and_get)
+test(test_custom_bucket_encoder_decoder)
+test(test_custom_client_encoder_decoder)
+test(test_unknown_content_type_encoder_decoder)
 test(test_missing_object)
 test(test_delete)
 test(test_set_bucket_properties)

@@ -104,6 +104,10 @@ class RiakClient:
                 self._w = 2
                 self._dw = 0
                 self._rw = 2
+                self._encoders = {'application/json':json.dumps,
+                                  'text/json':json.dumps}
+                self._decoders = {'application/json':json.loads,
+                                  'text/json':json.loads}
                 return None
 
         def get_transport(self):
@@ -197,6 +201,38 @@ class RiakClient:
                 @return self
                 """
                 self._transport.set_client_id(client_id)
+                return self
+
+        def get_encoder(self, content_type):
+                """
+                Get the encoding function for this content type
+                """
+                if content_type in self._encoders:
+                        return self._encoders[content_type]
+                else:
+                        return None
+        def set_encoder(self, content_type, encoder):
+                """
+                Set the encoding function for this content type
+                @param function encoder 
+                """
+                self._encoders[content_type] = encoder
+                return self
+        
+        def get_decoder(self, content_type):
+                """
+                Get the decoding function for this content type
+                """
+                if content_type in self._decoders:
+                        return self._decoders[content_type]
+                else:
+                        return None
+        def set_decoder(self, content_type, decoder):
+                """
+                Set the decoding function for this content type
+                @param function decoder 
+                """
+                self._decoders[content_type] = decoder
                 return self
 
         def bucket(self, name):
@@ -599,7 +635,8 @@ class RiakBucket :
                 self._w = None
                 self._dw = None
                 self._rw = None
-                self._props = None
+                self._encoders = {}
+                self._decoders = {}
                 return None
 
         def get_name(self):
@@ -692,8 +729,42 @@ class RiakBucket :
                 """
                 self._rw = rw
                 return self
-                                                         
-        def new(self, key, data=None):
+ 
+        def get_encoder(self, content_type):
+                """
+                Get the encoding function for this content type for this bucket
+                """
+                if content_type in self._encoders:
+                        return self._encoders[content_type]
+                else:
+                        return self._client.get_encoder(content_type)
+
+        def set_encoder(self, content_type, encoder):
+                """
+                Set the encoding function for this content type for this bucket
+                @param function encoder 
+                """
+                self._encoders[content_type] = encoder
+                return self
+        
+        def get_decoder(self, content_type):
+                """
+                Get the decoding function for this content type for this bucket
+                """
+                if content_type in self._decoders:
+                        return self._decoders[content_type]
+                else:
+                        return self._client.get_decoder(content_type)
+
+        def set_decoder(self, content_type, decoder):
+                """
+                Set the decoding function for this content type for this bucket
+                @param function decoder 
+                """
+                self._decoders[content_type] = decoder
+                return self
+                                                        
+        def new(self, key, data=None, content_type='application/json'):
                 """
                 Create a new Riak object that will be stored as JSON.
                 @param string key - Name of the key.
@@ -702,22 +773,23 @@ class RiakBucket :
                 """
                 obj = RiakObject(self._client, self, key)
                 obj.set_data(data)
-                obj.set_content_type('text/json')
-                obj._jsonize = True
+                obj.set_content_type(content_type)
+                obj._encode_data = True
                 return obj
         
-        def new_binary(self, key, data, content_type='text/json'):
+        def new_binary(self, key, data, content_type='application/octet-stream'):
                 """
                 Create a new Riak object that will be stored as plain text/binary.
                 @param string key - Name of the key.
                 @param object data - The data to store.
-                @param string content_type - The content type of the object. (default 'text/json')
+                @param string content_type - The content type of the object.
+                       (default 'application/octet-stream')
                 @return RiakObject
                 """
                 obj = RiakObject(self._client, self, key)
                 obj.set_data(data)
-                obj.set_content_type('text/json')
-                obj._jsonize = False
+                obj.set_content_type(content_type)
+                obj._encode_data = False
                 return obj
 
         def get(self, key, r=None):
@@ -728,7 +800,7 @@ class RiakBucket :
                 @return RiakObject
                 """
                 obj = RiakObject(self._client, self, key)
-                obj._jsonize = True
+                obj._encode_data = True
                 r = self.get_r(r)
                 return obj.reload(r)
 
@@ -740,7 +812,7 @@ class RiakBucket :
                 @return RiakObject
                 """
                 obj = RiakObject(self._client, self, key)
-                obj._jsonize = False
+                obj._encode_data = False
                 r = self.get_r(r)
                 return obj.reload(r)
 
@@ -848,7 +920,7 @@ class RiakObject :
                 self._client = client
                 self._bucket = bucket
                 self._key = key
-                self._jsonize = True
+                self._encode_data = True
                 self._vclock = None
                 self._data = None
                 self._metadata = {}
@@ -896,17 +968,34 @@ class RiakObject :
                 """
                 Get the data encoded for storing	
                 """
-                if self._jsonize == True:
-                        return json.dumps(self._data)
+                if self._encode_data == True:
+                        content_type = self.get_content_type()
+                        encoder = self._bucket.get_encoder(content_type)
+                        if encoder == None:
+                                if isinstance(self._data, basestring):
+                                        return self._data.encode()
+                                else:
+                                        raise RiakError("No encoder for non-string data "
+                                                        "with content type ${0}".
+                                                        format(content_type))
+                        else:
+                                return encoder(self._data)
                 else:
                         return self._data
  
         def set_encoded_data(self, data):
                 """
-                Get the data encoded for storing	
+                Set the object data from an encoded string - make sure
+                the metadata has been set correctly first.
                 """
-                if self._jsonize == True:
-                        self._data = json.loads(data)
+                if self._encode_data == True:
+                        content_type = self.get_content_type()
+                        decoder = self._bucket.get_decoder(content_type)
+                        if decoder == None:
+                                # if no decoder, just set as string data for application to handle
+                                self._data = data
+                        else:
+                                self._data = decoder(data)
                 else:
                         self._data = data
                 return self
@@ -939,7 +1028,7 @@ class RiakObject :
         
         def get_content_type(self):
                 """
-                Get the content type of this object. This is either text/json, or
+                Get the content type of this object. This is either application/json, or
                 the provided content type if the object was created via new_binary(...).
                 @return string
                 """
