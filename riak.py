@@ -733,6 +733,7 @@ class RiakBucket :
         def get_encoder(self, content_type):
                 """
                 Get the encoding function for this content type for this bucket
+                @param content_type: Content type requested
                 """
                 if content_type in self._encoders:
                         return self._encoders[content_type]
@@ -742,7 +743,9 @@ class RiakBucket :
         def set_encoder(self, content_type, encoder):
                 """
                 Set the encoding function for this content type for this bucket
-                @param function encoder 
+                @param content_type: Content type for encoder
+                @param encoder: Function to encode with - will be called with data as single
+                                argument.
                 """
                 self._encoders[content_type] = encoder
                 return self
@@ -750,6 +753,7 @@ class RiakBucket :
         def get_decoder(self, content_type):
                 """
                 Get the decoding function for this content type for this bucket
+                @param content_type: Content type for decoder
                 """
                 if content_type in self._decoders:
                         return self._decoders[content_type]
@@ -759,7 +763,8 @@ class RiakBucket :
         def set_decoder(self, content_type, decoder):
                 """
                 Set the decoding function for this content type for this bucket
-                @param function decoder 
+                @param content_type: Content type for decoder
+                @param decoder: Function to decode with - will be called with string
                 """
                 self._decoders[content_type] = decoder
                 return self
