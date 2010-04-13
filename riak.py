@@ -1422,19 +1422,24 @@ class RiakHttpTransport(RiakTransport) :
         Riak. The Riak API uses HTTP, so there is no persistent
         connection, and the RiakClient object is extremely lightweight.
         """
-        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', mapred_prefix='mapred'):
+        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', mapred_prefix='mapred',
+                     client_id = None):
                 """
                 Construct a new RiakClient object.
                 @param string host - Hostname or IP address (default '127.0.0.1')
                 @param int port - Port number (default 8098)
                 @param string prefix - Interface prefix (default 'riak')
                 @param string mapred_prefix - MapReduce prefix (default 'mapred')
+                @param string client_id - client id to use for vector clocks
                 """
                 self._host = host
                 self._port = port
                 self._prefix = prefix
                 self._mapred_prefix = mapred_prefix
-                self._client_id = 'php_' + base64.b64encode(str(random.randint(1, 1073741824)))
+                if client_id == None:
+                        self._client_id = 'php_' + base64.b64encode(str(random.randint(1, 1073741824)))
+                else:
+                        self._client_id = client_id
                 return None
 
         def __copy__(self):
@@ -1838,7 +1843,7 @@ class RiakPbcTransport :
         The RiakPbcTransport object holds a connection to the protocol buffers interface
         on the riak server.
         """
-        def __init__(self, host='127.0.0.1', port=8087):
+        def __init__(self, host='127.0.0.1', port=8087, client_id=None):
                 """
                 Construct a new RiakPbcTransport object.
                 @param string host - Hostname or IP address (default '127.0.0.1')
@@ -1846,6 +1851,7 @@ class RiakPbcTransport :
                 """
                 self._host = host
                 self._port = port
+                self._client_id = client_id
                 self._sock = None
                 self._hello = None
                 return None
@@ -2008,6 +2014,8 @@ class RiakPbcTransport :
                         s.connect((self._host, self._port))
                         req = riakclient_pb2.RpbHelloReq()
                         req.proto_major = 1
+                        if self._client_id != None:
+                                req.client_id = self._client_id
                         self.send_msg(MSG_CODE_HELLO_REQ, req)
                         msg_code, hello = self.recv_msg()
                         self._hello = hello
@@ -2026,7 +2034,10 @@ class RiakPbcTransport :
 
         def send_msg(self, msg_code, msg):
                 pkt = self.encode_msg(msg_code, msg)
-                self._sock.send(pkt)
+                sent_len = self._sock.send(pkt)
+                if sent_len != len(pkt):
+                        raise RiakError("PB socket returned short write {0} - expected {1}".
+                                        format(sent_len, len(pkt)))
                 return None
 
         def recv_msg(self):
@@ -2063,14 +2074,21 @@ class RiakPbcTransport :
                
 
         def recv_pkt(self):
-                # read 32-
                 nmsglen = self._sock.recv(4)
+                if (len(nmsglen) != 4):
+                        raise RiakError("Socket returned short packet length {0} - expected 4".
+                                        format(nmsglen))
                 msglen, = struct.unpack('!i', nmsglen)
                 self._inbuf_len = msglen
                 self._inbuf = ''
                 while len(self._inbuf) < msglen:
-                        recv_len = min(8192, msglen - len(self._inbuf))
-                        self._inbuf += self._sock.recv(recv_len)
+                        want_len = min(8192, msglen - len(self._inbuf))
+                        recv_buf = self._sock.recv(want_len)
+                        if len(recv_buf) != want_len:
+                                raise RiakError("Socket returned short read {0} - expected {1}".
+                                                format(recv_len, want_len))
+                        self._inbuf += recv_buf
+                
                 return None
                         
         def decode_contents(self, rpb_contents):
