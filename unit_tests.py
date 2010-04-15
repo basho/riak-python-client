@@ -104,6 +104,8 @@ def test_delete(transport):
 	assert(not obj.exists())
 
 def test_set_bucket_properties(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket('bucket')
 	# Test setting allow mult...
@@ -118,13 +120,14 @@ def test_set_bucket_properties(transport):
 	assert(bucket.get_n_val() == 2)
 
 def test_siblings(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Set up the bucket, clear any existing object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket('multiBucket')
 	bucket.set_allow_multiples(True)
 	obj = bucket.get('foo')
 	obj.delete()
-
 
         obj.reload()
 	assert(not obj.exists())
@@ -167,6 +170,8 @@ def test_siblings(transport):
 	obj.delete()
 
 def test_javascript_source_map(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -179,6 +184,8 @@ def test_javascript_source_map(transport):
 	assert(result == [2])
 
 def testJavascriptNamedMap(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -191,6 +198,8 @@ def testJavascriptNamedMap(transport):
 	assert(result == [2])
 
 def test_javascript_source_mapReduce(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -208,6 +217,8 @@ def test_javascript_source_mapReduce(transport):
 	assert(result == 3)
 
 def test_javascript_named_map_reduce(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -225,6 +236,8 @@ def test_javascript_named_map_reduce(transport):
 	assert(result == [9])
 
 def testJavascriptBucketMapReduce(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket_" . randint())
@@ -240,6 +253,8 @@ def testJavascriptBucketMapReduce(transport):
 	assert(result == [9])
 
 def test_javascript_arg_map_reduce(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -257,6 +272,8 @@ def test_javascript_arg_map_reduce(transport):
 	assert(result == [10])
 
 def test_erlang_map_reduce(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -274,6 +291,8 @@ def test_erlang_map_reduce(transport):
 	assert(len(result) == 2)
 
 def test_map_reduce_from_object(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -283,6 +302,8 @@ def test_map_reduce_from_object(transport):
 	assert(result == [2])
 
 def test_store_and_get_links(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")
@@ -296,6 +317,8 @@ def test_store_and_get_links(transport):
 	assert(len(links) == 3)
 
 def test_link_walking(transport):
+        if isinstance(transport, riak.RiakPbcTransport):
+                return None
 	# Create the object...
 	client = riak.RiakClient(transport=transport)
 	bucket = client.bucket("bucket")

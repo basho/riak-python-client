@@ -51,61 +51,61 @@
 **   The client should be prepared to handle messages without any pbmsg
 **   (i.e. length==1) for requests like ping or a put without return_body set.
 **   
-** 
+**   RpbGetClientIdReq -> RpbGetClientIdResp
+**   RpbSetClientIdReq -> RpbSetClientIdResp
+**   RpbGetServerInfoReq -> RpbGetServerInfoResp
 **   RpbPingReq -> RpbPingResp
 **   RpbGetReq -> RpbErrorResp | RbpGetResp
 **   RpbPutReq -> RpbErrorResp | RpbPutResp
 **   RpbDelReq -> RpbErrorResp | RpbDelResp
-**   RpbGetBucketPropsReq -> RpbErrorResp | RpbGetBucketPropsResp
-**   RpbSetBucketPropsReq -> RpbErrorResp | RpbSetBucketPropsResp
 **   RpbListBucketsReq -> RpbErrorResp | RpbListBucketsResp{1,}
 **   RpbListKeysReq -> RpbErrorResp | RpbListKeysResp{1,}
-**   RpbMapRedReq -> RpbErrorResp | RpbMapRedResp{1,}
 **
 **
 ** Message Codes
 **  0 - RpbErrorResp
-**  1 - RpbHelloReq
-**  2 - RpbHelloResp
-**  3 - RpbPingReq - 0 length
-**  4 - RpbPingResp (pong) - 0 length
-**  5 - RpbGetReq 
-**  6 - RpbGetResp
-**  7 - RpbPutReq 
-**  8 - RpbPutResp - 0 length
-**  9 - RpbDelReq 
-** 10 - RpbDelResp
-** 11 - RpbGetBucketPropsReq
-** 12 - RpbGetBucketPropsResp
-** 13 - RpbSetBucketPropsReq
-** 14 - RpbSetBucketPropsResp
+**  1 - RpbPingReq - 0 length
+**  2 - RpbPingResp (pong) - 0 length
+**  3 - RpbGetClientIdReq
+**  4 - RpbGetClientIdResp
+**  5 - RpbSetClientIdReq
+**  6 - RpbSetClientIdResp
+**  7 - RpbGetServerInfoReq
+**  8 - RpbGetServerInfoResp
+**  9 - RpbGetReq 
+** 10 - RpbGetResp
+** 11 - RpbPutReq 
+** 12 - RpbPutResp - 0 length
+** 13 - RpbDelReq 
+** 14 - RpbDelResp
 ** 15 - RpbListBucketsReq
 ** 16 - RpbListBucketsResp{1,}
 ** 17 - RpbListKeysReq
 ** 18 - RpbListKeysResp{1,}
-** 19 - RpbMapRedReq
-** 20 - RpbMapRedResp{1,}
 **
 */
 
+// Error response - may be generated for any Req
 message RpbErrorResp {
     required bytes errmsg = 1;
+    required int32 errcode = 2;
 }
 
-// Hello request - a client must say hello to the server on connection
-// with the maximum protocol version supported.
-message RpbHelloReq {
-    required int32 proto_major = 1; // Set to 1 for now
-    optional bytes client_id = 2;   // Client id to use
+// Get ClientId Request - no message defined, just send RpbGetClientIdReq message code
+message RpbGetClientIdResp {
+    required bytes client_id = 1; // Client id in use for this connection
 }
 
-// Hello response from the server
-message RpbHelloResp {
-    optional int32 proto_major = 1;
-    optional int32 proto_minor = 2;
-    optional bytes node = 3;
-    optional bytes client_id = 4; 
-    optional bytes server_version = 5;
+message RpbSetClientIdReq {
+    required bytes client_id = 1; // Client id to use for this connection
+}
+// Set ClientId Request - no message defined, just send RpbSetClientIdReq message code
+
+// Get server info request - no message defined, just send RpbGetServerInfoReq message code
+
+message RpbServerInfoResp {
+    optional bytes node = 1;
+    optional bytes server_version = 2;
 }
 
 
@@ -149,30 +149,6 @@ message RpbDelReq {
 
 // Delete response - not defined, will return a RpbDelResp on success or RpbErrorResp on failure
 
-
-// Get bucket properties request
-message RpbGetBucketPropsReq {
-    required bytes bucket = 1;
-    repeated bytes names = 2; // list of property names to receive - if empty return all
-}
-
-// Get bucket properties response
-message RpbGetBucketPropsResp {
-    required RpbTerm properties = 1;
-}
-
-
-// Set bucket properties request
-message RpbSetBucketPropsReq {
-    required bytes bucket = 1;
-    required RpbTerm properties = 2; 
-    optional RpbOptions options = 3;
-}
-
-// Set bucket properties response - not defined, will return RpbSetBucketPropsResp on success
-// or RpbErrorResp on failure
-
-
 // List buckets request - no message defined, just send RpbListBucketsReq
 
 // List buckets response - one or more of these packets will be sent
@@ -199,9 +175,8 @@ message RpbListKeysResp {
 
 // Map/Reduce request
 message RpbMapRedReq {
-    optional bytes input_bucket = 1; // Input bucket
-    repeated RpbMapRedInput input_keys = 2; // *OR* input_keys - not both
-    repeated RpbMapRedPhase phases = 3; // query is reserved word in erlang
+    required bytes request = 1;
+    required bytes content_type = 2;
 }
 
 // Map/Reduce response
@@ -209,7 +184,7 @@ message RpbMapRedReq {
 // true (and may not have phase/data in it)
 message RpbMapRedResp {
     optional int32 phase = 1;
-    optional RpbTerm data = 2;
+    optional bytes response = 2;
     optional bool done = 3;
 }
 
@@ -228,15 +203,14 @@ message RpbOptions {
 // Holds the value and associated metadata
 message RpbContent {
     required bytes value = 1;
-    optional RpbTerm metadata = 2;
-    optional bytes content_type = 3;
-    optional bytes charset = 4;
-    optional bytes content_encoding = 5;
-    optional bytes vtag = 6;
-    repeated RpbLink links = 7;
-    optional int32 last_mod = 8;
-    optional int32 last_mod_usecs = 9;
-    repeated RpbPair usermeta = 10;
+    optional bytes content_type = 2;
+    optional bytes charset = 3;
+    optional bytes content_encoding = 4;
+    optional bytes vtag = 5;
+    repeated RpbLink links = 6;
+    optional int32 last_mod = 7;
+    optional int32 last_mod_usecs = 8;
+    repeated RpbPair usermeta = 9;
 }
 
 // Key/value pair - used for user metadata
@@ -251,49 +225,3 @@ message RpbLink {
     optional bytes key = 2;
     optional bytes tag = 3;
 }
-
-// Map/reduce input
-message RpbMapRedInput {
-    required bytes bucket = 1;
-    required bytes key = 2;     
-    optional RpbTerm data = 3; 
-}
-
-// Map/reduce phase
-message RpbMapRedPhase {
-    required bytes type = 1;
-    optional bytes language = 2;
-    optional bytes source = 3;
-    optional bytes bucket = 4;
-    optional bytes key = 5;
-    optional bytes module = 6;
-    optional bytes function = 7;
-    optional bool keep = 8;
-    optional bytes tag = 9;
-    optional RpbTerm arg = 10;
-}
-
-/* RpbTerms are used to hold any general data structure made up of lists, associative arrays
-** integers, booleans and strings and is used for returning bucket properties and map/reduce
-** results.
-**
-** Type values - no enums
-** 1 = integer
-** 2 = boolean (uses int_val. 0 == false, !0 == true)
-** 3 = string
-** 5 = object - JSON-like name/value pairs
-** 6 = array 
-*/
-message RpbTerm {
-    required int32 type = 1;
-    optional int32 int_value = 3;
-    optional bytes string_value = 4;
-    repeated RpbObjectEntry object_entries = 5;
-    repeated RpbTerm array_values = 6;
-}
-
-message RpbObjectEntry {
-    required bytes name = 1;
-    required RpbTerm value = 2;
-}
-
