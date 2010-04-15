@@ -103,7 +103,7 @@ message RpbSetClientIdReq {
 
 // Get server info request - no message defined, just send RpbGetServerInfoReq message code
 
-message RpbServerInfoResp {
+message RpbGetServerInfoResp {
     optional bytes node = 1;
     optional bytes server_version = 2;
 }
@@ -113,7 +113,7 @@ message RpbServerInfoResp {
 message RpbGetReq {
     required bytes bucket = 1;
     required bytes key = 2;
-    optional RpbOptions options = 3;
+    optional int32 r = 3;
 }
 
 // Get Response - if the record was not found there will be no content/vclock
@@ -130,7 +130,9 @@ message RpbPutReq {
     required bytes key = 2;
     optional bytes vclock = 3;
     required RpbContent content = 4;
-    optional RpbOptions options = 5;
+    optional int32 w = 5;
+    optional int32 dw = 6;
+    optional bool return_body = 7;
 }
 
 // Put response - same as get response
@@ -144,7 +146,7 @@ message RpbPutResp {
 message RpbDelReq {
     required bytes bucket = 1;
     required bytes key = 2;
-    optional RpbOptions options = 3;
+    optional int32 rw = 3;
 }
 
 // Delete response - not defined, will return a RpbDelResp on success or RpbErrorResp on failure
@@ -162,7 +164,6 @@ message RpbListBucketsResp {
 // List keys in bucket request
 message RpbListKeysReq {
     required bytes bucket = 1;
-    optional RpbOptions options = 2;
 }
 
 // List keys in bucket response - one or more of these packets will be sent
@@ -177,6 +178,7 @@ message RpbListKeysResp {
 message RpbMapRedReq {
     required bytes request = 1;
     required bytes content_type = 2;
+    optional int32 timeout = 3; // timeout for operation in milliseconds
 }
 
 // Map/Reduce response
@@ -186,17 +188,6 @@ message RpbMapRedResp {
     optional int32 phase = 1;
     optional bytes response = 2;
     optional bool done = 3;
-}
-
-
-// Request options
-message RpbOptions {
-    optional int32 r = 1;
-    optional int32 w = 2;
-    optional int32 dw = 3;
-    optional int32 rw = 4;
-    optional bool return_body = 5;
-    optional int32 timeout = 6; // timeout for operation in milliseconds
 }
 
 // Content message included in get/put responses

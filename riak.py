@@ -1872,7 +1872,7 @@ class RiakPbcTransport :
                 bucket = robj.get_bucket()
 
                 req = riakclient_pb2.RpbGetReq()
-                req.options.r = r
+                req.r = r
  
                 req.bucket = bucket.get_name()
                 req.key = robj.get_key()
@@ -1897,10 +1897,10 @@ class RiakPbcTransport :
                 bucket = robj.get_bucket()
 
                 req = riakclient_pb2.RpbPutReq()
-                req.options.w = w
-                req.options.dw = dw
+                req.w = w
+                req.dw = dw
                 if return_body == True:
-                        req.options.return_body = 1
+                        req.return_body = 1
  
                 req.bucket = bucket.get_name()
                 req.key = robj.get_key()
@@ -1930,7 +1930,7 @@ class RiakPbcTransport :
                 bucket = robj.get_bucket()
 
                 req = riakclient_pb2.RpbDelReq()
-                req.options.rw = rw
+                req.rw = rw
  
                 req.bucket = bucket.get_name()
                 req.key = robj.get_key()
