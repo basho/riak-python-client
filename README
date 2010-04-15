@@ -8,6 +8,7 @@ Table of Contents
 =================
 1 Documentation 
 2 Repositories 
+3 Building
 
 
 1 Documentation 
@@ -35,3 +36,13 @@ Table of Contents
 
   [http://bitbucket.org/basho/riak]
 
+3 Building
+~~~~~~~~~~
+
+  The protocol buffers transport uses a module generated from riakclient.proto.
+  This repo includes the generated code, however if changes are made to the
+  .proto file (which must match client/server), make sure you have protoc
+  installed from http://code.google.com/p/protobuf/ and regenerate the
+  riakclient_pb2.py file with
+  
+    make pb 

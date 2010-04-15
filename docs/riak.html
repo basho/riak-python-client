@@ -1,5 +1,5 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: module riak</title>
 </head><body bgcolor="#f0f0f8">
 
@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>riak</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/rusty/Documents/Basho/Riak/client_lib/python/riak.py">/Users/rusty/Documents/Basho/Riak/client_lib/python/riak.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/jmeredith/basho/riak-python-client/riak.py">/Users/jmeredith/basho/riak-python-client/riak.py</a></font></td></tr></table>
     <p><tt>Copyright&nbsp;2010&nbsp;Rusty&nbsp;Klophaus&nbsp;&lt;rusty@basho.com&gt;<br>
 Copyright&nbsp;2010&nbsp;Justin&nbsp;Sheehy&nbsp;&lt;justin@basho.com&gt;<br>
 Copyright&nbsp;2009&nbsp;Jay&nbsp;Baird&nbsp;&lt;jay@mochimedia.com&gt;<br>
@@ -34,13 +34,18 @@ under&nbsp;the&nbsp;License.</tt></p>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="base64.html">base64</a><br>
+<a href="copy.html">copy</a><br>
 <a href="json.html">json</a><br>
-</td><td width="25%" valign=top><a href="logging.html">logging</a><br>
-<a href="pycurl.html">pycurl</a><br>
-</td><td width="25%" valign=top><a href="random.html">random</a><br>
+<a href="logging.html">logging</a><br>
+</td><td width="25%" valign=top><a href="pycurl.html">pycurl</a><br>
+<a href="random.html">random</a><br>
 <a href="re.html">re</a><br>
-</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
-<a href="urllib.html">urllib</a><br>
+<a href="riakclient_pb2.html">riakclient_pb2</a><br>
+</td><td width="25%" valign=top><a href="socket.html">socket</a><br>
+<a href="struct.html">struct</a><br>
+<a href="sys.html">sys</a><br>
+<a href="types.html">types</a><br>
+</td><td width="25%" valign=top><a href="urllib.html">urllib</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -49,6 +54,12 @@ under&nbsp;the&nbsp;License.</tt></p>
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>(<a href="exceptions.html#BaseException">exceptions.BaseException</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="riak.html#RiakError">RiakError</a>
+</font></dt></dl>
+</dd>
 <dt><font face="helvetica, arial"><a href="riak.html#RiakBucket">RiakBucket</a>
 </font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakClient">RiakClient</a>
 </font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakLink">RiakLink</a>
@@ -56,7 +67,14 @@ under&nbsp;the&nbsp;License.</tt></p>
 </font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakMapReduce">RiakMapReduce</a>
 </font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakMapReducePhase">RiakMapReducePhase</a>
 </font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakObject">RiakObject</a>
-</font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakUtils">RiakUtils</a>
+</font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakPbcTransport">RiakPbcTransport</a>
+</font></dt><dt><font face="helvetica, arial"><a href="riak.html#RiakTransport">RiakTransport</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="riak.html#RiakHttpTransport">RiakHttpTransport</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="riak.html#RiakUtils">RiakUtils</a>
 </font></dt></dl>
  <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -86,9 +104,18 @@ objects&nbsp;within&nbsp;the&nbsp;bucket.<br>
 @param&nbsp;int&nbsp;r&nbsp;-&nbsp;R-Value&nbsp;of&nbsp;the&nbsp;request&nbsp;(defaults&nbsp;to&nbsp;bucket's&nbsp;R)<br>
 @return&nbsp;<a href="#RiakObject">RiakObject</a></tt></dd></dl>
 
+<dl><dt><a name="RiakBucket-get_bool_property"><strong>get_bool_property</strong></a>(self, key)</dt><dd><tt>Get&nbsp;a&nbsp;boolean&nbsp;bucket&nbsp;property.&nbsp;&nbsp;Converts&nbsp;to&nbsp;a&nbsp;True/False&nbsp;value<br>
+@param&nbsp;string&nbsp;key&nbsp;-&nbsp;Property&nbsp;to&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="RiakBucket-get_decoder"><strong>get_decoder</strong></a>(self, content_type)</dt><dd><tt>Get&nbsp;the&nbsp;decoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type&nbsp;for&nbsp;this&nbsp;bucket<br>
+@param&nbsp;content_type:&nbsp;Content&nbsp;type&nbsp;for&nbsp;decoder</tt></dd></dl>
+
 <dl><dt><a name="RiakBucket-get_dw"><strong>get_dw</strong></a>(self, dw)</dt><dd><tt>Get&nbsp;the&nbsp;DW-value&nbsp;for&nbsp;this&nbsp;bucket,&nbsp;if&nbsp;it&nbsp;is&nbsp;set,&nbsp;otherwise&nbsp;return<br>
 the&nbsp;DW-value&nbsp;for&nbsp;the&nbsp;client.<br>
 @return&nbsp;integer</tt></dd></dl>
+
+<dl><dt><a name="RiakBucket-get_encoder"><strong>get_encoder</strong></a>(self, content_type)</dt><dd><tt>Get&nbsp;the&nbsp;encoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type&nbsp;for&nbsp;this&nbsp;bucket<br>
+@param&nbsp;content_type:&nbsp;Content&nbsp;type&nbsp;requested</tt></dd></dl>
 
 <dl><dt><a name="RiakBucket-get_n_val"><strong>get_n_val</strong></a>(self)</dt><dd><tt>Retrieve&nbsp;the&nbsp;N-value&nbsp;for&nbsp;this&nbsp;bucket.<br>
 @return&nbsp;integer</tt></dd></dl>
@@ -106,19 +133,24 @@ the&nbsp;DW-value&nbsp;for&nbsp;the&nbsp;client.<br>
 the&nbsp;R-value&nbsp;for&nbsp;the&nbsp;client.<br>
 @return&nbsp;integer</tt></dd></dl>
 
+<dl><dt><a name="RiakBucket-get_rw"><strong>get_rw</strong></a>(self, rw)</dt><dd><tt>Get&nbsp;the&nbsp;RW-value&nbsp;for&nbsp;this&nbsp;bucket,&nbsp;if&nbsp;it&nbsp;is&nbsp;set,&nbsp;otherwise&nbsp;return<br>
+the&nbsp;RW-value&nbsp;for&nbsp;the&nbsp;client.<br>
+@return&nbsp;integer</tt></dd></dl>
+
 <dl><dt><a name="RiakBucket-get_w"><strong>get_w</strong></a>(self, w)</dt><dd><tt>Get&nbsp;the&nbsp;W-value&nbsp;for&nbsp;this&nbsp;bucket,&nbsp;if&nbsp;it&nbsp;is&nbsp;set,&nbsp;otherwise&nbsp;return<br>
 the&nbsp;W-value&nbsp;for&nbsp;the&nbsp;client.<br>
 @return&nbsp;integer</tt></dd></dl>
 
-<dl><dt><a name="RiakBucket-new"><strong>new</strong></a>(self, key, data<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;Riak&nbsp;object&nbsp;that&nbsp;will&nbsp;be&nbsp;stored&nbsp;as&nbsp;JSON.<br>
+<dl><dt><a name="RiakBucket-new"><strong>new</strong></a>(self, key, data<font color="#909090">=None</font>, content_type<font color="#909090">='application/json'</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;Riak&nbsp;object&nbsp;that&nbsp;will&nbsp;be&nbsp;stored&nbsp;as&nbsp;JSON.<br>
 @param&nbsp;string&nbsp;key&nbsp;-&nbsp;Name&nbsp;of&nbsp;the&nbsp;key.<br>
 @param&nbsp;object&nbsp;data&nbsp;-&nbsp;The&nbsp;data&nbsp;to&nbsp;store.&nbsp;(default&nbsp;None)<br>
 @return&nbsp;<a href="#RiakObject">RiakObject</a></tt></dd></dl>
 
-<dl><dt><a name="RiakBucket-new_binary"><strong>new_binary</strong></a>(self, key, data, content_type<font color="#909090">='text/json'</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;Riak&nbsp;object&nbsp;that&nbsp;will&nbsp;be&nbsp;stored&nbsp;as&nbsp;plain&nbsp;text/binary.<br>
+<dl><dt><a name="RiakBucket-new_binary"><strong>new_binary</strong></a>(self, key, data, content_type<font color="#909090">='application/octet-stream'</font>)</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;Riak&nbsp;object&nbsp;that&nbsp;will&nbsp;be&nbsp;stored&nbsp;as&nbsp;plain&nbsp;text/binary.<br>
 @param&nbsp;string&nbsp;key&nbsp;-&nbsp;Name&nbsp;of&nbsp;the&nbsp;key.<br>
 @param&nbsp;object&nbsp;data&nbsp;-&nbsp;The&nbsp;data&nbsp;to&nbsp;store.<br>
-@param&nbsp;string&nbsp;content_type&nbsp;-&nbsp;The&nbsp;content&nbsp;type&nbsp;of&nbsp;the&nbsp;object.&nbsp;(default&nbsp;'text/json')<br>
+@param&nbsp;string&nbsp;content_type&nbsp;-&nbsp;The&nbsp;content&nbsp;type&nbsp;of&nbsp;the&nbsp;object.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(default&nbsp;'application/octet-stream')<br>
 @return&nbsp;<a href="#RiakObject">RiakObject</a></tt></dd></dl>
 
 <dl><dt><a name="RiakBucket-set_allow_multiples"><strong>set_allow_multiples</strong></a>(self, bool)</dt><dd><tt>If&nbsp;set&nbsp;to&nbsp;True,&nbsp;then&nbsp;writes&nbsp;with&nbsp;conflicting&nbsp;data&nbsp;will&nbsp;be&nbsp;stored<br>
@@ -127,9 +159,18 @@ calling&nbsp;has_siblings()&nbsp;and&nbsp;get_siblings().&nbsp;This&nbsp;should&
 if&nbsp;you&nbsp;know&nbsp;what&nbsp;you&nbsp;are&nbsp;doing.<br>
 @param&nbsp;boolean&nbsp;bool&nbsp;-&nbsp;True&nbsp;to&nbsp;store&nbsp;and&nbsp;return&nbsp;conflicting&nbsp;writes.</tt></dd></dl>
 
+<dl><dt><a name="RiakBucket-set_decoder"><strong>set_decoder</strong></a>(self, content_type, decoder)</dt><dd><tt>Set&nbsp;the&nbsp;decoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type&nbsp;for&nbsp;this&nbsp;bucket<br>
+@param&nbsp;content_type:&nbsp;Content&nbsp;type&nbsp;for&nbsp;decoder<br>
+@param&nbsp;decoder:&nbsp;Function&nbsp;to&nbsp;decode&nbsp;with&nbsp;-&nbsp;will&nbsp;be&nbsp;called&nbsp;with&nbsp;string</tt></dd></dl>
+
 <dl><dt><a name="RiakBucket-set_dw"><strong>set_dw</strong></a>(self, dw)</dt><dd><tt>Set&nbsp;the&nbsp;DW-value&nbsp;for&nbsp;this&nbsp;bucket.&nbsp;See&nbsp;<a href="#RiakBucket-set_r">set_r</a>(...)&nbsp;for&nbsp;more&nbsp;information.<br>
 @param&nbsp;integer&nbsp;dw&nbsp;-&nbsp;The&nbsp;new&nbsp;DW-value<br>
 @return&nbsp;self</tt></dd></dl>
+
+<dl><dt><a name="RiakBucket-set_encoder"><strong>set_encoder</strong></a>(self, content_type, encoder)</dt><dd><tt>Set&nbsp;the&nbsp;encoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type&nbsp;for&nbsp;this&nbsp;bucket<br>
+@param&nbsp;content_type:&nbsp;Content&nbsp;type&nbsp;for&nbsp;encoder<br>
+@param&nbsp;encoder:&nbsp;Function&nbsp;to&nbsp;encode&nbsp;with&nbsp;-&nbsp;will&nbsp;be&nbsp;called&nbsp;with&nbsp;data&nbsp;as&nbsp;single<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argument.</tt></dd></dl>
 
 <dl><dt><a name="RiakBucket-set_n_val"><strong>set_n_val</strong></a>(self, nval)</dt><dd><tt>Set&nbsp;the&nbsp;N-value&nbsp;for&nbsp;this&nbsp;bucket,&nbsp;which&nbsp;is&nbsp;the&nbsp;number&nbsp;of&nbsp;replicas<br>
 that&nbsp;will&nbsp;be&nbsp;written&nbsp;of&nbsp;each&nbsp;object&nbsp;in&nbsp;the&nbsp;bucket.&nbsp;Set&nbsp;this&nbsp;once<br>
@@ -152,6 +193,10 @@ operations&nbsp;that&nbsp;do&nbsp;not&nbsp;specify&nbsp;an&nbsp;R-value&nbsp;wil
 @param&nbsp;integer&nbsp;r&nbsp;-&nbsp;The&nbsp;new&nbsp;R-value.<br>
 @return&nbsp;self</tt></dd></dl>
 
+<dl><dt><a name="RiakBucket-set_rw"><strong>set_rw</strong></a>(self, rw)</dt><dd><tt>Set&nbsp;the&nbsp;RW-value&nbsp;for&nbsp;this&nbsp;bucket.&nbsp;See&nbsp;<a href="#RiakBucket-set_r">set_r</a>(...)&nbsp;for&nbsp;more&nbsp;information.<br>
+@param&nbsp;integer&nbsp;rw&nbsp;-&nbsp;The&nbsp;new&nbsp;RW-value<br>
+@return&nbsp;self</tt></dd></dl>
+
 <dl><dt><a name="RiakBucket-set_w"><strong>set_w</strong></a>(self, w)</dt><dd><tt>Set&nbsp;the&nbsp;W-value&nbsp;for&nbsp;this&nbsp;bucket.&nbsp;See&nbsp;<a href="#RiakBucket-set_r">set_r</a>(...)&nbsp;for&nbsp;more&nbsp;information.<br>
 @param&nbsp;integer&nbsp;w&nbsp;-&nbsp;The&nbsp;new&nbsp;W-value.<br>
 @return&nbsp;self</tt></dd></dl>
@@ -168,11 +213,12 @@ Riak.&nbsp;The&nbsp;Riak&nbsp;API&nbsp;uses&nbsp;HTTP,&nbsp;so&nbsp;there&nbsp;i
 connection,&nbsp;and&nbsp;the&nbsp;<a href="#RiakClient">RiakClient</a>&nbsp;object&nbsp;is&nbsp;extremely&nbsp;lightweight.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="RiakClient-__init__"><strong>__init__</strong></a>(self, host<font color="#909090">='127.0.0.1'</font>, port<font color="#909090">=8098</font>, prefix<font color="#909090">='riak'</font>, mapred_prefix<font color="#909090">='mapred'</font>)</dt><dd><tt>Construct&nbsp;a&nbsp;new&nbsp;<a href="#RiakClient">RiakClient</a>&nbsp;object.<br>
+<dl><dt><a name="RiakClient-__init__"><strong>__init__</strong></a>(self, host<font color="#909090">='127.0.0.1'</font>, port<font color="#909090">=8098</font>, prefix<font color="#909090">='riak'</font>, mapred_prefix<font color="#909090">='mapred'</font>, transport<font color="#909090">=None</font>)</dt><dd><tt>Construct&nbsp;a&nbsp;new&nbsp;<a href="#RiakClient">RiakClient</a>&nbsp;object.<br>
 @param&nbsp;string&nbsp;host&nbsp;-&nbsp;Hostname&nbsp;or&nbsp;IP&nbsp;address&nbsp;(default&nbsp;'127.0.0.1')<br>
 @param&nbsp;int&nbsp;port&nbsp;-&nbsp;Port&nbsp;number&nbsp;(default&nbsp;8098)<br>
 @param&nbsp;string&nbsp;prefix&nbsp;-&nbsp;Interface&nbsp;prefix&nbsp;(default&nbsp;'riak')<br>
-@param&nbsp;string&nbsp;mapred_prefix&nbsp;-&nbsp;MapReduce&nbsp;prefix&nbsp;(default&nbsp;'mapred')</tt></dd></dl>
+@param&nbsp;string&nbsp;mapred_prefix&nbsp;-&nbsp;MapReduce&nbsp;prefix&nbsp;(default&nbsp;'mapred')<br>
+@param&nbsp;RiakTranposrt&nbsp;transport&nbsp;-&nbsp;transport&nbsp;class&nbsp;to&nbsp;use</tt></dd></dl>
 
 <dl><dt><a name="RiakClient-add"><strong>add</strong></a>(self, *args)</dt><dd><tt>Start&nbsp;assembling&nbsp;a&nbsp;Map/Reduce&nbsp;operation.<br>
 @see&nbsp;<a href="#RiakMapReduce">RiakMapReduce</a>.<a href="#RiakClient-add">add</a>()<br>
@@ -185,11 +231,20 @@ this&nbsp;will&nbsp;always&nbsp;return&nbsp;a&nbsp;<a href="#RiakBucket">RiakBuc
 <dl><dt><a name="RiakClient-get_client_id"><strong>get_client_id</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;client_id&nbsp;for&nbsp;this&nbsp;<a href="#RiakClient">RiakClient</a>.<br>
 @return&nbsp;string</tt></dd></dl>
 
+<dl><dt><a name="RiakClient-get_decoder"><strong>get_decoder</strong></a>(self, content_type)</dt><dd><tt>Get&nbsp;the&nbsp;decoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type</tt></dd></dl>
+
 <dl><dt><a name="RiakClient-get_dw"><strong>get_dw</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;DW-value&nbsp;for&nbsp;this&nbsp;ClientOBject.&nbsp;(default&nbsp;2)<br>
 @return&nbsp;integer</tt></dd></dl>
 
+<dl><dt><a name="RiakClient-get_encoder"><strong>get_encoder</strong></a>(self, content_type)</dt><dd><tt>Get&nbsp;the&nbsp;encoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type</tt></dd></dl>
+
 <dl><dt><a name="RiakClient-get_r"><strong>get_r</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;R-value&nbsp;setting&nbsp;for&nbsp;this&nbsp;<a href="#RiakClient">RiakClient</a>.&nbsp;(default&nbsp;2)<br>
 @return&nbsp;integer</tt></dd></dl>
+
+<dl><dt><a name="RiakClient-get_rw"><strong>get_rw</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;RW-value&nbsp;for&nbsp;this&nbsp;ClientObject.&nbsp;(default&nbsp;2)<br>
+@return&nbsp;integer</tt></dd></dl>
+
+<dl><dt><a name="RiakClient-get_transport"><strong>get_transport</strong></a>(self)</dt><dd><tt>Get&nbsp;a&nbsp;transport&nbsp;object</tt></dd></dl>
 
 <dl><dt><a name="RiakClient-get_w"><strong>get_w</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;W-value&nbsp;setting&nbsp;for&nbsp;this&nbsp;<a href="#RiakClient">RiakClient</a>.&nbsp;(default&nbsp;2)<br>
 @return&nbsp;integer</tt></dd></dl>
@@ -211,10 +266,16 @@ unless&nbsp;you&nbsp;know&nbsp;what&nbsp;you&nbsp;are&nbsp;doing.<br>
 @param&nbsp;string&nbsp;client_id&nbsp;-&nbsp;The&nbsp;new&nbsp;client_id.<br>
 @return&nbsp;self</tt></dd></dl>
 
+<dl><dt><a name="RiakClient-set_decoder"><strong>set_decoder</strong></a>(self, content_type, decoder)</dt><dd><tt>Set&nbsp;the&nbsp;decoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type<br>
+@param&nbsp;function&nbsp;decoder</tt></dd></dl>
+
 <dl><dt><a name="RiakClient-set_dw"><strong>set_dw</strong></a>(self, dw)</dt><dd><tt>Set&nbsp;the&nbsp;DW-value&nbsp;for&nbsp;this&nbsp;<a href="#RiakClient">RiakClient</a>.&nbsp;See&nbsp;<a href="#RiakClient-set_r">set_r</a>(...)&nbsp;for&nbsp;a<br>
 description&nbsp;of&nbsp;how&nbsp;these&nbsp;values&nbsp;are&nbsp;used.<br>
 @param&nbsp;integer&nbsp;dw&nbsp;-&nbsp;The&nbsp;DW&nbsp;value.<br>
 @return&nbsp;self</tt></dd></dl>
+
+<dl><dt><a name="RiakClient-set_encoder"><strong>set_encoder</strong></a>(self, content_type, encoder)</dt><dd><tt>Set&nbsp;the&nbsp;encoding&nbsp;function&nbsp;for&nbsp;this&nbsp;content&nbsp;type<br>
+@param&nbsp;function&nbsp;encoder</tt></dd></dl>
 
 <dl><dt><a name="RiakClient-set_r"><strong>set_r</strong></a>(self, r)</dt><dd><tt>Set&nbsp;the&nbsp;R-value&nbsp;for&nbsp;this&nbsp;<a href="#RiakClient">RiakClient</a>.&nbsp;This&nbsp;value&nbsp;will&nbsp;be&nbsp;used<br>
 for&nbsp;any&nbsp;calls&nbsp;to&nbsp;get(...)&nbsp;or&nbsp;get_binary(...)&nbsp;where&nbsp;where&nbsp;1)&nbsp;no<br>
@@ -223,10 +284,140 @@ been&nbsp;set&nbsp;in&nbsp;the&nbsp;<a href="#RiakBucket">RiakBucket</a>.<br>
 @param&nbsp;integer&nbsp;r&nbsp;-&nbsp;The&nbsp;R&nbsp;value.<br>
 @return&nbsp;self</tt></dd></dl>
 
+<dl><dt><a name="RiakClient-set_rw"><strong>set_rw</strong></a>(self, rw)</dt><dd><tt>Set&nbsp;the&nbsp;RW-value&nbsp;for&nbsp;this&nbsp;<a href="#RiakClient">RiakClient</a>.&nbsp;See&nbsp;<a href="#RiakClient-set_r">set_r</a>(...)&nbsp;for&nbsp;a<br>
+description&nbsp;of&nbsp;how&nbsp;these&nbsp;values&nbsp;are&nbsp;used.<br>
+@param&nbsp;integer&nbsp;rw&nbsp;-&nbsp;The&nbsp;RW&nbsp;value.<br>
+@return&nbsp;self</tt></dd></dl>
+
 <dl><dt><a name="RiakClient-set_w"><strong>set_w</strong></a>(self, w)</dt><dd><tt>Set&nbsp;the&nbsp;W-value&nbsp;for&nbsp;this&nbsp;<a href="#RiakClient">RiakClient</a>.&nbsp;See&nbsp;<a href="#RiakClient-set_r">set_r</a>(...)&nbsp;for&nbsp;a<br>
 description&nbsp;of&nbsp;how&nbsp;these&nbsp;values&nbsp;are&nbsp;used.<br>
 @param&nbsp;integer&nbsp;w&nbsp;-&nbsp;The&nbsp;W&nbsp;value.<br>
 @return&nbsp;self</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RiakError">class <strong>RiakError</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="riak.html#RiakError">RiakError</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="RiakError-__init__"><strong>__init__</strong></a>(self, value)</dt></dl>
+
+<dl><dt><a name="RiakError-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x100119f80&gt;<dd><tt>T.<a href="#RiakError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><a name="RiakError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#RiakError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="RiakError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#RiakError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="RiakError-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#RiakError-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="RiakError-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#RiakError-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="RiakError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="RiakError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#RiakError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="RiakError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#RiakError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="RiakError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="RiakError-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+<dl><dt><strong>message</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RiakHttpTransport">class <strong>RiakHttpTransport</strong></a>(<a href="riak.html#RiakTransport">RiakTransport</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#RiakHttpTransport">RiakHttpTransport</a>&nbsp;object&nbsp;holds&nbsp;information&nbsp;necessary&nbsp;to&nbsp;connect&nbsp;to<br>
+Riak.&nbsp;The&nbsp;Riak&nbsp;API&nbsp;uses&nbsp;HTTP,&nbsp;so&nbsp;there&nbsp;is&nbsp;no&nbsp;persistent<br>
+connection,&nbsp;and&nbsp;the&nbsp;<a href="#RiakClient">RiakClient</a>&nbsp;object&nbsp;is&nbsp;extremely&nbsp;lightweight.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RiakHttpTransport-__copy__"><strong>__copy__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-__init__"><strong>__init__</strong></a>(self, host<font color="#909090">='127.0.0.1'</font>, port<font color="#909090">=8098</font>, prefix<font color="#909090">='riak'</font>, mapred_prefix<font color="#909090">='mapred'</font>, client_id<font color="#909090">=None</font>)</dt><dd><tt>Construct&nbsp;a&nbsp;new&nbsp;<a href="#RiakClient">RiakClient</a>&nbsp;object.<br>
+@param&nbsp;string&nbsp;host&nbsp;-&nbsp;Hostname&nbsp;or&nbsp;IP&nbsp;address&nbsp;(default&nbsp;'127.0.0.1')<br>
+@param&nbsp;int&nbsp;port&nbsp;-&nbsp;Port&nbsp;number&nbsp;(default&nbsp;8098)<br>
+@param&nbsp;string&nbsp;prefix&nbsp;-&nbsp;Interface&nbsp;prefix&nbsp;(default&nbsp;'riak')<br>
+@param&nbsp;string&nbsp;mapred_prefix&nbsp;-&nbsp;MapReduce&nbsp;prefix&nbsp;(default&nbsp;'mapred')<br>
+@param&nbsp;string&nbsp;client_id&nbsp;-&nbsp;client&nbsp;id&nbsp;to&nbsp;use&nbsp;for&nbsp;vector&nbsp;clocks</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-build_rest_path"><strong>build_rest_path</strong></a>(self, bucket, key<font color="#909090">=None</font>, spec<font color="#909090">=None</font>, params<font color="#909090">=None</font>)</dt><dd><tt>Given&nbsp;a&nbsp;<a href="#RiakClient">RiakClient</a>,&nbsp;<a href="#RiakBucket">RiakBucket</a>,&nbsp;Key,&nbsp;LinkSpec,&nbsp;and&nbsp;Params,<br>
+construct&nbsp;and&nbsp;return&nbsp;a&nbsp;URL.</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-check_http_code"><strong>check_http_code</strong></a>(self, response, expected_statuses)</dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-delete"><strong>delete</strong></a>(self, robj, rw)</dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-get"><strong>get</strong></a>(self, robj, r, vtag<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-get_bucket_props"><strong>get_bucket_props</strong></a>(self, bucket)</dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-mapred"><strong>mapred</strong></a>(self, inputs, query, timeout<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-parse_body"><strong>parse_body</strong></a>(self, response, expected_statuses)</dt><dd><tt>Given&nbsp;the&nbsp;output&nbsp;of&nbsp;<a href="#RiakUtils">RiakUtils</a>.http_request&nbsp;and&nbsp;a&nbsp;list&nbsp;of<br>
+statuses,&nbsp;populate&nbsp;the&nbsp;object.&nbsp;Only&nbsp;for&nbsp;use&nbsp;by&nbsp;the&nbsp;Riak&nbsp;client<br>
+library.<br>
+@return&nbsp;self</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-parse_links"><strong>parse_links</strong></a>(self, links, linkHeaders)</dt><dd><tt>Private.<br>
+@return&nbsp;self</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-ping"><strong>ping</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-put"><strong>put</strong></a>(self, robj, w<font color="#909090">=None</font>, dw<font color="#909090">=None</font>, return_body<font color="#909090">=True</font>)</dt><dd><tt>Serialize&nbsp;put&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-set_bucket_props"><strong>set_bucket_props</strong></a>(self, bucket, props)</dt><dd><tt>Set&nbsp;the&nbsp;properties&nbsp;on&nbsp;the&nbsp;bucket&nbsp;object&nbsp;given</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-to_link_header"><strong>to_link_header</strong></a>(self, link)</dt><dd><tt>Convert&nbsp;this&nbsp;<a href="#RiakLink">RiakLink</a>&nbsp;object&nbsp;to&nbsp;a&nbsp;link&nbsp;header&nbsp;string.&nbsp;Used&nbsp;internally.</tt></dd></dl>
+
+<hr>
+Class methods defined here:<br>
+<dl><dt><a name="RiakHttpTransport-build_headers"><strong>build_headers</strong></a>(self, headers)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-get_value"><strong>get_value</strong></a>(self, key, array, defaultValue)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-http_request"><strong>http_request</strong></a>(self, method, host, port, url, headers<font color="#909090">={}</font>, obj<font color="#909090">=''</font>)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt><dd><tt>Given&nbsp;a&nbsp;Method,&nbsp;URL,&nbsp;Headers,&nbsp;and&nbsp;Body,&nbsp;perform&nbsp;and&nbsp;HTTP&nbsp;request,<br>
+and&nbsp;return&nbsp;an&nbsp;array&nbsp;of&nbsp;arity&nbsp;2&nbsp;containing&nbsp;an&nbsp;associative&nbsp;array&nbsp;of<br>
+response&nbsp;headers&nbsp;and&nbsp;the&nbsp;response&nbsp;body.</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-httplib_request"><strong>httplib_request</strong></a>(self, method, host, port, uri, headers<font color="#909090">={}</font>, body<font color="#909090">=''</font>)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
+
+<dl><dt><a name="RiakHttpTransport-parse_http_headers"><strong>parse_http_headers</strong></a>(self, headers)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt><dd><tt>Parse&nbsp;an&nbsp;HTTP&nbsp;Header&nbsp;string&nbsp;into&nbsp;an&nbsp;asssociative&nbsp;array&nbsp;of<br>
+response&nbsp;headers.</tt></dd></dl>
+
+<dl><dt><a name="RiakHttpTransport-pycurl_request"><strong>pycurl_request</strong></a>(self, method, host, port, uri, headers<font color="#909090">={}</font>, body<font color="#909090">=''</font>)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -416,8 +607,8 @@ ignored&nbsp;if&nbsp;obj&nbsp;is&nbsp;a&nbsp;<a href="#RiakLink">RiakLink</a>&nb
 <dl><dt><a name="RiakObject-clear"><strong>clear</strong></a>(self)</dt><dd><tt>Reset&nbsp;this&nbsp;object.<br>
 @return&nbsp;self</tt></dd></dl>
 
-<dl><dt><a name="RiakObject-delete"><strong>delete</strong></a>(self, dw<font color="#909090">=None</font>)</dt><dd><tt>Delete&nbsp;this&nbsp;object&nbsp;from&nbsp;Riak.<br>
-@param&nbsp;integer&nbsp;dw&nbsp;-&nbsp;DW-value.&nbsp;Wait&nbsp;until&nbsp;this&nbsp;many&nbsp;partitions&nbsp;have<br>
+<dl><dt><a name="RiakObject-delete"><strong>delete</strong></a>(self, rw<font color="#909090">=None</font>)</dt><dd><tt>Delete&nbsp;this&nbsp;object&nbsp;from&nbsp;Riak.<br>
+@param&nbsp;integer&nbsp;rw&nbsp;-&nbsp;RW-value.&nbsp;Wait&nbsp;until&nbsp;this&nbsp;many&nbsp;partitions&nbsp;have<br>
 deleted&nbsp;the&nbsp;object&nbsp;before&nbsp;responding.<br>
 @return&nbsp;self</tt></dd></dl>
 
@@ -428,7 +619,7 @@ detect&nbsp;a&nbsp;get(...)&nbsp;or&nbsp;get_binary(...)&nbsp;operation&nbsp;whe
 <dl><dt><a name="RiakObject-get_bucket"><strong>get_bucket</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;bucket&nbsp;of&nbsp;this&nbsp;object.<br>
 @return&nbsp;<a href="#RiakBucket">RiakBucket</a></tt></dd></dl>
 
-<dl><dt><a name="RiakObject-get_content_type"><strong>get_content_type</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;content&nbsp;type&nbsp;of&nbsp;this&nbsp;object.&nbsp;This&nbsp;is&nbsp;either&nbsp;text/json,&nbsp;or<br>
+<dl><dt><a name="RiakObject-get_content_type"><strong>get_content_type</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;content&nbsp;type&nbsp;of&nbsp;this&nbsp;object.&nbsp;This&nbsp;is&nbsp;either&nbsp;application/json,&nbsp;or<br>
 the&nbsp;provided&nbsp;content&nbsp;type&nbsp;if&nbsp;the&nbsp;object&nbsp;was&nbsp;created&nbsp;via&nbsp;new_binary(...).<br>
 @return&nbsp;string</tt></dd></dl>
 
@@ -437,11 +628,17 @@ array,&nbsp;unless&nbsp;the&nbsp;object&nbsp;was&nbsp;constructed&nbsp;with&nbsp
 get_binary(...),&nbsp;in&nbsp;which&nbsp;case&nbsp;this&nbsp;will&nbsp;return&nbsp;a&nbsp;string.<br>
 @return&nbsp;array&nbsp;or&nbsp;string</tt></dd></dl>
 
+<dl><dt><a name="RiakObject-get_encoded_data"><strong>get_encoded_data</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;data&nbsp;encoded&nbsp;for&nbsp;storing</tt></dd></dl>
+
 <dl><dt><a name="RiakObject-get_key"><strong>get_key</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;key&nbsp;of&nbsp;this&nbsp;object.<br>
 @return&nbsp;string</tt></dd></dl>
 
 <dl><dt><a name="RiakObject-get_links"><strong>get_links</strong></a>(self)</dt><dd><tt>Return&nbsp;an&nbsp;array&nbsp;of&nbsp;<a href="#RiakLink">RiakLink</a>&nbsp;objects.<br>
 @return&nbsp;array()</tt></dd></dl>
+
+<dl><dt><a name="RiakObject-get_metadata"><strong>get_metadata</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;metadata&nbsp;stored&nbsp;in&nbsp;this&nbsp;object.&nbsp;Will&nbsp;return&nbsp;a&nbsp;associative<br>
+array<br>
+@return&nbsp;dict</tt></dd></dl>
 
 <dl><dt><a name="RiakObject-get_sibling"><strong>get_sibling</strong></a>(self, i, r<font color="#909090">=None</font>)</dt><dd><tt>Retrieve&nbsp;a&nbsp;sibling&nbsp;by&nbsp;sibling&nbsp;number.<br>
 @param&nbsp;&nbsp;integer&nbsp;i&nbsp;-&nbsp;Sibling&nbsp;number.<br>
@@ -468,10 +665,12 @@ responded&nbsp;before&nbsp;returning&nbsp;to&nbsp;client.<br>
 @see&nbsp;<a href="#RiakMapReduce">RiakMapReduce</a>.<a href="#RiakObject-map">map</a>()<br>
 @return&nbsp;<a href="#RiakMapReduce">RiakMapReduce</a></tt></dd></dl>
 
-<dl><dt><a name="RiakObject-populate"><strong>populate</strong></a>(self, response, expected_statuses)</dt><dd><tt>Given&nbsp;the&nbsp;output&nbsp;of&nbsp;<a href="#RiakUtils">RiakUtils</a>.http_request&nbsp;and&nbsp;a&nbsp;list&nbsp;of<br>
-statuses,&nbsp;populate&nbsp;the&nbsp;object.&nbsp;Only&nbsp;for&nbsp;use&nbsp;by&nbsp;the&nbsp;Riak&nbsp;client<br>
-library.<br>
-@return&nbsp;self</tt></dd></dl>
+<dl><dt><a name="RiakObject-populate"><strong>populate</strong></a>(self, Result)</dt><dd><tt>Populate&nbsp;the&nbsp;object&nbsp;based&nbsp;on&nbsp;the&nbsp;return&nbsp;from&nbsp;get.<br>
+If&nbsp;None&nbsp;returned,&nbsp;then&nbsp;object&nbsp;is&nbsp;not&nbsp;found<br>
+If&nbsp;a&nbsp;tuple&nbsp;of&nbsp;vclock,&nbsp;contents&nbsp;then&nbsp;one&nbsp;or&nbsp;more<br>
+whole&nbsp;revisions&nbsp;of&nbsp;the&nbsp;key&nbsp;were&nbsp;found<br>
+If&nbsp;a&nbsp;list&nbsp;of&nbsp;vtags&nbsp;is&nbsp;returned&nbsp;there&nbsp;are&nbsp;multiple<br>
+sibling&nbsp;that&nbsp;need&nbsp;to&nbsp;be&nbsp;retrieved&nbsp;with&nbsp;get.</tt></dd></dl>
 
 <dl><dt><a name="RiakObject-populate_links"><strong>populate_links</strong></a>(self, linkHeaders)</dt><dd><tt>Private.<br>
 @return&nbsp;self</tt></dd></dl>
@@ -480,7 +679,7 @@ library.<br>
 @see&nbsp;<a href="#RiakMapReduce">RiakMapReduce</a>.<a href="#RiakObject-reduce">reduce</a>()<br>
 @return&nbsp;<a href="#RiakMapReduce">RiakMapReduce</a></tt></dd></dl>
 
-<dl><dt><a name="RiakObject-reload"><strong>reload</strong></a>(self, r<font color="#909090">=None</font>)</dt><dd><tt>Reload&nbsp;the&nbsp;object&nbsp;from&nbsp;Riak.&nbsp;When&nbsp;this&nbsp;operation&nbsp;completes,&nbsp;the<br>
+<dl><dt><a name="RiakObject-reload"><strong>reload</strong></a>(self, r<font color="#909090">=None</font>, vtag<font color="#909090">=None</font>)</dt><dd><tt>Reload&nbsp;the&nbsp;object&nbsp;from&nbsp;Riak.&nbsp;When&nbsp;this&nbsp;operation&nbsp;completes,&nbsp;the<br>
 object&nbsp;could&nbsp;contain&nbsp;new&nbsp;metadata&nbsp;and&nbsp;a&nbsp;new&nbsp;value,&nbsp;if&nbsp;the&nbsp;object<br>
 was&nbsp;updated&nbsp;in&nbsp;Riak&nbsp;since&nbsp;it&nbsp;was&nbsp;last&nbsp;retrieved.<br>
 @param&nbsp;integer&nbsp;r&nbsp;-&nbsp;R-Value,&nbsp;wait&nbsp;for&nbsp;this&nbsp;many&nbsp;partitions&nbsp;to&nbsp;respond<br>
@@ -505,10 +704,18 @@ new_binary(...)&nbsp;or&nbsp;get_binary(...).<br>
 @param&nbsp;mixed&nbsp;data&nbsp;-&nbsp;The&nbsp;data&nbsp;to&nbsp;store.<br>
 @return&nbsp;data</tt></dd></dl>
 
-<dl><dt><a name="RiakObject-status"><strong>status</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;HTTP&nbsp;status&nbsp;from&nbsp;the&nbsp;last&nbsp;operation&nbsp;on&nbsp;this&nbsp;object.<br>
-@return&nbsp;integer</tt></dd></dl>
+<dl><dt><a name="RiakObject-set_encoded_data"><strong>set_encoded_data</strong></a>(self, data)</dt><dd><tt>Set&nbsp;the&nbsp;object&nbsp;data&nbsp;from&nbsp;an&nbsp;encoded&nbsp;string&nbsp;-&nbsp;make&nbsp;sure<br>
+the&nbsp;metadata&nbsp;has&nbsp;been&nbsp;set&nbsp;correctly&nbsp;first.</tt></dd></dl>
 
-<dl><dt><a name="RiakObject-store"><strong>store</strong></a>(self, w<font color="#909090">=None</font>, dw<font color="#909090">=None</font>)</dt><dd><tt>Store&nbsp;the&nbsp;object&nbsp;in&nbsp;Riak.&nbsp;When&nbsp;this&nbsp;operation&nbsp;completes,&nbsp;the<br>
+<dl><dt><a name="RiakObject-set_metadata"><strong>set_metadata</strong></a>(self, metadata)</dt><dd><tt>Set&nbsp;the&nbsp;metadata&nbsp;stored&nbsp;in&nbsp;this&nbsp;object.&nbsp;<br>
+@param&nbsp;dict&nbsp;metadata&nbsp;-&nbsp;The&nbsp;data&nbsp;to&nbsp;store.<br>
+@return&nbsp;data</tt></dd></dl>
+
+<dl><dt><a name="RiakObject-set_siblings"><strong>set_siblings</strong></a>(self, siblings)</dt><dd><tt>Set&nbsp;the&nbsp;array&nbsp;of&nbsp;siblings&nbsp;-&nbsp;used&nbsp;internally<br>
+Make&nbsp;sure&nbsp;this&nbsp;object&nbsp;is&nbsp;at&nbsp;index&nbsp;0&nbsp;so&nbsp;<a href="#RiakObject-get_siblings">get_siblings</a>(0)&nbsp;always&nbsp;returns<br>
+the&nbsp;current&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="RiakObject-store"><strong>store</strong></a>(self, w<font color="#909090">=None</font>, dw<font color="#909090">=None</font>, return_body<font color="#909090">=True</font>)</dt><dd><tt>Store&nbsp;the&nbsp;object&nbsp;in&nbsp;Riak.&nbsp;When&nbsp;this&nbsp;operation&nbsp;completes,&nbsp;the<br>
 object&nbsp;could&nbsp;contain&nbsp;new&nbsp;metadata&nbsp;and&nbsp;possibly&nbsp;new&nbsp;data&nbsp;if&nbsp;Riak<br>
 contains&nbsp;a&nbsp;newer&nbsp;version&nbsp;of&nbsp;the&nbsp;object&nbsp;according&nbsp;to&nbsp;the&nbsp;object's<br>
 vector&nbsp;clock.<br>
@@ -516,10 +723,88 @@ vector&nbsp;clock.<br>
 before&nbsp;returning&nbsp;to&nbsp;client.<br>
 @param&nbsp;integer&nbsp;dw&nbsp;-&nbsp;DW-value,&nbsp;wait&nbsp;for&nbsp;this&nbsp;many&nbsp;partitions&nbsp;to<br>
 confirm&nbsp;the&nbsp;write&nbsp;before&nbsp;returning&nbsp;to&nbsp;client.<br>
+@param&nbsp;bool&nbsp;return_body&nbsp;-&nbsp;if&nbsp;the&nbsp;newly&nbsp;stored&nbsp;object&nbsp;should&nbsp;be&nbsp;retrieved<br>
 @return&nbsp;self</tt></dd></dl>
 
 <dl><dt><a name="RiakObject-vclock"><strong>vclock</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;vclock&nbsp;of&nbsp;this&nbsp;object.<br>
 @return&nbsp;string</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RiakPbcTransport">class <strong>RiakPbcTransport</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#RiakPbcTransport">RiakPbcTransport</a>&nbsp;object&nbsp;holds&nbsp;a&nbsp;connection&nbsp;to&nbsp;the&nbsp;protocol&nbsp;buffers&nbsp;interface<br>
+on&nbsp;the&nbsp;riak&nbsp;server.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RiakPbcTransport-__copy__"><strong>__copy__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-__init__"><strong>__init__</strong></a>(self, host<font color="#909090">='127.0.0.1'</font>, port<font color="#909090">=8087</font>, client_id<font color="#909090">=None</font>)</dt><dd><tt>Construct&nbsp;a&nbsp;new&nbsp;<a href="#RiakPbcTransport">RiakPbcTransport</a>&nbsp;object.<br>
+@param&nbsp;string&nbsp;host&nbsp;-&nbsp;Hostname&nbsp;or&nbsp;IP&nbsp;address&nbsp;(default&nbsp;'127.0.0.1')<br>
+@param&nbsp;int&nbsp;port&nbsp;-&nbsp;Port&nbsp;number&nbsp;(default&nbsp;8087)</tt></dd></dl>
+
+<dl><dt><a name="RiakPbcTransport-decode_content"><strong>decode_content</strong></a>(self, rpb_content)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-decode_contents"><strong>decode_contents</strong></a>(self, rpb_contents)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-delete"><strong>delete</strong></a>(self, robj, rw<font color="#909090">=None</font>)</dt><dd><tt>Serialize&nbsp;get&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response</tt></dd></dl>
+
+<dl><dt><a name="RiakPbcTransport-encode_msg"><strong>encode_msg</strong></a>(self, msg_code, msg)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-get"><strong>get</strong></a>(self, robj, r<font color="#909090">=None</font>, vtag<font color="#909090">=None</font>)</dt><dd><tt>Serialize&nbsp;get&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response</tt></dd></dl>
+
+<dl><dt><a name="RiakPbcTransport-maybe_connect"><strong>maybe_connect</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-pbify_content"><strong>pbify_content</strong></a>(self, metadata, data, rpb_content)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-ping"><strong>ping</strong></a>(self)</dt><dd><tt>Ping&nbsp;the&nbsp;remote&nbsp;server<br>
+@return&nbsp;boolean</tt></dd></dl>
+
+<dl><dt><a name="RiakPbcTransport-put"><strong>put</strong></a>(self, robj, w<font color="#909090">=None</font>, dw<font color="#909090">=None</font>, return_body<font color="#909090">=True</font>)</dt><dd><tt>Serialize&nbsp;get&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response</tt></dd></dl>
+
+<dl><dt><a name="RiakPbcTransport-recv_msg"><strong>recv_msg</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-recv_pkt"><strong>recv_pkt</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-send_msg"><strong>send_msg</strong></a>(self, msg_code, msg)</dt></dl>
+
+<dl><dt><a name="RiakPbcTransport-send_msg_code"><strong>send_msg_code</strong></a>(self, msg_code)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RiakTransport">class <strong>RiakTransport</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;to&nbsp;encapsulate&nbsp;transport&nbsp;details<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RiakTransport-delete"><strong>delete</strong></a>(self, robj, rw<font color="#909090">=None</font>)</dt><dd><tt>Serialize&nbsp;delete&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response<br>
+@return&nbsp;true</tt></dd></dl>
+
+<dl><dt><a name="RiakTransport-get"><strong>get</strong></a>(self, robj, r<font color="#909090">=None</font>, vtag<font color="#909090">=None</font>)</dt><dd><tt>Serialize&nbsp;get&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response<br>
+@return&nbsp;(vclock=None,&nbsp;[(metadata,&nbsp;value)]=None)</tt></dd></dl>
+
+<dl><dt><a name="RiakTransport-get_bucket_props"><strong>get_bucket_props</strong></a>(self, bucket)</dt><dd><tt>Serialize&nbsp;get&nbsp;bucket&nbsp;property&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response<br>
+@return&nbsp;dict()</tt></dd></dl>
+
+<dl><dt><a name="RiakTransport-mapred"><strong>mapred</strong></a>(self, inputs, query, timeout<font color="#909090">=None</font>)</dt><dd><tt>Serialize&nbsp;map/reduce&nbsp;request</tt></dd></dl>
+
+<dl><dt><a name="RiakTransport-ping"><strong>ping</strong></a>(self)</dt><dd><tt>Ping&nbsp;the&nbsp;remote&nbsp;server<br>
+@return&nbsp;boolean</tt></dd></dl>
+
+<dl><dt><a name="RiakTransport-put"><strong>put</strong></a>(self, robj, w<font color="#909090">=None</font>, dw<font color="#909090">=None</font>, return_body<font color="#909090">=True</font>)</dt><dd><tt>Serialize&nbsp;put&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response&nbsp;-&nbsp;if&nbsp;'content'<br>
+is&nbsp;true,&nbsp;retrieve&nbsp;the&nbsp;updated&nbsp;metadata/content<br>
+@return&nbsp;(vclock=None,&nbsp;[(metadata,&nbsp;value)]=None)</tt></dd></dl>
+
+<dl><dt><a name="RiakTransport-set_bucket_props"><strong>set_bucket_props</strong></a>(self, bucket, props)</dt><dd><tt>Serialize&nbsp;set&nbsp;bucket&nbsp;property&nbsp;request&nbsp;and&nbsp;deserialize&nbsp;response<br>
+bucket&nbsp;=&nbsp;bucket&nbsp;object<br>
+props&nbsp;=&nbsp;dictionary&nbsp;of&nbsp;properties<br>
+@return&nbsp;boolean</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -532,23 +817,7 @@ confirm&nbsp;the&nbsp;write&nbsp;before&nbsp;returning&nbsp;to&nbsp;client.<br>
 @package&nbsp;<a href="#RiakUtils">RiakUtils</a><br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Class methods defined here:<br>
-<dl><dt><a name="RiakUtils-build_headers"><strong>build_headers</strong></a>(self, headers)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
-
-<dl><dt><a name="RiakUtils-build_rest_path"><strong>build_rest_path</strong></a>(self, client, bucket, key<font color="#909090">=None</font>, spec<font color="#909090">=None</font>, params<font color="#909090">=None</font>)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt><dd><tt>Given&nbsp;a&nbsp;<a href="#RiakClient">RiakClient</a>,&nbsp;<a href="#RiakBucket">RiakBucket</a>,&nbsp;Key,&nbsp;LinkSpec,&nbsp;and&nbsp;Params,<br>
-construct&nbsp;and&nbsp;return&nbsp;a&nbsp;URL.</tt></dd></dl>
-
 <dl><dt><a name="RiakUtils-get_value"><strong>get_value</strong></a>(self, key, array, defaultValue)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
-
-<dl><dt><a name="RiakUtils-http_request"><strong>http_request</strong></a>(self, method, host, port, url, headers<font color="#909090">={}</font>, obj<font color="#909090">=''</font>)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt><dd><tt>Given&nbsp;a&nbsp;Method,&nbsp;URL,&nbsp;Headers,&nbsp;and&nbsp;Body,&nbsp;perform&nbsp;and&nbsp;HTTP&nbsp;request,<br>
-and&nbsp;return&nbsp;an&nbsp;array&nbsp;of&nbsp;arity&nbsp;2&nbsp;containing&nbsp;an&nbsp;associative&nbsp;array&nbsp;of<br>
-response&nbsp;headers&nbsp;and&nbsp;the&nbsp;response&nbsp;body.</tt></dd></dl>
-
-<dl><dt><a name="RiakUtils-httplib_request"><strong>httplib_request</strong></a>(self, method, host, port, uri, headers<font color="#909090">={}</font>, body<font color="#909090">=''</font>)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
-
-<dl><dt><a name="RiakUtils-parse_http_headers"><strong>parse_http_headers</strong></a>(self, headers)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt><dd><tt>Parse&nbsp;an&nbsp;HTTP&nbsp;Header&nbsp;string&nbsp;into&nbsp;an&nbsp;asssociative&nbsp;array&nbsp;of<br>
-response&nbsp;headers.</tt></dd></dl>
-
-<dl><dt><a name="RiakUtils-pycurl_request"><strong>pycurl_request</strong></a>(self, method, host, port, uri, headers<font color="#909090">={}</font>, body<font color="#909090">=''</font>)<font color="#909090"><font face="helvetica, arial"> from __builtin__.classobj</font></font></dt></dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -565,5 +834,32 @@ response&nbsp;headers.</tt></dd></dl>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>HAS_PYCURL</strong> = True</td></tr></table>
+<td width="100%"><strong>HAS_PYCURL</strong> = True<br>
+<strong>MD_CHARSET</strong> = 'charset'<br>
+<strong>MD_CTYPE</strong> = 'content-type'<br>
+<strong>MD_ENCODING</strong> = 'content-encoding'<br>
+<strong>MD_LASTMOD</strong> = 'lastmod'<br>
+<strong>MD_LASTMOD_USECS</strong> = 'lastmod-usecs'<br>
+<strong>MD_LINKS</strong> = 'links'<br>
+<strong>MD_USERMETA</strong> = 'usermeta'<br>
+<strong>MD_VTAG</strong> = 'vtag'<br>
+<strong>MSG_CODE_DEL_REQ</strong> = 13<br>
+<strong>MSG_CODE_DEL_RESP</strong> = 14<br>
+<strong>MSG_CODE_ERROR_RESP</strong> = 0<br>
+<strong>MSG_CODE_GET_CLIENT_ID_REQ</strong> = 3<br>
+<strong>MSG_CODE_GET_CLIENT_ID_RESP</strong> = 4<br>
+<strong>MSG_CODE_GET_REQ</strong> = 9<br>
+<strong>MSG_CODE_GET_RESP</strong> = 10<br>
+<strong>MSG_CODE_GET_SERVER_INFO_REQ</strong> = 7<br>
+<strong>MSG_CODE_GET_SERVER_INFO_RESP</strong> = 8<br>
+<strong>MSG_CODE_LIST_BUCKETS_REQ</strong> = 15<br>
+<strong>MSG_CODE_LIST_BUCKETS_RESP</strong> = 16<br>
+<strong>MSG_CODE_LIST_KEYS_REQ</strong> = 17<br>
+<strong>MSG_CODE_LIST_KEYS_RESP</strong> = 18<br>
+<strong>MSG_CODE_PING_REQ</strong> = 1<br>
+<strong>MSG_CODE_PING_RESP</strong> = 2<br>
+<strong>MSG_CODE_PUT_REQ</strong> = 11<br>
+<strong>MSG_CODE_PUT_RESP</strong> = 12<br>
+<strong>MSG_CODE_SET_CLIENT_ID_REQ</strong> = 5<br>
+<strong>MSG_CODE_SET_CLIENT_ID_RESP</strong> = 6</td></tr></table>
 </body></html>
