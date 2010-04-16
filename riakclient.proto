@@ -58,7 +58,7 @@
 **   RpbGetReq -> RpbErrorResp | RbpGetResp
 **   RpbPutReq -> RpbErrorResp | RpbPutResp
 **   RpbDelReq -> RpbErrorResp | RpbDelResp
-**   RpbListBucketsReq -> RpbErrorResp | RpbListBucketsResp{1,}
+**   RpbListBucketsReq -> RpbErrorResp | RpbListBucketsResp
 **   RpbListKeysReq -> RpbErrorResp | RpbListKeysResp{1,}
 **
 **
@@ -88,7 +88,7 @@
 // Error response - may be generated for any Req
 message RpbErrorResp {
     required bytes errmsg = 1;
-    required int32 errcode = 2;
+    required uint32 errcode = 2;
 }
 
 // Get ClientId Request - no message defined, just send RpbGetClientIdReq message code
@@ -113,7 +113,7 @@ message RpbGetServerInfoResp {
 message RpbGetReq {
     required bytes bucket = 1;
     required bytes key = 2;
-    optional int32 r = 3;
+    optional uint32 r = 3;
 }
 
 // Get Response - if the record was not found there will be no content/vclock
@@ -130,8 +130,8 @@ message RpbPutReq {
     required bytes key = 2;
     optional bytes vclock = 3;
     required RpbContent content = 4;
-    optional int32 w = 5;
-    optional int32 dw = 6;
+    optional uint32 w = 5;
+    optional uint32 dw = 6;
     optional bool return_body = 7;
 }
 
@@ -146,18 +146,16 @@ message RpbPutResp {
 message RpbDelReq {
     required bytes bucket = 1;
     required bytes key = 2;
-    optional int32 rw = 3;
+    optional uint32 rw = 3;
 }
 
 // Delete response - not defined, will return a RpbDelResp on success or RpbErrorResp on failure
 
 // List buckets request - no message defined, just send RpbListBucketsReq
 
-// List buckets response - one or more of these packets will be sent
-// the last one will have done set true (and may not have any buckets in it)
+// List buckets response
 message RpbListBucketsResp {
     repeated bytes buckets = 1;
-    optional bool done = 2;
 }
 
 
@@ -178,14 +176,14 @@ message RpbListKeysResp {
 message RpbMapRedReq {
     required bytes request = 1;
     required bytes content_type = 2;
-    optional int32 timeout = 3; // timeout for operation in milliseconds
+    optional uint32 timeout = 3; // timeout for operation in milliseconds
 }
 
 // Map/Reduce response
 // one or more of these packets will be sent the last one will have done set
 // true (and may not have phase/data in it)
 message RpbMapRedResp {
-    optional int32 phase = 1;
+    optional uint32 phase = 1;
     optional bytes response = 2;
     optional bool done = 3;
 }
@@ -199,8 +197,8 @@ message RpbContent {
     optional bytes content_encoding = 4;
     optional bytes vtag = 5;
     repeated RpbLink links = 6;
-    optional int32 last_mod = 7;
-    optional int32 last_mod_usecs = 8;
+    optional uint32 last_mod = 7;
+    optional uint32 last_mod_usecs = 8;
     repeated RpbPair usermeta = 9;
 }
 
