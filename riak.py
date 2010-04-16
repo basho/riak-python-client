@@ -73,33 +73,37 @@ create, modify, and delete Riak objects, add and remove links from
 Riak objects, run Javascript (and Erlang) based Map/Reduce
 operations, and run Linkwalking operations.
 
-See the unit_tests.php file for example usage.
+See the unit_tests.py file for example usage.
 
 @author Rusty Klophaus (@rklophaus) (rusty@basho.com)
 @package RiakAPI
 """
 
-class RiakClient:
+class RiakClient(object):
         """
         The RiakClient object holds information necessary to connect to
         Riak. The Riak API uses HTTP, so there is no persistent
         connection, and the RiakClient object is extremely lightweight.
         """
-        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', mapred_prefix='mapred',
-                     transport=None):
+        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', 
+                     mapred_prefix='mapred', transport_class=None, 
+                     client_id=None):
                 """
                 Construct a new RiakClient object.
                 @param string host - Hostname or IP address (default '127.0.0.1')
                 @param int port - Port number (default 8098)
                 @param string prefix - Interface prefix (default 'riak')
                 @param string mapred_prefix - MapReduce prefix (default 'mapred')
-                @param RiakTranposrt transport - transport class to use
+                @param RiakTransport transport_class - transport class to use
                 """
-                if transport == None:
-                        self._transport = RiakHttpTransport(host, port, prefix, mapred_prefix)
+                if not transport_class:
+                        self._transport = RiakHttpTransport(host, 
+                                                            port, 
+                                                            prefix, 
+                                                            mapred_prefix, 
+                                                            client_id)
                 else:
-                        self._transport = transport
-
+                        self._transport = transport_class(host, port, client_id=client_id)
                 self._r = 2
                 self._w = 2
                 self._dw = 0
@@ -108,7 +112,6 @@ class RiakClient:
                                   'text/json':json.dumps}
                 self._decoders = {'application/json':json.loads,
                                   'text/json':json.loads}
-                return None
 
         def get_transport(self):
                 """
@@ -209,8 +212,7 @@ class RiakClient:
                 """
                 if content_type in self._encoders:
                         return self._encoders[content_type]
-                else:
-                        return None
+
         def set_encoder(self, content_type, encoder):
                 """
                 Set the encoding function for this content type
@@ -225,8 +227,7 @@ class RiakClient:
                 """
                 if content_type in self._decoders:
                         return self._decoders[content_type]
-                else:
-                        return None
+
         def set_decoder(self, content_type, decoder):
                 """
                 Set the decoding function for this content type
@@ -283,7 +284,7 @@ class RiakClient:
                 mr = RiakMapReduce(self)
                 return apply(mr.reduce, args)
         
-class RiakMapReduce:
+class RiakMapReduce(object):
         """
         The RiakMapReduce object allows you to build up and run a
         map/reduce operation on Riak.
@@ -435,7 +436,7 @@ class RiakMapReduce:
 
                 return a
 
-class RiakMapReducePhase:
+class RiakMapReducePhase(object):
         """
         The RiakMapReducePhase holds information about a Map phase or
         Reduce phase in a RiakMapReduce operation.
@@ -457,7 +458,6 @@ class RiakMapReducePhase:
                 self._function = function
                 self._keep = keep
                 self._arg = arg
-                return None
 
         def to_array(self):
                 """
@@ -483,7 +483,7 @@ class RiakMapReducePhase:
 
                 return {self._type : stepdef}
 
-class RiakLinkPhase :
+class RiakLinkPhase(object):
         """
         The RiakLinkPhase object holds information about a Link phase in a
         map/reduce operation.
@@ -500,7 +500,6 @@ class RiakLinkPhase :
                 self._bucket = bucket
                 self._tag = tag
                 self._keep = keep
-                return None
 
         def to_array(self):
                 """
@@ -512,7 +511,7 @@ class RiakLinkPhase :
                            'keep':self._keep}
                 return {'link':stepdef}
 
-class RiakLink :
+class RiakLink(object):
         """
         The RiakLink object represents a link from one Riak object to
         another.
@@ -530,7 +529,6 @@ class RiakLink :
                 self._key = key
                 self._tag = tag
                 self._client = None
-                return None
 
         def get(self, r=None):
                 """
@@ -620,7 +618,7 @@ class RiakLink :
                 is_equal = (self._bucket == link._bucket) and (self._key == link._key) and (self.get_tag() == link.get_tag())
                 return is_equal
 
-class RiakBucket :
+class RiakBucket(object):
         """
         The RiakBucket object allows you to access and change information
         about a Riak bucket, and provides methods to create or retrieve
@@ -637,7 +635,6 @@ class RiakBucket :
                 self._rw = None
                 self._encoders = {}
                 self._decoders = {}
-                return None
 
         def get_name(self):
                 """
@@ -885,8 +882,6 @@ class RiakBucket :
                 props = self.get_properties()
                 if (key in props.keys()):
                         return props[key]
-                else:
-                        return None
 
         def set_properties(self, props):
                 """
@@ -896,7 +891,6 @@ class RiakBucket :
                 """
                 t = self._client.get_transport()
                 t.set_bucket_props(self, props)
-                return None
 
         def get_properties(self):
                 """
@@ -907,7 +901,7 @@ class RiakBucket :
                 return t.get_bucket_props(self)
                
 
-class RiakObject :
+class RiakObject(object):
         """
         The RiakObject holds meta information about a Riak object, plus the
         object's data.
@@ -932,7 +926,6 @@ class RiakObject :
                 self._links = []
                 self._siblings = []
                 self._exists = False
-                return None
 
         def get_bucket(self):
                 """
@@ -1340,7 +1333,7 @@ class RiakObject :
                 mr.add(self._bucket._name, self._key)
                 return apply(mr.reduce, args)
         
-class RiakUtils :
+class RiakUtils(object):
         """
         Utility functions used by Riak library.
         @package RiakUtils	
@@ -1360,11 +1353,15 @@ class RiakError(Exception) :
         def __str__(self):
                 return repr(self.value)
  
-class RiakTransport :
+class RiakTransport(object):
         """
         Class to encapsulate transport details
         """
-        
+
+        def make_client_id(self):
+            return 'py_%s' % base64.b64encode(
+                    str(random.randint(1, 1073741824)))
+
         def ping(self):
                 """
                 Ping the remote server
@@ -1422,7 +1419,8 @@ class RiakHttpTransport(RiakTransport) :
         Riak. The Riak API uses HTTP, so there is no persistent
         connection, and the RiakClient object is extremely lightweight.
         """
-        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', mapred_prefix='mapred',
+        def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
+                     mapred_prefix='mapred',
                      client_id = None):
                 """
                 Construct a new RiakClient object.
@@ -1436,11 +1434,9 @@ class RiakHttpTransport(RiakTransport) :
                 self._port = port
                 self._prefix = prefix
                 self._mapred_prefix = mapred_prefix
-                if client_id == None:
-                        self._client_id = 'php_' + base64.b64encode(str(random.randint(1, 1073741824)))
-                else:
-                        self._client_id = client_id
-                return None
+                self._client_id = client_id
+                if not self._client_id:
+                        self._client_id = self.make_client_id()
 
         def __copy__(self):
                 return RiakHttpTransport(self._host, self._port, self._prefix, self._mapred_prefix)
@@ -1829,7 +1825,7 @@ MSG_CODE_LIST_BUCKETS_RESP    = 16
 MSG_CODE_LIST_KEYS_REQ        = 17
 MSG_CODE_LIST_KEYS_RESP       = 18
 
-class RiakPbcTransport :
+class RiakPbcTransport(RiakTransport):
         """
         The RiakPbcTransport object holds a connection to the protocol buffers interface
         on the riak server.
@@ -1843,8 +1839,9 @@ class RiakPbcTransport :
                 self._host = host
                 self._port = port
                 self._client_id = client_id
+                if not self._client_id:
+                        self._client_id = self.make_client_id()
                 self._sock = None
-                return None
 
         def __copy__(self):
                 return RiakPbcTransport(self._host, self._port)
@@ -1920,8 +1917,6 @@ class RiakPbcTransport :
                         for c in resp.contents:
                                 contents.append(self.decode_content(c))
                         return (resp.vclock, contents)
-                else:
-                        return None
 
         def delete(self, robj, rw = None):
                 """
@@ -1946,12 +1941,10 @@ class RiakPbcTransport :
                 if self._sock is None:
                         self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.connect((self._host, self._port))
-                return None
 
         def send_msg_code(self, msg_code):
                 pkt = struct.pack("!iB", 1, msg_code)
                 self._sock.send(pkt)
-                return None
 
         def encode_msg(self, msg_code, msg):
                 str = msg.SerializeToString()
@@ -1965,7 +1958,6 @@ class RiakPbcTransport :
                 if sent_len != len(pkt):
                         raise RiakError("PB socket returned short write {0} - expected {1}".
                                         format(sent_len, len(pkt)))
-                return None
 
         def recv_msg(self):
                 self.recv_pkt()
@@ -2013,7 +2005,6 @@ class RiakPbcTransport :
                                                 format(recv_len, want_len))
                         self._inbuf += recv_buf
                 
-                return None
                         
         def decode_contents(self, rpb_contents):
                 contents = []
@@ -2072,3 +2063,4 @@ class RiakPbcTransport :
                                         pb_link.key = link.get_key()
                                         pb_link.tag = link.get_tag()
                 rpb_content.value = data
+
