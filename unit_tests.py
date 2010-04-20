@@ -9,6 +9,7 @@ import random
 import copy
 import cPickle
 import fractions # class that JSON module will not serialize for custom encoder/decoder tests
+import commands
 
 HOST = 'localhost'
 HTTP_PORT = 8098
@@ -105,8 +106,6 @@ def test_delete(host, port, transport_class):
 	assert(not obj.exists())
 
 def test_set_bucket_properties(host, port, transport_class):
-        if transport_class == riak.RiakPbcTransport:
-                return None
 	client = riak.RiakClient(host, port, transport_class=transport_class)
 	bucket = client.bucket('bucket')
 	# Test setting allow mult...
@@ -341,6 +340,7 @@ test_fail = 0
 
 def test(function):
 	global test_pass, test_fail
+        assert(commands.getoutput("./reset_riak") == 'ok')
 	try:
 		apply(function, [HOST, HTTP_PORT, riak.RiakHttpTransport])
 		test_pass+=1

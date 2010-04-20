@@ -1824,6 +1824,10 @@ MSG_CODE_LIST_BUCKETS_REQ     = 15
 MSG_CODE_LIST_BUCKETS_RESP    = 16
 MSG_CODE_LIST_KEYS_REQ        = 17
 MSG_CODE_LIST_KEYS_RESP       = 18
+MSG_CODE_GET_BUCKET_REQ       = 19
+MSG_CODE_GET_BUCKET_RESP      = 20
+MSG_CODE_SET_BUCKET_REQ       = 21
+MSG_CODE_SET_BUCKET_RESP      = 22
 
 class RiakPbcTransport(RiakTransport):
         """
@@ -1937,6 +1941,46 @@ class RiakPbcTransport(RiakTransport):
                         raise RiakError("unexpected protocol buffer message code: ", msg_code) 
                 return self
 
+        def get_bucket_props(self, bucket):
+                """
+                Serialize bucket property request and deserialize response
+                """
+                req = riakclient_pb2.RpbGetBucketReq()
+                req.bucket = bucket.get_name()
+
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_GET_BUCKET_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code != MSG_CODE_GET_BUCKET_RESP:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code) 
+                props = {}
+                if resp.props.HasField('n_val'):
+                        props['n_val'] = resp.props.n_val
+                if resp.props.HasField('allow_mult'):
+                        props['allow_mult'] = resp.props.allow_mult
+
+                return props
+
+
+        def set_bucket_props(self, bucket, props):
+                """
+                Serialize set bucket property request and deserialize response
+                """
+                req = riakclient_pb2.RpbSetBucketReq()
+                req.bucket = bucket.get_name()
+                if 'n_val' in props:
+                        req.props.n_val = props['n_val']
+                if 'allow_mult' in props:
+                        req.props.allow_mult = props['allow_mult']
+                
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_SET_BUCKET_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code != MSG_CODE_SET_BUCKET_RESP:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code) 
+
+                return self
+
         def maybe_connect(self):
                 if self._sock is None:
                         self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -1976,10 +2020,10 @@ class RiakPbcTransport(RiakTransport):
                         msg.ParseFromString(self._inbuf[1:])
                 elif msg_code == MSG_CODE_DEL_RESP:
                         msg = None
-                elif msg_code == MSG_CODE_GET_BUCKET_PROPS_RESP:
-                        msg = riakclient_pb2.RpbGetBucketPropsResp()
+                elif msg_code == MSG_CODE_GET_BUCKET_RESP:
+                        msg = riakclient_pb2.RpbGetBucketResp()
                         msg.ParseFromString(self._inbuf[1:])
-                elif msg_code == MSG_CODE_SET_BUCKET_PROPS_RESP:
+                elif msg_code == MSG_CODE_SET_BUCKET_RESP:
                         msg = None
                 elif msg_code == MSG_CODE_MAPRED_RESP:
                         msg = riakclient_pb2.RpbMapRedResp()

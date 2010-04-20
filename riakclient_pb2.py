@@ -10,7 +10,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = descriptor.FileDescriptor(
   name='riakclient.proto',
   package='',
-  serialized_pb='\n\x10riakclient.proto\"/\n\x0cRpbErrorResp\x12\x0e\n\x06\x65rrmsg\x18\x01 \x02(\x0c\x12\x0f\n\x07\x65rrcode\x18\x02 \x02(\r\"\'\n\x12RpbGetClientIdResp\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"&\n\x11RpbSetClientIdReq\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"<\n\x14RpbGetServerInfoResp\x12\x0c\n\x04node\x18\x01 \x01(\x0c\x12\x16\n\x0eserver_version\x18\x02 \x01(\x0c\"3\n\tRpbGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\":\n\nRpbGetResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\"\x82\x01\n\tRpbPutReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0e\n\x06vclock\x18\x03 \x01(\x0c\x12\x1c\n\x07\x63ontent\x18\x04 \x02(\x0b\x32\x0b.RpbContent\x12\t\n\x01w\x18\x05 \x01(\r\x12\n\n\x02\x64w\x18\x06 \x01(\r\x12\x13\n\x0breturn_body\x18\x07 \x01(\x08\";\n\nRpbPutResp\x12\x1d\n\x08\x63ontents\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\"4\n\tRpbDelReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\n\n\x02rw\x18\x03 \x01(\r\"%\n\x12RpbListBucketsResp\x12\x0f\n\x07\x62uckets\x18\x01 \x03(\x0c\" \n\x0eRpbListKeysReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\"-\n\x0fRpbListKeysResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"F\n\x0cRpbMapRedReq\x12\x0f\n\x07request\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x02(\x0c\x12\x0f\n\x07timeout\x18\x03 \x01(\r\">\n\rRpbMapRedResp\x12\r\n\x05phase\x18\x01 \x01(\r\x12\x10\n\x08response\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\"\xc9\x01\n\nRpbContent\x12\r\n\x05value\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x01(\x0c\x12\x0f\n\x07\x63harset\x18\x03 \x01(\x0c\x12\x18\n\x10\x63ontent_encoding\x18\x04 \x01(\x0c\x12\x0c\n\x04vtag\x18\x05 \x01(\x0c\x12\x17\n\x05links\x18\x06 \x03(\x0b\x32\x08.RpbLink\x12\x10\n\x08last_mod\x18\x07 \x01(\r\x12\x16\n\x0elast_mod_usecs\x18\x08 \x01(\r\x12\x1a\n\x08usermeta\x18\t \x03(\x0b\x32\x08.RpbPair\"%\n\x07RpbPair\x12\x0b\n\x03key\x18\x01 \x02(\x0c\x12\r\n\x05value\x18\x02 \x01(\x0c\"3\n\x07RpbLink\x12\x0e\n\x06\x62ucket\x18\x01 \x01(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0b\n\x03tag\x18\x03 \x01(\x0c')
+  serialized_pb='\n\x10riakclient.proto\"/\n\x0cRpbErrorResp\x12\x0e\n\x06\x65rrmsg\x18\x01 \x02(\x0c\x12\x0f\n\x07\x65rrcode\x18\x02 \x02(\r\"\'\n\x12RpbGetClientIdResp\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"&\n\x11RpbSetClientIdReq\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"<\n\x14RpbGetServerInfoResp\x12\x0c\n\x04node\x18\x01 \x01(\x0c\x12\x16\n\x0eserver_version\x18\x02 \x01(\x0c\"3\n\tRpbGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\":\n\nRpbGetResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\"\x82\x01\n\tRpbPutReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0e\n\x06vclock\x18\x03 \x01(\x0c\x12\x1c\n\x07\x63ontent\x18\x04 \x02(\x0b\x32\x0b.RpbContent\x12\t\n\x01w\x18\x05 \x01(\r\x12\n\n\x02\x64w\x18\x06 \x01(\r\x12\x13\n\x0breturn_body\x18\x07 \x01(\x08\";\n\nRpbPutResp\x12\x1d\n\x08\x63ontents\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\"4\n\tRpbDelReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\n\n\x02rw\x18\x03 \x01(\r\"%\n\x12RpbListBucketsResp\x12\x0f\n\x07\x62uckets\x18\x01 \x03(\x0c\" \n\x0eRpbListKeysReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\"-\n\x0fRpbListKeysResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"!\n\x0fRpbGetBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\"2\n\x10RpbGetBucketResp\x12\x1e\n\x05props\x18\x01 \x02(\x0b\x32\x0f.RpbBucketProps\"A\n\x0fRpbSetBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x1e\n\x05props\x18\x02 \x02(\x0b\x32\x0f.RpbBucketProps\"F\n\x0cRpbMapRedReq\x12\x0f\n\x07request\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x02(\x0c\x12\x0f\n\x07timeout\x18\x03 \x01(\r\">\n\rRpbMapRedResp\x12\r\n\x05phase\x18\x01 \x01(\r\x12\x10\n\x08response\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\"\xc9\x01\n\nRpbContent\x12\r\n\x05value\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x01(\x0c\x12\x0f\n\x07\x63harset\x18\x03 \x01(\x0c\x12\x18\n\x10\x63ontent_encoding\x18\x04 \x01(\x0c\x12\x0c\n\x04vtag\x18\x05 \x01(\x0c\x12\x17\n\x05links\x18\x06 \x03(\x0b\x32\x08.RpbLink\x12\x10\n\x08last_mod\x18\x07 \x01(\r\x12\x16\n\x0elast_mod_usecs\x18\x08 \x01(\r\x12\x1a\n\x08usermeta\x18\t \x03(\x0b\x32\x08.RpbPair\"%\n\x07RpbPair\x12\x0b\n\x03key\x18\x01 \x02(\x0c\x12\r\n\x05value\x18\x02 \x01(\x0c\"3\n\x07RpbLink\x12\x0e\n\x06\x62ucket\x18\x01 \x01(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0b\n\x03tag\x18\x03 \x01(\x0c\"3\n\x0eRpbBucketProps\x12\r\n\x05n_val\x18\x01 \x01(\r\x12\x12\n\nallow_mult\x18\x02 \x01(\x08')
 
 
 
@@ -456,6 +456,97 @@ _RPBLISTKEYSRESP = descriptor.Descriptor(
 )
 
 
+_RPBGETBUCKETREQ = descriptor.Descriptor(
+  name='RpbGetBucketReq',
+  full_name='RpbGetBucketReq',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='bucket', full_name='RpbGetBucketReq.bucket', index=0,
+      number=1, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=693,
+  serialized_end=726,
+)
+
+
+_RPBGETBUCKETRESP = descriptor.Descriptor(
+  name='RpbGetBucketResp',
+  full_name='RpbGetBucketResp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='props', full_name='RpbGetBucketResp.props', index=0,
+      number=1, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=728,
+  serialized_end=778,
+)
+
+
+_RPBSETBUCKETREQ = descriptor.Descriptor(
+  name='RpbSetBucketReq',
+  full_name='RpbSetBucketReq',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='bucket', full_name='RpbSetBucketReq.bucket', index=0,
+      number=1, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='props', full_name='RpbSetBucketReq.props', index=1,
+      number=2, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=780,
+  serialized_end=845,
+)
+
+
 _RPBMAPREDREQ = descriptor.Descriptor(
   name='RpbMapRedReq',
   full_name='RpbMapRedReq',
@@ -493,8 +584,8 @@ _RPBMAPREDREQ = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=693,
-  serialized_end=763,
+  serialized_start=847,
+  serialized_end=917,
 )
 
 
@@ -535,8 +626,8 @@ _RPBMAPREDRESP = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=765,
-  serialized_end=827,
+  serialized_start=919,
+  serialized_end=981,
 )
 
 
@@ -619,8 +710,8 @@ _RPBCONTENT = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=830,
-  serialized_end=1031,
+  serialized_start=984,
+  serialized_end=1185,
 )
 
 
@@ -654,8 +745,8 @@ _RPBPAIR = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1033,
-  serialized_end=1070,
+  serialized_start=1187,
+  serialized_end=1224,
 )
 
 
@@ -696,14 +787,51 @@ _RPBLINK = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1072,
-  serialized_end=1123,
+  serialized_start=1226,
+  serialized_end=1277,
+)
+
+
+_RPBBUCKETPROPS = descriptor.Descriptor(
+  name='RpbBucketProps',
+  full_name='RpbBucketProps',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='n_val', full_name='RpbBucketProps.n_val', index=0,
+      number=1, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='allow_mult', full_name='RpbBucketProps.allow_mult', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=1279,
+  serialized_end=1330,
 )
 
 
 _RPBGETRESP.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBPUTREQ.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBPUTRESP.fields_by_name['contents'].message_type = _RPBCONTENT
+_RPBGETBUCKETRESP.fields_by_name['props'].message_type = _RPBBUCKETPROPS
+_RPBSETBUCKETREQ.fields_by_name['props'].message_type = _RPBBUCKETPROPS
 _RPBCONTENT.fields_by_name['links'].message_type = _RPBLINK
 _RPBCONTENT.fields_by_name['usermeta'].message_type = _RPBPAIR
 
@@ -779,6 +907,24 @@ class RpbListKeysResp(message.Message):
   
   # @@protoc_insertion_point(class_scope:RpbListKeysResp)
 
+class RpbGetBucketReq(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _RPBGETBUCKETREQ
+  
+  # @@protoc_insertion_point(class_scope:RpbGetBucketReq)
+
+class RpbGetBucketResp(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _RPBGETBUCKETRESP
+  
+  # @@protoc_insertion_point(class_scope:RpbGetBucketResp)
+
+class RpbSetBucketReq(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _RPBSETBUCKETREQ
+  
+  # @@protoc_insertion_point(class_scope:RpbSetBucketReq)
+
 class RpbMapRedReq(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _RPBMAPREDREQ
@@ -808,5 +954,11 @@ class RpbLink(message.Message):
   DESCRIPTOR = _RPBLINK
   
   # @@protoc_insertion_point(class_scope:RpbLink)
+
+class RpbBucketProps(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _RPBBUCKETPROPS
+  
+  # @@protoc_insertion_point(class_scope:RpbBucketProps)
 
 # @@protoc_insertion_point(module_scope)
