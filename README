@@ -6,12 +6,12 @@ This is the Python client for Riak.
 
 Table of Contents
 =================
-1 Documentation 
-2 Repositories 
+1 Documentation
+2 Repositories
 3 Building
 
 
-1 Documentation 
+1 Documentation
 ~~~~~~~~~~~~~~~~
 
   Documentation for the Python library can be found in the docs
@@ -21,7 +21,7 @@ Table of Contents
 
   [https://wiki.basho.com/display/RIAK/Client+Libraries]
 
-2 Repositories 
+2 Repositories
 ~~~~~~~~~~~~~~~
 
   The official source code for this client can be retrieved from
