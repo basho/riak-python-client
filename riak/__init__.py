@@ -1347,8 +1347,8 @@ class RiakTransport(object):
                 '''
                 Returns a random client identifier
                 '''
-            return 'py_%s' % base64.b64encode(
-                    str(random.randint(1, 1073741824)))
+                return 'py_%s' % base64.b64encode(
+                        str(random.randint(1, 1073741824)))
 
         @classmethod
         def make_fixed_client_id(self):
@@ -1434,7 +1434,7 @@ class RiakHttpTransport(RiakTransport) :
                 self._mapred_prefix = mapred_prefix
                 self._client_id = client_id
                 if not self._client_id:
-                        self._client_id = self.make_client_id()
+                        self._client_id = self.make_random_client_id()
 
         def __copy__(self):
                 return RiakHttpTransport(self._host, self._port, self._prefix, self._mapred_prefix)
