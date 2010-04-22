@@ -9,6 +9,7 @@ Table of Contents
 1 Documentation
 2 Repositories
 3 Building
+4 Testing
 
 
 1 Documentation
@@ -40,3 +41,7 @@ Table of Contents
 ~~~~~~~~~~
 
     python setup.py install
+
+4 Running Unit Tests
+~~~~~~~~~~
+    python setup.py test
