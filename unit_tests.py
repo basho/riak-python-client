@@ -8,12 +8,34 @@ except ImportError:
 import random
 import copy
 import cPickle
-import fractions # class that JSON module will not serialize for custom encoder/decoder tests
 
 HOST = 'localhost'
 HTTP_PORT = 8098
 PB_PORT = 8087
 VERBOSE = True
+
+class NotJsonSerializable(object):
+
+        def __init__(self, *args, **kwargs):
+                self.args = list(args)
+                self.kwargs = kwargs
+
+        def __eq__(self, other):
+                if len(self.args) != len(other.args):
+                        return False
+                if len(self.kwargs) != len(other.kwargs):
+                        return False
+                for name, value in self.kwargs.items():
+                        if other.kwargs[name] != value:
+                                return False
+                value1_args = copy.copy(self.args)
+                value2_args = copy.copy(other.args)
+                value1_args.sort()
+                value2_args.sort()
+                for i in xrange(len(value1_args)):
+                        if value1_args[i] != value2_args[i]:
+                                return False
+                return True
 
 # BEGIN UNIT TESTS
 
@@ -57,7 +79,7 @@ def test_custom_bucket_encoder_decoder(host, port, transport_class):
 	bucket = client.bucket("picklin_bucket")
         bucket.set_encoder('application/x-pickle', cPickle.dumps)
         bucket.set_decoder('application/x-pickle', cPickle.loads)
-        data = {'array':[1, 2, 3], 'badforjson':fractions.Fraction(1,3)}
+        data = {'array':[1, 2, 3], 'badforjson':NotJsonSerializable(1,3)}
 	obj = bucket.new("foo", data, 'application/x-pickle').store()
         obj.store()
         obj2 = bucket.get("foo")
@@ -69,7 +91,7 @@ def test_custom_client_encoder_decoder(host, port, transport_class):
 	bucket = client.bucket("picklin_client")
         client.set_encoder('application/x-pickle', cPickle.dumps)
         client.set_decoder('application/x-pickle', cPickle.loads)
-        data = {'array':[1, 2, 3], 'badforjson':fractions.Fraction(1,3)}
+        data = {'array':[1, 2, 3], 'badforjson':NotJsonSerializable(1,3)}
 	obj = bucket.new("foo", data, 'application/x-pickle').store()
         obj.store()
         obj2 = bucket.get("foo")

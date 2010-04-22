@@ -1075,7 +1075,7 @@ class RiakObject(object):
                         oldlink = RiakLink(obj._bucket._name, obj._key, tag)
                         
                 a = []
-                links = self._metadata[MD_LINKS] if MD_LINKS in self._metadata else []
+                links = self._metadata.get(MD_LINKS, [])
                 for link in links:
                         if not link.isEqual(oldlink):
                                 a.append(link)
@@ -2024,9 +2024,19 @@ class RiakPbcTransport(RiakTransport):
                         metadata[MD_VTAG] = rpb_content.vtag
                 links = []
                 for link in rpb_content.links:
-                        links.append(RiakLink(link.bucket if link.HasField("bucket") else None, 
-                                              link.key if link.HasField("key") else None, 
-                                              link.tag if link.HasField("tag") else None))
+                        if link.HasField("bucket"):
+                                bucket = link.bucket
+                        else:
+                                bucket = None
+                        if link.HasField("key"):
+                                key = link.key
+                        else:
+                                key = None
+                        if link.HasField("tag"):
+                                tag = link.tag
+                        else:
+                                tag = None
+                        links.append(RiakLink(bucket, key, tag))
                 if links != []:
                         metadata[MD_LINKS] = links
                 if rpb_content.HasField("last_mod"):
