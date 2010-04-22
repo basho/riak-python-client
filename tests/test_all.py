@@ -18,7 +18,7 @@ HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
-PB_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8097'))
+PB_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8087'))
 
 class NotJsonSerializable(object):
 
@@ -143,6 +143,16 @@ class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
             self.port = PB_PORT
             self.transport_class = riak.RiakPbcTransport
             super(RiakPbcTransportTestCase, self).setUp()
+
+        def test_uses_client_id_if_given(self):
+                self.host = PB_HOST
+                self.port = PB_PORT
+                zero_client_id = "\0\0\0\0"
+                c = riak.RiakClient(PB_HOST, PB_PORT,
+                                    transport_class = riak.RiakPbcTransport, 
+                                    client_id = zero_client_id)
+                self.assertEqual(zero_client_id, c.get_client_id()) # 
+                
 
 class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
 

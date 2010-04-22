@@ -1342,10 +1342,24 @@ class RiakTransport(object):
         Class to encapsulate transport details
         """
 
-        def make_client_id(self):
+        @classmethod
+        def make_random_client_id(self):
+                '''
+                Returns a random client identifier
+                '''
             return 'py_%s' % base64.b64encode(
                     str(random.randint(1, 1073741824)))
 
+        @classmethod
+        def make_fixed_client_id(self):
+                '''
+                Returns a unique identifier for the current machine/process/thread. 
+                '''
+                machine = platform.node() 
+                process = os.getpid() 
+                thread = threading.currentThread().getName()
+                return base64.b64encode('%s|%s|%s' % (machine, process, thread))
+ 
         def ping(self):
                 """
                 Ping the remote server
@@ -1823,8 +1837,6 @@ class RiakPbcTransport(RiakTransport):
                 self._host = host
                 self._port = port
                 self._client_id = client_id
-                if not self._client_id:
-                        self._client_id = self.make_client_id()
                 self._sock = None
 
         def __copy__(self):
@@ -1843,6 +1855,33 @@ class RiakPbcTransport(RiakTransport):
                 else:
                         return 0
 
+        def get_client_id(self):
+                """
+                Get the client id used by this connection
+                """
+                self.maybe_connect()
+                self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ)
+                msg_code, resp = self.recv_msg()
+                if msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
+                        return resp.client_id
+                else:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code)
+
+        def set_client_id(self, client_id):
+                """
+                Set the client id used by this connection
+                """
+                req = riakclient_pb2.RpbSetClientIdReq()
+                req.client_id = client_id
+
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
+                        return True
+                else:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code)
+                
         def get(self, robj, r = None, vtag = None):
                 """
                 Serialize get request and deserialize response
@@ -1925,6 +1964,8 @@ class RiakPbcTransport(RiakTransport):
                 if self._sock is None:
                         self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.connect((self._host, self._port))
+                        if self._client_id:
+                                self.set_client_id(self._client_id)
 
         def send_msg_code(self, msg_code):
                 pkt = struct.pack("!iB", 1, msg_code)
@@ -1952,6 +1993,11 @@ class RiakPbcTransport(RiakTransport):
                         raise Exception(msg.errmsg)
                 elif msg_code == MSG_CODE_PING_RESP:
                         msg = None
+                elif msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
+                        msg = riakclient_pb2.RpbGetClientIdResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                elif msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
+                        msg = None
                 elif msg_code == MSG_CODE_GET_RESP:
                         msg = riakclient_pb2.RpbGetResp()
                         msg.ParseFromString(self._inbuf[1:])
@@ -1960,14 +2006,6 @@ class RiakPbcTransport(RiakTransport):
                         msg.ParseFromString(self._inbuf[1:])
                 elif msg_code == MSG_CODE_DEL_RESP:
                         msg = None
-                elif msg_code == MSG_CODE_GET_BUCKET_PROPS_RESP:
-                        msg = riakclient_pb2.RpbGetBucketPropsResp()
-                        msg.ParseFromString(self._inbuf[1:])
-                elif msg_code == MSG_CODE_SET_BUCKET_PROPS_RESP:
-                        msg = None
-                elif msg_code == MSG_CODE_MAPRED_RESP:
-                        msg = riakclient_pb2.RpbMapRedResp()
-                        msg.ParseFromString(self._inbuf[1:])
                 else:
                         raise Exception("unknown msg code {0}".format(msg_code))
                 return msg_code, msg
