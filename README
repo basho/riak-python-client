@@ -40,6 +40,11 @@ Table of Contents
 3 Installing
 ~~~~~~~~~~
 
+    You must have Protocol buffers installed before you can install this, 
+    you can get that from:
+
+    [http://code.google.com/p/protobuf/downloads/list]
+
     python setup.py install
 
 4 Running Unit Tests
