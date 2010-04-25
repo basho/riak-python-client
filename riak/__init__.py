@@ -632,9 +632,9 @@ class RiakBucket(object):
                 the R-value for the client.
                 @return integer
                 """
-                if (r != None):
+                if (r is not None):
                         return r
-                if (self._r != None):
+                if (self._r is not None):
                         return self._r
                 return self._client.get_r()
 
@@ -654,9 +654,9 @@ class RiakBucket(object):
                 the W-value for the client.
                 @return integer
                 """
-                if (w != None):
+                if (w is not None):
                         return w
-                if (self._w != None):
+                if (self._w is not None):
                         return self._w
                 return self._client.get_w()
 
@@ -675,9 +675,9 @@ class RiakBucket(object):
                 the DW-value for the client.
                 @return integer
                 """
-                if (dw != None):
+                if (dw is not None):
                         return dw
-                if (self._dw != None):
+                if (self._dw is not None):
                         return self._dw
                 return self._client.get_dw()
 
@@ -696,9 +696,9 @@ class RiakBucket(object):
                 the RW-value for the client.
                 @return integer
                 """
-                if (rw != None):
+                if (rw is not None):
                         return rw
-                if (self._rw != None):
+                if (self._rw is not None):
                         return self._rw
                 return self._client.get_rw()
 
@@ -1101,7 +1101,7 @@ class RiakObject(object):
                 # Issue the get over our transport
                 t = self._client.get_transport()
                 Result = t.put(self, w, dw, return_body)
-                if Result != None:
+                if Result is not None:
                         self.populate(Result)
 
                 return self
@@ -1122,7 +1122,7 @@ class RiakObject(object):
                 Result = t.get(self, r, vtag)
 
                 self.clear()
-                if Result != None:
+                if Result is not None:
                         self.populate(Result)
 
                 return self
@@ -1203,7 +1203,7 @@ class RiakObject(object):
                 for linkHeader in linkHeaders.strip().split(','):
                         linkHeader = linkHeader.strip()
                         matches = re.match("\<\/([^\/]+)\/([^\/]+)\/([^\/]+)\>; ?riaktag=\"([^\']+)\"", linkHeader)
-                        if (matches != None):
+                        if (matches is not None):
                                 link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
                                 self._links.append(link)
                 return self
@@ -1444,14 +1444,14 @@ class RiakHttpTransport(RiakTransport) :
         """
         def ping(self) :
                 response = self.http_request('GET', self._host, self._port, '/ping')
-                return(response != None) and (response[1] == 'OK')
+                return(response is not None) and (response[1] == 'OK')
 
         """
         Get a bucket/key from the server
         """
         def get(self, robj, r, vtag = None) :
                 params = {'r' : r}
-                if vtag != None:
+                if vtag is not None:
                         params['vtag'] = vtag
                 host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                                        None, params)
@@ -1473,7 +1473,7 @@ class RiakHttpTransport(RiakTransport) :
                            'X-Riak-ClientId' : self._client_id}
 
                 # Add the vclock if it exists...
-                if (robj.vclock() != None):
+                if (robj.vclock() is not None):
                         headers['X-Riak-Vclock'] = robj.vclock()
 
                 # Create the header from metadata
@@ -1540,7 +1540,7 @@ class RiakHttpTransport(RiakTransport) :
         def mapred(self, inputs, query, timeout=None):
                 # Construct the job, optionally set the timeout...
                 job = {'inputs':inputs, 'query':query}
-                if timeout != None:
+                if timeout is not None:
                         job['timeout'] = timeout
 
                 content = json.dumps(job)
@@ -1646,7 +1646,7 @@ class RiakHttpTransport(RiakTransport) :
                 for linkHeader in linkHeaders.strip().split(','):
                         linkHeader = linkHeader.strip()
                         matches = re.match("\<\/([^\/]+)\/([^\/]+)\/([^\/]+)\>; ?riaktag=\"([^\']+)\"", linkHeader)
-                        if (matches != None):
+                        if (matches is not None):
                                 link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
                                 links.append(link)
                 return self
@@ -1674,11 +1674,11 @@ class RiakHttpTransport(RiakTransport) :
                 path += '/' + urllib.quote_plus(bucket._name)
 
                 # Add '.../key'
-                if (key != None):
+                if (key is not None):
                         path += '/' + urllib.quote_plus(key)
 
                 # Add query parameters.
-                if (params != None):
+                if (params is not None):
                         s = ''
                         for key in params.keys():
                                 if (s != ''): s += '&'
@@ -1723,8 +1723,8 @@ class RiakHttpTransport(RiakTransport) :
 
                         return response_headers, response_body
                 except:
-                        if client != None: client.close()
-                        if response != None: response.close()
+                        if client is not None: client.close()
+                        if response is not None: response.close()
                         raise
 
 
@@ -1769,7 +1769,7 @@ class RiakHttpTransport(RiakTransport) :
 
                         return response_headers, response_body
                 except:
-                        if (client != None) : client.close()
+                        if (client is not None) : client.close()
                         raise
 
         @classmethod
@@ -1886,7 +1886,7 @@ class RiakPbcTransport(RiakTransport):
                 """
                 Serialize get request and deserialize response
                 """
-                if vtag != None:
+                if vtag is not None:
                         raise RiakError("PB transport does not support vtags")
 
                 bucket = robj.get_bucket()
@@ -1925,7 +1925,7 @@ class RiakPbcTransport(RiakTransport):
                 req.bucket = bucket.get_name()
                 req.key = robj.get_key()
                 vclock = robj.vclock()
-                if vclock != None:
+                if vclock is not None:
                         req.vclock = vclock
 
                 self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
@@ -1935,7 +1935,7 @@ class RiakPbcTransport(RiakTransport):
                 msg_code, resp = self.recv_msg()
                 if msg_code != MSG_CODE_PUT_RESP:
                         raise RiakError("unexpected protocol buffer message code: ", msg_code)
-                if resp != None:
+                if resp is not None:
                         contents = []
                         for c in resp.contents:
                                 contents.append(self.decode_content(c))
@@ -2024,7 +2024,7 @@ class RiakPbcTransport(RiakTransport):
                         recv_buf = self._sock.recv(want_len)
                         if len(recv_buf) != want_len:
                                 raise RiakError("Socket returned short read {0} - expected {1}".
-                                                format(recv_len, want_len))
+                                                format(len(recv_buf), want_len))
                         self._inbuf += recv_buf
 
 
