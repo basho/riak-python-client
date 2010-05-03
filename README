@@ -6,12 +6,13 @@ This is the Python client for Riak.
 
 Table of Contents
 =================
-1 Documentation 
-2 Repositories 
+1 Documentation
+2 Repositories
 3 Building
+4 Testing
 
 
-1 Documentation 
+1 Documentation
 ~~~~~~~~~~~~~~~~
 
   Documentation for the Python library can be found in the docs
@@ -21,7 +22,7 @@ Table of Contents
 
   [https://wiki.basho.com/display/RIAK/Client+Libraries]
 
-2 Repositories 
+2 Repositories
 ~~~~~~~~~~~~~~~
 
   The official source code for this client can be retrieved from
@@ -36,13 +37,16 @@ Table of Contents
 
   [http://bitbucket.org/basho/riak]
 
-3 Building
+3 Installing
 ~~~~~~~~~~
 
-  The protocol buffers transport uses a module generated from riakclient.proto.
-  This repo includes the generated code, however if changes are made to the
-  .proto file (which must match client/server), make sure you have protoc
-  installed from http://code.google.com/p/protobuf/ and regenerate the
-  riakclient_pb2.py file with
-  
-    make pb 
+    You must have Protocol buffers installed before you can install this, 
+    you can get that from:
+
+    [http://code.google.com/p/protobuf/downloads/list]
+
+    python setup.py install
+
+4 Running Unit Tests
+~~~~~~~~~~
+    python setup.py test

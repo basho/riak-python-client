@@ -35,27 +35,11 @@ except ImportError:
         HAS_PYCURL = False
 
 # Use json as first choice, simplejson as second choice.
-try: 
+try:
         import json
-except ImportError: 
+except ImportError:
         import simplejson as json
 
-
-"""
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.    
-"""
 
 MD_CTYPE    = "content-type"
 MD_CHARSET  = "charset"
@@ -85,8 +69,8 @@ class RiakClient(object):
         Riak. The Riak API uses HTTP, so there is no persistent
         connection, and the RiakClient object is extremely lightweight.
         """
-        def __init__(self, host='127.0.0.1', port=8098, prefix='riak', 
-                     mapred_prefix='mapred', transport_class=None, 
+        def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
+                     mapred_prefix='mapred', transport_class=None,
                      client_id=None):
                 """
                 Construct a new RiakClient object.
@@ -97,10 +81,10 @@ class RiakClient(object):
                 @param RiakTransport transport_class - transport class to use
                 """
                 if not transport_class:
-                        self._transport = RiakHttpTransport(host, 
-                                                            port, 
-                                                            prefix, 
-                                                            mapred_prefix, 
+                        self._transport = RiakHttpTransport(host,
+                                                            port,
+                                                            prefix,
+                                                            mapred_prefix,
                                                             client_id)
                 else:
                         self._transport = transport_class(host, port, client_id=client_id)
@@ -161,7 +145,7 @@ class RiakClient(object):
                 @return integer
                 """
                 return self._dw
-        
+
         def set_dw(self, dw):
                 """
                 Set the DW-value for this RiakClient. See set_r(...) for a
@@ -178,7 +162,7 @@ class RiakClient(object):
                 @return integer
                 """
                 return self._rw
-        
+
         def set_rw(self, rw):
                 """
                 Set the RW-value for this RiakClient. See set_r(...) for a
@@ -188,14 +172,14 @@ class RiakClient(object):
                 """
                 self._rw = rw
                 return self
-        
+
         def get_client_id(self):
                 """
                 Get the client_id for this RiakClient.
                 @return string
                 """
                 return self._transport.get_client_id()
-        
+
         def set_client_id(self, client_id):
                 """
                 Set the client_id for this RiakClient. Should not be called
@@ -216,11 +200,11 @@ class RiakClient(object):
         def set_encoder(self, content_type, encoder):
                 """
                 Set the encoding function for this content type
-                @param function encoder 
+                @param function encoder
                 """
                 self._encoders[content_type] = encoder
                 return self
-        
+
         def get_decoder(self, content_type):
                 """
                 Get the decoding function for this content type
@@ -231,7 +215,7 @@ class RiakClient(object):
         def set_decoder(self, content_type, decoder):
                 """
                 Set the decoding function for this content type
-                @param function decoder 
+                @param function decoder
                 """
                 self._decoders[content_type] = decoder
                 return self
@@ -243,7 +227,7 @@ class RiakClient(object):
                 @return RiakBucket
                 """
                 return RiakBucket(self, name)
-        
+
         def is_alive(self):
                 """
                 Check if the Riak server for this RiakClient is alive.
@@ -259,7 +243,7 @@ class RiakClient(object):
                 """
                 mr = RiakMapReduce(self)
                 return apply(mr.add, args)
-        
+
         def link(self, args):
                 """
                 Start assembling a Map/Reduce operation.
@@ -267,7 +251,7 @@ class RiakClient(object):
                 """
                 mr = RiakMapReduce(self)
                 return apply(mr.link, args)
-        
+
         def map(self, *args):
                 """
                 Start assembling a Map/Reduce operation.
@@ -275,7 +259,7 @@ class RiakClient(object):
                 """
                 mr = RiakMapReduce(self)
                 return apply(mr.map, args)
-        
+
         def reduce(self, *args):
                 """
                 Start assembling a Map/Reduce operation.
@@ -283,7 +267,7 @@ class RiakClient(object):
                 """
                 mr = RiakMapReduce(self)
                 return apply(mr.reduce, args)
-        
+
 class RiakMapReduce(object):
         """
         The RiakMapReduce object allows you to build up and run a
@@ -301,7 +285,7 @@ class RiakMapReduce(object):
                 self._phases = []
                 self._inputs = []
                 self._input_mode = None
-        
+
         def add(self, arg1, arg2=None, arg3=None):
                 """
                 Add inputs to a map/reduce operation. This method takes three
@@ -320,10 +304,10 @@ class RiakMapReduce(object):
                                 return self.add_bucket(arg1)
                 else:
                         return self.add_bucket_key_data(arg1, arg2, arg3)
-                
+
         def add_object(self, obj):
                 return self.add_bucket_key_data(obj._bucket._name, obj._key, None)
-                
+
         def add_bucket_key_data(self, bucket, key, data) :
                 if self._input_mode == 'bucket':
                         raise Exception('Already added a bucket, can\'t add an object.')
@@ -349,7 +333,7 @@ class RiakMapReduce(object):
                 """
                 self._phases.append(RiakLinkPhase(bucket, tag, keep))
                 return self
-        
+
         def map(self, function, options=[]):
                 """
                 Add a map phase to the map/reduce operation.
@@ -363,7 +347,7 @@ class RiakMapReduce(object):
                 """
                 if isinstance(function, list):
                         language = 'erlang'
-                else: 
+                else:
                         language='javascript'
 
                 mr = RiakMapReducePhase('map',
@@ -387,7 +371,7 @@ class RiakMapReduce(object):
 
                 if isinstance(function, list):
                         language = 'erlang'
-                else: 
+                else:
                         language='javascript'
 
                 mr = RiakMapReducePhase('reduce',
@@ -397,7 +381,7 @@ class RiakMapReduce(object):
                                         RiakUtils.get_value('arg', options, None))
                 self._phases.append(mr)
                 return self
-                        
+
         def run(self, timeout=None):
                 """
                 Run the map/reduce operation. Returns an array of results, or an
@@ -467,7 +451,7 @@ class RiakMapReducePhase(object):
                 stepdef = {'keep':self._keep,
                            'language':self._language,
                            'arg':self._arg}
-                        
+
                 if (self._language == 'javascript') and isinstance(self._function, list):
                         stepdef['bucket'] = self._function[0]
                         stepdef['key'] = self._function[1]
@@ -568,7 +552,7 @@ class RiakLink(object):
                 @return string
                 """
                 return self._key
-        
+
         def set_key(self, key):
                 """
                 Set the key of this link.
@@ -648,9 +632,9 @@ class RiakBucket(object):
                 the R-value for the client.
                 @return integer
                 """
-                if (r != None):
+                if (r is not None):
                         return r
-                if (self._r != None):
+                if (self._r is not None):
                         return self._r
                 return self._client.get_r()
 
@@ -663,19 +647,19 @@ class RiakBucket(object):
                 """
                 self._r = r
                 return self
-                                                         
+
         def get_w(self, w):
                 """
                 Get the W-value for this bucket, if it is set, otherwise return
                 the W-value for the client.
                 @return integer
                 """
-                if (w != None):
+                if (w is not None):
                         return w
-                if (self._w != None):
+                if (self._w is not None):
                         return self._w
                 return self._client.get_w()
-        
+
         def set_w(self, w):
                 """
                 Set the W-value for this bucket. See set_r(...) for more information.
@@ -691,12 +675,12 @@ class RiakBucket(object):
                 the DW-value for the client.
                 @return integer
                 """
-                if (dw != None):
+                if (dw is not None):
                         return dw
-                if (self._dw != None):
+                if (self._dw is not None):
                         return self._dw
                 return self._client.get_dw()
-                                                         
+
         def set_dw(self, dw):
                 """
                 Set the DW-value for this bucket. See set_r(...) for more information.
@@ -705,19 +689,19 @@ class RiakBucket(object):
                 """
                 self._dw = dw
                 return self
-                                                         
+
         def get_rw(self, rw):
                 """
                 Get the RW-value for this bucket, if it is set, otherwise return
                 the RW-value for the client.
                 @return integer
                 """
-                if (rw != None):
+                if (rw is not None):
                         return rw
-                if (self._rw != None):
+                if (self._rw is not None):
                         return self._rw
                 return self._client.get_rw()
-                                                         
+
         def set_rw(self, rw):
                 """
                 Set the RW-value for this bucket. See set_r(...) for more information.
@@ -726,7 +710,7 @@ class RiakBucket(object):
                 """
                 self._rw = rw
                 return self
- 
+
         def get_encoder(self, content_type):
                 """
                 Get the encoding function for this content type for this bucket
@@ -746,7 +730,7 @@ class RiakBucket(object):
                 """
                 self._encoders[content_type] = encoder
                 return self
-        
+
         def get_decoder(self, content_type):
                 """
                 Get the decoding function for this content type for this bucket
@@ -765,7 +749,7 @@ class RiakBucket(object):
                 """
                 self._decoders[content_type] = decoder
                 return self
-                                                        
+
         def new(self, key, data=None, content_type='application/json'):
                 """
                 Create a new Riak object that will be stored as JSON.
@@ -778,7 +762,7 @@ class RiakBucket(object):
                 obj.set_content_type(content_type)
                 obj._encode_data = True
                 return obj
-        
+
         def new_binary(self, key, data, content_type='application/octet-stream'):
                 """
                 Create a new Riak object that will be stored as plain text/binary.
@@ -832,7 +816,7 @@ class RiakBucket(object):
         def get_n_val(self):
                 """
                 Retrieve the N-value for this bucket.
-                @return integer                                                         
+                @return integer
                 """
                 return self.get_property('n_val')
 
@@ -842,7 +826,7 @@ class RiakBucket(object):
                 and returned to the client. This situation can be detected by
                 calling has_siblings() and get_siblings(). This should only be used
                 if you know what you are doing.
-                @param boolean bool - True to store and return conflicting writes.                                                         
+                @param boolean bool - True to store and return conflicting writes.
                 """
                 return self.set_property('allow_mult', bool)
 
@@ -858,7 +842,7 @@ class RiakBucket(object):
                 Set a bucket property. This should only be used if you know what
                 you are doing.
                 @param string key - Property to set.
-                @param mixed value - Property value.                                                         
+                @param mixed value - Property value.
                 """
                 return self.set_properties({key : value})
 
@@ -887,7 +871,7 @@ class RiakBucket(object):
                 """
                 Set multiple bucket properties in one call. This should only be
                 used if you know what you are doing.
-                @param array props - An associative array of key:value.        
+                @param array props - An associative array of key:value.
                 """
                 t = self._client.get_transport()
                 t.set_bucket_props(self, props)
@@ -895,17 +879,17 @@ class RiakBucket(object):
         def get_properties(self):
                 """
                 Retrieve an associative array of all bucket properties.
-                @return Array		
+                @return Array
                 """
                 t = self._client.get_transport()
                 return t.get_bucket_props(self)
-               
+
 
 class RiakObject(object):
         """
         The RiakObject holds meta information about a Riak object, plus the
         object's data.
-        @package RiakObject	
+        @package RiakObject
         """
 
         def __init__(self, client, bucket, key=None):
@@ -914,7 +898,7 @@ class RiakObject(object):
                 @param RiakClient client - A RiakClient object.
                 @param RiakBucket bucket - A RiakBucket object.
                 @param string key - An optional key. If not specified, then key
-                is generated by server when store(...) is called.		
+                is generated by server when store(...) is called.
                 """
                 self._client = client
                 self._bucket = bucket
@@ -947,24 +931,24 @@ class RiakObject(object):
                 Get the data stored in this object. Will return a associative
                 array, unless the object was constructed with new_binary(...) or
                 get_binary(...), in which case this will return a string.
-                @return array or string		
+                @return array or string
                 """
                 return self._data
-        
+
         def set_data(self, data):
                 """
                 Set the data stored in this object. This data will be
                 JSON encoded unless the object was constructed with
                 new_binary(...) or get_binary(...).
                 @param mixed data - The data to store.
-                @return data		
+                @return data
                 """
                 self._data = data
                 return self
-  
+
         def get_encoded_data(self):
                 """
-                Get the data encoded for storing	
+                Get the data encoded for storing
                 """
                 if self._encode_data == True:
                         content_type = self.get_content_type()
@@ -980,7 +964,7 @@ class RiakObject(object):
                                 return encoder(self._data)
                 else:
                         return self._data
- 
+
         def set_encoded_data(self, data):
                 """
                 Set the object data from an encoded string - make sure
@@ -997,8 +981,8 @@ class RiakObject(object):
                 else:
                         self._data = data
                 return self
-      
-         
+
+
         def get_metadata(self):
                 """
                 Get the metadata stored in this object. Will return a associative
@@ -1006,16 +990,16 @@ class RiakObject(object):
                 @return dict
                 """
                 return self._metadata
-        
+
         def set_metadata(self, metadata):
                 """
-                Set the metadata stored in this object. 
+                Set the metadata stored in this object.
                 @param dict metadata - The data to store.
-                @return data		
+                @return data
                 """
                 self._metadata = metadata
                 return self
-        
+
         def exists(self):
                 """
                 Return True if the object exists, False otherwise. Allows you to
@@ -1023,7 +1007,7 @@ class RiakObject(object):
                 @return boolean
                 """
                 return self._exists
-        
+
         def get_content_type(self):
                 """
                 Get the content type of this object. This is either application/json, or
@@ -1031,34 +1015,34 @@ class RiakObject(object):
                 @return string
                 """
                 return self._metadata[MD_CTYPE]
-        
+
         def set_content_type(self, content_type):
                 """
                 Set the content type of this object.
                 @param string content_type - The new content type.
-                @return self		
+                @return self
                 """
                 self._metadata[MD_CTYPE] = content_type
                 return self
-        
+
         def add_link(self, obj, tag=None):
                 """
                 Add a link to a RiakObject.
                 @param mixed obj - Either a RiakObject or a RiakLink object.
                 @param string tag - Optional link tag. (default is bucket name,
                 ignored if obj is a RiakLink object.)
-                @return RiakObject		
+                @return RiakObject
                 """
                 if isinstance(obj, RiakLink):
                         newlink = obj
                 else:
                         newlink = RiakLink(obj._bucket._name, obj._key, tag)
-                        
+
                 self.remove_link(newlink)
                 links = self._metadata[MD_LINKS]
                 links.append(newlink)
                 return self
-                
+
         def remove_link(self, obj, tag=None):
                 """
                 Remove a link to a RiakObject.
@@ -1067,15 +1051,15 @@ class RiakObject(object):
                 @param mixed obj - Either a RiakObject or a RiakLink object.
                 @param string tag - Optional link tag. (default is bucket name,
                 ignored if obj is a RiakLink object.)
-                @return self		
+                @return self
                 """
                 if isinstance(obj, RiakLink):
                         oldlink = obj
                 else:
                         oldlink = RiakLink(obj._bucket._name, obj._key, tag)
-                        
+
                 a = []
-                links = self._metadata[MD_LINKS] if MD_LINKS in self._metadata else []
+                links = self._metadata.get(MD_LINKS, [])
                 for link in links:
                         if not link.isEqual(oldlink):
                                 a.append(link)
@@ -1086,7 +1070,7 @@ class RiakObject(object):
         def get_links(self):
                 """
                 Return an array of RiakLink objects.
-                @return array()		
+                @return array()
                 """
                 # Set the clients before returning...
                 if MD_LINKS in self._metadata:
@@ -1096,7 +1080,7 @@ class RiakObject(object):
                         return links
                 else:
                         return []
-                        
+
         def store(self, w=None, dw=None, return_body=True):
                 """
                 Store the object in Riak. When this operation completes, the
@@ -1108,16 +1092,16 @@ class RiakObject(object):
                 @param integer dw - DW-value, wait for this many partitions to
                 confirm the write before returning to client.
                 @param bool return_body - if the newly stored object should be retrieved
-                @return self		
+                @return self
                 """
                 # Use defaults if not specified...
                 w = self._bucket.get_w(w)
                 dw = self._bucket.get_dw(w)
-                
+
                 # Issue the get over our transport
                 t = self._client.get_transport()
                 Result = t.put(self, w, dw, return_body)
-                if Result != None:
+                if Result is not None:
                         self.populate(Result)
 
                 return self
@@ -1130,7 +1114,7 @@ class RiakObject(object):
                 was updated in Riak since it was last retrieved.
                 @param integer r - R-Value, wait for this many partitions to respond
                 before returning to client.
-                @return self		
+                @return self
                 """
                 # Do the request...
                 r = self._bucket.get_r(r)
@@ -1138,7 +1122,7 @@ class RiakObject(object):
                 Result = t.get(self, r, vtag)
 
                 self.clear()
-                if Result != None:
+                if Result is not None:
                         self.populate(Result)
 
                 return self
@@ -1149,7 +1133,7 @@ class RiakObject(object):
                 Delete this object from Riak.
                 @param integer rw - RW-value. Wait until this many partitions have
                 deleted the object before responding.
-                @return self		
+                @return self
                 """
                 # Use defaults if not specified...
                 rw = self._bucket.get_rw(rw)
@@ -1157,11 +1141,11 @@ class RiakObject(object):
                 Result = t.delete(self, rw)
                 self.clear()
                 return self
-                        
+
         def clear(self) :
                 """
                 Reset this object.
-                @return self		
+                @return self
                 """
                 self._headers = []
                 self._links = []
@@ -1169,11 +1153,11 @@ class RiakObject(object):
                 self._exists = False
                 self._siblings = []
                 return self
-        
+
         def vclock(self) :
                 """
                 Get the vclock of this object.
-                @return string		
+                @return string
                 """
                 return self._vclock
 
@@ -1186,7 +1170,7 @@ class RiakObject(object):
                 If a list of vtags is returned there are multiple
                 sibling that need to be retrieved with get.
                 """
-                self.clear()                
+                self.clear()
                 if Result == None:
                         return self
                 elif type(Result) == types.ListType:
@@ -1210,16 +1194,16 @@ class RiakObject(object):
                                         sibling.set_siblings(siblings)
                 else:
                         raise RiakError("do not know how to handle type " + str(type(Result)))
-                       
+
         def populate_links(self, linkHeaders) :
                 """
                 Private.
-                @return self		
+                @return self
                 """
                 for linkHeader in linkHeaders.strip().split(','):
                         linkHeader = linkHeader.strip()
                         matches = re.match("\<\/([^\/]+)\/([^\/]+)\/([^\/]+)\>; ?riaktag=\"([^\']+)\"", linkHeader)
-                        if (matches != None):
+                        if (matches is not None):
                                 link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
                                 self._links.append(link)
                 return self
@@ -1230,33 +1214,33 @@ class RiakObject(object):
                 @return boolean
                 """
                 return(self.get_sibling_count() > 0)
-        
+
         def get_sibling_count(self):
                 """
                 Get the number of siblings that this object contains.
-                @return integer		
+                @return integer
                 """
                 return len(self._siblings)
-        
+
         def get_sibling(self, i, r=None):
                 """
                 Retrieve a sibling by sibling number.
                 @param  integer i - Sibling number.
                 @param  integer r - R-Value. Wait until this many partitions
                 have responded before returning to client.
-                @return RiakObject.		
+                @return RiakObject.
                 """
                 if isinstance(self._siblings[i], RiakObject):
                         return self._siblings[i]
                 else:
                         # Use defaults if not specified.
                         r = self._bucket.get_r(r)
-                
+
                         # Run the request...
                         vtag = self._siblings[i]
                         obj = RiakObject(self._client, self._bucket, self._key)
                         obj.reload(r, vtag)
-                        
+
                         # And make sure it knows who it's siblings are
                         self._siblings[i] = obj
                         obj.set_siblings(self._siblings)
@@ -1267,13 +1251,13 @@ class RiakObject(object):
                 Retrieve an array of siblings.
                 @param integer r - R-Value. Wait until this many partitions have
                 responded before returning to client.
-                @return array of RiakObject		
+                @return array of RiakObject
                 """
                 a = [self]
                 for i in range(self.get_sibling_count()):
                         a.append(self.get_sibling(i, r))
                 return a
-                
+
         def set_siblings(self, siblings):
                 """
                 Set the array of siblings - used internally
@@ -1297,22 +1281,22 @@ class RiakObject(object):
                 """
                 Start assembling a Map/Reduce operation.
                 @see RiakMapReduce.add()
-                @return RiakMapReduce		
+                @return RiakMapReduce
                 """
                 mr = RiakMapReduce(self._client)
                 mr.add(self._bucket._name, self._key)
                 return apply(mr.add, args)
-        
+
         def link(self, *args):
                 """
                 Start assembling a Map/Reduce operation.
                 @see RiakMapReduce.link()
-                @return RiakMapReduce		
+                @return RiakMapReduce
                 """
                 mr = RiakMapReduce(self._client)
                 mr.add(self._bucket._name, self._key)
                 return apply(mr.link, args)
-        
+
         def map(self, *args):
                 """
                 Start assembling a Map/Reduce operation.
@@ -1322,7 +1306,7 @@ class RiakObject(object):
                 mr = RiakMapReduce(self._client)
                 mr.add(self._bucket._name, self._key)
                 return apply(mr.map, args)
-        
+
         def reduce(self, params):
                 """
                 Start assembling a Map/Reduce operation.
@@ -1332,11 +1316,11 @@ class RiakObject(object):
                 mr = RiakMapReduce(self._client)
                 mr.add(self._bucket._name, self._key)
                 return apply(mr.reduce, args)
-        
+
 class RiakUtils(object):
         """
         Utility functions used by Riak library.
-        @package RiakUtils	
+        @package RiakUtils
         """
         @classmethod
         def get_value(self, key, array, defaultValue) :
@@ -1344,38 +1328,52 @@ class RiakUtils(object):
                         return array[key]
                 else:
                         return defaultValue
-		
-                       
+
+
 
 class RiakError(Exception) :
         def __init__(self, value):
                 self.value = value
         def __str__(self):
                 return repr(self.value)
- 
+
 class RiakTransport(object):
         """
         Class to encapsulate transport details
         """
 
-        def make_client_id(self):
-            return 'py_%s' % base64.b64encode(
-                    str(random.randint(1, 1073741824)))
+        @classmethod
+        def make_random_client_id(self):
+                '''
+                Returns a random client identifier
+                '''
+                return 'py_%s' % base64.b64encode(
+                        str(random.randint(1, 1073741824)))
 
+        @classmethod
+        def make_fixed_client_id(self):
+                '''
+                Returns a unique identifier for the current machine/process/thread. 
+                '''
+                machine = platform.node() 
+                process = os.getpid() 
+                thread = threading.currentThread().getName()
+                return base64.b64encode('%s|%s|%s' % (machine, process, thread))
+ 
         def ping(self):
                 """
                 Ping the remote server
                 @return boolean
                 """
                 raise RiakError("not implemented")
-        
+
         def get(self, robj, r = None, vtag = None):
                 """
                 Serialize get request and deserialize response
                 @return (vclock=None, [(metadata, value)]=None)
                 """
                 raise RiakError("not implemented")
-        
+
         def put(self, robj, w = None, dw = None, return_body = True):
                 """
                 Serialize put request and deserialize response - if 'content'
@@ -1383,21 +1381,21 @@ class RiakTransport(object):
                 @return (vclock=None, [(metadata, value)]=None)
                 """
                 raise RiakError("not implemented")
-        
+
         def delete(self, robj, rw = None):
                 """
                 Serialize delete request and deserialize response
                 @return true
                 """
                 raise RiakError("not implemented")
-        
+
         def get_bucket_props(self, bucket) :
                 """
                 Serialize get bucket property request and deserialize response
                 @return dict()
                 """
                 raise RiakError("not implemented")
-        
+
         def set_bucket_props(self, bucket, props) :
                 """
                 Serialize set bucket property request and deserialize response
@@ -1406,13 +1404,13 @@ class RiakTransport(object):
                 @return boolean
                 """
                 raise RiakError("not implemented")
-        
+
         def mapred(self, inputs, query, timeout = None) :
                 """
                 Serialize map/reduce request
                 """
                 raise RiakError("not implemented")
-        
+
 class RiakHttpTransport(RiakTransport) :
         """
         The RiakHttpTransport object holds information necessary to connect to
@@ -1436,7 +1434,7 @@ class RiakHttpTransport(RiakTransport) :
                 self._mapred_prefix = mapred_prefix
                 self._client_id = client_id
                 if not self._client_id:
-                        self._client_id = self.make_client_id()
+                        self._client_id = self.make_random_client_id()
 
         def __copy__(self):
                 return RiakHttpTransport(self._host, self._port, self._prefix, self._mapred_prefix)
@@ -1446,14 +1444,14 @@ class RiakHttpTransport(RiakTransport) :
         """
         def ping(self) :
                 response = self.http_request('GET', self._host, self._port, '/ping')
-                return(response != None) and (response[1] == 'OK')
+                return(response is not None) and (response[1] == 'OK')
 
         """
         Get a bucket/key from the server
         """
         def get(self, robj, r, vtag = None) :
                 params = {'r' : r}
-                if vtag != None:
+                if vtag is not None:
                         params['vtag'] = vtag
                 host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                                        None, params)
@@ -1468,16 +1466,16 @@ class RiakHttpTransport(RiakTransport) :
                 params = {'returnbody' : 'true', 'w' : w, 'dw' : dw}
                 host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                                        None, params)
-                
+
                 # Construct the headers...
                 headers = {'Accept' : 'text/plain, */*; q=0.5',
                            'Content-Type' : robj.get_content_type(),
                            'X-Riak-ClientId' : self._client_id}
-                
+
                 # Add the vclock if it exists...
-                if (robj.vclock() != None):
+                if (robj.vclock() is not None):
                         headers['X-Riak-Vclock'] = robj.vclock()
-                        
+
                 # Create the header from metadata
                 links = robj.get_links()
                 if links != []:
@@ -1508,7 +1506,7 @@ class RiakHttpTransport(RiakTransport) :
                 params = {'props' : 'True', 'keys' : 'False'}
                 host, port, url = self.build_rest_path(bucket, None, None, params)
                 response = self.http_request('GET', host, port, url)
-                
+
                 headers = response[0]
                 encoded_props = response[1]
                 if (headers['http_code'] == 200):
@@ -1525,14 +1523,14 @@ class RiakHttpTransport(RiakTransport) :
                 host, port, url = self.build_rest_path(bucket)
                 headers = {'Content-Type' : 'application/json'}
                 content = json.dumps({'props' : props})
-	
+
                 #Run the request...
                 response = self.http_request('PUT', host, port, url, headers, content)
 
                 # Handle the response...
                 if (response == None):
                         raise Exception('Error setting bucket properties.')
-        
+
                 # Check the response value...
                 status = response[0]['http_code']
                 if (status != 204):
@@ -1542,7 +1540,7 @@ class RiakHttpTransport(RiakTransport) :
         def mapred(self, inputs, query, timeout=None):
                 # Construct the job, optionally set the timeout...
                 job = {'inputs':inputs, 'query':query}
-                if timeout != None:
+                if timeout is not None:
                         job['timeout'] = timeout
 
                 content = json.dumps(job)
@@ -1554,20 +1552,20 @@ class RiakHttpTransport(RiakTransport) :
                 response = self.http_request('POST', host, port, url, {}, content)
                 result = json.loads(response[1])
                 return result
-                
+
 
         def check_http_code(self, response, expected_statuses):
                 status = response[0]['http_code']
                 if (not status in expected_statuses):
                         m = 'Expected status ' + str(expected_statuses) + ', received ' + str(status)
                         raise Exception(m)
-                
+
         def parse_body(self, response, expected_statuses):
                 """
                 Given the output of RiakUtils.http_request and a list of
                 statuses, populate the object. Only for use by the Riak client
                 library.
-                @return self		
+                @return self
                 """
                 # If no response given, then return.
                 if (response == None):
@@ -1580,7 +1578,7 @@ class RiakHttpTransport(RiakTransport) :
                 headers = response[0]
                 data = response[1]
                 status = headers['http_code']
-          
+
                 # Check if the server is down(status==0)
                 if (status == 0):
                         m = 'Could not contact Riak Server: http://' + self._client._host + ':' + str(self._client._port) + '!'
@@ -1601,7 +1599,7 @@ class RiakHttpTransport(RiakTransport) :
                         siblings = data.strip().split('\n')
                         siblings.pop(0)
                         return siblings
-                      
+
                 # Parse the headers...
                 vclock = None
                 metadata = {}
@@ -1643,12 +1641,12 @@ class RiakHttpTransport(RiakTransport) :
         def parse_links(self, links, linkHeaders) :
                 """
                 Private.
-                @return self		
+                @return self
                 """
                 for linkHeader in linkHeaders.strip().split(','):
                         linkHeader = linkHeader.strip()
                         matches = re.match("\<\/([^\/]+)\/([^\/]+)\/([^\/]+)\>; ?riaktag=\"([^\']+)\"", linkHeader)
-                        if (matches != None):
+                        if (matches is not None):
                                 link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
                                 links.append(link)
                 return self
@@ -1656,7 +1654,7 @@ class RiakHttpTransport(RiakTransport) :
 
         """
         Utility functions used by Riak library.
-        @package RiakUtils	
+        @package RiakUtils
         """
         @classmethod
         def get_value(self, key, array, defaultValue) :
@@ -1664,23 +1662,23 @@ class RiakHttpTransport(RiakTransport) :
                         return array[key]
                 else:
                         return defaultValue
-		
+
         def build_rest_path(self, bucket, key=None, spec=None, params=None) :
                 """
                 Given a RiakClient, RiakBucket, Key, LinkSpec, and Params,
-                construct and return a URL.		
+                construct and return a URL.
                 """
                 # Build 'http://hostname:port/prefix/bucket'
                 path = ''
-		path += '/' + self._prefix
-		path += '/' + urllib.quote_plus(bucket._name)
+                path += '/' + self._prefix
+                path += '/' + urllib.quote_plus(bucket._name)
 
                 # Add '.../key'
-                if (key != None):
+                if (key is not None):
                         path += '/' + urllib.quote_plus(key)
-                        
+
                 # Add query parameters.
-                if (params != None):
+                if (params is not None):
                         s = ''
                         for key in params.keys():
                                 if (s != ''): s += '&'
@@ -1725,25 +1723,25 @@ class RiakHttpTransport(RiakTransport) :
 
                         return response_headers, response_body
                 except:
-                        if client != None: client.close()
-                        if response != None: response.close()
+                        if client is not None: client.close()
+                        if response is not None: response.close()
                         raise
 
-        
+
         @classmethod
         def pycurl_request(self, method, host, port, uri, headers={}, body=''):
                 url = "http://" + host + ":" + str(port) + uri
                 # Set up Curl...
                 client = pycurl.Curl()
-                client.setopt(pycurl.URL, url)                
+                client.setopt(pycurl.URL, url)
                 client.setopt(pycurl.HTTPHEADER, self.build_headers(headers))
                 if method == 'GET':
                         client.setopt(pycurl.HTTPGET, 1)
                 elif method == 'POST':
-                        client.setopt(pycurl.POST, 1)                        
+                        client.setopt(pycurl.POST, 1)
                         client.setopt(pycurl.POSTFIELDS, body)
                 elif method == 'PUT':
-                        client.setopt(pycurl.CUSTOMREQUEST, method)        
+                        client.setopt(pycurl.CUSTOMREQUEST, method)
                         client.setopt(pycurl.POSTFIELDS, body)
                 elif method == 'DELETE':
                         client.setopt(pycurl.CUSTOMREQUEST, method)
@@ -1751,7 +1749,7 @@ class RiakHttpTransport(RiakTransport) :
                 # Capture the response headers...
                 response_headers_io = StringIO()
                 client.setopt(pycurl.HEADERFUNCTION, response_headers_io.write)
-                
+
                 # Capture the response body...
                 response_body_io = StringIO()
                 client.setopt(pycurl.WRITEFUNCTION, response_body_io.write)
@@ -1761,17 +1759,17 @@ class RiakHttpTransport(RiakTransport) :
                         client.perform()
                         http_code = client.getinfo(pycurl.HTTP_CODE)
                         client.close()
-                        
+
                         # Get the headers...
                         response_headers = self.parse_http_headers(response_headers_io.getvalue())
                         response_headers['http_code'] = http_code
-                        
+
                         # Get the body...
                         response_body = response_body_io.getvalue()
 
                         return response_headers, response_body
                 except:
-                        if (client != None) : client.close()
+                        if (client is not None) : client.close()
                         raise
 
         @classmethod
@@ -1785,7 +1783,7 @@ class RiakHttpTransport(RiakTransport) :
         def parse_http_headers(self, headers) :
                 """
                 Parse an HTTP Header string into an asssociative array of
-                response headers.		
+                response headers.
                 """
                 retVal = {}
                 fields = headers.split("\n")
@@ -1802,7 +1800,7 @@ class RiakHttpTransport(RiakTransport) :
                         else:
                                 retVal[key] = value
                 return retVal
-        
+
 
 ## Protocol codes
 MSG_CODE_ERROR_RESP           =  0
@@ -1843,8 +1841,6 @@ class RiakPbcTransport(RiakTransport):
                 self._host = host
                 self._port = port
                 self._client_id = client_id
-                if not self._client_id:
-                        self._client_id = self.make_client_id()
                 self._sock = None
 
         def __copy__(self):
@@ -1863,18 +1859,45 @@ class RiakPbcTransport(RiakTransport):
                 else:
                         return 0
 
+        def get_client_id(self):
+                """
+                Get the client id used by this connection
+                """
+                self.maybe_connect()
+                self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ)
+                msg_code, resp = self.recv_msg()
+                if msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
+                        return resp.client_id
+                else:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code)
+
+        def set_client_id(self, client_id):
+                """
+                Set the client id used by this connection
+                """
+                req = riakclient_pb2.RpbSetClientIdReq()
+                req.client_id = client_id
+
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
+                msg_code, resp = self.recv_msg()
+                if msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
+                        return True
+                else:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code)
+                
         def get(self, robj, r = None, vtag = None):
                 """
                 Serialize get request and deserialize response
                 """
-                if vtag != None:
+                if vtag is not None:
                         raise RiakError("PB transport does not support vtags")
 
                 bucket = robj.get_bucket()
 
                 req = riakclient_pb2.RpbGetReq()
                 req.r = r
- 
+
                 req.bucket = bucket.get_name()
                 req.key = robj.get_key()
 
@@ -1888,7 +1911,7 @@ class RiakPbcTransport(RiakTransport):
                         return (resp.vclock, contents)
                 else:
                         return 0
-                
+
                 return 0
 
         def put(self, robj, w = None, dw = None, return_body = True):
@@ -1902,21 +1925,21 @@ class RiakPbcTransport(RiakTransport):
                 req.dw = dw
                 if return_body == True:
                         req.return_body = 1
- 
+
                 req.bucket = bucket.get_name()
                 req.key = robj.get_key()
                 vclock = robj.vclock()
-                if vclock != None:
+                if vclock is not None:
                         req.vclock = vclock
 
-                self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content) 
+                self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
                 self.maybe_connect()
                 self.send_msg(MSG_CODE_PUT_REQ, req)
                 msg_code, resp = self.recv_msg()
                 if msg_code != MSG_CODE_PUT_RESP:
-                        raise RiakError("unexpected protocol buffer message code: ", msg_code) 
-                if resp != None:
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code)
+                if resp is not None:
                         contents = []
                         for c in resp.contents:
                                 contents.append(self.decode_content(c))
@@ -1930,7 +1953,7 @@ class RiakPbcTransport(RiakTransport):
 
                 req = riakclient_pb2.RpbDelReq()
                 req.rw = rw
- 
+
                 req.bucket = bucket.get_name()
                 req.key = robj.get_key()
 
@@ -1938,7 +1961,7 @@ class RiakPbcTransport(RiakTransport):
                 self.send_msg(MSG_CODE_DEL_REQ, req)
                 msg_code, resp = self.recv_msg()
                 if msg_code != MSG_CODE_DEL_RESP:
-                        raise RiakError("unexpected protocol buffer message code: ", msg_code) 
+                        raise RiakError("unexpected protocol buffer message code: ", msg_code)
                 return self
 
         def get_bucket_props(self, bucket):
@@ -1985,6 +2008,8 @@ class RiakPbcTransport(RiakTransport):
                 if self._sock is None:
                         self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         s.connect((self._host, self._port))
+                        if self._client_id:
+                                self.set_client_id(self._client_id)
 
         def send_msg_code(self, msg_code):
                 pkt = struct.pack("!iB", 1, msg_code)
@@ -2012,6 +2037,11 @@ class RiakPbcTransport(RiakTransport):
                         raise Exception(msg.errmsg)
                 elif msg_code == MSG_CODE_PING_RESP:
                         msg = None
+                elif msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
+                        msg = riakclient_pb2.RpbGetClientIdResp()
+                        msg.ParseFromString(self._inbuf[1:])
+                elif msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
+                        msg = None
                 elif msg_code == MSG_CODE_GET_RESP:
                         msg = riakclient_pb2.RpbGetResp()
                         msg.ParseFromString(self._inbuf[1:])
@@ -2031,7 +2061,7 @@ class RiakPbcTransport(RiakTransport):
                 else:
                         raise Exception("unknown msg code {0}".format(msg_code))
                 return msg_code, msg
-               
+
 
         def recv_pkt(self):
                 nmsglen = self._sock.recv(4)
@@ -2046,16 +2076,16 @@ class RiakPbcTransport(RiakTransport):
                         recv_buf = self._sock.recv(want_len)
                         if len(recv_buf) != want_len:
                                 raise RiakError("Socket returned short read {0} - expected {1}".
-                                                format(recv_len, want_len))
+                                                format(len(recv_buf), want_len))
                         self._inbuf += recv_buf
-                
-                        
+
+
         def decode_contents(self, rpb_contents):
                 contents = []
                 for rpb_c in rpb_contents:
                         contents.append(self.decode_content(rpb_c))
                 return contents
-        
+
         def decode_content(self, rpb_content):
                 metadata = {}
                 if rpb_content.HasField("content_type"):
@@ -2068,9 +2098,19 @@ class RiakPbcTransport(RiakTransport):
                         metadata[MD_VTAG] = rpb_content.vtag
                 links = []
                 for link in rpb_content.links:
-                        links.append(RiakLink(link.bucket if link.HasField("bucket") else None, 
-                                              link.key if link.HasField("key") else None, 
-                                              link.tag if link.HasField("tag") else None))
+                        if link.HasField("bucket"):
+                                bucket = link.bucket
+                        else:
+                                bucket = None
+                        if link.HasField("key"):
+                                key = link.key
+                        else:
+                                key = None
+                        if link.HasField("tag"):
+                                tag = link.tag
+                        else:
+                                tag = None
+                        links.append(RiakLink(bucket, key, tag))
                 if links != []:
                         metadata[MD_LINKS] = links
                 if rpb_content.HasField("last_mod"):
@@ -2083,7 +2123,7 @@ class RiakPbcTransport(RiakTransport):
                 if len(usermeta) > 0:
                         metadata[MD_USERMETA] = usermeta
                 return (metadata, rpb_content.value)
-        
+
         def pbify_content(self, metadata, data, rpb_content) :
                 pbmetadata = {}
                 # Convert the broken out fields, building up
