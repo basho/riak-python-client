@@ -1826,6 +1826,9 @@ MSG_CODE_GET_BUCKET_REQ       = 19
 MSG_CODE_GET_BUCKET_RESP      = 20
 MSG_CODE_SET_BUCKET_REQ       = 21
 MSG_CODE_SET_BUCKET_RESP      = 22
+MSG_CODE_MAPRED_REQ           = 23
+MSG_CODE_MAPRED_RESP          = 24
+
 
 class RiakPbcTransport(RiakTransport):
         """
@@ -2003,6 +2006,49 @@ class RiakPbcTransport(RiakTransport):
                         raise RiakError("unexpected protocol buffer message code: ", msg_code) 
 
                 return self
+
+        def mapred(self, inputs, query, timeout=None):
+                # Construct the job, optionally set the timeout...
+                job = {'inputs':inputs, 'query':query}
+                if timeout is not None:
+                        job['timeout'] = timeout
+
+                content = json.dumps(job)
+
+                req = riakclient_pb2.RpbMapRedReq()
+                req.request = content
+                req.content_type = "application/json"
+
+                self.maybe_connect()
+                self.send_msg(MSG_CODE_MAPRED_REQ, req)
+
+                # dictionary of phase results - each content should be an encoded array
+                # which is appended to the result for that phase.
+                result = {}
+                while True:
+                        msg_code, resp = self.recv_msg()
+                        if msg_code != MSG_CODE_MAPRED_RESP:
+                                raise RiakError("unexpected protocol buffer message code: ", 
+                                                msg_code) 
+                        if resp.HasField("phase") and resp.HasField("response"):
+                                content = json.loads(resp.response)
+                                if resp.phase in result:
+                                        result[resp.phase] += content
+                                else:
+                                        result[resp.phase] = content
+
+                        if resp.HasField("done") and resp.done:
+                                break;
+                
+                # If a single result - return the same as the HTTP interface does
+                # otherwise return all the phase information
+                if len(result) == 0:
+                        return None
+                elif len(result) == 1:
+                        return result[max(result.keys())]
+                else:
+                        return result
+
 
         def maybe_connect(self):
                 if self._sock is None:

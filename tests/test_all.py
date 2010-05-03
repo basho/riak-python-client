@@ -196,33 +196,6 @@ class BaseTestCase(object):
                 # Clean up for next test...
                 obj.delete()
 
-class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
-
-        def setUp(self):
-            self.host = PB_HOST
-            self.port = PB_PORT
-            self.transport_class = riak.RiakPbcTransport
-            super(RiakPbcTransportTestCase, self).setUp()
-
-        def test_uses_client_id_if_given(self):
-                self.host = PB_HOST
-                self.port = PB_PORT
-                zero_client_id = "\0\0\0\0"
-                c = riak.RiakClient(PB_HOST, PB_PORT,
-                                    transport_class = riak.RiakPbcTransport, 
-                                    client_id = zero_client_id)
-                self.assertEqual(zero_client_id, c.get_client_id()) # 
-                
-
-class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
-
-        def setUp(self):
-            self.host = HTTP_HOST
-            self.port = HTTP_PORT
-            self.transport_class = riak.RiakHttpTransport
-            super(RiakHttpTransportTestCase, self).setUp()
-
-
         def test_javascript_source_map(self):
                 # Create the object...
                 bucket = self.client.bucket("bucket")
@@ -356,6 +329,33 @@ class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
                 self.assertEqual(len(results), 3)
                 results = obj.link("bucket", "tag").run()
                 self.assertEqual(len(results), 1)
+
+class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
+
+        def setUp(self):
+            self.host = PB_HOST
+            self.port = PB_PORT
+            self.transport_class = riak.RiakPbcTransport
+            super(RiakPbcTransportTestCase, self).setUp()
+
+        def test_uses_client_id_if_given(self):
+                self.host = PB_HOST
+                self.port = PB_PORT
+                zero_client_id = "\0\0\0\0"
+                c = riak.RiakClient(PB_HOST, PB_PORT,
+                                    transport_class = riak.RiakPbcTransport, 
+                                    client_id = zero_client_id)
+                self.assertEqual(zero_client_id, c.get_client_id()) # 
+                
+
+class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
+
+        def setUp(self):
+            self.host = HTTP_HOST
+            self.port = HTTP_PORT
+            self.transport_class = riak.RiakHttpTransport
+            super(RiakHttpTransportTestCase, self).setUp()
+
 
 if __name__ == '__main__':
         unittest.main()
