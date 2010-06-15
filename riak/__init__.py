@@ -16,30 +16,7 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-"""
-
-# Import libraries.
-#import sys, random, logging, base64, urllib, re
-#from cStringIO import StringIO
-#import types
-#import riakclient_pb2
-#import socket, struct, copy
-#import riak_object
-#import bucket
-#import client
-#import mapreduce
-
-# Use pycurl as first choice, httplib as second choice.
-try:
-    import pycurl
-    HAS_PYCURL = True
-except ImportError:
-    import httplib
-    HAS_PYCURL = False
-
-
-
-"""
+---
 The Riak API for Python allows you to connect to a Riak instance,
 create, modify, and delete Riak objects, add and remove links from
 Riak objects, run Javascript (and Erlang) based Map/Reduce
@@ -59,10 +36,12 @@ class RiakError(Exception) :
         def __str__(self):
                 return repr(self.value)
 
-import riak_object
-import bucket
-import client
-import mapreduce
+from riak_object import RiakObject
+from bucket import RiakBucket 
+from client import RiakClient
+from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase
+from transports.pbc import RiakPbcTransport
+from transports.http import RiakHttpTransport
 
 
 

@@ -26,6 +26,7 @@ except ImportError:
 from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce, RiakLink
+
 class RiakClient(object):
     """
     The RiakClient object holds information necessary to connect to
