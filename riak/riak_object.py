@@ -17,9 +17,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-import types, copy
+import types, copy, re
 from metadata import *
-
+from riak import RiakError
 
 class RiakObject(object):
     """
@@ -449,6 +449,6 @@ class RiakObject(object):
         """
         mr = RiakMapReduce(self._client)
         mr.add(self._bucket._name, self._key)
-        return apply(mr.reduce, args)
+        return apply(mr.reduce, params)
 
 from mapreduce import *

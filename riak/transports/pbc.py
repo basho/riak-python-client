@@ -27,6 +27,7 @@ except ImportError:
 from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakMapReduce, RiakLink
+from riak import RiakError
 import riakclient_pb2
 
 ## Protocol codes
@@ -67,6 +68,7 @@ class RiakPbcTransport(RiakTransport):
         @param string host - Hostname or IP address (default '127.0.0.1')
         @param int port - Port number (default 8087)
         """
+        super(RiakPbcTransport, self).__init__()
         self._host = host
         self._port = port
         self._client_id = client_id
@@ -106,7 +108,7 @@ class RiakPbcTransport(RiakTransport):
         """
         req = riakclient_pb2.RpbSetClientIdReq()
         req.client_id = client_id
-
+        
         self.maybe_connect()
         self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
         msg_code, resp = self.recv_msg()

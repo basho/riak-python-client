@@ -294,7 +294,7 @@ class RiakLink(object):
         @param string name - The bucket name.
         @return self
         """
-        self._bucket = bucket
+        self._bucket = name
         return self
 
     def get_key(self):

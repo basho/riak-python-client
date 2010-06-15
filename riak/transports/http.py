@@ -18,6 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 import urllib, re
+from cStringIO import StringIO
 # Use pycurl as first choice, httplib as second choice.
 try:
     import pycurl
@@ -33,6 +34,7 @@ except ImportError:
 from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakLink
+from riak import RiakError
 
 class RiakHttpTransport(RiakTransport) :
     """
@@ -51,6 +53,7 @@ class RiakHttpTransport(RiakTransport) :
         @param string mapred_prefix - MapReduce prefix (default 'mapred')
         @param string client_id - client id to use for vector clocks
         """
+        super(RiakHttpTransport, self).__init__()
         self._host = host
         self._port = port
         self._prefix = prefix
@@ -206,7 +209,7 @@ class RiakHttpTransport(RiakTransport) :
 
         # Check if the server is down(status==0)
         if (status == 0):
-            m = 'Could not contact Riak Server: http://' + self._client._host + ':' + str(self._client._port) + '!'
+            m = 'Could not contact Riak Server: http://' + self._host + ':' + str(self._port) + '!'
             raise RiakError(m)
 
         # Verify that we got one of the expected statuses. Otherwise, raise an exception.
