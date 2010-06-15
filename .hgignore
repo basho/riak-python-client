@@ -1,7 +1,6 @@
 syntax: glob
 *.pyc
 docs
-riakclient_pb2.py
 riak.egg-info
 build
 *.html
