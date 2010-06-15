@@ -4,10 +4,6 @@ import os
 import subprocess
 from setuptools import setup, find_packages
 
-#try:
-#    from setuptools import setup
-#except ImportError:
-#    from distutils.core import setup
 
 def make_docs():
     if not os.path.exists('docs'):
@@ -17,20 +13,18 @@ def make_docs():
         os.rename(name, 'docs/%s' % name)
 
 def make_pb():
-    subprocess.call(['protoc', '--python_out=./riak', 'riakclient.proto'])
+    subprocess.call(['protoc', '--python_out=.', './riak/transports/riakclient.proto'])
 
-if __name__ == '__main__':
-    ##make_docs()
-    ##make_pb()
-
+if __name__ == "__main__":
     setup(
-        name='riak_client',
-        version='1.0',
+        name='riak',
+        version='1.0.0',
         packages = find_packages(),
         install_requires = ['protobuf>=2.3.0'],
+        dependency_links = ["http://downloads.basho.com/support"],
         package_data = {
             '' : ['*.proto']
-        },
+            },
         description='Python client for Riak',
         license='Apache 2',
         platforms='Platform Independent',
@@ -38,4 +32,4 @@ if __name__ == '__main__':
         author_email='riak@basho.com',
         test_suite='riak.tests.test_all',
         url='https://bitbucket.org/basho/riak-python-client',
-        )
+   )
