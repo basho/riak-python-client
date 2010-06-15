@@ -26,6 +26,7 @@ if __name__ == "__main__":
             '' : ['*.proto']
             },
         description='Python client for Riak',
+        zip_safe=True,
         license='Apache 2',
         platforms='Platform Independent',
         author='Basho Technologies',

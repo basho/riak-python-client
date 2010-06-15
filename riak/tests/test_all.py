@@ -8,9 +8,9 @@ import os
 import random
 import sys
 import unittest
-from riak.client import RiakClient
-from riak.transports import RiakPbcTransport
-from riak.transports import RiakHttpTransport
+from riak import RiakClient
+from riak import RiakPbcTransport
+from riak import RiakHttpTransport
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)

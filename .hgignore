@@ -5,3 +5,4 @@ riak.egg-info
 build
 *.html
 .*.swp
+dist/*
