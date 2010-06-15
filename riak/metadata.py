@@ -1,0 +1,8 @@
+MD_CTYPE    = "content-type"
+MD_CHARSET  = "charset"
+MD_ENCODING = "content-encoding"
+MD_VTAG     = "vtag"
+MD_LINKS    = "links"
+MD_LASTMOD  = "lastmod"
+MD_LASTMOD_USECS = "lastmod-usecs"
+MD_USERMETA = "usermeta"
