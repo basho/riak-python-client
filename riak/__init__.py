@@ -43,6 +43,10 @@ from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase
 from transports.pbc import RiakPbcTransport
 from transports.http import RiakHttpTransport
 
+ONE = "one"
+ALL = "all"
+QUORUM = "quorum"
+
 
 
 
