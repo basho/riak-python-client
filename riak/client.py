@@ -52,10 +52,10 @@ class RiakClient(object):
                                                 client_id)
         else:
             self._transport = transport_class(host, port, client_id=client_id)
-        self._r = 2
-        self._w = 2
-        self._dw = 0
-        self._rw = 2
+        self._r = "default"
+        self._w = "default"
+        self._dw = "default"
+        self._rw = "default"
         self._encoders = {'application/json':json.dumps,
                           'text/json':json.dumps}
         self._decoders = {'application/json':json.loads,
@@ -69,7 +69,7 @@ class RiakClient(object):
 
     def get_r(self):
         """
-        Get the R-value setting for this RiakClient. (default 2)
+        Get the R-value setting for this RiakClient. (default "quorum")
         @return integer
         """
         return self._r
@@ -88,7 +88,7 @@ class RiakClient(object):
 
     def get_w(self):
         """
-        Get the W-value setting for this RiakClient. (default 2)
+        Get the W-value setting for this RiakClient. (default "quorum")
         @return integer
         """
         return self._w
@@ -105,7 +105,7 @@ class RiakClient(object):
 
     def get_dw(self):
         """
-        Get the DW-value for this ClientOBject. (default 2)
+        Get the DW-value for this ClientOBject. (default "quorum")
         @return integer
         """
         return self._dw
@@ -122,7 +122,7 @@ class RiakClient(object):
 
     def get_rw(self):
         """
-        Get the RW-value for this ClientObject. (default 2)
+        Get the RW-value for this ClientObject. (default "quorum")
         @return integer
         """
         return self._rw

@@ -236,6 +236,30 @@ class RiakBucket(object):
         """
         return self.get_property('n_val')
 
+    def set_default_r_val(self, rval):
+        return self.set_property('r', rval)
+
+    def get_default_r_val(self):
+        return self.get_property('r')
+
+    def set_default_w_val(self, wval):
+        return self.set_property('w', wval)
+
+    def get_default_w_val(self):
+        return self.get_property('w')
+
+    def set_default_dw_val(self, dwval):
+        return self.set_property('dw', dwval)
+
+    def get_default_dw_val(self):
+        return self.get_property('dw')
+
+    def set_default_rw_val(self, rwval):
+        return self.set_property('rw', rwval)
+    
+    def get_default_rw_val(self):
+        return self.get_property('rw')
+
     def set_allow_multiples(self, bool):
         """
         If set to True, then writes with conflicting data will be stored
