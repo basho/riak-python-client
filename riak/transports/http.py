@@ -129,7 +129,20 @@ class RiakHttpTransport(RiakTransport) :
         return self
 
 
-    def get_bucket_props(self, bucket):
+    def get_keys(self, bucket):
+        params = {'props' : 'True', 'keys' : 'true'}
+        host, port, url = self.build_rest_path(bucket, None, None, params)
+        response = self.http_request('GET', host, port, url)
+
+        headers = response[0]
+        encoded_props = response[1]
+        if (headers['http_code'] == 200):
+            props = json.loads(encoded_props)
+            return props['keys']
+        else:
+            raise Exception('Error getting bucket properties.')
+        
+    def get_bucket_props(self, bucket, keys=False):
         # Run the request...
         params = {'props' : 'True', 'keys' : 'False'}
         host, port, url = self.build_rest_path(bucket, None, None, params)

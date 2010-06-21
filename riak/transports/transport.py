@@ -100,3 +100,4 @@ class RiakTransport(object):
 
     def set_client_id(self, client_id):
         raise RiakError("not implemented")
+

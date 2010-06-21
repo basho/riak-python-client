@@ -323,3 +323,6 @@ class RiakBucket(object):
         """
         t = self._client.get_transport()
         return t.get_bucket_props(self)
+
+    def get_keys(self):
+        return self._client.get_transport().get_keys(self)
