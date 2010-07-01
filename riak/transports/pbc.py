@@ -57,11 +57,25 @@ MSG_CODE_SET_BUCKET_RESP      = 22
 MSG_CODE_MAPRED_REQ           = 23
 MSG_CODE_MAPRED_RESP          = 24
 
+RIAKC_RW_ONE = 4294967294
+RIAKC_RW_QUORUM = 4294967293
+RIAKC_RW_ALL = 4294967292
+RIAKC_RW_DEFAULT = 4294967291
+
+
+
+
 class RiakPbcTransport(RiakTransport):
     """
     The RiakPbcTransport object holds a connection to the protocol buffers interface
     on the riak server.
     """
+    rw_names = {
+        'default' : RIAKC_RW_DEFAULT,
+        'all' : RIAKC_RW_ALL,
+        'quorum' : RIAKC_RW_QUORUM,
+        'one' : RIAKC_RW_ONE 
+        }
     def __init__(self, host='127.0.0.1', port=8087, client_id=None):
         """
         Construct a new RiakPbcTransport object.
@@ -73,6 +87,12 @@ class RiakPbcTransport(RiakTransport):
         self._port = port
         self._client_id = client_id
         self._sock = None
+
+    def translate_rw_val(self, rw):
+        val = self.rw_names.get(rw)
+        if val is None:
+            return rw
+        return val
 
     def __copy__(self):
         return RiakPbcTransport(self._host, self._port)
@@ -127,7 +147,7 @@ class RiakPbcTransport(RiakTransport):
         bucket = robj.get_bucket()
 
         req = riakclient_pb2.RpbGetReq()
-        req.r = r
+        req.r = self.translate_rw_val(r)
 
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
@@ -150,10 +170,10 @@ class RiakPbcTransport(RiakTransport):
         Serialize get request and deserialize response
         """
         bucket = robj.get_bucket()
-
+        
         req = riakclient_pb2.RpbPutReq()
-        req.w = w
-        req.dw = dw
+        req.w = self.translate_rw_val(w)
+        req.dw = self.translate_rw_val(dw)
         if return_body == True:
             req.return_body = 1
 
@@ -183,7 +203,7 @@ class RiakPbcTransport(RiakTransport):
         bucket = robj.get_bucket()
 
         req = riakclient_pb2.RpbDelReq()
-        req.rw = rw
+        req.rw = self.translate_rw_val(rw)
 
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
