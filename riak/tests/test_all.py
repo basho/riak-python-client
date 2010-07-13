@@ -147,6 +147,25 @@ class BaseTestCase(object):
         self.assertFalse(bucket.get_allow_multiples())
         self.assertEqual(bucket.get_n_val(), 2)
 
+    def test_rw_settings(self):
+        bucket = self.client.bucket('rwsettings')
+        self.assertEqual(bucket.get_r(), "default")
+        self.assertEqual(bucket.get_w(), "default")
+        self.assertEqual(bucket.get_dw(), "default")
+        self.assertEqual(bucket.get_rw(), "default")
+
+        bucket.set_w(1)
+        self.assertEqual(bucket.get_w(), 1)
+
+        bucket.set_r("quorum")
+        self.assertEqual(bucket.get_r(), "quorum")
+
+        bucket.set_dw("all")
+        self.assertEqual(bucket.get_dw(), "all")
+
+        bucket.set_rw("one")
+        self.assertEqual(bucket.get_rw(), "one")
+
     def test_siblings(self):
         # Set up the bucket, clear any existing object...
         bucket = self.client.bucket('multiBucket')

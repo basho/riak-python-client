@@ -64,7 +64,7 @@ class RiakBucket(object):
         self._r = r
         return self
 
-    def get_w(self, w):
+    def get_w(self, w=None):
         """
         Get the W-value for this bucket, if it is set, otherwise return
         the W-value for the client.
@@ -85,7 +85,7 @@ class RiakBucket(object):
         self._w = w
         return self
 
-    def get_dw(self, dw):
+    def get_dw(self, dw=None):
         """
         Get the DW-value for this bucket, if it is set, otherwise return
         the DW-value for the client.
@@ -106,7 +106,7 @@ class RiakBucket(object):
         self._dw = dw
         return self
 
-    def get_rw(self, rw):
+    def get_rw(self, rw=None):
         """
         Get the RW-value for this bucket, if it is set, otherwise return
         the RW-value for the client.
