@@ -192,7 +192,7 @@ class RiakPbcTransport(RiakTransport):
             raise RiakError("unexpected protocol buffer message code: ", msg_code)
         if resp is not None:
             contents = []
-            for c in resp.contents:
+            for c in resp.content:
                 contents.append(self.decode_content(c))
             return (resp.vclock, contents)
 

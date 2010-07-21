@@ -42,9 +42,8 @@
 **
 **     pbmsg is the encoded protocol buffer message
 **
-**   On connect, the client sends RpbHello with protocol/node information.
-**   After that client can make requests and will receive responses.
-**   For each request message there is a correspondign response message,
+**   On connect, the client can make requests and will receive responses.
+**   For each request message there is a corresponding response message,
 **   or the server will respond with an error message if something has
 **   gone wrong.
 **
@@ -80,7 +79,7 @@
 ** 13 - RpbDelReq 
 ** 14 - RpbDelResp
 ** 15 - RpbListBucketsReq
-** 16 - RpbListBucketsResp{1,}
+** 16 - RpbListBucketsResp
 ** 17 - RpbListKeysReq
 ** 18 - RpbListKeysResp{1,}
 ** 19 - RpbGetBucketReq
@@ -88,7 +87,7 @@
 ** 21 - RpbSetBucketReq
 ** 22 - RpbSetBucketResp
 ** 23 - RpbMapRedReq
-** 24 - RpbMapRedResp
+** 24 - RpbMapRedResp{1,}
 **
 */
 
@@ -144,7 +143,7 @@ message RpbPutReq {
 
 // Put response - same as get response
 message RpbPutResp {
-    repeated RpbContent contents = 1;
+    repeated RpbContent content = 1;
     optional bytes vclock = 2;        // the opaque vector clock for the object
 }
 
@@ -202,7 +201,6 @@ message RpbSetBucketReq {
 message RpbMapRedReq {
     required bytes request = 1;
     required bytes content_type = 2;
-    optional uint32 timeout = 3; // timeout for operation in milliseconds
 }
 
 // Map/Reduce response
