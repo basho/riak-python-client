@@ -247,9 +247,9 @@ class BaseTestCase(object):
             .add("bucket", "bar") \
             .add("bucket", "baz") \
             .map("function (v) { return [1]; }") \
-            .reduce("function(v) { return v.length; } ") \
+            .reduce("function(v) { return [v.length]; } ") \
             .run()
-        self.assertEqual(result, 3)
+        self.assertEqual(result, [3])
 
     def test_javascript_named_map_reduce(self):
         # Create the object...
