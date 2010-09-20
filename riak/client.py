@@ -208,6 +208,16 @@ class RiakClient(object):
         mr = RiakMapReduce(self)
         return apply(mr.add, args)
 
+    def search(self, *args):
+        """
+        Start assembling a Map/Reduce operation based on search
+        results.
+        @see RiakMapReduce.add()
+        @return RiakMapReduce
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.search, args)
+
     def link(self, args):
         """
         Start assembling a Map/Reduce operation.

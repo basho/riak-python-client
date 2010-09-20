@@ -224,7 +224,7 @@ class BaseTestCase(object):
             .run()
         self.assertEqual(result, [2])
 
-    def testJavascriptNamedMap(self):
+    def test_javascript_named_map(self):
         # Create the object...
         bucket = self.client.bucket("bucket")
         bucket.new("foo", 2).store()
@@ -235,7 +235,7 @@ class BaseTestCase(object):
             .run()
         self.assertEqual(result, [2])
 
-    def test_javascript_source_mapReduce(self):
+    def test_javascript_source_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket("bucket")
         bucket.new("foo", 2).store()
@@ -267,7 +267,7 @@ class BaseTestCase(object):
             .run()
         self.assertEqual(result, [9])
 
-    def testJavascriptBucketMapReduce(self):
+    def test_javascript_bucket_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket("bucket_%s" % self.randint())
         bucket.new("foo", 2).store()
@@ -346,6 +346,26 @@ class BaseTestCase(object):
         self.assertEqual(len(results), 3)
         results = obj.link("bucket", "tag").run()
         self.assertEqual(len(results), 1)
+
+    def test_search_integration(self):
+        # Create some objects to search across...
+        bucket = self.client.bucket("searchbucket")
+        bucket.new("one", {"foo":"one", "bar":"red"}).store()
+        bucket.new("two", {"foo":"two", "bar":"green"}).store()
+        bucket.new("three", {"foo":"three", "bar":"blue"}).store()
+        bucket.new("four", {"foo":"four", "bar":"orange"}).store()
+        bucket.new("five", {"foo":"five", "bar":"yellow"}).store()
+
+       # Run some operations...
+        results = self.client.search("searchbucket", "foo:one OR foo:two").run()
+        if (len(results) == 0):
+            print "\n\nNot running test \"testSearchIntegration()\".\n"
+            print "Please ensure that you have installed the Riak Search hook on bucket \"searchbucket\" by running \"bin/search-cmd install searchbucket\".\n\n"
+            return
+        self.assertEqual(len(results), 2)
+        results = self.client.search("searchbucket", "(foo:one OR foo:two OR foo:three OR foo:four) AND (NOT bar:green)").run()
+        self.assertEqual(len(results), 3)
+
 
 class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
 

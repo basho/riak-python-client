@@ -61,6 +61,8 @@ class RiakMapReduce(object):
     def add_bucket_key_data(self, bucket, key, data) :
         if self._input_mode == 'bucket':
             raise Exception('Already added a bucket, can\'t add an object.')
+        elif self._input_mode == 'search':
+            raise Exception('Already added a search query, can\'t add an object.')
         else:
             self._inputs.append([bucket, key, data])
             return self
@@ -69,6 +71,21 @@ class RiakMapReduce(object):
         self._input_mode = 'bucket'
         self._inputs = bucket
         return self
+
+    def search(self, bucket, query):
+        """
+        Begin a map/reduce operation using a Search. (For this to work,
+        Riak Search must be installed, and the bucket must have the Riak
+        Search post-commit hook set.)
+        @param bucket - The bucket over which to perform the search.
+        @param query - The search query.
+        """
+        self._input_mode = 'search'
+        self._inputs = {'module':'riak_search', 
+                       'function':'mapred_search',
+                       'arg':[bucket, query]}
+        return self
+        
 
     def link(self, bucket='_', tag='_', keep=False):
         """
@@ -142,10 +159,19 @@ class RiakMapReduce(object):
         @param integer timeout - Timeout in seconds.
         @return array()
         """
+        num_phases = len(self._phases)
+
+        # If there are no phases, then just echo the inputs back to the user.
+        if (num_phases == 0):
+            self.reduce(["riak_kv_mapreduce", "reduce_identity"])
+            num_phases = 1
+            link_results_flag = True
+        else:
+            link_results_flag = False
+
         # Convert all phases to associative arrays. Also,
         # if none of the phases are accumulating, then set the last one to
         # accumulate.
-        num_phases = len(self._phases)
         keep_flag = False
         query = []
         for i in range(num_phases):
@@ -159,15 +185,18 @@ class RiakMapReduce(object):
         result = t.mapred(self._inputs, query)
 
         # If the last phase is NOT a link phase, then return the result.
-        lastIsLink = isinstance(self._phases[-1], RiakLinkPhase)
-        if not lastIsLink:
+        link_results_flag = link_results_flag or isinstance(self._phases[-1], RiakLinkPhase)
+        if not link_results_flag:
             return result
 
         # Otherwise, if the last phase IS a link phase, then convert the
         # results to RiakLink objects.
         a = []
         for r in result:
-            link = RiakLink(r[0], r[1], r[2])
+            if (len(r) == 2):
+                link = RiakLink(r[0], r[1])
+            elif (len(r) == 3):
+                link = RiakLink(r[0], r[1], r[2])
             link._client = self._client
             a.append(link)
 
