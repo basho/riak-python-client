@@ -74,9 +74,7 @@ class RiakMapReduce(object):
 
     def search(self, bucket, query):
         """
-        Begin a map/reduce operation using a Search. (For this to work,
-        Riak Search must be installed, and the bucket must have the Riak
-        Search post-commit hook set.)
+        Begin a map/reduce operation using a Search.
         @param bucket - The bucket over which to perform the search.
         @param query - The search query.
         """
