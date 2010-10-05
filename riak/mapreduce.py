@@ -74,7 +74,8 @@ class RiakMapReduce(object):
 
     def search(self, bucket, query):
         """
-        Begin a map/reduce operation using a Search.
+        Begin a map/reduce operation using a Search. This command will 
+        return an error unless executed against a Riak Search cluster.
         @param bucket - The bucket over which to perform the search.
         @param query - The search query.
         """

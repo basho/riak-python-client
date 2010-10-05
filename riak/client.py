@@ -211,7 +211,8 @@ class RiakClient(object):
     def search(self, *args):
         """
         Start assembling a Map/Reduce operation based on search
-        results.
+        results. This command will return an error unless executed 
+        against a Riak Search cluster.
         @see RiakMapReduce.add()
         @return RiakMapReduce
         """
