@@ -16,7 +16,7 @@ HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
-PB_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8087'))
+PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 
 class NotJsonSerializable(object):
 
