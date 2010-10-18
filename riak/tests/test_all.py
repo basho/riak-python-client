@@ -17,6 +17,7 @@ HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
+SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
 
 class NotJsonSerializable(object):
 
@@ -348,6 +349,8 @@ class BaseTestCase(object):
         self.assertEqual(len(results), 1)
 
     def test_search_integration(self):
+        if SKIP_SEARCH:
+            return True
         # Create some objects to search across...
         bucket = self.client.bucket("searchbucket")
         bucket.new("one", {"foo":"one", "bar":"red"}).store()
