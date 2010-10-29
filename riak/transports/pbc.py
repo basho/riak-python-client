@@ -214,6 +214,29 @@ class RiakPbcTransport(RiakTransport):
         if msg_code != MSG_CODE_DEL_RESP:
             raise RiakError("unexpected protocol buffer message code: ", msg_code)
         return self
+    
+    def get_keys(self, bucket):
+        """
+        Lists all keys within a bucket.
+        """
+        req = riakclient_pb2.RpbListKeysReq()
+        req.bucket = bucket.get_name()
+
+        self.maybe_connect()
+        self.send_msg(MSG_CODE_LIST_KEYS_REQ, req)
+        keys = []
+        while True:
+            msg_code, resp = self.recv_msg()
+            if msg_code != MSG_CODE_LIST_KEYS_RESP:
+                raise RiakError("unexpected protocol buffer message code: ", msg_code)
+
+            for key in resp.keys:
+                keys.append(key)
+
+            if resp.HasField("done") and resp.done:
+                break;
+
+        return keys
 
     def get_bucket_props(self, bucket):
         """
@@ -344,6 +367,9 @@ class RiakPbcTransport(RiakTransport):
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_DEL_RESP:
             msg = None
+        elif msg_code == MSG_CODE_LIST_KEYS_RESP:
+            msg = riakclient_pb2.RpbListKeysResp()
+            msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_GET_BUCKET_RESP:
             msg = riakclient_pb2.RpbGetBucketResp()
             msg.ParseFromString(self._inbuf[1:])
