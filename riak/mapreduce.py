@@ -155,7 +155,7 @@ class RiakMapReduce(object):
         """
         Run the map/reduce operation. Returns an array of results, or an
         array of RiakLink objects if the last phase is a link phase.
-        @param integer timeout - Timeout in seconds.
+        @param integer timeout - Timeout in milliseconds.
         @return array()
         """
         num_phases = len(self._phases)
