@@ -181,7 +181,7 @@ class RiakMapReduce(object):
             query.append(phase.to_array())
 
         t = self._client.get_transport()
-        result = t.mapred(self._inputs, query)
+        result = t.mapred(self._inputs, query, timeout)
 
         # If the last phase is NOT a link phase, then return the result.
         link_results_flag = link_results_flag or isinstance(self._phases[-1], RiakLinkPhase)
