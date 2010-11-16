@@ -91,7 +91,7 @@ class RiakMapReduce(object):
         Add a link phase to the map/reduce operation.
         @param string bucket - Bucket name (default '_', which means all
         buckets)
-        @param string tag - Tag (default '_', which means all buckets)
+        @param string tag - Tag (default '_', which means any tag)
         @param boolean keep - Flag whether to keep results from this
         stage in the map/reduce. (default False, unless this is the last
         step in the phase)
