@@ -1,3 +1,5 @@
 riak/*.pyc
 riak/tests/*.pyc
 riak/transports/*.pyc
+
+docs/_build

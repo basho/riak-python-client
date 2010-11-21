@@ -1,0 +1,7 @@
+.. ref-client:
+
+==========
+RiakClient
+==========
+
+TBD.

@@ -1,0 +1,7 @@
+.. ref-bucket:
+
+==========
+RiakBucket
+==========
+
+TBD.
