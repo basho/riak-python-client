@@ -213,13 +213,13 @@ class RiakClient(object):
         Start assembling a Map/Reduce operation based on search
         results. This command will return an error unless executed 
         against a Riak Search cluster.
-        @see RiakMapReduce.add()
+        @see RiakMapReduce.search()
         @return RiakMapReduce
         """
         mr = RiakMapReduce(self)
         return apply(mr.search, args)
 
-    def link(self, args):
+    def link(self, *args):
         """
         Start assembling a Map/Reduce operation.
         @see RiakMapReduce.link()
