@@ -248,13 +248,142 @@ Manually fetching data is also possible::
 Fetching Data Via Map/Reduce
 ============================
 
-TBD.
+When you need to work with larger sets of data, one of the tools at your
+disposal is MapReduce_. This technique iterates over all of the data, returning
+data from the map phase & combining all the different maps in the reduce
+phase(s).
+
+.. _MapReduce: http://wiki.basho.com/display/RIAK/MapReduce
+
+To perform a map operation, such as returning all active users, you can do
+something like::
+
+  import riak
+  
+  client = riak.RiakClient()
+  # First, you need to ``add`` the bucket you want to MapReduce on.
+  query = client.add('user')
+  # Then, you supply a Javascript map function as the code to be executed.
+  query.map("function(v) { var data = JSON.parse(v.values[0].data); if(data.is_active == true) { return [[v.key, data]]; } return []; }")
+  
+  for result in query.run():
+      # Print the key (``v.key``) and the value for that key (``data``).
+      print "%s - %s" % (result[0], result[1])
+  
+  # Results in something like:
+  #
+  # mr_smith - {'first_name': 'Mister', 'last_name': 'Smith', 'is_active': True}
+  # johndoe - {'first_name': 'John', 'last_name': 'Doe', 'is_active': True}
+  # annabody - {'first_name': 'Anna', 'last_name': 'Body', 'is_active': True}
+
+You can also do this manually::
+
+  import riak
+  
+  client = riak.RiakClient()
+  query = riak.RiakMapReduce(client).add('user')
+  query.map("function(v) { var data = JSON.parse(v.values[0].data); if(data.is_active == true) { return [[v.key, data]]; } return []; }")
+  
+  for result in query.run():
+      print "%s - %s" % (result[0], result[1])
+
+Adding a reduce phase, say to sort by username (key), looks almost identical::
+
+  import riak
+  
+  client = riak.RiakClient()
+  query = client.add('user')
+  query.map("function(v) { var data = JSON.parse(v.values[0].data); if(data.is_active == true) { return [[v.key, data]]; } return []; }")
+  query.reduce("function(values) { return values.sort(); }")
+  
+  for result in query.run():
+      # Print the key (``v.key``) and the value for that key (``data``).
+      print "%s - %s" % (result[0], result[1])
+  
+  # Results in something like:
+  #
+  # annabody - {'first_name': 'Anna', 'last_name': 'Body', 'is_active': True}
+  # johndoe - {'first_name': 'John', 'last_name': 'Doe', 'is_active': True}
+  # mr_smith - {'first_name': 'Mister', 'last_name': 'Smith', 'is_active': True}
 
 
 Working With Related Data Via Links
 ===================================
 
-TBD.
+Links_ are powerful concept in Riak that allow, within the key/value pair's
+metadata, relations between objects.
+
+.. _Links: http://wiki.basho.com/display/RIAK/Links
+
+Adding them to your data is relatively trivial. For instance, we'll link a
+user's statuses to their user data::
+
+  import riak
+  import uuid
+  
+  client = riak.RiakClient()
+  user_bucket = client.bucket('user')
+  status_bucket = client.bucket('status')
+  
+  johndoe = user_bucket.get('johndoe')
+  
+  new_status = status_bucket.new(uuid.uuid1(), data={
+      'message': 'First post!',
+      'created': time.time(),
+      'is_public': True,
+  })
+  # Add one direction (from status to user)...
+  new_status.add_link(johndoe)
+  new_status.store()
+  
+  # ... Then add the other direction.
+  johndoe.add_link(new_status)
+  johndoe.store()
+
+Fetching the data is equally simple::
+
+  import riak
+  
+  client = riak.RiakClient()
+  user_bucket = client.bucket('user')
+  
+  johndoe = user_bucket.get('johndoe')
+  
+  for status_link in johndoe.get_links():
+      # Since what we get back are lightweight ``RiakLink`` objects, we need to
+      # get the associated ``RiakObject`` to access its data.
+      status = status_link.get()
+      print status.get_data()['message']
+
+As usual, it's also possible to do this manually::
+
+  import riak
+  import uuid
+  
+  client = riak.RiakClient()
+  user_bucket = client.bucket('user')
+  status_bucket = client.bucket('status')
+  
+  johndoe = user_bucket.get('johndoe')
+  
+  new_status_key = uuid.uuid1()
+  new_status = status_bucket.new(new_status_key, data={
+      'message': 'First post!',
+      'created': time.time(),
+      'is_public': True,
+  })
+  
+  # Add one direction (from status to user)...
+  user_link = riak.RiakLink(user_bucket, 'johndoe')
+  new_status.add_link(user_link)
+  new_status.store()
+  
+  # ... Then add the other direction.
+  status_link = riak.RiakLink(status_bucket, new_status_key)
+  johndoe.add_link(status_link)
+  johndoe.store()
+  
+  # Querying looks the same...
 
 
 Using Search
