@@ -4,8 +4,8 @@
 RiakClient
 ==========
 
-The RiakClient object holds information necessary to connect to Riak. The
-Riak API uses HTTP, so there is no persistent connection, and the RiakClient
+The ``RiakClient`` object holds information necessary to connect to Riak. The
+Riak API uses HTTP, so there is no persistent connection, and the ``RiakClient``
 object is extremely lightweight.
 
 

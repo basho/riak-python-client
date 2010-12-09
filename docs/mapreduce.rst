@@ -1,0 +1,7 @@
+.. ref-mapreduce:
+
+=============
+RiakMapReduce
+=============
+
+TBD.

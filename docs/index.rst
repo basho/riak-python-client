@@ -26,6 +26,8 @@ Contents:
    
    client
    bucket
+   riak_object
+   mapreduce
 
 Indices and tables
 ------------------
