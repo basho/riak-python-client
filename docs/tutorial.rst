@@ -389,4 +389,30 @@ As usual, it's also possible to do this manually::
 Using Search
 ============
 
-TBD.
+`Riak Search`_ is a new feature available as of Riak 0.13. It allows you to create
+queries that filter on data in the values without writing a MapReduce. It takes
+inspiration from Lucene_, a popular Java-based search library, and incorporates
+a Solr-like interface into Riak. The setup of this is outside the realm of this
+tutorial, but usage of this feature looks like::
+
+  import riak
+  
+  client = riak.RiakClient()
+  
+  # First parameter is the bucket we want to search within, the second
+  # is the query we want to perform.
+  search_query = client.search('user', 'first_name:[Anna TO John]')
+  
+  for result in search_query.run():
+      # You get ``RiakLink`` objects back.
+      user = result.get()
+      user_data = user.get_data()
+      print "%s %s" % (user_data['first_name'], user_data['last_name'])
+  
+  # Results in something like:
+  #
+  # John Doe
+  # Anna Body
+
+.. _`Riak Search`: http://wiki.basho.com/display/RIAK/Riak+Search
+.. _Lucene: http://lucene.apache.org/
