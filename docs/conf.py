@@ -258,3 +258,4 @@ epub_copyright = u'2010, Daniel Lindsley'
 # Autodoc settings
 autodoc_default_flags = ['members', 'undoc-members']
 autodoc_member_order = 'bysource'
+autoclass_content = 'both'

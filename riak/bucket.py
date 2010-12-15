@@ -28,9 +28,12 @@ class RiakBucket(object):
 
     def __init__(self, client, name):
         """
-        Returns a new ``RiakBucket`` instance. The ``client`` argument should be a
-        ``RiakClient`` instance and the ``name`` argument should be the bucket name as
-        a string.
+        Returns a new ``RiakBucket`` instance.
+
+        :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
+        :type client: :class:`RiakClient <riak.client.RiakClient>`
+        :param name: The bucket name
+        :type name: string
         """
         self._client = client
         self._name = name
@@ -192,14 +195,14 @@ class RiakBucket(object):
 
     def new(self, key, data=None, content_type='application/json'):
         """
-        Create a new :class:`RiakObject` that will be stored as JSON. A shortcut for
-        manually instantiating a :class:`RiakObject`.
+        Create a new :class:`RiakObject <riak.riak_object.RiakObject>` that will be stored as JSON. A shortcut for
+        manually instantiating a :class:`RiakObject <riak.riak_object.RiakObject>`.
 
         :param key: Name of the key.
         :type key: string
-        :param data: The data to store. (default None)
+        :param data: The data to store.
         :type data: object
-        :rtype: :class:`RiakObject`
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj.set_data(data)
@@ -209,17 +212,16 @@ class RiakBucket(object):
 
     def new_binary(self, key, data, content_type='application/octet-stream'):
         """
-        Create a new :class:`RiakObject` that will be stored as plain text/binary.
-        A shortcut for manually instantiating a :class:`RiakObject`.
+        Create a new :class:`RiakObject <riak.riak_object.RiakObject>` that will be stored as plain text/binary.
+        A shortcut for manually instantiating a :class:`RiakObject <riak.riak_object.RiakObject>`.
 
         :param key: Name of the key.
         :type key: string
         :param data: The data to store.
         :type data: object
         :param content_type: The content type of the object.
-               (default 'application/octet-stream')
         :type content_type: string
-        :rtype: :class:`RiakObject`
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj.set_data(data)
@@ -235,7 +237,7 @@ class RiakBucket(object):
         :type key: string
         :param r: R-Value of the request (defaults to bucket's R)
         :type r: integer
-        :rtype: :class:`RiakObject`
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = True
@@ -250,7 +252,7 @@ class RiakBucket(object):
         :type key: string
         :param r: R-Value of the request (defaults to bucket's R)
         :type r: integer
-        :rtype: :class:`RiakObject`
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = False
