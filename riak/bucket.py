@@ -21,12 +21,17 @@ from riak_object import RiakObject
 
 class RiakBucket(object):
     """
-    The RiakBucket object allows you to access and change information
+    The ``RiakBucket`` object allows you to access and change information
     about a Riak bucket, and provides methods to create or retrieve
     objects within the bucket.
     """
 
     def __init__(self, client, name):
+        """
+        Returns a new ``RiakBucket`` instance. The ``client`` argument should be a
+        ``RiakClient`` instance and the ``name`` argument should be the bucket name as
+        a string.
+        """
         self._client = client
         self._name = name
         self._r = None
@@ -38,7 +43,7 @@ class RiakBucket(object):
 
     def get_name(self):
         """
-        Get the bucket name.
+        Get the bucket name as a string.
         """
         return self._name
 
@@ -46,7 +51,8 @@ class RiakBucket(object):
         """
         Get the R-value for this bucket, if it is set, otherwise return
         the R-value for the client.
-        @return integer
+
+        :rtype: integer
         """
         if (r is not None):
             return r
@@ -56,10 +62,13 @@ class RiakBucket(object):
 
     def set_r(self, r):
         """
-        Set the R-value for this bucket. get(...) and get_binary(...)
-        operations that do not specify an R-value will use this value.
-        @param integer r - The new R-value.
-        @return self
+        Set the R-value for this bucket. :func:`RiakBucket.get` and
+        :func:`RiakBucket.get_binary` operations that do not specify an
+        R-value will use this value.
+
+        :param r: The new R-value.
+        :type r: integer
+        :rtype: self
         """
         self._r = r
         return self
@@ -68,7 +77,8 @@ class RiakBucket(object):
         """
         Get the W-value for this bucket, if it is set, otherwise return
         the W-value for the client.
-        @return integer
+
+        :rtype: integer
         """
         if (w is not None):
             return w
@@ -78,9 +88,12 @@ class RiakBucket(object):
 
     def set_w(self, w):
         """
-        Set the W-value for this bucket. See set_r(...) for more information.
-        @param integer w - The new W-value.
-        @return self
+        Set the W-value for this bucket. See :func:`RiakBucket.set_r` for
+        more information.
+
+        :param w: The new W-value.
+        :type w: integer
+        :rtype: self
         """
         self._w = w
         return self
@@ -89,7 +102,8 @@ class RiakBucket(object):
         """
         Get the DW-value for this bucket, if it is set, otherwise return
         the DW-value for the client.
-        @return integer
+
+        :rtype: integer
         """
         if (dw is not None):
             return dw
@@ -99,9 +113,12 @@ class RiakBucket(object):
 
     def set_dw(self, dw):
         """
-        Set the DW-value for this bucket. See set_r(...) for more information.
-        @param integer dw - The new DW-value
-        @return self
+        Set the DW-value for this bucket. See :func:`RiakBucket.set_r` for more
+        information.
+
+        :param dw: The new DW-value
+        :type dw: integer
+        :rtype: self
         """
         self._dw = dw
         return self
@@ -110,7 +127,8 @@ class RiakBucket(object):
         """
         Get the RW-value for this bucket, if it is set, otherwise return
         the RW-value for the client.
-        @return integer
+
+        :rtype: integer
         """
         if (rw is not None):
             return rw
@@ -120,17 +138,21 @@ class RiakBucket(object):
 
     def set_rw(self, rw):
         """
-        Set the RW-value for this bucket. See set_r(...) for more information.
-        @param integer rw - The new RW-value
-        @return self
+        Set the RW-value for this bucket. See :func:`RiakBucket.set_r` for more
+        information.
+
+        :param rw: The new RW-value
+        :type rw: integer
+        :rtype: self
         """
         self._rw = rw
         return self
 
     def get_encoder(self, content_type):
         """
-        Get the encoding function for this content type for this bucket
-        @param content_type: Content type requested
+        Get the encoding function for the provided content type for this bucket.
+
+        :param content_type: Content type requested
         """
         if content_type in self._encoders:
             return self._encoders[content_type]
@@ -139,9 +161,10 @@ class RiakBucket(object):
 
     def set_encoder(self, content_type, encoder):
         """
-        Set the encoding function for this content type for this bucket
-        @param content_type: Content type for encoder
-        @param encoder: Function to encode with - will be called with data as single
+        Set the encoding function for the provided content type for this bucket.
+
+        :param content_type: Content type for encoder
+        :param encoder: Function to encode with - will be called with data as single
                         argument.
         """
         self._encoders[content_type] = encoder
@@ -149,8 +172,9 @@ class RiakBucket(object):
 
     def get_decoder(self, content_type):
         """
-        Get the decoding function for this content type for this bucket
-        @param content_type: Content type for decoder
+        Get the decoding function for the provided content type for this bucket.
+
+        :param content_type: Content type for decoder
         """
         if content_type in self._decoders:
             return self._decoders[content_type]
@@ -159,19 +183,24 @@ class RiakBucket(object):
 
     def set_decoder(self, content_type, decoder):
         """
-        Set the decoding function for this content type for this bucket
-        @param content_type: Content type for decoder
-        @param decoder: Function to decode with - will be called with string
+        Set the decoding function for the provided content type for this bucket.
+
+        :param content_type: Content type for decoder
+        :param decoder: Function to decode with - will be called with string
         """
         self._decoders[content_type] = decoder
         return self
 
     def new(self, key, data=None, content_type='application/json'):
         """
-        Create a new Riak object that will be stored as JSON.
-        @param string key - Name of the key.
-        @param object data - The data to store. (default None)
-        @return RiakObject
+        Create a new :class:`RiakObject` that will be stored as JSON. A shortcut for
+        manually instantiating a :class:`RiakObject`.
+
+        :param key: Name of the key.
+        :type key: string
+        :param data: The data to store. (default None)
+        :type data: object
+        :rtype: :class:`RiakObject`
         """
         obj = RiakObject(self._client, self, key)
         obj.set_data(data)
@@ -181,12 +210,17 @@ class RiakBucket(object):
 
     def new_binary(self, key, data, content_type='application/octet-stream'):
         """
-        Create a new Riak object that will be stored as plain text/binary.
-        @param string key - Name of the key.
-        @param object data - The data to store.
-        @param string content_type - The content type of the object.
+        Create a new :class:`RiakObject` that will be stored as plain text/binary.
+        A shortcut for manually instantiating a :class:`RiakObject`.
+
+        :param key: Name of the key.
+        :type key: string
+        :param data: The data to store.
+        :type data: object
+        :param content_type: The content type of the object.
                (default 'application/octet-stream')
-        @return RiakObject
+        :type content_type: string
+        :rtype: :class:`RiakObject`
         """
         obj = RiakObject(self._client, self, key)
         obj.set_data(data)
@@ -197,9 +231,12 @@ class RiakBucket(object):
     def get(self, key, r=None):
         """
         Retrieve a JSON-encoded object from Riak.
-        @param string key - Name of the key.
-        @param int r - R-Value of the request (defaults to bucket's R)
-        @return RiakObject
+
+        :param key: Name of the key.
+        :type key: string
+        :param r: R-Value of the request (defaults to bucket's R)
+        :type r: integer
+        :rtype: :class:`RiakObject`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = True
@@ -209,9 +246,12 @@ class RiakBucket(object):
     def get_binary(self, key, r=None):
         """
         Retrieve a binary/string object from Riak.
-        @param string key - Name of the key.
-        @param int r - R-Value of the request (defaults to bucket's R)
-        @return RiakObject
+
+        :param key: Name of the key.
+        :type key: string
+        :param r: R-Value of the request (defaults to bucket's R)
+        :type r: integer
+        :rtype: :class:`RiakObject`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = False
@@ -221,18 +261,24 @@ class RiakBucket(object):
     def set_n_val(self, nval):
         """
         Set the N-value for this bucket, which is the number of replicas
-        that will be written of each object in the bucket. Set this once
-        before you write any data to the bucket, and never change it
-        again, otherwise unpredictable things could happen. This should
-        only be used if you know what you are doing.
-        @param integer nval - The new N-Val.
+        that will be written of each object in the bucket.
+
+        .. warning::
+
+           Set this once before you write any data to the bucket, and never
+           change it again, otherwise unpredictable things could happen.
+           This should only be used if you know what you are doing.
+
+        :param nval: The new N-Val.
+        :type nval: integer
         """
         return self.set_property('n_val', nval)
 
     def get_n_val(self):
         """
         Retrieve the N-value for this bucket.
-        @return integer
+
+        :rtype: integer
         """
         return self.get_property('n_val')
 
@@ -256,7 +302,7 @@ class RiakBucket(object):
 
     def set_default_rw_val(self, rwval):
         return self.set_property('rw', rwval)
-    
+
     def get_default_rw_val(self):
         return self.get_property('rw')
 
@@ -264,32 +310,47 @@ class RiakBucket(object):
         """
         If set to True, then writes with conflicting data will be stored
         and returned to the client. This situation can be detected by
-        calling has_siblings() and get_siblings(). This should only be used
-        if you know what you are doing.
-        @param boolean bool - True to store and return conflicting writes.
+        calling has_siblings() and get_siblings().
+
+        .. warning::
+
+           This should only be used if you know what you are doing, as it can lead to
+           unexpected results.
+
+        :param bool: True to store and return conflicting writes.
+        :type bool: boolean
         """
         return self.set_property('allow_mult', bool)
 
     def get_allow_multiples(self):
         """
         Retrieve the 'allow multiples' setting.
-        @return Boolean
+
+        :rtype: Boolean
         """
         return self.get_bool_property('allow_mult')
 
     def set_property(self, key, value):
         """
-        Set a bucket property. This should only be used if you know what
-        you are doing.
-        @param string key - Property to set.
-        @param mixed value - Property value.
+        Set a bucket property.
+
+        .. warning::
+
+           This should only be used if you know what you are doing.
+
+        :param key: Property to set.
+        :type key: string
+        :param value: Property value.
+        :type value: mixed
         """
         return self.set_properties({key : value})
 
     def get_bool_property(self, key):
         """
-        Get a boolean bucket property.  Converts to a True/False value
-        @param string key - Property to set.
+        Get a boolean bucket property.  Converts to a ``True`` or ``False`` value.
+
+        :param key: Property to set.
+        :type key: string
         """
         prop = self.get_property(key)
         if prop == True or prop > 0:
@@ -300,8 +361,10 @@ class RiakBucket(object):
     def get_property(self, key):
         """
         Retrieve a bucket property.
-        @param string key - The property to retrieve.
-        @return mixed
+
+        :param key: The property to retrieve.
+        :type key: string
+        :rtype: mixed
         """
         props = self.get_properties()
         if (key in props.keys()):
@@ -309,9 +372,14 @@ class RiakBucket(object):
 
     def set_properties(self, props):
         """
-        Set multiple bucket properties in one call. This should only be
-        used if you know what you are doing.
-        @param array props - An associative array of key:value.
+        Set multiple bucket properties in one call.
+
+        .. warning::
+
+           This should only be used if you know what you are doing.
+
+        :param props: An associative array of key:value.
+        :type props: array
         """
         t = self._client.get_transport()
         t.set_bucket_props(self, props)
@@ -319,10 +387,18 @@ class RiakBucket(object):
     def get_properties(self):
         """
         Retrieve an associative array of all bucket properties.
-        @return Array
+
+        :rtype: array
         """
         t = self._client.get_transport()
         return t.get_bucket_props(self)
 
     def get_keys(self):
+        """
+        Return all keys within the bucket.
+
+        .. warning::
+
+           At current, this is a very expensive operation. Use with caution.
+        """
         return self._client.get_transport().get_keys(self)
