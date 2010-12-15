@@ -62,9 +62,8 @@ class RiakBucket(object):
 
     def set_r(self, r):
         """
-        Set the R-value for this bucket. :func:`RiakBucket.get` and
-        :func:`RiakBucket.get_binary` operations that do not specify an
-        R-value will use this value.
+        Set the R-value for this bucket. This value is used by :func:`get`
+        and :func:`get_binary` operations that do not specify an R-value.
 
         :param r: The new R-value.
         :type r: integer
@@ -88,7 +87,7 @@ class RiakBucket(object):
 
     def set_w(self, w):
         """
-        Set the W-value for this bucket. See :func:`RiakBucket.set_r` for
+        Set the W-value for this bucket. See :func:`set_r` for
         more information.
 
         :param w: The new W-value.
@@ -113,7 +112,7 @@ class RiakBucket(object):
 
     def set_dw(self, dw):
         """
-        Set the DW-value for this bucket. See :func:`RiakBucket.set_r` for more
+        Set the DW-value for this bucket. See :func:`set_r` for more
         information.
 
         :param dw: The new DW-value
@@ -138,7 +137,7 @@ class RiakBucket(object):
 
     def set_rw(self, rw):
         """
-        Set the RW-value for this bucket. See :func:`RiakBucket.set_r` for more
+        Set the RW-value for this bucket. See :func:`set_r` for more
         information.
 
         :param rw: The new RW-value
