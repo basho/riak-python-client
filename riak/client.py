@@ -29,20 +29,26 @@ from riak.mapreduce import RiakMapReduce, RiakLink
 
 class RiakClient(object):
     """
-    The RiakClient object holds information necessary to connect to
+    The ``RiakClient`` object holds information necessary to connect to
     Riak. The Riak API uses HTTP, so there is no persistent
-    connection, and the RiakClient object is extremely lightweight.
+    connection, and the ``RiakClient`` object is extremely lightweight.
     """
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
                  mapred_prefix='mapred', transport_class=None,
                  client_id=None):
         """
-        Construct a new RiakClient object.
-        @param string host - Hostname or IP address (default '127.0.0.1')
-        @param int port - Port number (default 8098)
-        @param string prefix - Interface prefix (default 'riak')
-        @param string mapred_prefix - MapReduce prefix (default 'mapred')
-        @param RiakTransport transport_class - transport class to use
+        Construct a new ``RiakClient`` object.
+
+        :param host: Hostname or IP address
+        :type host: string
+        :param port: Port number
+        :type port: integer
+        :param prefix: Interface prefix
+        :type prefix: string
+        :param mapred_prefix: MapReduce prefix
+        :type mapred_prefix: string
+        :param transport_class: transport class to use
+        :type transport_class: :class:`RiakTransport`
         """
         if not transport_class:
             self._transport = RiakHttpTransport(host,
@@ -63,123 +69,146 @@ class RiakClient(object):
 
     def get_transport(self):
         """
-        Get a transport object
+        Get the transport instance the client is using for it's connection.
         """
         return self._transport;
 
     def get_r(self):
         """
-        Get the R-value setting for this RiakClient. (default "quorum")
-        @return integer
+        Get the R-value setting for this ``RiakClient``. (default "quorum")
+
+        :rtype: integer
         """
         return self._r
 
     def set_r(self, r):
         """
-        Set the R-value for this RiakClient. This value will be used
-        for any calls to get(...) or get_binary(...) where where 1) no
-        R-value is specified in the method call and 2) no R-value has
-        been set in the RiakBucket.
-        @param integer r - The R value.
-        @return self
+        Set the R-value for this ``RiakClient``. This value will be used
+        for any calls to :func:`RiakBucket.get <riak.bucket.RiakBucket.get>`
+        or :func:`RiakBucket.get_binary <riak.bucket.RiakBucket.get_binary>`
+        where 1) no R-value is specified in the method call and 2) no R-value has
+        been set in the :class:`RiakBucket <riak.bucket.RiakBucket>`.
+
+        :param r: The R value.
+        :type r: integer
+        :rtype: self
         """
         self._r = r
         return self
 
     def get_w(self):
         """
-        Get the W-value setting for this RiakClient. (default "quorum")
-        @return integer
+        Get the W-value setting for this ``RiakClient``. (default "quorum")
+
+        :rtype: integer
         """
         return self._w
 
     def set_w(self, w):
         """
-        Set the W-value for this RiakClient. See set_r(...) for a
+        Set the W-value for this ``RiakClient`` instance. See :func:`set_r` for a
         description of how these values are used.
-        @param integer w - The W value.
-        @return self
+
+        :param w: The W value.
+        :type w: integer
+        :rtype: self
         """
         self._w = w
         return self
 
     def get_dw(self):
         """
-        Get the DW-value for this ClientOBject. (default "quorum")
-        @return integer
+        Get the DW-value for this ``RiakClient`` instance. (default "quorum")
+
+        :rtype: integer
         """
         return self._dw
 
     def set_dw(self, dw):
         """
-        Set the DW-value for this RiakClient. See set_r(...) for a
+        Set the DW-value for this ``RiakClient`` instance. See :func:`set_r` for a
         description of how these values are used.
-        @param integer dw - The DW value.
-        @return self
+
+        :param dw: The DW value.
+        :type dw: integer
+        :rtype: self
         """
         self._dw = dw
         return self
 
     def get_rw(self):
         """
-        Get the RW-value for this ClientObject. (default "quorum")
-        @return integer
+        Get the RW-value for this ``RiakClient`` instance. (default "quorum")
+
+        :rtype: integer
         """
         return self._rw
 
     def set_rw(self, rw):
         """
-        Set the RW-value for this RiakClient. See set_r(...) for a
+        Set the RW-value for this ``RiakClient`` instance. See :func:`set_r` for a
         description of how these values are used.
-        @param integer rw - The RW value.
-        @return self
+
+        :param rw: The RW value.
+        :type rw: integer
+        :rtype: self
         """
         self._rw = rw
         return self
 
     def get_client_id(self):
         """
-        Get the client_id for this RiakClient.
-        @return string
+        Get the ``client_id`` for this ``RiakClient`` instance.
+
+        :rtype: string
         """
         return self._transport.get_client_id()
 
     def set_client_id(self, client_id):
         """
-        Set the client_id for this RiakClient. Should not be called
-        unless you know what you are doing.
-        @param string client_id - The new client_id.
-        @return self
+        Set the client_id for this ``RiakClient`` instance.
+
+        .. warning::
+
+           You should not call this method unless you know what you are doing.
+
+        :param client_id: The new client_id.
+        :type client_id: string
+        :rtype: self
         """
         self._transport.set_client_id(client_id)
         return self
 
     def get_encoder(self, content_type):
         """
-        Get the encoding function for this content type
+        Get the encoding function for the provided content type.
         """
         if content_type in self._encoders:
             return self._encoders[content_type]
 
     def set_encoder(self, content_type, encoder):
         """
-        Set the encoding function for this content type
-        @param function encoder
+        Set the encoding function for the provided content type.
+
+        :param encoder:
+        :type encoder: function
         """
         self._encoders[content_type] = encoder
         return self
 
     def get_decoder(self, content_type):
         """
-        Get the decoding function for this content type
+        Get the decoding function for the provided content type.
         """
         if content_type in self._decoders:
             return self._decoders[content_type]
 
     def set_decoder(self, content_type, decoder):
         """
-        Set the decoding function for this content type
-        @param function decoder
+        Set the decoding function for the provided content type.
+
+        :param decoder:
+        :type decoder: function
         """
         self._decoders[content_type] = decoder
         return self
@@ -187,23 +216,25 @@ class RiakClient(object):
     def bucket(self, name):
         """
         Get the bucket by the specified name. Since buckets always exist,
-        this will always return a RiakBucket.
-        @return RiakBucket
+        this will always return a :class:`RiakBucket <riak.bucket.RiakBucket>`.
+
+        :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
         """
         return RiakBucket(self, name)
 
     def is_alive(self):
         """
-        Check if the Riak server for this RiakClient is alive.
-        @return boolean
+        Check if the Riak server for this ``RiakClient`` instance is alive.
+
+        :rtype: boolean
         """
         return self._transport.ping()
 
     def add(self, *args):
         """
-        Start assembling a Map/Reduce operation.
-        @see RiakMapReduce.add()
-        @return RiakMapReduce
+        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.add `.
+
+        :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return apply(mr.add, args)
@@ -211,34 +242,37 @@ class RiakClient(object):
     def search(self, *args):
         """
         Start assembling a Map/Reduce operation based on search
-        results. This command will return an error unless executed 
-        against a Riak Search cluster.
-        @see RiakMapReduce.search()
-        @return RiakMapReduce
+        results. This command will return an error unless executed
+        against a Riak Search cluster. A shortcut for :func:`RiakMapReduce.search`.
+
+        :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return apply(mr.search, args)
 
     def link(self, *args):
         """
-        Start assembling a Map/Reduce operation.
-        @see RiakMapReduce.link()
+        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.link`.
+
+        :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return apply(mr.link, args)
 
     def map(self, *args):
         """
-        Start assembling a Map/Reduce operation.
-        @see RiakMapReduce.map()
+        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.map`.
+
+        :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return apply(mr.map, args)
 
     def reduce(self, *args):
         """
-        Start assembling a Map/Reduce operation.
-        @see RiakMapReduce.reduce()
+        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.reduce`.
+
+        :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return apply(mr.reduce, args)
