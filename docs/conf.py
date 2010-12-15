@@ -254,3 +254,7 @@ epub_copyright = u'2010, Daniel Lindsley'
 
 # Allow duplicate toc entries.
 #epub_tocdup = True
+
+# Autodoc settings
+autodoc_default_flags = ['members', 'undoc-members']
+autodoc_member_order = 'bysource'
