@@ -232,7 +232,7 @@ class RiakClient(object):
 
     def add(self, *args):
         """
-        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.add `.
+        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.add`.
 
         :rtype: :class:`RiakMapReduce`
         """
