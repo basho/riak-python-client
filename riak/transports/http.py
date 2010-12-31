@@ -105,8 +105,14 @@ class RiakHttpTransport(RiakTransport) :
 
         # If the request is conditional and the vtag exists, add the
         # HTTP conditional header
-        if conditional and "vtag" in robj.get_metadata():
-            headers['If-Match'] = robj.get_metadata()['vtag']
+        if conditional:
+            if "vtag" in robj.get_metadata():
+                # Only update if the ETag we have matches the currently
+                # stored one rfc2616#14.25
+                headers['If-Match'] = robj.get_metadata()['vtag']
+            else:
+                # Only update if no record exists rfc2616#14.26
+                headers['If-None-Match'] = "*"
 
         # Add the vclock if it exists...
         if (robj.vclock() is not None):

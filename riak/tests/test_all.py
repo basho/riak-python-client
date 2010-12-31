@@ -105,7 +105,7 @@ class BaseTestCase(object):
         # second one, creating a concurrent write issue.
         data = obj2.get_data()
         obj2.set_data(data + 1)
-        obj2.store(conditional=True)
+        obj2.store()
     
         # Let's increment the data of the first object.  This is a classic
         # race condition for a counter.  Since obj2 already incremented the
@@ -113,6 +113,19 @@ class BaseTestCase(object):
         # on a conditional store(), an error should be raised
         data = obj1.get_data()
         obj1.set_data(data + 1)
+
+        self.assertRaises(ConcurrencyError, obj1.store, conditional=True)
+
+    def test_conditional_store_new(self):
+        bucket = self.client.bucket('bucket')
+        # Create a new object
+        rand = self.randint()
+        obj1 = bucket.new('foo', rand)
+        obj2 = bucket.new('foo', rand+1)
+
+        # This tests when obj2 is stored under the same key as obj1 but
+        # obj1 is stored after obj2, creating a concurrency issue
+        obj2.store()
 
         self.assertRaises(ConcurrencyError, obj1.store, conditional=True)
     
@@ -419,6 +432,15 @@ class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
 
 
     def test_conditional_store(self):
+        bucket = self.client.bucket('bucket')
+        # Create a new object
+        rand = self.randint()
+        obj = bucket.new('foo', rand)
+
+        # Conditional store() on PB is not supported at this point.
+        self.assertRaises(NotImplementedError, obj.store, conditional=True)
+
+    def test_conditional_store_new(self):
         bucket = self.client.bucket('bucket')
         # Create a new object
         rand = self.randint()
