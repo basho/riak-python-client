@@ -243,7 +243,8 @@ class RiakObject(object):
         else:
             return []
 
-    def store(self, w=None, dw=None, return_body=True):
+    def store(self, w=None, dw=None, return_body=True,
+              conditional=False):
         """
         Store the object in Riak. When this operation completes, the
         object could contain new metadata and possibly new data if Riak
@@ -266,7 +267,8 @@ class RiakObject(object):
 
         # Issue the get over our transport
         t = self._client.get_transport()
-        Result = t.put(self, w, dw, return_body)
+        Result = t.put(self, w, dw, return_body,
+                       conditional=conditional)
         if Result is not None:
             self.populate(Result)
 

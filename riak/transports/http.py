@@ -35,6 +35,8 @@ from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakLink
 from riak import RiakError
+from riak import ConcurrencyError
+
 
 class RiakHttpTransport(RiakTransport) :
     """
@@ -86,7 +88,8 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('GET', host, port, url)
         return self.parse_body(response, [200, 300, 404])
 
-    def put(self, robj, w = None, dw = None, return_body = True):
+    def put(self, robj, w = None, dw = None, return_body = True,
+            conditional=False):
         """
         Serialize put request and deserialize response
         """
@@ -99,6 +102,11 @@ class RiakHttpTransport(RiakTransport) :
         headers = {'Accept' : 'text/plain, */*; q=0.5',
                    'Content-Type' : robj.get_content_type(),
                    'X-Riak-ClientId' : self._client_id}
+
+        # If the request is conditional and the vtag exists, add the
+        # HTTP conditional header
+        if conditional and "vtag" in robj.get_metadata():
+            headers['If-Match'] = robj.get_metadata()['vtag']
 
         # Add the vclock if it exists...
         if (robj.vclock() is not None):
@@ -116,6 +124,11 @@ class RiakHttpTransport(RiakTransport) :
 
         # Run the operation.
         response = self.http_request('PUT', host, port, url, headers, content)
+
+        if response[0]['http_code'] == 412:
+            raise ConcurrencyError("%s has been updated since last read"
+                                   " reload data and try again.")
+
         return self.parse_body(response, [200, 300])
 
     def delete(self, robj, rw):

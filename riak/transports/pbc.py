@@ -165,7 +165,8 @@ class RiakPbcTransport(RiakTransport):
 
         return 0
 
-    def put(self, robj, w = None, dw = None, return_body = True):
+    def put(self, robj, w = None, dw = None, return_body = True,
+            conditional=True):
         """
         Serialize get request and deserialize response
         """

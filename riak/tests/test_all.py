@@ -11,6 +11,7 @@ import unittest
 from riak import RiakClient
 from riak import RiakPbcTransport
 from riak import RiakHttpTransport
+from riak import ConcurrencyError
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -87,6 +88,34 @@ class BaseTestCase(object):
         obj = bucket.get_binary('foo2')
         self.assertEqual(data, json.loads(obj.get_data()))
 
+    def test_conditional_store(self):
+        bucket = self.client.bucket('bucket')
+        # Create a new object
+        rand = self.randint()
+        obj = bucket.new('foo', rand)
+        obj.store()
+
+        # Retrive the new object
+        obj1 = bucket.get('foo')
+
+        # Get the same object
+        obj2 = bucket.get('foo')
+
+        # Test the case where the first thread stores it's data after the
+        # second one, creating a concurrent write issue.
+        data = obj2.get_data()
+        obj2.set_data(data + 1)
+        obj2.store(conditional=True)
+    
+        # Let's increment the data of the first object.  This is a classic
+        # race condition for a counter.  Since obj2 already incremented the
+        # counter, obj1 has stale data and is incrementing that stale data.
+        # on a conditional store(), an error should be raised
+        data = obj1.get_data()
+        obj1.set_data(data + 1)
+
+        self.assertRaises(ConcurrencyError, obj1.store, conditional=True)
+    
     def test_custom_bucket_encoder_decoder(self):
         # Teach the bucket how to pickle
         bucket = self.client.bucket("picklin_bucket")

@@ -36,6 +36,10 @@ class RiakError(Exception) :
         def __str__(self):
                 return repr(self.value)
 
+class ConcurrencyError(RiakError):
+        """Optimistic Concurrency Control fails"""
+        pass
+
 from riak_object import RiakObject
 from bucket import RiakBucket 
 from client import RiakClient
