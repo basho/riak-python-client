@@ -166,10 +166,13 @@ class RiakPbcTransport(RiakTransport):
         return 0
 
     def put(self, robj, w = None, dw = None, return_body = True,
-            conditional=True):
+            conditional=False):
         """
         Serialize get request and deserialize response
         """
+        if conditional:
+            raise NotImplementedError("conditonal put not supported with PB")
+                                      
         bucket = robj.get_bucket()
         
         req = riakclient_pb2.RpbPutReq()

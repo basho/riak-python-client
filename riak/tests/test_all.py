@@ -417,6 +417,16 @@ class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
 
+
+    def test_conditional_store(self):
+        bucket = self.client.bucket('bucket')
+        # Create a new object
+        rand = self.randint()
+        obj = bucket.new('foo', rand)
+
+        # Conditional store() on PB is not supported at this point.
+        self.assertRaises(NotImplementedError, obj.store, conditional=True)
+
 class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
 
     def setUp(self):
