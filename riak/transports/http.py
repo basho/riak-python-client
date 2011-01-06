@@ -189,7 +189,7 @@ class RiakHttpTransport(RiakTransport) :
             raise Exception('Error setting bucket properties.')
         return True
 
-    def mapred(self, inputs, query, key_filters=None, timeout=None):
+    def mapred(self, inputs, query, timeout=None):
         # Construct the job, optionally set the timeout...
         job = {'inputs':inputs, 'query':query}
         if timeout is not None:
