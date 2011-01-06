@@ -298,6 +298,21 @@ class BaseTestCase(object):
             .run()
         self.assertEqual(result, [10])
 
+    def test_key_filters(self):
+        bucket = self.client.bucket("kftest")
+        bucket.new("basho-20101215", 1).store()
+        bucket.new("google-20110103", 2).store()
+        bucket.new("yahoo-20090613", 3).store()
+
+        result = self.client \
+            .add("kftest") \
+            .add_key_filters([["tokenize", "-", 2]]) \
+            .add_key_filter("ends_with", "0613") \
+            .map("function (v, keydata) { return [v.key]; }") \
+            .run()
+
+        self.assertEqual(result, ["yahoo-20090613"])
+
     def test_erlang_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket("bucket")

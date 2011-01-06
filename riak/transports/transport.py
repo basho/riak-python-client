@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak import RiakError 
+from riak import RiakError
 import base64
 import random
 import threading
@@ -73,6 +73,13 @@ class RiakTransport(object):
         """
         Serialize delete request and deserialize response
         @return true
+        """
+        raise RiakError("not implemented")
+
+    def get_buckets(self) :
+        """
+        Serialize get buckets request and deserialize response
+        @return dict()
         """
         raise RiakError("not implemented")
 
