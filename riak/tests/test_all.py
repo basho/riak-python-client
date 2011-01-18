@@ -70,6 +70,18 @@ class BaseTestCase(object):
         self.assertEqual(obj.get_bucket().get_name(), 'bucket')
         self.assertEqual(obj.get_key(), 'foo')
         self.assertEqual(obj.get_data(), rand)
+    
+    def test_store_and_get_unicode(self):
+        bucket = self.client.bucket(u'bucket')
+        rand = self.randint()
+        obj = bucket.new(u'foo', rand)
+        obj.store()
+        obj = bucket.get(u'foo')
+        self.assertTrue(obj.exists())
+        self.assertEqual(obj.get_bucket().get_name(), 'bucket')
+        self.assertEqual(obj.get_key(), 'foo')
+        self.assertEqual(obj.get_data(), rand)
+
 
     def test_binary_store_and_get(self):
         bucket = self.client.bucket('bucket')
@@ -222,6 +234,13 @@ class BaseTestCase(object):
         result = self.client \
             .add("bucket", "foo") \
             .map("function (v) { return [JSON.parse(v.values[0].data)]; }") \
+            .run()
+        self.assertEqual(result, [2])
+        
+        #test unicode function
+        result = self.client \
+            .add("bucket", u"foo") \
+            .map(u"function (v) { return [JSON.parse(v.values[0].data)]; }") \
             .run()
         self.assertEqual(result, [2])
 

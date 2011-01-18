@@ -218,6 +218,9 @@ class RiakMapReducePhase(object):
         @param mixed arg - Additional value to pass into the map or
         reduce function.
         """
+        if isinstance(function, unicode):
+            function = function.encode('utf-8')
+
         self._type = type
         self._language = language
         self._function = function
