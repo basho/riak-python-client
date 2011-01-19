@@ -149,7 +149,7 @@ class RiakHttpTransport(RiakTransport) :
         headers, encoded_props = response[0:2]
         if (headers['http_code'] == 200):
             props = json.loads(encoded_props)
-            return prop['buckets']
+            return props['buckets']
         else:
             raise Exception('Error getting buckets.')
 
