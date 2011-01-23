@@ -394,9 +394,6 @@ class RiakPbcTransport(RiakTransport):
         while len(self._inbuf) < msglen:
             want_len = min(8192, msglen - len(self._inbuf))
             recv_buf = self._sock.recv(want_len)
-            if len(recv_buf) != want_len:
-                raise RiakError("Socket returned short read {0} - expected {1}".
-                                format(len(recv_buf), want_len))
             self._inbuf += recv_buf
 
 
