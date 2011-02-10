@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import copy
 import cPickle
 try:
@@ -70,6 +72,13 @@ class BaseTestCase(object):
         self.assertEqual(obj.get_bucket().get_name(), 'bucket')
         self.assertEqual(obj.get_key(), 'foo')
         self.assertEqual(obj.get_data(), rand)
+
+        #unicode input should raise a TypeError,
+        #to avoid issues further down the line
+        self.assertRaises(TypeError, self.client.bucket, u'bucket')
+        self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
+        self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
+        self.assertRaises(TypeError, bucket.get, u'foo')
 
     def test_binary_store_and_get(self):
         bucket = self.client.bucket('bucket')
@@ -219,11 +228,14 @@ class BaseTestCase(object):
         bucket = self.client.bucket("bucket")
         bucket.new("foo", 2).store()
         # Run the map...
-        result = self.client \
-            .add("bucket", "foo") \
-            .map("function (v) { return [JSON.parse(v.values[0].data)]; }") \
-            .run()
+        mr = self.client.add("bucket", "foo")
+        result = mr.map(
+            "function (v) { return [JSON.parse(v.values[0].data)]; }").run()
         self.assertEqual(result, [2])
+
+        #test unicode function
+        self.assertRaises(TypeError, mr.map,
+            u"function (v) { return [JSON.parse(v.values[0].data)]; }")
 
     def test_javascript_named_map(self):
         # Create the object...
