@@ -172,7 +172,8 @@ You can also manually store data by using ``RiakObject``::
   status_bucket = client.bucket('status')
 
   # We use ``uuid.uuid1().hex`` here to create a unique identifier for the status.
-  new_status = riak.RiakObject(client, status_bucket, uuid.uuid1().hex)
+  post_uuid = uuid.uuid1().hex
+  new_status = riak.RiakObject(client, status_bucket, post_uuid)
 
   # Add in the data you want to store.
   new_status.set_data({
@@ -233,7 +234,7 @@ Manually fetching data is also possible::
   status_bucket = client.bucket('status')
   
   # We're using the UUID generated from the above section.
-  first_post_status = riak.RiakObject(client, status_bucket, '39fbee54-fb82-11df-a2cf-d49a20c04e6a')
+  first_post_status = riak.RiakObject(client, status_bucket, post_uuid)
   first_post_status._encode_data = True
   r = status_bucket.get_r()
   
