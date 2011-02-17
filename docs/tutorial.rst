@@ -235,7 +235,7 @@ Manually fetching data is also possible::
   # We're using the UUID generated from the above section.
   first_post_status = riak.RiakObject(client, status_bucket, '39fbee54-fb82-11df-a2cf-d49a20c04e6a')
   first_post_status._encode_data = True
-  r = status_bucket.get_r(r)
+  r = status_bucket.get_r()
   
   # Calling ``reload`` will cause the ``RiakObject`` instance to load fresh
   # data/metadata from Riak.
