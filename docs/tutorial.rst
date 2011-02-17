@@ -127,10 +127,10 @@ JSON-encoded structure or a binary blob.
 To store JSON-encoded data, you'd do something like the following::
 
   import riak
-  
+
   client = riak.RiakClient()
   user_bucket = client.bucket('user')
-  
+
   # We're creating the user data & keying off their username.
   new_user = user_bucket.new('johndoe', data={
       'first_name': 'John',
@@ -149,17 +149,17 @@ As mentioned, Riak can also handle binary data, such as images, audio files,
 etc. Storing binary data looks almost identical::
 
   import riak
-  
+
   client = riak.RiakClient()
   user_photo_bucket = client.bucket('user_photo')
-  
+
   # For example purposes, we'll read a file off the filesystem, but you can get
   # the data from anywhere.
   the_photo_data = open('/tmp/johndoe_headshot.jpg', 'rb').read()
-  
+
   # We're storing the photo in a different bucket but keyed off the same
   # username.
-  new_user = user_bucket.new_binary('johndoe', data=the_photo_data, content_type='image/jpeg')
+  new_user = user_photo_bucket.new_binary('johndoe', data=the_photo_data, content_type='image/jpeg')
   new_user.store()
 
 You can also manually store data by using ``RiakObject``::
@@ -167,26 +167,26 @@ You can also manually store data by using ``RiakObject``::
   import riak
   import time
   import uuid
-  
+
   client = riak.RiakClient()
   status_bucket = client.bucket('status')
-  
-  # We use ``uuid.uuid1()`` here to create a unique identifier for the status.
-  new_status = RiakObject(client, status_bucket, uuid.uuid1())
-  
+
+  # We use ``uuid.uuid1().hex`` here to create a unique identifier for the status.
+  new_status = riak.RiakObject(client, status_bucket, uuid.uuid1().hex)
+
   # Add in the data you want to store.
   new_status.set_data({
       'message': 'First post!',
       'created': time.time(),
       'is_public': True,
   })
-  
+
   # Set the content type.
   new_status.set_content_type('application/json')
-  
+
   # We want to do JSON-encoding on the value.
   new_status._encode_data = True
-  
+
   # Again, make sure you save it.
   new_status.store()
 
@@ -233,7 +233,7 @@ Manually fetching data is also possible::
   status_bucket = client.bucket('status')
   
   # We're using the UUID generated from the above section.
-  first_post_status = RiakObject(client, status_bucket, '39fbee54-fb82-11df-a2cf-d49a20c04e6a')
+  first_post_status = riak.RiakObject(client, status_bucket, '39fbee54-fb82-11df-a2cf-d49a20c04e6a')
   first_post_status._encode_data = True
   r = status_bucket.get_r(r)
   
@@ -327,7 +327,7 @@ user's statuses to their user data::
   
   johndoe = user_bucket.get('johndoe')
   
-  new_status = status_bucket.new(uuid.uuid1(), data={
+  new_status = status_bucket.new(uuid.uuid1().hex, data={
       'message': 'First post!',
       'created': time.time(),
       'is_public': True,
@@ -366,7 +366,7 @@ As usual, it's also possible to do this manually::
   
   johndoe = user_bucket.get('johndoe')
   
-  new_status_key = uuid.uuid1()
+  new_status_key = uuid.uuid1().hex
   new_status = status_bucket.new(new_status_key, data={
       'message': 'First post!',
       'created': time.time(),
