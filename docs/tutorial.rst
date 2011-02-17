@@ -359,6 +359,7 @@ Fetching the data is equally simple::
 As usual, it's also possible to do this manually::
 
   import riak
+  import time
   import uuid
   
   client = riak.RiakClient()
@@ -369,7 +370,7 @@ As usual, it's also possible to do this manually::
   
   new_status_key = uuid.uuid1().hex
   new_status = status_bucket.new(new_status_key, data={
-      'message': 'First post!',
+      'message': 'First post (so many firsts)!',
       'created': time.time(),
       'is_public': True,
   })
