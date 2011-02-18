@@ -366,6 +366,9 @@ As usual, it's also possible to do this manually::
   user_bucket = client.bucket('user')
   status_bucket = client.bucket('status')
   
+  # NOTE: The user/johndoe key must exist, see earlier example,
+  #       or else the johndoe.store() step at the end of this example
+  #       will fail.
   johndoe = user_bucket.get('johndoe')
   
   new_status_key = uuid.uuid1().hex
@@ -376,12 +379,12 @@ As usual, it's also possible to do this manually::
   })
   
   # Add one direction (from status to user)...
-  user_link = riak.RiakLink(user_bucket, 'johndoe')
+  user_link = riak.mapreduce.RiakLink(user_bucket, 'johndoe')
   new_status.add_link(user_link)
   new_status.store()
   
   # ... Then add the other direction.
-  status_link = riak.RiakLink(status_bucket, new_status_key)
+  status_link = riak.mapreduce.RiakLink(status_bucket, new_status_key)
   johndoe.add_link(status_link)
   johndoe.store()
   

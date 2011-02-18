@@ -274,9 +274,9 @@ class RiakHttpTransport(RiakTransport) :
         header = ''
         header += '</'
         header += self._prefix + '/'
-        header += urllib.quote_plus(link.get_bucket()) + '/'
+        header += urllib.quote_plus(link.get_bucket().get_name()) + '/'
         header += urllib.quote_plus(link.get_key()) + '>; riaktag="'
-        header += urllib.quote_plus(link.get_tag()) + '"'
+        header += urllib.quote_plus(link.get_tag().get_name()) + '"'
         return header
 
     def parse_links(self, links, linkHeaders) :
