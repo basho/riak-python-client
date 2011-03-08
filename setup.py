@@ -18,7 +18,7 @@ def make_pb():
 if __name__ == "__main__":
     setup(
         name='riak',
-        version='1.1.1',
+        version='1.2.1',
         packages = find_packages(),
         install_requires = ['protobuf>=2.3.0'],
         dependency_links = ["http://downloads.basho.com/support"],
@@ -32,5 +32,5 @@ if __name__ == "__main__":
         author='Basho Technologies',
         author_email='riak@basho.com',
         test_suite='riak.tests.test_all',
-        url='https://bitbucket.org/basho/riak-python-client',
+        url='https://github.com/basho/riak-python-client'
    )
