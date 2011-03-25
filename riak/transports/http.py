@@ -91,7 +91,7 @@ class RiakHttpTransport(RiakTransport) :
         Serialize put request and deserialize response
         """
        # Construct the URL...
-        params = {'returnbody' : 'true', 'w' : w, 'dw' : dw}
+        params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw}
         host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                                None, params)
 
@@ -116,7 +116,11 @@ class RiakHttpTransport(RiakTransport) :
 
         # Run the operation.
         response = self.http_request('PUT', host, port, url, headers, content)
-        return self.parse_body(response, [200, 300])
+        if return_body:
+          return self.parse_body(response, [200, 300])
+        else:
+          self.check_http_code(response, [204])
+          return None
 
     def delete(self, robj, rw):
         # Construct the URL...
