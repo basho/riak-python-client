@@ -267,7 +267,7 @@ class RiakObject(object):
         # Issue the get over our transport
         t = self._client.get_transport()
         Result = t.put(self, w, dw, return_body)
-        if Result is not None:
+        if return_body and Result is not None:
             self.populate(Result)
 
         return self
