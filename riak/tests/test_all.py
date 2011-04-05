@@ -396,6 +396,11 @@ class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
         self.transport_class = RiakHttpTransport
         super(RiakHttpTransportTestCase, self).setUp()
 
+    def test_no_returnbody(self):
+        bucket = self.client.bucket("bucket")
+        o = bucket.new("foo", "bar").store(return_body=False)
+        self.assertEqual(o.vclock(), None)
+        
 
 if __name__ == '__main__':
     unittest.main()
