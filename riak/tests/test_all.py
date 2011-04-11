@@ -350,12 +350,21 @@ class BaseTestCase(object):
 
     def test_store_of_missing_object(self):
         bucket = self.client.bucket("bucket")
-        o = bucket.get("nonexistent_key2")
+        # for json objects 
+        o = bucket.get("nonexistent_key_json")
         self.assertEqual(o.exists(), False)
         o.set_data({"foo" : "bar"})
         o = o.store()
         self.assertEqual(o.get_data(), {"foo" : "bar"})
         self.assertEqual(o.get_content_type(), "application/json")
+        o.delete()
+        # for binary objects
+        o = bucket.get_binary("nonexistent_key_binary")
+        self.assertEqual(o.exists(), False)
+        o.set_data("1234567890")
+        o = o.store()
+        self.assertEqual(o.get_data(), "1234567890")
+        self.assertEqual(o.get_content_type(), "application/octet-stream")
         o.delete()
 
 

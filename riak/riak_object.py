@@ -92,7 +92,10 @@ class RiakObject(object):
         """
         self._data = data
         if MD_CTYPE not in self._metadata:
-            self.set_content_type("application/json")
+            if self._encode_data:
+                self.set_content_type("application/json")
+            else:
+                self.set_content_type("application/octet-stream")
         return self
 
     def get_encoded_data(self):
