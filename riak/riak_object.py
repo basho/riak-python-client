@@ -91,6 +91,8 @@ class RiakObject(object):
         :rtype: data
         """
         self._data = data
+        if MD_CTYPE not in self._metadata:
+            self.set_content_type("application/json")
         return self
 
     def get_encoded_data(self):

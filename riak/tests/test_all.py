@@ -348,6 +348,17 @@ class BaseTestCase(object):
         results = obj.link("bucket", "tag").run()
         self.assertEqual(len(results), 1)
 
+    def test_store_of_missing_object(self):
+        bucket = self.client.bucket("bucket")
+        o = bucket.get("nonexistent_key2")
+        self.assertEqual(o.exists(), False)
+        o.set_data({"foo" : "bar"})
+        o = o.store()
+        self.assertEqual(o.get_data(), {"foo" : "bar"})
+        self.assertEqual(o.get_content_type(), "application/json")
+        o.delete()
+
+
     def test_search_integration(self):
         if SKIP_SEARCH:
             return True
