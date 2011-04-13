@@ -18,6 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 from riak_object import RiakObject
+import mimetypes
 
 class RiakBucket(object):
     """
@@ -409,3 +410,13 @@ class RiakBucket(object):
            At current, this is a very expensive operation. Use with caution.
         """
         return self._client.get_transport().get_keys(self)
+
+    def new_binary_from_file(self, key, filename):
+        """
+        Create a new Riak object in the bucket, using the content of the specified file.
+        """
+        binary_data = open(filename, "rb").read()
+        mimetype, encoding = mimetypes.guess_type(filename)
+        if not mimetype:
+            mimetype = 'application/octet-stream'
+        return self.new_binary(key, binary_data, mimetype)
