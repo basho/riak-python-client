@@ -389,7 +389,32 @@ class BaseTestCase(object):
         results = self.client.search("searchbucket", "(foo:one OR foo:two OR foo:three OR foo:four) AND (NOT bar:green)").run()
         self.assertEqual(len(results), 3)
 
+    def test_store_binary_object_from_file(self):
+        print __file__
+        bucket = self.client.bucket('bucket')
+        rand = str(self.randint())
+        obj = bucket.new_binary_from_file('foo_from_file', os.path.dirname(__file__) + "/test_all.py")
+        obj.store()
+        obj = bucket.get_binary('foo_from_file')
+        self.assertNotEqual(obj.get_data(), None)
+        self.assertEqual(obj.get_content_type(), "text/x-python")
 
+    def test_store_binary_object_from_file_should_use_default_mimetype(self):
+        bucket = self.client.bucket('bucket')
+        rand = str(self.randint())
+        obj = bucket.new_binary_from_file('foo_from_file', os.path.dirname(__file__) + '/../../THANKS')
+        obj.store()
+        obj = bucket.get_binary('foo_from_file')
+        self.assertEqual(obj.get_content_type(), 'application/octet-stream')
+
+    def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
+        bucket = self.client.bucket('bucket')
+        rand = str(self.randint())
+        self.assertRaises(IOError, bucket.new_binary_from_file, 'not_found_from_file', 'FILE_NOT_FOUND')
+        obj = bucket.get_binary('not_found_from_file')
+        self.assertEqual(obj.get_data(), None)
+
+        
 class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
 
     def setUp(self):
