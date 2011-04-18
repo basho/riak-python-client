@@ -242,10 +242,8 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket listing request and deserialize response
         """
-        req = riakclient_pb2.RpbListBucketsReq()
-
         self.maybe_connect()
-        self.send_msg(MSG_CODE_LIST_KEYS_REQ, req)
+        self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
           raise RiakError("unexpected protocol buffer message code: ", msg_code)
@@ -382,6 +380,9 @@ class RiakPbcTransport(RiakTransport):
             msg = None
         elif msg_code == MSG_CODE_LIST_KEYS_RESP:
             msg = riakclient_pb2.RpbListKeysResp()
+            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code == MSG_CODE_LIST_BUCKETS_RESP:
+            msg = riakclient_pb2.RpbListBucketsResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_GET_BUCKET_RESP:
             msg = riakclient_pb2.RpbGetBucketResp()

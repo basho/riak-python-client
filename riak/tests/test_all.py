@@ -325,6 +325,12 @@ class BaseTestCase(object):
 
         self.assertEqual(result, ["yahoo-20090613"])
 
+    def test_key_filters_with_search_query(self):
+        mapreduce = self.client \
+            .search("kftest", "query")
+        self.assertRaises(Exception, mapreduce.add_key_filters, [["tokenize", "-", 2]])
+        self.assertRaises(Exception, mapreduce.add_key_filter, "ends_with", "0613")
+
     def test_erlang_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket("bucket")
@@ -406,7 +412,7 @@ class BaseTestCase(object):
         bucket.new("four", {"foo":"four", "bar":"orange"}).store()
         bucket.new("five", {"foo":"five", "bar":"yellow"}).store()
 
-       # Run some operations...
+        # Run some operations...
         results = self.client.search("searchbucket", "foo:one OR foo:two").run()
         if (len(results) == 0):
             print "\n\nNot running test \"testSearchIntegration()\".\n"
@@ -416,6 +422,11 @@ class BaseTestCase(object):
         results = self.client.search("searchbucket", "(foo:one OR foo:two OR foo:three OR foo:four) AND (NOT bar:green)").run()
         self.assertEqual(len(results), 3)
 
+    def test_list_buckets(self):
+        bucket = self.client.bucket("list_bucket")
+        bucket.new("one", {"foo":"one", "bar":"red"}).store()
+        buckets = self.client.get_buckets()
+        self.assertTrue("list_bucket" in buckets)
 
 class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
 
