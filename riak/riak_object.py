@@ -47,7 +47,7 @@ class RiakObject(object):
         self._encode_data = True
         self._vclock = None
         self._data = None
-        self._metadata = {}
+        self._metadata = {MD_USERMETA: {}}
         self._links = []
         self._siblings = []
         self._exists = False
@@ -156,6 +156,25 @@ class RiakObject(object):
         :rtype: data
         """
         self._metadata = metadata
+        return self
+
+    def get_usermeta(self):
+        if MD_USERMETA in self._metadata:
+          return self._metadata[MD_USERMETA]
+        else:
+          return {}
+
+    def set_usermeta(self, usermeta):
+        """
+        Sets the custom user metadata on this object. This doesn't include things
+        like content type and links, but only user-defined meta attributes stored
+        with the Riak object.
+
+        :param userdata: The user metadata to store.
+        :type userdata: dict
+        :rtype: data
+        """
+        self._metadata[MD_USERMETA] = usermeta
         return self
 
     def exists(self):

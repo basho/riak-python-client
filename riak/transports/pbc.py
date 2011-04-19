@@ -456,7 +456,7 @@ class RiakPbcTransport(RiakTransport):
             elif k == MD_ENCODING:
                 rpb_content.charset = v
             elif k == MD_USERMETA:
-                for uk, uv in v:
+                for uk, uv in v.iteritems():
                     pair = rpb_content.usermeta.add()
                     pair.key = uk
                     pair.value = uv
