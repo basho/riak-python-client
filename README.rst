@@ -11,7 +11,7 @@ The documentation source is found in `docs/ subdirectory
 <https://github.com/basho/riak-python-client/tree/master/docs>`_ and can be 
 built with `Sphinx <http://sphinx.pocoo.org/>`_.
 
-Documentation for Riak is available at http://wiki.basho.com/display/RIAK/Riak
+Documentation for Riak is available at http://wiki.basho.com/How-Things-Work.html
 
 Install
 =======
@@ -35,7 +35,7 @@ This tutorial assumes basic working knowledge of how Riak works & what it can
 do. If you need a more comprehensive overview how to use Riak, please check out
 the `Riak Fast Track`_.
 
-.. _`Riak Fast Track`: http://wiki.basho.com/display/RIAK/The+Riak+Fast+Track
+.. _`Riak Fast Track`: http://wiki.basho.com/The-Riak-Fast-Track.html
 
 
 Quick Start
@@ -281,7 +281,7 @@ disposal is MapReduce_. This technique iterates over all of the data, returning
 data from the map phase & combining all the different maps in the reduce
 phase(s).
 
-.. _MapReduce: http://wiki.basho.com/display/RIAK/MapReduce
+.. _MapReduce: http://wiki.basho.com/MapReduce.html
 
 To perform a map operation, such as returning all active users, you can do
 something like::
@@ -341,7 +341,7 @@ Working With Related Data Via Links
 Links_ are powerful concept in Riak that allow, within the key/value pair's
 metadata, relations between objects.
 
-.. _Links: http://wiki.basho.com/display/RIAK/Links
+.. _Links: http://wiki.basho.com/Links.html
 
 Adding them to your data is relatively trivial. For instance, we'll link a
 user's statuses to their user data::
@@ -412,5 +412,5 @@ tutorial, but usage of this feature looks like::
   # John Doe
   # Anna Body
 
-.. _`Riak Search`: http://wiki.basho.com/display/RIAK/Riak+Search
+.. _`Riak Search`: http://wiki.basho.com/Riak-Search.html
 .. _Lucene: http://lucene.apache.org/
