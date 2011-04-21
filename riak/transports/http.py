@@ -173,7 +173,7 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('PUT', host, port, url, headers, content)
 
         # Handle the response...
-        if (response == None):
+        if (response is None):
             raise Exception('Error setting bucket properties.')
 
         # Check the response value...
@@ -213,7 +213,7 @@ class RiakHttpTransport(RiakTransport) :
         @return self
         """
         # If no response given, then return.
-        if (response == None):
+        if (response is None):
             return self
 
         # Make sure expected code came back
@@ -433,7 +433,7 @@ class RiakHttpTransport(RiakTransport) :
         fields = headers.split("\n")
         for field in fields:
             matches = re.match("([^:]+):(.+)", field)
-            if (matches == None): continue
+            if (matches is None): continue
             key = matches.group(1).lower()
             value = matches.group(2).strip()
             if (key in retVal.keys()):

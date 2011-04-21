@@ -47,7 +47,7 @@ class RiakMapReduce(object):
         @param mixed arg3 - Arg or blank
         @return RiakMapReduce
         """
-        if (arg2 == None) and (arg3 == None):
+        if (arg2 is None) and (arg3 is None):
             if isinstance(arg1, RiakObject):
                 return self.add_object(arg1)
             else:
@@ -349,7 +349,7 @@ class RiakLink(object):
         Get the tag of this link.
         @return string
         """
-        if (self._tag == None):
+        if (self._tag is None):
             return self._bucket
         else:
             return self._tag

@@ -108,7 +108,7 @@ class RiakObject(object):
         if self._encode_data == True:
             content_type = self.get_content_type()
             encoder = self._bucket.get_encoder(content_type)
-            if encoder == None:
+            if encoder is None:
                 if isinstance(self._data, basestring):
                     return self._data.encode()
                 else:
@@ -128,7 +128,7 @@ class RiakObject(object):
         if self._encode_data == True:
             content_type = self.get_content_type()
             decoder = self._bucket.get_decoder(content_type)
-            if decoder == None:
+            if decoder is None:
                 # if no decoder, just set as string data for application to handle
                 self._data = data
             else:
@@ -352,7 +352,7 @@ class RiakObject(object):
         sibling that need to be retrieved with get.
         """
         self.clear()
-        if Result == None:
+        if Result is None:
             return self
         elif type(Result) == types.ListType:
             self.set_siblings(Result)
