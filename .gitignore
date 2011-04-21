@@ -1,6 +1,4 @@
-riak/*.pyc
-riak/tests/*.pyc
-riak/transports/*.pyc
+*.pyc
 
 docs/_build
 
