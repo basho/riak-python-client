@@ -3,3 +3,4 @@
 docs/_build
 
 .*.swp
+.coverage
