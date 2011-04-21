@@ -63,7 +63,7 @@ class RiakHttpTransport(RiakTransport) :
             self._client_id = self.make_random_client_id()
 
     def __copy__(self):
-        return RiakHttpTransport(self._host, self._port, self._prefix, 
+        return RiakHttpTransport(self._host, self._port, self._prefix,
                                  self._mapred_prefix)
 
     """
@@ -145,7 +145,7 @@ class RiakHttpTransport(RiakTransport) :
             return props['keys']
         else:
             raise Exception('Error getting bucket properties.')
-        
+
     def get_bucket_props(self, bucket, keys=False):
         # Run the request...
         params = {'props' : 'True', 'keys' : 'False'}

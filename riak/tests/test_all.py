@@ -362,7 +362,7 @@ class BaseTestCase(object):
 
     def test_store_of_missing_object(self):
         bucket = self.client.bucket("bucket")
-        # for json objects 
+        # for json objects
         o = bucket.get("nonexistent_key_json")
         self.assertEqual(o.exists(), False)
         o.set_data({"foo" : "bar"})
@@ -426,7 +426,7 @@ class BaseTestCase(object):
         obj = bucket.get_binary('not_found_from_file')
         self.assertEqual(obj.get_data(), None)
 
-        
+
 class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
 
     def setUp(self):
@@ -457,7 +457,7 @@ class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
         bucket = self.client.bucket("bucket")
         o = bucket.new("foo", "bar").store(return_body=False)
         self.assertEqual(o.vclock(), None)
-        
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -37,7 +37,7 @@ class RiakError(Exception) :
                 return repr(self.value)
 
 from riak_object import RiakObject
-from bucket import RiakBucket 
+from bucket import RiakBucket
 from client import RiakClient
 from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase
 from transports.pbc import RiakPbcTransport

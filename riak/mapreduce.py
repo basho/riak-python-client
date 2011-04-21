@@ -74,17 +74,17 @@ class RiakMapReduce(object):
 
     def search(self, bucket, query):
         """
-        Begin a map/reduce operation using a Search. This command will 
+        Begin a map/reduce operation using a Search. This command will
         return an error unless executed against a Riak Search cluster.
         @param bucket - The bucket over which to perform the search.
         @param query - The search query.
         """
         self._input_mode = 'search'
-        self._inputs = {'module':'riak_search', 
+        self._inputs = {'module':'riak_search',
                        'function':'mapred_search',
                        'arg':[bucket, query]}
         return self
-        
+
 
     def link(self, bucket='_', tag='_', keep=False):
         """
