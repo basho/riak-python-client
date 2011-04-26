@@ -115,9 +115,9 @@ class RiakHttpTransport(RiakTransport) :
         content = robj.get_encoded_data()
 
         # Run the operation.
-        response = self.http_request('PUT', host, port, url, headers, content)
+        response = self.http_request('POST', host, port, url, headers, content)
         if return_body:
-          return self.parse_body(response, [200, 300])
+          return self.parse_body(response, [200, 201, 300])
         else:
           self.check_http_code(response, [204])
           return None
