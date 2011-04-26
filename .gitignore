@@ -4,3 +4,7 @@ docs/_build
 
 .*.swp
 .coverage
+
+build/
+dist/
+riak.egg-info/
