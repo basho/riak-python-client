@@ -201,6 +201,52 @@ class RiakMapReduce(object):
 
         return a
 
+    ##
+    # Start Shortcuts to built-ins
+    ##
+    def map_values(self, options=None):
+        return self.map("Riak.mapValues", options=options)
+
+    def map_values_json(self, options=None):
+        return self.map("Riak.mapValuesJson", options=options)
+
+    def reduce_sum(self, options=None):
+        return self.reduce("Riak.reduceSum", options=options)
+
+    def reduce_min(self, options=None):
+        return self.reduce("Riak.reduceMin", options=options)
+
+    def reduce_max(self, options=None):
+        return self.reduce("Riak.reduceMax", options=options)
+
+    def reduce_sort(self, js_function, options=None):
+        if options is None:
+            options = dict()
+
+        options['arg'] = js_function
+        return self.reduce("Riak.reduceSort", options=options)
+
+    def reduce_numeric_sort(self, options=None):
+        return self.reduce("Riak.reduceNumericSort", options=options)        
+
+    def reduce_limit(self, limit, options=None):
+        if options is None:
+            options = dict()
+
+        options['arg'] = limit
+        return self.reduce("Riak.reduceLimit", options=options)
+
+    def reduce_slice(self, start_end, options=None):
+        if options is None:
+            options = dict()
+
+        options['arg'] = start_end
+        return self.reduce("Riak.reduceSlice", options=options)
+
+    def filter_not_found(self, options=None):
+        return self.reduce("Riak.filterNotFound", options=options)
+
+
 class RiakMapReducePhase(object):
     """
     The RiakMapReducePhase holds information about a Map phase or
@@ -383,3 +429,4 @@ class RiakLink(object):
         """
         is_equal = (self._bucket == link._bucket) and (self._key == link._key) and (self.get_tag() == link.get_tag())
         return is_equal
+
