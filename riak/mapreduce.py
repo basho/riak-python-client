@@ -219,11 +219,13 @@ class RiakMapReduce(object):
     def reduce_max(self, options=None):
         return self.reduce("Riak.reduceMax", options=options)
 
-    def reduce_sort(self, js_function, options=None):
+    def reduce_sort(self, js_cmp=None, options=None):
         if options is None:
             options = dict()
 
-        options['arg'] = js_function
+        if js_cmp:
+            options['arg'] = js_cmp
+
         return self.reduce("Riak.reduceSort", options=options)
 
     def reduce_numeric_sort(self, options=None):
@@ -234,13 +236,17 @@ class RiakMapReduce(object):
             options = dict()
 
         options['arg'] = limit
-        return self.reduce("Riak.reduceLimit", options=options)
+        # reduceLimit is broken in riak_kv
+        code="""function(value, arg) {
+            return value.slice(0, arg);
+        }"""
+        return self.reduce(code, options=options)
 
-    def reduce_slice(self, start_end, options=None):
+    def reduce_slice(self, start, end, options=None):
         if options is None:
             options = dict()
 
-        options['arg'] = start_end
+        options['arg'] = [start, end]
         return self.reduce("Riak.reduceSlice", options=options)
 
     def filter_not_found(self, options=None):
