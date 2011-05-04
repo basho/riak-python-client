@@ -426,8 +426,198 @@ class BaseTestCase(object):
         obj = bucket.get_binary('not_found_from_file')
         self.assertEqual(obj.get_data(), None)
 
+class MapReduceAliasTestMixIn(object):
+    """This tests the map reduce aliases"""
 
-class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
+    def test_map_values(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new_binary('one', data='value_1').store()
+        bucket.new_binary('two', data='value_2').store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values().run()
+
+        # Sort the result so that we can have a consistent
+        # expected value
+        result.sort()
+
+        self.assertEqual(result, ["value_1", "value_2"])
+
+    def test_map_values_json(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data={'val': 'value_1'}).store()
+        bucket.new('two', data={'val': 'value_2'}).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().run()
+
+        # Sort the result so that we can have a consistent
+        # expected value
+        result.sort(key=lambda x: x['val'])
+
+        self.assertEqual(result, [{'val': "value_1"}, {'val': "value_2"}])
+
+    def test_reduce_sum(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_sum().run()
+
+        self.assertEqual(result, [3])
+
+    def test_reduce_min(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_min().run()
+
+        self.assertEqual(result, [1])
+
+    def test_reduce_max(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_max().run()
+
+        self.assertEqual(result, [2])
+
+    def test_reduce_sort(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data="value1").store()
+        bucket.new('two', data="value2").store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_sort().run()
+
+        self.assertEqual(result, ["value1","value2"])
+
+    def test_reduce_sort_custom(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data="value1").store()
+        bucket.new('two', data="value2").store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_sort("""function(x,y) {
+           if(x == y) return 0;
+           return x > y ? -1 : 1;
+        }""").run()
+
+        self.assertEqual(result, ["value2","value1"])
+
+    def test_reduce_numeric_sort(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_numeric_sort().run()
+
+        self.assertEqual(result, [1,2])
+
+    def test_reduce_limit(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json()\
+                   .reduce_numeric_sort()\
+                   .reduce_limit(1).run()
+
+        self.assertEqual(result, [1])
+
+    def test_reduce_slice(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json()\
+                   .reduce_numeric_sort()\
+                   .reduce_slice(1,2).run()
+
+        self.assertEqual(result, [2])
+
+    def test_filter_not_found(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Make sure "three" does not exist
+        bucket.get('three').delete()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')\
+                        .add('bucket', 'three')
+
+        # Use the map_values alias
+        result = mr.map_values_json()\
+                   .filter_not_found()\
+                   .run()
+
+        self.assertEqual(sorted(result), [1,2])
+
+
+class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
+                               unittest.TestCase):
 
     def setUp(self):
         self.host = PB_HOST
@@ -445,7 +635,7 @@ class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
 
-class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
+class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
     def setUp(self):
         self.host = HTTP_HOST
