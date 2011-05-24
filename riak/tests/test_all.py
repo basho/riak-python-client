@@ -484,6 +484,15 @@ class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
         o = bucket.new("foo", "bar").store(return_body=False)
         self.assertEqual(o.vclock(), None)
 
+    def test_generate_key(self):
+        # Ensure that Riak generates a random key when
+        # the key passed to bucket.new() is None.
+        bucket = self.client.bucket('random_key_bucket')
+        for key in bucket.get_keys():
+            bucket.get(str(key)).delete()
+        bucket.new(None, data={}).store()
+        self.assertEqual(len(bucket.get_keys()), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
