@@ -213,6 +213,14 @@ class RiakClient(object):
         self._decoders[content_type] = decoder
         return self
 
+    def get_buckets(self):
+        """
+        Get the list of buckets.
+        NOTE: Do not use this in production, as it requires traversing through
+        all keys stored in a cluster.
+        """
+        return self._transport.get_buckets()
+
     def bucket(self, name):
         """
         Get the bucket by the specified name. Since buckets always exist,

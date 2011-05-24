@@ -76,6 +76,13 @@ class RiakTransport(object):
         """
         raise RiakError("not implemented")
 
+    def get_buckets(self) :
+        """
+        Serialize get buckets request and deserialize response
+        @return dict()
+        """
+        raise RiakError("not implemented")
+
     def get_bucket_props(self, bucket) :
         """
         Serialize get bucket property request and deserialize response

@@ -19,6 +19,7 @@ under the License.
 """
 import urllib
 from riak_object import RiakObject
+from bucket import RiakBucket
 
 class RiakMapReduce(object):
     """
@@ -34,6 +35,7 @@ class RiakMapReduce(object):
         self._client = client
         self._phases = []
         self._inputs = []
+        self._key_filters = []
         self._input_mode = None
 
     def add(self, arg1, arg2=None, arg3=None):
@@ -70,6 +72,20 @@ class RiakMapReduce(object):
     def add_bucket(self, bucket) :
         self._input_mode = 'bucket'
         self._inputs = bucket
+        return self
+
+    def add_key_filters(self, key_filters) :
+        if self._input_mode == 'search':
+          raise Exception('Key filters are not supported in search query.')
+
+        self._key_filters.extend(key_filters)
+        return self
+
+    def add_key_filter(self, *args) :
+        if self._input_mode == 'search':
+          raise Exception('Key filters are not supported in search query.')
+
+        self._key_filters.append(args)
         return self
 
     def search(self, bucket, query):
@@ -179,6 +195,17 @@ class RiakMapReduce(object):
                 phase._keep = True
             if phase._keep: keep_flag = True
             query.append(phase.to_array())
+
+        if (len(self._key_filters) > 0):
+          bucket_name = None
+          if (type(self._inputs) == str):
+            bucket_name = self._inputs
+          elif (type(self._inputs) == RiakBucket):
+            bucket_name = self._inputs.get_name()
+
+          if (bucket_name is not None):
+            self._inputs = {'bucket':       bucket_name,
+                            'key_filters':  self._key_filters}
 
         t = self._client.get_transport()
         result = t.mapred(self._inputs, query, timeout)

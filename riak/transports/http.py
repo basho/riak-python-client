@@ -138,13 +138,24 @@ class RiakHttpTransport(RiakTransport) :
         host, port, url = self.build_rest_path(bucket, None, None, params)
         response = self.http_request('GET', host, port, url)
 
-        headers = response[0]
-        encoded_props = response[1]
+        headers, encoded_props = response[0:2]
         if (headers['http_code'] == 200):
             props = json.loads(encoded_props)
             return props['keys']
         else:
             raise Exception('Error getting bucket properties.')
+
+    def get_buckets(self):
+        params = {'buckets': 'true'}
+        host, port, url = self.build_rest_path(None, None, None, params)
+        response = self.http_request('GET', host, port, url)
+
+        headers, encoded_props = response[0:2]
+        if (headers['http_code'] == 200):
+            props = json.loads(encoded_props)
+            return props['buckets']
+        else:
+            raise Exception('Error getting buckets.')
 
     def get_bucket_props(self, bucket, keys=False):
         # Run the request...
@@ -315,7 +326,10 @@ class RiakHttpTransport(RiakTransport) :
         # Build 'http://hostname:port/prefix/bucket'
         path = ''
         path += '/' + self._prefix
-        path += '/' + urllib.quote_plus(bucket._name)
+
+        # Add '.../bucket'
+        if (bucket is not None):
+            path += '/' + urllib.quote_plus(bucket._name)
 
         # Add '.../key'
         if (key is not None):
