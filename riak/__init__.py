@@ -39,7 +39,7 @@ class RiakError(Exception) :
 from riak_object import RiakObject
 from bucket import RiakBucket
 from client import RiakClient
-from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase
+from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase, F
 from transports.pbc import RiakPbcTransport
 from transports.http import RiakHttpTransport
 

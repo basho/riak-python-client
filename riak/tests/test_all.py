@@ -13,6 +13,7 @@ import unittest
 from riak import RiakClient
 from riak import RiakPbcTransport
 from riak import RiakHttpTransport
+from riak import F
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -684,6 +685,60 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket.new(None, data={}).store()
         self.assertEqual(len(bucket.get_keys()), 1)
 
+
+class RiakTestFilter(unittest.TestCase):
+    def test_simple(self):
+        f1 = F("tokenize", "-", 1)
+        self.assertEqual(f1._filters, [["tokenize", "-", 1]])
+
+    def test_add(self):
+        f1 = F("tokenize", "-", 1)
+        f2 = F("eq", "2005")
+        f3 = f1 + f2
+        self.assertEqual(f3._filters, [["tokenize", "-", 1], ["eq", "2005"]])
+
+    def test_and(self):
+        f1 = F("starts_with", "2005-")
+        f2 = F("ends_with", "-01")
+        f3 = f1 & f2
+        self.assertEqual(f3._filters, [["and", [["starts_with", "2005-"]], [["ends_with", "-01"]]]])
+
+    def test_multi_and(self):
+        f1 = F("starts_with", "2005-")
+        f2 = F("ends_with", "-01")
+        f3 = F("matches", "-11-")
+        f4 = f1 & f2 & f3
+        self.assertEqual(f4._filters, [["and",
+                                        [["starts_with", "2005-"]],
+                                        [["ends_with", "-01"]],
+                                        [["matches", "-11-"]],
+                                       ]])
+        
+    def test_or(self):
+        f1 = F("starts_with", "2005-")
+        f2 = F("ends_with", "-01")
+        f3 = f1 | f2
+        self.assertEqual(f3._filters, [["or", [["starts_with", "2005-"]], [["ends_with", "-01"]]]])
+
+    def test_multi_or(self):
+        f1 = F("starts_with", "2005-")
+        f2 = F("ends_with", "-01")
+        f3 = F("matches", "-11-")
+        f4 = f1 | f2 | f3
+        self.assertEqual(f4._filters, [["or",
+                                        [["starts_with", "2005-"]],
+                                        [["ends_with", "-01"]],
+                                        [["matches", "-11-"]],
+                                       ]])
+
+    def test_chaining(self):
+        f1 = F().tokenize("-", 1).eq("2005")
+        f2 = F().tokenize("-", 2).eq("05")
+        f3 = f1 & f2
+        self.assertEqual(f3._filters, [["and",
+                                        [["tokenize", "-", 1], ["eq", "2005"]],
+                                        [["tokenize", "-", 2], ["eq", "05"]]
+                                      ]])                                        
 
 if __name__ == '__main__':
     unittest.main()
