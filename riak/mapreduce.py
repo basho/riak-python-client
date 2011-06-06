@@ -501,3 +501,6 @@ class F(object):
             other = F(*args1)
             return self + other
         return function
+
+    def __iter__(self):
+        return iter(self._filters)
