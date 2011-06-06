@@ -418,10 +418,11 @@ tutorial, but usage of this feature looks like::
 Using Key Filters
 ==================
 
-`Key filters`_ are a way to pre-process MapReduce inputs from a full
-bucket query simply by examining the key — without loading the object
-first. This is especially useful if your keys are composed of
-domain-specific information that can be analyzed at query-time.
+`Key filters`_ are a new feature available as of Riak 0.14.  They are
+a way to pre-process MapReduce inputs from a full bucket query simply
+by examining the key — without loading the object first. This is
+especially useful if your keys are composed of domain-specific
+information that can be analyzed at query-time.
 
 To illustrate this, let’s contrive an example. Let’s say we’re storing
 customer invoices with a key constructed from the customer name and
