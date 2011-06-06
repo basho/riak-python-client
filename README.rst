@@ -414,3 +414,56 @@ tutorial, but usage of this feature looks like::
 
 .. _`Riak Search`: http://wiki.basho.com/Riak-Search.html
 .. _Lucene: http://lucene.apache.org/
+
+Using Key Filters
+==================
+
+`Key filters`_ are a way to pre-process MapReduce inputs from a full
+bucket query simply by examining the key — without loading the object
+first. This is especially useful if your keys are composed of
+domain-specific information that can be analyzed at query-time.
+
+To illustrate this, let’s contrive an example. Let’s say we’re storing
+customer invoices with a key constructed from the customer name and
+the date, in a bucket called “invoices”. Here are some sample keys::
+
+    basho-20101215
+    google-20110103
+    yahoo-20090613
+
+To query all invoices for a given customer::
+
+    import riak
+    
+    client = riak.RiakClient()
+    
+    query = client.add("invoices")
+    query.add_key_filter("tokenize", "-", 1)
+    query.add_key_filter("eq", "google")
+
+    query.map("""function(v) {
+        var data = JSON.parse(v.values[0].data);
+        return [[v.key, data]];
+    }""")
+    
+   
+More complex key filters can be built using riak.f::
+
+    import riak
+    from riak import f
+
+    client = riak.RiakClient()
+
+    # Query basho's orders for 2010
+    filters = f.tokenize("-", 1).eq("basho")\
+            & f.tokenize("-", 2).starts_with("2010")
+
+    query = client.add("invoices")
+    query = query.add_key_filters(filters)
+   
+    query.map("""function(v) {
+        var data = JSON.parse(v.values[0].data);
+        return [[v.key, data]];
+    }""")
+
+.. _`Key filters`: http://wiki.basho.com/Key-Filters.html
