@@ -450,10 +450,7 @@ To query all invoices for a given customer::
    
 Alternatively, you can use riak.f to build key filters::
 
-    ...
-    query = client.add("invoices")
     query.add_key_filters(f.tokenize("-", 1).eq("google"))
-    ...
 
 Boolean operators can be used with riak.f instances::
 
