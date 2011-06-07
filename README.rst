@@ -458,8 +458,8 @@ Boolean operators can be used with riak.f instances::
     filters = f.tokenize("-", 1).eq("basho")\
             & f.tokenize("-", 2).starts_with("2010")
 
-Alternatively filters can be added together in order to produce very
-complex filters::
+Filters can be combined using the + operator to produce very complex
+filters::
 
     # Query invoices for basho or google
     filters = f.tokenize("-", 1) + (f.eq("basho") | f.eq("google"))
