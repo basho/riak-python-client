@@ -448,21 +448,21 @@ To query all invoices for a given customer::
     }""")
     
    
-Alternatively, you can use riak.f to build key filters::
+Alternatively, you can use riak.key_filter to build key filters::
 
-    query.add_key_filters(f.tokenize("-", 1).eq("google"))
+    query.add_key_filters(key_filter.tokenize("-", 1).eq("google"))
 
 Boolean operators can be used with riak.f instances::
 
     # Query basho's orders for 2010
-    filters = f.tokenize("-", 1).eq("basho")\
-            & f.tokenize("-", 2).starts_with("2010")
+    filters = key_filter.tokenize("-", 1).eq("basho")\
+            & key_filter.tokenize("-", 2).starts_with("2010")
 
 Filters can be combined using the + operator to produce very complex
 filters::
 
     # Query invoices for basho or google
-    filters = f.tokenize("-", 1) + (f.eq("basho") | f.eq("google"))
+    filters = key_filter.tokenize("-", 1) + (key_filter.eq("basho") | key_filter.eq("google"))
 
     # This is the same as the following key filters
     [['tokenize', '-', 1], ['or', [['eq', 'google']], [['eq', 'yahoo']]]]
