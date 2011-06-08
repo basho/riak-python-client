@@ -463,7 +463,7 @@ class RiakLink(object):
         is_equal = (self._bucket == link._bucket) and (self._key == link._key) and (self.get_tag() == link.get_tag())
         return is_equal
 
-class F(object):
+class RiakKeyFilter(object):
     def __init__(self, *args):
         if args:
             self._filters = [list(args)]
@@ -471,7 +471,7 @@ class F(object):
             self._filters = []
 
     def __add__(self, other):
-        f = F()
+        f = RiakKeyFilter()
         f._filters = self._filters + other._filters
         return f
 
@@ -479,12 +479,12 @@ class F(object):
         # If the current filter is an and, append the other's
         # filters onto the filter
         if(self._filters and self._filters[0][0] == op):
-            f = F()
+            f = RiakKeyFilter()
             f._filters.extend(self._filters)
             f._filters[0].append(other._filters)
             return f
-        # Otherwise just create a new F() object with an and
-        return F(op, self._filters, other._filters)
+        # Otherwise just create a new RiakKeyFilter() object with an and
+        return RiakKeyFilter(op, self._filters, other._filters)
         
     def __and__(self, other):
         return self._bool_op("and", other)
@@ -498,7 +498,7 @@ class F(object):
     def __getattr__(self, name):
         def function(*args):
             args1 = [name] + list(args)
-            other = F(*args1)
+            other = RiakKeyFilter(*args1)
             return self + other
         return function
 

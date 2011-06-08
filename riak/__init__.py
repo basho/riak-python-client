@@ -39,7 +39,8 @@ class RiakError(Exception) :
 from riak_object import RiakObject
 from bucket import RiakBucket
 from client import RiakClient
-from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase, F
+from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase,\
+    RiakKeyFilter
 from transports.pbc import RiakPbcTransport
 from transports.http import RiakHttpTransport
 
@@ -47,6 +48,6 @@ ONE = "one"
 ALL = "all"
 QUORUM = "quorum"
 
-f = F()
+key_filter = RiakKeyFilter()
 
 
