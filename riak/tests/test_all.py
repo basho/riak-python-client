@@ -13,6 +13,7 @@ import unittest
 from riak import RiakClient
 from riak import RiakPbcTransport
 from riak import RiakHttpTransport
+from riak import RiakKeyFilter, key_filter
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -324,6 +325,28 @@ class BaseTestCase(object):
             .run()
 
         self.assertEqual(result, ["yahoo-20090613"])
+
+    def test_key_filters_f_chain(self):
+        bucket = self.client.bucket("kftest")
+        bucket.new("basho-20101215", 1).store()
+        bucket.new("google-20110103", 2).store()
+        bucket.new("yahoo-20090613", 3).store()
+
+
+        # compose a chain of key filters using f as the root of
+        # two filters ANDed together to ensure that f can be the root
+        # of multiple chains
+        filters = key_filter.tokenize("-", 1).eq("yahoo") \
+            & key_filter.tokenize("-", 2).ends_with("0613")
+
+        result = self.client \
+            .add("kftest") \
+            .add_key_filters(filters) \
+            .map("function (v, keydata) { return [v.key]; }") \
+            .run()
+
+        self.assertEqual(result, ["yahoo-20090613"])
+
 
     def test_key_filters_with_search_query(self):
         mapreduce = self.client \
@@ -684,6 +707,61 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket.new(None, data={}).store()
         self.assertEqual(len(bucket.get_keys()), 1)
 
+
+class RiakTestFilter(unittest.TestCase):
+    def test_simple(self):
+        f1 = RiakKeyFilter("tokenize", "-", 1)
+        self.assertEqual(f1._filters, [["tokenize", "-", 1]])
+
+    def test_add(self):
+        f1 = RiakKeyFilter("tokenize", "-", 1)
+        f2 = RiakKeyFilter("eq", "2005")
+        f3 = f1 + f2
+        self.assertEqual(list(f3), [["tokenize", "-", 1], ["eq", "2005"]])
+
+    def test_and(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = f1 & f2
+        self.assertEqual(list(f3), [["and", [["starts_with", "2005-"]], [["ends_with", "-01"]]]])
+
+    def test_multi_and(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = RiakKeyFilter("matches", "-11-")
+        f4 = f1 & f2 & f3
+        self.assertEqual(list(f4), [["and",
+                                        [["starts_with", "2005-"]],
+                                        [["ends_with", "-01"]],
+                                        [["matches", "-11-"]],
+                                       ]])
+
+    def test_or(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = f1 | f2
+        self.assertEqual(list(f3), [["or", [["starts_with", "2005-"]],
+                                        [["ends_with", "-01"]]]])
+
+    def test_multi_or(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = RiakKeyFilter("matches", "-11-")
+        f4 = f1 | f2 | f3
+        self.assertEqual(list(f4), [["or",
+                               [["starts_with", "2005-"]],
+                               [["ends_with", "-01"]],
+                               [["matches", "-11-"]],
+                             ]])
+
+    def test_chaining(self):
+        f1 = key_filter.tokenize("-", 1).eq("2005")
+        f2 = key_filter.tokenize("-", 2).eq("05")
+        f3 = f1 & f2
+        self.assertEqual(list(f3), [["and",
+                                     [["tokenize", "-", 1], ["eq", "2005"]],
+                                     [["tokenize", "-", 2], ["eq", "05"]]
+                                   ]])
 
 if __name__ == '__main__':
     unittest.main()

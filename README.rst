@@ -414,3 +414,58 @@ tutorial, but usage of this feature looks like::
 
 .. _`Riak Search`: http://wiki.basho.com/Riak-Search.html
 .. _Lucene: http://lucene.apache.org/
+
+Using Key Filters
+==================
+
+`Key filters`_ are a new feature available as of Riak 0.14.  They are
+a way to pre-process MapReduce inputs from a full bucket query simply
+by examining the key — without loading the object first. This is
+especially useful if your keys are composed of domain-specific
+information that can be analyzed at query-time.
+
+To illustrate this, let’s contrive an example. Let’s say we’re storing
+customer invoices with a key constructed from the customer name and
+the date, in a bucket called “invoices”. Here are some sample keys::
+
+    basho-20101215
+    google-20110103
+    yahoo-20090613
+
+To query all invoices for a given customer::
+
+    import riak
+    
+    client = riak.RiakClient()
+    
+    query = client.add("invoices")
+    query.add_key_filter("tokenize", "-", 1)
+    query.add_key_filter("eq", "google")
+
+    query.map("""function(v) {
+        var data = JSON.parse(v.values[0].data);
+        return [[v.key, data]];
+    }""")
+    
+   
+Alternatively, you can use riak.key_filter to build key filters::
+
+    query.add_key_filters(key_filter.tokenize("-", 1).eq("google"))
+
+Boolean operators can be used with riak.f instances::
+
+    # Query basho's orders for 2010
+    filters = key_filter.tokenize("-", 1).eq("basho")\
+            & key_filter.tokenize("-", 2).starts_with("2010")
+
+Filters can be combined using the + operator to produce very complex
+filters::
+
+    # Query invoices for basho or google
+    filters = key_filter.tokenize("-", 1) + (key_filter.eq("basho") | key_filter.eq("google"))
+
+    # This is the same as the following key filters
+    [['tokenize', '-', 1], ['or', [['eq', 'google']], [['eq', 'yahoo']]]]
+
+
+.. _`Key filters`: http://wiki.basho.com/Key-Filters.html
