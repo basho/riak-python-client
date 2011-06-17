@@ -463,6 +463,16 @@ class BaseTestCase(object):
         obj = bucket.get_binary('foo_from_file')
         self.assertEqual(obj.get_content_type(), 'application/octet-stream')
 
+    def test_store_metadata(self):
+        bucket = self.client.bucket('bucket')
+        rand = self.randint()
+        obj = bucket.new('fooster', rand)
+        obj.set_usermeta({'custom': 'some metadata'})
+        obj.store()
+        obj = bucket.get('fooster')
+        print(obj.get_usermeta())
+        self.assertEqual('some metadata', obj.get_usermeta()['custom'])
+
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
         bucket = self.client.bucket('bucket')
         rand = str(self.randint())
