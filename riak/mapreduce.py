@@ -19,6 +19,7 @@ under the License.
 """
 import urllib
 from riak_object import RiakObject
+from bucket import RiakBucket
 
 class RiakMapReduce(object):
     """
@@ -34,6 +35,7 @@ class RiakMapReduce(object):
         self._client = client
         self._phases = []
         self._inputs = []
+        self._key_filters = []
         self._input_mode = None
 
     def add(self, arg1, arg2=None, arg3=None):
@@ -47,7 +49,7 @@ class RiakMapReduce(object):
         @param mixed arg3 - Arg or blank
         @return RiakMapReduce
         """
-        if (arg2 == None) and (arg3 == None):
+        if (arg2 is None) and (arg3 is None):
             if isinstance(arg1, RiakObject):
                 return self.add_object(arg1)
             else:
@@ -72,19 +74,33 @@ class RiakMapReduce(object):
         self._inputs = bucket
         return self
 
+    def add_key_filters(self, key_filters) :
+        if self._input_mode == 'search':
+          raise Exception('Key filters are not supported in search query.')
+
+        self._key_filters.extend(key_filters)
+        return self
+
+    def add_key_filter(self, *args) :
+        if self._input_mode == 'search':
+          raise Exception('Key filters are not supported in search query.')
+
+        self._key_filters.append(args)
+        return self
+
     def search(self, bucket, query):
         """
-        Begin a map/reduce operation using a Search. This command will 
+        Begin a map/reduce operation using a Search. This command will
         return an error unless executed against a Riak Search cluster.
         @param bucket - The bucket over which to perform the search.
         @param query - The search query.
         """
         self._input_mode = 'search'
-        self._inputs = {'module':'riak_search', 
+        self._inputs = {'module':'riak_search',
                        'function':'mapred_search',
                        'arg':[bucket, query]}
         return self
-        
+
 
     def link(self, bucket='_', tag='_', keep=False):
         """
@@ -180,6 +196,17 @@ class RiakMapReduce(object):
             if phase._keep: keep_flag = True
             query.append(phase.to_array())
 
+        if (len(self._key_filters) > 0):
+          bucket_name = None
+          if (type(self._inputs) == str):
+            bucket_name = self._inputs
+          elif (type(self._inputs) == RiakBucket):
+            bucket_name = self._inputs.get_name()
+
+          if (bucket_name is not None):
+            self._inputs = {'bucket':       bucket_name,
+                            'key_filters':  self._key_filters}
+
         t = self._client.get_transport()
         result = t.mapred(self._inputs, query, timeout)
 
@@ -200,6 +227,58 @@ class RiakMapReduce(object):
             a.append(link)
 
         return a
+
+    ##
+    # Start Shortcuts to built-ins
+    ##
+    def map_values(self, options=None):
+        return self.map("Riak.mapValues", options=options)
+
+    def map_values_json(self, options=None):
+        return self.map("Riak.mapValuesJson", options=options)
+
+    def reduce_sum(self, options=None):
+        return self.reduce("Riak.reduceSum", options=options)
+
+    def reduce_min(self, options=None):
+        return self.reduce("Riak.reduceMin", options=options)
+
+    def reduce_max(self, options=None):
+        return self.reduce("Riak.reduceMax", options=options)
+
+    def reduce_sort(self, js_cmp=None, options=None):
+        if options is None:
+            options = dict()
+
+        if js_cmp:
+            options['arg'] = js_cmp
+
+        return self.reduce("Riak.reduceSort", options=options)
+
+    def reduce_numeric_sort(self, options=None):
+        return self.reduce("Riak.reduceNumericSort", options=options)        
+
+    def reduce_limit(self, limit, options=None):
+        if options is None:
+            options = dict()
+
+        options['arg'] = limit
+        # reduceLimit is broken in riak_kv
+        code="""function(value, arg) {
+            return value.slice(0, arg);
+        }"""
+        return self.reduce(code, options=options)
+
+    def reduce_slice(self, start, end, options=None):
+        if options is None:
+            options = dict()
+
+        options['arg'] = [start, end]
+        return self.reduce("Riak.reduceSlice", options=options)
+
+    def filter_not_found(self, options=None):
+        return self.reduce("Riak.filterNotFound", options=options)
+
 
 class RiakMapReducePhase(object):
     """
@@ -349,7 +428,7 @@ class RiakLink(object):
         Get the tag of this link.
         @return string
         """
-        if (self._tag == None):
+        if (self._tag is None):
             return self._bucket
         else:
             return self._tag
@@ -383,3 +462,45 @@ class RiakLink(object):
         """
         is_equal = (self._bucket == link._bucket) and (self._key == link._key) and (self.get_tag() == link.get_tag())
         return is_equal
+
+class RiakKeyFilter(object):
+    def __init__(self, *args):
+        if args:
+            self._filters = [list(args)]
+        else:
+            self._filters = []
+
+    def __add__(self, other):
+        f = RiakKeyFilter()
+        f._filters = self._filters + other._filters
+        return f
+
+    def _bool_op(self, op, other):
+        # If the current filter is an and, append the other's
+        # filters onto the filter
+        if(self._filters and self._filters[0][0] == op):
+            f = RiakKeyFilter()
+            f._filters.extend(self._filters)
+            f._filters[0].append(other._filters)
+            return f
+        # Otherwise just create a new RiakKeyFilter() object with an and
+        return RiakKeyFilter(op, self._filters, other._filters)
+        
+    def __and__(self, other):
+        return self._bool_op("and", other)
+
+    def __or__(self, other):
+        return self._bool_op("or", other)
+
+    def __repr__(self):
+        return str(self._filters)
+
+    def __getattr__(self, name):
+        def function(*args):
+            args1 = [name] + list(args)
+            other = RiakKeyFilter(*args1)
+            return self + other
+        return function
+
+    def __iter__(self):
+        return iter(self._filters)

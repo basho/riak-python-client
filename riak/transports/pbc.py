@@ -74,7 +74,7 @@ class RiakPbcTransport(RiakTransport):
         'default' : RIAKC_RW_DEFAULT,
         'all' : RIAKC_RW_ALL,
         'quorum' : RIAKC_RW_QUORUM,
-        'one' : RIAKC_RW_ONE 
+        'one' : RIAKC_RW_ONE
         }
     def __init__(self, host='127.0.0.1', port=8087, client_id=None):
         """
@@ -128,7 +128,7 @@ class RiakPbcTransport(RiakTransport):
         """
         req = riakclient_pb2.RpbSetClientIdReq()
         req.client_id = client_id
-        
+
         self.maybe_connect()
         self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
         msg_code, resp = self.recv_msg()
@@ -170,7 +170,7 @@ class RiakPbcTransport(RiakTransport):
         Serialize get request and deserialize response
         """
         bucket = robj.get_bucket()
-        
+
         req = riakclient_pb2.RpbPutReq()
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
@@ -214,7 +214,7 @@ class RiakPbcTransport(RiakTransport):
         if msg_code != MSG_CODE_DEL_RESP:
             raise RiakError("unexpected protocol buffer message code: ", msg_code)
         return self
-    
+
     def get_keys(self, bucket):
         """
         Lists all keys within a bucket.
@@ -237,6 +237,17 @@ class RiakPbcTransport(RiakTransport):
                 break;
 
         return keys
+
+    def get_buckets(self):
+        """
+        Serialize bucket listing request and deserialize response
+        """
+        self.maybe_connect()
+        self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
+        msg_code, resp = self.recv_msg()
+        if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
+          raise RiakError("unexpected protocol buffer message code: ", msg_code)
+        return resp.buckets
 
     def get_bucket_props(self, bucket):
         """
@@ -369,6 +380,9 @@ class RiakPbcTransport(RiakTransport):
             msg = None
         elif msg_code == MSG_CODE_LIST_KEYS_RESP:
             msg = riakclient_pb2.RpbListKeysResp()
+            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code == MSG_CODE_LIST_BUCKETS_RESP:
+            msg = riakclient_pb2.RpbListBucketsResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_GET_BUCKET_RESP:
             msg = riakclient_pb2.RpbGetBucketResp()

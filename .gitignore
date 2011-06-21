@@ -1,7 +1,10 @@
-riak/*.pyc
-riak/tests/*.pyc
-riak/transports/*.pyc
+*.pyc
 
 docs/_build
 
 .*.swp
+.coverage
+
+build/
+dist/
+riak.egg-info/

@@ -63,7 +63,7 @@ class RiakHttpTransport(RiakTransport) :
             self._client_id = self.make_random_client_id()
 
     def __copy__(self):
-        return RiakHttpTransport(self._host, self._port, self._prefix, 
+        return RiakHttpTransport(self._host, self._port, self._prefix,
                                  self._mapred_prefix)
 
     """
@@ -118,9 +118,13 @@ class RiakHttpTransport(RiakTransport) :
         content = robj.get_encoded_data()
 
         # Run the operation.
-        response = self.http_request('PUT', host, port, url, headers, content)
+        if robj.get_key() is None:
+          response = self.http_request('POST', host, port, url, headers, content)
+        else:
+          response = self.http_request('PUT', host, port, url, headers, content)
+
         if return_body:
-          return self.parse_body(response, [200, 300])
+          return self.parse_body(response, [200, 201, 300])
         else:
           self.check_http_code(response, [204])
           return None
@@ -141,14 +145,25 @@ class RiakHttpTransport(RiakTransport) :
         host, port, url = self.build_rest_path(bucket, None, None, params)
         response = self.http_request('GET', host, port, url)
 
-        headers = response[0]
-        encoded_props = response[1]
+        headers, encoded_props = response[0:2]
         if (headers['http_code'] == 200):
             props = json.loads(encoded_props)
             return props['keys']
         else:
             raise Exception('Error getting bucket properties.')
-        
+
+    def get_buckets(self):
+        params = {'buckets': 'true'}
+        host, port, url = self.build_rest_path(None, None, None, params)
+        response = self.http_request('GET', host, port, url)
+
+        headers, encoded_props = response[0:2]
+        if (headers['http_code'] == 200):
+            props = json.loads(encoded_props)
+            return props['buckets']
+        else:
+            raise Exception('Error getting buckets.')
+
     def get_bucket_props(self, bucket, keys=False):
         # Run the request...
         params = {'props' : 'True', 'keys' : 'False'}
@@ -176,7 +191,7 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('PUT', host, port, url, headers, content)
 
         # Handle the response...
-        if (response == None):
+        if (response is None):
             raise Exception('Error setting bucket properties.')
 
         # Check the response value...
@@ -216,7 +231,7 @@ class RiakHttpTransport(RiakTransport) :
         @return self
         """
         # If no response given, then return.
-        if (response == None):
+        if (response is None):
             return self
 
         # Make sure expected code came back
@@ -318,7 +333,10 @@ class RiakHttpTransport(RiakTransport) :
         # Build 'http://hostname:port/prefix/bucket'
         path = ''
         path += '/' + self._prefix
-        path += '/' + urllib.quote_plus(bucket._name)
+
+        # Add '.../bucket'
+        if (bucket is not None):
+            path += '/' + urllib.quote_plus(bucket._name)
 
         # Add '.../key'
         if (key is not None):
@@ -436,7 +454,7 @@ class RiakHttpTransport(RiakTransport) :
         fields = headers.split("\n")
         for field in fields:
             matches = re.match("([^:]+):(.+)", field)
-            if (matches == None): continue
+            if (matches is None): continue
             key = matches.group(1).lower()
             value = matches.group(2).strip()
             if (key in retVal.keys()):

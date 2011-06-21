@@ -13,6 +13,7 @@ import unittest
 from riak import RiakClient
 from riak import RiakPbcTransport
 from riak import RiakHttpTransport
+from riak import RiakKeyFilter, key_filter
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -310,6 +311,49 @@ class BaseTestCase(object):
             .run()
         self.assertEqual(result, [10])
 
+    def test_key_filters(self):
+        bucket = self.client.bucket("kftest")
+        bucket.new("basho-20101215", 1).store()
+        bucket.new("google-20110103", 2).store()
+        bucket.new("yahoo-20090613", 3).store()
+
+        result = self.client \
+            .add("kftest") \
+            .add_key_filters([["tokenize", "-", 2]]) \
+            .add_key_filter("ends_with", "0613") \
+            .map("function (v, keydata) { return [v.key]; }") \
+            .run()
+
+        self.assertEqual(result, ["yahoo-20090613"])
+
+    def test_key_filters_f_chain(self):
+        bucket = self.client.bucket("kftest")
+        bucket.new("basho-20101215", 1).store()
+        bucket.new("google-20110103", 2).store()
+        bucket.new("yahoo-20090613", 3).store()
+
+
+        # compose a chain of key filters using f as the root of
+        # two filters ANDed together to ensure that f can be the root
+        # of multiple chains
+        filters = key_filter.tokenize("-", 1).eq("yahoo") \
+            & key_filter.tokenize("-", 2).ends_with("0613")
+
+        result = self.client \
+            .add("kftest") \
+            .add_key_filters(filters) \
+            .map("function (v, keydata) { return [v.key]; }") \
+            .run()
+
+        self.assertEqual(result, ["yahoo-20090613"])
+
+
+    def test_key_filters_with_search_query(self):
+        mapreduce = self.client \
+            .search("kftest", "query")
+        self.assertRaises(Exception, mapreduce.add_key_filters, [["tokenize", "-", 2]])
+        self.assertRaises(Exception, mapreduce.add_key_filter, "ends_with", "0613")
+
     def test_erlang_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket("bucket")
@@ -362,7 +406,7 @@ class BaseTestCase(object):
 
     def test_store_of_missing_object(self):
         bucket = self.client.bucket("bucket")
-        # for json objects 
+        # for json objects
         o = bucket.get("nonexistent_key_json")
         self.assertEqual(o.exists(), False)
         o.set_data({"foo" : "bar"})
@@ -391,7 +435,7 @@ class BaseTestCase(object):
         bucket.new("four", {"foo":"four", "bar":"orange"}).store()
         bucket.new("five", {"foo":"five", "bar":"yellow"}).store()
 
-       # Run some operations...
+        # Run some operations...
         results = self.client.search("searchbucket", "foo:one OR foo:two").run()
         if (len(results) == 0):
             print "\n\nNot running test \"testSearchIntegration()\".\n"
@@ -436,8 +480,204 @@ class BaseTestCase(object):
         obj = bucket.get_binary('not_found_from_file')
         self.assertEqual(obj.get_data(), None)
 
-        
-class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
+    def test_list_buckets(self):
+        bucket = self.client.bucket("list_bucket")
+        bucket.new("one", {"foo":"one", "bar":"red"}).store()
+        buckets = self.client.get_buckets()
+        self.assertTrue("list_bucket" in buckets)
+
+class MapReduceAliasTestMixIn(object):
+    """This tests the map reduce aliases"""
+
+    def test_map_values(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new_binary('one', data='value_1').store()
+        bucket.new_binary('two', data='value_2').store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values().run()
+
+        # Sort the result so that we can have a consistent
+        # expected value
+        result.sort()
+
+        self.assertEqual(result, ["value_1", "value_2"])
+
+    def test_map_values_json(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data={'val': 'value_1'}).store()
+        bucket.new('two', data={'val': 'value_2'}).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().run()
+
+        # Sort the result so that we can have a consistent
+        # expected value
+        result.sort(key=lambda x: x['val'])
+
+        self.assertEqual(result, [{'val': "value_1"}, {'val': "value_2"}])
+
+    def test_reduce_sum(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_sum().run()
+
+        self.assertEqual(result, [3])
+
+    def test_reduce_min(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_min().run()
+
+        self.assertEqual(result, [1])
+
+    def test_reduce_max(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_max().run()
+
+        self.assertEqual(result, [2])
+
+    def test_reduce_sort(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data="value1").store()
+        bucket.new('two', data="value2").store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_sort().run()
+
+        self.assertEqual(result, ["value1","value2"])
+
+    def test_reduce_sort_custom(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data="value1").store()
+        bucket.new('two', data="value2").store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_sort("""function(x,y) {
+           if(x == y) return 0;
+           return x > y ? -1 : 1;
+        }""").run()
+
+        self.assertEqual(result, ["value2","value1"])
+
+    def test_reduce_numeric_sort(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json().reduce_numeric_sort().run()
+
+        self.assertEqual(result, [1,2])
+
+    def test_reduce_limit(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json()\
+                   .reduce_numeric_sort()\
+                   .reduce_limit(1).run()
+
+        self.assertEqual(result, [1])
+
+    def test_reduce_slice(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')
+
+        # Use the map_values alias
+        result = mr.map_values_json()\
+                   .reduce_numeric_sort()\
+                   .reduce_slice(1,2).run()
+
+        self.assertEqual(result, [2])
+
+    def test_filter_not_found(self):
+        # Add a value to the bucket
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        # Make sure "three" does not exist
+        bucket.get('three').delete()
+
+        # Create a map reduce object and use one and two as inputs
+        mr = self.client.add('bucket', 'one')\
+                        .add('bucket', 'two')\
+                        .add('bucket', 'three')
+
+        # Use the map_values alias
+        result = mr.map_values_json()\
+                   .filter_not_found()\
+                   .run()
+
+        self.assertEqual(sorted(result), [1,2])
+
+
+class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
+                               unittest.TestCase):
 
     def setUp(self):
         self.host = PB_HOST
@@ -455,7 +695,7 @@ class RiakPbcTransportTestCase(BaseTestCase, unittest.TestCase):
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
 
-class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
+class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
     def setUp(self):
         self.host = HTTP_HOST
@@ -467,7 +707,71 @@ class RiakHttpTransportTestCase(BaseTestCase, unittest.TestCase):
         bucket = self.client.bucket("bucket")
         o = bucket.new("foo", "bar").store(return_body=False)
         self.assertEqual(o.vclock(), None)
-        
+
+    def test_generate_key(self):
+        # Ensure that Riak generates a random key when
+        # the key passed to bucket.new() is None.
+        bucket = self.client.bucket('random_key_bucket')
+        for key in bucket.get_keys():
+            bucket.get(str(key)).delete()
+        bucket.new(None, data={}).store()
+        self.assertEqual(len(bucket.get_keys()), 1)
+
+
+class RiakTestFilter(unittest.TestCase):
+    def test_simple(self):
+        f1 = RiakKeyFilter("tokenize", "-", 1)
+        self.assertEqual(f1._filters, [["tokenize", "-", 1]])
+
+    def test_add(self):
+        f1 = RiakKeyFilter("tokenize", "-", 1)
+        f2 = RiakKeyFilter("eq", "2005")
+        f3 = f1 + f2
+        self.assertEqual(list(f3), [["tokenize", "-", 1], ["eq", "2005"]])
+
+    def test_and(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = f1 & f2
+        self.assertEqual(list(f3), [["and", [["starts_with", "2005-"]], [["ends_with", "-01"]]]])
+
+    def test_multi_and(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = RiakKeyFilter("matches", "-11-")
+        f4 = f1 & f2 & f3
+        self.assertEqual(list(f4), [["and",
+                                        [["starts_with", "2005-"]],
+                                        [["ends_with", "-01"]],
+                                        [["matches", "-11-"]],
+                                       ]])
+
+    def test_or(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = f1 | f2
+        self.assertEqual(list(f3), [["or", [["starts_with", "2005-"]],
+                                        [["ends_with", "-01"]]]])
+
+    def test_multi_or(self):
+        f1 = RiakKeyFilter("starts_with", "2005-")
+        f2 = RiakKeyFilter("ends_with", "-01")
+        f3 = RiakKeyFilter("matches", "-11-")
+        f4 = f1 | f2 | f3
+        self.assertEqual(list(f4), [["or",
+                               [["starts_with", "2005-"]],
+                               [["ends_with", "-01"]],
+                               [["matches", "-11-"]],
+                             ]])
+
+    def test_chaining(self):
+        f1 = key_filter.tokenize("-", 1).eq("2005")
+        f2 = key_filter.tokenize("-", 2).eq("05")
+        f3 = f1 & f2
+        self.assertEqual(list(f3), [["and",
+                                     [["tokenize", "-", 1], ["eq", "2005"]],
+                                     [["tokenize", "-", 2], ["eq", "05"]]
+                                   ]])
 
 if __name__ == '__main__':
     unittest.main()

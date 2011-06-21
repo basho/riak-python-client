@@ -1,0 +1,6 @@
+python-riak (1.2.1) unstable; urgency=low
+
+  * Initial packaging
+
+ -- Dmitry Rozhkov <dmitry.rojkov@gmail.com>  Wed, 27 Apr 2011 20:34:29 +0200
+
