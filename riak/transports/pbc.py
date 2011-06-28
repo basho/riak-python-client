@@ -120,7 +120,7 @@ class RiakPbcTransport(RiakTransport):
         if msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
             return resp.client_id
         else:
-            raise RiakError("unexpected protocol buffer message code: ", msg_code)
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
 
     def set_client_id(self, client_id):
         """
@@ -135,7 +135,7 @@ class RiakPbcTransport(RiakTransport):
         if msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
             return True
         else:
-            raise RiakError("unexpected protocol buffer message code: ", msg_code)
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
 
     def get(self, robj, r = None, vtag = None):
         """
@@ -159,11 +159,9 @@ class RiakPbcTransport(RiakTransport):
             contents = []
             for c in resp.content:
                 contents.append(self.decode_content(c))
-            return (resp.vclock, contents)
+            return resp.vclock, contents
         else:
             return 0
-
-        return 0
 
     def put(self, robj, w = None, dw = None, return_body = True):
         """
@@ -174,7 +172,7 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbPutReq()
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
-        if return_body == True:
+        if return_body:
             req.return_body = 1
 
         req.bucket = bucket.get_name()
@@ -189,12 +187,12 @@ class RiakPbcTransport(RiakTransport):
         self.send_msg(MSG_CODE_PUT_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_PUT_RESP:
-            raise RiakError("unexpected protocol buffer message code: ", msg_code)
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         if resp is not None:
             contents = []
             for c in resp.content:
                 contents.append(self.decode_content(c))
-            return (resp.vclock, contents)
+            return resp.vclock, contents
 
     def delete(self, robj, rw = None):
         """
@@ -212,7 +210,7 @@ class RiakPbcTransport(RiakTransport):
         self.send_msg(MSG_CODE_DEL_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_DEL_RESP:
-            raise RiakError("unexpected protocol buffer message code: ", msg_code)
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         return self
 
     def get_keys(self, bucket):
@@ -228,13 +226,13 @@ class RiakPbcTransport(RiakTransport):
         while True:
             msg_code, resp = self.recv_msg()
             if msg_code != MSG_CODE_LIST_KEYS_RESP:
-                raise RiakError("unexpected protocol buffer message code: ", msg_code)
+                raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
 
             for key in resp.keys:
                 keys.append(key)
 
             if resp.HasField("done") and resp.done:
-                break;
+                break
 
         return keys
 
@@ -246,7 +244,7 @@ class RiakPbcTransport(RiakTransport):
         self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
-          raise RiakError("unexpected protocol buffer message code: ", msg_code)
+          raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         return resp.buckets
 
     def get_bucket_props(self, bucket):
@@ -260,7 +258,7 @@ class RiakPbcTransport(RiakTransport):
         self.send_msg(MSG_CODE_GET_BUCKET_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_GET_BUCKET_RESP:
-            raise RiakError("unexpected protocol buffer message code: ", msg_code)
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         props = {}
         if resp.props.HasField('n_val'):
             props['n_val'] = resp.props.n_val
@@ -285,7 +283,7 @@ class RiakPbcTransport(RiakTransport):
         self.send_msg(MSG_CODE_SET_BUCKET_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_SET_BUCKET_RESP:
-            raise RiakError("unexpected protocol buffer message code: ", msg_code)
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
 
         return self
 
@@ -310,8 +308,7 @@ class RiakPbcTransport(RiakTransport):
         while True:
             msg_code, resp = self.recv_msg()
             if msg_code != MSG_CODE_MAPRED_RESP:
-                raise RiakError("unexpected protocol buffer message code: ",
-                                msg_code)
+                raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
             if resp.HasField("phase") and resp.HasField("response"):
                 content = json.loads(resp.response)
                 if resp.phase in result:
@@ -324,7 +321,7 @@ class RiakPbcTransport(RiakTransport):
 
         # If a single result - return the same as the HTTP interface does
         # otherwise return all the phase information
-        if len(result) == 0:
+        if not len(result):
             return None
         elif len(result) == 1:
             return result[max(result.keys())]
@@ -399,7 +396,7 @@ class RiakPbcTransport(RiakTransport):
 
     def recv_pkt(self):
         nmsglen = self._sock.recv(4)
-        if (len(nmsglen) != 4):
+        if len(nmsglen) != 4:
             raise RiakError("Socket returned short packet length {0} - expected 4".
                             format(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
@@ -445,7 +442,7 @@ class RiakPbcTransport(RiakTransport):
             else:
                 tag = None
             links.append(RiakLink(bucket, key, tag))
-        if links != []:
+        if links:
             metadata[MD_LINKS] = links
         if rpb_content.HasField("last_mod"):
             metadata[MD_LASTMOD] = rpb_content.last_mod
@@ -456,10 +453,9 @@ class RiakPbcTransport(RiakTransport):
             usermeta[usermd.key] = usermd.value
         if len(usermeta) > 0:
             metadata[MD_USERMETA] = usermeta
-        return (metadata, rpb_content.value)
+        return metadata, rpb_content.value
 
     def pbify_content(self, metadata, data, rpb_content) :
-        pbmetadata = {}
         # Convert the broken out fields, building up
         # pbmetadata for any unknown ones
         for k,v in metadata.iteritems():
@@ -481,3 +477,117 @@ class RiakPbcTransport(RiakTransport):
                     pb_link.key = link.get_key()
                     pb_link.tag = link.get_tag()
         rpb_content.value = data
+
+from Queue import Empty, Full, Queue
+class RiakPbcPoolTransport(RiakTransport):
+    """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
+    def __init__(self, host='127.0.0.1', port=8087, client_id=None, maxsize=0, block=False, timeout=None):
+        self.host = host
+        self.port = port
+        self.client_id = client_id
+        self.block = block
+        self.timeout = timeout
+
+        self.pool = Queue(None)
+        [self.pool.put(None) for _ in xrange(maxsize)]
+
+        self.num_connections = 0
+        self.num_requests = 0
+
+    def _new_conn(self):
+        """New PBC connection"""
+        self.num_connections += 1
+        return RiakPbcTransport(self.host, self.port, self.client_id)
+
+    def _get_conn(self):
+        conn = None
+        try:
+            conn = self.pool.get(block=self.block, timeout=self.timeout)
+        except Empty:
+            pass
+        return conn or self._new_conn()
+
+    def _put_conn(self, conn):
+        try:
+            self.pool.put(conn, block=False)
+        except Full:
+            self.num_connections -= 1
+
+    def _make_call(self, function):
+        """checkout conn, try operation, put conn back in pool"""
+        self.num_requests += 1
+        try:
+            conn = self._get_conn()
+            rv = function(conn)
+            self._put_conn(conn)
+        except Exception:
+            self.num_connections -= 1
+            #re-raise leave caller decide what to do
+            raise
+        return rv
+
+    def ping(self):
+        """
+        Ping the remote server
+        @return boolean
+        """
+        return self._make_call(lambda conn: conn.ping())
+
+    def get(self, robj, r = None, vtag = None):
+        """
+        Serialize get request and deserialize response
+        @return (vclock=None, [(metadata, value)]=None)
+        """
+        return self._make_call(lambda conn: conn.get(robj, r, vtag))
+
+    def put(self, robj, w = None, dw = None, return_body = True):
+        """
+        Serialize put request and deserialize response - if 'content'
+        is true, retrieve the updated metadata/content
+        @return (vclock=None, [(metadata, value)]=None)
+        """
+        return self._make_call(lambda conn: conn.put(robj, w, dw, return_body))
+
+    def delete(self, robj, rw = None):
+        """
+        Serialize delete request and deserialize response
+        @return true
+        """
+        return self._make_call(lambda conn: conn.delete(robj, rw))
+
+    def get_buckets(self):
+        """
+        Serialize bucket listing request and deserialize response
+        """
+        return self._make_call(lambda conn: conn.get_buckets())
+
+    def get_bucket_props(self, bucket) :
+        """
+        Serialize get bucket property request and deserialize response
+        @return dict()
+        """
+        return self._make_call(lambda conn: conn.get_bucket_props(bucket))
+
+    def set_bucket_props(self, bucket, props) :
+        """
+        Serialize set bucket property request and deserialize response
+        bucket = bucket object
+        props = dictionary of properties
+        @return boolean
+        """
+        return self._make_call(lambda conn: conn.set_bucket_props(bucket, props))
+
+    def mapred(self, inputs, query, timeout = None) :
+        """
+        Serialize map/reduce request
+        """
+        return self._make_call(lambda conn: conn.mapred(inputs, query, timeout))
+
+    def set_client_id(self, client_id):
+        """Mmm, this can turn ugly if you use different id for different objects in the pool"""
+        return self._make_call(lambda conn: conn.set_client_id(client_id))
+
+    def get_client_id(self):
+        """see set_client_id notes, you can do wrong with this"""
+        return self._make_call(lambda conn: conn.get_client_id())
+    

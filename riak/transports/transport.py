@@ -31,17 +31,17 @@ class RiakTransport(object):
 
     @classmethod
     def make_random_client_id(self):
-        '''
+        """
         Returns a random client identifier
-        '''
+        """
         return 'py_%s' % base64.b64encode(
                 str(random.randint(1, 1073741824)))
 
     @classmethod
     def make_fixed_client_id(self):
-        '''
+        """
         Returns a unique identifier for the current machine/process/thread.
-        '''
+        """
         machine = platform.node()
         process = os.getpid()
         thread = threading.currentThread().getName()
@@ -106,5 +106,8 @@ class RiakTransport(object):
         raise RiakError("not implemented")
 
     def set_client_id(self, client_id):
+        raise RiakError("not implemented")
+
+    def get_client_id(self, client_id):
         raise RiakError("not implemented")
 

@@ -8,11 +8,10 @@ except ImportError:
     import simplejson as json
 import os
 import random
-import sys
 import unittest
 from riak import RiakClient
-from riak import RiakPbcTransport
-from riak import RiakHttpTransport
+from riak import RiakPbcTransport, RiakPbcPoolTransport
+from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
 from riak import RiakKeyFilter, key_filter
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
@@ -694,6 +693,23 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
                             client_id = zero_client_id)
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
+class RiakPbcPoolTransportCase(BaseTestCase, MapReduceAliasTestMixIn,
+                               unittest.TestCase):
+    def setUp(self):
+        self.host = PB_HOST
+        self.port = PB_PORT
+        self.transport_class = RiakPbcPoolTransport
+        super(RiakPbcPoolTransportCase, self).setUp()
+
+    def test_uses_client_id_if_given(self):
+        self.host = PB_HOST
+        self.port = PB_PORT
+        zero_client_id = "\0\0\0\0"
+        c = RiakClient(PB_HOST, PB_PORT,
+                            transport_class = RiakPbcPoolTransport,
+                            client_id = zero_client_id)
+        self.assertEqual(zero_client_id, c.get_client_id()) #
+
 
 class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
@@ -702,6 +718,50 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         self.port = HTTP_PORT
         self.transport_class = RiakHttpTransport
         super(RiakHttpTransportTestCase, self).setUp()
+
+    def test_no_returnbody(self):
+        bucket = self.client.bucket("bucket")
+        o = bucket.new("foo", "bar").store(return_body=False)
+        self.assertEqual(o.vclock(), None)
+
+    def test_generate_key(self):
+        # Ensure that Riak generates a random key when
+        # the key passed to bucket.new() is None.
+        bucket = self.client.bucket('random_key_bucket')
+        for key in bucket.get_keys():
+            bucket.get(str(key)).delete()
+        bucket.new(None, data={}).store()
+        self.assertEqual(len(bucket.get_keys()), 1)
+
+class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
+
+    def setUp(self):
+        self.host = HTTP_HOST
+        self.port = HTTP_PORT
+        self.transport_class = RiakHttpPoolTransport
+        super(RiakHttpPoolTransportTestCase, self).setUp()
+
+    def test_no_returnbody(self):
+        bucket = self.client.bucket("bucket")
+        o = bucket.new("foo", "bar").store(return_body=False)
+        self.assertEqual(o.vclock(), None)
+
+    def test_generate_key(self):
+        # Ensure that Riak generates a random key when
+        # the key passed to bucket.new() is None.
+        bucket = self.client.bucket('random_key_bucket')
+        for key in bucket.get_keys():
+            bucket.get(str(key)).delete()
+        bucket.new(None, data={}).store()
+        self.assertEqual(len(bucket.get_keys()), 1)
+
+class RiakHttpReuseTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
+
+    def setUp(self):
+        self.host = HTTP_HOST
+        self.port = HTTP_PORT
+        self.transport_class = RiakHttpReuseTransport
+        super(RiakHttpReuseTransportTestCase, self).setUp()
 
     def test_no_returnbody(self):
         bucket = self.client.bucket("bucket")
