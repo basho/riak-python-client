@@ -488,7 +488,8 @@ class RiakPbcPoolTransport(RiakTransport):
         self.block = block
         self.timeout = timeout
 
-        self.pool = Queue(None)
+        self.pool = Queue(maxsize)
+        # Fill the queue up so that doing get() on it will block properly (check Queue#get)
         [self.pool.put(None) for _ in xrange(maxsize)]
 
         self.num_connections = 0
