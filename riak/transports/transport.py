@@ -106,8 +106,14 @@ class RiakTransport(object):
         raise RiakError("not implemented")
 
     def set_client_id(self, client_id):
+        """
+        TODO Only used for PBC transports, should it be here Or in a new PBCTransport base class?
+        """
         raise RiakError("not implemented")
 
-    def get_client_id(self, client_id):
+    def get_client_id(self):
+        """
+        TODO Only used for PBC transports, should it be here Or in a new PBCTransport base class?
+        """
         raise RiakError("not implemented")
 

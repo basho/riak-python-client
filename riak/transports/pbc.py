@@ -492,12 +492,14 @@ class RiakPbcPoolTransport(RiakTransport):
         # Fill the queue up so that doing get() on it will block properly (check Queue#get)
         [self.pool.put(None) for _ in xrange(maxsize)]
 
-        self.num_connections = 0
-        self.num_requests = 0
+        #not thread safe: http://29a.ch/2009/2/20/atomic-get-and-increment-in-python
+        #TODO replace with thread safe
+        #self.num_connections = 0
+        #self.num_requests = 0
 
     def _new_conn(self):
         """New PBC connection"""
-        self.num_connections += 1
+        #self.num_connections += 1
         return RiakPbcTransport(self.host, self.port, self.client_id)
 
     def _get_conn(self):
@@ -512,17 +514,18 @@ class RiakPbcPoolTransport(RiakTransport):
         try:
             self.pool.put(conn, block=False)
         except Full:
-            self.num_connections -= 1
+            pass
+            #self.num_connections -= 1
 
     def _make_call(self, function):
         """checkout conn, try operation, put conn back in pool"""
-        self.num_requests += 1
+        #self.num_requests += 1
         try:
             conn = self._get_conn()
             rv = function(conn)
             self._put_conn(conn)
         except Exception:
-            self.num_connections -= 1
+            #self.num_connections -= 1
             #re-raise leave caller decide what to do
             raise
         return rv
