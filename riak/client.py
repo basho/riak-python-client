@@ -25,7 +25,7 @@ except ImportError:
 
 from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
-from riak.mapreduce import RiakMapReduce, RiakLink
+from riak.mapreduce import RiakMapReduce
 
 class RiakClient(object):
     """
@@ -71,7 +71,7 @@ class RiakClient(object):
         """
         Get the transport instance the client is using for it's connection.
         """
-        return self._transport;
+        return self._transport
 
     def get_r(self):
         """
