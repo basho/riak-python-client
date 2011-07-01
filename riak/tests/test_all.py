@@ -10,7 +10,7 @@ import os
 import random
 import unittest
 from riak import RiakClient
-from riak import RiakPbcTransport, RiakPbcPoolTransport
+from riak import RiakPbcTransport, RiakPbcCachedTransport
 from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
 from riak import RiakKeyFilter, key_filter
 
@@ -691,20 +691,20 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
                             client_id = zero_client_id)
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
-class RiakPbcPoolTransportCase(BaseTestCase, MapReduceAliasTestMixIn,
+class RiakPbcCachedTransportCase(BaseTestCase, MapReduceAliasTestMixIn,
                                unittest.TestCase):
     def setUp(self):
         self.host = PB_HOST
         self.port = PB_PORT
-        self.transport_class = RiakPbcPoolTransport
-        super(RiakPbcPoolTransportCase, self).setUp()
+        self.transport_class = RiakPbcCachedTransport
+        super(RiakPbcCachedTransportCase, self).setUp()
 
     def test_uses_client_id_if_given(self):
         self.host = PB_HOST
         self.port = PB_PORT
         zero_client_id = "\0\0\0\0"
         c = RiakClient(PB_HOST, PB_PORT,
-                            transport_class = RiakPbcPoolTransport,
+                            transport_class = RiakPbcCachedTransport,
                             client_id = zero_client_id)
         self.assertEqual(zero_client_id, c.get_client_id()) #
 

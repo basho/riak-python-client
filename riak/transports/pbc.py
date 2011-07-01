@@ -479,7 +479,7 @@ class RiakPbcTransport(RiakTransport):
         rpb_content.value = data
 
 from Queue import Empty, Full, Queue
-class RiakPbcPoolTransport(RiakTransport):
+class RiakPbcCachedTransport(RiakTransport):
     """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
     def __init__(self, host='127.0.0.1', port=8087, client_id=None, maxsize=0, block=False, timeout=None):
         self.host = host
