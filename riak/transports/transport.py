@@ -107,13 +107,14 @@ class RiakTransport(object):
 
     def set_client_id(self, client_id):
         """
-        TODO Only used for PBC transports, should it be here Or in a new PBCTransport base class?
+        Set the client id. This overrides the default, random client id, which is automatically
+        generated when none is specified in when creating the transport object.
         """
         raise RiakError("not implemented")
 
     def get_client_id(self):
         """
-        TODO Only used for PBC transports, should it be here Or in a new PBCTransport base class?
+        Fetch the client id for the transport.
         """
         raise RiakError("not implemented")
 

@@ -445,7 +445,6 @@ class BaseTestCase(object):
         self.assertEqual(len(results), 3)
 
     def test_store_binary_object_from_file(self):
-        print __file__
         bucket = self.client.bucket('bucket')
         rand = str(self.randint())
         obj = bucket.new_binary_from_file('foo_from_file', os.path.dirname(__file__) + "/test_all.py")
@@ -469,7 +468,6 @@ class BaseTestCase(object):
         obj.set_usermeta({'custom': 'some metadata'})
         obj.store()
         obj = bucket.get('fooster')
-        print(obj.get_usermeta())
         self.assertEqual('some metadata', obj.get_usermeta()['custom'])
 
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
@@ -754,6 +752,10 @@ class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unitt
             bucket.get(str(key)).delete()
         bucket.new(None, data={}).store()
         self.assertEqual(len(bucket.get_keys()), 1)
+
+    def test_set_client_id(self):
+        self.client.set_client_id("Client")
+        self.assertEqual(self.client.get_transport().get_client_id(), "Client")
 
 class RiakHttpReuseTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 

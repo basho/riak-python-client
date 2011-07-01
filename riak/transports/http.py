@@ -66,6 +66,12 @@ class RiakHttpTransport(RiakTransport) :
         return RiakHttpTransport(self._host, self._port, self._prefix,
                                  self._mapred_prefix)
 
+    def set_client_id(self, client_id):
+        self._client_id = client_id
+
+    def get_client_id(self):
+        return self._client_id
+
     def ping(self) :
         """
         Check server is alive over HTTP
