@@ -3,6 +3,7 @@ import threading
 import string
 import re
 import random
+import time
 from subprocess import Popen, PIPE
 
 def erlang_config(hash, depth=1):
@@ -72,6 +73,8 @@ class TestServer:
         self._prepared = False
         self._started = False
         self.vm_args = self.__class__.VM_ARGS_DEFAULTS
+        self.app_config = self.__class__.APP_CONFIG_DEFAULTS
+        self.app_config["riak_core"]["ring_state_dir"] = os.path.join(self.temp_dir, "data", "ring")
 
     def prepare(self):
         if not self._prepared:
@@ -92,12 +95,13 @@ class TestServer:
 
     def start(self):
         if self._prepared and not self._started:
-            print("Starting...")
             with self._lock:
                 self._server = Popen([self._riak_script, "console"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
                 self._server.stdin.write("\n")
                 self._server.stdin.flush()
                 self.wait_for_erlang_prompt()
+                while True:
+                    print(self._server.stderr.read(1))
 
     def wait_for_erlang_prompt(self):
         prompted = False
@@ -111,23 +115,21 @@ class TestServer:
                 prompted = True
 
     def __write_riak_script(self):
-        temp_bin_file = open(self._riak_script, "wb")
-        riak_file = open(os.path.join(self.bin_dir, "riak"), "r")
-        for line in riak_file.readlines():
-            line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r'\1%s' % self._temp_bin, line)
-            line = re.sub("(RUNNER_ETC_DIR=)(.*)", r'\1%s' % self._temp_etc, line)
-            line = re.sub("(RUNNER_USER=)(.*)", r'\1', line)
-            line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' % self._temp_log, line)
-            line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' % self._temp_pipe, line)
+        with open(self._riak_script, "wb") as temp_bin_file, open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
+                
+            for line in riak_file.readlines():
+                line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r'\1%s' % self._temp_bin, line)
+                line = re.sub("(RUNNER_ETC_DIR=)(.*)", r'\1%s' % self._temp_etc, line)
+                line = re.sub("(RUNNER_USER=)(.*)", r'\1', line)
+                line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' % self._temp_log, line)
+                line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' % self._temp_pipe, line)
 
-            if string.strip(line) == "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}":
-                line = "RUNNER_BASE_DIR=%s\n" % os.path.normpath(os.path.join(self.bin_dir, ".."))
+                if string.strip(line) == "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}":
+                    line = "RUNNER_BASE_DIR=%s\n" % os.path.normpath(os.path.join(self.bin_dir, ".."))
 
-            temp_bin_file.write(line)
+                temp_bin_file.write(line)
 
-        os.fchmod(temp_bin_file.fileno(), 0755)
-        temp_bin_file.close()
-        riak_file.close()
+            os.fchmod(temp_bin_file.fileno(), 0755)
 
     def __write_vm_args(self):
         with open(os.path.join(self._temp_etc, "vm.args"), 'wb') as vm_args:
