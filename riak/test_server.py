@@ -3,7 +3,7 @@ import threading
 import string
 import re
 import random
-import time
+import shutil
 from subprocess import Popen, PIPE
 
 def erlang_config(hash, depth=1):
@@ -100,8 +100,22 @@ class TestServer:
                 self._server.stdin.write("\n")
                 self._server.stdin.flush()
                 self.wait_for_erlang_prompt()
-                while True:
-                    print(self._server.stderr.read(1))
+                self._started = True
+
+    def stop(self):
+        if self._started:
+            with self._lock:
+                self._server.stdin.write("init:stop().\n")
+                self._server.stdin.flush()
+                self._server.wait()
+                self._started = False
+
+    def cleanup(self):
+        if self._started:
+            self.stop()
+
+        shutil.rmtree(self.temp_dir, True)
+        self._prepared = False
 
     def wait_for_erlang_prompt(self):
         prompted = False
@@ -133,12 +147,12 @@ class TestServer:
 
     def __write_vm_args(self):
         with open(os.path.join(self._temp_etc, "vm.args"), 'wb') as vm_args:
-            for arg, value in self.__class__.VM_ARGS_DEFAULTS.items():
+            for arg, value in self.vm_args.items():
                 vm_args.write("%s %s\n" % (arg, value))
 
     def __write_app_config(self):
         with open(os.path.join(self._temp_etc, "app.config"), "wb") as app_config:
-            app_config.write(erlang_config(self.__class__.APP_CONFIG_DEFAULTS))
+            app_config.write(erlang_config(self.app_config))
             app_config.write(".")
 
 
@@ -146,3 +160,5 @@ if __name__ == "__main__":
     server = TestServer()
     server.prepare()
     server.start()
+    server.stop()
+    server.cleanup()
