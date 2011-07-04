@@ -62,6 +62,13 @@ class TestServer:
       },
       "luwak": {
           "enabled": True
+      },
+      "sasl": {
+          "sasl_error_logger": bytearray('{file, "log/sasl-error.log"}'),
+          "errlog_type": bytearray("error"),
+          "error_logger_mf_dir": "log/sasl",
+          "error_logger_mf_maxbytes": 10485760,
+          "error_logger_mf_maxfiles": 5
       }
     }
 
@@ -117,13 +124,46 @@ class TestServer:
         shutil.rmtree(self.temp_dir, True)
         self._prepared = False
 
+    def recycle(self):
+        if self._started:
+            with self._lock:
+                stdin = self._server.stdin
+                if self.app_config["riak_kv"]["storage_backend"] == "riak_kv_test_backend":
+                    stdin.write("riak_kv_test_backend:reset().\n")
+                    stdin.flush()
+                    self.wait_for_erlang_prompt()
+
+                    if self.app_config["riak_search"]["enabled"]:
+                        stdin.write("riak_search_test_backend:reset().\n")
+                        stdin.flush()
+                        self.wait_for_erlang_prompt()
+                else:
+                    stdin.write("init:restart().\n")
+                    stdin.flush()
+                    self.wait_for_erlang_prompt()
+                    self.wait_for_startup()
+
+    def wait_for_startup(self):
+        listening = False
+        while not listening:
+            try:
+                s = socket.create_connection((self.app_config["riak_core"]["web_ip"], self.app_config["riak_core"]["web_port"]), 1.0)
+            except socket.error, (value, message):
+                pass
+            else:
+                listening = True
+
+
     def wait_for_erlang_prompt(self):
+        print("Waiting")
         prompted = False
         buffer = ""
         while not prompted:
             line = self._server.stdout.read(1)
             if len(line) > 0:
                 buffer += line
+                if len(buffer) % 100 == 0:
+                    print(buffer)
             if re.search(r"\(%s\)\d+>" % self.vm_args["-name"], buffer):
                 print("Started...")
                 prompted = True
@@ -160,5 +200,6 @@ if __name__ == "__main__":
     server = TestServer()
     server.prepare()
     server.start()
+    server.recycle()
     server.stop()
     server.cleanup()
