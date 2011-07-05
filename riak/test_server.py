@@ -4,6 +4,7 @@ import string
 import re
 import random
 import shutil
+import time
 from subprocess import Popen, PIPE
 
 def erlang_config(hash, depth=1):
@@ -155,17 +156,13 @@ class TestServer:
 
 
     def wait_for_erlang_prompt(self):
-        print("Waiting")
         prompted = False
         buffer = ""
         while not prompted:
             line = self._server.stdout.read(1)
             if len(line) > 0:
                 buffer += line
-                if len(buffer) % 100 == 0:
-                    print(buffer)
             if re.search(r"\(%s\)\d+>" % self.vm_args["-name"], buffer):
-                print("Started...")
                 prompted = True
 
     def __write_riak_script(self):
@@ -200,6 +197,10 @@ if __name__ == "__main__":
     server = TestServer()
     server.prepare()
     server.start()
+    print("Started...")
+    time.sleep(20)
+    print("Recycling...")
     server.recycle()
+    time.sleep(20)
     server.stop()
     server.cleanup()
