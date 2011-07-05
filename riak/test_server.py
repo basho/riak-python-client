@@ -63,13 +63,6 @@ class TestServer:
       },
       "luwak": {
           "enabled": True
-      },
-      "sasl": {
-          "sasl_error_logger": bytearray('{file, "log/sasl-error.log"}'),
-          "errlog_type": bytearray("error"),
-          "error_logger_mf_dir": "log/sasl",
-          "error_logger_mf_maxbytes": 10485760,
-          "error_logger_mf_maxfiles": 5
       }
     }
 
