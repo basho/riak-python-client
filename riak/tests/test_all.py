@@ -13,6 +13,7 @@ from riak import RiakClient
 from riak import RiakPbcTransport, RiakPbcCachedTransport
 from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
 from riak import RiakKeyFilter, key_filter
+from riak.test_server import TestServer
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -20,6 +21,16 @@ PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
+USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
+
+if USE_TEST_SERVER:
+    HTTP_PORT = 9000
+    PB_PORT = 9002
+    test_server = TestServer()
+    test_server.cleanup()
+    test_server.prepare()
+    test_server.start()
+
 
 class NotJsonSerializable(object):
 
