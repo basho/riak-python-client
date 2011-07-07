@@ -35,6 +35,9 @@ from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakLink
 from riak import RiakError
+from riak.multidict import MultiDict
+
+MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
 
 class RiakHttpTransport(RiakTransport) :
     """
@@ -102,21 +105,16 @@ class RiakHttpTransport(RiakTransport) :
                                                params=params)
 
         # Construct the headers...
-        headers = {'Accept' : 'text/plain, */*; q=0.5',
-                   'Content-Type' : robj.get_content_type(),
-                   'X-Riak-ClientId' : self._client_id}
+        headers = MultiDict({'Accept' : 'text/plain, */*; q=0.5',
+                             'Content-Type' : robj.get_content_type(),
+                             'X-Riak-ClientId' : self._client_id})
 
         # Add the vclock if it exists...
         if robj.vclock() is not None:
             headers['X-Riak-Vclock'] = robj.vclock()
 
         # Create the header from metadata
-        links = robj.get_links()
-        if links:
-            headers['Link'] = ''
-            for link in links:
-                if headers['Link'] != '': headers['Link'] += ', '
-                headers['Link'] += self.to_link_header(link)
+        links = self.add_links_for_riak_object(robj, headers)
 
         for key, value in robj.get_usermeta().iteritems():
             headers['X-Riak-Meta-%s' % key] = value
@@ -307,7 +305,7 @@ class RiakHttpTransport(RiakTransport) :
         header += urllib.quote_plus(link.get_tag()) + '"'
         return header
 
-    def parse_links(self, links, linkHeaders) :
+    def parse_links(self, links, linkHeaders):
         """
         Private.
         @return self
@@ -319,6 +317,24 @@ class RiakHttpTransport(RiakTransport) :
                 link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
                 links.append(link)
         return self
+
+    def add_links_for_riak_object(self, robject, headers):
+        links = robject.get_links()
+        if links:
+            current_header = ''
+            for link in links:
+                header = self.to_link_header(link)
+                if len(current_header + header) > MAX_LINK_HEADER_SIZE:
+                    headers.setdefault('Link', []).append(current_header)
+                    current_header = ''
+
+                if current_header != '': header = ', ' + header
+                current_header += header
+
+            headers.add('Link', current_header)
+
+        return headers
+
 
 
     #Utility functions used by Riak library.
@@ -449,10 +465,7 @@ class RiakHttpTransport(RiakTransport) :
 
     @classmethod
     def build_headers(cls, headers):
-        headers1 = []
-        for key in headers.keys():
-            headers1.append('%s: %s' % (key, headers[key]))
-        return headers1
+        return ['%s: %s' % (header, value) for header, value in headers.iteritems()]
 
     @classmethod
     def parse_http_headers(cls, headers) :
