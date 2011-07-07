@@ -13,6 +13,7 @@ from riak import RiakClient
 from riak import RiakPbcTransport, RiakPbcCachedTransport
 from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
 from riak import RiakKeyFilter, key_filter
+from riak.mapreduce import RiakLink
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -730,6 +731,18 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
             bucket.get(str(key)).delete()
         bucket.new(None, data={}).store()
         self.assertEqual(len(bucket.get_keys()), 1)
+
+    def test_too_many_link_headers_shouldnt_break_http(self):
+        bucket = self.client.bucket("bucket")
+        o = bucket.new("lots_of_links", "My god, it's full of links!")
+        for i in range(0, 400):
+            link = RiakLink("other", "key%d" % i, "next")
+            o.add_link(link)
+
+        o.store()
+        stored_object = bucket.get("lots_of_links")
+        self.assertEqual(len(stored_object.get_links()), 400)
+
 
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
