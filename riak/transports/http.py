@@ -465,10 +465,7 @@ class RiakHttpTransport(RiakTransport) :
 
     @classmethod
     def build_headers(cls, headers):
-        headers1 = []
-        for key in headers.keys():
-            headers1.append('%s: %s' % (key, headers[key]))
-        return headers1
+        return ['%s: %s' % (header, value) for header, value in headers.iteritems()]
 
     @classmethod
     def parse_http_headers(cls, headers) :
