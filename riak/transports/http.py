@@ -37,7 +37,7 @@ from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.multidict import MultiDict
 
-MAX_LINK_HEADER_SIZE = 8192 - 6 # substract length of "Link: " header string
+MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
 
 class RiakHttpTransport(RiakTransport) :
     """
