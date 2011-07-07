@@ -81,9 +81,9 @@ class TestServer:
         if not self._prepared:
             self.create_temp_directories()
             self._riak_script = os.path.join(self._temp_bin, "riak")
-            self.__write_riak_script()
-            self.__write_vm_args()
-            self.__write_app_config()
+            self.write_riak_script()
+            self.write_vm_args()
+            self.write_app_config()
             self._prepared = True
 
     def create_temp_directories(self):
@@ -158,7 +158,7 @@ class TestServer:
             if re.search(r"\(%s\)\d+>" % self.vm_args["-name"], buffer):
                 prompted = True
 
-    def __write_riak_script(self):
+    def write_riak_script(self):
         with open(self._riak_script, "wb") as temp_bin_file, open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
                 
             for line in riak_file.readlines():
@@ -175,12 +175,12 @@ class TestServer:
 
             os.fchmod(temp_bin_file.fileno(), 0755)
 
-    def __write_vm_args(self):
+    def write_vm_args(self):
         with open(os.path.join(self._temp_etc, "vm.args"), 'wb') as vm_args:
             for arg, value in self.vm_args.items():
                 vm_args.write("%s %s\n" % (arg, value))
 
-    def __write_app_config(self):
+    def write_app_config(self):
         with open(os.path.join(self._temp_etc, "app.config"), "wb") as app_config:
             app_config.write(erlang_config(self.app_config))
             app_config.write(".")
