@@ -6,6 +6,7 @@ import random
 import shutil
 import time
 from subprocess import Popen, PIPE
+from riak.util import deep_merge
 
 def erlang_config(hash, depth=1):
     def printable(item):
@@ -67,14 +68,22 @@ class TestServer:
     }
 
     def __init__(self, tmp_dir="/tmp/riak/test_server",
-                 bin_dir=os.path.expanduser("~/.riak/install/riak-0.14.2/bin")):
+                 bin_dir=os.path.expanduser("~/.riak/install/riak-0.14.2/bin"),
+                 vm_args=None, **options):
         self._lock = threading.Lock()
         self.temp_dir = "/tmp/riak/test_server"
         self.bin_dir = bin_dir
         self._prepared = False
         self._started = False
-        self.vm_args = self.__class__.VM_ARGS_DEFAULTS
-        self.app_config = self.__class__.APP_CONFIG_DEFAULTS
+        self.vm_args = self.VM_ARGS_DEFAULTS.copy()
+        if vm_args is not None:
+            self.vm_args = deep_merge(self.vm_args, vm_args)
+
+        self.app_config = self.APP_CONFIG_DEFAULTS.copy()
+        for key, value in options.items():
+            if key in self.app_config:
+                self.app_config[key] = deep_merge(self.app_config[key], value)
+
         self.app_config["riak_core"]["ring_state_dir"] = os.path.join(self.temp_dir, "data", "ring")
 
     def prepare(self):
