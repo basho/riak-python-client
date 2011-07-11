@@ -274,6 +274,8 @@ class RiakPbcTransport(RiakTransport):
         """
         req = riakclient_pb2.RpbSetBucketReq()
         req.bucket = bucket.get_name()
+        if not 'n_val' in props and not 'allow_mult' in props: return self
+
         if 'n_val' in props:
             req.props.n_val = props['n_val']
         if 'allow_mult' in props:

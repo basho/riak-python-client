@@ -27,6 +27,8 @@ class RiakBucket(object):
     objects within the bucket.
     """
 
+    SEARCH_PRECOMMIT_HOOK = {"mod": "riak_search_kv_hook", "fun": "precommit"}
+
     def __init__(self, client, name):
         """
         Returns a new ``RiakBucket`` instance.
@@ -420,3 +422,17 @@ class RiakBucket(object):
         if not mimetype:
             mimetype = 'application/octet-stream'
         return self.new_binary(key, binary_data, mimetype)
+    
+    def search_enabled(self):
+        return (self.SEARCH_PRECOMMIT_HOOK in (self.get_property("precommit") or []))
+
+    def enable_search(self):
+        if self.SEARCH_PRECOMMIT_HOOK not in (self.get_property("precommit") or []):
+            self.set_properties({"precommit": list(self.get_property("precommit") or []) + list([self.SEARCH_PRECOMMIT_HOOK])})
+        return True
+
+    def disable_search(self):
+        if self.SEARCH_PRECOMMIT_HOOK in (self.get_property("precommit") or []):
+            self.set_properties({"precommit": self.get_property("precommit").remove(self.SEARCH_PRECOMMIT_HOOK)})
+        return True
+
