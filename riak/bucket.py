@@ -428,7 +428,7 @@ class RiakBucket(object):
 
     def enable_search(self):
         if self.SEARCH_PRECOMMIT_HOOK not in (self.get_property("precommit") or []):
-            self.set_properties({"precommit": list(self.get_property("precommit") or []) + list([self.SEARCH_PRECOMMIT_HOOK])})
+            self.set_properties({"precommit": (self.get_property("precommit") or []) + [self.SEARCH_PRECOMMIT_HOOK]})
         return True
 
     def disable_search(self):
