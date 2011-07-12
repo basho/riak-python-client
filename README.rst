@@ -474,7 +474,7 @@ Luwak for Large File Storage
 ============================
 
 If your Riak installation has Luwak support enabled, you can use the client to
-interact with it, storing, fetching and deleting files.
+interact with it, storing, fetching and deleting files::
 
     client = riak.RiakClient()
 
