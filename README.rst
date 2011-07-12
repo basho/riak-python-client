@@ -412,6 +412,16 @@ tutorial, but usage of this feature looks like::
   # John Doe
   # Anna Body
 
+You can enable and disable search for specific buckets through convenience
+methods that install/remove the precommit hook
+
+  bucket = client.bucket('search')
+
+  if bucket.search_enabled():
+    bucket.disable_search()
+  else:
+    bucket.enable_search()
+
 .. _`Riak Search`: http://wiki.basho.com/Riak-Search.html
 .. _Lucene: http://lucene.apache.org/
 
