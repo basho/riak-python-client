@@ -469,3 +469,20 @@ filters::
 
 
 .. _`Key filters`: http://wiki.basho.com/Key-Filters.html
+
+Luwak for Large File Storage
+============================
+
+If your Riak installation has Luwak support enabled, you can use the client to
+interact with it, storing, fetching and deleting files.
+
+    client = riak.RiakClient()
+
+    client.store_file('image.jpg', 'lots of data', content_type="image/jpeg")
+
+    # Returns just the data stored in luwak
+    client.get_file('image.jpg')
+
+    client.delete_file('image.jpg')
+
+.. _`Luwak`: http://wiki.basho.com/Luwak.html
