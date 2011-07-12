@@ -118,3 +118,11 @@ class RiakTransport(object):
         """
         raise RiakError("not implemented")
 
+    def store_file(self, key, content_type="application/octet-stream", content=None):
+        raise RiakError("luwak not supported by this transport.")
+
+    def get_file(self, key):
+        raise RiakError("luwak not supported by this transport.")
+
+    def delete_file(self, key):
+        raise RiakError("luwak not supported by this transport.")

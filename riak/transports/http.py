@@ -344,6 +344,20 @@ class RiakHttpTransport(RiakTransport) :
 
         return self.do_put(host, port, url, headers, content, key=key)
 
+    def get_file(self, key):
+        host, port, url = self.build_rest_path(prefix='luwak', key=key)
+        response = self.http_request('GET', host, port, url)
+        result = self.parse_body(response, [200, 300, 404])
+        if result is not None:
+            (vclock, data) = result
+            (headers, body) = data.pop()
+            return body
+
+    def delete_file(self, key):
+        host, port, url = self.build_rest_path(prefix='luwak', key=key)
+        response = self.http_request('DELETE', host, port, url)
+        self.parse_body(response, [204, 404])
+
     # Utility functions used by Riak library.
 
     @classmethod

@@ -584,4 +584,4 @@ class RiakPbcCachedTransport(RiakTransport):
     def get_client_id(self):
         """see set_client_id notes, you can do wrong with this"""
         return self._make_call(lambda conn: conn.get_client_id())
-    
+
