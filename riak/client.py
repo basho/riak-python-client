@@ -284,3 +284,6 @@ class RiakClient(object):
         """
         mr = RiakMapReduce(self)
         return apply(mr.reduce, args)
+
+    def store_file(self, filename, data, content_type="application/octet-stream"):
+        self._transport.store_file(filename, content_type=content_type, content=data)
