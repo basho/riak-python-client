@@ -3,12 +3,11 @@ from xml.etree import ElementTree
 
 class RiakSearch:
     def __init__(self, client, transport_class=None,
-                 host="127.0.0.1", port=8098, client_id=None):
+                 host="127.0.0.1", port=8098):
         if not transport_class:
             self._transport = RiakHttpTransport(host,
                                                 port,
-                                                "/solr",
-                                                client_id)
+                                                "/solr")
         else:
             self._transport = transport_class(host, port, client_id=client_id)
 
