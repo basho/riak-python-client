@@ -26,6 +26,7 @@ except ImportError:
 from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
+from riak.search import RiakSearch
 
 class RiakClient(object):
     """
@@ -61,16 +62,6 @@ class RiakClient(object):
         else:
             self._transport = transport_class(host, port, client_id=client_id)
 
-        if not solr_transport_class:
-            self.solr_transport = RiakHttpTransport(host,
-                                                    port,
-                                                    prefix,
-                                                    mapred_prefix,
-                                                    client_id)
-        else:
-            self.solr_transport = solr_transport_class(host, port, client_id=client_id)
-            
-
         self._r = "default"
         self._w = "default"
         self._dw = "default"
@@ -79,6 +70,9 @@ class RiakClient(object):
                           'text/json':json.dumps}
         self._decoders = {'application/json':json.loads,
                           'text/json':json.loads}
+        self._solr = None
+        self._host = host
+        self._port = port
 
     def get_transport(self):
         """
@@ -297,3 +291,9 @@ class RiakClient(object):
         """
         mr = RiakMapReduce(self)
         return apply(mr.reduce, args)
+
+    def solr(self):
+        if self._solr is None:
+            self._solr = RiakSearch(self)
+
+        return self._solr

@@ -422,5 +422,5 @@ class RiakBucket(object):
         return self.new_binary(key, binary_data, mimetype)
     
     def search(self, query, **params):
-        return self._client.solr_transport.search(self, query, **params)
+        return self._client.solr().search(self._name, query, **params)
 
