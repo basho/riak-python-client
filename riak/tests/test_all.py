@@ -9,6 +9,8 @@ except ImportError:
 import os
 import random
 import unittest
+from xml.dom.minidom import parse, parseString
+
 from riak import RiakClient
 from riak import RiakPbcTransport, RiakPbcCachedTransport
 from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
@@ -757,7 +759,7 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = bucket.search("username:roidrage", wt="xml")
-        self.assertRegexpMatches(results, r'<?xml')
+        self.assertEquals(1, len(list(results.find("result").iter("doc"))))
 
     def test_solr_search_with_params(self):
         if SKIP_SEARCH:
@@ -765,7 +767,7 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = self.client.solr().search("searchbucket", "username:roidrage", wt="xml")
-        self.assertRegexpMatches(results, r'<?xml')
+        self.assertEquals(1, len(list(results.find("result").iter("doc"))))
 
     def test_solr_search(self):
         if SKIP_SEARCH:

@@ -1,4 +1,5 @@
 from riak.transports import RiakHttpTransport
+from xml.etree import ElementTree
 
 class RiakSearch:
     def __init__(self, client, transport_class=None,
@@ -12,7 +13,18 @@ class RiakSearch:
             self._transport = transport_class(host, port, client_id=client_id)
 
         self._client = client
+        self._decoders = {"text/xml": ElementTree.fromstring}
  
+    def get_decoder(self, content_type):
+        decoder = self._client.get_decoder(content_type) or self._decoders[content_type]
+        if not decoder:
+            decoder = self.decode
+
+        return decoder
+
+    def decode(self, data):
+        return data
+
     def add(self, doc):
         pass
 
@@ -23,9 +35,5 @@ class RiakSearch:
         options = {'q': query, 'wt': 'json'}
         options.update(params)
         headers, results = self._transport.search(index, options)
-        decoder = self._client.get_decoder(headers['content-type'])
-
-        if decoder:
-            return decoder(results)
-        else:
-            return results
+        decoder = self.get_decoder(headers['content-type'])
+        return decoder(results)
