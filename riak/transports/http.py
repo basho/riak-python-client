@@ -220,6 +220,16 @@ class RiakHttpTransport(RiakTransport) :
         result = json.loads(response[1])
         return result
 
+    def search(self, bucket, query, **params):
+        options = {'q': query, 'wt': 'json'}
+        options.update(params)
+        prefix = "/solr/%s/select" % bucket.get_name()
+        host, port, url = self.build_rest_path(bucket=None, params=options, prefix=prefix)
+        response = self.http_request('GET', host, port, url)
+        if options['wt'] == "json":
+            return json.loads(response[1])
+        else:
+            return response[1]
 
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
@@ -346,14 +356,14 @@ class RiakHttpTransport(RiakTransport) :
         else:
             return defaultValue
 
-    def build_rest_path(self, bucket, key=None, params=None) :
+    def build_rest_path(self, bucket, key=None, params=None, prefix=None) :
         """
         Given a RiakClient, RiakBucket, Key, LinkSpec, and Params,
         construct and return a URL.
         """
         # Build 'http://hostname:port/prefix/bucket'
         path = ''
-        path += '/' + self._prefix
+        path += '/' + (prefix or self._prefix)
 
         # Add '.../bucket'
         if bucket is not None:

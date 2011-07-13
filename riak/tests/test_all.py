@@ -743,6 +743,21 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         stored_object = bucket.get("lots_of_links")
         self.assertEqual(len(stored_object.get_links()), 400)
 
+    def test_solr_search(self):
+        if SKIP_SEARCH:
+            return True
+        bucket = self.client.bucket('searchbucket')
+        bucket.new("user", {"username": "roidrage"}).store()
+        results = bucket.search("username:roidrage")
+        self.assertEquals(1, len(results["response"]["docs"]))
+
+    def test_solr_search_with_params(self):
+        if SKIP_SEARCH:
+            return True
+        bucket = self.client.bucket('searchbucket')
+        bucket.new("user", {"username": "roidrage"}).store()
+        results = bucket.search("username:roidrage", wt="xml")
+        self.assertRegexpMatches(results, r'<?xml')
 
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
