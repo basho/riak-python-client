@@ -40,8 +40,8 @@ class RiakSearch:
         xml.appendChild(root)
 
         url = "/solr/%s/update" % index
-        host, port, url = self._transport.build_rest_path(bucket=None, prefix=url)
-        headers, response = self._transport.http_request('POST', host, port, url, {'Content-Type': 'text/xml'}, xml.toxml())
+        self._transport.post_request(uri=url, body=xml.toxml(),
+                                     content_type="text/xml")
 
     def delete(self, doc):
         pass

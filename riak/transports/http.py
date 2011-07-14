@@ -340,6 +340,8 @@ class RiakHttpTransport(RiakTransport) :
         return headers
 
 
+    def post_request(self, uri=None, body=None, content_type="application/json"):
+        return self.http_request('POST', self._host, self._port, uri, {'Content-Type': content_type}, body) 
 
     #Utility functions used by Riak library.
 
