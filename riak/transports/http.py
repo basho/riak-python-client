@@ -220,11 +220,6 @@ class RiakHttpTransport(RiakTransport) :
         result = json.loads(response[1])
         return result
 
-    def search(self, index, options):
-        prefix = "/solr/%s/select" % index
-        host, port, url = self.build_rest_path(bucket=None, params=options, prefix=prefix)
-        return self.http_request('GET', host, port, url)
-
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
         if not status in expected_statuses:
@@ -339,6 +334,9 @@ class RiakHttpTransport(RiakTransport) :
 
         return headers
 
+    def get_request(self, uri=None, params=None):
+        host, port, url = self.build_rest_path(bucket=None, params=params, prefix=uri)
+        return self.http_request('GET', host, port, url)
 
     def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
         host, port, uri = self.build_rest_path(prefix=uri, params=params)

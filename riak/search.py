@@ -49,6 +49,7 @@ class RiakSearch:
     def search(self, index, query, **params):
         options = {'q': query, 'wt': 'json'}
         options.update(params)
-        headers, results = self._transport.search(index, options)
+        uri = "/solr/%s/select" % index
+        headers, results = self._transport.get_request(uri, options)
         decoder = self.get_decoder(headers['content-type'])
         return decoder(results)
