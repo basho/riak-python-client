@@ -43,8 +43,31 @@ class RiakSearch:
         self._transport.post_request(uri=url, body=xml.toxml(),
                                      content_type="text/xml")
 
-    def delete(self, doc):
-        pass
+    index = add
+
+    def delete(self, index, docs=None, queries=None):
+        xml = Document()
+        root = xml.createElement('delete')
+        if docs:
+            for doc in docs:
+                doc_element = xml.createElement('id')
+                text = xml.createTextNode(doc)
+                doc_element.appendChild(text)
+                root.appendChild(doc_element)
+        if queries:
+            for query in queries:
+                query_element = xml.createElement('query')
+                text = xml.createTextNode(query)
+                query_element.appendChild(text)
+                root.appendChild(query_element)
+
+        xml.appendChild(root)
+
+        url = "/solr/%s/update" % index
+        self._transport.post_request(uri=url, body=xml.toxml(),
+                                     content_type="text/xml")
+
+    remove = delete
 
     def search(self, index, query, **params):
         options = {'q': query, 'wt': 'json'}
@@ -53,3 +76,5 @@ class RiakSearch:
         headers, results = self._transport.get_request(uri, options)
         decoder = self.get_decoder(headers['content-type'])
         return decoder(results)
+    
+    select = search

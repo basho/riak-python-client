@@ -792,6 +792,29 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(2, len(results["response"]["docs"]))
 
+    def test_delete_documents_from_search_by_id(self):
+        if SKIP_SEARCH:
+            return True
+        self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
+        self.client.solr().delete("searchbucket", docs=["dizzy"])
+        results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
+        self.assertEquals(1, len(results["response"]["docs"]))
+
+    def test_delete_documents_from_search_by_query(self):
+        if SKIP_SEARCH:
+            return True
+        self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
+        self.client.solr().delete("searchbucket", queries=["username:dizzy", "username:russell"])
+        results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
+        self.assertEquals(0, len(results["response"]["docs"]))
+
+    def test_delete_documents_from_search_by_query_and_id(self):
+        if SKIP_SEARCH:
+            return True
+        self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
+        self.client.solr().delete("searchbucket", docs=["dizzy"], queries=["username:russell"])
+        results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
+        self.assertEquals(0, len(results["response"]["docs"]))
 
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
