@@ -1,5 +1,6 @@
 from riak.transports import RiakHttpTransport
 from xml.etree import ElementTree
+from xml.dom.minidom import Document
 
 class RiakSearch:
     def __init__(self, client, transport_class=None,
@@ -24,8 +25,23 @@ class RiakSearch:
     def decode(self, data):
         return data
 
-    def add(self, doc):
-        pass
+    def add(self, index, *docs):
+        xml = Document()
+        root = xml.createElement('add')
+        for doc in docs:
+            doc_element = xml.createElement('doc')
+            for key, value in doc.iteritems():
+                field = xml.createElement('field')
+                field.setAttribute("name", key)
+                text = xml.createTextNode(value)
+                field.appendChild(text)
+                doc_element.appendChild(field)
+            root.appendChild(doc_element)
+        xml.appendChild(root)
+
+        url = "/solr/%s/update" % index
+        host, port, url = self._transport.build_rest_path(bucket=None, prefix=url)
+        headers, response = self._transport.http_request('POST', host, port, url, {'Content-Type': 'text/xml'}, xml.toxml())
 
     def delete(self, doc):
         pass
