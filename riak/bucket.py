@@ -420,3 +420,7 @@ class RiakBucket(object):
         if not mimetype:
             mimetype = 'application/octet-stream'
         return self.new_binary(key, binary_data, mimetype)
+    
+    def search(self, query, **params):
+        return self._client.solr().search(self._name, query, **params)
+

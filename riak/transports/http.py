@@ -220,7 +220,6 @@ class RiakHttpTransport(RiakTransport) :
         result = json.loads(response[1])
         return result
 
-
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
         if not status in expected_statuses:
@@ -335,7 +334,13 @@ class RiakHttpTransport(RiakTransport) :
 
         return headers
 
+    def get_request(self, uri=None, params=None):
+        host, port, url = self.build_rest_path(bucket=None, params=params, prefix=uri)
+        return self.http_request('GET', host, port, url)
 
+    def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
+        host, port, uri = self.build_rest_path(prefix=uri, params=params)
+        return self.http_request('POST', self._host, self._port, uri, {'Content-Type': content_type}, body) 
 
     #Utility functions used by Riak library.
 
@@ -346,14 +351,14 @@ class RiakHttpTransport(RiakTransport) :
         else:
             return defaultValue
 
-    def build_rest_path(self, bucket, key=None, params=None) :
+    def build_rest_path(self, bucket=None, key=None, params=None, prefix=None) :
         """
         Given a RiakClient, RiakBucket, Key, LinkSpec, and Params,
         construct and return a URL.
         """
         # Build 'http://hostname:port/prefix/bucket'
         path = ''
-        path += '/' + self._prefix
+        path += '/' + (prefix or self._prefix)
 
         # Add '.../bucket'
         if bucket is not None:

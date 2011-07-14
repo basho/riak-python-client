@@ -26,6 +26,7 @@ except ImportError:
 from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
+from riak.search import RiakSearch
 
 class RiakClient(object):
     """
@@ -35,7 +36,7 @@ class RiakClient(object):
     """
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
                  mapred_prefix='mapred', transport_class=None,
-                 client_id=None):
+                 client_id=None, solr_transport_class=None):
         """
         Construct a new ``RiakClient`` object.
 
@@ -49,6 +50,8 @@ class RiakClient(object):
         :type mapred_prefix: string
         :param transport_class: transport class to use
         :type transport_class: :class:`RiakTransport`
+        :param solr_transport_class: HTTP-based transport class for Solr interface queries
+        :type transport_class: :class:`RiakHttpTransport`
         """
         if not transport_class:
             self._transport = RiakHttpTransport(host,
@@ -58,6 +61,7 @@ class RiakClient(object):
                                                 client_id)
         else:
             self._transport = transport_class(host, port, client_id=client_id)
+
         self._r = "default"
         self._w = "default"
         self._dw = "default"
@@ -66,6 +70,9 @@ class RiakClient(object):
                           'text/json':json.dumps}
         self._decoders = {'application/json':json.loads,
                           'text/json':json.loads}
+        self._solr = None
+        self._host = host
+        self._port = port
 
     def get_transport(self):
         """
@@ -284,3 +291,9 @@ class RiakClient(object):
         """
         mr = RiakMapReduce(self)
         return apply(mr.reduce, args)
+
+    def solr(self):
+        if self._solr is None:
+            self._solr = RiakSearch(self, host=self._host, port=self._port)
+
+        return self._solr
