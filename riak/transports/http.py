@@ -340,7 +340,8 @@ class RiakHttpTransport(RiakTransport) :
         return headers
 
 
-    def post_request(self, uri=None, body=None, content_type="application/json"):
+    def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
+        host, port, uri = self.build_rest_path(prefix=uri, params=params)
         return self.http_request('POST', self._host, self._port, uri, {'Content-Type': content_type}, body) 
 
     #Utility functions used by Riak library.
@@ -352,7 +353,7 @@ class RiakHttpTransport(RiakTransport) :
         else:
             return defaultValue
 
-    def build_rest_path(self, bucket, key=None, params=None, prefix=None) :
+    def build_rest_path(self, bucket=None, key=None, params=None, prefix=None) :
         """
         Given a RiakClient, RiakBucket, Key, LinkSpec, and Params,
         construct and return a URL.
