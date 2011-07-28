@@ -450,6 +450,7 @@ document ids or queries::
 
 .. _`Riak Search`: http://wiki.basho.com/Riak-Search.html
 .. _Lucene: http://lucene.apache.org/
+.. _`Riak Search - Querying via the Solr Interface`: http://wiki.basho.com/Riak-Search---Querying.html#Querying-via-the-Solr-Interface
 
 Using Key Filters
 ==================
