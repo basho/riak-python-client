@@ -412,6 +412,42 @@ tutorial, but usage of this feature looks like::
   # John Doe
   # Anna Body
 
+Search using the Solr Interface
+-------------------------------
+
+The search as outlined above goes through Riak's MapReduce facilities to find
+and fetch objects. Sometimes you either want to go through the Solr-like
+interface Riak Search offers, e.g. to index and search documents without storing
+them in Riak KV and relying on the pre-commit hook to index.
+
+Using the Solr interface also allows you to specify sort and limit parameters,
+which, using the search based on MapReduce, you'd have to do that with reduce
+functions.
+
+You can index documents into search indexes as simple Python dicts, which need
+to have an attribute named "id"::
+
+    client = riak.RiakClient()
+    client.solr().add("user", {"id": "anna", "first_name": "Anna"})
+
+To search for documents, specify the index and a query string::
+
+    client = riak.RiakClient()
+    client.solr().search("user", "first_name:Anna")
+
+Additionally you can specify all the parameters supported by the Solr
+interface::
+
+    client.solr().search("user", "Anna", wt="json", df="first_name")
+
+The search interface supports both XML and JSON, parsing both result formats
+into dicts.
+
+You can also remove documents from the index again, using either a list of
+document ids or queries::
+
+    client.solr().delete("user", docs=["anna"], queries=["first_name:Anna"])
+
 .. _`Riak Search`: http://wiki.basho.com/Riak-Search.html
 .. _Lucene: http://lucene.apache.org/
 
