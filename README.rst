@@ -478,11 +478,12 @@ on demand for testing purposes in your application. It uses in-memory storage
 backends for both Riak KV and Riak Search and is therefore reasonably fast for a
 testing setup. The in-memory setups also make it easier to wipe all data in the
 instance without having to list and delete all keys manually. The original code
-comes from Ripple, as do the file system implementations.
+comes from Ripple_, as do the file system implementations.
 
 The server needs a local Riak installation, of which it uses only the installed
 Erlang libraries and the configuration files to generate and run a temporary
-server in a different directory.
+server in a different directory. Make sure you run the most recent stable
+version of Riak, and not a development snapshot, where your mileage may vary.
 
 By default, the HTTP port is set to 9000 and the Protocol Buffers interface
 listens on port 9001.
@@ -522,3 +523,9 @@ The server should shut down properly when you stop the Python process, but if
 you only need it for a subset of your tests, just stop the server::
 
     server.stop()
+
+If you plan on repeatedly running the test server, either in multiple test
+suites or in subsequent test runs, be sure to call cleanup() before starting or
+after stopping it.
+
+.. _Ripple: https://github.com/seancribbs/ripple
