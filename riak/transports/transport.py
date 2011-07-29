@@ -118,3 +118,25 @@ class RiakTransport(object):
         """
         raise RiakError("not implemented")
 
+    def store_file(self, key, content_type="application/octet-stream", content=None):
+        """
+        Store a large piece of data in luwak.
+        key = the key/filename for the object
+        content_type = the object's content type
+        content = the object's data
+        """
+        raise RiakError("luwak not supported by this transport.")
+
+    def get_file(self, key):
+        """
+        Get an object from luwak.
+        key = the object's key
+        """
+        raise RiakError("luwak not supported by this transport.")
+
+        """
+        Delete an object in luwak.
+        key = the object's key
+        """
+    def delete_file(self, key):
+        raise RiakError("luwak not supported by this transport.")

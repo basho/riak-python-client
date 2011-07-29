@@ -9,6 +9,9 @@ except ImportError:
 import os
 import random
 import unittest
+import uuid
+import time
+
 from riak import RiakClient
 from riak import RiakPbcTransport, RiakPbcCachedTransport
 from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
@@ -21,6 +24,7 @@ PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
+SKIP_LUWAK = int(os.environ.get('SKIP_LUWAK', '0'))
 
 class NotJsonSerializable(object):
 
@@ -743,6 +747,46 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         stored_object = bucket.get("lots_of_links")
         self.assertEqual(len(stored_object.get_links()), 400)
 
+    def test_store_file_with_luwak(self):
+        if SKIP_LUWAK:
+            return True
+
+        file = os.path.dirname(__file__) + "/test_all.py"
+        with open(file, "r") as input_file:
+            data = input_file.read()
+
+        key = uuid.uuid1().hex
+        self.client.store_file(key, data)
+
+    def test_store_get_file_with_luwak(self):
+        if SKIP_LUWAK:
+            return True
+
+        file = os.path.dirname(__file__) + "/test_all.py"
+        with open(file, "r") as input_file:
+            data = input_file.read()
+
+        key = uuid.uuid1().hex
+        self.client.store_file(key, data)
+        time.sleep(1)
+        file = self.client.get_file(key)
+        self.assertEquals(data, file)
+
+    def test_delete_file_with_luwak(self):
+        if SKIP_LUWAK:
+            return True
+
+        file = os.path.dirname(__file__) + "/test_all.py"
+        with open(file, "r") as input_file:
+            data = input_file.read()
+
+        key = uuid.uuid1().hex
+        self.client.store_file(key, data)
+        time.sleep(1)
+        self.client.delete_file(key)
+        time.sleep(1)
+        file = self.client.get_file(key)
+        self.assertIsNone(file)
 
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
