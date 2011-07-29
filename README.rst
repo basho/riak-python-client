@@ -490,7 +490,7 @@ listens on port 9001.
 To use it, simply point it to your local Riak installation, and the rest is done
 automagically::
 
-    from riak import TestServer
+    from riak.test_server import TestServer
 
     server = TestServer(bin_dir="/usr/local/riak/0.14.2/bin")
     server.prepare()
@@ -516,7 +516,7 @@ dicts, following the same key-value format of the app.config file.
 
 So to change the default HTTP port to 8080, you can do the following::
 
-    server = TestServer(riak_core={"http_port": 8080})
+    server = TestServer(riak_core={"web_port": 8080})
 
 The server should shut down properly when you stop the Python process, but if
 you only need it for a subset of your tests, just stop the server::
