@@ -754,6 +754,22 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         stored_object = bucket.get("lots_of_links")
         self.assertEqual(len(stored_object.get_links()), 400)
 
+    def test_bucket_search_enabled(self):
+        bucket = self.client.bucket("unsearch_bucket")
+        self.assertFalse(bucket.search_enabled())
+
+    def test_enable_search_commit_hook(self):
+        bucket = self.client.bucket("search_bucket")
+        bucket.enable_search()
+        self.assertTrue(self.client.bucket("search_bucket").search_enabled())
+
+    def test_disable_search_commit_hook(self):
+        bucket = self.client.bucket("no_search_bucket")
+        bucket.enable_search()
+        self.assertTrue(self.client.bucket("no_search_bucket").search_enabled())
+        bucket.disable_search()
+        self.assertFalse(self.client.bucket("no_search_bucket").search_enabled())
+
 
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
