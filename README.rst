@@ -469,3 +469,63 @@ filters::
 
 
 .. _`Key filters`: http://wiki.basho.com/Key-Filters.html
+
+Test Server
+===========
+
+The client includes a Riak test server that can be used to start a Riak instance
+on demand for testing purposes in your application. It uses in-memory storage
+backends for both Riak KV and Riak Search and is therefore reasonably fast for a
+testing setup. The in-memory setups also make it easier to wipe all data in the
+instance without having to list and delete all keys manually. The original code
+comes from Ripple_, as do the file system implementations.
+
+The server needs a local Riak installation, of which it uses only the installed
+Erlang libraries and the configuration files to generate and run a temporary
+server in a different directory. Make sure you run the most recent stable
+version of Riak, and not a development snapshot, where your mileage may vary.
+
+By default, the HTTP port is set to 9000 and the Protocol Buffers interface
+listens on port 9001.
+
+To use it, simply point it to your local Riak installation, and the rest is done
+automagically::
+
+    from riak.test_server import TestServer
+
+    server = TestServer(bin_dir="/usr/local/riak/0.14.2/bin")
+    server.prepare()
+    server.start()
+
+The server is started as an external process, with communication going through
+the Erlang console. That allows it to easily wipe the in-memory backends used by
+Riak and Riak Search. You can use the recycle() method to clean up the server::
+
+    server.recycle()
+
+To change the default configuration, you can specify additional arguments for
+the Erlang VM. Let's raise the maximum number of processes to 1000000, just for
+fun::
+
+    server = TestServer(vm_args={"+P": "1000000"})
+
+You can also change the default configuration used to generate the app.config
+file for the Riak instance. The format of the attributes follows the convention
+of the app.config file itself, using a dict with keys for every section in the
+configuration file, so "riak_core", "riak_kv", and so on. These in turn are also
+dicts, following the same key-value format of the app.config file.
+
+So to change the default HTTP port to 8080, you can do the following::
+
+    server = TestServer(riak_core={"web_port": 8080})
+
+The server should shut down properly when you stop the Python process, but if
+you only need it for a subset of your tests, just stop the server::
+
+    server.stop()
+
+If you plan on repeatedly running the test server, either in multiple test
+suites or in subsequent test runs, be sure to call cleanup() before starting or
+after stopping it.
+
+.. _Ripple: https://github.com/seancribbs/ripple

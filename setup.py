@@ -31,6 +31,6 @@ if __name__ == "__main__":
         platforms='Platform Independent',
         author='Basho Technologies',
         author_email='riak@basho.com',
-        test_suite='riak.tests.test_all',
+        test_suite='riak.tests.suite',
         url='https://github.com/basho/riak-python-client'
    )
