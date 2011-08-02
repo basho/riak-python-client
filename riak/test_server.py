@@ -168,21 +168,21 @@ class TestServer:
                 prompted = True
 
     def write_riak_script(self):
-        with open(self._riak_script, "wb") as temp_bin_file, open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
-                
-            for line in riak_file.readlines():
-                line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r'\1%s' % self._temp_bin, line)
-                line = re.sub("(RUNNER_ETC_DIR=)(.*)", r'\1%s' % self._temp_etc, line)
-                line = re.sub("(RUNNER_USER=)(.*)", r'\1', line)
-                line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' % self._temp_log, line)
-                line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' % self._temp_pipe, line)
+        with open(self._riak_script, "wb") as temp_bin_file:
+            with open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
+                for line in riak_file.readlines():
+                    line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r'\1%s' % self._temp_bin, line)
+                    line = re.sub("(RUNNER_ETC_DIR=)(.*)", r'\1%s' % self._temp_etc, line)
+                    line = re.sub("(RUNNER_USER=)(.*)", r'\1', line)
+                    line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' % self._temp_log, line)
+                    line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' % self._temp_pipe, line)
 
-                if string.strip(line) == "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}":
-                    line = "RUNNER_BASE_DIR=%s\n" % os.path.normpath(os.path.join(self.bin_dir, ".."))
+                    if string.strip(line) == "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}":
+                        line = "RUNNER_BASE_DIR=%s\n" % os.path.normpath(os.path.join(self.bin_dir, ".."))
 
-                temp_bin_file.write(line)
+                    temp_bin_file.write(line)
 
-            os.fchmod(temp_bin_file.fileno(), 0755)
+                os.fchmod(temp_bin_file.fileno(), 0755)
 
     def write_vm_args(self):
         with open(os.path.join(self._temp_etc, "vm.args"), 'wb') as vm_args:
