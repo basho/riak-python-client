@@ -334,7 +334,13 @@ class RiakPbcTransport(RiakTransport):
     def maybe_connect(self):
         if self._sock is None:
             self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((self._host, self._port))
+
+            try:
+                s.connect((self._host, self._port))
+            except:
+                self._sock = None
+                raise
+
             if self._client_id:
                 self.set_client_id(self._client_id)
 
@@ -399,6 +405,7 @@ class RiakPbcTransport(RiakTransport):
     def recv_pkt(self):
         nmsglen = self._sock.recv(4)
         if len(nmsglen) != 4:
+            self._sock = None
             raise RiakError("Socket returned short packet length {0} - expected 4".
                             format(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
