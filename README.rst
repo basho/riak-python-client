@@ -474,7 +474,10 @@ Luwak for Large File Storage
 ============================
 
 If your Riak installation has Luwak support enabled, you can use the client to
-interact with it, storing, fetching and deleting files::
+interact with it, storing, fetching and deleting files. Note that Luwak is HTTP
+only and will always use the settings provided for the HTTP transport. If you
+mix Luwak with normal Riak usage through the Protocol Buffers interface, it's
+best to use multiple client objects for each separate use case::
 
     client = riak.RiakClient()
 
