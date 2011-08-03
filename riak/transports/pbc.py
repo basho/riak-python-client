@@ -481,6 +481,7 @@ class RiakPbcTransport(RiakTransport):
         rpb_content.value = data
 
 from Queue import Empty, Full, Queue
+import contextlib
 class RiakPbcCachedTransport(RiakTransport):
     """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
     def __init__(self, host='127.0.0.1', port=8087, client_id=None, maxsize=0, block=False, timeout=None):
@@ -512,29 +513,30 @@ class RiakPbcCachedTransport(RiakTransport):
         except Full:
             pass
 
-    def _make_call(self, function):
+    @contextlib.contextmanager
+    def _get_connection_from_pool(self):
         """checkout conn, try operation, put conn back in pool"""
+        conn = self._get_conn()
         try:
-            conn = self._get_conn()
-            rv = function(conn)
+            yield conn
+        finally:
             self._put_conn(conn)
-        except Exception:
-            raise
-        return rv
 
     def ping(self):
         """
         Ping the remote server
         @return boolean
         """
-        return self._make_call(lambda conn: conn.ping())
+        with self._get_connection_from_pool() as conn:
+            return conn.ping()
 
     def get(self, robj, r = None, vtag = None):
         """
         Serialize get request and deserialize response
         @return (vclock=None, [(metadata, value)]=None)
         """
-        return self._make_call(lambda conn: conn.get(robj, r, vtag))
+        with self._get_connection_from_pool() as conn:
+            return conn.get(robj, r, vtag)
 
     def put(self, robj, w = None, dw = None, return_body = True):
         """
@@ -542,27 +544,30 @@ class RiakPbcCachedTransport(RiakTransport):
         is true, retrieve the updated metadata/content
         @return (vclock=None, [(metadata, value)]=None)
         """
-        return self._make_call(lambda conn: conn.put(robj, w, dw, return_body))
+        with self._get_connection_from_pool() as conn:
+            return conn.put(robj, w, dw, return_body)
 
     def delete(self, robj, rw = None):
         """
         Serialize delete request and deserialize response
         @return true
         """
-        return self._make_call(lambda conn: conn.delete(robj, rw))
-
+        with self._get_connection_from_pool() as conn:
+            return conn.delete(robj, rw)
     def get_buckets(self):
         """
         Serialize bucket listing request and deserialize response
         """
-        return self._make_call(lambda conn: conn.get_buckets())
+        with self._get_connection_from_pool() as conn:
+            return conn.get_buckets()
 
     def get_bucket_props(self, bucket) :
         """
         Serialize get bucket property request and deserialize response
         @return dict()
         """
-        return self._make_call(lambda conn: conn.get_bucket_props(bucket))
+        with self._get_connection_from_pool() as conn:
+            return conn.get_bucket_props(bucket)
 
     def set_bucket_props(self, bucket, props) :
         """
@@ -571,19 +576,23 @@ class RiakPbcCachedTransport(RiakTransport):
         props = dictionary of properties
         @return boolean
         """
-        return self._make_call(lambda conn: conn.set_bucket_props(bucket, props))
+        with self._get_connection_from_pool() as conn:
+            return conn.set_bucket_props(bucket, props)
 
     def mapred(self, inputs, query, timeout = None) :
         """
         Serialize map/reduce request
         """
-        return self._make_call(lambda conn: conn.mapred(inputs, query, timeout))
+        with self._get_connection_from_pool() as conn:
+            return conn.mapred(inputs, query, timeout)
 
     def set_client_id(self, client_id):
         """Mmm, this can turn ugly if you use different id for different objects in the pool"""
-        return self._make_call(lambda conn: conn.set_client_id(client_id))
+        with self._get_connection_from_pool() as conn:
+            return conn.set_client_id(client_id)
 
     def get_client_id(self):
         """see set_client_id notes, you can do wrong with this"""
-        return self._make_call(lambda conn: conn.get_client_id())
+        with self._get_connection_from_pool() as conn:
+            return conn.get_client_id()
     
