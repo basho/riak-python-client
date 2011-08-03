@@ -495,48 +495,48 @@ class RiakPbcCachedTransport(RiakTransport):
         # Fill the queue up so that doing get() on it will block properly (check Queue#get)
         [self.pool.put(None) for _ in xrange(maxsize)]
 
-    def _new_conn(self):
+    def _new_connection(self):
         """New PBC connection"""
         return RiakPbcTransport(self.host, self.port, self.client_id)
 
-    def _get_conn(self):
-        conn = None
+    def _get_connection(self):
+        connection = None
         try:
-            conn = self.pool.get(block=self.block, timeout=self.timeout)
+            connection = self.pool.get(block=self.block, timeout=self.timeout)
         except Empty:
             pass
-        return conn or self._new_conn()
+        return connection or self._new_connection()
 
-    def _put_conn(self, conn):
+    def _put_connection(self, connection):
         try:
-            self.pool.put(conn, block=False)
+            self.pool.put(connection, block=False)
         except Full:
             pass
 
     @contextlib.contextmanager
     def _get_connection_from_pool(self):
         """checkout conn, try operation, put conn back in pool"""
-        conn = self._get_conn()
+        connection = self._get_connection()
         try:
-            yield conn
+            yield connection
         finally:
-            self._put_conn(conn)
+            self._put_connection(connection)
 
     def ping(self):
         """
         Ping the remote server
         @return boolean
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.ping()
+        with self._get_connection_from_pool() as connection:
+            return connection.ping()
 
     def get(self, robj, r = None, vtag = None):
         """
         Serialize get request and deserialize response
         @return (vclock=None, [(metadata, value)]=None)
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.get(robj, r, vtag)
+        with self._get_connection_from_pool() as connection:
+            return connection.get(robj, r, vtag)
 
     def put(self, robj, w = None, dw = None, return_body = True):
         """
@@ -544,30 +544,31 @@ class RiakPbcCachedTransport(RiakTransport):
         is true, retrieve the updated metadata/content
         @return (vclock=None, [(metadata, value)]=None)
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.put(robj, w, dw, return_body)
+        with self._get_connection_from_pool() as connection:
+            return connection.put(robj, w, dw, return_body)
 
     def delete(self, robj, rw = None):
         """
         Serialize delete request and deserialize response
         @return true
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.delete(robj, rw)
+        with self._get_connection_from_pool() as connection:
+            return connection.delete(robj, rw)
+
     def get_buckets(self):
         """
         Serialize bucket listing request and deserialize response
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.get_buckets()
+        with self._get_connection_from_pool() as connection:
+            return connection.get_buckets()
 
     def get_bucket_props(self, bucket) :
         """
         Serialize get bucket property request and deserialize response
         @return dict()
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.get_bucket_props(bucket)
+        with self._get_connection_from_pool() as connection:
+            return connection.get_bucket_props(bucket)
 
     def set_bucket_props(self, bucket, props) :
         """
@@ -576,23 +577,23 @@ class RiakPbcCachedTransport(RiakTransport):
         props = dictionary of properties
         @return boolean
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.set_bucket_props(bucket, props)
+        with self._get_connection_from_pool() as connection:
+            return connection.set_bucket_props(bucket, props)
 
     def mapred(self, inputs, query, timeout = None) :
         """
         Serialize map/reduce request
         """
-        with self._get_connection_from_pool() as conn:
-            return conn.mapred(inputs, query, timeout)
+        with self._get_connection_from_pool() as connection:
+            return connection.mapred(inputs, query, timeout)
 
     def set_client_id(self, client_id):
         """Mmm, this can turn ugly if you use different id for different objects in the pool"""
-        with self._get_connection_from_pool() as conn:
-            return conn.set_client_id(client_id)
+        with self._get_connection_from_pool() as connection:
+            return connection.set_client_id(client_id)
 
     def get_client_id(self):
         """see set_client_id notes, you can do wrong with this"""
-        with self._get_connection_from_pool() as conn:
-            return conn.get_client_id()
+        with self._get_connection_from_pool() as connection:
+            return connection.get_client_id()
     
