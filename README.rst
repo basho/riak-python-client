@@ -481,7 +481,8 @@ best to use multiple client objects for each separate use case::
 
     client = riak.RiakClient()
 
-    client.store_file('image.jpg', 'lots of data', content_type="image/jpeg")
+    image = open('hulk.jpg', 'rb')
+    client.store_file('image.jpg', image.read(), content_type="image/jpeg")
 
     # Returns just the data stored in luwak
     client.get_file('image.jpg')
