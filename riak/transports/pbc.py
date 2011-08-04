@@ -603,4 +603,3 @@ class RiakPbcCachedTransport(RiakTransport):
         """see set_client_id notes, you can do wrong with this"""
         with self._get_connection_from_pool() as connection:
             return connection.get_client_id()
-    

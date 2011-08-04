@@ -9,6 +9,9 @@ except ImportError:
 import os
 import random
 import unittest
+import uuid
+import time
+
 from riak import RiakClient
 from riak import RiakPbcTransport, RiakPbcCachedTransport
 from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
@@ -32,6 +35,7 @@ if USE_TEST_SERVER:
     test_server.prepare()
     test_server.start()
 
+SKIP_LUWAK = int(os.environ.get('SKIP_LUWAK', '0'))
 
 class NotJsonSerializable(object):
 
@@ -770,6 +774,46 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket.disable_search()
         self.assertFalse(self.client.bucket("no_search_bucket").search_enabled())
 
+    def test_store_file_with_luwak(self):
+        if SKIP_LUWAK:
+            return True
+
+        file = os.path.dirname(__file__) + "/test_all.py"
+        with open(file, "r") as input_file:
+            data = input_file.read()
+
+        key = uuid.uuid1().hex
+        self.client.store_file(key, data)
+
+    def test_store_get_file_with_luwak(self):
+        if SKIP_LUWAK:
+            return True
+
+        file = os.path.dirname(__file__) + "/test_all.py"
+        with open(file, "r") as input_file:
+            data = input_file.read()
+
+        key = uuid.uuid1().hex
+        self.client.store_file(key, data)
+        time.sleep(1)
+        file = self.client.get_file(key)
+        self.assertEquals(data, file)
+
+    def test_delete_file_with_luwak(self):
+        if SKIP_LUWAK:
+            return True
+
+        file = os.path.dirname(__file__) + "/test_all.py"
+        with open(file, "r") as input_file:
+            data = input_file.read()
+
+        key = uuid.uuid1().hex
+        self.client.store_file(key, data)
+        time.sleep(1)
+        self.client.delete_file(key)
+        time.sleep(1)
+        file = self.client.get_file(key)
+        self.assertIsNone(file)
 
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 

@@ -539,3 +539,24 @@ suites or in subsequent test runs, be sure to call cleanup() before starting or
 after stopping it.
 
 .. _Ripple: https://github.com/seancribbs/ripple
+
+Luwak for Large File Storage
+============================
+
+If your Riak installation has Luwak support enabled, you can use the client to
+interact with it, storing, fetching and deleting files. Note that Luwak is HTTP
+only and will always use the settings provided for the HTTP transport. If you
+mix Luwak with normal Riak usage through the Protocol Buffers interface, it's
+best to use multiple client objects for each separate use case::
+
+    client = riak.RiakClient()
+
+    image = open('hulk.jpg', 'rb')
+    client.store_file('image.jpg', image.read(), content_type="image/jpeg")
+
+    # Returns just the data stored in luwak
+    client.get_file('image.jpg')
+
+    client.delete_file('image.jpg')
+
+.. _`Luwak`: http://wiki.basho.com/Luwak.html

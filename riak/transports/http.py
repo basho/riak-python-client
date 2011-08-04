@@ -101,7 +101,7 @@ class RiakHttpTransport(RiakTransport) :
         """
        # Construct the URL...
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw}
-        host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+        host, port, url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                                params=params)
 
         # Construct the headers...
@@ -120,9 +120,10 @@ class RiakHttpTransport(RiakTransport) :
             headers['X-Riak-Meta-%s' % key] = value
 
         content = robj.get_encoded_data()
+        return self.do_put(host, port, url, headers, content, return_body, key=robj.get_key())
 
-        # Run the operation.
-        if robj.get_key() is None:
+    def do_put(self, host, port, url, headers, content, return_body=False, key=None):
+        if key is None:
           response = self.http_request('POST', host, port, url, headers, content)
         else:
           response = self.http_request('PUT', host, port, url, headers, content)
@@ -191,7 +192,7 @@ class RiakHttpTransport(RiakTransport) :
         headers = {'Content-Type' : 'application/json'}
         content = json.dumps({'props' : props})
 
-        #Run the request...
+        # Run the request...
         response = self.http_request('PUT', host, port, url, headers, content)
 
         # Handle the response...
@@ -336,8 +337,28 @@ class RiakHttpTransport(RiakTransport) :
         return headers
 
 
+    def store_file(self, key, content_type="application/octet-stream", content=None):
+        host, port, url = self.build_rest_path(prefix='luwak', key=key)
+        headers = {'Content-Type' : content_type,
+                   'X-Riak-ClientId' : self._client_id}
 
-    #Utility functions used by Riak library.
+        return self.do_put(host, port, url, headers, content, key=key)
+
+    def get_file(self, key):
+        host, port, url = self.build_rest_path(prefix='luwak', key=key)
+        response = self.http_request('GET', host, port, url)
+        result = self.parse_body(response, [200, 300, 404])
+        if result is not None:
+            (vclock, data) = result
+            (headers, body) = data.pop()
+            return body
+
+    def delete_file(self, key):
+        host, port, url = self.build_rest_path(prefix='luwak', key=key)
+        response = self.http_request('DELETE', host, port, url)
+        self.parse_body(response, [204, 404])
+
+    # Utility functions used by Riak library.
 
     @classmethod
     def get_value(cls, key, array, defaultValue) :
@@ -346,14 +367,14 @@ class RiakHttpTransport(RiakTransport) :
         else:
             return defaultValue
 
-    def build_rest_path(self, bucket, key=None, params=None) :
+    def build_rest_path(self, bucket=None, key=None, params=None, prefix=None) :
         """
         Given a RiakClient, RiakBucket, Key, LinkSpec, and Params,
         construct and return a URL.
         """
         # Build 'http://hostname:port/prefix/bucket'
         path = ''
-        path += '/' + self._prefix
+        path += '/' + (prefix or self._prefix)
 
         # Add '.../bucket'
         if bucket is not None:
