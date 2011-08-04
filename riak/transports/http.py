@@ -221,7 +221,6 @@ class RiakHttpTransport(RiakTransport) :
         result = json.loads(response[1])
         return result
 
-
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
         if not status in expected_statuses:
@@ -336,6 +335,9 @@ class RiakHttpTransport(RiakTransport) :
 
         return headers
 
+    def get_request(self, uri=None, params=None):
+        host, port, url = self.build_rest_path(bucket=None, params=params, prefix=uri)
+        return self.http_request('GET', host, port, url)
 
     def store_file(self, key, content_type="application/octet-stream", content=None):
         host, port, url = self.build_rest_path(prefix='luwak', key=key)
@@ -357,6 +359,10 @@ class RiakHttpTransport(RiakTransport) :
         host, port, url = self.build_rest_path(prefix='luwak', key=key)
         response = self.http_request('DELETE', host, port, url)
         self.parse_body(response, [204, 404])
+
+    def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
+        host, port, uri = self.build_rest_path(prefix=uri, params=params)
+        return self.http_request('POST', self._host, self._port, uri, {'Content-Type': content_type}, body) 
 
     # Utility functions used by Riak library.
 
