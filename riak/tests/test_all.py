@@ -8,7 +8,12 @@ except ImportError:
     import simplejson as json
 import os
 import random
-import unittest
+import platform
+
+if platform.python_version() < '2.7':
+    unittest = __import__('unittest2')
+else:
+    import unittest
 import uuid
 import time
 
@@ -829,7 +834,9 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = bucket.search("username:roidrage", wt="xml")
-        self.assertEquals(1, len(list(results.find("result").iter("doc"))))
+        result = results.find("result")
+        if not hasattr(result, "iter"): setattr(result, "iter", result.getiterator)
+        self.assertEquals(1, len(list(result.iter("doc"))))
 
     def test_solr_search_with_params(self):
         if SKIP_SEARCH:
@@ -837,7 +844,9 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = self.client.solr().search("searchbucket", "username:roidrage", wt="xml")
-        self.assertEquals(1, len(list(results.find("result").iter("doc"))))
+        result = results.find("result")
+        if not hasattr(result, "iter"): setattr(result, "iter", result.getiterator)
+        self.assertEquals(1, len(list(result.iter("doc"))))
 
     def test_solr_search(self):
         if SKIP_SEARCH:
