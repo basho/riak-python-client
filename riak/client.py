@@ -17,12 +17,15 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+import random
+
 # Use json as first choice, simplejson as second choice.
 try:
     import json
 except ImportError:
     import simplejson as json
 
+from riak import RiakError
 from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
@@ -34,9 +37,9 @@ class RiakClient(object):
     Riak. The Riak API uses HTTP, so there is no persistent
     connection, and the ``RiakClient`` object is extremely lightweight.
     """
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred', transport_class=None,
-                 client_id=None, solr_transport_class=None):
+    def __init__(self, host='127.0.0.1', port=8098, servers=None, prefix='riak',
+                 mapred_prefix='mapred', transport_class=None, client_id=None,
+                 solr_transport_class=None):
         """
         Construct a new ``RiakClient`` object.
 
@@ -53,14 +56,20 @@ class RiakClient(object):
         :param solr_transport_class: HTTP-based transport class for Solr interface queries
         :type transport_class: :class:`RiakHttpTransport`
         """
-        if not transport_class:
-            self._transport = RiakHttpTransport(host,
-                                                port,
-                                                prefix,
-                                                mapred_prefix,
-                                                client_id)
+        if servers:
+            self._servers = servers
         else:
-            self._transport = transport_class(host, port, client_id=client_id)
+            self._servers = [(host, port)]
+
+        self._transport_class = transport_class
+        self._host = host
+        self._port = port
+        self._prefix = prefix
+        self._mapred_prefix = mapred_prefix
+        self._client_id = client_id
+
+        self._current_server = None
+        self._transport = None # self.get_transport()
 
         self._r = "default"
         self._w = "default"
@@ -71,14 +80,41 @@ class RiakClient(object):
         self._decoders = {'application/json':json.loads,
                           'text/json':json.loads}
         self._solr = None
-        self._host = host
-        self._port = port
 
     def get_transport(self):
         """
         Get the transport instance the client is using for it's connection.
         """
+        if self._transport:
+            return self._transport
+
+        if not self._servers:
+            raise RiakError("No live servers left to try.")
+
+        self._current_server = random.choice(self._servers)
+        self._host, self._port = self._current_server
+
+        if not self._transport_class:
+            transport = RiakHttpTransport(self._host,
+                                          self._port,
+                                          self._prefix,
+                                          self._mapred_prefix,
+                                          self._client_id)
+        else:
+            transport = self._transport_class(self._host, self._port,
+                                              client_id=self._client_id)
+
+        self._transport = TransportContextManager(self, transport)
         return self._transport
+
+    def drop_server(self):
+        """
+        Drops the current used server from the server pool. Called when any
+        exception is raised while using the transport.
+        """
+        self._transport = None
+        self._servers.remove(self._current_server)
+        self._current_server = None
 
     def get_r(self):
         """
@@ -169,7 +205,8 @@ class RiakClient(object):
 
         :rtype: string
         """
-        return self._transport.get_client_id()
+        with self.get_transport() as t:
+            return t.get_client_id()
 
     def set_client_id(self, client_id):
         """
@@ -183,7 +220,9 @@ class RiakClient(object):
         :type client_id: string
         :rtype: self
         """
-        self._transport.set_client_id(client_id)
+        self._client_id = client_id
+        with self.get_transport() as t:
+            t.set_client_id(client_id)
         return self
 
     def get_encoder(self, content_type):
@@ -226,7 +265,8 @@ class RiakClient(object):
         NOTE: Do not use this in production, as it requires traversing through
         all keys stored in a cluster.
         """
-        return self._transport.get_buckets()
+        with self.get_transport() as t:
+            return t.get_buckets()
 
     def bucket(self, name):
         """
@@ -243,7 +283,8 @@ class RiakClient(object):
 
         :rtype: boolean
         """
-        return self._transport.ping()
+        with self.get_transport() as t:
+            return t.ping()
 
     def add(self, *args):
         """
@@ -296,16 +337,33 @@ class RiakClient(object):
         """
         Store data in luwak using filename as the key
         """
-        self._transport.store_file(filename, content_type=content_type, content=data)
+        with self.get_transport() as t:
+            t.store_file(filename, content_type=content_type, content=data)
 
     def get_file(self, filename):
-        return self._transport.get_file(filename)
+        with self.get_transport() as t:
+            return t.get_file(filename)
 
     def delete_file(self, filename):
-        self._transport.delete_file(filename)
+        with self.get_transport() as t:
+            t.delete_file(filename)
 
     def solr(self):
         if self._solr is None:
-            self._solr = RiakSearch(self, host=self._host, port=self._port)
+            with self.get_transport() as t:
+                self._solr = RiakSearch(self, host=t._host, port=t._port)
 
         return self._solr
+
+
+class TransportContextManager(object):
+    def __init__(self, client, transport):
+        self.client = client
+        self.transport = transport
+
+    def __enter__(self):
+        return self.transport
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type:
+            self.client.drop_server()

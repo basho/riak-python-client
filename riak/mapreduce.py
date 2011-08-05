@@ -207,8 +207,8 @@ class RiakMapReduce(object):
             self._inputs = {'bucket':       bucket_name,
                             'key_filters':  self._key_filters}
 
-        t = self._client.get_transport()
-        result = t.mapred(self._inputs, query, timeout)
+        with self._client.get_transport() as t:
+            result = t.mapred(self._inputs, query, timeout)
 
         # If the last phase is NOT a link phase, then return the result.
         link_results_flag = link_results_flag or isinstance(self._phases[-1], RiakLinkPhase)
