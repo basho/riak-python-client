@@ -17,6 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+import copy
 import random
 
 # Use json as first choice, simplejson as second choice.
@@ -25,7 +26,6 @@ try:
 except ImportError:
     import simplejson as json
 
-from riak import RiakError
 from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
@@ -38,8 +38,8 @@ class RiakClient(object):
     connection, and the ``RiakClient`` object is extremely lightweight.
     """
     def __init__(self, host='127.0.0.1', port=8098, servers=None, prefix='riak',
-                 mapred_prefix='mapred', transport_class=None, client_id=None,
-                 solr_transport_class=None):
+                 mapred_prefix='mapred', transport_class=None, pool_class=None,
+                 client_id=None, solr_transport_class=None):
         """
         Construct a new ``RiakClient`` object.
 
@@ -47,29 +47,30 @@ class RiakClient(object):
         :type host: string
         :param port: Port number
         :type port: integer
+        :param servers: List of (Hostname, Port) pairs
+        :type servers: list
         :param prefix: Interface prefix
         :type prefix: string
         :param mapred_prefix: MapReduce prefix
         :type mapred_prefix: string
         :param transport_class: transport class to use
         :type transport_class: :class:`RiakTransport`
+        :param pool_class: pool class to use
+        :type pool_class: :class:`RiakPool`
         :param solr_transport_class: HTTP-based transport class for Solr interface queries
         :type transport_class: :class:`RiakHttpTransport`
         """
-        if servers:
-            self._servers = servers
-        else:
-            self._servers = [(host, port)]
+        if not pool_class:
+            pool_class = RiakDeletePool
+        self._pool = pool_class(servers or [(host, port)])
 
         self._transport_class = transport_class
-        self._host = host
-        self._port = port
         self._prefix = prefix
         self._mapred_prefix = mapred_prefix
         self._client_id = client_id
 
         self._current_server = None
-        self._transport = None # self.get_transport()
+        self._transport = None
 
         self._r = "default"
         self._w = "default"
@@ -88,21 +89,17 @@ class RiakClient(object):
         if self._transport:
             return self._transport
 
-        if not self._servers:
-            raise RiakError("No live servers left to try.")
-
-        self._current_server = random.choice(self._servers)
-        self._host, self._port = self._current_server
+        self._current_server = self._pool.get_server()
+        host, port = self._current_server
 
         if not self._transport_class:
-            transport = RiakHttpTransport(self._host,
-                                          self._port,
+            transport = RiakHttpTransport(host,
+                                          port,
                                           self._prefix,
                                           self._mapred_prefix,
                                           self._client_id)
         else:
-            transport = self._transport_class(self._host, self._port,
-                                              client_id=self._client_id)
+            transport = self._transport_class(host, port, client_id=self._client_id)
 
         self._transport = TransportContextManager(self, transport)
         return self._transport
@@ -112,8 +109,8 @@ class RiakClient(object):
         Drops the current used server from the server pool. Called when any
         exception is raised while using the transport.
         """
+        self._pool.drop_server(self._current_server)
         self._transport = None
-        self._servers.remove(self._current_server)
         self._current_server = None
 
     def get_r(self):
@@ -357,6 +354,9 @@ class RiakClient(object):
 
 
 class TransportContextManager(object):
+    """
+    Used to enforce server pool semantics when an exception occurs.
+    """
     def __init__(self, client, transport):
         self.client = client
         self.transport = transport
@@ -367,3 +367,28 @@ class TransportContextManager(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type:
             self.client.drop_server()
+
+
+class RiakPool(object):
+    pass
+
+
+class RiakDeletePool(RiakPool):
+    """
+    Deletes servers permanently after an exception is raised by the transport.
+
+    If all servers are deleted the original server list is used again.
+    """
+    def __init__(self, servers):
+        self._servers = copy.copy(servers)
+        self._current_servers = copy.copy(servers)
+
+    def get_server(self):
+        if not self._current_servers:
+            # go back to the original list
+            self._current_servers = copy.copy(self._servers)
+
+        return random.choice(self._current_servers)
+
+    def drop_server(self, server):
+        self._current_servers.remove(server)
