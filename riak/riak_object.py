@@ -461,7 +461,7 @@ class RiakObject(object):
         :type r: integer
         :rtype: array of RiakObject
         """
-        a = [self]
+        a = []
         for i in range(self.get_sibling_count()):
             a.append(self.get_sibling(i, r))
         return a
