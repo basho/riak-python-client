@@ -26,6 +26,7 @@ To run the unit tests, execute::
 
     python setup.py test
 
+If you don't have `Luwak <http://wiki.basho.com/Luwak.html>`_ or `Riak Search <http://wiki.basho.com/Riak-Search.html>`_ enabled you can set the ``SKIP_LUWAK`` and ``SKIP_SEARCH`` environment variables to skip those tests.
 
 ========
 Tutorial
