@@ -573,7 +573,10 @@ class RiakHttpReuseTransport(RiakHttpTransport):
             if response is not None: response.close()
             raise
 
-import urllib3
+try:
+    import urllib3
+except ImportError:
+    urllib3 = None
 
 class RiakHttpPoolTransport(RiakHttpTransport):
     """
@@ -585,6 +588,9 @@ class RiakHttpPoolTransport(RiakHttpTransport):
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
                  mapred_prefix='mapred',
                  client_id=None):
+        if urllib3 is None:
+            raise RiakError("this transport is not available (no urllib3)")
+
         super(RiakHttpPoolTransport, self).__init__(host=host,
                                                     port=port,
                                                     prefix=prefix,
