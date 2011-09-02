@@ -71,7 +71,7 @@ class TestServer:
                  bin_dir=os.path.expanduser("~/.riak/install/riak-0.14.2/bin"),
                  vm_args=None, **options):
         self._lock = threading.Lock()
-        self.temp_dir = "/tmp/riak/test_server"
+        self.temp_dir = tmp_dir
         self.bin_dir = bin_dir
         self._prepared = False
         self._started = False
