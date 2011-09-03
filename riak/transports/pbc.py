@@ -407,7 +407,7 @@ class RiakPbcTransport(RiakTransport):
             msg = riakclient_pb2.RpbMapRedResp()
             msg.ParseFromString(self._inbuf[1:])
         else:
-            raise Exception("unknown msg code {0}".format(msg_code))
+            raise Exception("unknown msg code %s"%msg_code)
         return msg_code, msg
 
 
@@ -415,8 +415,8 @@ class RiakPbcTransport(RiakTransport):
         nmsglen = self._sock.recv(4)
         if len(nmsglen) != 4:
             self._sock = None
-            raise RiakError("Socket returned short packet length {0} - expected 4".
-                            format(nmsglen))
+            raise RiakError("Socket returned short packet length %d - expected 4"%\
+                            nmsglen)
         msglen, = struct.unpack('!i', nmsglen)
         self._inbuf_len = msglen
         self._inbuf = ''
@@ -426,8 +426,8 @@ class RiakPbcTransport(RiakTransport):
             if not recv_buf: break
             self._inbuf += recv_buf
         if len(self._inbuf) != self._inbuf_len:
-            raise RiakError("Socket returned short packet {0} - expected {1}".
-                            format(len(self._inbuf), self._inbuf_len))
+            raise RiakError("Socket returned short packet %d - expected %d"%\
+                            (len(self._inbuf), self._inbuf_len))
 
     def decode_contents(self, rpb_contents):
         contents = []
