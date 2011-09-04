@@ -44,7 +44,7 @@ class TestServer:
         "-smp": "enable",
         "-env ERL_MAX_PORTS": 4096,
         "-env ERL_FULLSWEEP_AFTER": 10,
-        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__), "../erl_src"))
+        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__), "erl_src"))
     }
 
     APP_CONFIG_DEFAULTS = {
