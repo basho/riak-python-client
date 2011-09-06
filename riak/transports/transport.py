@@ -134,9 +134,9 @@ class RiakTransport(object):
         """
         raise RiakError("luwak not supported by this transport.")
 
+    def delete_file(self, key):
         """
         Delete an object in luwak.
         key = the object's key
         """
-    def delete_file(self, key):
         raise RiakError("luwak not supported by this transport.")
