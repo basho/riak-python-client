@@ -19,13 +19,7 @@ under the License.
 """
 import urllib, re
 from cStringIO import StringIO
-# Use pycurl as first choice, httplib as second choice.
-try:
-    import pycurl
-    HAS_PYCURL = True
-except ImportError:
-    import httplib
-    HAS_PYCURL = False
+import httplib
 try:
     import json
 except ImportError:
@@ -403,11 +397,7 @@ class RiakHttpTransport(RiakTransport) :
         """
         if not headers:
             headers = {}
-        if HAS_PYCURL:
-            return cls.pycurl_request(method, host, port, url, headers, obj)
-        else:
-            return cls.httplib_request(method, host, port, url, headers, obj)
-
+        return cls.httplib_request(method, host, port, url, headers, obj)
 
     @classmethod
     def httplib_request(cls, method, host, port, uri, headers = None, body=''):
@@ -434,53 +424,6 @@ class RiakHttpTransport(RiakTransport) :
         except:
             if client is not None: client.close()
             if response is not None: response.close()
-            raise
-
-
-    @classmethod
-    def pycurl_request(cls, method, host, port, uri, headers, body=''):
-        if not headers:
-            headers = {}
-        url = "http://" + host + ":" + str(port) + uri
-        # Set up Curl...
-        client = pycurl.Curl()
-        client.setopt(pycurl.URL, url)
-        client.setopt(pycurl.HTTPHEADER, cls.build_headers(headers))
-        if method == 'GET':
-            client.setopt(pycurl.HTTPGET, 1)
-        elif method == 'POST':
-            client.setopt(pycurl.POST, 1)
-            client.setopt(pycurl.POSTFIELDS, body)
-        elif method == 'PUT':
-            client.setopt(pycurl.CUSTOMREQUEST, method)
-            client.setopt(pycurl.POSTFIELDS, body)
-        elif method == 'DELETE':
-            client.setopt(pycurl.CUSTOMREQUEST, method)
-
-        # Capture the response headers...
-        response_headers_io = StringIO()
-        client.setopt(pycurl.HEADERFUNCTION, response_headers_io.write)
-
-        # Capture the response body...
-        response_body_io = StringIO()
-        client.setopt(pycurl.WRITEFUNCTION, response_body_io.write)
-
-        try:
-            # Run the request.
-            client.perform()
-            http_code = client.getinfo(pycurl.HTTP_CODE)
-            client.close()
-
-            # Get the headers...
-            response_headers = cls.parse_http_headers(response_headers_io.getvalue())
-            response_headers['http_code'] = http_code
-
-            # Get the body...
-            response_body = response_body_io.getvalue()
-
-            return response_headers, response_body
-        except:
-            if client is not None: client.close()
             raise
 
     @classmethod
