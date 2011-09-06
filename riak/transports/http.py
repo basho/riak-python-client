@@ -386,18 +386,13 @@ class RiakHttpTransport(RiakTransport) :
         # Return.
         return path
 
-    def http_request(self, method, url, headers = None, obj = '') :
+    def http_request(self, method, uri, headers=None, body='') :
         """
         Given a Method, URL, Headers, and Body, perform and HTTP request,
-        and return an array of arity 2 containing an associative array of
-        response headers and the response body.
+        and return a 2-tuple containing a dictionary of response headers
+        and the response body.
         """
-        if not headers:
-            headers = {}
-        return self.httplib_request(method, url, headers, obj)
-
-    def httplib_request(self, method, uri, headers = None, body=''):
-        if not headers:
+        if headers is None:
             headers = {}
         # Run the request...
         client = None
@@ -469,7 +464,7 @@ class RiakHttpReuseTransport(RiakHttpTransport):
         return RiakHttpReuseTransport(self._host, self._port, self._prefix,
                                       self._mapred_prefix)
 
-    def httplib_request(self, method, uri, headers, body=''):
+    def http_request(self, method, uri, headers, body=''):
         # Run the request...
         client = None
         response = None
@@ -533,7 +528,7 @@ class RiakHttpPoolTransport(RiakHttpTransport):
         return RiakHttpPoolTransport(self._host, self._port, self._prefix,
                                      self._mapred_prefix)
 
-    def httplib_request(self, method, uri, headers, body=''):
+    def http_request(self, method, uri, headers, body=''):
         try:
             ### it seems wrong to put the pool into a *class* variable,
             ### but this code is supporting backwards-compat where the
