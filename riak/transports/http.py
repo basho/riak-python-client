@@ -366,13 +366,6 @@ class RiakHttpTransport(RiakTransport) :
 
     # Utility functions used by Riak library.
 
-    @classmethod
-    def get_value(cls, key, array, defaultValue) :
-        if key in array:
-            return array[key]
-        else:
-            return defaultValue
-
     def build_rest_path(self, bucket=None, key=None, params=None, prefix=None) :
         """
         Given a RiakClient, RiakBucket, Key, LinkSpec, and Params,
