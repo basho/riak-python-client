@@ -69,8 +69,6 @@ RIAKC_RW_ALL = 4294967292
 RIAKC_RW_DEFAULT = 4294967291
 
 
-
-
 class RiakPbcTransport(RiakTransport):
     """
     The RiakPbcTransport object holds a connection to the protocol buffers interface
@@ -82,7 +80,7 @@ class RiakPbcTransport(RiakTransport):
         'quorum' : RIAKC_RW_QUORUM,
         'one' : RIAKC_RW_ONE
         }
-    def __init__(self, host='127.0.0.1', port=8087, client_id=None):
+    def __init__(self, host='127.0.0.1', port=8087, client_id=None, timeout=None):
         """
         Construct a new RiakPbcTransport object.
         @param string host - Hostname or IP address (default '127.0.0.1')
@@ -96,6 +94,7 @@ class RiakPbcTransport(RiakTransport):
         self._port = port
         self._client_id = client_id
         self._sock = None
+        self._timeout = timeout
 
     def translate_rw_val(self, rw):
         val = self.rw_names.get(rw)
@@ -343,6 +342,7 @@ class RiakPbcTransport(RiakTransport):
     def maybe_connect(self):
         if self._sock is None:
             self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._sock.settimeout(self._timeout)
 
             try:
                 s.connect((self._host, self._port))
@@ -508,7 +508,7 @@ class RiakPbcCachedTransport(RiakTransport):
         self.port = port
         self.client_id = client_id
         self.block = block
-        self.timeout = timeout
+        self._timeout = timeout
 
         self.pool = Queue(maxsize)
         # Fill the queue up so that doing get() on it will block properly (check Queue#get)
@@ -516,12 +516,12 @@ class RiakPbcCachedTransport(RiakTransport):
 
     def _new_connection(self):
         """New PBC connection"""
-        return RiakPbcTransport(self.host, self.port, self.client_id)
+        return RiakPbcTransport(self.host, self.port, self.client_id, timeout=self._timeout)
 
     def _get_connection(self):
         connection = None
         try:
-            connection = self.pool.get(block=self.block, timeout=self.timeout)
+            connection = self.pool.get(block=self.block, timeout=self._timeout)
         except Empty:
             pass
         return connection or self._new_connection()

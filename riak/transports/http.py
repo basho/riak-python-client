@@ -40,8 +40,7 @@ class RiakHttpTransport(RiakTransport) :
     connection, and the RiakClient object is extremely lightweight.
     """
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id = None):
+                 mapred_prefix='mapred', client_id=None, timeout=None):
         """
         Construct a new RiakClient object.
         @param string host - Hostname or IP address (default '127.0.0.1')
@@ -56,12 +55,13 @@ class RiakHttpTransport(RiakTransport) :
         self._prefix = prefix
         self._mapred_prefix = mapred_prefix
         self._client_id = client_id
+        self._timeout = timeout
         if not self._client_id:
             self._client_id = self.make_random_client_id()
 
     def __copy__(self):
         return RiakHttpTransport(self._host, self._port, self._prefix,
-                                 self._mapred_prefix)
+                                 self._mapred_prefix, timeout=self._timeout)
 
     def set_client_id(self, client_id):
         self._client_id = client_id
@@ -73,6 +73,7 @@ class RiakHttpTransport(RiakTransport) :
         """
         Check server is alive over HTTP
         """
+
         response = self.http_request('GET', '/ping')
         return(response is not None) and (response[1] == 'OK')
 
@@ -354,7 +355,7 @@ class RiakHttpTransport(RiakTransport) :
 
     def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
         uri = self.build_rest_path(prefix=uri, params=params)
-        return self.http_request('POST', uri, {'Content-Type': content_type}, body) 
+        return self.http_request('POST', uri, {'Content-Type': content_type}, body)
 
     # Utility functions used by Riak library.
 
@@ -386,7 +387,7 @@ class RiakHttpTransport(RiakTransport) :
         # Return.
         return path
 
-    def http_request(self, method, uri, headers=None, body='') :
+    def http_request(self, method, uri, headers=None, body='', timeout=None):
         """
         Given a Method, URL, Headers, and Body, perform and HTTP request,
         and return a 2-tuple containing a dictionary of response headers
@@ -398,7 +399,7 @@ class RiakHttpTransport(RiakTransport) :
         client = None
         response = None
         try:
-            client = httplib.HTTPConnection(self._host, self._port)
+            client = httplib.HTTPConnection(self._host, self._port, timeout=self._timeout)
             client.request(method, uri, body, headers)
             response = client.getresponse()
 
@@ -451,18 +452,18 @@ class RiakHttpReuseTransport(RiakHttpTransport):
     """
 
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id=None):
+                 mapred_prefix='mapred', client_id=None, timeout=None):
         super(RiakHttpReuseTransport, self).__init__(host=host,
                                                      port=port,
                                                      prefix=prefix,
                                                      mapred_prefix=
                                                      mapred_prefix,
-                                                     client_id=client_id)
+                                                     client_id=client_id,
+                                                     timeout=timeout)
 
     def __copy__(self):
         return RiakHttpReuseTransport(self._host, self._port, self._prefix,
-                                      self._mapred_prefix)
+                                      self._mapred_prefix, timeout=self._timeout)
 
     def http_request(self, method, uri, headers=None, body=''):
         if headers is None:
@@ -471,7 +472,7 @@ class RiakHttpReuseTransport(RiakHttpTransport):
         client = None
         response = None
         try:
-            client = httplib.HTTPConnection(self._host, self._port)
+            client = httplib.HTTPConnection(self._host, self._port, timeout=self._timeout)
 
             #handle the connection myself, try to reuse sockets
             client.auto_open = 0
@@ -514,21 +515,20 @@ class RiakHttpPoolTransport(RiakHttpTransport):
     http_pool = None
 
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id=None):
+                 mapred_prefix='mapred', client_id=None, timeout=None):
         if urllib3 is None:
             raise RiakError("this transport is not available (no urllib3)")
 
         super(RiakHttpPoolTransport, self).__init__(host=host,
                                                     port=port,
                                                     prefix=prefix,
-                                                    mapred_prefix=
-                                                    mapred_prefix,
-                                                    client_id=client_id)
+                                                    mapred_prefix=mapred_prefix,
+                                                    client_id=client_id,
+                                                    timeout=timeout)
 
     def __copy__(self):
         return RiakHttpPoolTransport(self._host, self._port, self._prefix,
-                                     self._mapred_prefix)
+                                     self._mapred_prefix, timeout=self._timeout)
 
     def http_request(self, method, uri, headers={}, body=''):
         if headers is None:
@@ -538,7 +538,9 @@ class RiakHttpPoolTransport(RiakHttpTransport):
             ### but this code is supporting backwards-compat where the
             ### use of a class variable was the design.
             if self.__class__.http_pool is None:
-                self.__class__.http_pool = urllib3.connection_from_url('http://%s:%d' % (self._host, self._port), maxsize=10)
+                self.__class__.http_pool = urllib3.connection_from_url(
+                    'http://%s:%d' % (self._host, self._port),
+                    maxsize=10, timeout=self._timeout)
 
             response = self.http_pool.urlopen(method, uri, body, headers)
 
