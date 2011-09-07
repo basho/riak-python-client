@@ -17,6 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+from __future__ import with_statement
+
 import urllib, re
 from cStringIO import StringIO
 import httplib
@@ -30,6 +32,7 @@ from riak.metadata import *
 from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.multidict import MultiDict
+from connection import HTTPConnectionManager
 
 MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
 
@@ -51,8 +54,7 @@ class RiakHttpTransport(RiakTransport) :
         @param string client_id - client id to use for vector clocks
         """
         super(RiakHttpTransport, self).__init__()
-        self._host = host
-        self._port = port
+        self._conns = HTTPConnectionManager([(host, port)])
         self._prefix = prefix
         self._mapred_prefix = mapred_prefix
         self._client_id = client_id
@@ -60,6 +62,9 @@ class RiakHttpTransport(RiakTransport) :
             self._client_id = self.make_random_client_id()
 
     def __copy__(self):
+        ### not implemented right now
+        raise Exception('not implemented')
+        ### we don't have _host and _port. will fix after some refactoring...
         return RiakHttpTransport(self._host, self._port, self._prefix,
                                  self._mapred_prefix)
 
@@ -240,7 +245,8 @@ class RiakHttpTransport(RiakTransport) :
 
         # Check if the server is down(status==0)
         if not status:
-            m = 'Could not contact Riak Server: http://' + self._host + ':' + str(self._port) + '!'
+            ### we need the host/port that was used.
+            m = 'Could not contact Riak Server: http://$HOST:$PORT !'
             raise RiakError(m)
 
         # Verify that we got one of the expected statuses. Otherwise, raise an exception.
@@ -395,27 +401,22 @@ class RiakHttpTransport(RiakTransport) :
         if headers is None:
             headers = {}
         # Run the request...
-        client = None
-        response = None
-        try:
-            client = httplib.HTTPConnection(self._host, self._port)
-            client.request(method, uri, body, headers)
-            response = client.getresponse()
+        with self._conns.withconn() as conn:
+            conn.request(method, uri, body, headers)
+            response = conn.getresponse()
 
-            # Get the response headers...
-            response_headers = {'http_code': response.status}
-            for (key, value) in response.getheaders():
-                response_headers[key.lower()] = value
+            try:
+                # Get the response headers...
+                response_headers = {'http_code': response.status}
+                for (key, value) in response.getheaders():
+                    response_headers[key.lower()] = value
 
-            # Get the body...
-            response_body = response.read()
-            response.close()
+                # Get the body...
+                response_body = response.read()
+            finally:
+              response.close()
 
             return response_headers, response_body
-        except:
-            if client is not None: client.close()
-            if response is not None: response.close()
-            raise
 
     @classmethod
     def build_headers(cls, headers):
