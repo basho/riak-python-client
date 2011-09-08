@@ -15,11 +15,24 @@ class ConnectionManager(object):
   connection_class = None
 
   def __init__(self, hostports=[]):
+    # We want a private copy of this list: either to detach the argument
+    # default, or to detach from the caller's list.
     self.hostports = hostports[:]
-    self.conns = [ ]
+
+    # Open a connection to each specified host/port. On single-threaded
+    # systems, this will create a round-robin across all specified servers.
+    # When multi-threaded, this will give us an initial set for all the
+    # threads to work with (and more will be created, according to demand).
+    self.conns = [self.connection_class(host, port)
+                  for host, port in hostports]
 
   def add_hostport(self, host, port):
     self.hostports.append((host, port))
+
+    # Open an initial connection. For single-threaded, this adds to the
+    # round-robin pool. On multi-threaded, it simply gives us an extra
+    # connectiong for the load-balancing across the servers.
+    self.conn.append(self.connection_class(host, port))
 
   def remove_host(self, host, port=None):
     if port is None:
@@ -28,7 +41,27 @@ class ConnectionManager(object):
     else:
       self.hostports.remove((host, port))
 
-  # just in case somebody wants a host/port combo and typos...
+    # Now that the host/port pair has been removed from self.hostports,
+    # no connections on this pair will be added in .giveback(). Thus, the
+    # existing connections are all that may exist at this time. We'll
+    # snapshot the list, and look for offending connections, then try and
+    # remove them, being wary that race conditions may remove them before
+    # we can remove it.
+    for conn in self.conns[:]:
+      if conn.host == host:
+        try:
+          if port is None or conn.port == port:
+            self.conns.remove(conn)
+
+            # If the connection was still present (no ValueError), then we
+            # should go ahead and close it down.
+            conn.close()
+        except ValueError:
+          # Another thread removed the connection. It won't be coming back,
+          # so we have nothing to do here.
+          pass
+
+  # Just in case somebody uses a host/port combo and typos...
   remove_hostport = remove_host
 
   def take(self):
@@ -80,17 +113,20 @@ class ConnectionManager(object):
       return conn
 
     # Be careful about rotating. We want to append before removing, so that
-    # we never hit a len==0 race condition.
+    # we never hit a len==0 race condition (which could prevent the creation
+    # of needed connections).
     self.hostports.append((host, port))
 
     # RACE: another thread may have appended the same host/port pair. We
-    #   will add another pair. Each thread will remove one, resulting in
-    #   a correct state of a single pair in the list.
+    #   will add another pair. Each thread will remove one (either [0], or
+    #   one that had been appened), resulting in a correct state of a single
+    #   pair in the list.
     # RACE: another thread may get the host/port pair from hostports[0]
     #   before we have a chance to remove it. We don't need precision
     #   round-robin behavior; just something close.
-    # RACE: another thread may have removed hostports[0], but it will have
-    #   placed another copy at the end. We have added a host/port pair, and
+    # RACE: another thread may have removed hostports[0] (which we are
+    #   also trying to remove), but it will have placed another copy at
+    #   the end before doing so. We have also added a host/port pair, and
     #   will remove one, leaving the list in a correct state.
     self.hostports.remove((host, port))
 
