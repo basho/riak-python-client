@@ -17,6 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+from __future__ import with_statement
+
 import socket, struct
 
 try:
@@ -28,7 +30,11 @@ from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakMapReduce, RiakLink
 from riak import RiakError
-import riakclient_pb2
+
+try:
+    import riakclient_pb2
+except ImportError:
+    riakclient_pb2 = None
 
 ## Protocol codes
 MSG_CODE_ERROR_RESP           =  0
@@ -82,6 +88,9 @@ class RiakPbcTransport(RiakTransport):
         @param string host - Hostname or IP address (default '127.0.0.1')
         @param int port - Port number (default 8087)
         """
+        if riakclient_pb2 is None:
+            raise RiakError("this transport is not available (no protobuf)")
+
         super(RiakPbcTransport, self).__init__()
         self._host = host
         self._port = port
@@ -358,8 +367,8 @@ class RiakPbcTransport(RiakTransport):
         pkt = self.encode_msg(msg_code, msg)
         sent_len = self._sock.send(pkt)
         if sent_len != len(pkt):
-            raise RiakError("PB socket returned short write {0} - expected {1}".
-                            format(sent_len, len(pkt)))
+            raise RiakError("PB socket returned short write %d - expected %d"%\
+                            (sent_len, len(pkt))
 
     def recv_msg(self):
         self.recv_pkt()
@@ -398,7 +407,7 @@ class RiakPbcTransport(RiakTransport):
             msg = riakclient_pb2.RpbMapRedResp()
             msg.ParseFromString(self._inbuf[1:])
         else:
-            raise Exception("unknown msg code {0}".format(msg_code))
+            raise Exception("unknown msg code %s"%msg_code)
         return msg_code, msg
 
 
@@ -406,8 +415,8 @@ class RiakPbcTransport(RiakTransport):
         nmsglen = self._sock.recv(4)
         if len(nmsglen) != 4:
             self._sock = None
-            raise RiakError("Socket returned short packet length {0} - expected 4".
-                            format(nmsglen))
+            raise RiakError("Socket returned short packet length %d - expected 4"%\
+                            nmsglen)
         msglen, = struct.unpack('!i', nmsglen)
         self._inbuf_len = msglen
         self._inbuf = ''
@@ -417,8 +426,8 @@ class RiakPbcTransport(RiakTransport):
             if not recv_buf: break
             self._inbuf += recv_buf
         if len(self._inbuf) != self._inbuf_len:
-            raise RiakError("Socket returned short packet {0} - expected {1}".
-                            format(len(self._inbuf), self._inbuf_len))
+            raise RiakError("Socket returned short packet %d - expected %d"%\
+                            (len(self._inbuf), self._inbuf_len))
 
     def decode_contents(self, rpb_contents):
         contents = []
@@ -492,6 +501,9 @@ import contextlib
 class RiakPbcCachedTransport(RiakTransport):
     """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
     def __init__(self, host='127.0.0.1', port=8087, client_id=None, maxsize=0, block=False, timeout=None):
+        if riakclient_pb2 is None:
+            raise RiakError("this transport is not available (no protobuf)")
+
         self.host = host
         self.port = port
         self.client_id = client_id

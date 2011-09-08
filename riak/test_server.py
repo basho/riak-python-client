@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 import os.path
 import threading
 import string
@@ -7,6 +9,11 @@ import shutil
 import time
 from subprocess import Popen, PIPE
 from riak.util import deep_merge
+
+try:
+  bytes
+except NameError:
+  bytes = str
 
 def erlang_config(hash, depth=1):
     def printable(item):
@@ -48,7 +55,7 @@ class TestServer:
           "ring_creation_size": 64
       },
       "riak_kv": {
-          "storage_backend": bytearray("riak_kv_test_backend"),
+          "storage_backend": bytes("riak_kv_test_backend"),
           "pb_ip": "127.0.0.1",
           "pb_port": 9002,
           "js_vm_count": 8,
@@ -60,7 +67,7 @@ class TestServer:
       },
       "riak_search": {
           "enabled": True,
-          "search_backend": bytearray("riak_search_test_backend")
+          "search_backend": bytes("riak_search_test_backend")
       },
       "luwak": {
           "enabled": True
