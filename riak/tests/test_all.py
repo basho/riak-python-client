@@ -43,6 +43,7 @@ HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
 SKIP_LUWAK = int(os.environ.get('SKIP_LUWAK', '0'))
+SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
 USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
 
 if USE_TEST_SERVER:
@@ -517,6 +518,66 @@ class BaseTestCase(object):
         buckets = self.client.get_buckets()
         self.assertTrue("list_bucket" in buckets)
 
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    def test_secondary_index_store(self):
+        # Create a new object with indexes...
+        bucket = self.client.bucket('indexbucket')
+        rand = self.randint()
+        obj = bucket.new('mykey1', rand)
+        obj.set_indexes({
+                'field1_bin': 'val1',
+                'field2_int': 1001
+                })
+        obj.store()
+
+        # Retrieve the object, check that the correct indexes exist...
+        obj = bucket.get('mykey1')
+        self.assertEqual('val1', obj.get_indexes()['field1_bin'])
+        self.assertEqual(1001, int(obj.get_indexes()['field2_int']))
+
+        # Clean up...
+        bucket.get('mykey1').delete()
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    def test_secondary_index_query(self):
+        bucket = self.client.bucket('indexbucket')
+        bucket.new('mykey1', 'data1').set_indexes({'field1_bin':'val1', 'field2_int':1001}).store()
+        bucket.new('mykey2', 'data2').set_indexes({'field1_bin':'val2', 'field2_int':1002}).store()
+        bucket.new('mykey3', 'data3').set_indexes({'field1_bin':'val3', 'field2_int':1003}).store()
+        bucket.new('mykey4', 'data4').set_indexes({'field1_bin':'val4', 'field2_int':1004}).store()
+
+        # Test an equality query...
+        results = self.client.index('indexbucket', 'field1_bin', 'val2').run()
+        self.assertEquals(1, len(results))
+        self.assertEquals('mykey2', results[0].get_key())
+
+        # Test a range query...
+        results = self.client.index('indexbucket', 'field1_bin', 'val2', 'val4').run()
+        vals = set()
+        for i in results:
+            vals.add(i.get_key())
+        self.assertEquals(3, len(results))
+        self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
+
+        # Test an equality query...
+        results = self.client.index('indexbucket', 'field2_int', 1002).run()
+        self.assertEquals(1, len(results))
+        self.assertEquals('mykey2', results[0].get_key())
+
+        # Test a range query...
+        results = self.client.index('indexbucket', 'field2_int', 1002, 1004).run()
+        vals = set()
+        for i in results:
+            vals.add(i.get_key())
+        self.assertEquals(3, len(results))
+        self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
+
+        # Clean up...
+        bucket.get('mykey1').delete()
+        bucket.get('mykey2').delete()
+        bucket.get('mykey3').delete()
+        bucket.get('mykey4').delete()
+
 class MapReduceAliasTestMixIn(object):
     """This tests the map reduce aliases"""
 
@@ -896,7 +957,6 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         self.client.solr().delete("searchbucket", docs=["dizzy"], queries=["username:russell"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(0, len(results["response"]["docs"]))
-
 
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 

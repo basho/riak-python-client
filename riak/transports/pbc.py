@@ -471,6 +471,11 @@ class RiakPbcTransport(RiakTransport):
             usermeta[usermd.key] = usermd.value
         if len(usermeta) > 0:
             metadata[MD_USERMETA] = usermeta
+        indexes = {}
+        for index in rpb_content.indexes:
+            indexes[index.key] = index.value
+        if len(indexes) > 0:
+            metadata[MD_INDEX] = indexes
         return metadata, rpb_content.value
 
     def pbify_content(self, metadata, data, rpb_content) :
@@ -488,6 +493,11 @@ class RiakPbcTransport(RiakTransport):
                     pair = rpb_content.usermeta.add()
                     pair.key = uk
                     pair.value = uv
+            elif k == MD_INDEX:
+                for uk, uv in v.iteritems():
+                    pair = rpb_content.indexes.add()
+                    pair.key = uk
+                    pair.value = str(uv)
             elif k == MD_LINKS:
                 for link in v:
                     pb_link = rpb_content.links.add()

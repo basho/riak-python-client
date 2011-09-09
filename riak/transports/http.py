@@ -113,6 +113,9 @@ class RiakHttpTransport(RiakTransport) :
         for key, value in robj.get_usermeta().iteritems():
             headers['X-Riak-Meta-%s' % key] = value
 
+        for key, value in robj.get_indexes().iteritems():
+            headers['X-Riak-Index-%s' % key] = value
+
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body, key=robj.get_key())
 
@@ -261,7 +264,7 @@ class RiakHttpTransport(RiakTransport) :
 
         # Parse the headers...
         vclock = None
-        metadata = {MD_USERMETA: {}}
+        metadata = {MD_USERMETA: {}, MD_INDEX: {}}
         links = []
         for header, value in headers.iteritems():
             if header == 'content-type':
@@ -278,6 +281,8 @@ class RiakHttpTransport(RiakTransport) :
                 metadata[MD_LASTMOD] = value
             elif header.startswith('x-riak-meta-'):
                 metadata[MD_USERMETA][header.replace('x-riak-meta-', '')] = value
+            elif header.startswith('x-riak-index-'):
+                metadata[MD_INDEX][header.replace('x-riak-index-', '')] = value
             elif header == 'x-riak-vclock':
                 vclock = value
         if links:
