@@ -368,7 +368,7 @@ class RiakPbcTransport(RiakTransport):
         sent_len = self._sock.send(pkt)
         if sent_len != len(pkt):
             raise RiakError("PB socket returned short write %d - expected %d"%\
-                            (sent_len, len(pkt))
+                            (sent_len, len(pkt)))
 
     def recv_msg(self):
         self.recv_pkt()
