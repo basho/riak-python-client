@@ -40,6 +40,11 @@ class TestServerTestCase(unittest.TestCase):
     def test_set_default_tmp_dir(self):
         self.assertEquals(self.test_server.temp_dir, "/tmp/riak/test_server")
 
+    def test_set_non_default_tmp_dir(self):
+        tmp_dir = '/not/the/default/dir'
+        server = TestServer(tmp_dir=tmp_dir)
+        self.assertEquals(server.temp_dir, tmp_dir)
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(TestServerTestCase())
