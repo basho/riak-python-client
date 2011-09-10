@@ -35,7 +35,7 @@ class RiakTransport(object):
         Returns a random client identifier
         """
         return 'py_%s' % base64.b64encode(
-                str(random.randint(1, 1073741824)))
+                str(random.randint(1, 0x40000000)))
 
     @classmethod
     def make_fixed_client_id(self):
@@ -134,9 +134,9 @@ class RiakTransport(object):
         """
         raise RiakError("luwak not supported by this transport.")
 
+    def delete_file(self, key):
         """
         Delete an object in luwak.
         key = the object's key
         """
-    def delete_file(self, key):
         raise RiakError("luwak not supported by this transport.")

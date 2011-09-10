@@ -19,13 +19,7 @@ under the License.
 """
 import urllib, re
 from cStringIO import StringIO
-# Use pycurl as first choice, httplib as second choice.
-try:
-    import pycurl
-    HAS_PYCURL = True
-except ImportError:
-    import httplib
-    HAS_PYCURL = False
+import httplib
 try:
     import json
 except ImportError:
@@ -79,7 +73,7 @@ class RiakHttpTransport(RiakTransport) :
         """
         Check server is alive over HTTP
         """
-        response = self.http_request('GET', self._host, self._port, '/ping')
+        response = self.http_request('GET', '/ping')
         return(response is not None) and (response[1] == 'OK')
 
 
@@ -90,9 +84,9 @@ class RiakHttpTransport(RiakTransport) :
         params = {'r' : r}
         if vtag is not None:
             params['vtag'] = vtag
-        host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
-                                               params=params)
-        response = self.http_request('GET', host, port, url)
+        url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+                                   params=params)
+        response = self.http_request('GET', url)
         return self.parse_body(response, [200, 300, 404])
 
     def put(self, robj, w = None, dw = None, return_body = True):
@@ -101,8 +95,8 @@ class RiakHttpTransport(RiakTransport) :
         """
        # Construct the URL...
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw}
-        host, port, url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
-                                               params=params)
+        url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
+                                   params=params)
 
         # Construct the headers...
         headers = MultiDict({'Accept' : 'text/plain, */*; q=0.5',
@@ -120,13 +114,13 @@ class RiakHttpTransport(RiakTransport) :
             headers['X-Riak-Meta-%s' % key] = value
 
         content = robj.get_encoded_data()
-        return self.do_put(host, port, url, headers, content, return_body, key=robj.get_key())
+        return self.do_put(url, headers, content, return_body, key=robj.get_key())
 
-    def do_put(self, host, port, url, headers, content, return_body=False, key=None):
+    def do_put(self, url, headers, content, return_body=False, key=None):
         if key is None:
-          response = self.http_request('POST', host, port, url, headers, content)
+          response = self.http_request('POST', url, headers, content)
         else:
-          response = self.http_request('PUT', host, port, url, headers, content)
+          response = self.http_request('PUT', url, headers, content)
 
         if return_body:
           return self.parse_body(response, [200, 201, 300])
@@ -137,18 +131,18 @@ class RiakHttpTransport(RiakTransport) :
     def delete(self, robj, rw):
         # Construct the URL...
         params = {'rw' : rw}
-        host, port, url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
-                                               params=params)
+        url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+                                   params=params)
         # Run the operation..
-        response = self.http_request('DELETE', host, port, url)
+        response = self.http_request('DELETE', url)
         self.check_http_code(response, [204, 404])
         return self
 
 
     def get_keys(self, bucket):
         params = {'props' : 'True', 'keys' : 'true'}
-        host, port, url = self.build_rest_path(bucket, params=params)
-        response = self.http_request('GET', host, port, url)
+        url = self.build_rest_path(bucket, params=params)
+        response = self.http_request('GET', url)
 
         headers, encoded_props = response[0:2]
         if headers['http_code'] == 200:
@@ -159,8 +153,8 @@ class RiakHttpTransport(RiakTransport) :
 
     def get_buckets(self):
         params = {'buckets': 'true'}
-        host, port, url = self.build_rest_path(None, params=params)
-        response = self.http_request('GET', host, port, url)
+        url = self.build_rest_path(None, params=params)
+        response = self.http_request('GET', url)
 
         headers, encoded_props = response[0:2]
         if headers['http_code'] == 200:
@@ -172,8 +166,8 @@ class RiakHttpTransport(RiakTransport) :
     def get_bucket_props(self, bucket):
         # Run the request...
         params = {'props' : 'True', 'keys' : 'False'}
-        host, port, url = self.build_rest_path(bucket, params=params)
-        response = self.http_request('GET', host, port, url)
+        url = self.build_rest_path(bucket, params=params)
+        response = self.http_request('GET', url)
 
         headers = response[0]
         encoded_props = response[1]
@@ -188,12 +182,12 @@ class RiakHttpTransport(RiakTransport) :
         """
         Set the properties on the bucket object given
         """
-        host, port, url = self.build_rest_path(bucket)
+        url = self.build_rest_path(bucket)
         headers = {'Content-Type' : 'application/json'}
         content = json.dumps({'props' : props})
 
         # Run the request...
-        response = self.http_request('PUT', host, port, url, headers, content)
+        response = self.http_request('PUT', url, headers, content)
 
         # Handle the response...
         if response is None:
@@ -214,10 +208,8 @@ class RiakHttpTransport(RiakTransport) :
         content = json.dumps(job)
 
         # Do the request...
-        host = self._host
-        port = self._port
         url = "/" + self._mapred_prefix
-        response = self.http_request('POST', host, port, url, {}, content)
+        response = self.http_request('POST', url, {}, content)
         result = json.loads(response[1])
         return result
 
@@ -336,19 +328,19 @@ class RiakHttpTransport(RiakTransport) :
         return headers
 
     def get_request(self, uri=None, params=None):
-        host, port, url = self.build_rest_path(bucket=None, params=params, prefix=uri)
-        return self.http_request('GET', host, port, url)
+        url = self.build_rest_path(bucket=None, params=params, prefix=uri)
+        return self.http_request('GET', url)
 
     def store_file(self, key, content_type="application/octet-stream", content=None):
-        host, port, url = self.build_rest_path(prefix='luwak', key=key)
+        url = self.build_rest_path(prefix='luwak', key=key)
         headers = {'Content-Type' : content_type,
                    'X-Riak-ClientId' : self._client_id}
 
-        return self.do_put(host, port, url, headers, content, key=key)
+        return self.do_put(url, headers, content, key=key)
 
     def get_file(self, key):
-        host, port, url = self.build_rest_path(prefix='luwak', key=key)
-        response = self.http_request('GET', host, port, url)
+        url = self.build_rest_path(prefix='luwak', key=key)
+        response = self.http_request('GET', url)
         result = self.parse_body(response, [200, 300, 404])
         if result is not None:
             (vclock, data) = result
@@ -356,22 +348,15 @@ class RiakHttpTransport(RiakTransport) :
             return body
 
     def delete_file(self, key):
-        host, port, url = self.build_rest_path(prefix='luwak', key=key)
-        response = self.http_request('DELETE', host, port, url)
+        url = self.build_rest_path(prefix='luwak', key=key)
+        response = self.http_request('DELETE', url)
         self.parse_body(response, [204, 404])
 
     def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
-        host, port, uri = self.build_rest_path(prefix=uri, params=params)
-        return self.http_request('POST', self._host, self._port, uri, {'Content-Type': content_type}, body) 
+        uri = self.build_rest_path(prefix=uri, params=params)
+        return self.http_request('POST', uri, {'Content-Type': content_type}, body) 
 
     # Utility functions used by Riak library.
-
-    @classmethod
-    def get_value(cls, key, array, defaultValue) :
-        if key in array:
-            return array[key]
-        else:
-            return defaultValue
 
     def build_rest_path(self, bucket=None, key=None, params=None, prefix=None) :
         """
@@ -399,32 +384,21 @@ class RiakHttpTransport(RiakTransport) :
             path += '?' + s
 
         # Return.
-        return self._host, self._port, path
+        return path
 
-    @classmethod
-    def http_request(cls, method, host, port, url, headers = None, obj = '') :
+    def http_request(self, method, uri, headers=None, body='') :
         """
         Given a Method, URL, Headers, and Body, perform and HTTP request,
-        and return an array of arity 2 containing an associative array of
-        response headers and the response body.
+        and return a 2-tuple containing a dictionary of response headers
+        and the response body.
         """
-        if not headers:
-            headers = {}
-        if HAS_PYCURL:
-            return cls.pycurl_request(method, host, port, url, headers, obj)
-        else:
-            return cls.httplib_request(method, host, port, url, headers, obj)
-
-
-    @classmethod
-    def httplib_request(cls, method, host, port, uri, headers = None, body=''):
-        if not headers:
+        if headers is None:
             headers = {}
         # Run the request...
         client = None
         response = None
         try:
-            client = httplib.HTTPConnection(host, port)
+            client = httplib.HTTPConnection(self._host, self._port)
             client.request(method, uri, body, headers)
             response = client.getresponse()
 
@@ -441,53 +415,6 @@ class RiakHttpTransport(RiakTransport) :
         except:
             if client is not None: client.close()
             if response is not None: response.close()
-            raise
-
-
-    @classmethod
-    def pycurl_request(cls, method, host, port, uri, headers, body=''):
-        if not headers:
-            headers = {}
-        url = "http://" + host + ":" + str(port) + uri
-        # Set up Curl...
-        client = pycurl.Curl()
-        client.setopt(pycurl.URL, url)
-        client.setopt(pycurl.HTTPHEADER, cls.build_headers(headers))
-        if method == 'GET':
-            client.setopt(pycurl.HTTPGET, 1)
-        elif method == 'POST':
-            client.setopt(pycurl.POST, 1)
-            client.setopt(pycurl.POSTFIELDS, body)
-        elif method == 'PUT':
-            client.setopt(pycurl.CUSTOMREQUEST, method)
-            client.setopt(pycurl.POSTFIELDS, body)
-        elif method == 'DELETE':
-            client.setopt(pycurl.CUSTOMREQUEST, method)
-
-        # Capture the response headers...
-        response_headers_io = StringIO()
-        client.setopt(pycurl.HEADERFUNCTION, response_headers_io.write)
-
-        # Capture the response body...
-        response_body_io = StringIO()
-        client.setopt(pycurl.WRITEFUNCTION, response_body_io.write)
-
-        try:
-            # Run the request.
-            client.perform()
-            http_code = client.getinfo(pycurl.HTTP_CODE)
-            client.close()
-
-            # Get the headers...
-            response_headers = cls.parse_http_headers(response_headers_io.getvalue())
-            response_headers['http_code'] = http_code
-
-            # Get the body...
-            response_body = response_body_io.getvalue()
-
-            return response_headers, response_body
-        except:
-            if client is not None: client.close()
             raise
 
     @classmethod
@@ -537,13 +464,14 @@ class RiakHttpReuseTransport(RiakHttpTransport):
         return RiakHttpReuseTransport(self._host, self._port, self._prefix,
                                       self._mapred_prefix)
 
-    @classmethod
-    def httplib_request(cls, method, host, port, uri, headers, body=''):
+    def http_request(self, method, uri, headers=None, body=''):
+        if headers is None:
+            headers = {}
         # Run the request...
         client = None
         response = None
         try:
-            client = httplib.HTTPConnection(host, port)
+            client = httplib.HTTPConnection(self._host, self._port)
 
             #handle the connection myself, try to reuse sockets
             client.auto_open = 0
@@ -602,13 +530,17 @@ class RiakHttpPoolTransport(RiakHttpTransport):
         return RiakHttpPoolTransport(self._host, self._port, self._prefix,
                                      self._mapred_prefix)
 
-    @classmethod
-    def httplib_request(cls, method, host, port, uri, headers, body=''):
+    def http_request(self, method, uri, headers={}, body=''):
+        if headers is None:
+            headers = {}
         try:
-            if cls.http_pool is None:
-                cls.http_pool = urllib3.connection_from_url('http://%s:%d' % (host, port), maxsize=10)
+            ### it seems wrong to put the pool into a *class* variable,
+            ### but this code is supporting backwards-compat where the
+            ### use of a class variable was the design.
+            if self.__class__.http_pool is None:
+                self.__class__.http_pool = urllib3.connection_from_url('http://%s:%d' % (self._host, self._port), maxsize=10)
 
-            response = cls.http_pool.urlopen(method, uri, body, headers)
+            response = self.http_pool.urlopen(method, uri, body, headers)
 
             response_headers = {'http_code': response.status}
             for key, value in response.getheaders().iteritems():
