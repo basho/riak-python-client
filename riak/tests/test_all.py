@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import with_statement
 
 import copy
 import cPickle
@@ -24,12 +25,24 @@ from riak import RiakKeyFilter, key_filter
 from riak.mapreduce import RiakLink
 from riak.test_server import TestServer
 
+try:
+    import riak.transports.riakclient_pb2
+    HAVE_PROTO = True
+except ImportError:
+    HAVE_PROTO = False
+try:
+    import urllib3
+    HAVE_HTTP_POOL = True
+except ImportError:
+    HAVE_HTTP_POOL = False
+
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
+SKIP_LUWAK = int(os.environ.get('SKIP_LUWAK', '0'))
 USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
 
 if USE_TEST_SERVER:
@@ -40,7 +53,6 @@ if USE_TEST_SERVER:
     test_server.prepare()
     test_server.start()
 
-SKIP_LUWAK = int(os.environ.get('SKIP_LUWAK', '0'))
 
 class NotJsonSerializable(object):
 
@@ -443,10 +455,8 @@ class BaseTestCase(object):
         self.assertEqual(o.get_content_type(), "application/octet-stream")
         o.delete()
 
-
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_search_integration(self):
-        if SKIP_SEARCH:
-            return True
         # Create some objects to search across...
         bucket = self.client.bucket("searchbucket")
         bucket.new("one", {"foo":"one", "bar":"red"}).store()
@@ -698,6 +708,8 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
                                unittest.TestCase):
 
     def setUp(self):
+        if not HAVE_PROTO:
+          self.skipTest('protobuf is unavailable')
         self.host = PB_HOST
         self.port = PB_PORT
         self.transport_class = RiakPbcTransport
@@ -712,9 +724,12 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
                             client_id = zero_client_id)
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
+
 class RiakPbcCachedTransportCase(BaseTestCase, MapReduceAliasTestMixIn,
                                unittest.TestCase):
     def setUp(self):
+        if not HAVE_PROTO:
+          self.skipTest('protobuf is unavailable')
         self.host = PB_HOST
         self.port = PB_PORT
         self.transport_class = RiakPbcCachedTransport
@@ -779,10 +794,8 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket.disable_search()
         self.assertFalse(self.client.bucket("no_search_bucket").search_enabled())
 
+    @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
     def test_store_file_with_luwak(self):
-        if SKIP_LUWAK:
-            return True
-
         file = os.path.dirname(__file__) + "/test_all.py"
         with open(file, "r") as input_file:
             data = input_file.read()
@@ -790,10 +803,8 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         key = uuid.uuid1().hex
         self.client.store_file(key, data)
 
+    @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
     def test_store_get_file_with_luwak(self):
-        if SKIP_LUWAK:
-            return True
-
         file = os.path.dirname(__file__) + "/test_all.py"
         with open(file, "r") as input_file:
             data = input_file.read()
@@ -804,10 +815,8 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         file = self.client.get_file(key)
         self.assertEquals(data, file)
 
+    @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
     def test_delete_file_with_luwak(self):
-        if SKIP_LUWAK:
-            return True
-
         file = os.path.dirname(__file__) + "/test_all.py"
         with open(file, "r") as input_file:
             data = input_file.read()
@@ -820,17 +829,15 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         file = self.client.get_file(key)
         self.assertIsNone(file)
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search_from_bucket(self):
-        if SKIP_SEARCH:
-            return True
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = bucket.search("username:roidrage")
         self.assertEquals(1, len(results["response"]["docs"]))
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search_with_params_from_bucket(self):
-        if SKIP_SEARCH:
-            return True
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = bucket.search("username:roidrage", wt="xml")
@@ -838,9 +845,8 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         if not hasattr(result, "iter"): setattr(result, "iter", result.getiterator)
         self.assertEquals(1, len(list(result.iter("doc"))))
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search_with_params(self):
-        if SKIP_SEARCH:
-            return True
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = self.client.solr().search("searchbucket", "username:roidrage", wt="xml")
@@ -848,56 +854,52 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         if not hasattr(result, "iter"): setattr(result, "iter", result.getiterator)
         self.assertEquals(1, len(list(result.iter("doc"))))
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search(self):
-        if SKIP_SEARCH:
-            return True
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
         results = self.client.solr().search("searchbucket", "username:roidrage")
         self.assertEquals(1, len(results["response"]["docs"]))
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_document_to_index(self):
-        if SKIP_SEARCH:
-            return True
-
         self.client.solr().add("searchbucket", {"id": "doc", "username": "tony"})
         results = self.client.solr().search("searchbucket", "username:tony")
         self.assertEquals("tony", results["response"]["docs"][0]["fields"]["username"])
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_multiple_documents_to_index(self):
-        if SKIP_SEARCH:
-            return True
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(2, len(results["response"]["docs"]))
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_id(self):
-        if SKIP_SEARCH:
-            return True
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         self.client.solr().delete("searchbucket", docs=["dizzy"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(1, len(results["response"]["docs"]))
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query(self):
-        if SKIP_SEARCH:
-            return True
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         self.client.solr().delete("searchbucket", queries=["username:dizzy", "username:russell"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(0, len(results["response"]["docs"]))
 
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query_and_id(self):
-        if SKIP_SEARCH:
-            return True
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         self.client.solr().delete("searchbucket", docs=["dizzy"], queries=["username:russell"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(0, len(results["response"]["docs"]))
 
+
 class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
     def setUp(self):
+        if not HAVE_HTTP_POOL:
+            self.skipTest('urllib3 is unavailable')
         self.host = HTTP_HOST
         self.port = HTTP_PORT
         self.transport_class = RiakHttpPoolTransport
