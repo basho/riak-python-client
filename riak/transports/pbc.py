@@ -416,7 +416,7 @@ class RiakPbcTransport(RiakTransport):
         if len(nmsglen) != 4:
             self._sock = None
             raise RiakError("Socket returned short packet length %d - expected 4"%\
-                            nmsglen)
+                            len(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
         self._inbuf_len = msglen
         self._inbuf = ''
