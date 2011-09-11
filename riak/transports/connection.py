@@ -32,7 +32,7 @@ class ConnectionManager(object):
     # Open an initial connection. For single-threaded, this adds to the
     # round-robin pool. On multi-threaded, it simply gives us an extra
     # connectiong for the load-balancing across the servers.
-    self.conn.append(self.connection_class(host, port))
+    self.conns.append(self.connection_class(host, port))
 
   def remove_host(self, host, port=None):
     if port is None:
@@ -48,18 +48,17 @@ class ConnectionManager(object):
     # remove them, being wary that race conditions may remove them before
     # we can remove it.
     for conn in self.conns[:]:
-      if conn.host == host:
+      if conn.host == host and (port is None or conn.port == port):
         try:
-          if port is None or conn.port == port:
-            self.conns.remove(conn)
-
-            # If the connection was still present (no ValueError), then we
-            # should go ahead and close it down.
-            conn.close()
+          self.conns.remove(conn)
         except ValueError:
           # Another thread removed the connection. It won't be coming back,
           # so we have nothing to do here.
           pass
+        else:
+          # If the connection was still present (no ValueError), then we
+          # should go ahead and close it down.
+          conn.close()
 
   # Just in case somebody uses a host/port combo and typos...
   remove_hostport = remove_host
