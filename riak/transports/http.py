@@ -387,7 +387,7 @@ class RiakHttpTransport(RiakTransport) :
         # Return.
         return path
 
-    def http_request(self, method, uri, headers=None, body='', timeout=None):
+    def http_request(self, method, uri, headers=None, body=''):
         """
         Given a Method, URL, Headers, and Body, perform and HTTP request,
         and return a 2-tuple containing a dictionary of response headers
