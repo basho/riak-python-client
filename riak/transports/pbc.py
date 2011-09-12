@@ -19,7 +19,7 @@ under the License.
 """
 from __future__ import with_statement
 
-import socket, struct
+import select, socket, struct
 
 try:
     import json
@@ -410,9 +410,15 @@ class RiakPbcTransport(RiakTransport):
             raise Exception("unknown msg code %s"%msg_code)
         return msg_code, msg
 
+    def _recv(self, length):
+        if self._timeout:
+            ready = select.select([self._sock], [], [], self._timeout)
+            if not ready[0]:
+                raise socket.timeout("timed out")
+        return self._sock.recv(length)
 
     def recv_pkt(self):
-        nmsglen = self._sock.recv(4)
+        nmsglen = self._recv(4)
         if len(nmsglen) != 4:
             self._sock = None
             raise RiakError("Socket returned short packet length %d - expected 4"%\
@@ -422,7 +428,7 @@ class RiakPbcTransport(RiakTransport):
         self._inbuf = ''
         while len(self._inbuf) < msglen:
             want_len = min(8192, msglen - len(self._inbuf))
-            recv_buf = self._sock.recv(want_len)
+            recv_buf = self._recv(want_len)
             if not recv_buf: break
             self._inbuf += recv_buf
         if len(self._inbuf) != self._inbuf_len:
