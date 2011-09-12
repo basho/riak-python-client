@@ -1,4 +1,2 @@
-from http import RiakHttpTransport, RiakHttpReuseTransport, RiakHttpPoolTransport
+from http import RiakHttpTransport
 from pbc import RiakPbcTransport, RiakPbcCachedTransport
-
-
