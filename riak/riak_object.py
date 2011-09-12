@@ -395,20 +395,6 @@ class RiakObject(object):
         else:
             raise RiakError("do not know how to handle type " + str(type(Result)))
 
-    def populate_links(self, linkHeaders) :
-        """
-        Private.
-
-        :rtype: self
-        """
-        for linkHeader in linkHeaders.strip().split(','):
-            linkHeader = linkHeader.strip()
-            matches = re.match("\<\/([^\/]+)\/([^\/]+)\/([^\/]+)\>; ?riaktag=\"([^\']+)\"", linkHeader)
-            if (matches is not None):
-                link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
-                self._links.append(link)
-        return self
-
     def has_siblings(self):
         """
         Return True if this object has siblings.
