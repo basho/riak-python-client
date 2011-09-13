@@ -5,12 +5,12 @@ from xml.dom.minidom import Document
 class RiakSearch:
     def __init__(self, client, transport_class=None,
                  host="127.0.0.1", port=8098):
-        if not transport_class:
-            self._transport = RiakHttpTransport(host,
-                                                port,
-                                                "/solr")
-        else:
-            self._transport = transport_class(host, port, client_id=client_id)
+        if transport_class is None:
+            transport_class = RiakHttpTransport
+
+        hostports = [ (host, port), ]
+        self._cm = transport_class.default_cm(hostports)
+        self._transport = transport_class(self._cm, prefix="/solr")
 
         self._client = client
         self._decoders = {"text/xml": ElementTree.fromstring}
