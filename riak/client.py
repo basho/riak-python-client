@@ -27,6 +27,8 @@ from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
 from riak.search import RiakSearch
+import riak.transports.connection
+
 
 class RiakClient(object):
     """
@@ -53,14 +55,21 @@ class RiakClient(object):
         :param solr_transport_class: HTTP-based transport class for Solr interface queries
         :type transport_class: :class:`RiakHttpTransport`
         """
-        if not transport_class:
-            self._transport = RiakHttpTransport(host,
-                                                port,
-                                                prefix,
-                                                mapred_prefix,
-                                                client_id)
-        else:
-            self._transport = transport_class(host, port, client_id=client_id)
+        if transport_class is None:
+            transport_class = RiakHttpTransport
+
+        hostports = [ (host, port), ]
+        self._cm = transport_class.default_cm(hostports)
+
+        ### we need to allow additional transport options. make this an
+        ### argument to __init__ ?
+        transport_options = { }
+
+        self._transport = transport_class(self._cm,
+                                          prefix=prefix,
+                                          mapred_prefix=mapred_prefix,
+                                          client_id=client_id,
+                                          **transport_options)
 
         self._r = "default"
         self._w = "default"

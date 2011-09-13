@@ -30,6 +30,7 @@ from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakMapReduce, RiakLink
 from riak import RiakError
+from connection import SocketConnectionManager
 
 try:
     import riakclient_pb2
@@ -82,7 +83,11 @@ class RiakPbcTransport(RiakTransport):
         'quorum' : RIAKC_RW_QUORUM,
         'one' : RIAKC_RW_ONE
         }
-    def __init__(self, host='127.0.0.1', port=8087, client_id=None):
+
+    # The ConnectionManager class that this transport prefers.
+    default_cm = SocketConnectionManager
+
+    def __init__(self, cm, client_id=None, **unused_options):
         """
         Construct a new RiakPbcTransport object.
         @param string host - Hostname or IP address (default '127.0.0.1')
@@ -92,6 +97,10 @@ class RiakPbcTransport(RiakTransport):
             raise RiakError("this transport is not available (no protobuf)")
 
         super(RiakPbcTransport, self).__init__()
+
+        ### backwards compat. we don't use the ConnectionManager (yet).
+        host, port = cm.hostports[0]
+
         self._host = host
         self._port = port
         self._client_id = client_id
@@ -500,9 +509,14 @@ from Queue import Empty, Full, Queue
 import contextlib
 class RiakPbcCachedTransport(RiakTransport):
     """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
-    def __init__(self, host='127.0.0.1', port=8087, client_id=None, maxsize=0, block=False, timeout=None):
+    def __init__(self, cm,
+                 client_id=None, maxsize=0, block=False, timeout=None,
+                 **unused_options):
         if riakclient_pb2 is None:
             raise RiakError("this transport is not available (no protobuf)")
+
+        ### backwards compat. we don't use the ConnectionManager (yet).
+        host, port = cm.hostports[0]
 
         self.host = host
         self.port = port

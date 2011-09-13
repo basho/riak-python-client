@@ -42,9 +42,13 @@ class RiakHttpTransport(RiakTransport) :
     Riak. The Riak API uses HTTP, so there is no persistent
     connection, and the RiakClient object is extremely lightweight.
     """
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id = None):
+
+    # The ConnectionManager class that this transport prefers.
+    default_cm = HTTPConnectionManager
+
+    def __init__(self, cm,
+                 prefix='riak', mapred_prefix='mapred', client_id=None,
+                 **unused_options):
         """
         Construct a new RiakClient object.
         @param string host - Hostname or IP address (default '127.0.0.1')
@@ -54,7 +58,7 @@ class RiakHttpTransport(RiakTransport) :
         @param string client_id - client id to use for vector clocks
         """
         super(RiakHttpTransport, self).__init__()
-        self._conns = HTTPConnectionManager([(host, port)])
+        self._conns = cm
         self._prefix = prefix
         self._mapred_prefix = mapred_prefix
         self._client_id = client_id
@@ -451,18 +455,18 @@ class RiakHttpReuseTransport(RiakHttpTransport):
     Reuse sockets
     """
 
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id=None):
-        super(RiakHttpReuseTransport, self).__init__(host=host,
-                                                     port=port,
-                                                     prefix=prefix,
-                                                     mapred_prefix=
+    def __init__(self, cm,
+                 prefix='riak', mapred_prefix='mapred', client_id=None,
+                 **unused_options):
+        super(RiakHttpReuseTransport, self).__init__(cm,
+                                                     prefix,
                                                      mapred_prefix,
-                                                     client_id=client_id)
+                                                     client_id)
+        ### for backwards compat
+        self._host, self._port = cm.hostports[0]
 
     def __copy__(self):
-        return RiakHttpReuseTransport(self._host, self._port, self._prefix,
+        return RiakHttpReuseTransport(self._conns, self._prefix,
                                       self._mapred_prefix)
 
     def http_request(self, method, uri, headers=None, body=''):
@@ -514,21 +518,21 @@ class RiakHttpPoolTransport(RiakHttpTransport):
 
     http_pool = None
 
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id=None):
+    def __init__(self, cm,
+                 prefix='riak', mapred_prefix='mapred', client_id=None,
+                 **unused_options):
         if urllib3 is None:
             raise RiakError("this transport is not available (no urllib3)")
 
-        super(RiakHttpPoolTransport, self).__init__(host=host,
-                                                    port=port,
-                                                    prefix=prefix,
-                                                    mapred_prefix=
+        super(RiakHttpPoolTransport, self).__init__(cm,
+                                                    prefix,
                                                     mapred_prefix,
-                                                    client_id=client_id)
+                                                    client_id)
+        ### for backwards compat
+        self._host, self._port = cm.hostports[0]
 
     def __copy__(self):
-        return RiakHttpPoolTransport(self._host, self._port, self._prefix,
+        return RiakHttpPoolTransport(self._conns, self._prefix,
                                      self._mapred_prefix)
 
     def http_request(self, method, uri, headers={}, body=''):

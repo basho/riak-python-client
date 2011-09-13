@@ -929,8 +929,6 @@ class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unitt
 class RiakHttpReuseTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
     def setUp(self):
-        ### RiakHttpReuseTransport does not work on this branch.
-        self.skipTest('RiakHttpReuseTransport is broken right now.')
         self.host = HTTP_HOST
         self.port = HTTP_PORT
         self.transport_class = RiakHttpReuseTransport
