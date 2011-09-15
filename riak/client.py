@@ -265,6 +265,16 @@ class RiakClient(object):
         mr = RiakMapReduce(self)
         return apply(mr.search, args)
 
+    def index(self, *args):
+        """
+        Start assembling a Map/Reduce operation based on secondary
+        index query results. 
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.index, args)
+
     def link(self, *args):
         """
         Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.link`.

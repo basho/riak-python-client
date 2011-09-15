@@ -63,8 +63,8 @@ class RiakMapReduce(object):
     def add_bucket_key_data(self, bucket, key, data) :
         if self._input_mode == 'bucket':
             raise Exception('Already added a bucket, can\'t add an object.')
-        elif self._input_mode == 'search':
-            raise Exception('Already added a search query, can\'t add an object.')
+        elif self._input_mode == 'query':
+            raise Exception('Already added a query, can\'t add an object.')
         else:
             self._inputs.append([bucket, key, data])
             return self
@@ -75,15 +75,15 @@ class RiakMapReduce(object):
         return self
 
     def add_key_filters(self, key_filters) :
-        if self._input_mode == 'search':
-          raise Exception('Key filters are not supported in search query.')
+        if self._input_mode == 'query':
+          raise Exception('Key filters are not supported in a query.')
 
         self._key_filters.extend(key_filters)
         return self
 
     def add_key_filter(self, *args) :
-        if self._input_mode == 'search':
-          raise Exception('Key filters are not supported in search query.')
+        if self._input_mode == 'query':
+          raise Exception('Key filters are not supported in a query.')
 
         self._key_filters.append(args)
         return self
@@ -95,12 +95,31 @@ class RiakMapReduce(object):
         @param bucket - The bucket over which to perform the search.
         @param query - The search query.
         """
-        self._input_mode = 'search'
+        self._input_mode = 'query'
         self._inputs = {'module':'riak_search',
                        'function':'mapred_search',
                        'arg':[bucket, query]}
         return self
 
+    def index(self, bucket, index, startkey, endkey = None):
+        """
+        Begin a map/reduce operation using a Secondary Index
+        query.
+        @param bucket - The bucket over which to perform the search.
+        @param query - The search query.
+        """
+        self._input_mode = 'query'
+
+        if endkey == None:
+            self._inputs = {'bucket': bucket,
+                            'index':index,
+                            'key':startkey }
+        else:
+            self._inputs = {'bucket':bucket,
+                            'index':index,
+                            'start':startkey,
+                            'end':endkey }
+        return self
 
     def link(self, bucket='_', tag='_', keep=False):
         """
@@ -214,6 +233,10 @@ class RiakMapReduce(object):
         link_results_flag = link_results_flag or isinstance(self._phases[-1], RiakLinkPhase)
         if not link_results_flag:
             return result
+
+        # If there are no results, then return an empty list.
+        if result == None:
+            return []
 
         # Otherwise, if the last phase IS a link phase, then convert the
         # results to RiakLink objects.
