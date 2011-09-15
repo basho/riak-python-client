@@ -47,7 +47,7 @@ class RiakObject(object):
         self._encode_data = True
         self._vclock = None
         self._data = None
-        self._metadata = {MD_USERMETA: {}}
+        self._metadata = {MD_USERMETA: {}, MD_INDEX: {}}
         self._links = []
         self._siblings = []
         self._exists = False
@@ -175,6 +175,24 @@ class RiakObject(object):
         :rtype: data
         """
         self._metadata[MD_USERMETA] = usermeta
+        return self
+
+    def get_indexes(self):
+        if MD_INDEX in self._metadata:
+            return self._metadata[MD_INDEX]
+        else:
+            return {}
+
+    def set_indexes(self, indexes):
+        """
+        Sets the field/value indexes under which this object will be
+        indexed.
+
+        :param indexes: The field/value index data.
+        :type indexes: dict
+        :rtype: data
+        """
+        self._metadata[MD_INDEX] = indexes
         return self
 
     def exists(self):
