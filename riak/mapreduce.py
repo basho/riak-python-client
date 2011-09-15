@@ -234,6 +234,10 @@ class RiakMapReduce(object):
         if not link_results_flag:
             return result
 
+        # If there are no results, then return an empty list.
+        if result == None:
+            return []
+
         # Otherwise, if the last phase IS a link phase, then convert the
         # results to RiakLink objects.
         a = []

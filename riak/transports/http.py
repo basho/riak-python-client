@@ -213,6 +213,12 @@ class RiakHttpTransport(RiakTransport) :
         # Do the request...
         url = "/" + self._mapred_prefix
         response = self.http_request('POST', url, {}, content)
+
+        # Make sure the expected status code came back...
+        status = response[0]['http_code']
+        if status != 200:
+            raise Exception('Error running MapReduce operation. Status: ' + str(status) + ' : ' + response[1])
+
         result = json.loads(response[1])
         return result
 
