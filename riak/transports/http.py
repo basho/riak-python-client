@@ -43,6 +43,9 @@ class RiakHttpTransport(RiakTransport) :
     connection, and the RiakClient object is extremely lightweight.
     """
 
+    # We're using the new RiakTransport API
+    api = 2
+
     # The ConnectionManager class that this transport prefers.
     default_cm = HTTPConnectionManager
 

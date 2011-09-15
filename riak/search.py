@@ -8,9 +8,17 @@ class RiakSearch:
         if transport_class is None:
             transport_class = RiakHttpTransport
 
-        hostports = [ (host, port), ]
-        self._cm = transport_class.default_cm(hostports)
-        self._transport = transport_class(self._cm, prefix="/solr")
+        api = getattr(transport_class, 'api', 1)
+        if api >= 2:
+            hostports = [ (host, port), ]
+            self._cm = transport_class.default_cm(hostports)
+            self._transport = transport_class(self._cm, prefix="/solr")
+        else:
+            # The old code which attempted to use api==1 would actually
+            # throw a NameError, so it was obviously never used. We will
+            # simply raise an error here, intead of a gentle warning.
+            raise DeprecationWarning('please upgrade the transport to the '
+                                     'new API')
 
         self._client = client
         self._decoders = {"text/xml": ElementTree.fromstring}

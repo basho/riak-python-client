@@ -29,6 +29,12 @@ class RiakTransport(object):
     Class to encapsulate transport details
     """
 
+    # Subclasses should specify their API level.
+    #   * missing or 1: the API used up and through 1.3.x.
+    #   * 2: the API introduced with 1.4.x
+    #
+    # api = 2
+
     @classmethod
     def make_random_client_id(self):
         """

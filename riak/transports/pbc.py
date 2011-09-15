@@ -77,6 +77,10 @@ class RiakPbcTransport(RiakTransport):
     The RiakPbcTransport object holds a connection to the protocol buffers interface
     on the riak server.
     """
+
+    # We're using the new RiakTransport API
+    api = 2
+
     rw_names = {
         'default' : RIAKC_RW_DEFAULT,
         'all' : RIAKC_RW_ALL,
