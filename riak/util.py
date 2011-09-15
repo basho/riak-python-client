@@ -1,4 +1,5 @@
 import collections
+import warnings
 
 def quacks_like_dict(object):
     """Check if object is dict-like"""
@@ -31,3 +32,6 @@ def deep_merge(a, b):
                     current_dst[key] = current_src[key]
     return dst
 
+
+def deprecated(message, stacklevel=3):
+    warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
