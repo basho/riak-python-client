@@ -387,3 +387,31 @@ tutorial, but usage of this feature looks like::
 
 .. _`Riak Search`: http://wiki.basho.com/Riak-Search.html
 .. _Lucene: http://lucene.apache.org/
+
+Using Secondary Indexes
+=======================
+
+Secondary Indexes is a new feature available as of Riak 1.0. It
+allows you to tag an object with index metadata, and then later find
+the object by querying the metadata, returning a list of matching keys.
+
+Usage of this feature looks like::
+
+  import riak
+
+  client = riak.RiakClient()
+  bucket = client.bucket('mybucket')
+
+  # Store the object...
+  obj = bucket.new('mykey1', 'mydata')
+  obj.set_indexes({
+          'field1_bin': 'val1',
+          'field2_int': 1001
+          })
+  obj.store()
+
+  # Query the indexes. The return value is a list of ``RiakLink`` objects.
+  results = client.index('mybucket', 'field1_bin', 'val1').run()
+
+  # Query the indexes using a range...
+  results = client.index('mybucket', 'field1_bin', 'val1', 'val5').run()
