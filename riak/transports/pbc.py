@@ -224,14 +224,30 @@ class RiakPbcTransport(RiakTransport):
 
         @return (key, vclock, metadata)
         """
-        ### not sure about all this. just use put() for now. we need the
-        ### resp.key value from self.put(). maybe refactor.
-        response = self.put(robj, w, dw, return_meta)
-        if response is None:
-            return None, None, None
-        assert len(response[1]) == 1
-        return None, response[0], response[1][0][0]
-        
+        bucket = robj.get_bucket()
+
+        req = riakclient_pb2.RpbPutReq()
+        req.w = self.translate_rw_val(w)
+        req.dw = self.translate_rw_val(dw)
+        if return_meta:
+            req.return_body = 1
+
+        req.bucket = bucket.get_name()
+
+        self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
+
+        self.maybe_connect()
+        self.send_msg(MSG_CODE_PUT_REQ, req)
+        msg_code, resp = self.recv_msg()
+        if msg_code != MSG_CODE_PUT_RESP:
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        if not resp:
+            raise RiakError("missing response object")
+        if len(resp.content) != 1:
+            raise RiakError("siblings were returned from object creation")
+
+        metadata, content = self.decode_content(resp.content[0])
+        return resp.key, resp.vclock, metadata
 
     def delete(self, robj, rw = None):
         """
