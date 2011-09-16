@@ -93,6 +93,13 @@ class BaseTestCase(object):
     def setUp(self):
         self.client = self.create_client()
 
+        # make sure these are not left over from a previous, failed run
+        bucket = self.client.bucket('bucket')
+        o = bucket.get('nonexistent_key_json')
+        o.delete()
+        o = bucket.get('nonexistent_key_binary')
+        o.delete()
+
     def test_is_alive(self):
         self.assertTrue(self.client.is_alive())
 
