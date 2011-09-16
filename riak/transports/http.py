@@ -133,7 +133,9 @@ class RiakHttpTransport(RiakTransport) :
         headers = self.build_put_headers(robj)
         content = robj.get_encoded_data()
         response = self.http_request('POST', url, headers, content)
-        key = response[0]['location']
+        location = response[0]['location']
+        idx = location.rindex('/')
+        key = location[idx+1:]
         if return_meta:
             vclock, [(metadata, data)] = self.parse_body(response, [201])
             return key, vclock, metadata
