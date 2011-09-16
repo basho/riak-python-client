@@ -217,6 +217,13 @@ class RiakPbcTransport(RiakTransport):
             return resp.vclock, contents
 
     def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key.
+
+        If return_meta is False, then the vlock and metadata return values
+        will be None.
+
+        @return (key, vclock, metadata)
+        """
         ### not sure about all this. just use put() for now. we need the
         ### resp.key value from self.put(). maybe refactor.
         response = self.put(robj, w, dw, return_meta)
@@ -603,6 +610,17 @@ class RiakPbcCachedTransport(RiakTransport):
         """
         with self._get_connection_from_pool() as connection:
             return connection.put(robj, w, dw, return_body)
+
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key.
+
+        If return_meta is False, then the vlock and metadata return values
+        will be None.
+
+        @return (key, vclock, metadata)
+        """
+        with self._get_connection_from_pool() as connection:
+            return connection.put_new(robj, w, dw, return_meta)
 
     def delete(self, robj, rw = None):
         """
