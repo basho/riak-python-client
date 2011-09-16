@@ -216,6 +216,16 @@ class RiakPbcTransport(RiakTransport):
                 contents.append(self.decode_content(c))
             return resp.vclock, contents
 
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        ### not sure about all this. just use put() for now. we need the
+        ### resp.key value from self.put(). maybe refactor.
+        response = self.put(robj, w, dw, return_meta)
+        if response is None:
+            return None, None, None
+        assert len(response[1]) == 1
+        return None, response[0], response[1][0][0]
+        
+
     def delete(self, robj, rw = None):
         """
         Serialize get request and deserialize response
