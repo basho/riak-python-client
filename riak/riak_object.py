@@ -307,7 +307,7 @@ class RiakObject(object):
         """
         # Use defaults if not specified...
         w = self._bucket.get_w(w)
-        dw = self._bucket.get_dw(w)
+        dw = self._bucket.get_dw(dw)
 
         # Issue the get over our transport
         t = self._client.get_transport()
