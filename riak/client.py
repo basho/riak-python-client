@@ -17,11 +17,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-# Use json as first choice, simplejson as second choice.
+# Use simplejson as first choice, json as second choice.
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket

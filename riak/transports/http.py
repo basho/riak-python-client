@@ -21,9 +21,9 @@ import urllib, re
 from cStringIO import StringIO
 import httplib
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 from transport import RiakTransport
 from riak.metadata import *

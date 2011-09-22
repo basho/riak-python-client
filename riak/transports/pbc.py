@@ -22,9 +22,9 @@ from __future__ import with_statement
 import socket, struct
 
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 from transport import RiakTransport
 from riak.metadata import *
