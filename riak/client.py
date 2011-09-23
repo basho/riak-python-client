@@ -163,6 +163,22 @@ class RiakClient(object):
         self._rw = rw
         return self
 
+    def get_stats(self):
+        """
+        Get the node stats."
+        """
+        return self._transport.stats()
+
+    def get_stat(self, stat):
+        """
+        Get a specific stat, returns None if not found or protocol failed.
+        """
+        try:
+            stats = self.get_stats()
+            return stats[stat]
+        except:
+            return None
+
     def get_client_id(self):
         """
         Get the ``client_id`` for this ``RiakClient`` instance.

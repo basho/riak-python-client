@@ -88,6 +88,8 @@
 ** 22 - RpbSetBucketResp
 ** 23 - RpbMapRedReq
 ** 24 - RpbMapRedResp{1,}
+** 25 - RpbStatsReq
+** 26 - RpbStatsResp
 **
 */
 
@@ -262,4 +264,12 @@ message RpbLink {
 message RpbBucketProps {
     optional uint32 n_val = 1;
     optional bool allow_mult = 2;
+}
+
+// RpbStatsReq doesn't have a message body, just send the code
+
+// Node stats
+message RpbStatsResp {
+    optional bytes node = 1;
+    optional bytes stats = 2;
 }

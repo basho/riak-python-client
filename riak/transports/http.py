@@ -69,6 +69,19 @@ class RiakHttpTransport(RiakTransport) :
     def get_client_id(self):
         return self._client_id
 
+    def stats(self):
+        """
+        Retrieve node stats (e.g. storage_backend)
+        """
+        response = self.http_request('GET', '/stats')
+        headers = response[0]
+        encoded_stats = response[1]
+        if headers['http_code'] == 200:
+            return json.loads(encoded_stats)
+        else:
+            raise Exception('Error getting node stats.')
+        return self.parse_body(response, [200])
+
     def ping(self) :
         """
         Check server is alive over HTTP
