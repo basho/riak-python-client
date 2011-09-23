@@ -93,10 +93,9 @@ class BaseTestCase(object):
     def setUp(self):
         self.client = self.create_client()
 
-        # node properties for toggling various tests
-        self.stats = self.client.get_stats()
-        self.backend = self.stats[u'storage_backend']
-        self.enabled_2i = self.backend == u'riak_kv_eleveldb_backend'
+    def is_2i_backend(self):
+        backend = self.client.get_stat('storage_backend')
+        return backend == 'riak_kv_eleveldb_backend'
 
     def test_is_alive(self):
         self.assertTrue(self.client.is_alive())
@@ -525,7 +524,7 @@ class BaseTestCase(object):
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_store(self):
-        if self.enabled_2i == True:
+        if self.is_2i_backend():
             # Create a new object with indexes...
             bucket = self.client.bucket('indexbucket')
             rand = self.randint()
@@ -546,7 +545,7 @@ class BaseTestCase(object):
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):
-        if self.enabled_2i == True:
+        if self.is_2i_backend():
             bucket = self.client.bucket('indexbucket')
             bucket.new('mykey1', 'data1').set_indexes({'field1_bin':'val1', 'field2_int':1001}).store()
             bucket.new('mykey2', 'data2').set_indexes({'field1_bin':'val2', 'field2_int':1002}).store()
@@ -563,27 +562,27 @@ class BaseTestCase(object):
             vals = set()
             for i in results:
                 vals.add(i.get_key())
-                self.assertEquals(3, len(results))
-                self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
+            self.assertEquals(3, len(results))
+            self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
 
-                # Test an equality query...
-                results = self.client.index('indexbucket', 'field2_int', 1002).run()
-                self.assertEquals(1, len(results))
-                self.assertEquals('mykey2', results[0].get_key())
+            # Test an equality query...
+            results = self.client.index('indexbucket', 'field2_int', 1002).run()
+            self.assertEquals(1, len(results))
+            self.assertEquals('mykey2', results[0].get_key())
 
-                # Test a range query...
-                results = self.client.index('indexbucket', 'field2_int', 1002, 1004).run()
-                vals = set()
-                for i in results:
-                    vals.add(i.get_key())
-                    self.assertEquals(3, len(results))
-                    self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
+            # Test a range query...
+            results = self.client.index('indexbucket', 'field2_int', 1002, 1004).run()
+            vals = set()
+            for i in results:
+                vals.add(i.get_key())
+            self.assertEquals(3, len(results))
+            self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
 
-                # Clean up...
-                bucket.get('mykey1').delete()
-                bucket.get('mykey2').delete()
-                bucket.get('mykey3').delete()
-                bucket.get('mykey4').delete()
+            # Clean up...
+            bucket.get('mykey1').delete()
+            bucket.get('mykey2').delete()
+            bucket.get('mykey3').delete()
+            bucket.get('mykey4').delete()
 
 class MapReduceAliasTestMixIn(object):
     """This tests the map reduce aliases"""
