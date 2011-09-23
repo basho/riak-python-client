@@ -7,10 +7,11 @@ from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 
+
 DESCRIPTOR = descriptor.FileDescriptor(
   name='riakclient.proto',
   package='',
-  serialized_pb='\n\x10riakclient.proto\"/\n\x0cRpbErrorResp\x12\x0e\n\x06\x65rrmsg\x18\x01 \x02(\x0c\x12\x0f\n\x07\x65rrcode\x18\x02 \x02(\r\"\'\n\x12RpbGetClientIdResp\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"&\n\x11RpbSetClientIdReq\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"<\n\x14RpbGetServerInfoResp\x12\x0c\n\x04node\x18\x01 \x01(\x0c\x12\x16\n\x0eserver_version\x18\x02 \x01(\x0c\"\xa4\x01\n\tRpbGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\x12\n\n\x02pr\x18\x04 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x05 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x06 \x01(\x08\x12\x13\n\x0bif_modified\x18\x07 \x01(\x0c\x12\x0c\n\x04head\x18\x08 \x01(\x08\x12\x15\n\rdeletedvclock\x18\t \x01(\x08\"M\n\nRpbGetResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x11\n\tunchanged\x18\x03 \x01(\x08\"\xd3\x01\n\tRpbPutReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0e\n\x06vclock\x18\x03 \x01(\x0c\x12\x1c\n\x07\x63ontent\x18\x04 \x02(\x0b\x32\x0b.RpbContent\x12\t\n\x01w\x18\x05 \x01(\r\x12\n\n\x02\x64w\x18\x06 \x01(\r\x12\x13\n\x0breturn_body\x18\x07 \x01(\x08\x12\n\n\x02pw\x18\x08 \x01(\r\x12\x17\n\x0fif_not_modified\x18\t \x01(\x08\x12\x15\n\rif_none_match\x18\n \x01(\x08\x12\x13\n\x0breturn_head\x18\x0b \x01(\x08\"G\n\nRpbPutResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x0b\n\x03key\x18\x03 \x01(\x0c\"~\n\tRpbDelReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\n\n\x02rw\x18\x03 \x01(\r\x12\x0e\n\x06vclock\x18\x04 \x01(\x0c\x12\t\n\x01r\x18\x05 \x01(\r\x12\t\n\x01w\x18\x06 \x01(\r\x12\n\n\x02pr\x18\x07 \x01(\r\x12\n\n\x02pw\x18\x08 \x01(\r\x12\n\n\x02\x64w\x18\t \x01(\r\"%\n\x12RpbListBucketsResp\x12\x0f\n\x07\x62uckets\x18\x01 \x03(\x0c\" \n\x0eRpbListKeysReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\"-\n\x0fRpbListKeysResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"!\n\x0fRpbGetBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\"2\n\x10RpbGetBucketResp\x12\x1e\n\x05props\x18\x01 \x02(\x0b\x32\x0f.RpbBucketProps\"A\n\x0fRpbSetBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x1e\n\x05props\x18\x02 \x02(\x0b\x32\x0f.RpbBucketProps\"5\n\x0cRpbMapRedReq\x12\x0f\n\x07request\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x02(\x0c\">\n\rRpbMapRedResp\x12\r\n\x05phase\x18\x01 \x01(\r\x12\x10\n\x08response\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\"\xe4\x01\n\nRpbContent\x12\r\n\x05value\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x01(\x0c\x12\x0f\n\x07\x63harset\x18\x03 \x01(\x0c\x12\x18\n\x10\x63ontent_encoding\x18\x04 \x01(\x0c\x12\x0c\n\x04vtag\x18\x05 \x01(\x0c\x12\x17\n\x05links\x18\x06 \x03(\x0b\x32\x08.RpbLink\x12\x10\n\x08last_mod\x18\x07 \x01(\r\x12\x16\n\x0elast_mod_usecs\x18\x08 \x01(\r\x12\x1a\n\x08usermeta\x18\t \x03(\x0b\x32\x08.RpbPair\x12\x19\n\x07indexes\x18\n \x03(\x0b\x32\x08.RpbPair\"%\n\x07RpbPair\x12\x0b\n\x03key\x18\x01 \x02(\x0c\x12\r\n\x05value\x18\x02 \x01(\x0c\"3\n\x07RpbLink\x12\x0e\n\x06\x62ucket\x18\x01 \x01(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0b\n\x03tag\x18\x03 \x01(\x0c\"3\n\x0eRpbBucketProps\x12\r\n\x05n_val\x18\x01 \x01(\r\x12\x12\n\nallow_mult\x18\x02 \x01(\x08')
+  serialized_pb='\n\x10riakclient.proto\"/\n\x0cRpbErrorResp\x12\x0e\n\x06\x65rrmsg\x18\x01 \x02(\x0c\x12\x0f\n\x07\x65rrcode\x18\x02 \x02(\r\"\'\n\x12RpbGetClientIdResp\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"&\n\x11RpbSetClientIdReq\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"<\n\x14RpbGetServerInfoResp\x12\x0c\n\x04node\x18\x01 \x01(\x0c\x12\x16\n\x0eserver_version\x18\x02 \x01(\x0c\"\xa4\x01\n\tRpbGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\x12\n\n\x02pr\x18\x04 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x05 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x06 \x01(\x08\x12\x13\n\x0bif_modified\x18\x07 \x01(\x0c\x12\x0c\n\x04head\x18\x08 \x01(\x08\x12\x15\n\rdeletedvclock\x18\t \x01(\x08\"M\n\nRpbGetResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x11\n\tunchanged\x18\x03 \x01(\x08\"\xd3\x01\n\tRpbPutReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0e\n\x06vclock\x18\x03 \x01(\x0c\x12\x1c\n\x07\x63ontent\x18\x04 \x02(\x0b\x32\x0b.RpbContent\x12\t\n\x01w\x18\x05 \x01(\r\x12\n\n\x02\x64w\x18\x06 \x01(\r\x12\x13\n\x0breturn_body\x18\x07 \x01(\x08\x12\n\n\x02pw\x18\x08 \x01(\r\x12\x17\n\x0fif_not_modified\x18\t \x01(\x08\x12\x15\n\rif_none_match\x18\n \x01(\x08\x12\x13\n\x0breturn_head\x18\x0b \x01(\x08\"G\n\nRpbPutResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x0b\n\x03key\x18\x03 \x01(\x0c\"~\n\tRpbDelReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\n\n\x02rw\x18\x03 \x01(\r\x12\x0e\n\x06vclock\x18\x04 \x01(\x0c\x12\t\n\x01r\x18\x05 \x01(\r\x12\t\n\x01w\x18\x06 \x01(\r\x12\n\n\x02pr\x18\x07 \x01(\r\x12\n\n\x02pw\x18\x08 \x01(\r\x12\n\n\x02\x64w\x18\t \x01(\r\"%\n\x12RpbListBucketsResp\x12\x0f\n\x07\x62uckets\x18\x01 \x03(\x0c\" \n\x0eRpbListKeysReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\"-\n\x0fRpbListKeysResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"!\n\x0fRpbGetBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\"2\n\x10RpbGetBucketResp\x12\x1e\n\x05props\x18\x01 \x02(\x0b\x32\x0f.RpbBucketProps\"A\n\x0fRpbSetBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x1e\n\x05props\x18\x02 \x02(\x0b\x32\x0f.RpbBucketProps\"5\n\x0cRpbMapRedReq\x12\x0f\n\x07request\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x02(\x0c\">\n\rRpbMapRedResp\x12\r\n\x05phase\x18\x01 \x01(\r\x12\x10\n\x08response\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\"\xe4\x01\n\nRpbContent\x12\r\n\x05value\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x01(\x0c\x12\x0f\n\x07\x63harset\x18\x03 \x01(\x0c\x12\x18\n\x10\x63ontent_encoding\x18\x04 \x01(\x0c\x12\x0c\n\x04vtag\x18\x05 \x01(\x0c\x12\x17\n\x05links\x18\x06 \x03(\x0b\x32\x08.RpbLink\x12\x10\n\x08last_mod\x18\x07 \x01(\r\x12\x16\n\x0elast_mod_usecs\x18\x08 \x01(\r\x12\x1a\n\x08usermeta\x18\t \x03(\x0b\x32\x08.RpbPair\x12\x19\n\x07indexes\x18\n \x03(\x0b\x32\x08.RpbPair\"%\n\x07RpbPair\x12\x0b\n\x03key\x18\x01 \x02(\x0c\x12\r\n\x05value\x18\x02 \x01(\x0c\"3\n\x07RpbLink\x12\x0e\n\x06\x62ucket\x18\x01 \x01(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0b\n\x03tag\x18\x03 \x01(\x0c\"3\n\x0eRpbBucketProps\x12\r\n\x05n_val\x18\x01 \x01(\r\x12\x12\n\nallow_mult\x18\x02 \x01(\x08\"+\n\x0cRpbStatsResp\x12\x0c\n\x04node\x18\x01 \x01(\x0c\x12\r\n\x05stats\x18\x02 \x01(\x0c')
 
 
 
@@ -953,6 +954,40 @@ _RPBBUCKETPROPS = descriptor.Descriptor(
 )
 
 
+_RPBSTATSRESP = descriptor.Descriptor(
+  name='RpbStatsResp',
+  full_name='RpbStatsResp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='node', full_name='RpbStatsResp.node', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='stats', full_name='RpbStatsResp.stats', index=1,
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=1642,
+  serialized_end=1685,
+)
+
 _RPBGETRESP.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBPUTREQ.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBPUTRESP.fields_by_name['content'].message_type = _RPBCONTENT
@@ -961,6 +996,30 @@ _RPBSETBUCKETREQ.fields_by_name['props'].message_type = _RPBBUCKETPROPS
 _RPBCONTENT.fields_by_name['links'].message_type = _RPBLINK
 _RPBCONTENT.fields_by_name['usermeta'].message_type = _RPBPAIR
 _RPBCONTENT.fields_by_name['indexes'].message_type = _RPBPAIR
+"""
+DESCRIPTOR.message_types_by_name['RpbErrorResp'] = _RPBERRORRESP
+DESCRIPTOR.message_types_by_name['RpbGetClientIdResp'] = _RPBGETCLIENTIDRESP
+DESCRIPTOR.message_types_by_name['RpbSetClientIdReq'] = _RPBSETCLIENTIDREQ
+DESCRIPTOR.message_types_by_name['RpbGetServerInfoResp'] = _RPBGETSERVERINFORESP
+DESCRIPTOR.message_types_by_name['RpbGetReq'] = _RPBGETREQ
+DESCRIPTOR.message_types_by_name['RpbGetResp'] = _RPBGETRESP
+DESCRIPTOR.message_types_by_name['RpbPutReq'] = _RPBPUTREQ
+DESCRIPTOR.message_types_by_name['RpbPutResp'] = _RPBPUTRESP
+DESCRIPTOR.message_types_by_name['RpbDelReq'] = _RPBDELREQ
+DESCRIPTOR.message_types_by_name['RpbListBucketsResp'] = _RPBLISTBUCKETSRESP
+DESCRIPTOR.message_types_by_name['RpbListKeysReq'] = _RPBLISTKEYSREQ
+DESCRIPTOR.message_types_by_name['RpbListKeysResp'] = _RPBLISTKEYSRESP
+DESCRIPTOR.message_types_by_name['RpbGetBucketReq'] = _RPBGETBUCKETREQ
+DESCRIPTOR.message_types_by_name['RpbGetBucketResp'] = _RPBGETBUCKETRESP
+DESCRIPTOR.message_types_by_name['RpbSetBucketReq'] = _RPBSETBUCKETREQ
+DESCRIPTOR.message_types_by_name['RpbMapRedReq'] = _RPBMAPREDREQ
+DESCRIPTOR.message_types_by_name['RpbMapRedResp'] = _RPBMAPREDRESP
+DESCRIPTOR.message_types_by_name['RpbContent'] = _RPBCONTENT
+DESCRIPTOR.message_types_by_name['RpbPair'] = _RPBPAIR
+DESCRIPTOR.message_types_by_name['RpbLink'] = _RPBLINK
+DESCRIPTOR.message_types_by_name['RpbBucketProps'] = _RPBBUCKETPROPS
+DESCRIPTOR.message_types_by_name['RpbStatsResp'] = _RPBSTATSRESP
+"""
 
 class RpbErrorResp(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
@@ -1087,5 +1146,11 @@ class RpbBucketProps(message.Message):
   DESCRIPTOR = _RPBBUCKETPROPS
   
   # @@protoc_insertion_point(class_scope:RpbBucketProps)
+
+class RpbStatsResp(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _RPBSTATSRESP
+  
+  # @@protoc_insertion_point(class_scope:RpbStatsResp)
 
 # @@protoc_insertion_point(module_scope)

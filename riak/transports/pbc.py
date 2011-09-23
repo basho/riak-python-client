@@ -62,6 +62,8 @@ MSG_CODE_SET_BUCKET_REQ       = 21
 MSG_CODE_SET_BUCKET_RESP      = 22
 MSG_CODE_MAPRED_REQ           = 23
 MSG_CODE_MAPRED_RESP          = 24
+MSG_CODE_STATS_REQ            = 25
+MSG_CODE_STATS_RESP           = 26
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -118,6 +120,18 @@ class RiakPbcTransport(RiakTransport):
             return 1
         else:
             return 0
+
+    def stats(self):
+        """
+        Retrieve node stats (e.g. storage_backend)
+        """
+        self.maybe_connect()
+        self.send_msg_code(MSG_CODE_STATS_REQ)
+        msg_code, resp = self.recv_msg()
+        if msg_code == MSG_CODE_STATS_RESP:
+            return json.loads(resp.stats)
+        else:
+            raise Exception('Error getting node stats.')
 
     def get_client_id(self):
         """
@@ -405,6 +419,9 @@ class RiakPbcTransport(RiakTransport):
             msg = None
         elif msg_code == MSG_CODE_MAPRED_RESP:
             msg = riakclient_pb2.RpbMapRedResp()
+            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code == MSG_CODE_STATS_RESP:
+            msg = riakclient_pb2.RpbStatsResp()
             msg.ParseFromString(self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s"%msg_code)
