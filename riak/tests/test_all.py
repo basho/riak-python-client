@@ -546,6 +546,13 @@ class BaseTestCase(object):
         bucket.new('mykey3', 'data3').set_indexes({'field1_bin':'val3', 'field2_int':1003}).store()
         bucket.new('mykey4', 'data4').set_indexes({'field1_bin':'val4', 'field2_int':1004}).store()
 
+        # Immediate test to see if 2i is even supported w/ the backend
+        try:
+            self.client.index('foo','bar_bin','baz').run()
+        except Exception as e:
+            if "indexes_not_supported" in str(e):
+                return True
+
         # Test an equality query...
         results = self.client.index('indexbucket', 'field1_bin', 'val2').run()
         self.assertEquals(1, len(results))
