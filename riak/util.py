@@ -1,8 +1,13 @@
-import collections
+import warnings
+try:
+    from collections import Mapping
+except ImportError:
+    # compatibility with Python 2.5
+    Mapping = dict
 
 def quacks_like_dict(object):
     """Check if object is dict-like"""
-    return isinstance(object, collections.Mapping)
+    return isinstance(object, Mapping)
     
 def deep_merge(a, b):
     """Merge two deep dicts non-destructively
@@ -31,3 +36,6 @@ def deep_merge(a, b):
                     current_dst[key] = current_src[key]
     return dst
 
+
+def deprecated(message, stacklevel=3):
+    warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
