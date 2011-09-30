@@ -22,6 +22,7 @@ from riak import RiakClient
 from riak import RiakPbcTransport, RiakPbcCachedTransport
 from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
 from riak import RiakKeyFilter, key_filter
+from riak.riak_index_entry import RiakIndexEntry
 from riak.mapreduce import RiakLink
 from riak.test_server import TestServer
 
@@ -524,16 +525,67 @@ class BaseTestCase(object):
         bucket = self.client.bucket('indexbucket')
         rand = self.randint()
         obj = bucket.new('mykey1', rand)
-        obj.set_indexes({
-                'field1_bin': 'val1',
-                'field2_int': 1001
-                })
+        obj.add_index('field1_bin', 'val1a')
+        obj.add_index('field1_int', 1011)
         obj.store()
 
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
-        self.assertEqual('val1', obj.get_indexes()['field1_bin'])
-        self.assertEqual(1001, int(obj.get_indexes()['field2_int']))
+        self.assertEqual(['val1a'], sorted(obj.get_indexes('field1_bin')))
+        self.assertEqual(['1011'], sorted(obj.get_indexes('field1_int')))
+
+        # Add more indexes and save...
+        obj.add_index('field1_bin', 'val1b')
+        obj.add_index('field1_int', 1012)
+        obj.store()
+
+        # Retrieve the object, check that the correct indexes exist...
+        obj = bucket.get('mykey1')
+        self.assertEqual(['val1a', 'val1b'], sorted(obj.get_indexes('field1_bin')))
+        self.assertEqual(['1011', '1012'], sorted(obj.get_indexes('field1_int')))
+
+        # Check the get_indexes() function...
+        self.assertEqual([
+                RiakIndexEntry('field1_bin', 'val1a'),
+                RiakIndexEntry('field1_bin', 'val1b'),
+                RiakIndexEntry('field1_int', 1011),
+                RiakIndexEntry('field1_int', 1012)
+                ], sorted(obj.get_indexes()))
+
+        # Delete an index...
+        obj.remove_index('field1_bin', 'val1a')
+        obj.remove_index('field1_int', 1011)
+        obj.store()
+
+        # Retrieve the object, check that the correct indexes exist...
+        obj = bucket.get('mykey1')
+        self.assertEqual(['val1b'], sorted(obj.get_indexes('field1_bin')))
+        self.assertEqual(['1012'], sorted(obj.get_indexes('field1_int')))
+
+        # Check duplicate entries...
+        obj.add_index('field1_bin', 'val1a')
+        obj.add_index('field1_bin', 'val1a')
+        obj.add_index('field1_bin', 'val1a')
+        obj.add_index('field1_int', 1011)
+        obj.add_index('field1_int', 1011)
+        obj.add_index('field1_int', 1011)
+
+        self.assertEqual([
+                RiakIndexEntry('field1_bin', 'val1a'),
+                RiakIndexEntry('field1_bin', 'val1b'),
+                RiakIndexEntry('field1_int', 1011),
+                RiakIndexEntry('field1_int', 1012)
+                ], sorted(obj.get_indexes()))
+
+        obj.store()
+        obj = bucket.get('mykey1')
+
+        self.assertEqual([
+                RiakIndexEntry('field1_bin', 'val1a'),
+                RiakIndexEntry('field1_bin', 'val1b'),
+                RiakIndexEntry('field1_int', 1011),
+                RiakIndexEntry('field1_int', 1012)
+                ], sorted(obj.get_indexes()))
 
         # Clean up...
         bucket.get('mykey1').delete()
@@ -541,10 +593,27 @@ class BaseTestCase(object):
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):
         bucket = self.client.bucket('indexbucket')
-        bucket.new('mykey1', 'data1').set_indexes({'field1_bin':'val1', 'field2_int':1001}).store()
-        bucket.new('mykey2', 'data2').set_indexes({'field1_bin':'val2', 'field2_int':1002}).store()
-        bucket.new('mykey3', 'data3').set_indexes({'field1_bin':'val3', 'field2_int':1003}).store()
-        bucket.new('mykey4', 'data4').set_indexes({'field1_bin':'val4', 'field2_int':1004}).store()
+
+        bucket.\
+            new('mykey1', 'data1').\
+            add_index('field1_bin', 'val1').\
+            add_index('field2_int', 1001).\
+            store()
+        bucket.\
+            new('mykey2', 'data1').\
+            add_index('field1_bin', 'val2').\
+            add_index('field2_int', 1002).\
+            store()
+        bucket.\
+            new('mykey3', 'data1').\
+            add_index('field1_bin', 'val3').\
+            add_index('field2_int', 1003).\
+            store()
+        bucket.\
+            new('mykey4', 'data1').\
+            add_index('field1_bin', 'val4').\
+            add_index('field2_int', 1004).\
+            store()
 
         # Immediate test to see if 2i is even supported w/ the backend
         try:

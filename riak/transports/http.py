@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-import urllib, re
+import urllib, re, csv
 from cStringIO import StringIO
 import httplib
 try:
@@ -29,6 +29,7 @@ from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakLink
 from riak import RiakError
+from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
 
 MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
@@ -113,8 +114,12 @@ class RiakHttpTransport(RiakTransport) :
         for key, value in robj.get_usermeta().iteritems():
             headers['X-Riak-Meta-%s' % key] = value
 
-        for key, value in robj.get_indexes().iteritems():
-            headers['X-Riak-Index-%s' % key] = value
+        for rie in robj.get_indexes():
+            key = 'X-Riak-Index-%s' % rie.get_field()
+            if key in headers:
+                headers[key] += ", " + rie.get_value()
+            else:
+                headers[key] = rie.get_value()
 
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body, key=robj.get_key())
@@ -270,7 +275,7 @@ class RiakHttpTransport(RiakTransport) :
 
         # Parse the headers...
         vclock = None
-        metadata = {MD_USERMETA: {}, MD_INDEX: {}}
+        metadata = {MD_USERMETA: {}, MD_INDEX: []}
         links = []
         for header, value in headers.iteritems():
             if header == 'content-type':
@@ -288,7 +293,13 @@ class RiakHttpTransport(RiakTransport) :
             elif header.startswith('x-riak-meta-'):
                 metadata[MD_USERMETA][header.replace('x-riak-meta-', '')] = value
             elif header.startswith('x-riak-index-'):
-                metadata[MD_INDEX][header.replace('x-riak-index-', '')] = value
+                field = header.replace('x-riak-index-', '')
+                reader = csv.reader([value], skipinitialspace=True)
+                for line in reader:
+                    for token in line:
+                        rie = RiakIndexEntry(field, token)
+                        metadata[MD_INDEX].append(rie)
+
             elif header == 'x-riak-vclock':
                 vclock = value
         if links:
