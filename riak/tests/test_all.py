@@ -92,6 +92,44 @@ class BaseTestCase(object):
 
     def setUp(self):
         self.client = self.create_client()
+        self.stats = RiakHttpTransport('localhost', 8098)
+
+    def get_stats(self, expecting=[]):
+        (_,stats) = self.stats.http_request('GET', '/stats')
+        props = json.loads(stats)
+        for k,v in expecting:
+            if props.get(k) < v:
+                raise Exception('%s = %d (exp. min %d)' % (k, props.get(k), v))
+        return props
+
+    def test_stats(self):
+        is_pbc = type(self.client.get_transport()) in [riak.RiakPbcTransport,
+                                                       riak.RiakPbcCachedTransport
+                                                       ]
+
+        # get current stats, ensure there's valid data in there
+        stats = self.get_stats([('cpu_nprocs',0), 
+                                ('cpu_avg1',0),
+                                ('cpu_avg5',0),
+                                ('cpu_avg15',0),
+                                ('mem_total',0),
+                                ('mem_allocated',0),
+                                ('ring_num_partitions',8),
+                                ('ring_creation_size',8),
+                                ('pbc_connects_total',1 if is_pbc else 0),
+                                ('pbc_active',1 if is_pbc else 0),
+                                ])
+
+        # verify that there's at least 1 node in the cluster
+        self.assertTrue(len(stats['ring_members']) > 0)
+
+        # perform a put, get and verify increment
+        self.test_store_and_get()
+        self.get_stats([('node_gets_total',stats['node_gets_total'] + 1),
+                        ('node_puts_total',stats['node_puts_total'] + 1),
+                        ])
+
+        # TODO: force a read-repair to happen and check that stat
 
     def test_is_alive(self):
         self.assertTrue(self.client.is_alive())
