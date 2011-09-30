@@ -30,6 +30,7 @@ from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakMapReduce, RiakLink
 from riak import RiakError
+from riak.riak_index_entry import RiakIndexEntry
 
 try:
     import riakclient_pb2
@@ -471,9 +472,10 @@ class RiakPbcTransport(RiakTransport):
             usermeta[usermd.key] = usermd.value
         if len(usermeta) > 0:
             metadata[MD_USERMETA] = usermeta
-        indexes = {}
+        indexes = []
         for index in rpb_content.indexes:
-            indexes[index.key] = index.value
+            rie = RiakIndexEntry(index.key, index.value)
+            indexes.append(rie)
         if len(indexes) > 0:
             metadata[MD_INDEX] = indexes
         return metadata, rpb_content.value
@@ -494,10 +496,10 @@ class RiakPbcTransport(RiakTransport):
                     pair.key = uk
                     pair.value = uv
             elif k == MD_INDEX:
-                for uk, uv in v.iteritems():
+                for rie in v:
                     pair = rpb_content.indexes.add()
-                    pair.key = uk
-                    pair.value = str(uv)
+                    pair.key = rie.get_field()
+                    pair.value = rie.get_value()
             elif k == MD_LINKS:
                 for link in v:
                     pb_link = rpb_content.links.add()
