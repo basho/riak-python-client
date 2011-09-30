@@ -395,19 +395,20 @@ Secondary Indexes is a new feature available as of Riak 1.0. It
 allows you to tag an object with index metadata, and then later find
 the object by querying the metadata, returning a list of matching keys.
 
-Usage of this feature looks like::
+Your Riak cluster must have Secondary Indexes enabled. See the Riak
+documentation for details.
+
+Usage of this feature looks like:
 
   import riak
 
   client = riak.RiakClient()
   bucket = client.bucket('mybucket')
 
-  # Store the object...
+  # Create and store the object with indexes...
   obj = bucket.new('mykey1', 'mydata')
-  obj.set_indexes({
-          'field1_bin': 'val1',
-          'field2_int': 1001
-          })
+  obj.add_index('field1_bin', 'val1')
+  obj.add_index('field2_int', 1001)
   obj.store()
 
   # Query the indexes. The return value is a list of ``RiakLink`` objects.
@@ -415,3 +416,8 @@ Usage of this feature looks like::
 
   # Query the indexes using a range...
   results = client.index('mybucket', 'field1_bin', 'val1', 'val5').run()
+
+  # Remove an index entry...
+  obj = bucket.get('mykey1')
+  obj.remove_index('field1_bin', 'val1')
+  obj.store()
