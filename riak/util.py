@@ -1,8 +1,12 @@
-import collections
+try:
+    from collections import Mapping
+except ImportError:
+    # compatibility with Python 2.5
+    Mapping = dict
 
 def quacks_like_dict(object):
     """Check if object is dict-like"""
-    return isinstance(object, collections.Mapping)
+    return isinstance(object, Mapping)
     
 def deep_merge(a, b):
     """Merge two deep dicts non-destructively
