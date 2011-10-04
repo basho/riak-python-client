@@ -22,6 +22,8 @@ from __future__ import with_statement
 import urllib, re
 from cStringIO import StringIO
 import httplib
+import socket
+import errno
 try:
     import json
 except ImportError:
@@ -48,6 +50,9 @@ class RiakHttpTransport(RiakTransport) :
 
     # The ConnectionManager class that this transport prefers.
     default_cm = HTTPConnectionManager
+
+    # How many times to retry a request
+    RETRY_COUNT = 3
 
     def __init__(self, cm,
                  prefix='riak', mapred_prefix='mapred', client_id=None,
@@ -419,22 +424,40 @@ class RiakHttpTransport(RiakTransport) :
         if headers is None:
             headers = {}
         # Run the request...
-        with self._conns.withconn() as conn:
-            conn.request(method, uri, body, headers)
-            response = conn.getresponse()
+        for retry in range(self.RETRY_COUNT):
+            with self._conns.withconn() as conn:
+                ### should probably build this try/except into a custom
+                ### contextmanager for the connection.
+                try:
+                    conn.request(method, uri, body, headers)
+                    response = conn.getresponse()
 
-            try:
-                # Get the response headers...
-                response_headers = {'http_code': response.status}
-                for (key, value) in response.getheaders():
-                    response_headers[key.lower()] = value
+                    try:
+                        # Get the response headers...
+                        response_headers = {'http_code': response.status}
+                        for (key, value) in response.getheaders():
+                            response_headers[key.lower()] = value
 
-                # Get the body...
-                response_body = response.read()
-            finally:
-              response.close()
+                        # Get the body...
+                        response_body = response.read()
+                    finally:
+                      response.close()
 
-            return response_headers, response_body
+                    return response_headers, response_body
+                except socket.error, e:
+                    conn.close()
+                    if e[0] == errno.ECONNRESET:
+                        # Grab another connection and try again.
+                        continue
+                    # Don't know how to handle this.
+                    raise
+                except httplib.HTTPException:
+                    # Just close the connection and try again.
+                    conn.close()
+                    continue
+
+        # No luck, even with retrying.
+        raise RiakError("could not get a response")
 
     @classmethod
     def build_headers(cls, headers):
