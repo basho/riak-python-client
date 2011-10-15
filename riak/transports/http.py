@@ -343,7 +343,9 @@ class RiakHttpTransport(RiakTransport) :
             linkHeader = linkHeader.strip()
             matches = re.match("</([^/]+)/([^/]+)/([^/]+)>; ?riaktag=\"([^\']+)\"", linkHeader)
             if matches is not None:
-                link = RiakLink(matches.group(2), matches.group(3), matches.group(4))
+                link = RiakLink(urllib.unquote_plus(matches.group(2)),
+                                urllib.unquote_plus(matches.group(3)),
+                                urllib.unquote_plus(matches.group(4)))
                 links.append(link)
         return self
 

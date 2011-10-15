@@ -440,6 +440,17 @@ class BaseTestCase(object):
         obj = bucket.get("foo")
         links = obj.get_links()
         self.assertEqual(len(links), 3)
+        for l in links:
+            if (l.get_key() == "foo1"):
+                self.assertEqual(l.get_tag(), "")
+                next
+            if (l.get_key() == "foo2"):
+                self.assertEqual(l.get_tag(), "tag")
+                next
+            if (l.get_key() == "foo3"):
+                self.assertEqual(l.get_tag(), "tag2!@#%^&*)")
+                next
+            self.assertEqual("unknown key", l.get_key())
 
     def test_link_walking(self):
         # Create the object...
