@@ -216,6 +216,39 @@ class RiakPbcTransport(RiakTransport):
                 contents.append(self.decode_content(c))
             return resp.vclock, contents
 
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key.
+
+        If return_meta is False, then the vlock and metadata return values
+        will be None.
+
+        @return (key, vclock, metadata)
+        """
+        bucket = robj.get_bucket()
+
+        req = riakclient_pb2.RpbPutReq()
+        req.w = self.translate_rw_val(w)
+        req.dw = self.translate_rw_val(dw)
+        if return_meta:
+            req.return_body = 1
+
+        req.bucket = bucket.get_name()
+
+        self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
+
+        self.maybe_connect()
+        self.send_msg(MSG_CODE_PUT_REQ, req)
+        msg_code, resp = self.recv_msg()
+        if msg_code != MSG_CODE_PUT_RESP:
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        if not resp:
+            raise RiakError("missing response object")
+        if len(resp.content) != 1:
+            raise RiakError("siblings were returned from object creation")
+
+        metadata, content = self.decode_content(resp.content[0])
+        return resp.key, resp.vclock, metadata
+
     def delete(self, robj, rw = None):
         """
         Serialize get request and deserialize response
@@ -593,6 +626,17 @@ class RiakPbcCachedTransport(RiakTransport):
         """
         with self._get_connection_from_pool() as connection:
             return connection.put(robj, w, dw, return_body)
+
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key.
+
+        If return_meta is False, then the vlock and metadata return values
+        will be None.
+
+        @return (key, vclock, metadata)
+        """
+        with self._get_connection_from_pool() as connection:
+            return connection.put_new(robj, w, dw, return_meta)
 
     def delete(self, robj, rw = None):
         """

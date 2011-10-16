@@ -114,25 +114,7 @@ class RiakHttpTransport(RiakTransport) :
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw}
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
-
-        # Construct the headers...
-        headers = MultiDict({'Accept' : 'text/plain, */*; q=0.5',
-                             'Content-Type' : robj.get_content_type(),
-                             'X-Riak-ClientId' : self._client_id})
-
-        # Add the vclock if it exists...
-        if robj.vclock() is not None:
-            headers['X-Riak-Vclock'] = robj.vclock()
-
-        # Create the header from metadata
-        links = self.add_links_for_riak_object(robj, headers)
-
-        for key, value in robj.get_usermeta().iteritems():
-            headers['X-Riak-Meta-%s' % key] = value
-
-        for key, value in robj.get_indexes().iteritems():
-            headers['X-Riak-Index-%s' % key] = value
-
+        headers = self.build_put_headers(robj)
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body, key=robj.get_key())
 
@@ -147,6 +129,24 @@ class RiakHttpTransport(RiakTransport) :
         else:
           self.check_http_code(response, [204])
           return None
+
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key."""
+        # Construct the URL...
+        params = {'returnbody' : str(return_meta).lower(), 'w' : w, 'dw' : dw}
+        url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
+        headers = self.build_put_headers(robj)
+        content = robj.get_encoded_data()
+        response = self.http_request('POST', url, headers, content)
+        location = response[0]['location']
+        idx = location.rindex('/')
+        key = location[idx+1:]
+        if return_meta:
+            vclock, [(metadata, data)] = self.parse_body(response, [201])
+            return key, vclock, metadata
+        else:
+            self.check_http_code(response, [201])
+            return key, None, None
 
     def delete(self, robj, rw):
         # Construct the URL...
@@ -414,6 +414,29 @@ class RiakHttpTransport(RiakTransport) :
 
         # Return.
         return path
+
+    def build_put_headers(self, robj):
+        """Build the headers for a POST/PUT request."""
+
+        # Construct the headers...
+        headers = MultiDict({'Accept' : 'text/plain, */*; q=0.5',
+                             'Content-Type' : robj.get_content_type(),
+                             'X-Riak-ClientId' : self._client_id})
+
+        # Add the vclock if it exists...
+        if robj.vclock() is not None:
+            headers['X-Riak-Vclock'] = robj.vclock()
+
+        # Create the header from metadata
+        links = self.add_links_for_riak_object(robj, headers)
+
+        for key, value in robj.get_usermeta().iteritems():
+            headers['X-Riak-Meta-%s' % key] = value
+
+        for key, value in robj.get_indexes().iteritems():
+            headers['X-Riak-Index-%s' % key] = value
+
+        return headers
 
     def http_request(self, method, uri, headers=None, body='') :
         """
