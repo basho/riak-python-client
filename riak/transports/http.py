@@ -339,7 +339,7 @@ class RiakHttpTransport(RiakTransport) :
             for link in links:
                 header = self.to_link_header(link)
                 if len(current_header + header) > MAX_LINK_HEADER_SIZE:
-                    headers.setdefault('Link', []).append(current_header)
+                    headers.add('Link', current_header)
                     current_header = ''
 
                 if current_header != '': header = ', ' + header
