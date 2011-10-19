@@ -391,8 +391,8 @@ class RiakBucket(object):
         :param props: An associative array of key:value.
         :type props: array
         """
-        t = self._client.get_transport()
-        t.set_bucket_props(self, props)
+        with self._client.get_transport() as t:
+            t.set_bucket_props(self, props)
 
     def get_properties(self):
         """
@@ -400,8 +400,8 @@ class RiakBucket(object):
 
         :rtype: array
         """
-        t = self._client.get_transport()
-        return t.get_bucket_props(self)
+        with self._client.get_transport() as t:
+            return t.get_bucket_props(self)
 
     def get_keys(self):
         """
@@ -411,7 +411,8 @@ class RiakBucket(object):
 
            At current, this is a very expensive operation. Use with caution.
         """
-        return self._client.get_transport().get_keys(self)
+        with self._client.get_transport() as t:
+            return t.get_keys(self)
 
     def new_binary_from_file(self, key, filename):
         """

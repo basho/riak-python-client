@@ -1067,7 +1067,8 @@ class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unitt
 
     def test_set_client_id(self):
         self.client.set_client_id("Client")
-        self.assertEqual(self.client.get_transport().get_client_id(), "Client")
+        with self.client.get_transport() as t:
+            self.assertEqual(t.get_client_id(), "Client")
 
 class RiakHttpReuseTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 

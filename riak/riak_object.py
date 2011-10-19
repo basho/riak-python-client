@@ -337,10 +337,10 @@ class RiakObject(object):
         dw = self._bucket.get_dw(dw)
 
         # Issue the get over our transport
-        t = self._client.get_transport()
-        Result = t.put(self, w, dw, return_body)
-        if Result is not None:
-            self.populate(Result)
+        with self._client.get_transport() as t:
+            Result = t.put(self, w, dw, return_body)
+            if Result is not None:
+                self.populate(Result)
 
         return self
 
@@ -358,12 +358,12 @@ class RiakObject(object):
         """
         # Do the request...
         r = self._bucket.get_r(r)
-        t = self._client.get_transport()
-        Result = t.get(self, r, vtag)
+        with self._client.get_transport() as t:
+            Result = t.get(self, r, vtag)
 
-        self.clear()
-        if Result is not None:
-            self.populate(Result)
+            self.clear()
+            if Result is not None:
+                self.populate(Result)
 
         return self
 
@@ -379,9 +379,10 @@ class RiakObject(object):
         """
         # Use defaults if not specified...
         rw = self._bucket.get_rw(rw)
-        t = self._client.get_transport()
-        Result = t.delete(self, rw)
-        self.clear()
+        with self._client.get_transport() as t:
+            Result = t.delete(self, rw)
+            self.clear()
+
         return self
 
     def clear(self) :
