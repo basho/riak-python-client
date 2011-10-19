@@ -19,7 +19,7 @@ under the License.
 """
 from __future__ import with_statement
 
-import socket, struct
+import select, socket, struct
 
 try:
     import json
@@ -70,8 +70,6 @@ RIAKC_RW_ALL = 4294967292
 RIAKC_RW_DEFAULT = 4294967291
 
 
-
-
 class RiakPbcTransport(RiakTransport):
     """
     The RiakPbcTransport object holds a connection to the protocol buffers interface
@@ -83,7 +81,7 @@ class RiakPbcTransport(RiakTransport):
         'quorum' : RIAKC_RW_QUORUM,
         'one' : RIAKC_RW_ONE
         }
-    def __init__(self, host='127.0.0.1', port=8087, client_id=None):
+    def __init__(self, host='127.0.0.1', port=8087, client_id=None, timeout=None):
         """
         Construct a new RiakPbcTransport object.
         @param string host - Hostname or IP address (default '127.0.0.1')
@@ -97,6 +95,7 @@ class RiakPbcTransport(RiakTransport):
         self._port = port
         self._client_id = client_id
         self._sock = None
+        self._timeout = timeout
 
     def translate_rw_val(self, rw):
         val = self.rw_names.get(rw)
@@ -344,6 +343,7 @@ class RiakPbcTransport(RiakTransport):
     def maybe_connect(self):
         if self._sock is None:
             self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._sock.settimeout(self._timeout)
 
             try:
                 s.connect((self._host, self._port))
@@ -411,9 +411,15 @@ class RiakPbcTransport(RiakTransport):
             raise Exception("unknown msg code %s"%msg_code)
         return msg_code, msg
 
+    def _recv(self, length):
+        if self._timeout:
+            ready = select.select([self._sock], [], [], self._timeout)
+            if not ready[0]:
+                raise socket.timeout("timed out")
+        return self._sock.recv(length)
 
     def recv_pkt(self):
-        nmsglen = self._sock.recv(4)
+        nmsglen = self._recv(4)
         if len(nmsglen) != 4:
             self._sock = None
             raise RiakError("Socket returned short packet length %d - expected 4"%\
@@ -423,7 +429,7 @@ class RiakPbcTransport(RiakTransport):
         self._inbuf = ''
         while len(self._inbuf) < msglen:
             want_len = min(8192, msglen - len(self._inbuf))
-            recv_buf = self._sock.recv(want_len)
+            recv_buf = self._recv(want_len)
             if not recv_buf: break
             self._inbuf += recv_buf
         if len(self._inbuf) != self._inbuf_len:
@@ -520,7 +526,7 @@ class RiakPbcCachedTransport(RiakTransport):
         self.port = port
         self.client_id = client_id
         self.block = block
-        self.timeout = timeout
+        self._timeout = timeout
 
         self.pool = Queue(maxsize)
         # Fill the queue up so that doing get() on it will block properly (check Queue#get)
@@ -528,12 +534,12 @@ class RiakPbcCachedTransport(RiakTransport):
 
     def _new_connection(self):
         """New PBC connection"""
-        return RiakPbcTransport(self.host, self.port, self.client_id)
+        return RiakPbcTransport(self.host, self.port, self.client_id, timeout=self._timeout)
 
     def _get_connection(self):
         connection = None
         try:
-            connection = self.pool.get(block=self.block, timeout=self.timeout)
+            connection = self.pool.get(block=self.block, timeout=self._timeout)
         except Empty:
             pass
         return connection or self._new_connection()
