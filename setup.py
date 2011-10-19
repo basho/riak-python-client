@@ -23,10 +23,12 @@ if __name__ == "__main__":
         install_requires = ['protobuf>=2.3.0', 'urllib3>=0.4.0'],
         dependency_links = ["http://downloads.basho.com/support"],
         package_data = {
-            '' : ['*.proto']
+            '' : ['*.proto'],
+            'riak' : ['erl_src/*']
             },
         description='Python client for Riak',
         zip_safe=True,
+        include_package_data=True,
         license='Apache 2',
         platforms='Platform Independent',
         author='Basho Technologies',
