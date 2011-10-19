@@ -25,6 +25,12 @@ class Atom(object):
     def __repr__(self):
         return repr(self.str)
 
+    def __eq__(self, other):
+        return self.str == other
+
+    def __cmp__(self, other):
+        return cmp(self.str, other)
+
 def erlang_config(hash, depth=1):
     def printable(item):
         k, v = item
