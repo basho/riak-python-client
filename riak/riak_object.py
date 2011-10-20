@@ -40,7 +40,8 @@ class RiakObject(object):
         :type key: string
         """
         try:
-            key.encode('ascii')
+            if isinstance(key, basestring):
+                key.encode('ascii')
         except UnicodeEncodeError:
             raise TypeError('Unicode keys are not supported.')
 
