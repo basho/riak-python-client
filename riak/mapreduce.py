@@ -320,7 +320,9 @@ class RiakMapReducePhase(object):
         @param mixed arg - Additional value to pass into the map or
         reduce function.
         """
-        if isinstance(function, unicode):
+        try:
+            function.encode('ascii')
+        except UnicodeEncodeError:
             raise TypeError('Unicode encoded functions are not supported.')
 
         self._type = type
