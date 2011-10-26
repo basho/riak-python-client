@@ -29,6 +29,12 @@ class RiakTransport(object):
     Class to encapsulate transport details
     """
 
+    # Subclasses should specify their API level.
+    #   * missing or 1: the API used up and through 1.3.x.
+    #   * 2: the API introduced with 1.4.x
+    #
+    # api = 2
+
     @classmethod
     def make_random_client_id(self):
         """
@@ -66,6 +72,16 @@ class RiakTransport(object):
         Serialize put request and deserialize response - if 'content'
         is true, retrieve the updated metadata/content
         @return (vclock=None, [(metadata, value)]=None)
+        """
+        raise RiakError("not implemented")
+
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key.
+
+        If return_meta is False, then the vlock and metadata return values
+        will be None.
+
+        @return (key, vclock, metadata)
         """
         raise RiakError("not implemented")
 

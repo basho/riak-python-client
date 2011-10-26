@@ -5,12 +5,20 @@ from xml.dom.minidom import Document
 class RiakSearch:
     def __init__(self, client, transport_class=None,
                  host="127.0.0.1", port=8098):
-        if not transport_class:
-            self._transport = RiakHttpTransport(host,
-                                                port,
-                                                "/solr")
+        if transport_class is None:
+            transport_class = RiakHttpTransport
+
+        api = getattr(transport_class, 'api', 1)
+        if api >= 2:
+            hostports = [ (host, port), ]
+            self._cm = transport_class.default_cm(hostports)
+            self._transport = transport_class(self._cm, prefix="/solr")
         else:
-            self._transport = transport_class(host, port, client_id=client_id)
+            # The old code which attempted to use api==1 would actually
+            # throw a NameError, so it was obviously never used. We will
+            # simply raise an error here, intead of a gentle warning.
+            raise DeprecationWarning('please upgrade the transport to the '
+                                     'new API')
 
         self._client = client
         self._decoders = {"text/xml": ElementTree.fromstring}

@@ -336,11 +336,19 @@ class RiakObject(object):
         w = self._bucket.get_w(w)
         dw = self._bucket.get_dw(dw)
 
-        # Issue the get over our transport
+        # Issue the put over our transport
         t = self._client.get_transport()
-        Result = t.put(self, w, dw, return_body)
-        if Result is not None:
-            self.populate(Result)
+
+        if self._key is None:
+            key, vclock, metadata = t.put_new(self, w, dw, return_body)
+            self._exists = True
+            self._key = key
+            self._vclock = vclock
+            self.set_metadata(metadata)
+        else:
+            Result = t.put(self, w, dw, return_body)
+            if Result is not None:
+                self.populate(Result)
 
         return self
 
