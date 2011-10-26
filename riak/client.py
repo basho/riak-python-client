@@ -302,11 +302,12 @@ class RiakClient(object):
         mr = RiakMapReduce(self)
         return apply(mr.reduce, args)
 
-    def store_file(self, filename, data, content_type="application/octet-stream"):
+    def store_file(self, data, filename=None, content_type="application/octet-stream"):
         """
-        Store data in luwak using filename as the key
+        Store data in luwak using filename as the key.
+        If filename is ``None`` -- return the new generated key.
         """
-        self._transport.store_file(filename, content_type=content_type, content=data)
+        return self._transport.store_file(data, filename, content_type=content_type)
 
     def get_file(self, filename):
         return self._transport.get_file(filename)

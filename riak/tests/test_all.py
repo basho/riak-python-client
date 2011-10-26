@@ -948,7 +948,7 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
             data = input_file.read()
 
         key = uuid.uuid1().hex
-        self.client.store_file(key, data)
+        self.client.store_file(data, key)
 
     @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
     def test_store_get_file_with_luwak(self):
@@ -957,7 +957,20 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
             data = input_file.read()
 
         key = uuid.uuid1().hex
-        self.client.store_file(key, data)
+        self.client.store_file(data, key)
+        time.sleep(1)
+        file = self.client.get_file(key)
+        self.assertEquals(data, file)
+
+    @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
+    def test_store_file_without_key_with_luwak(self):
+        file = os.path.join(os.path.dirname(__file__), "test_all.py")
+        with open(file, "r") as input_file:
+            data = input_file.read()
+
+        # key = uuid.uuid1().hex
+        key = self.client.store_file(data)
+        self.assertIsNot(key, None)
         time.sleep(1)
         file = self.client.get_file(key)
         self.assertEquals(data, file)

@@ -70,19 +70,18 @@ class RiakHttpTransport(RiakTransport) :
     def get_client_id(self):
         return self._client_id
 
-    def ping(self) :
+    def ping(self):
         """
         Check server is alive over HTTP
         """
         response = self.http_request('GET', '/ping')
         return(response is not None) and (response[1] == 'OK')
 
-
-    def get(self, robj, r, vtag = None) :
+    def get(self, robj, r, vtag=None):
         """
         Get a bucket/key from the server
         """
-        params = {'r' : r}
+        params = {'r': r}
         if vtag is not None:
             params['vtag'] = vtag
         url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
@@ -90,19 +89,19 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('GET', url)
         return self.parse_body(response, [200, 300, 404])
 
-    def put(self, robj, w = None, dw = None, return_body = True):
+    def put(self, robj, w=None, dw=None, return_body=True):
         """
         Serialize put request and deserialize response
         """
-       # Construct the URL...
-        params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw}
+        # Construct the URL...
+        params = {'returnbody': str(return_body).lower(), 'w': w, 'dw': dw}
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
 
         # Construct the headers...
-        headers = MultiDict({'Accept' : 'text/plain, */*; q=0.5',
-                             'Content-Type' : robj.get_content_type(),
-                             'X-Riak-ClientId' : self._client_id})
+        headers = MultiDict({'Accept': 'text/plain, */*; q=0.5',
+                             'Content-Type': robj.get_content_type(),
+                             'X-Riak-ClientId': self._client_id})
 
         # Add the vclock if it exists...
         if robj.vclock() is not None:
@@ -126,19 +125,21 @@ class RiakHttpTransport(RiakTransport) :
 
     def do_put(self, url, headers, content, return_body=False, key=None):
         if key is None:
-          response = self.http_request('POST', url, headers, content)
+            response = self.http_request('POST', url, headers, content)
         else:
-          response = self.http_request('PUT', url, headers, content)
+            response = self.http_request('PUT', url, headers, content)
 
         if return_body:
-          return self.parse_body(response, [200, 201, 300])
+            return self.parse_body(response, [200, 201, 300])
         else:
-          self.check_http_code(response, [204])
-          return None
+            # As I assume it was [204] before because this method was intended
+            # for PUT only, but as you can see above it now does POST too.
+            self.check_http_code(response, [201, 204])
+            return response
 
     def delete(self, robj, rw):
         # Construct the URL...
-        params = {'rw' : rw}
+        params = {'rw': rw}
         url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                    params=params)
         # Run the operation..
@@ -342,7 +343,8 @@ class RiakHttpTransport(RiakTransport) :
                     headers.add('Link', current_header)
                     current_header = ''
 
-                if current_header != '': header = ', ' + header
+                if current_header != '':
+                    header = ', ' + header
                 current_header += header
 
             headers.add('Link', current_header)
@@ -353,12 +355,17 @@ class RiakHttpTransport(RiakTransport) :
         url = self.build_rest_path(bucket=None, params=params, prefix=uri)
         return self.http_request('GET', url)
 
-    def store_file(self, key, content_type="application/octet-stream", content=None):
+    def store_file(self, content, key=None,
+                   content_type="application/octet-stream"):
         url = self.build_rest_path(prefix='luwak', key=key)
-        headers = {'Content-Type' : content_type,
-                   'X-Riak-ClientId' : self._client_id}
+        headers = {'Content-Type': content_type,
+                   'X-Riak-ClientId': self._client_id}
 
-        return self.do_put(url, headers, content, key=key)
+        response = self.do_put(url, headers, content, key=key)
+        headers = response[0]
+        if key is None:
+            rv = headers.get('location')[len('/luwak/'):]
+            return rv
 
     def get_file(self, key):
         url = self.build_rest_path(prefix='luwak', key=key)
