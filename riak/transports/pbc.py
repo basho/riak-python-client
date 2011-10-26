@@ -558,6 +558,13 @@ from Queue import Empty, Full, Queue
 import contextlib
 class RiakPbcCachedTransport(RiakTransport):
     """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
+
+    # We're using the new RiakTransport API
+    api = 2
+
+    # The ConnectionManager class that this transport prefers.
+    default_cm = SocketConnectionManager
+
     def __init__(self, cm,
                  client_id=None, maxsize=0, block=False, timeout=None,
                  **unused_options):
@@ -566,6 +573,7 @@ class RiakPbcCachedTransport(RiakTransport):
 
         ### backwards compat. we don't use the ConnectionManager (yet).
         host, port = cm.hostports[0]
+        self._cm = cm
 
         self.host = host
         self.port = port
@@ -579,7 +587,7 @@ class RiakPbcCachedTransport(RiakTransport):
 
     def _new_connection(self):
         """New PBC connection"""
-        return RiakPbcTransport(self.host, self.port, self.client_id)
+        return RiakPbcTransport(self._cm, self.client_id)
 
     def _get_connection(self):
         connection = None
