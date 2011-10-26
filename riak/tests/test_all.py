@@ -911,7 +911,11 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket = self.client.bucket('random_key_bucket')
         for key in bucket.get_keys():
             bucket.get(str(key)).delete()
-        bucket.new(None, data={}).store()
+        o = bucket.new(None, data={})
+        self.assertIsNone(o.get_key())
+        o.store()
+        self.assertIsNotNone(o.get_key())
+        self.assertNotIn('/', o.get_key())
         self.assertEqual(len(bucket.get_keys()), 1)
 
     def test_too_many_link_headers_shouldnt_break_http(self):
