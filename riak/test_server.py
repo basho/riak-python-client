@@ -15,6 +15,22 @@ try:
 except NameError:
   bytes = str
 
+class Atom(object):
+    def __init__(self, s):
+        self.str = s
+
+    def __str__(self):
+        return str(self.str)
+
+    def __repr__(self):
+        return repr(self.str)
+
+    def __eq__(self, other):
+        return self.str == other
+
+    def __cmp__(self, other):
+        return cmp(self.str, other)
+
 def erlang_config(hash, depth=1):
     def printable(item):
         k, v = item
@@ -44,7 +60,7 @@ class TestServer:
         "-smp": "enable",
         "-env ERL_MAX_PORTS": 4096,
         "-env ERL_FULLSWEEP_AFTER": 10,
-        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__), "../erl_src"))
+        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__), "erl_src"))
     }
 
     APP_CONFIG_DEFAULTS = {
@@ -55,7 +71,7 @@ class TestServer:
           "ring_creation_size": 64
       },
       "riak_kv": {
-          "storage_backend": bytes("riak_kv_test_backend"),
+          "storage_backend": Atom("riak_kv_test_backend"),
           "pb_ip": "127.0.0.1",
           "pb_port": 9002,
           "js_vm_count": 8,
@@ -67,7 +83,7 @@ class TestServer:
       },
       "riak_search": {
           "enabled": True,
-          "search_backend": bytes("riak_search_test_backend")
+          "search_backend": Atom("riak_search_test_backend")
       },
       "luwak": {
           "enabled": True
@@ -92,6 +108,7 @@ class TestServer:
                 self.app_config[key] = deep_merge(self.app_config[key], value)
 
         self.app_config["riak_core"]["ring_state_dir"] = os.path.join(self.temp_dir, "data", "ring")
+        self.app_config["riak_core"]["platform_data_dir"] = self.temp_dir
 
     def prepare(self):
         if not self._prepared:

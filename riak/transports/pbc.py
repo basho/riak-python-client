@@ -30,6 +30,8 @@ from transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakMapReduce, RiakLink
 from riak import RiakError
+from riak.riak_index_entry import RiakIndexEntry
+from connection import SocketConnectionManager
 
 try:
     import riakclient_pb2
@@ -76,13 +78,21 @@ class RiakPbcTransport(RiakTransport):
     The RiakPbcTransport object holds a connection to the protocol buffers interface
     on the riak server.
     """
+
+    # We're using the new RiakTransport API
+    api = 2
+
     rw_names = {
         'default' : RIAKC_RW_DEFAULT,
         'all' : RIAKC_RW_ALL,
         'quorum' : RIAKC_RW_QUORUM,
         'one' : RIAKC_RW_ONE
         }
-    def __init__(self, host='127.0.0.1', port=8087, client_id=None):
+
+    # The ConnectionManager class that this transport prefers.
+    default_cm = SocketConnectionManager
+
+    def __init__(self, cm, client_id=None, **unused_options):
         """
         Construct a new RiakPbcTransport object.
         @param string host - Hostname or IP address (default '127.0.0.1')
@@ -92,6 +102,10 @@ class RiakPbcTransport(RiakTransport):
             raise RiakError("this transport is not available (no protobuf)")
 
         super(RiakPbcTransport, self).__init__()
+
+        ### backwards compat. we don't use the ConnectionManager (yet).
+        host, port = cm.hostports[0]
+
         self._host = host
         self._port = port
         self._client_id = client_id
@@ -202,6 +216,39 @@ class RiakPbcTransport(RiakTransport):
             for c in resp.content:
                 contents.append(self.decode_content(c))
             return resp.vclock, contents
+
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key.
+
+        If return_meta is False, then the vlock and metadata return values
+        will be None.
+
+        @return (key, vclock, metadata)
+        """
+        bucket = robj.get_bucket()
+
+        req = riakclient_pb2.RpbPutReq()
+        req.w = self.translate_rw_val(w)
+        req.dw = self.translate_rw_val(dw)
+        if return_meta:
+            req.return_body = 1
+
+        req.bucket = bucket.get_name()
+
+        self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
+
+        self.maybe_connect()
+        self.send_msg(MSG_CODE_PUT_REQ, req)
+        msg_code, resp = self.recv_msg()
+        if msg_code != MSG_CODE_PUT_RESP:
+            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        if not resp:
+            raise RiakError("missing response object")
+        if len(resp.content) != 1:
+            raise RiakError("siblings were returned from object creation")
+
+        metadata, content = self.decode_content(resp.content[0])
+        return resp.key, resp.vclock, metadata
 
     def delete(self, robj, rw = None):
         """
@@ -471,9 +518,10 @@ class RiakPbcTransport(RiakTransport):
             usermeta[usermd.key] = usermd.value
         if len(usermeta) > 0:
             metadata[MD_USERMETA] = usermeta
-        indexes = {}
+        indexes = []
         for index in rpb_content.indexes:
-            indexes[index.key] = index.value
+            rie = RiakIndexEntry(index.key, index.value)
+            indexes.append(rie)
         if len(indexes) > 0:
             metadata[MD_INDEX] = indexes
         return metadata, rpb_content.value
@@ -494,10 +542,10 @@ class RiakPbcTransport(RiakTransport):
                     pair.key = uk
                     pair.value = uv
             elif k == MD_INDEX:
-                for uk, uv in v.iteritems():
+                for rie in v:
                     pair = rpb_content.indexes.add()
-                    pair.key = uk
-                    pair.value = str(uv)
+                    pair.key = rie.get_field()
+                    pair.value = rie.get_value()
             elif k == MD_LINKS:
                 for link in v:
                     pb_link = rpb_content.links.add()
@@ -510,9 +558,22 @@ from Queue import Empty, Full, Queue
 import contextlib
 class RiakPbcCachedTransport(RiakTransport):
     """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
-    def __init__(self, host='127.0.0.1', port=8087, client_id=None, maxsize=0, block=False, timeout=None):
+
+    # We're using the new RiakTransport API
+    api = 2
+
+    # The ConnectionManager class that this transport prefers.
+    default_cm = SocketConnectionManager
+
+    def __init__(self, cm,
+                 client_id=None, maxsize=0, block=False, timeout=None,
+                 **unused_options):
         if riakclient_pb2 is None:
             raise RiakError("this transport is not available (no protobuf)")
+
+        ### backwards compat. we don't use the ConnectionManager (yet).
+        host, port = cm.hostports[0]
+        self._cm = cm
 
         self.host = host
         self.port = port
@@ -526,7 +587,7 @@ class RiakPbcCachedTransport(RiakTransport):
 
     def _new_connection(self):
         """New PBC connection"""
-        return RiakPbcTransport(self.host, self.port, self.client_id)
+        return RiakPbcTransport(self._cm, self.client_id)
 
     def _get_connection(self):
         connection = None
@@ -575,6 +636,17 @@ class RiakPbcCachedTransport(RiakTransport):
         """
         with self._get_connection_from_pool() as connection:
             return connection.put(robj, w, dw, return_body)
+
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key.
+
+        If return_meta is False, then the vlock and metadata return values
+        will be None.
+
+        @return (key, vclock, metadata)
+        """
+        with self._get_connection_from_pool() as connection:
+            return connection.put_new(robj, w, dw, return_meta)
 
     def delete(self, robj, rw = None):
         """

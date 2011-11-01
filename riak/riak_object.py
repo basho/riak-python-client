@@ -20,6 +20,7 @@ under the License.
 import types, copy, re
 from metadata import *
 from riak import RiakError
+from riak.riak_index_entry import RiakIndexEntry
 
 class RiakObject(object):
     """
@@ -47,7 +48,7 @@ class RiakObject(object):
         self._encode_data = True
         self._vclock = None
         self._data = None
-        self._metadata = {MD_USERMETA: {}, MD_INDEX: {}}
+        self._metadata = {MD_USERMETA: {}, MD_INDEX: []}
         self._links = []
         self._siblings = []
         self._exists = False
@@ -177,23 +178,49 @@ class RiakObject(object):
         self._metadata[MD_USERMETA] = usermeta
         return self
 
-    def get_indexes(self):
-        if MD_INDEX in self._metadata:
+    def add_index(self, field, value):
+        """
+        Tag this object with the specified field/value pair for indexing.
+
+        :param field: The index field.
+        :type field: string
+        :param value: The index value.
+        :type value: string or integer
+        :rtype: self
+        """
+        rie = RiakIndexEntry(field, value)
+        if not rie in self._metadata[MD_INDEX]:
+            self._metadata[MD_INDEX].append(rie)
+
+        return self
+
+    def remove_index(self, field, value):
+        """
+        Remove the specified field/value pair as an index on this object.
+
+        :param field: The index field.
+        :type field: string
+        :param value: The index value.
+        :type value: string or integer
+        :rtype: self
+        """
+        rie = RiakIndexEntry(field, value)
+        if rie in self._metadata[MD_INDEX]:
+            self._metadata[MD_INDEX].remove(rie)
+        return self
+
+    def get_indexes(self, field = None):
+        """
+        Get a list of the index entries for this object. If a field is provided, returns a list 
+
+        :param field: The index field.
+        :type field: string or None
+        :rtype: (array of RiakIndexEntry) or (array of string or integer)
+        """
+        if field == None:
             return self._metadata[MD_INDEX]
         else:
-            return {}
-
-    def set_indexes(self, indexes):
-        """
-        Sets the field/value indexes under which this object will be
-        indexed.
-
-        :param indexes: The field/value index data.
-        :type indexes: dict
-        :rtype: data
-        """
-        self._metadata[MD_INDEX] = indexes
-        return self
+            return [x.get_value() for x in self._metadata[MD_INDEX] if x.get_field() == field]
 
     def exists(self):
         """
@@ -307,13 +334,21 @@ class RiakObject(object):
         """
         # Use defaults if not specified...
         w = self._bucket.get_w(w)
-        dw = self._bucket.get_dw(w)
+        dw = self._bucket.get_dw(dw)
 
-        # Issue the get over our transport
+        # Issue the put over our transport
         t = self._client.get_transport()
-        Result = t.put(self, w, dw, return_body)
-        if Result is not None:
-            self.populate(Result)
+
+        if self._key is None:
+            key, vclock, metadata = t.put_new(self, w, dw, return_body)
+            self._exists = True
+            self._key = key
+            self._vclock = vclock
+            self.set_metadata(metadata)
+        else:
+            Result = t.put(self, w, dw, return_body)
+            if Result is not None:
+                self.populate(Result)
 
         return self
 
