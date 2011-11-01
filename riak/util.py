@@ -1,3 +1,5 @@
+import warnings
+
 try:
     from collections import Mapping
 except ImportError:
@@ -35,3 +37,6 @@ def deep_merge(a, b):
                     current_dst[key] = current_src[key]
     return dst
 
+
+def deprecated(message, stacklevel=3):
+    warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
