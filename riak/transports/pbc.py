@@ -148,8 +148,7 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbSetClientIdReq()
         req.client_id = client_id
 
-        self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
         if msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
             return True
         else:
@@ -170,8 +169,7 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        self.send_msg(MSG_CODE_GET_REQ, req)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg(MSG_CODE_GET_REQ, req)
         if msg_code == MSG_CODE_GET_RESP:
             contents = []
             for c in resp.content:
@@ -200,8 +198,7 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        self.send_msg(MSG_CODE_PUT_REQ, req)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req)
         if msg_code != MSG_CODE_PUT_RESP:
             raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         if resp is not None:
@@ -230,8 +227,7 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        self.send_msg(MSG_CODE_PUT_REQ, req)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req)
         if msg_code != MSG_CODE_PUT_RESP:
             raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         if not resp:
@@ -254,8 +250,7 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        self.send_msg(MSG_CODE_DEL_REQ, req)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req)
         if msg_code != MSG_CODE_DEL_RESP:
             raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         return self
@@ -267,7 +262,7 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbListKeysReq()
         req.bucket = bucket.get_name()
 
-        self.send_msg(MSG_CODE_LIST_KEYS_REQ, req)
+        self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req)
         keys = []
         while True:
             msg_code, resp = self.recv_msg()
@@ -298,8 +293,7 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbGetBucketReq()
         req.bucket = bucket.get_name()
 
-        self.send_msg(MSG_CODE_GET_BUCKET_REQ, req)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req)
         if msg_code != MSG_CODE_GET_BUCKET_RESP:
             raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         props = {}
@@ -324,8 +318,7 @@ class RiakPbcTransport(RiakTransport):
         if 'allow_mult' in props:
             req.props.allow_mult = props['allow_mult']
 
-        self.send_msg(MSG_CODE_SET_BUCKET_REQ, req)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg(MSG_CODE_SET_BUCKET_REQ, req)
         if msg_code != MSG_CODE_SET_BUCKET_RESP:
             raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
 
@@ -343,7 +336,7 @@ class RiakPbcTransport(RiakTransport):
         req.request = content
         req.content_type = "application/json"
 
-        self.send_msg(MSG_CODE_MAPRED_REQ, req)
+        self.send_msg_multi(MSG_CODE_MAPRED_REQ, req)
 
         # dictionary of phase results - each content should be an encoded array
         # which is appended to the result for that phase.
@@ -398,6 +391,10 @@ class RiakPbcTransport(RiakTransport):
         return hdr + str
 
     def send_msg(self, msg_code, msg):
+        self.send_msg_multi(msg_code, msg)
+        return self.recv_msg()
+
+    def send_msg_multi(self, msg_code, msg):
         self.maybe_connect()
         pkt = self.encode_msg(msg_code, msg)
         sent_len = self._sock.send(pkt)
