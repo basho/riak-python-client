@@ -125,7 +125,6 @@ class RiakPbcTransport(RiakTransport):
         Ping the remote server
         @return boolean
         """
-        self.maybe_connect()
         self.send_msg_code(MSG_CODE_PING_REQ)
         msg_code, msg = self.recv_msg()
         if msg_code == MSG_CODE_PING_RESP:
@@ -137,7 +136,6 @@ class RiakPbcTransport(RiakTransport):
         """
         Get the client id used by this connection
         """
-        self.maybe_connect()
         self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ)
         msg_code, resp = self.recv_msg()
         if msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
@@ -152,7 +150,6 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbSetClientIdReq()
         req.client_id = client_id
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
@@ -175,7 +172,6 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_GET_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code == MSG_CODE_GET_RESP:
@@ -206,7 +202,6 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_PUT_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_PUT_RESP:
@@ -237,7 +232,6 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_PUT_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_PUT_RESP:
@@ -262,7 +256,6 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_DEL_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_DEL_RESP:
@@ -276,7 +269,6 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbListKeysReq()
         req.bucket = bucket.get_name()
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_LIST_KEYS_REQ, req)
         keys = []
         while True:
@@ -296,7 +288,6 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket listing request and deserialize response
         """
-        self.maybe_connect()
         self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
@@ -310,7 +301,6 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbGetBucketReq()
         req.bucket = bucket.get_name()
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_GET_BUCKET_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_GET_BUCKET_RESP:
@@ -337,7 +327,6 @@ class RiakPbcTransport(RiakTransport):
         if 'allow_mult' in props:
             req.props.allow_mult = props['allow_mult']
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_SET_BUCKET_REQ, req)
         msg_code, resp = self.recv_msg()
         if msg_code != MSG_CODE_SET_BUCKET_RESP:
@@ -357,7 +346,6 @@ class RiakPbcTransport(RiakTransport):
         req.request = content
         req.content_type = "application/json"
 
-        self.maybe_connect()
         self.send_msg(MSG_CODE_MAPRED_REQ, req)
 
         # dictionary of phase results - each content should be an encoded array
@@ -401,6 +389,7 @@ class RiakPbcTransport(RiakTransport):
                 self.set_client_id(self._client_id)
 
     def send_msg_code(self, msg_code):
+        self.maybe_connect()
         pkt = struct.pack("!iB", 1, msg_code)
         self._sock.send(pkt)
 
@@ -411,6 +400,7 @@ class RiakPbcTransport(RiakTransport):
         return hdr + str
 
     def send_msg(self, msg_code, msg):
+        self.maybe_connect()
         pkt = self.encode_msg(msg_code, msg)
         sent_len = self._sock.send(pkt)
         if sent_len != len(pkt):
