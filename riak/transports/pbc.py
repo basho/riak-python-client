@@ -125,8 +125,7 @@ class RiakPbcTransport(RiakTransport):
         Ping the remote server
         @return boolean
         """
-        self.send_msg_code(MSG_CODE_PING_REQ)
-        msg_code, msg = self.recv_msg()
+        msg_code, msg = self.send_msg_code(MSG_CODE_PING_REQ)
         if msg_code == MSG_CODE_PING_RESP:
             return 1
         else:
@@ -136,8 +135,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Get the client id used by this connection
         """
-        self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ)
         if msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
             return resp.client_id
         else:
@@ -288,8 +286,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket listing request and deserialize response
         """
-        self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
-        msg_code, resp = self.recv_msg()
+        msg_code, resp = self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
         if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
           raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
         return resp.buckets
@@ -392,6 +389,7 @@ class RiakPbcTransport(RiakTransport):
         self.maybe_connect()
         pkt = struct.pack("!iB", 1, msg_code)
         self._sock.send(pkt)
+        return self.recv_msg()
 
     def encode_msg(self, msg_code, msg):
         str = msg.SerializeToString()
