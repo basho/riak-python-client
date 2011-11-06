@@ -36,6 +36,7 @@ from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
 from connection import HTTPConnectionManager
+import riak.util
 
 MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
 
@@ -519,111 +520,24 @@ class RiakHttpTransport(RiakTransport) :
                 retVal[key] = value
         return retVal
 
-import socket
 
 class RiakHttpReuseTransport(RiakHttpTransport):
-    """
-    Reuse sockets
-    """
-
+    "Deprecated transport."
     def __init__(self, cm,
                  prefix='riak', mapred_prefix='mapred', client_id=None,
                  **unused_options):
-        super(RiakHttpReuseTransport, self).__init__(cm,
-                                                     prefix,
-                                                     mapred_prefix,
-                                                     client_id)
-        ### for backwards compat
-        self._host, self._port = cm.hostports[0]
+        RiakHttpTransport.__init__(self, cm, prefix, mapred_prefix,
+                                   client_id, **unused_options)
+        riak.util.deprecated('please use RiakHttpTransport instead',
+                             stacklevel=4)
 
-    def __copy__(self):
-        return RiakHttpReuseTransport(self._conns, self._prefix,
-                                      self._mapred_prefix)
-
-    def http_request(self, method, uri, headers=None, body=''):
-        if headers is None:
-            headers = {}
-        # Run the request...
-        client = None
-        response = None
-        try:
-            client = httplib.HTTPConnection(self._host, self._port)
-
-            #handle the connection myself, try to reuse sockets
-            client.auto_open = 0
-            client.connect()
-            client.sock.setsockopt(
-                socket.SOL_SOCKET, socket.SO_REUSEADDR,
-                client.sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR) | 1)
-
-            client.request(method, uri, body, headers)
-            response = client.getresponse()
-
-            # Get the response headers...
-            response_headers = {'http_code': response.status}
-            for (key, value) in response.getheaders():
-                response_headers[key.lower()] = value
-
-            # Get the body...
-            response_body = response.read()
-            response.close()
-
-            #close, this does not make any difference
-            client.close()
-
-            return response_headers, response_body
-        except:
-            if client is not None: client.close()
-            if response is not None: response.close()
-            raise
-
-try:
-    import urllib3
-except ImportError:
-    urllib3 = None
 
 class RiakHttpPoolTransport(RiakHttpTransport):
-    """
-    Use HTTP pool
-    """
-
-    http_pool = None
-
+    "Deprecated transport."
     def __init__(self, cm,
                  prefix='riak', mapred_prefix='mapred', client_id=None,
                  **unused_options):
-        if urllib3 is None:
-            raise RiakError("this transport is not available (no urllib3)")
-
-        super(RiakHttpPoolTransport, self).__init__(cm,
-                                                    prefix,
-                                                    mapred_prefix,
-                                                    client_id)
-        ### for backwards compat
-        self._host, self._port = cm.hostports[0]
-
-    def __copy__(self):
-        return RiakHttpPoolTransport(self._conns, self._prefix,
-                                     self._mapred_prefix)
-
-    def http_request(self, method, uri, headers={}, body=''):
-        if headers is None:
-            headers = {}
-        try:
-            ### it seems wrong to put the pool into a *class* variable,
-            ### but this code is supporting backwards-compat where the
-            ### use of a class variable was the design.
-            if self.__class__.http_pool is None:
-                self.__class__.http_pool = urllib3.connection_from_url('http://%s:%d' % (self._host, self._port), maxsize=10)
-
-            response = self.http_pool.urlopen(method, uri, body, headers)
-
-            response_headers = {'http_code': response.status}
-            for key, value in response.getheaders().iteritems():
-                response_headers[key.lower()] = value
-
-            response_body = response.data
-
-            return response_headers, response_body
-        except:
-            raise
+        RiakHttpTransport.__init__(self, cm, prefix, mapred_prefix,
+                                   client_id, **unused_options)
+        riak.util.deprecated('please use RiakHttpTransport instead',
+                             stacklevel=4)
