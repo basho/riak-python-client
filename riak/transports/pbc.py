@@ -106,6 +106,7 @@ class RiakPbcTransport(RiakTransport):
         ### backwards compat. we don't use the ConnectionManager (yet).
         host, port = cm.hostports[0]
 
+        self._cm = cm
         self._host = host
         self._port = port
         self._client_id = client_id
@@ -118,7 +119,7 @@ class RiakPbcTransport(RiakTransport):
         return val
 
     def __copy__(self):
-        return RiakPbcTransport(self._host, self._port)
+        return RiakPbcTransport(self._cm, self._client_id)
 
     def ping(self):
         """
