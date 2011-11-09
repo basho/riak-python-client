@@ -5,6 +5,7 @@
 import httplib
 import socket
 import contextlib
+import functools
 
 
 class ConnectionManager(object):
@@ -132,10 +133,6 @@ class ConnectionManager(object):
     return conn
 
 
-class HTTPConnectionManager(ConnectionManager):
-  connection_class = httplib.HTTPConnection
-
-
 class Socket(object):
 
   def __init__(self, host, port):
@@ -160,8 +157,18 @@ class Socket(object):
       self.sock = None
 
 
-class SocketConnectionManager(ConnectionManager):
-  connection_class = Socket
+class FactoryConnectionManager(ConnectionManager):
+
+  def __init__(self, connection_class, hostports=[]):
+    self.connection_class = connection_class
+    ConnectionManager.__init__(self, hostports)
+
+
+def cm_using(connection_class):
+  return functools.partial(FactoryConnectionManager, connection_class)
+
+HTTPConnectionManager = cm_using(httplib.HTTPConnection)
+SocketConnectionManager = cm_using(Socket)
 
 
 class NoHostsDefined(Exception):
