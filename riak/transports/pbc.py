@@ -258,16 +258,12 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbListKeysReq()
         req.bucket = bucket.get_name()
 
-        self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req)
         keys = []
-        while True:
-            msg_code, resp = self.recv_msg(MSG_CODE_LIST_KEYS_RESP)
-
+        def _handle_response(resp):
             for key in resp.keys:
                 keys.append(key)
-
-            if resp.HasField("done") and resp.done:
-                break
+        self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req,
+                            MSG_CODE_LIST_KEYS_RESP, _handle_response)
 
         return keys
 
@@ -326,22 +322,18 @@ class RiakPbcTransport(RiakTransport):
         req.request = content
         req.content_type = "application/json"
 
-        self.send_msg_multi(MSG_CODE_MAPRED_REQ, req)
-
         # dictionary of phase results - each content should be an encoded array
         # which is appended to the result for that phase.
         result = {}
-        while True:
-            msg_code, resp = self.recv_msg(MSG_CODE_MAPRED_RESP)
+        def _handle_response(resp):
             if resp.HasField("phase") and resp.HasField("response"):
                 content = json.loads(resp.response)
                 if resp.phase in result:
                     result[resp.phase] += content
                 else:
                     result[resp.phase] = content
-
-            if resp.HasField("done") and resp.done:
-                break;
+        self.send_msg_multi(MSG_CODE_MAPRED_REQ, req, MSG_CODE_MAPRED_RESP,
+                            _handle_response)
 
         # If a single result - return the same as the HTTP interface does
         # otherwise return all the phase information
@@ -367,9 +359,7 @@ class RiakPbcTransport(RiakTransport):
                 self.set_client_id(self._client_id)
 
     def send_msg_code(self, msg_code, expect):
-        self.maybe_connect()
-        pkt = struct.pack("!iB", 1, msg_code)
-        self._sock.send(pkt)
+        self.send_pkt(struct.pack("!iB", 1, msg_code))
         return self.recv_msg(expect)
 
     def encode_msg(self, msg_code, msg):
@@ -379,12 +369,19 @@ class RiakPbcTransport(RiakTransport):
         return hdr + str
 
     def send_msg(self, msg_code, msg, expect):
-        self.send_msg_multi(msg_code, msg)
+        self.send_pkt(self.encode_msg(msg_code, msg))
         return self.recv_msg(expect)
 
-    def send_msg_multi(self, msg_code, msg):
+    def send_msg_multi(self, msg_code, msg, expect, handler):
+        self.send_pkt(self.encode_msg(msg_code, msg))
+        while True:
+            msg_code, resp = self.recv_msg(expect)
+            handler(resp)
+            if resp.HasField("done") and resp.done:
+                break
+
+    def send_pkt(self, pkt):
         self.maybe_connect()
-        pkt = self.encode_msg(msg_code, msg)
         sent_len = self._sock.send(pkt)
         if sent_len != len(pkt):
             raise RiakError("PB socket returned short write %d - expected %d"%\
