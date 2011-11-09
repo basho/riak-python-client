@@ -126,7 +126,8 @@ class RiakPbcTransport(RiakTransport):
         Ping the remote server
         @return boolean
         """
-        msg_code, msg = self.send_msg_code(MSG_CODE_PING_REQ)
+        # An expected response code of None implies "any response is valid".
+        msg_code, msg = self.send_msg_code(MSG_CODE_PING_REQ, None)
         if msg_code == MSG_CODE_PING_RESP:
             return 1
         else:
@@ -136,11 +137,9 @@ class RiakPbcTransport(RiakTransport):
         """
         Get the client id used by this connection
         """
-        msg_code, resp = self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ)
-        if msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
-            return resp.client_id
-        else:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ,
+                                            MSG_CODE_GET_CLIENT_ID_RESP)
+        return resp.client_id
 
     def set_client_id(self, client_id):
         """
@@ -149,11 +148,9 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbSetClientIdReq()
         req.client_id = client_id
 
-        msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
-        if msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
-            return True
-        else:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req,
+                                       MSG_CODE_SET_CLIENT_ID_RESP)
+        return True
 
     def get(self, robj, r = None, vtag = None):
         """
@@ -170,7 +167,8 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        msg_code, resp = self.send_msg(MSG_CODE_GET_REQ, req)
+        # An expected response code of None implies "any response is valid".
+        msg_code, resp = self.send_msg(MSG_CODE_GET_REQ, req, None)
         if msg_code == MSG_CODE_GET_RESP:
             contents = []
             for c in resp.content:
@@ -199,9 +197,8 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req)
-        if msg_code != MSG_CODE_PUT_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req,
+                                       MSG_CODE_PUT_RESP)
         if resp is not None:
             contents = []
             for c in resp.content:
@@ -228,9 +225,8 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req)
-        if msg_code != MSG_CODE_PUT_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req,
+                                       MSG_CODE_PUT_RESP)
         if not resp:
             raise RiakError("missing response object")
         if len(resp.content) != 1:
@@ -251,9 +247,8 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req)
-        if msg_code != MSG_CODE_DEL_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req,
+                                       MSG_CODE_DEL_RESP)
         return self
 
     def get_keys(self, bucket):
@@ -266,9 +261,7 @@ class RiakPbcTransport(RiakTransport):
         self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req)
         keys = []
         while True:
-            msg_code, resp = self.recv_msg()
-            if msg_code != MSG_CODE_LIST_KEYS_RESP:
-                raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+            msg_code, resp = self.recv_msg(MSG_CODE_LIST_KEYS_RESP)
 
             for key in resp.keys:
                 keys.append(key)
@@ -282,9 +275,8 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket listing request and deserialize response
         """
-        msg_code, resp = self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
-        if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
-          raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ,
+                                            MSG_CODE_LIST_BUCKETS_RESP)
         return resp.buckets
 
     def get_bucket_props(self, bucket):
@@ -294,9 +286,8 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbGetBucketReq()
         req.bucket = bucket.get_name()
 
-        msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req)
-        if msg_code != MSG_CODE_GET_BUCKET_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req,
+                                       MSG_CODE_GET_BUCKET_RESP)
         props = {}
         if resp.props.HasField('n_val'):
             props['n_val'] = resp.props.n_val
@@ -319,10 +310,8 @@ class RiakPbcTransport(RiakTransport):
         if 'allow_mult' in props:
             req.props.allow_mult = props['allow_mult']
 
-        msg_code, resp = self.send_msg(MSG_CODE_SET_BUCKET_REQ, req)
-        if msg_code != MSG_CODE_SET_BUCKET_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
-
+        msg_code, resp = self.send_msg(MSG_CODE_SET_BUCKET_REQ, req,
+                                       MSG_CODE_SET_BUCKET_RESP)
         return self
 
     def mapred(self, inputs, query, timeout=None):
@@ -343,9 +332,7 @@ class RiakPbcTransport(RiakTransport):
         # which is appended to the result for that phase.
         result = {}
         while True:
-            msg_code, resp = self.recv_msg()
-            if msg_code != MSG_CODE_MAPRED_RESP:
-                raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+            msg_code, resp = self.recv_msg(MSG_CODE_MAPRED_RESP)
             if resp.HasField("phase") and resp.HasField("response"):
                 content = json.loads(resp.response)
                 if resp.phase in result:
@@ -379,11 +366,11 @@ class RiakPbcTransport(RiakTransport):
             if self._client_id:
                 self.set_client_id(self._client_id)
 
-    def send_msg_code(self, msg_code):
+    def send_msg_code(self, msg_code, expect):
         self.maybe_connect()
         pkt = struct.pack("!iB", 1, msg_code)
         self._sock.send(pkt)
-        return self.recv_msg()
+        return self.recv_msg(expect)
 
     def encode_msg(self, msg_code, msg):
         str = msg.SerializeToString()
@@ -391,9 +378,9 @@ class RiakPbcTransport(RiakTransport):
         hdr = struct.pack("!iB", 1 + slen, msg_code)
         return hdr + str
 
-    def send_msg(self, msg_code, msg):
+    def send_msg(self, msg_code, msg, expect):
         self.send_msg_multi(msg_code, msg)
-        return self.recv_msg()
+        return self.recv_msg(expect)
 
     def send_msg_multi(self, msg_code, msg):
         self.maybe_connect()
@@ -403,7 +390,7 @@ class RiakPbcTransport(RiakTransport):
             raise RiakError("PB socket returned short write %d - expected %d"%\
                             (sent_len, len(pkt)))
 
-    def recv_msg(self):
+    def recv_msg(self, expect):
         self.recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code == MSG_CODE_ERROR_RESP:
@@ -441,6 +428,9 @@ class RiakPbcTransport(RiakTransport):
             msg.ParseFromString(self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s"%msg_code)
+        if expect and msg_code != expect:
+            raise RiakError("unexpected protocol buffer message code: %d"
+                            % msg_code)
         return msg_code, msg
 
 
