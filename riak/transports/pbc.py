@@ -562,5 +562,5 @@ class RiakPbcCachedTransport(RiakPbcTransport):
                  client_id=None, maxsize=0, block=False, timeout=None,
                  **unused_options):
         RiakPbcTransport.__init__(self, cm, client_id, **unused_options)
-        riak.util.deprecated('please use RiakHttpTransport instead',
+        riak.util.deprecated('please use RiakPbcTransport instead',
                              stacklevel=4)
