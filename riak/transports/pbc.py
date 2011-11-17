@@ -32,6 +32,7 @@ from riak.mapreduce import RiakMapReduce, RiakLink
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 from connection import SocketConnectionManager
+import riak.util
 
 try:
     import riakclient_pb2
@@ -554,146 +555,12 @@ class RiakPbcTransport(RiakTransport):
                     pb_link.tag = link.get_tag()
         rpb_content.value = data
 
-from Queue import Empty, Full, Queue
-import contextlib
-class RiakPbcCachedTransport(RiakTransport):
-    """Threadsafe pool of PBC connections, based on urllib3's pool [aka Queue]"""
 
-    # We're using the new RiakTransport API
-    api = 2
-
-    # The ConnectionManager class that this transport prefers.
-    default_cm = SocketConnectionManager
-
+class RiakPbcCachedTransport(RiakPbcTransport):
+    "Deprecated transport."
     def __init__(self, cm,
                  client_id=None, maxsize=0, block=False, timeout=None,
                  **unused_options):
-        if riakclient_pb2 is None:
-            raise RiakError("this transport is not available (no protobuf)")
-
-        ### backwards compat. we don't use the ConnectionManager (yet).
-        host, port = cm.hostports[0]
-        self._cm = cm
-
-        self.host = host
-        self.port = port
-        self.client_id = client_id
-        self.block = block
-        self.timeout = timeout
-
-        self.pool = Queue(maxsize)
-        # Fill the queue up so that doing get() on it will block properly (check Queue#get)
-        [self.pool.put(None) for _ in xrange(maxsize)]
-
-    def _new_connection(self):
-        """New PBC connection"""
-        return RiakPbcTransport(self._cm, self.client_id)
-
-    def _get_connection(self):
-        connection = None
-        try:
-            connection = self.pool.get(block=self.block, timeout=self.timeout)
-        except Empty:
-            pass
-        return connection or self._new_connection()
-
-    def _put_connection(self, connection):
-        try:
-            self.pool.put(connection, block=False)
-        except Full:
-            pass
-
-    @contextlib.contextmanager
-    def _get_connection_from_pool(self):
-        """checkout conn, try operation, put conn back in pool"""
-        connection = self._get_connection()
-        try:
-            yield connection
-        finally:
-            self._put_connection(connection)
-
-    def ping(self):
-        """
-        Ping the remote server
-        @return boolean
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.ping()
-
-    def get(self, robj, r = None, vtag = None):
-        """
-        Serialize get request and deserialize response
-        @return (vclock=None, [(metadata, value)]=None)
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.get(robj, r, vtag)
-
-    def put(self, robj, w = None, dw = None, return_body = True):
-        """
-        Serialize put request and deserialize response - if 'content'
-        is true, retrieve the updated metadata/content
-        @return (vclock=None, [(metadata, value)]=None)
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.put(robj, w, dw, return_body)
-
-    def put_new(self, robj, w=None, dw=None, return_meta=True):
-        """Put a new object into the Riak store, returning its (new) key.
-
-        If return_meta is False, then the vlock and metadata return values
-        will be None.
-
-        @return (key, vclock, metadata)
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.put_new(robj, w, dw, return_meta)
-
-    def delete(self, robj, rw = None):
-        """
-        Serialize delete request and deserialize response
-        @return true
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.delete(robj, rw)
-
-    def get_buckets(self):
-        """
-        Serialize bucket listing request and deserialize response
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.get_buckets()
-
-    def get_bucket_props(self, bucket) :
-        """
-        Serialize get bucket property request and deserialize response
-        @return dict()
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.get_bucket_props(bucket)
-
-    def set_bucket_props(self, bucket, props) :
-        """
-        Serialize set bucket property request and deserialize response
-        bucket = bucket object
-        props = dictionary of properties
-        @return boolean
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.set_bucket_props(bucket, props)
-
-    def mapred(self, inputs, query, timeout = None) :
-        """
-        Serialize map/reduce request
-        """
-        with self._get_connection_from_pool() as connection:
-            return connection.mapred(inputs, query, timeout)
-
-    def set_client_id(self, client_id):
-        """Mmm, this can turn ugly if you use different id for different objects in the pool"""
-        with self._get_connection_from_pool() as connection:
-            return connection.set_client_id(client_id)
-
-    def get_client_id(self):
-        """see set_client_id notes, you can do wrong with this"""
-        with self._get_connection_from_pool() as connection:
-            return connection.get_client_id()
+        RiakPbcTransport.__init__(self, cm, client_id, **unused_options)
+        riak.util.deprecated('please use RiakPbcTransport instead',
+                             stacklevel=4)
