@@ -26,12 +26,12 @@ try:
 except ImportError:
     import simplejson as json
 
-from transport import RiakTransport
+from riak.transports.transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakMapReduce, RiakLink
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
-from connection import SocketConnectionManager
+from riak.transports import connection
 
 try:
     import riakclient_pb2
@@ -71,6 +71,24 @@ RIAKC_RW_ALL = 4294967292
 RIAKC_RW_DEFAULT = 4294967291
 
 
+class SocketWithId(connection.Socket):
+    def __init__(self, host, port):
+        connection.Socket.__init__(self, host, port)
+        self.last_client_id = None
+
+    def maybe_connect(self):
+        # If we're going to establish a new connection, then reset the last
+        # client_id used on this connection.
+        if self.sock is None:
+            self.last_client_id = None
+
+            connection.Socket.maybe_connect(self)
+
+    def send(self, pkt):
+        self.sock.sendall(pkt)
+
+    def recv(self, want_len):
+        return self.sock.recv(want_len)
 
 
 class RiakPbcTransport(RiakTransport):
@@ -90,26 +108,19 @@ class RiakPbcTransport(RiakTransport):
         }
 
     # The ConnectionManager class that this transport prefers.
-    default_cm = SocketConnectionManager
+    default_cm = connection.cm_using(SocketWithId)
 
     def __init__(self, cm, client_id=None, **unused_options):
         """
         Construct a new RiakPbcTransport object.
-        @param string host - Hostname or IP address (default '127.0.0.1')
-        @param int port - Port number (default 8087)
         """
         if riakclient_pb2 is None:
             raise RiakError("this transport is not available (no protobuf)")
 
         super(RiakPbcTransport, self).__init__()
 
-        ### backwards compat. we don't use the ConnectionManager (yet).
-        host, port = cm.hostports[0]
-
-        self._host = host
-        self._port = port
+        self._cm = cm
         self._client_id = client_id
-        self._sock = None
 
     def translate_rw_val(self, rw):
         val = self.rw_names.get(rw)
@@ -118,16 +129,15 @@ class RiakPbcTransport(RiakTransport):
         return val
 
     def __copy__(self):
-        return RiakPbcTransport(self._host, self._port)
+        return RiakPbcTransport(self._cm, self._client_id)
 
     def ping(self):
         """
         Ping the remote server
         @return boolean
         """
-        self.maybe_connect()
-        self.send_msg_code(MSG_CODE_PING_REQ)
-        msg_code, msg = self.recv_msg()
+        # An expected response code of None implies "any response is valid".
+        msg_code, msg = self.send_msg_code(MSG_CODE_PING_REQ, None)
         if msg_code == MSG_CODE_PING_RESP:
             return 1
         else:
@@ -137,13 +147,9 @@ class RiakPbcTransport(RiakTransport):
         """
         Get the client id used by this connection
         """
-        self.maybe_connect()
-        self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ)
-        msg_code, resp = self.recv_msg()
-        if msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
-            return resp.client_id
-        else:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ,
+                                            MSG_CODE_GET_CLIENT_ID_RESP)
+        return resp.client_id
 
     def set_client_id(self, client_id):
         """
@@ -152,13 +158,21 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbSetClientIdReq()
         req.client_id = client_id
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req)
-        msg_code, resp = self.recv_msg()
-        if msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
-            return True
-        else:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req,
+                                       MSG_CODE_SET_CLIENT_ID_RESP)
+
+        # Using different client_id values across connections is a bad idea
+        # since you never know which connection you might use for a given
+        # API call. Setting the client_id manually (rather than as part of
+        # the transport construction) can be error-prone since the connection
+        # could drop and be reinstated using self._client_id.
+        #
+        # To minimize the potential impact of variant client_id values across
+        # connections, we'll store this new client_id and use it for all
+        # future connections.
+        self._client_id = client_id
+
+        return True
 
     def get(self, robj, r = None, vtag = None):
         """
@@ -175,9 +189,8 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_GET_REQ, req)
-        msg_code, resp = self.recv_msg()
+        # An expected response code of None implies "any response is valid".
+        msg_code, resp = self.send_msg(MSG_CODE_GET_REQ, req, None)
         if msg_code == MSG_CODE_GET_RESP:
             contents = []
             for c in resp.content:
@@ -206,11 +219,8 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_PUT_REQ, req)
-        msg_code, resp = self.recv_msg()
-        if msg_code != MSG_CODE_PUT_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req,
+                                       MSG_CODE_PUT_RESP)
         if resp is not None:
             contents = []
             for c in resp.content:
@@ -237,11 +247,8 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_PUT_REQ, req)
-        msg_code, resp = self.recv_msg()
-        if msg_code != MSG_CODE_PUT_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req,
+                                       MSG_CODE_PUT_RESP)
         if not resp:
             raise RiakError("missing response object")
         if len(resp.content) != 1:
@@ -262,11 +269,8 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_DEL_REQ, req)
-        msg_code, resp = self.recv_msg()
-        if msg_code != MSG_CODE_DEL_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req,
+                                       MSG_CODE_DEL_RESP)
         return self
 
     def get_keys(self, bucket):
@@ -276,19 +280,12 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbListKeysReq()
         req.bucket = bucket.get_name()
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_LIST_KEYS_REQ, req)
         keys = []
-        while True:
-            msg_code, resp = self.recv_msg()
-            if msg_code != MSG_CODE_LIST_KEYS_RESP:
-                raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
-
+        def _handle_response(resp):
             for key in resp.keys:
                 keys.append(key)
-
-            if resp.HasField("done") and resp.done:
-                break
+        self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req,
+                            MSG_CODE_LIST_KEYS_RESP, _handle_response)
 
         return keys
 
@@ -296,11 +293,8 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket listing request and deserialize response
         """
-        self.maybe_connect()
-        self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ)
-        msg_code, resp = self.recv_msg()
-        if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
-          raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ,
+                                            MSG_CODE_LIST_BUCKETS_RESP)
         return resp.buckets
 
     def get_bucket_props(self, bucket):
@@ -310,11 +304,8 @@ class RiakPbcTransport(RiakTransport):
         req = riakclient_pb2.RpbGetBucketReq()
         req.bucket = bucket.get_name()
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_GET_BUCKET_REQ, req)
-        msg_code, resp = self.recv_msg()
-        if msg_code != MSG_CODE_GET_BUCKET_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req,
+                                       MSG_CODE_GET_BUCKET_RESP)
         props = {}
         if resp.props.HasField('n_val'):
             props['n_val'] = resp.props.n_val
@@ -337,12 +328,8 @@ class RiakPbcTransport(RiakTransport):
         if 'allow_mult' in props:
             req.props.allow_mult = props['allow_mult']
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_SET_BUCKET_REQ, req)
-        msg_code, resp = self.recv_msg()
-        if msg_code != MSG_CODE_SET_BUCKET_RESP:
-            raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
-
+        msg_code, resp = self.send_msg(MSG_CODE_SET_BUCKET_REQ, req,
+                                       MSG_CODE_SET_BUCKET_RESP)
         return self
 
     def mapred(self, inputs, query, timeout=None):
@@ -357,25 +344,18 @@ class RiakPbcTransport(RiakTransport):
         req.request = content
         req.content_type = "application/json"
 
-        self.maybe_connect()
-        self.send_msg(MSG_CODE_MAPRED_REQ, req)
-
         # dictionary of phase results - each content should be an encoded array
         # which is appended to the result for that phase.
         result = {}
-        while True:
-            msg_code, resp = self.recv_msg()
-            if msg_code != MSG_CODE_MAPRED_RESP:
-                raise RiakError("unexpected protocol buffer message code: %d"%msg_code)
+        def _handle_response(resp):
             if resp.HasField("phase") and resp.HasField("response"):
                 content = json.loads(resp.response)
                 if resp.phase in result:
                     result[resp.phase] += content
                 else:
                     result[resp.phase] = content
-
-            if resp.HasField("done") and resp.done:
-                break;
+        self.send_msg_multi(MSG_CODE_MAPRED_REQ, req, MSG_CODE_MAPRED_RESP,
+                            _handle_response)
 
         # If a single result - return the same as the HTTP interface does
         # otherwise return all the phase information
@@ -386,23 +366,10 @@ class RiakPbcTransport(RiakTransport):
         else:
             return result
 
-
-    def maybe_connect(self):
-        if self._sock is None:
-            self._sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-            try:
-                s.connect((self._host, self._port))
-            except:
-                self._sock = None
-                raise
-
-            if self._client_id:
-                self.set_client_id(self._client_id)
-
-    def send_msg_code(self, msg_code):
-        pkt = struct.pack("!iB", 1, msg_code)
-        self._sock.send(pkt)
+    def send_msg_code(self, msg_code, expect):
+        with self._cm.withconn() as conn:
+            self.send_pkt(conn, struct.pack("!iB", 1, msg_code))
+            return self.recv_msg(conn, expect)
 
     def encode_msg(self, msg_code, msg):
         str = msg.SerializeToString()
@@ -410,15 +377,38 @@ class RiakPbcTransport(RiakTransport):
         hdr = struct.pack("!iB", 1 + slen, msg_code)
         return hdr + str
 
-    def send_msg(self, msg_code, msg):
-        pkt = self.encode_msg(msg_code, msg)
-        sent_len = self._sock.send(pkt)
-        if sent_len != len(pkt):
-            raise RiakError("PB socket returned short write %d - expected %d"%\
-                            (sent_len, len(pkt)))
+    def send_msg(self, msg_code, msg, expect):
+        with self._cm.withconn() as conn:
+            self.send_pkt(conn, self.encode_msg(msg_code, msg))
+            if msg_code == MSG_CODE_SET_CLIENT_ID_REQ:
+                conn.last_client_id = self._client_id
+            return self.recv_msg(conn, expect)
 
-    def recv_msg(self):
-        self.recv_pkt()
+    def send_msg_multi(self, msg_code, msg, expect, handler):
+        with self._cm.withconn() as conn:
+            self.send_pkt(conn, self.encode_msg(msg_code, msg))
+            while True:
+                msg_code, resp = self.recv_msg(conn, expect)
+                handler(resp)
+                if resp.HasField("done") and resp.done:
+                    break
+
+    def send_pkt(self, conn, pkt):
+        conn.maybe_connect()
+
+        # If the last client_id used on this connection is different than our
+        # client_id, then set a new ID on the connection.
+        if conn.last_client_id != self._client_id:
+            req = riakclient_pb2.RpbSetClientIdReq()
+            req.client_id = self._client_id
+            conn.send(self.encode_msg(MSG_CODE_SET_CLIENT_ID_REQ, req))
+            conn.last_client_id = self._client_id
+            self.recv_msg(conn, MSG_CODE_SET_CLIENT_ID_RESP)
+
+        conn.send(pkt)
+
+    def recv_msg(self, conn, expect):
+        self.recv_pkt(conn)
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code == MSG_CODE_ERROR_RESP:
             msg = riakclient_pb2.RpbErrorResp()
@@ -455,13 +445,15 @@ class RiakPbcTransport(RiakTransport):
             msg.ParseFromString(self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s"%msg_code)
+        if expect and msg_code != expect:
+            raise RiakError("unexpected protocol buffer message code: %d"
+                            % msg_code)
         return msg_code, msg
 
 
-    def recv_pkt(self):
-        nmsglen = self._sock.recv(4)
+    def recv_pkt(self, conn):
+        nmsglen = conn.recv(4)
         if len(nmsglen) != 4:
-            self._sock = None
             raise RiakError("Socket returned short packet length %d - expected 4"%\
                             len(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
@@ -469,7 +461,7 @@ class RiakPbcTransport(RiakTransport):
         self._inbuf = ''
         while len(self._inbuf) < msglen:
             want_len = min(8192, msglen - len(self._inbuf))
-            recv_buf = self._sock.recv(want_len)
+            recv_buf = conn.recv(want_len)
             if not recv_buf: break
             self._inbuf += recv_buf
         if len(self._inbuf) != self._inbuf_len:
@@ -563,7 +555,7 @@ class RiakPbcCachedTransport(RiakTransport):
     api = 2
 
     # The ConnectionManager class that this transport prefers.
-    default_cm = SocketConnectionManager
+    default_cm = connection.cm_using(SocketWithId)
 
     def __init__(self, cm,
                  client_id=None, maxsize=0, block=False, timeout=None,
@@ -572,11 +564,8 @@ class RiakPbcCachedTransport(RiakTransport):
             raise RiakError("this transport is not available (no protobuf)")
 
         ### backwards compat. we don't use the ConnectionManager (yet).
-        host, port = cm.hostports[0]
         self._cm = cm
 
-        self.host = host
-        self.port = port
         self.client_id = client_id
         self.block = block
         self.timeout = timeout
