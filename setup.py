@@ -20,7 +20,8 @@ if __name__ == "__main__":
         name='riak',
         version='1.3.0',
         packages = find_packages(),
-        install_requires = ['protobuf>=2.3.0', 'urllib3>=0.4.0'],
+        install_requires = ['urllib3>=0.4.0'],
+        tests_require = ['protobuf>=2.3.0'],
         dependency_links = ["http://downloads.basho.com/support"],
         package_data = {
             '' : ['*.proto'],
