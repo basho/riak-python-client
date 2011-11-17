@@ -22,7 +22,7 @@ if __name__ == "__main__":
         packages = find_packages(),
         extras_require = {
             'protobuf': ['protobuf>=2.3.0'],
-            }
+            },
         dependency_links = ["http://downloads.basho.com/support"],
         package_data = {
             '' : ['*.proto'],
