@@ -41,8 +41,8 @@ class RiakObject(object):
         """
         try:
             if isinstance(key, basestring):
-                key.encode('ascii')
-        except UnicodeEncodeError:
+                key = key.encode('ascii')
+        except UnicodeError:
             raise TypeError('Unicode keys are not supported.')
 
         self._client = client

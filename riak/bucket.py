@@ -40,8 +40,8 @@ class RiakBucket(object):
         """
         try:
             if isinstance(name, basestring):
-                name.encode('ascii')
-        except UnicodeEncodeError:
+                name = name.encode('ascii')
+        except UnicodeError:
             raise TypeError('Unicode bucket names are not supported.')
 
         self._client = client
@@ -215,8 +215,8 @@ class RiakBucket(object):
         """
         try:
             if isinstance(data, basestring):
-                data.encode('ascii')
-        except UnicodeEncodeError:
+                data = data.encode('ascii')
+        except UnicodeError:
             raise TypeError('Unicode data values are not supported.')
 
         obj = RiakObject(self._client, self, key)

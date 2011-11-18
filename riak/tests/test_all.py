@@ -115,12 +115,20 @@ class BaseTestCase(object):
         self.assertEqual(obj.get_key(), 'foo')
         self.assertEqual(obj.get_data(), rand)
 
-        #unicode input should raise a TypeError,
-        #to avoid issues further down the line
-        self.assertRaises(TypeError, self.client.bucket, u'bucket')
+        # unicode objects are fine, as long as they don't
+        # contain any non-ASCII chars
+        self.client.bucket(u'bucket')
+        self.assertRaises(TypeError, self.client.bucket, u'búcket')
+        self.assertRaises(TypeError, self.client.bucket, 'búcket')
+
+        bucket.get(u'foo')
+        self.assertRaises(TypeError, bucket.get, u'føø')
+        self.assertRaises(TypeError, bucket.get, 'føø')
+
+        self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
         self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
-        self.assertRaises(TypeError, bucket.get, u'foo')
+        self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
 
     def test_binary_store_and_get(self):
         bucket = self.client.bucket('bucket')
@@ -275,9 +283,16 @@ class BaseTestCase(object):
             "function (v) { return [JSON.parse(v.values[0].data)]; }").run()
         self.assertEqual(result, [2])
 
-        #test unicode function
+        # test ASCII-encodable unicode is accepted
+        mr.map(u"function (v) { return [JSON.parse(v.values[0].data)]; }")
+
+        # test non-ASCII-encodable unicode is rejected
         self.assertRaises(TypeError, mr.map,
-            u"function (v) { return [JSON.parse(v.values[0].data)]; }")
+            u"function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
+
+        # test non-ASCII-encodable string is rejected
+        self.assertRaises(TypeError, mr.map,
+            "function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
 
     def test_javascript_named_map(self):
         # Create the object...

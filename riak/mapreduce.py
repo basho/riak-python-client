@@ -322,8 +322,8 @@ class RiakMapReducePhase(object):
         """
         try:
             if isinstance(function, basestring):
-                function.encode('ascii')
-        except UnicodeEncodeError:
+                function = function.encode('ascii')
+        except UnicodeError:
             raise TypeError('Unicode encoded functions are not supported.')
 
         self._type = type
