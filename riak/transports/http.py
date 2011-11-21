@@ -25,9 +25,9 @@ import httplib
 import socket
 import errno
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 from transport import RiakTransport
 from riak.metadata import *

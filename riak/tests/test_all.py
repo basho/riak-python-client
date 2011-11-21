@@ -4,9 +4,9 @@ from __future__ import with_statement
 import copy
 import cPickle
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 import os
 import random
 import platform
