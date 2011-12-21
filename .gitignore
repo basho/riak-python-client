@@ -9,3 +9,8 @@ build/
 dist/
 riak.egg-info/
 *.egg
+
+.Python
+bin/
+include/
+lib/
