@@ -486,7 +486,7 @@ class RiakObject(object):
 
             # Run the request...
             vtag = self._siblings[i]
-            obj = RiakObject(self._client, self._bucket, self._key)
+            obj = self.__class__(self._client, self._bucket, self._key)
             obj.reload(r, vtag)
 
             # And make sure it knows who it's siblings are

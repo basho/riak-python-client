@@ -19,6 +19,8 @@ import uuid
 import time
 
 from riak import RiakClient
+from riak import RiakBucket
+from riak import RiakObject
 from riak import RiakPbcTransport
 from riak import RiakHttpTransport
 from riak import RiakKeyFilter, key_filter
@@ -80,11 +82,11 @@ class BaseTestCase(object):
     def randint():
         return random.randint(1, 999999)
 
-    def create_client(self, host=None, port=None, transport_class=None):
+    def create_client(self, host=None, port=None, transport_class=None, bucket_class=None):
         host = host or self.host
         port = port or self.port
         transport_class = transport_class or self.transport_class
-        return RiakClient(self.host, self.port, transport_class=self.transport_class)
+        return RiakClient(self.host, self.port, transport_class=self.transport_class, bucket_class=bucket_class)
 
     def setUp(self):
         self.client = self.create_client()
@@ -670,6 +672,17 @@ class BaseTestCase(object):
         bucket.get('mykey2').delete()
         bucket.get('mykey3').delete()
         bucket.get('mykey4').delete()
+
+    def test_custom_bucket_and_object_classes(self):
+        class CustomObject(RiakObject): pass
+        class CustomBucket(RiakBucket):
+            object_class = CustomObject
+        client = self.create_client(bucket_class=CustomBucket)
+        bucket = client.bucket('customBucket')
+        self.assertTrue(isinstance(bucket, CustomBucket))
+        obj = bucket.get('foo')
+        self.assertTrue(isinstance(obj, CustomObject))
+
 
 class MapReduceAliasTestMixIn(object):
     """This tests the map reduce aliases"""
