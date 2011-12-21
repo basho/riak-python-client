@@ -19,8 +19,8 @@ import uuid
 import time
 
 from riak import RiakClient
-from riak import RiakPbcTransport, RiakPbcCachedTransport
-from riak import RiakHttpTransport, RiakHttpPoolTransport, RiakHttpReuseTransport
+from riak import RiakPbcTransport
+from riak import RiakHttpTransport
 from riak import RiakKeyFilter, key_filter
 from riak.riak_index_entry import RiakIndexEntry
 from riak.mapreduce import RiakLink
@@ -31,11 +31,6 @@ try:
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
-try:
-    import urllib3
-    HAVE_HTTP_POOL = True
-except ImportError:
-    HAVE_HTTP_POOL = False
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -115,12 +110,20 @@ class BaseTestCase(object):
         self.assertEqual(obj.get_key(), 'foo')
         self.assertEqual(obj.get_data(), rand)
 
-        #unicode input should raise a TypeError,
-        #to avoid issues further down the line
-        self.assertRaises(TypeError, self.client.bucket, u'bucket')
+        # unicode objects are fine, as long as they don't
+        # contain any non-ASCII chars
+        self.client.bucket(u'bucket')
+        self.assertRaises(TypeError, self.client.bucket, u'búcket')
+        self.assertRaises(TypeError, self.client.bucket, 'búcket')
+
+        bucket.get(u'foo')
+        self.assertRaises(TypeError, bucket.get, u'føø')
+        self.assertRaises(TypeError, bucket.get, 'føø')
+
+        self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
         self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
-        self.assertRaises(TypeError, bucket.get, u'foo')
+        self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
 
     def test_binary_store_and_get(self):
         bucket = self.client.bucket('bucket')
@@ -275,9 +278,16 @@ class BaseTestCase(object):
             "function (v) { return [JSON.parse(v.values[0].data)]; }").run()
         self.assertEqual(result, [2])
 
-        #test unicode function
+        # test ASCII-encodable unicode is accepted
+        mr.map(u"function (v) { return [JSON.parse(v.values[0].data)]; }")
+
+        # test non-ASCII-encodable unicode is rejected
         self.assertRaises(TypeError, mr.map,
-            u"function (v) { return [JSON.parse(v.values[0].data)]; }")
+            u"function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
+
+        # test non-ASCII-encodable string is rejected
+        self.assertRaises(TypeError, mr.map,
+            "function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
 
     def test_javascript_named_map(self):
         # Create the object...
@@ -872,26 +882,6 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
 
-class RiakPbcCachedTransportCase(BaseTestCase, MapReduceAliasTestMixIn,
-                               unittest.TestCase):
-    def setUp(self):
-        if not HAVE_PROTO:
-          self.skipTest('protobuf is unavailable')
-        self.host = PB_HOST
-        self.port = PB_PORT
-        self.transport_class = RiakPbcCachedTransport
-        super(RiakPbcCachedTransportCase, self).setUp()
-
-    def test_uses_client_id_if_given(self):
-        self.host = PB_HOST
-        self.port = PB_PORT
-        zero_client_id = "\0\0\0\0"
-        c = RiakClient(PB_HOST, PB_PORT,
-                            transport_class = RiakPbcCachedTransport,
-                            client_id = zero_client_id)
-        self.assertEqual(zero_client_id, c.get_client_id()) #
-
-
 class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
     def setUp(self):
@@ -911,7 +901,11 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket = self.client.bucket('random_key_bucket')
         for key in bucket.get_keys():
             bucket.get(str(key)).delete()
-        bucket.new(None, data={}).store()
+        o = bucket.new(None, data={})
+        self.assertIsNone(o.get_key())
+        o.store()
+        self.assertIsNotNone(o.get_key())
+        self.assertNotIn('/', o.get_key())
         self.assertEqual(len(bucket.get_keys()), 1)
 
     def test_too_many_link_headers_shouldnt_break_http(self):
@@ -1040,56 +1034,6 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         self.client.solr().delete("searchbucket", docs=["dizzy"], queries=["username:russell"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(0, len(results["response"]["docs"]))
-
-class RiakHttpPoolTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
-
-    def setUp(self):
-        if not HAVE_HTTP_POOL:
-            self.skipTest('urllib3 is unavailable')
-        self.host = HTTP_HOST
-        self.port = HTTP_PORT
-        self.transport_class = RiakHttpPoolTransport
-        super(RiakHttpPoolTransportTestCase, self).setUp()
-
-    def test_no_returnbody(self):
-        bucket = self.client.bucket("bucket")
-        o = bucket.new("foo", "bar").store(return_body=False)
-        self.assertEqual(o.vclock(), None)
-
-    def test_generate_key(self):
-        # Ensure that Riak generates a random key when
-        # the key passed to bucket.new() is None.
-        bucket = self.client.bucket('random_key_bucket')
-        for key in bucket.get_keys():
-            bucket.get(str(key)).delete()
-        bucket.new(None, data={}).store()
-        self.assertEqual(len(bucket.get_keys()), 1)
-
-    def test_set_client_id(self):
-        self.client.set_client_id("Client")
-        self.assertEqual(self.client.get_transport().get_client_id(), "Client")
-
-class RiakHttpReuseTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
-
-    def setUp(self):
-        self.host = HTTP_HOST
-        self.port = HTTP_PORT
-        self.transport_class = RiakHttpReuseTransport
-        super(RiakHttpReuseTransportTestCase, self).setUp()
-
-    def test_no_returnbody(self):
-        bucket = self.client.bucket("bucket")
-        o = bucket.new("foo", "bar").store(return_body=False)
-        self.assertEqual(o.vclock(), None)
-
-    def test_generate_key(self):
-        # Ensure that Riak generates a random key when
-        # the key passed to bucket.new() is None.
-        bucket = self.client.bucket('random_key_bucket')
-        for key in bucket.get_keys():
-            bucket.get(str(key)).delete()
-        bucket.new(None, data={}).store()
-        self.assertEqual(len(bucket.get_keys()), 1)
 
 
 class RiakTestFilter(unittest.TestCase):

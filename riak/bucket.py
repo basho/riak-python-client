@@ -38,7 +38,10 @@ class RiakBucket(object):
         :param name: The bucket name
         :type name: string
         """
-        if isinstance(name, unicode):
+        try:
+            if isinstance(name, basestring):
+                name = name.encode('ascii')
+        except UnicodeError:
             raise TypeError('Unicode bucket names are not supported.')
 
         self._client = client
@@ -210,7 +213,10 @@ class RiakBucket(object):
         :type data: object
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        if isinstance(data, unicode):
+        try:
+            if isinstance(data, basestring):
+                data = data.encode('ascii')
+        except UnicodeError:
             raise TypeError('Unicode data values are not supported.')
 
         obj = RiakObject(self._client, self, key)

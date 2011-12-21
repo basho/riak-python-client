@@ -17,9 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+from __future__ import with_statement
+
 import urllib, re, csv
 from cStringIO import StringIO
 import httplib
+import socket
+import errno
 try:
     import json
 except ImportError:
@@ -31,6 +35,8 @@ from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
+from connection import HTTPConnectionManager
+import riak.util
 
 MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
 
@@ -40,9 +46,19 @@ class RiakHttpTransport(RiakTransport) :
     Riak. The Riak API uses HTTP, so there is no persistent
     connection, and the RiakClient object is extremely lightweight.
     """
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id = None):
+
+    # We're using the new RiakTransport API
+    api = 2
+
+    # The ConnectionManager class that this transport prefers.
+    default_cm = HTTPConnectionManager
+
+    # How many times to retry a request
+    RETRY_COUNT = 3
+
+    def __init__(self, cm,
+                 prefix='riak', mapred_prefix='mapred', client_id=None,
+                 **unused_options):
         """
         Construct a new RiakClient object.
         @param string host - Hostname or IP address (default '127.0.0.1')
@@ -52,8 +68,7 @@ class RiakHttpTransport(RiakTransport) :
         @param string client_id - client id to use for vector clocks
         """
         super(RiakHttpTransport, self).__init__()
-        self._host = host
-        self._port = port
+        self._conns = cm
         self._prefix = prefix
         self._mapred_prefix = mapred_prefix
         self._client_id = client_id
@@ -61,6 +76,9 @@ class RiakHttpTransport(RiakTransport) :
             self._client_id = self.make_random_client_id()
 
     def __copy__(self):
+        ### not implemented right now
+        raise Exception('not implemented')
+        ### we don't have _host and _port. will fix after some refactoring...
         return RiakHttpTransport(self._host, self._port, self._prefix,
                                  self._mapred_prefix)
 
@@ -98,29 +116,7 @@ class RiakHttpTransport(RiakTransport) :
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw}
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
-
-        # Construct the headers...
-        headers = MultiDict({'Accept' : 'text/plain, */*; q=0.5',
-                             'Content-Type' : robj.get_content_type(),
-                             'X-Riak-ClientId' : self._client_id})
-
-        # Add the vclock if it exists...
-        if robj.vclock() is not None:
-            headers['X-Riak-Vclock'] = robj.vclock()
-
-        # Create the header from metadata
-        links = self.add_links_for_riak_object(robj, headers)
-
-        for key, value in robj.get_usermeta().iteritems():
-            headers['X-Riak-Meta-%s' % key] = value
-
-        for rie in robj.get_indexes():
-            key = 'X-Riak-Index-%s' % rie.get_field()
-            if key in headers:
-                headers[key] += ", " + rie.get_value()
-            else:
-                headers[key] = rie.get_value()
-
+        headers = self.build_put_headers(robj)
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body, key=robj.get_key())
 
@@ -135,6 +131,24 @@ class RiakHttpTransport(RiakTransport) :
         else:
           self.check_http_code(response, [204])
           return None
+        
+    def put_new(self, robj, w=None, dw=None, return_meta=True):
+        """Put a new object into the Riak store, returning its (new) key."""
+        # Construct the URL...
+        params = {'returnbody' : str(return_meta).lower(), 'w' : w, 'dw' : dw}
+        url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
+        headers = self.build_put_headers(robj)
+        content = robj.get_encoded_data()
+        response = self.http_request('POST', url, headers, content)
+        location = response[0]['location']
+        idx = location.rindex('/')
+        key = location[idx+1:]
+        if return_meta:
+            vclock, [(metadata, data)] = self.parse_body(response, [201])
+            return key, vclock, metadata
+        else:
+            self.check_http_code(response, [201])
+            return key, None, None
 
     def delete(self, robj, rw):
         # Construct the URL...
@@ -254,7 +268,8 @@ class RiakHttpTransport(RiakTransport) :
 
         # Check if the server is down(status==0)
         if not status:
-            m = 'Could not contact Riak Server: http://' + self._host + ':' + str(self._port) + '!'
+            ### we need the host/port that was used.
+            m = 'Could not contact Riak Server: http://$HOST:$PORT !'
             raise RiakError(m)
 
         # Verify that we got one of the expected statuses. Otherwise, raise an exception.
@@ -408,6 +423,33 @@ class RiakHttpTransport(RiakTransport) :
         # Return.
         return path
 
+    def build_put_headers(self, robj):
+        """Build the headers for a POST/PUT request."""
+
+        # Construct the headers...
+        headers = MultiDict({'Accept' : 'text/plain, */*; q=0.5',
+                             'Content-Type' : robj.get_content_type(),
+                             'X-Riak-ClientId' : self._client_id})
+
+        # Add the vclock if it exists...
+        if robj.vclock() is not None:
+            headers['X-Riak-Vclock'] = robj.vclock()
+
+        # Create the header from metadata
+        links = self.add_links_for_riak_object(robj, headers)
+
+        for key, value in robj.get_usermeta().iteritems():
+            headers['X-Riak-Meta-%s' % key] = value
+
+        for rie in robj.get_indexes():
+            key = 'X-Riak-Index-%s' % rie.get_field()
+            if key in headers:
+                headers[key] += ", " + rie.get_value()
+            else:
+                headers[key] = rie.get_value()
+        
+        return headers
+
     def http_request(self, method, uri, headers=None, body='') :
         """
         Given a Method, URL, Headers, and Body, perform and HTTP request,
@@ -417,27 +459,40 @@ class RiakHttpTransport(RiakTransport) :
         if headers is None:
             headers = {}
         # Run the request...
-        client = None
-        response = None
-        try:
-            client = httplib.HTTPConnection(self._host, self._port)
-            client.request(method, uri, body, headers)
-            response = client.getresponse()
+        for retry in range(self.RETRY_COUNT):
+            with self._conns.withconn() as conn:
+                ### should probably build this try/except into a custom
+                ### contextmanager for the connection.
+                try:
+                    conn.request(method, uri, body, headers)
+                    response = conn.getresponse()
 
-            # Get the response headers...
-            response_headers = {'http_code': response.status}
-            for (key, value) in response.getheaders():
-                response_headers[key.lower()] = value
+                    try:
+                        # Get the response headers...
+                        response_headers = {'http_code': response.status}
+                        for (key, value) in response.getheaders():
+                            response_headers[key.lower()] = value
 
-            # Get the body...
-            response_body = response.read()
-            response.close()
+                        # Get the body...
+                        response_body = response.read()
+                    finally:
+                      response.close()
 
-            return response_headers, response_body
-        except:
-            if client is not None: client.close()
-            if response is not None: response.close()
-            raise
+                    return response_headers, response_body
+                except socket.error, e:
+                    conn.close()
+                    if e[0] == errno.ECONNRESET:
+                        # Grab another connection and try again.
+                        continue
+                    # Don't know how to handle this.
+                    raise
+                except httplib.HTTPException:
+                    # Just close the connection and try again.
+                    conn.close()
+                    continue
+
+        # No luck, even with retrying.
+        raise RiakError("could not get a response")
 
     @classmethod
     def build_headers(cls, headers):
@@ -465,111 +520,24 @@ class RiakHttpTransport(RiakTransport) :
                 retVal[key] = value
         return retVal
 
-import socket
 
 class RiakHttpReuseTransport(RiakHttpTransport):
-    """
-    Reuse sockets
-    """
+    "Deprecated transport."
+    def __init__(self, cm,
+                 prefix='riak', mapred_prefix='mapred', client_id=None,
+                 **unused_options):
+        RiakHttpTransport.__init__(self, cm, prefix, mapred_prefix,
+                                   client_id, **unused_options)
+        riak.util.deprecated('please use RiakHttpTransport instead',
+                             stacklevel=4)
 
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id=None):
-        super(RiakHttpReuseTransport, self).__init__(host=host,
-                                                     port=port,
-                                                     prefix=prefix,
-                                                     mapred_prefix=
-                                                     mapred_prefix,
-                                                     client_id=client_id)
-
-    def __copy__(self):
-        return RiakHttpReuseTransport(self._host, self._port, self._prefix,
-                                      self._mapred_prefix)
-
-    def http_request(self, method, uri, headers=None, body=''):
-        if headers is None:
-            headers = {}
-        # Run the request...
-        client = None
-        response = None
-        try:
-            client = httplib.HTTPConnection(self._host, self._port)
-
-            #handle the connection myself, try to reuse sockets
-            client.auto_open = 0
-            client.connect()
-            client.sock.setsockopt(
-                socket.SOL_SOCKET, socket.SO_REUSEADDR,
-                client.sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR) | 1)
-
-            client.request(method, uri, body, headers)
-            response = client.getresponse()
-
-            # Get the response headers...
-            response_headers = {'http_code': response.status}
-            for (key, value) in response.getheaders():
-                response_headers[key.lower()] = value
-
-            # Get the body...
-            response_body = response.read()
-            response.close()
-
-            #close, this does not make any difference
-            client.close()
-
-            return response_headers, response_body
-        except:
-            if client is not None: client.close()
-            if response is not None: response.close()
-            raise
-
-try:
-    import urllib3
-except ImportError:
-    urllib3 = None
 
 class RiakHttpPoolTransport(RiakHttpTransport):
-    """
-    Use HTTP pool
-    """
-
-    http_pool = None
-
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred',
-                 client_id=None):
-        if urllib3 is None:
-            raise RiakError("this transport is not available (no urllib3)")
-
-        super(RiakHttpPoolTransport, self).__init__(host=host,
-                                                    port=port,
-                                                    prefix=prefix,
-                                                    mapred_prefix=
-                                                    mapred_prefix,
-                                                    client_id=client_id)
-
-    def __copy__(self):
-        return RiakHttpPoolTransport(self._host, self._port, self._prefix,
-                                     self._mapred_prefix)
-
-    def http_request(self, method, uri, headers={}, body=''):
-        if headers is None:
-            headers = {}
-        try:
-            ### it seems wrong to put the pool into a *class* variable,
-            ### but this code is supporting backwards-compat where the
-            ### use of a class variable was the design.
-            if self.__class__.http_pool is None:
-                self.__class__.http_pool = urllib3.connection_from_url('http://%s:%d' % (self._host, self._port), maxsize=10)
-
-            response = self.http_pool.urlopen(method, uri, body, headers)
-
-            response_headers = {'http_code': response.status}
-            for key, value in response.getheaders().iteritems():
-                response_headers[key.lower()] = value
-
-            response_body = response.data
-
-            return response_headers, response_body
-        except:
-            raise
+    "Deprecated transport."
+    def __init__(self, cm,
+                 prefix='riak', mapred_prefix='mapred', client_id=None,
+                 **unused_options):
+        RiakHttpTransport.__init__(self, cm, prefix, mapred_prefix,
+                                   client_id, **unused_options)
+        riak.util.deprecated('please use RiakHttpTransport instead',
+                             stacklevel=4)
