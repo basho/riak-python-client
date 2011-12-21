@@ -40,7 +40,7 @@ class RiakClient(object):
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
                  mapred_prefix='mapred', transport_class=None,
                  client_id=None, solr_transport_class=None,
-                 bucket_class=None):
+                 bucket_class_factory=None):
         """
         Construct a new ``RiakClient`` object.
 
@@ -55,13 +55,16 @@ class RiakClient(object):
         :param transport_class: Transport class to use
         :type transport_class: :class:`RiakTransport`
         :param solr_transport_class: HTTP-based transport class for Solr interface queries
-        :param bucket_class: Bucket class to use
-        :type bucket_class: :class:`RiakBucket`
+        :param bucket_class_factory: Callable that given a bucket name returns a class to use
+        :type bucket_class_factory: callable
         """
         if transport_class is None:
             transport_class = RiakHttpTransport
 
-        self.bucket_class = bucket_class or RiakBucket
+        if callable(bucket_class_factory):
+            self.bucket_class_factory = bucket_class_factory
+        else:
+            self.bucket_class_factory = lambda name: RiakBucket
 
         api = getattr(transport_class, 'api', 1)
         if api >= 2:
@@ -255,7 +258,7 @@ class RiakClient(object):
 
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
         """
-        return self.bucket_class(self, name)
+        return self.bucket_class_factory(name)(self, name)
 
     def is_alive(self):
         """

@@ -82,11 +82,11 @@ class BaseTestCase(object):
     def randint():
         return random.randint(1, 999999)
 
-    def create_client(self, host=None, port=None, transport_class=None, bucket_class=None):
+    def create_client(self, host=None, port=None, transport_class=None, bucket_class_factory=None):
         host = host or self.host
         port = port or self.port
         transport_class = transport_class or self.transport_class
-        return RiakClient(self.host, self.port, transport_class=self.transport_class, bucket_class=bucket_class)
+        return RiakClient(self.host, self.port, transport_class=self.transport_class, bucket_class_factory=bucket_class_factory)
 
     def setUp(self):
         self.client = self.create_client()
@@ -674,14 +674,27 @@ class BaseTestCase(object):
         bucket.get('mykey4').delete()
 
     def test_custom_bucket_and_object_classes(self):
-        class CustomObject(RiakObject): pass
-        class CustomBucket(RiakBucket):
-            object_class = CustomObject
-        client = self.create_client(bucket_class=CustomBucket)
-        bucket = client.bucket('customBucket')
-        self.assertTrue(isinstance(bucket, CustomBucket))
-        obj = bucket.get('foo')
-        self.assertTrue(isinstance(obj, CustomObject))
+        class CustomObject1(RiakObject): pass
+        class CustomObject2(RiakObject): pass
+        class CustomBucket1(RiakBucket):
+            object_class = CustomObject1
+        class CustomBucket2(RiakBucket):
+            object_class = CustomObject2
+
+        def factory(name):
+            return dict(
+                customBucket1=CustomBucket1, 
+                customBucket2=CustomBucket2).get(name)
+
+        client = self.create_client(bucket_class_factory=factory)
+        bucket1 = client.bucket('customBucket1')
+        bucket2 = client.bucket('customBucket2')
+        self.assertTrue(isinstance(bucket1, CustomBucket1))
+        self.assertTrue(isinstance(bucket2, CustomBucket2))
+        obj1 = bucket1.get('foo')
+        self.assertTrue(isinstance(obj1, CustomObject1))
+        obj2 = bucket2.get('foo')
+        self.assertTrue(isinstance(obj2, CustomObject2))
 
 
 class MapReduceAliasTestMixIn(object):
