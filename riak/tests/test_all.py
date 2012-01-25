@@ -540,6 +540,7 @@ class BaseTestCase(object):
         # Immediate test to see if 2i is even supported w/ the backend
         try:
             self.client.index('foo','bar_bin','baz').run()
+            return True
         except Exception as e:
             if "indexes_not_supported" in str(e):
                 return False
