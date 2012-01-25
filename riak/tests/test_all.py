@@ -540,11 +540,10 @@ class BaseTestCase(object):
         # Immediate test to see if 2i is even supported w/ the backend
         try:
             self.client.index('foo','bar_bin','baz').run()
-            return True
         except Exception as e:
             if "indexes_not_supported" in str(e):
                 return False
-            raise e # re-raise to fail the test
+            raise True # re-raise to fail the test
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_store(self):
