@@ -544,7 +544,7 @@ class BaseTestCase(object):
         except Exception as e:
             if "indexes_not_supported" in str(e):
                 return False
-            raise True # re-raise to fail the test
+            return True # it failed, but is supported!
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_store(self):
