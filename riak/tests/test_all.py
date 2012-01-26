@@ -536,8 +536,21 @@ class BaseTestCase(object):
         buckets = self.client.get_buckets()
         self.assertTrue("list_bucket" in buckets)
 
+    def is_2i_supported(self):
+        # Immediate test to see if 2i is even supported w/ the backend
+        try:
+            self.client.index('foo','bar_bin','baz').run()
+            return True
+        except Exception as e:
+            if "indexes_not_supported" in str(e):
+                return False
+            return True # it failed, but is supported!
+
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_store(self):
+        if not self.is_2i_supported():
+            return True
+
         # Create a new object with indexes...
         bucket = self.client.bucket('indexbucket')
         rand = self.randint()
@@ -609,6 +622,9 @@ class BaseTestCase(object):
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):
+        if not self.is_2i_supported():
+            return True
+
         bucket = self.client.bucket('indexbucket')
 
         bucket.\
@@ -631,13 +647,6 @@ class BaseTestCase(object):
             add_index('field1_bin', 'val4').\
             add_index('field2_int', 1004).\
             store()
-
-        # Immediate test to see if 2i is even supported w/ the backend
-        try:
-            self.client.index('foo','bar_bin','baz').run()
-        except Exception as e:
-            if "indexes_not_supported" in str(e):
-                return True
 
         # Test an equality query...
         results = self.client.index('indexbucket', 'field1_bin', 'val2').run()
