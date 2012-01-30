@@ -632,13 +632,6 @@ class BaseTestCase(object):
             add_index('field2_int', 1004).\
             store()
 
-        # Immediate test to see if 2i is even supported w/ the backend
-        try:
-            self.client.index('foo','bar_bin','baz').run()
-        except Exception as e:
-            if "indexes_not_supported" in str(e):
-                return True
-
         # Test an equality query...
         results = self.client.index('indexbucket', 'field1_bin', 'val2').run()
         self.assertEquals(1, len(results))
