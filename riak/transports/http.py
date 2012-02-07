@@ -519,25 +519,3 @@ class RiakHttpTransport(RiakTransport) :
             else:
                 retVal[key] = value
         return retVal
-
-
-class RiakHttpReuseTransport(RiakHttpTransport):
-    "Deprecated transport."
-    def __init__(self, cm,
-                 prefix='riak', mapred_prefix='mapred', client_id=None,
-                 **unused_options):
-        RiakHttpTransport.__init__(self, cm, prefix, mapred_prefix,
-                                   client_id, **unused_options)
-        riak.util.deprecated('please use RiakHttpTransport instead',
-                             stacklevel=4)
-
-
-class RiakHttpPoolTransport(RiakHttpTransport):
-    "Deprecated transport."
-    def __init__(self, cm,
-                 prefix='riak', mapred_prefix='mapred', client_id=None,
-                 **unused_options):
-        RiakHttpTransport.__init__(self, cm, prefix, mapred_prefix,
-                                   client_id, **unused_options)
-        riak.util.deprecated('please use RiakHttpTransport instead',
-                             stacklevel=4)
