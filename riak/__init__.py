@@ -41,8 +41,8 @@ from bucket import RiakBucket
 from client import RiakClient
 from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase,\
     RiakKeyFilter
-from transports.pbc import RiakPbcTransport, RiakPbcCachedTransport
-from transports.http import RiakHttpTransport, RiakHttpReuseTransport, RiakHttpPoolTransport
+from transports.pbc import RiakPbcTransport
+from transports.http import RiakHttpTransport
 
 ONE = "one"
 ALL = "all"

@@ -547,12 +547,3 @@ class RiakPbcTransport(RiakTransport):
                     pb_link.key = link.get_key()
                     pb_link.tag = link.get_tag()
         rpb_content.value = data
-
-class RiakPbcCachedTransport(RiakPbcTransport):
-    "Deprecated transport."
-    def __init__(self, cm,
-                 client_id=None, maxsize=0, block=False, timeout=None,
-                 **unused_options):
-        RiakPbcTransport.__init__(self, cm, client_id, **unused_options)
-        riak.util.deprecated('please use RiakPbcTransport instead',
-                             stacklevel=4)

@@ -2,8 +2,8 @@
 import glob
 import os
 import subprocess
+import platform
 from setuptools import setup, find_packages
-
 
 def make_docs():
     if not os.path.exists('docs'):
@@ -16,10 +16,16 @@ def make_pb():
     subprocess.call(['protoc', '--python_out=.', './riak/transports/riakclient.proto'])
 
 if __name__ == "__main__":
+    if platform.python_version() < '2.7':
+        test_require = ["unittest2"]
+    else:
+        test_require = []
+
     setup(
         name='riak',
         version='1.3.0',
         packages = find_packages(),
+        requires = test_require,
         extras_require = {
             'protobuf': ['protobuf>=2.3.0'],
             },
