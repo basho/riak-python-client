@@ -147,7 +147,7 @@ class RiakPbcTransport(RiakTransport):
     # The ConnectionManager class that this transport prefers.
     default_cm = connection.cm_using(SocketWithId)
 
-    def __init__(self, cm, client_id=None, retries=1, **unused_options):
+    def __init__(self, cm, client_id=None, max_attempts=1, **unused_options):
         """
         Construct a new RiakPbcTransport object.
         """
@@ -158,7 +158,7 @@ class RiakPbcTransport(RiakTransport):
 
         self._cm = cm
         self._client_id = client_id
-        self._retries = retries
+        self._max_attempts = max_attempts
 
     def translate_rw_val(self, rw):
         val = self.rw_names.get(rw)
@@ -432,8 +432,10 @@ class RiakPbcTransport(RiakTransport):
                     break
 
     def send_pkt(self, conn, pkt):
-        attempt, e = 0, None
-        for attempt in xrange(self._retries):
+        attempt = 0
+        e = None
+        for attempt in xrange(self._max_attempts):
+            e = None
             try:
                 conn.maybe_connect()
 
@@ -454,7 +456,7 @@ class RiakPbcTransport(RiakTransport):
                     raise
 
         # Max attempts reached, raise whatever exception we are getting
-        if attempt + 1 == self.retries and e is not None:
+        if attempt + 1 == self._max_attempts and e is not None:
             raise e
 
     def recv_msg(self, conn, expect):
