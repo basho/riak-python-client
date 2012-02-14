@@ -23,12 +23,11 @@ try:
 except ImportError:
     import simplejson as json
 
-from riak.transports import RiakHttpTransport
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
 from riak.search import RiakSearch
+from riak.transports import RiakHttpTransport
 from riak.util import deprecated
-import riak.transports.connection
 
 
 class RiakClient(object):
@@ -86,10 +85,10 @@ class RiakClient(object):
         self._w = "default"
         self._dw = "default"
         self._rw = "default"
-        self._encoders = {'application/json':json.dumps,
-                          'text/json':json.dumps}
-        self._decoders = {'application/json':json.loads,
-                          'text/json':json.loads}
+        self._encoders = {'application/json': json.dumps,
+                          'text/json': json.dumps}
+        self._decoders = {'application/json': json.loads,
+                          'text/json': json.loads}
         self._solr = None
         self._host = host
         self._port = port
@@ -288,7 +287,7 @@ class RiakClient(object):
     def index(self, *args):
         """
         Start assembling a Map/Reduce operation based on secondary
-        index query results. 
+        index query results.
 
         :rtype: :class:`RiakMapReduce`
         """
