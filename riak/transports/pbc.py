@@ -28,6 +28,8 @@ try:
 except ImportError:
     import simplejson as json
 
+from riak import RiakError
+from riak.mapreduce import RiakLink
 from riak.metadata import (
         MD_CHARSET,
         MD_CTYPE,
@@ -39,8 +41,6 @@ from riak.metadata import (
         MD_USERMETA,
         MD_VTAG,
         )
-from riak import RiakError
-from riak.mapreduce import RiakLink
 from riak.riak_index_entry import RiakIndexEntry
 from riak.transports import connection
 from riak.transports.transport import RiakTransport
