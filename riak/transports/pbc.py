@@ -147,7 +147,7 @@ class RiakPbcTransport(RiakTransport):
     # The ConnectionManager class that this transport prefers.
     default_cm = connection.cm_using(SocketWithId)
 
-    def __init__(self, cm, client_id=None, **unused_options):
+    def __init__(self, cm, client_id=None, retries=1, **unused_options):
         """
         Construct a new RiakPbcTransport object.
         """
@@ -158,6 +158,7 @@ class RiakPbcTransport(RiakTransport):
 
         self._cm = cm
         self._client_id = client_id
+        self._retries = retries
 
     def translate_rw_val(self, rw):
         val = self.rw_names.get(rw)
@@ -431,18 +432,30 @@ class RiakPbcTransport(RiakTransport):
                     break
 
     def send_pkt(self, conn, pkt):
-        conn.maybe_connect()
+        attempt, e = 0, None
+        for attempt in xrange(self._retries):
+            try:
+                conn.maybe_connect()
 
-        # If the last client_id used on this connection is different than our
-        # client_id, then set a new ID on the connection.
-        if conn.last_client_id != self._client_id:
-            req = riakclient_pb2.RpbSetClientIdReq()
-            req.client_id = self._client_id
-            conn.send(self.encode_msg(MSG_CODE_SET_CLIENT_ID_REQ, req))
-            conn.last_client_id = self._client_id
-            self.recv_msg(conn, MSG_CODE_SET_CLIENT_ID_RESP)
+                # If the last client_id used on this connection is different than our
+                # client_id, then set a new ID on the connection.
+                if conn.last_client_id != self._client_id:
+                    req = riakclient_pb2.RpbSetClientIdReq()
+                    req.client_id = self._client_id
+                    conn.send(self.encode_msg(MSG_CODE_SET_CLIENT_ID_REQ, req))
+                    conn.last_client_id = self._client_id
+                    self.recv_msg(conn, MSG_CODE_SET_CLIENT_ID_RESP)
 
-        conn.send(pkt)
+                conn.send(pkt)
+            except socket.error, e:
+                # If this is some unknown socket error bail out
+                # instead of retrying
+                if e[0] not in CONN_CLOSED_ERRORS:
+                    raise
+
+        # Max attempts reached, raise whatever exception we are getting
+        if attempt + 1 == self.retries and e is not None:
+            raise e
 
     def recv_msg(self, conn, expect):
         self.recv_pkt(conn)
