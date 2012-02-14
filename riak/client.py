@@ -39,7 +39,8 @@ class RiakClient(object):
     """
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
                  mapred_prefix='mapred', transport_class=None,
-                 client_id=None, solr_transport_class=None):
+                 client_id=None, solr_transport_class=None,
+                 transport_options=None):
         """
         Construct a new ``RiakClient`` object.
 
@@ -55,6 +56,8 @@ class RiakClient(object):
         :type transport_class: :class:`RiakTransport`
         :param solr_transport_class: HTTP-based transport class for Solr interface queries
         :type transport_class: :class:`RiakHttpTransport`
+        :param transport_options: Optional key-value args to pass to the transport constuctor
+        :type transport_options: dict
         """
         if transport_class is None:
             transport_class = RiakHttpTransport
@@ -64,9 +67,10 @@ class RiakClient(object):
             hostports = [ (host, port), ]
             self._cm = transport_class.default_cm(hostports)
 
-            ### we need to allow additional transport options. make this an
-            ### argument to __init__ ?
-            transport_options = { }
+            # If no transport options are provided, then default to the
+            # empty dict, otherwise just pass through what we are provided.
+            if transport_options is None:
+                transport_options = {}
 
             self._transport = transport_class(self._cm,
                                               prefix=prefix,
