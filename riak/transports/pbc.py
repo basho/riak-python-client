@@ -82,10 +82,22 @@ RIAKC_RW_QUORUM = 4294967293
 RIAKC_RW_ALL = 4294967292
 RIAKC_RW_DEFAULT = 4294967291
 
+# These are a specific set of socket errors
+# that could be raised on send/recv that indicate
+# that the socket is closed or reset, and is not
+# usable. On seeing any of these errors, the socket
+# should be closed, and the connection re-established.
+CONN_CLOSED_ERRORS = (
+                        errno.EHOSTUNREACH,
+                        errno.ECONNRESET,
+                        errno.EBADF,
+                        errno.EPIPE
+                     )
+
 
 class SocketWithId(connection.Socket):
     def __init__(self, host, port):
-        connection.Socket.__init__(self, host, port)
+        super(SocketWithId, self).__init__(host, port)
         self.last_client_id = None
 
     def maybe_connect(self):
@@ -93,14 +105,27 @@ class SocketWithId(connection.Socket):
         # client_id used on this connection.
         if self.sock is None:
             self.last_client_id = None
-
-            connection.Socket.maybe_connect(self)
+            super(SocketWithId, self).maybe_connect()
 
     def send(self, pkt):
-        self.sock.sendall(pkt)
+        try:
+            self.sock.sendall(pkt)
+        except socket.error, e:
+            # If the socket is in a bad state, close it and allow it
+            # to re-connect on the next try
+            if e[0] in CONN_CLOSED_ERRORS:
+                self.close()
+            raise
 
     def recv(self, want_len):
-        return self.sock.recv(want_len)
+        try:
+            return self.sock.recv(want_len)
+        except socket.error, e:
+            # If the socket is in a bad state, close it and allow it
+            # to re-connect on the next try
+            if e[0] in CONN_CLOSED_ERRORS:
+                self.close()
+            raise
 
 
 class RiakPbcTransport(RiakTransport):
