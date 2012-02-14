@@ -19,20 +19,31 @@ under the License.
 """
 from __future__ import with_statement
 
-import socket, struct
+import errno
+import socket
+import struct
 
 try:
     import json
 except ImportError:
     import simplejson as json
 
-from riak.transports.transport import RiakTransport
-from riak.metadata import *
-from riak.mapreduce import RiakMapReduce, RiakLink
+from riak.metadata import (
+        MD_CHARSET,
+        MD_CTYPE,
+        MD_ENCODING,
+        MD_INDEX,
+        MD_LASTMOD,
+        MD_LASTMOD_USECS,
+        MD_LINKS,
+        MD_USERMETA,
+        MD_VTAG,
+        )
 from riak import RiakError
+from riak.mapreduce import RiakLink
 from riak.riak_index_entry import RiakIndexEntry
 from riak.transports import connection
-from connection import SocketConnectionManager
+from riak.transports.transport import RiakTransport
 import riak.util
 
 try:
@@ -103,10 +114,10 @@ class RiakPbcTransport(RiakTransport):
     api = 2
 
     rw_names = {
-        'default' : RIAKC_RW_DEFAULT,
-        'all' : RIAKC_RW_ALL,
-        'quorum' : RIAKC_RW_QUORUM,
-        'one' : RIAKC_RW_ONE
+        'default': RIAKC_RW_DEFAULT,
+        'all': RIAKC_RW_ALL,
+        'quorum': RIAKC_RW_QUORUM,
+        'one': RIAKC_RW_ONE
         }
 
     # The ConnectionManager class that this transport prefers.
@@ -176,7 +187,7 @@ class RiakPbcTransport(RiakTransport):
 
         return True
 
-    def get(self, robj, r = None, vtag = None):
+    def get(self, robj, r=None, vtag=None):
         """
         Serialize get request and deserialize response
         """
@@ -201,7 +212,7 @@ class RiakPbcTransport(RiakTransport):
         else:
             return 0
 
-    def put(self, robj, w = None, dw = None, return_body = True):
+    def put(self, robj, w=None, dw=None, return_body=True):
         """
         Serialize get request and deserialize response
         """
@@ -259,7 +270,7 @@ class RiakPbcTransport(RiakTransport):
         metadata, content = self.decode_content(resp.content[0])
         return resp.key, resp.vclock, metadata
 
-    def delete(self, robj, rw = None):
+    def delete(self, robj, rw=None):
         """
         Serialize get request and deserialize response
         """
@@ -316,14 +327,14 @@ class RiakPbcTransport(RiakTransport):
 
         return props
 
-
     def set_bucket_props(self, bucket, props):
         """
         Serialize set bucket property request and deserialize response
         """
         req = riakclient_pb2.RpbSetBucketReq()
         req.bucket = bucket.get_name()
-        if not 'n_val' in props and not 'allow_mult' in props: return self
+        if not 'n_val' in props and not 'allow_mult' in props:
+            return self
 
         if 'n_val' in props:
             req.props.n_val = props['n_val']
@@ -336,7 +347,7 @@ class RiakPbcTransport(RiakTransport):
 
     def mapred(self, inputs, query, timeout=None):
         # Construct the job, optionally set the timeout...
-        job = {'inputs':inputs, 'query':query}
+        job = {'inputs': inputs, 'query': query}
         if timeout is not None:
             job['timeout'] = timeout
 
@@ -446,29 +457,29 @@ class RiakPbcTransport(RiakTransport):
             msg = riakclient_pb2.RpbMapRedResp()
             msg.ParseFromString(self._inbuf[1:])
         else:
-            raise Exception("unknown msg code %s"%msg_code)
+            raise Exception("unknown msg code %s" % msg_code)
         if expect and msg_code != expect:
             raise RiakError("unexpected protocol buffer message code: %d"
                             % msg_code)
         return msg_code, msg
 
-
     def recv_pkt(self, conn):
         nmsglen = conn.recv(4)
         if len(nmsglen) != 4:
-            raise RiakError("Socket returned short packet length %d - expected 4"%\
-                            len(nmsglen))
+            raise RiakError("Socket returned short packet length %d - expected 4"
+                            % len(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
         self._inbuf_len = msglen
         self._inbuf = ''
         while len(self._inbuf) < msglen:
             want_len = min(8192, msglen - len(self._inbuf))
             recv_buf = conn.recv(want_len)
-            if not recv_buf: break
+            if not recv_buf:
+                break
             self._inbuf += recv_buf
         if len(self._inbuf) != self._inbuf_len:
-            raise RiakError("Socket returned short packet %d - expected %d"%\
-                            (len(self._inbuf), self._inbuf_len))
+            raise RiakError("Socket returned short packet %d - expected %d"
+                            % (len(self._inbuf), self._inbuf_len))
 
     def decode_contents(self, rpb_contents):
         contents = []
@@ -520,10 +531,10 @@ class RiakPbcTransport(RiakTransport):
             metadata[MD_INDEX] = indexes
         return metadata, rpb_content.value
 
-    def pbify_content(self, metadata, data, rpb_content) :
+    def pbify_content(self, metadata, data, rpb_content):
         # Convert the broken out fields, building up
         # pbmetadata for any unknown ones
-        for k,v in metadata.iteritems():
+        for k, v in metadata.iteritems():
             if k == MD_CTYPE:
                 rpb_content.content_type = v
             elif k == MD_CHARSET:
@@ -547,3 +558,4 @@ class RiakPbcTransport(RiakTransport):
                     pb_link.key = link.get_key()
                     pb_link.tag = link.get_tag()
         rpb_content.value = data
+
