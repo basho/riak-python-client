@@ -215,11 +215,11 @@ class RiakMapReduce(object):
             if phase._keep: keep_flag = True
             query.append(phase.to_array())
 
-        if (len(self._key_filters) > 0):
+        if len(self._key_filters) > 0:
           bucket_name = None
-          if (type(self._inputs) == str):
+          if isinstance(self._inputs, basestring):
             bucket_name = self._inputs
-          elif (type(self._inputs) == RiakBucket):
+          elif isinstance(self._inputs, RiakBucket):
             bucket_name = self._inputs.get_name()
 
           if (bucket_name is not None):

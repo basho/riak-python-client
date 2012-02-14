@@ -26,6 +26,7 @@ class RiakBucket(object):
     about a Riak bucket, and provides methods to create or retrieve
     objects within the bucket.
     """
+    object_class = RiakObject
 
     SEARCH_PRECOMMIT_HOOK = {"mod": "riak_search_kv_hook", "fun": "precommit"}
 
@@ -219,7 +220,7 @@ class RiakBucket(object):
         except UnicodeError:
             raise TypeError('Unicode data values are not supported.')
 
-        obj = RiakObject(self._client, self, key)
+        obj = self.object_class(self._client, self, key)
         obj.set_data(data)
         obj.set_content_type(content_type)
         obj._encode_data = True
@@ -238,7 +239,7 @@ class RiakBucket(object):
         :type content_type: string
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        obj = RiakObject(self._client, self, key)
+        obj = self.object_class(self._client, self, key)
         obj.set_data(data)
         obj.set_content_type(content_type)
         obj._encode_data = False
@@ -254,7 +255,7 @@ class RiakBucket(object):
         :type r: integer
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        obj = RiakObject(self._client, self, key)
+        obj = self.object_class(self._client, self, key)
         obj._encode_data = True
         r = self.get_r(r)
         return obj.reload(r)
@@ -269,7 +270,7 @@ class RiakBucket(object):
         :type r: integer
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        obj = RiakObject(self._client, self, key)
+        obj = self.object_class(self._client, self, key)
         obj._encode_data = False
         r = self.get_r(r)
         return obj.reload(r)
