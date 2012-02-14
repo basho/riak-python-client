@@ -119,7 +119,15 @@ class SocketWithId(connection.Socket):
 
     def recv(self, want_len):
         try:
-            return self.sock.recv(want_len)
+            res = self.sock.recv(want_len)
+
+            # Assume the socket is closed if no data is
+            # returned on a blocking read.
+            if len(res) == 0 and want_len > 0:
+                self.close()
+
+            return res
+
         except socket.error, e:
             # If the socket is in a bad state, close it and allow it
             # to re-connect on the next try
