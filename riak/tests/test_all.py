@@ -890,6 +890,33 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
                             client_id = zero_client_id)
         self.assertEqual(zero_client_id, c.get_client_id()) #
 
+    def test_close_underlying_socket(self):
+        c = RiakClient(PB_HOST, PB_PORT, transport_class = RiakPbcTransport)
+
+        bucket = self.client.bucket('bucket_test_close')
+        rand = self.randint()
+        obj = bucket.new('foo', rand)
+        obj.store()
+        obj = bucket.get('foo')
+        self.assertTrue(obj.exists())
+        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
+        self.assertEqual(obj.get_key(), 'foo')
+        self.assertEqual(obj.get_data(), rand)
+
+        # Close the underlying socket. This gets a bit sketchy,
+        # since we are reaching into the internals, but there is
+        # no other way to get at the socket
+        conns = c._cm.conns
+        for conn in conns:
+            if conn.sock is not None:
+                conn.sock.close()
+
+        obj = bucket.get('foo')
+        self.assertTrue(obj.exists())
+        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
+        self.assertEqual(obj.get_key(), 'foo')
+        self.assertEqual(obj.get_data(), rand)
+
 
 class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
