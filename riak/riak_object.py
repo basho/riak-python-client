@@ -214,7 +214,7 @@ class RiakObject(object):
 
     def get_indexes(self, field = None):
         """
-        Get a list of the index entries for this object. If a field is provided, returns a list 
+        Get a list of the index entries for this object. If a field is provided, returns a list
 
         :param field: The index field.
         :type field: string or None
@@ -255,6 +255,27 @@ class RiakObject(object):
         :rtype: self
         """
         self._metadata[MD_CTYPE] = content_type
+        return self
+
+    def set_links(self, links):
+        """
+        Replaces all links to a RiakObject
+
+        :param links: An iterable of 2-item tuples, consisting of (RiakObject, tag). This could also be an iterable of
+            just a RiakObject, instead of the tuple, then a tag of None would be used. Lastly, it could also be an
+            iterable of RiakLink. They have tags built-in.
+        """
+        new_links = []
+        for item in links:
+            if isinstance(item, RiakLink):
+                link = item
+            elif isinstance(item, RiakObject):
+                link = RiakLink(item._bucket._name, item._key, None)
+            else:
+                link = RiakLink(item[0]._bucket._name, item._key, item[1])
+            new_links.append(link)
+
+        self._metadata[MD_LINKS] = new_links
         return self
 
     def add_link(self, obj, tag=None):
