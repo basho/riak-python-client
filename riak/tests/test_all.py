@@ -432,25 +432,23 @@ class BaseTestCase(object):
     def test_store_and_get_links(self):
         # Create the object...
         bucket = self.client.bucket("bucket")
-        bucket.new("foo", 2) \
+        bucket.new_binary("test_store_and_get_links", '2') \
             .add_link(bucket.new("foo1")) \
             .add_link(bucket.new("foo2"), "tag") \
             .add_link(bucket.new("foo3"), "tag2!@#%^&*)") \
             .store()
-        obj = bucket.get("foo")
+        obj = bucket.get("test_store_and_get_links")
         links = obj.get_links()
         self.assertEqual(len(links), 3)
         for l in links:
             if (l.get_key() == "foo1"):
-                self.assertEqual(l.get_tag(), "")
-                next
-            if (l.get_key() == "foo2"):
+                self.assertEqual(l.get_tag(), "bucket")
+            elif (l.get_key() == "foo2"):
                 self.assertEqual(l.get_tag(), "tag")
-                next
-            if (l.get_key() == "foo3"):
+            elif (l.get_key() == "foo3"):
                 self.assertEqual(l.get_tag(), "tag2!@#%^&*)")
-                next
-            self.assertEqual("unknown key", l.get_key())
+            else:
+                self.assertEqual("unknown key", l.get_key())
 
     def test_link_walking(self):
         # Create the object...

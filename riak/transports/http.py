@@ -131,7 +131,7 @@ class RiakHttpTransport(RiakTransport) :
         else:
           self.check_http_code(response, [204])
           return None
-        
+
     def put_new(self, robj, w=None, dw=None, return_meta=True):
         """Put a new object into the Riak store, returning its (new) key."""
         # Construct the URL...
@@ -341,7 +341,8 @@ class RiakHttpTransport(RiakTransport) :
         """
         for linkHeader in linkHeaders.strip().split(','):
             linkHeader = linkHeader.strip()
-            matches = re.match("</([^/]+)/([^/]+)/([^/]+)>; ?riaktag=\"([^\']+)\"", linkHeader)
+            matches = re.match("</([^/]+)/([^/]+)/([^/]+)>; ?riaktag=\"([^\']+)\"", linkHeader) or \
+                re.match("</(buckets)/([^/]+)/keys/([^/]+)>; ?riaktag=\"([^\']+)\"", linkHeader)
             if matches is not None:
                 link = RiakLink(urllib.unquote_plus(matches.group(2)),
                                 urllib.unquote_plus(matches.group(3)),
@@ -393,7 +394,7 @@ class RiakHttpTransport(RiakTransport) :
 
     def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
         uri = self.build_rest_path(prefix=uri, params=params)
-        return self.http_request('POST', uri, {'Content-Type': content_type}, body) 
+        return self.http_request('POST', uri, {'Content-Type': content_type}, body)
 
     # Utility functions used by Riak library.
 
@@ -449,7 +450,7 @@ class RiakHttpTransport(RiakTransport) :
                 headers[key] += ", " + rie.get_value()
             else:
                 headers[key] = rie.get_value()
-        
+
         return headers
 
     def http_request(self, method, uri, headers=None, body='') :
