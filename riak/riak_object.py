@@ -214,7 +214,7 @@ class RiakObject(object):
 
     def get_indexes(self, field = None):
         """
-        Get a list of the index entries for this object. If a field is provided, returns a list 
+        Get a list of the index entries for this object. If a field is provided, returns a list
 
         :param field: The index field.
         :type field: string or None
@@ -244,7 +244,13 @@ class RiakObject(object):
 
         :rtype: string
         """
-        return self._metadata[MD_CTYPE]
+        try:
+            return self._metadata[MD_CTYPE]
+        except KeyError:
+            if self._encode_data:
+                return "application/json"
+            else:
+                return "application/octet-stream"
 
     def set_content_type(self, content_type):
         """
