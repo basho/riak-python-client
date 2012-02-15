@@ -458,6 +458,7 @@ class RiakPbcTransport(RiakTransport):
                     self.recv_msg(conn, MSG_CODE_SET_CLIENT_ID_RESP)
 
                 conn.send(pkt)
+                break
             except socket.error, e:
                 # If this is some unknown socket error bail out
                 # instead of retrying
