@@ -272,7 +272,7 @@ class RiakObject(object):
             elif isinstance(item, RiakObject):
                 link = RiakLink(item._bucket._name, item._key, None)
             else:
-                link = RiakLink(item[0]._bucket._name, item._key, item[1])
+                link = RiakLink(item[0]._bucket._name, item[0]._key, item[1])
             new_links.append(link)
 
         self._metadata[MD_LINKS] = new_links

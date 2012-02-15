@@ -441,6 +441,21 @@ class BaseTestCase(object):
         links = obj.get_links()
         self.assertEqual(len(links), 3)
 
+    def test_set_links(self):
+        # Create the object
+        bucket = self.client.bucket("bucket")
+        bucket.new("foo", 2).set_links([bucket.new("foo1"),
+            (bucket.new("foo2"), "tag"),
+            RiakLink("bucket", "foo2", "tag2")]).store()
+        obj = bucket.get("foo")
+        links = sorted(obj.get_links(), key=lambda x: x.get_key())
+        self.assertEqual(len(links), 3)
+        self.assertEqual(links[0].get_key(), "foo1")
+        self.assertEqual(links[1].get_key(), "foo2")
+        self.assertEqual(links[1].get_tag(), "tag")
+        self.assertEqual(links[2].get_key(), "foo2")
+        self.assertEqual(links[2].get_tag(), "tag2")
+
     def test_link_walking(self):
         # Create the object...
         bucket = self.client.bucket("bucket")
