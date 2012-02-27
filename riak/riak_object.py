@@ -257,14 +257,20 @@ class RiakObject(object):
         self._metadata[MD_CTYPE] = content_type
         return self
 
-    def set_links(self, links):
+    def set_links(self, links, all_link=False):
         """
         Replaces all links to a RiakObject
 
         :param links: An iterable of 2-item tuples, consisting of (RiakObject, tag). This could also be an iterable of
             just a RiakObject, instead of the tuple, then a tag of None would be used. Lastly, it could also be an
             iterable of RiakLink. They have tags built-in.
+        :param all_link: A boolean indicates if links is all RiakLink object
+            This speeds up the operation.
         """
+        if all_link:
+            self._metadata[MD_LINKS] = links
+            return self
+
         new_links = []
         for item in links:
             if isinstance(item, RiakLink):
