@@ -646,6 +646,22 @@ class BaseTestCase(object):
         bucket.get('mykey1').delete()
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    def test_set_indexes(self):
+        if not self.is_2i_supported():
+            return True
+
+        bucket = self.client.bucket('indexbucket')
+        foo = bucket.new('foo', 1)
+        foo.set_indexes((('field1_bin', 'test'), ('field2_int', 1337))).store()
+        result = self.client.index('indexbucket', 'field2_int', 1337).run()
+        self.assertEqual(1, len(result))
+        self.assertEqual('foo', result[0].get_key())
+
+        result = self.client.index('indexbucket', 'field1_bin', 'test').run()
+        self.assertEqual(1, len(result))
+        self.assertEqual('foo', result[0].get_key())
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):
         if not self.is_2i_supported():
             return True

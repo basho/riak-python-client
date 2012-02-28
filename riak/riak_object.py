@@ -212,6 +212,22 @@ class RiakObject(object):
             self._metadata[MD_INDEX].remove(rie)
         return self
 
+    def set_indexes(self, indexes):
+        """
+        Sets indexes once and for all. Currenly supports an iterable of 2 item tuples,
+        (field, value)
+
+        :param indexes: iterable of 2 item tuples consisting the field and value.
+        :rtype: self
+        """
+        new_indexes = []
+        for field, value in indexes:
+            rie = RiakIndexEntry(field, value)
+            new_indexes.append(rie)
+        self._metadata[MD_INDEX] = new_indexes
+
+        return self
+
     def get_indexes(self, field = None):
         """
         Get a list of the index entries for this object. If a field is provided, returns a list
