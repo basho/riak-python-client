@@ -200,7 +200,7 @@ class TestServer:
                     line = re.sub("(RUNNER_USER=)(.*)", r'\1', line)
                     line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' % self._temp_log, line)
                     line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' % self._temp_pipe, line)
-                    line = re.sub("(PLATFORM_DATA_DIR=)(.*)", r'\1%s' % self.temp_dir)
+                    line = re.sub("(PLATFORM_DATA_DIR=)(.*)", r'\1%s' % self.temp_dir, line)
 
                     if string.strip(line) == "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}":
                         line = "RUNNER_BASE_DIR=%s\n" % os.path.normpath(os.path.join(self.bin_dir, ".."))
