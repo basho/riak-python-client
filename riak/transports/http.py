@@ -108,7 +108,7 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('GET', url)
         return self.parse_body(response, [200, 300, 404])
 
-    def put(self, robj, w = None, dw = None, return_body = True):
+    def put(self, robj, w = None, dw = None, return_body = True, if_none_match=False):
         """
         Serialize put request and deserialize response
         """
@@ -117,6 +117,8 @@ class RiakHttpTransport(RiakTransport) :
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
         headers = self.build_put_headers(robj)
+        if if_none_match:
+            headers["If-None-Match"] = "1"
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body, key=robj.get_key())
 
@@ -131,8 +133,8 @@ class RiakHttpTransport(RiakTransport) :
         else:
           self.check_http_code(response, [204])
           return None
-        
-    def put_new(self, robj, w=None, dw=None, return_meta=True):
+
+    def put_new(self, robj, w=None, dw=None, return_meta=True, if_none_match=False):
         """Put a new object into the Riak store, returning its (new) key."""
         # Construct the URL...
         params = {'returnbody' : str(return_meta).lower(), 'w' : w, 'dw' : dw}
@@ -391,7 +393,7 @@ class RiakHttpTransport(RiakTransport) :
 
     def post_request(self, uri=None, body=None, params=None, content_type="application/json"):
         uri = self.build_rest_path(prefix=uri, params=params)
-        return self.http_request('POST', uri, {'Content-Type': content_type}, body) 
+        return self.http_request('POST', uri, {'Content-Type': content_type}, body)
 
     # Utility functions used by Riak library.
 
@@ -447,7 +449,7 @@ class RiakHttpTransport(RiakTransport) :
                 headers[key] += ", " + rie.get_value()
             else:
                 headers[key] = rie.get_value()
-        
+
         return headers
 
     def http_request(self, method, uri, headers=None, body='') :

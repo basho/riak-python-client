@@ -246,7 +246,7 @@ class RiakPbcTransport(RiakTransport):
         else:
             return 0
 
-    def put(self, robj, w=None, dw=None, return_body=True):
+    def put(self, robj, w=None, dw=None, return_body=True, if_none_match=False):
         """
         Serialize get request and deserialize response
         """
@@ -257,6 +257,8 @@ class RiakPbcTransport(RiakTransport):
         req.dw = self.translate_rw_val(dw)
         if return_body:
             req.return_body = 1
+        if if_none_match:
+            req.if_none_match = 1
 
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
@@ -274,7 +276,7 @@ class RiakPbcTransport(RiakTransport):
                 contents.append(self.decode_content(c))
             return resp.vclock, contents
 
-    def put_new(self, robj, w=None, dw=None, return_meta=True):
+    def put_new(self, robj, w=None, dw=None, return_meta=True, if_none_match=False):
         """Put a new object into the Riak store, returning its (new) key.
 
         If return_meta is False, then the vlock and metadata return values
@@ -289,6 +291,8 @@ class RiakPbcTransport(RiakTransport):
         req.dw = self.translate_rw_val(dw)
         if return_meta:
             req.return_body = 1
+        if if_none_match:
+            req.if_none_match = 1
 
         req.bucket = bucket.get_name()
 

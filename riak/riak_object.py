@@ -324,7 +324,7 @@ class RiakObject(object):
         else:
             return []
 
-    def store(self, w=None, dw=None, return_body=True):
+    def store(self, w=None, dw=None, return_body=True, if_none_match=False):
         """
         Store the object in Riak. When this operation completes, the
         object could contain new metadata and possibly new data if Riak
@@ -339,6 +339,9 @@ class RiakObject(object):
         :type dw: integer
         :param return_body: if the newly stored object should be retrieved
         :type return_body: bool
+        :param if_none_match: Should the object be stored only if there is no
+         key previously defined
+        :type if_none_match: bool
         :rtype: self
         """
         # Use defaults if not specified...
@@ -349,13 +352,13 @@ class RiakObject(object):
         t = self._client.get_transport()
 
         if self._key is None:
-            key, vclock, metadata = t.put_new(self, w, dw, return_body)
+            key, vclock, metadata = t.put_new(self, w, dw, return_body, if_none_match)
             self._exists = True
             self._key = key
             self._vclock = vclock
             self.set_metadata(metadata)
         else:
-            Result = t.put(self, w, dw, return_body)
+            Result = t.put(self, w, dw, return_body, if_none_match)
             if Result is not None:
                 self.populate(Result)
 
