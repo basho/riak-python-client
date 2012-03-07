@@ -118,7 +118,7 @@ class RiakHttpTransport(RiakTransport) :
                                    params=params)
         headers = self.build_put_headers(robj)
         if if_none_match:
-            headers["If-None-Match"] = "1"
+            headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body, key=robj.get_key())
 
@@ -140,6 +140,8 @@ class RiakHttpTransport(RiakTransport) :
         params = {'returnbody' : str(return_meta).lower(), 'w' : w, 'dw' : dw}
         url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
         headers = self.build_put_headers(robj)
+        if if_none_match:
+            headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
         response = self.http_request('POST', url, headers, content)
         location = response[0]['location']
