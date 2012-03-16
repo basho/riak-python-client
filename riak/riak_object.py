@@ -212,6 +212,22 @@ class RiakObject(object):
             self._metadata[MD_INDEX].remove(rie)
         return self
 
+    def set_indexes(self, indexes):
+        """
+        Sets indexes once and for all. Currenly supports an iterable of 2 item tuples,
+        (field, value)
+
+        :param indexes: iterable of 2 item tuples consisting the field and value.
+        :rtype: self
+        """
+        new_indexes = []
+        for field, value in indexes:
+            rie = RiakIndexEntry(field, value)
+            new_indexes.append(rie)
+        self._metadata[MD_INDEX] = new_indexes
+
+        return self
+
     def get_indexes(self, field = None):
         """
         Get a list of the index entries for this object. If a field is provided, returns a list
@@ -261,6 +277,33 @@ class RiakObject(object):
         :rtype: self
         """
         self._metadata[MD_CTYPE] = content_type
+        return self
+
+    def set_links(self, links, all_link=False):
+        """
+        Replaces all links to a RiakObject
+
+        :param links: An iterable of 2-item tuples, consisting of (RiakObject, tag). This could also be an iterable of
+            just a RiakObject, instead of the tuple, then a tag of None would be used. Lastly, it could also be an
+            iterable of RiakLink. They have tags built-in.
+        :param all_link: A boolean indicates if links is all RiakLink object
+            This speeds up the operation.
+        """
+        if all_link:
+            self._metadata[MD_LINKS] = links
+            return self
+
+        new_links = []
+        for item in links:
+            if isinstance(item, RiakLink):
+                link = item
+            elif isinstance(item, RiakObject):
+                link = RiakLink(item._bucket._name, item._key, None)
+            else:
+                link = RiakLink(item[0]._bucket._name, item[0]._key, item[1])
+            new_links.append(link)
+
+        self._metadata[MD_LINKS] = new_links
         return self
 
     def add_link(self, obj, tag=None):
