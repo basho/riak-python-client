@@ -214,7 +214,7 @@ class RiakObject(object):
 
     def set_indexes(self, indexes):
         """
-        Sets indexes once and for all. Currenly supports an iterable of 2 item tuples,
+        Replaces all indexes on a Riak object. Currenly supports an iterable of 2 item tuples,
         (field, value)
 
         :param indexes: iterable of 2 item tuples consisting the field and value.
@@ -286,7 +286,7 @@ class RiakObject(object):
         :param links: An iterable of 2-item tuples, consisting of (RiakObject, tag). This could also be an iterable of
             just a RiakObject, instead of the tuple, then a tag of None would be used. Lastly, it could also be an
             iterable of RiakLink. They have tags built-in.
-        :param all_link: A boolean indicates if links is all RiakLink object
+        :param all_link: A boolean indicates if links are all RiakLink objects
             This speeds up the operation.
         """
         if all_link:
