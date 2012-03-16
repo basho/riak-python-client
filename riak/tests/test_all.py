@@ -451,6 +451,31 @@ class BaseTestCase(object):
             else:
                 self.assertEqual("unknown key", l.get_key())
 
+    def test_set_links(self):
+        # Create the object
+        bucket = self.client.bucket("bucket")
+        bucket.new("foo", 2).set_links([bucket.new("foo1"),
+            (bucket.new("foo2"), "tag"),
+            RiakLink("bucket", "foo2", "tag2")]).store()
+        obj = bucket.get("foo")
+        links = sorted(obj.get_links(), key=lambda x: x.get_key())
+        self.assertEqual(len(links), 3)
+        self.assertEqual(links[0].get_key(), "foo1")
+        self.assertEqual(links[1].get_key(), "foo2")
+        self.assertEqual(links[1].get_tag(), "tag")
+        self.assertEqual(links[2].get_key(), "foo2")
+        self.assertEqual(links[2].get_tag(), "tag2")
+
+    def test_set_links_all_links(self):
+        bucket = self.client.bucket("bucket")
+        foo1 = bucket.new("foo", 1)
+        foo2 = bucket.new("foo2", 2).store()
+        links = [RiakLink("bucket", "foo2")]
+        foo1.set_links(links, True)
+        links = foo1.get_links()
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links[0].get_key(), "foo2")
+
     def test_link_walking(self):
         # Create the object...
         bucket = self.client.bucket("bucket")
@@ -629,6 +654,22 @@ class BaseTestCase(object):
 
         # Clean up...
         bucket.get('mykey1').delete()
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    def test_set_indexes(self):
+        if not self.is_2i_supported():
+            return True
+
+        bucket = self.client.bucket('indexbucket')
+        foo = bucket.new('foo', 1)
+        foo.set_indexes((('field1_bin', 'test'), ('field2_int', 1337))).store()
+        result = self.client.index('indexbucket', 'field2_int', 1337).run()
+        self.assertEqual(1, len(result))
+        self.assertEqual('foo', result[0].get_key())
+
+        result = self.client.index('indexbucket', 'field1_bin', 'test').run()
+        self.assertEqual(1, len(result))
+        self.assertEqual('foo', result[0].get_key())
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):
