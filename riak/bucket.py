@@ -297,7 +297,7 @@ class RiakBucket(object):
         obj._encode_data = False
         return obj
 
-    def get(self, key, r=None):
+    def get(self, key, r=None, pr=None):
         """
         Retrieve a JSON-encoded object from Riak.
 
@@ -305,14 +305,17 @@ class RiakBucket(object):
         :type key: string
         :param r: R-Value of the request (defaults to bucket's R)
         :type r: integer
+        :param pr: PR-Value of the request (defaults to bucket's PR)
+        :type pr: integer
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = True
         r = self.get_r(r)
-        return obj.reload(r)
+        pr = self.get_pr(pr)
+        return obj.reload(r=r, pr=pr)
 
-    def get_binary(self, key, r=None):
+    def get_binary(self, key, r=None, pr=None):
         """
         Retrieve a binary/string object from Riak.
 
@@ -320,12 +323,15 @@ class RiakBucket(object):
         :type key: string
         :param r: R-Value of the request (defaults to bucket's R)
         :type r: integer
+        :param pr: PR-Value of the request (defaults to bucket's PR)
+        :type pr: integer
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = False
         r = self.get_r(r)
-        return obj.reload(r)
+        pr = self.get_pr(pr)
+        return obj.reload(r=r, pr=pr)
 
     def set_n_val(self, nval):
         """
