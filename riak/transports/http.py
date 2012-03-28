@@ -272,11 +272,6 @@ class RiakHttpTransport(RiakTransport) :
             m = 'Could not contact Riak Server: http://$HOST:$PORT !'
             raise RiakError(m)
 
-        # Verify that we got one of the expected statuses. Otherwise, raise an exception.
-        if not status in expected_statuses:
-            m = 'Expected status ' + str(expected_statuses) + ', received ' + str(status)
-            raise RiakError(m)
-
         # If 404(Not Found), then clear the object.
         if status == 404:
             return None
