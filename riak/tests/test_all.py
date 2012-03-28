@@ -222,6 +222,17 @@ class BaseTestCase(object):
         bucket.set_rw("one")
         self.assertEqual(bucket.get_rw(), "one")
 
+    def test_primary_quora(self):
+        bucket = self.client.bucket('primary_quora')
+        self.assertEqual(bucket.get_pr(), "default")
+        self.assertEqual(bucket.get_pw(), "default")
+
+        bucket.set_pr(1)
+        self.assertEqual(bucket.get_pr(), 1)
+
+        bucket.set_pw("quorum")
+        self.assertEqual(bucket.get_pw(), "quorum")
+
     def test_if_none_match(self):
         bucket = self.client.bucket('if_none_match_test')
         obj = bucket.get('obj')

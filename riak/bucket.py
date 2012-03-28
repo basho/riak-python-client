@@ -50,6 +50,8 @@ class RiakBucket(object):
         self._w = None
         self._dw = None
         self._rw = None
+        self._pr = None
+        self._pw = None
         self._encoders = {}
         self._decoders = {}
 
@@ -157,6 +159,57 @@ class RiakBucket(object):
         :rtype: self
         """
         self._rw = rw
+        return self
+
+    def get_pr(self, pr=None):
+        """
+        Get the PR-value for this bucket, if it is set, otherwise return
+        the PR-value for the client.
+
+        :rtype: integer
+        """
+        if (pr is not None):
+            return pr
+        if (self._pr is not None):
+            return self._pr
+        return self._client.get_pr()
+
+    def set_pr(self, pr):
+        """
+        Set the PR-value for this bucket. See :func:`set_r` for more
+        information.
+
+        :param pr: The new PR-value
+        :type pr: integer
+        :rtype: self
+        """
+        self._pr = pr
+        return self
+
+
+    def get_pw(self, pw=None):
+        """
+        Get the PW-value for this bucket, if it is set, otherwise return
+        the PW-value for the client.
+
+        :rtype: integer
+        """
+        if (pw is not None):
+            return pw
+        if (self._pw is not None):
+            return self._pw
+        return self._client.get_pw()
+
+    def set_pw(self, pw):
+        """
+        Set the PW-value for this bucket. See :func:`set_r` for more
+        information.
+
+        :param pw: The new PR-value
+        :type pw: integer
+        :rtype: self
+        """
+        self._pw = pw
         return self
 
     def get_encoder(self, content_type):
@@ -428,7 +481,7 @@ class RiakBucket(object):
         if not mimetype:
             mimetype = 'application/octet-stream'
         return self.new_binary(key, binary_data, mimetype)
-    
+
     def search_enabled(self):
         """
         Returns True if the search precommit hook is enabled for this bucket.
