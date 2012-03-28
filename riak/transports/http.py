@@ -108,7 +108,7 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('GET', url)
         return self.parse_body(response, [200, 300, 404])
 
-    def put(self, robj, w = None, dw = None, return_body = True):
+    def put(self, robj, w = None, dw = None, return_body = True, if_none_match=False):
         """
         Serialize put request and deserialize response
         """
@@ -117,6 +117,8 @@ class RiakHttpTransport(RiakTransport) :
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
         headers = self.build_put_headers(robj)
+        if if_none_match:
+            headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body, key=robj.get_key())
 
@@ -132,12 +134,14 @@ class RiakHttpTransport(RiakTransport) :
           self.check_http_code(response, [204])
           return None
 
-    def put_new(self, robj, w=None, dw=None, return_meta=True):
+    def put_new(self, robj, w=None, dw=None, return_meta=True, if_none_match=False):
         """Put a new object into the Riak store, returning its (new) key."""
         # Construct the URL...
         params = {'returnbody' : str(return_meta).lower(), 'w' : w, 'dw' : dw}
         url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
         headers = self.build_put_headers(robj)
+        if if_none_match:
+            headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
         response = self.http_request('POST', url, headers, content)
         location = response[0]['location']

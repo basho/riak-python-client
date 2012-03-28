@@ -222,6 +222,20 @@ class BaseTestCase(object):
         bucket.set_rw("one")
         self.assertEqual(bucket.get_rw(), "one")
 
+    def test_if_none_match(self):
+        bucket = self.client.bucket('if_none_match_test')
+        obj = bucket.get('obj')
+        obj.delete()
+
+        obj.reload()
+        self.assertFalse(obj.exists())
+        obj.set_data(["first store"])
+        obj.store()
+
+        obj.set_data(["second store"])
+        with self.assertRaises(Exception):
+            obj.store(if_none_match=True)
+
     def test_siblings(self):
         # Set up the bucket, clear any existing object...
         bucket = self.client.bucket('multiBucket')
