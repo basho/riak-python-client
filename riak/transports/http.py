@@ -418,8 +418,9 @@ class RiakHttpTransport(RiakTransport) :
         if params is not None:
             s = ''
             for key in params.keys():
-                if s != '': s += '&'
-                s += urllib.quote_plus(key) + '=' + urllib.quote_plus(str(params[key]))
+                if params[key] is not None:
+                    if s != '': s += '&'
+                    s += urllib.quote_plus(key) + '=' + urllib.quote_plus(str(params[key]))
             path += '?' + s
 
         # Return.

@@ -1169,6 +1169,8 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(0, len(results["response"]["docs"]))
 
+    def test_build_rest_path_excludes_empty_query_params(self):
+        self.assertEquals(self.client.get_transport().build_rest_path(bucket=self.client.bucket("foo"), key="bar", params={'r': None}), "/riak/foo/bar?")
 
 class RiakTestFilter(unittest.TestCase):
     def test_simple(self):
