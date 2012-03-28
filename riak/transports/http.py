@@ -244,7 +244,7 @@ class RiakHttpTransport(RiakTransport) :
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
         if not status in expected_statuses:
-            m = 'Expected status ' + str(expected_statuses) + ', received ' + str(status)
+            m = 'Expected status ' + str(expected_statuses) + ', received ' + str(status) + ':' + response[1]
             raise Exception(m)
 
     def parse_body(self, response, expected_statuses):
