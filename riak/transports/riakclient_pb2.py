@@ -7,6 +7,7 @@ from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 
+
 DESCRIPTOR = descriptor.FileDescriptor(
   name='riakclient.proto',
   package='',
@@ -952,7 +953,6 @@ _RPBBUCKETPROPS = descriptor.Descriptor(
   serialized_end=1640,
 )
 
-
 _RPBGETRESP.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBPUTREQ.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBPUTRESP.fields_by_name['content'].message_type = _RPBCONTENT
@@ -961,6 +961,27 @@ _RPBSETBUCKETREQ.fields_by_name['props'].message_type = _RPBBUCKETPROPS
 _RPBCONTENT.fields_by_name['links'].message_type = _RPBLINK
 _RPBCONTENT.fields_by_name['usermeta'].message_type = _RPBPAIR
 _RPBCONTENT.fields_by_name['indexes'].message_type = _RPBPAIR
+DESCRIPTOR.message_types_by_name['RpbErrorResp'] = _RPBERRORRESP
+DESCRIPTOR.message_types_by_name['RpbGetClientIdResp'] = _RPBGETCLIENTIDRESP
+DESCRIPTOR.message_types_by_name['RpbSetClientIdReq'] = _RPBSETCLIENTIDREQ
+DESCRIPTOR.message_types_by_name['RpbGetServerInfoResp'] = _RPBGETSERVERINFORESP
+DESCRIPTOR.message_types_by_name['RpbGetReq'] = _RPBGETREQ
+DESCRIPTOR.message_types_by_name['RpbGetResp'] = _RPBGETRESP
+DESCRIPTOR.message_types_by_name['RpbPutReq'] = _RPBPUTREQ
+DESCRIPTOR.message_types_by_name['RpbPutResp'] = _RPBPUTRESP
+DESCRIPTOR.message_types_by_name['RpbDelReq'] = _RPBDELREQ
+DESCRIPTOR.message_types_by_name['RpbListBucketsResp'] = _RPBLISTBUCKETSRESP
+DESCRIPTOR.message_types_by_name['RpbListKeysReq'] = _RPBLISTKEYSREQ
+DESCRIPTOR.message_types_by_name['RpbListKeysResp'] = _RPBLISTKEYSRESP
+DESCRIPTOR.message_types_by_name['RpbGetBucketReq'] = _RPBGETBUCKETREQ
+DESCRIPTOR.message_types_by_name['RpbGetBucketResp'] = _RPBGETBUCKETRESP
+DESCRIPTOR.message_types_by_name['RpbSetBucketReq'] = _RPBSETBUCKETREQ
+DESCRIPTOR.message_types_by_name['RpbMapRedReq'] = _RPBMAPREDREQ
+DESCRIPTOR.message_types_by_name['RpbMapRedResp'] = _RPBMAPREDRESP
+DESCRIPTOR.message_types_by_name['RpbContent'] = _RPBCONTENT
+DESCRIPTOR.message_types_by_name['RpbPair'] = _RPBPAIR
+DESCRIPTOR.message_types_by_name['RpbLink'] = _RPBLINK
+DESCRIPTOR.message_types_by_name['RpbBucketProps'] = _RPBBUCKETPROPS
 
 class RpbErrorResp(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType

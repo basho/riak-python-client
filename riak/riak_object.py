@@ -367,7 +367,7 @@ class RiakObject(object):
         else:
             return []
 
-    def store(self, w=None, dw=None, return_body=True, if_none_match=False):
+    def store(self, w=None, dw=None, pw=None, return_body=True, if_none_match=False):
         """
         Store the object in Riak. When this operation completes, the
         object could contain new metadata and possibly new data if Riak
@@ -380,6 +380,9 @@ class RiakObject(object):
         :param dw: DW-value, wait for this many partitions to
          confirm the write before returning to client.
         :type dw: integer
+        :param pw: PW-value, require this many primary partitions to be available
+         before performing the put
+        :type pw: integer
         :param return_body: if the newly stored object should be retrieved
         :type return_body: bool
         :param if_none_match: Should the object be stored only if there is no
@@ -390,25 +393,26 @@ class RiakObject(object):
         # Use defaults if not specified...
         w = self._bucket.get_w(w)
         dw = self._bucket.get_dw(dw)
+        pw = self._bucket.get_pw(pw)
 
         # Issue the put over our transport
         t = self._client.get_transport()
 
         if self._key is None:
-            key, vclock, metadata = t.put_new(self, w, dw, return_body, if_none_match)
+            key, vclock, metadata = t.put_new(self, w=w, dw=dw, pw=pw, return_body=return_body, if_none_match=if_none_match)
             self._exists = True
             self._key = key
             self._vclock = vclock
             self.set_metadata(metadata)
         else:
-            Result = t.put(self, w, dw, return_body, if_none_match)
+            Result = t.put(self, w=w, dw=dw, pw=pw, return_body=return_body, if_none_match=if_none_match)
             if Result is not None:
                 self.populate(Result)
 
         return self
 
 
-    def reload(self, r=None, vtag=None):
+    def reload(self, r=None, pr=None, vtag=None):
         """
         Reload the object from Riak. When this operation completes, the
         object could contain new metadata and a new value, if the object
@@ -421,8 +425,9 @@ class RiakObject(object):
         """
         # Do the request...
         r = self._bucket.get_r(r)
+        pr = self._bucket.get_pr(pr)
         t = self._client.get_transport()
-        Result = t.get(self, r, vtag)
+        Result = t.get(self, r=r, pr=pr, vtag=vtag)
 
         self.clear()
         if Result is not None:
@@ -431,19 +436,39 @@ class RiakObject(object):
         return self
 
 
-    def delete(self, rw=None):
+    def delete(self, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """
         Delete this object from Riak.
 
         :param rw: RW-value. Wait until this many partitions have
-            deleted the object before responding.
+            deleted the object before responding. (deprecated in Riak 1.0+, use R/W/DW)
         :type rw: integer
+        :param r: R-value, wait for this many partitions to read object
+         before performing the put
+        :type r: integer
+        :param w: W-value, wait for this many partitions to respond
+         before returning to client.
+        :type w: integer
+        :param dw: DW-value, wait for this many partitions to
+         confirm the write before returning to client.
+        :type dw: integer
+        :param pr: PR-value, require this many primary partitions to be available
+         before performing the read that precedes the put
+        :type pr: integer
+        :param pr: PW-value, require this many primary partitions to be available
+         before performing the put
+        :type pw: integer
         :rtype: self
         """
         # Use defaults if not specified...
         rw = self._bucket.get_rw(rw)
+        r = self._bucket.get_r(r)
+        w = self._bucket.get_w(w)
+        dw = self._bucket.get_dw(dw)
+        pr = self._bucket.get_pr(pr)
+        pw = self._bucket.get_pw(pw)
         t = self._client.get_transport()
-        Result = t.delete(self, rw)
+        Result = t.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
         self.clear()
         return self
 

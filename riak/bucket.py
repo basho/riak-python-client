@@ -50,6 +50,8 @@ class RiakBucket(object):
         self._w = None
         self._dw = None
         self._rw = None
+        self._pr = None
+        self._pw = None
         self._encoders = {}
         self._decoders = {}
 
@@ -159,6 +161,57 @@ class RiakBucket(object):
         self._rw = rw
         return self
 
+    def get_pr(self, pr=None):
+        """
+        Get the PR-value for this bucket, if it is set, otherwise return
+        the PR-value for the client.
+
+        :rtype: integer
+        """
+        if (pr is not None):
+            return pr
+        if (self._pr is not None):
+            return self._pr
+        return self._client.get_pr()
+
+    def set_pr(self, pr):
+        """
+        Set the PR-value for this bucket. See :func:`set_r` for more
+        information.
+
+        :param pr: The new PR-value
+        :type pr: integer
+        :rtype: self
+        """
+        self._pr = pr
+        return self
+
+
+    def get_pw(self, pw=None):
+        """
+        Get the PW-value for this bucket, if it is set, otherwise return
+        the PW-value for the client.
+
+        :rtype: integer
+        """
+        if (pw is not None):
+            return pw
+        if (self._pw is not None):
+            return self._pw
+        return self._client.get_pw()
+
+    def set_pw(self, pw):
+        """
+        Set the PW-value for this bucket. See :func:`set_r` for more
+        information.
+
+        :param pw: The new PR-value
+        :type pw: integer
+        :rtype: self
+        """
+        self._pw = pw
+        return self
+
     def get_encoder(self, content_type):
         """
         Get the encoding function for the provided content type for this bucket.
@@ -244,7 +297,7 @@ class RiakBucket(object):
         obj._encode_data = False
         return obj
 
-    def get(self, key, r=None):
+    def get(self, key, r=None, pr=None):
         """
         Retrieve a JSON-encoded object from Riak.
 
@@ -252,14 +305,17 @@ class RiakBucket(object):
         :type key: string
         :param r: R-Value of the request (defaults to bucket's R)
         :type r: integer
+        :param pr: PR-Value of the request (defaults to bucket's PR)
+        :type pr: integer
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = True
         r = self.get_r(r)
-        return obj.reload(r)
+        pr = self.get_pr(pr)
+        return obj.reload(r=r, pr=pr)
 
-    def get_binary(self, key, r=None):
+    def get_binary(self, key, r=None, pr=None):
         """
         Retrieve a binary/string object from Riak.
 
@@ -267,12 +323,15 @@ class RiakBucket(object):
         :type key: string
         :param r: R-Value of the request (defaults to bucket's R)
         :type r: integer
+        :param pr: PR-Value of the request (defaults to bucket's PR)
+        :type pr: integer
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = False
         r = self.get_r(r)
-        return obj.reload(r)
+        pr = self.get_pr(pr)
+        return obj.reload(r=r, pr=pr)
 
     def set_n_val(self, nval):
         """
@@ -428,7 +487,7 @@ class RiakBucket(object):
         if not mimetype:
             mimetype = 'application/octet-stream'
         return self.new_binary(key, binary_data, mimetype)
-    
+
     def search_enabled(self):
         """
         Returns True if the search precommit hook is enabled for this bucket.
