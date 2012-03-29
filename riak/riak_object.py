@@ -197,7 +197,7 @@ class RiakObject(object):
 
         return self
 
-    def remove_index(self, field, value):
+    def remove_index(self, field=None, value=None):
         """
         Remove the specified field/value pair as an index on this object.
 
@@ -207,10 +207,21 @@ class RiakObject(object):
         :type value: string or integer
         :rtype: self
         """
-        rie = RiakIndexEntry(field, value)
-        if rie in self._metadata[MD_INDEX]:
-            self._metadata[MD_INDEX].remove(rie)
+        if not field and not value:
+            ries = self._metadata[MD_INDEX]
+        elif field and not value:
+            ries = [x for x in self._metadata[MD_INDEX] if x.get_field() == field]
+        elif field and value:
+            ries = [RiakIndexEntry(field, value)]
+        else:
+            raise Exception("Cannot pass value without a field name while removing index")
+
+        for rie in ries:
+            if rie in self._metadata[MD_INDEX]:
+                self._metadata[MD_INDEX].remove(rie)
         return self
+
+    remove_indexes = remove_index
 
     def set_indexes(self, indexes):
         """
