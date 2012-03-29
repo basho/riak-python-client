@@ -264,7 +264,7 @@ class BaseTestCase(object):
         # Set up the bucket, clear any existing object...
         bucket = self.client.bucket('multiBucket')
         bucket.set_allow_multiples(True)
-        obj = bucket.get('foo')
+        obj = bucket.get_binary('foo')
         obj.delete()
 
         obj.reload()
@@ -281,9 +281,9 @@ class BaseTestCase(object):
                 if randval not in vals:
                     break
 
-            other_obj = other_bucket.new('foo', randval)
+            other_obj = other_bucket.new_binary('foo', str(randval))
             other_obj.store()
-            vals.add(randval)
+            vals.add(str(randval))
 
         # Make sure the object has itself plus four siblings...
         obj.reload()

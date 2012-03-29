@@ -245,7 +245,7 @@ class RiakPbcTransport(RiakTransport):
                 contents.append(self.decode_content(c))
             return resp.vclock, contents
         else:
-            return 0
+            return None
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=True, if_none_match=False):
         """
