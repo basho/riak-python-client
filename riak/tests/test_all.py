@@ -697,6 +697,56 @@ class BaseTestCase(object):
         self.assertEqual('foo', result[0].get_key())
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    def test_remove_indexes(self):
+        if not self.is_2i_supported():
+            return True
+
+        bucket = self.client.bucket('indexbucket')
+        bar = bucket.new('bar', 1).add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
+        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        self.assertEqual(1, len(result))
+        self.assertEqual(3, len(bar.get_indexes()))
+        self.assertEqual(2, len(bar.get_indexes('bar_int')))
+        
+        # remove all indexes
+        bar = bar.remove_indexes().store()
+        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        self.assertEqual(0, len(result))
+        result = self.client.index('indexbucket', 'baz_bin', 'baz').run()
+        self.assertEqual(0, len(result))
+        self.assertEqual(0, len(bar.get_indexes()))
+        self.assertEqual(0, len(bar.get_indexes('bar_int')))
+        self.assertEqual(0, len(bar.get_indexes('baz_bin')))
+
+        # add index again
+        bar = bar.add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
+        # remove all index with field='bar_int'
+        bar = bar.remove_index(field='bar_int').store()
+        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        self.assertEqual(0, len(result))
+        result = self.client.index('indexbucket', 'bar_int', 2).run()
+        self.assertEqual(0, len(result))
+        result = self.client.index('indexbucket', 'baz_bin', 'baz').run()
+        self.assertEqual(1, len(result))
+        self.assertEqual(1, len(bar.get_indexes()))
+        self.assertEqual(0, len(bar.get_indexes('bar_int')))
+        self.assertEqual(1, len(bar.get_indexes('baz_bin')))
+
+        # add index again
+        bar = bar.add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
+        # remove an index field value pair
+        bar = bar.remove_index(field='bar_int', value=2).store()
+        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        self.assertEqual(1, len(result))
+        result = self.client.index('indexbucket', 'bar_int', 2).run()
+        self.assertEqual(0, len(result))
+        result = self.client.index('indexbucket', 'baz_bin', 'baz').run()
+        self.assertEqual(1, len(result))
+        self.assertEqual(2, len(bar.get_indexes()))
+        self.assertEqual(1, len(bar.get_indexes('bar_int')))
+        self.assertEqual(1, len(bar.get_indexes('baz_bin')))
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):
         if not self.is_2i_supported():
             return True
