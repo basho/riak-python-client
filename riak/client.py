@@ -85,6 +85,8 @@ class RiakClient(object):
         self._w = "default"
         self._dw = "default"
         self._rw = "default"
+        self._pr = "default"
+        self._pw = "default"
         self._encoders = {'application/json': json.dumps,
                           'text/json': json.dumps}
         self._decoders = {'application/json': json.loads,
@@ -180,6 +182,46 @@ class RiakClient(object):
         :rtype: self
         """
         self._rw = rw
+        return self
+
+    def get_pr(self):
+        """
+        Get the PR-value setting for this ``RiakClient``. (default 0)
+
+        :rtype: integer
+        """
+        return self._pr
+
+    def set_pr(self, pr):
+        """
+        Set the PR-value for this ``RiakClient`` instance. See :func:`set_r` for a
+        description of how these values are used.
+
+        :param pr: The PR value.
+        :type pr: integer
+        :rtype: self
+        """
+        self._pr = pr
+        return self
+
+    def get_pw(self):
+        """
+        Get the PW-value setting for this ``RiakClient``. (default 0)
+
+        :rtype: integer
+        """
+        return self._pr
+
+    def set_pw(self, pw):
+        """
+        Set the PW-value for this ``RiakClient`` instance. See :func:`set_r` for a
+        description of how these values are used.
+
+        :param pw: The W value.
+        :type pw: integer
+        :rtype: self
+        """
+        self._pr = pr
         return self
 
     def get_client_id(self):

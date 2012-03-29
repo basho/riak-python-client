@@ -96,11 +96,11 @@ class RiakHttpTransport(RiakTransport) :
         return(response is not None) and (response[1] == 'OK')
 
 
-    def get(self, robj, r, vtag = None) :
+    def get(self, robj, r = None, pr = None, vtag = None) :
         """
         Get a bucket/key from the server
         """
-        params = {'r' : r}
+        params = {'r' : r, 'pr': pr}
         if vtag is not None:
             params['vtag'] = vtag
         url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
@@ -108,12 +108,12 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('GET', url)
         return self.parse_body(response, [200, 300, 404])
 
-    def put(self, robj, w = None, dw = None, return_body = True, if_none_match=False):
+    def put(self, robj, w = None, dw = None, pw = None, return_body = True, if_none_match=False):
         """
         Serialize put request and deserialize response
         """
        # Construct the URL...
-        params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw}
+        params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw, 'pw' : pw }
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
         headers = self.build_put_headers(robj)
@@ -134,10 +134,10 @@ class RiakHttpTransport(RiakTransport) :
           self.check_http_code(response, [204])
           return None
 
-    def put_new(self, robj, w=None, dw=None, return_meta=True, if_none_match=False):
+    def put_new(self, robj, w=None, dw=None, pw=None, return_body=True, if_none_match=False):
         """Put a new object into the Riak store, returning its (new) key."""
         # Construct the URL...
-        params = {'returnbody' : str(return_meta).lower(), 'w' : w, 'dw' : dw}
+        params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw, 'pw' : pw}
         url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
         headers = self.build_put_headers(robj)
         if if_none_match:
@@ -147,18 +147,19 @@ class RiakHttpTransport(RiakTransport) :
         location = response[0]['location']
         idx = location.rindex('/')
         key = location[idx+1:]
-        if return_meta:
+        if return_body:
             vclock, [(metadata, data)] = self.parse_body(response, [201])
             return key, vclock, metadata
         else:
             self.check_http_code(response, [201])
             return key, None, None
 
-    def delete(self, robj, rw):
+    def delete(self, robj, rw=None, r = None, w = None, dw = None, pr = None, pw = None):
         # Construct the URL...
-        params = {'rw' : rw}
+        params = {'rw' : rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw}
         url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                    params=params)
+        # TODO: Send vclock of robj if it exists
         # Run the operation..
         response = self.http_request('DELETE', url)
         self.check_http_code(response, [204, 404])
@@ -418,8 +419,9 @@ class RiakHttpTransport(RiakTransport) :
         if params is not None:
             s = ''
             for key in params.keys():
-                if s != '': s += '&'
-                s += urllib.quote_plus(key) + '=' + urllib.quote_plus(str(params[key]))
+                if params[key] is not None:
+                    if s != '': s += '&'
+                    s += urllib.quote_plus(key) + '=' + urllib.quote_plus(str(params[key]))
             path += '?' + s
 
         # Return.
