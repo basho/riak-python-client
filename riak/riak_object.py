@@ -208,7 +208,7 @@ class RiakObject(object):
         :rtype: self
         """
         if not field and not value:
-            ries = self._metadata[MD_INDEX]
+            ries = self._metadata[MD_INDEX][:]
         elif field and not value:
             ries = [x for x in self._metadata[MD_INDEX] if x.get_field() == field]
         elif field and value:
