@@ -126,6 +126,19 @@ class BaseTestCase(object):
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
 
+    def test_generate_key(self):
+        # Ensure that Riak generates a random key when
+        # the key passed to bucket.new() is None.
+        bucket = self.client.bucket('random_key_bucket')
+        existing_keys = bucket.get_keys()
+        o = bucket.new(None, data={})
+        self.assertIsNone(o.get_key())
+        o.store()
+        self.assertIsNotNone(o.get_key())
+        self.assertNotIn('/', o.get_key())
+        self.assertNotIn(o.get_key(), existing_keys)
+        self.assertEqual(len(bucket.get_keys()), len(existing_keys) + 1)
+
     def test_binary_store_and_get(self):
         bucket = self.client.bucket('bucket')
         # Store as binary, retrieve as binary, then compare...
@@ -1017,19 +1030,6 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         bucket = self.client.bucket("bucket")
         o = bucket.new("foo", "bar").store(return_body=False)
         self.assertEqual(o.vclock(), None)
-
-    def test_generate_key(self):
-        # Ensure that Riak generates a random key when
-        # the key passed to bucket.new() is None.
-        bucket = self.client.bucket('random_key_bucket')
-        for key in bucket.get_keys():
-            bucket.get(str(key)).delete()
-        o = bucket.new(None, data={})
-        self.assertIsNone(o.get_key())
-        o.store()
-        self.assertIsNotNone(o.get_key())
-        self.assertNotIn('/', o.get_key())
-        self.assertEqual(len(bucket.get_keys()), 1)
 
     def test_too_many_link_headers_shouldnt_break_http(self):
         bucket = self.client.bucket("bucket")
