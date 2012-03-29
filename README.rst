@@ -2,6 +2,8 @@
 Python Client for Riak
 ========================
 
+.. image:: https://secure.travis-ci.org/basho/riak-python-client.png?branch=master
+   :target: http://travis-ci.org/basho/riak-python-client
 
 Documentation
 ==============
@@ -11,7 +13,7 @@ The documentation source is found in `docs/ subdirectory
 <https://github.com/basho/riak-python-client/tree/master/docs>`_ and can be
 built with `Sphinx <http://sphinx.pocoo.org/>`_.
 
-Documentation for Riak is available at http://wiki.basho.com/How-Things-Work.html
+Documentation for Riak is available at http://wiki.basho.com/Riak.html
 
 Install
 =======
