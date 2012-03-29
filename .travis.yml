@@ -2,10 +2,8 @@ language: python
 python:
   - "2.6"
   - "2.7"
-install:
-  - python setup.py easy_install protobuf=2.4.1
-  - python setup.py develop
-script: python setup.py test
+install: ./setup.py develop
+script: ./setup.py test
 # TODO: get search enabled on Travis' Riak install, or fix the test server
 env: "SKIP_LUWAK=1 SKIP_SEARCH=1"
 notifications:
