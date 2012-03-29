@@ -500,6 +500,8 @@ class RiakObject(object):
             if len(contents) > 0:
                 (metadata, data) = contents.pop(0)
                 self._exists = True
+                if not metadata.has_key(MD_INDEX):
+                    metadata[MD_INDEX] = []
                 self.set_metadata(metadata)
                 self.set_encoded_data(data)
                 # Create objects for all siblings
