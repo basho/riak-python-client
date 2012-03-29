@@ -264,12 +264,11 @@ class BaseTestCase(object):
         # Set up the bucket, clear any existing object...
         bucket = self.client.bucket('multiBucket')
         bucket.set_allow_multiples(True)
-        obj = bucket.get('foo')
-        obj.delete()
-
-        obj.reload()
-        self.assertFalse(obj.exists())
-        self.assertEqual(obj.get_data(), None)
+        obj = bucket.get_binary('foo')
+        # Even if it previously existed, let's store a base resolved version
+        # from which we can diverge by sending a stale vclock.
+        obj.set_data('start')
+        obj.store()
 
         # Store the same object five times...
         vals = set()
@@ -281,9 +280,10 @@ class BaseTestCase(object):
                 if randval not in vals:
                     break
 
-            other_obj = other_bucket.new('foo', randval)
+            other_obj = other_bucket.new_binary('foo', str(randval))
+            other_obj._vclock = obj._vclock
             other_obj.store()
-            vals.add(randval)
+            vals.add(str(randval))
 
         # Make sure the object has itself plus four siblings...
         obj.reload()
@@ -303,9 +303,6 @@ class BaseTestCase(object):
         obj.reload()
         self.assertEqual(obj.get_sibling_count(), 0)
         self.assertEqual(obj.get_data(), obj3.get_data())
-
-        # Clean up for next test...
-        obj.delete()
 
     def test_javascript_source_map(self):
         # Create the object...
