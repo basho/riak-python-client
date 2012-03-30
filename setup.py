@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     setup(
         name='riak',
-        version='1.3.0',
+        version='1.4.0',
         packages = find_packages(),
         install_requires = install_requires,
         tests_require = tests_require,
@@ -39,5 +39,9 @@ if __name__ == "__main__":
         author='Basho Technologies',
         author_email='clients@basho.com',
         test_suite='riak.tests.suite',
-        url='https://github.com/basho/riak-python-client'
+        url='https://github.com/basho/riak-python-client',
+        classifiers = ['License :: OSI Approved :: Apache Software License',
+                       'Intended Audience :: Developers',
+                       'Operating System :: OS Independent',
+                       'Topic :: Database']
    )
