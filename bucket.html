@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RiakBucket &mdash; Riak (Python binding) v1.1.1 documentation</title>
+    <title>RiakBucket &mdash; Riak Python Client 1.4.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.1.1',
+        VERSION:     '1.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak (Python binding) v1.1.1 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 1.4.0 documentation" href="index.html" />
     <link rel="next" title="RiakObject" href="riak_object.html" />
     <link rel="prev" title="RiakClient" href="client.html" /> 
   </head>
@@ -39,7 +42,7 @@
         <li class="right" >
           <a href="client.html" title="RiakClient"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Riak (Python binding) v1.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -61,7 +64,7 @@ objects within the bucket.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>) &#8211; A <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a> instance</li>
 <li><strong>name</strong> (<em>string</em>) &#8211; The bucket name</li>
 </ul>
@@ -69,6 +72,11 @@ objects within the bucket.</p>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="riak.bucket.RiakBucket.SEARCH_PRECOMMIT_HOOK">
+<tt class="descname">SEARCH_PRECOMMIT_HOOK</tt><em class="property"> = {'fun': 'precommit', 'mod': 'riak_search_kv_hook'}</em><a class="headerlink" href="#riak.bucket.RiakBucket.SEARCH_PRECOMMIT_HOOK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.get_name">
 <tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_name" title="Permalink to this definition">¶</a></dt>
@@ -84,7 +92,7 @@ the R-value for the client.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
 </tbody>
 </table>
@@ -99,13 +107,9 @@ and <a class="reference internal" href="#riak.bucket.RiakBucket.get_binary" titl
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>integer</em>) &#8211; The new R-value.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> (<em>integer</em>) &#8211; The new R-value.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">self</p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
 </tr>
 </tbody>
 </table>
@@ -120,7 +124,7 @@ the W-value for the client.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
 </tbody>
 </table>
@@ -135,13 +139,9 @@ more information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>w</strong> (<em>integer</em>) &#8211; The new W-value.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>w</strong> (<em>integer</em>) &#8211; The new W-value.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">self</p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
 </tr>
 </tbody>
 </table>
@@ -156,7 +156,7 @@ the DW-value for the client.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
 </tbody>
 </table>
@@ -171,13 +171,9 @@ information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dw</strong> (<em>integer</em>) &#8211; The new DW-value</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dw</strong> (<em>integer</em>) &#8211; The new DW-value</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">self</p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
 </tr>
 </tbody>
 </table>
@@ -192,7 +188,7 @@ the RW-value for the client.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
 </tbody>
 </table>
@@ -207,13 +203,73 @@ information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>rw</strong> (<em>integer</em>) &#8211; The new RW-value</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rw</strong> (<em>integer</em>) &#8211; The new RW-value</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">self</p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.get_pr">
+<tt class="descname">get_pr</tt><big>(</big><em>pr=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_pr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PR-value for this bucket, if it is set, otherwise return
+the PR-value for the client.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.set_pr">
+<tt class="descname">set_pr</tt><big>(</big><em>pr</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_pr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the PR-value for this bucket. See <a class="reference internal" href="#riak.bucket.RiakBucket.set_r" title="riak.bucket.RiakBucket.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for more
+information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pr</strong> (<em>integer</em>) &#8211; The new PR-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.get_pw">
+<tt class="descname">get_pw</tt><big>(</big><em>pw=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_pw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PW-value for this bucket, if it is set, otherwise return
+the PW-value for the client.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.set_pw">
+<tt class="descname">set_pw</tt><big>(</big><em>pw</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_pw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the PW-value for this bucket. See <a class="reference internal" href="#riak.bucket.RiakBucket.set_r" title="riak.bucket.RiakBucket.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for more
+information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pw</strong> (<em>integer</em>) &#8211; The new PR-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
 </tr>
 </tbody>
 </table>
@@ -227,10 +283,7 @@ information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>content_type</strong> &#8211; Content type requested</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>content_type</strong> &#8211; Content type requested</td>
 </tr>
 </tbody>
 </table>
@@ -244,7 +297,7 @@ information.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>content_type</strong> &#8211; Content type for encoder</li>
 <li><strong>encoder</strong> &#8211; Function to encode with - will be called with data as single
 argument.</li>
@@ -263,10 +316,7 @@ argument.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>content_type</strong> &#8211; Content type for decoder</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>content_type</strong> &#8211; Content type for decoder</td>
 </tr>
 </tbody>
 </table>
@@ -280,7 +330,7 @@ argument.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>content_type</strong> &#8211; Content type for decoder</li>
 <li><strong>decoder</strong> &#8211; Function to decode with - will be called with string</li>
 </ul>
@@ -299,13 +349,13 @@ manually instantiating a <a class="reference internal" href="riak_object.html#ri
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>key</strong> (<em>string</em>) &#8211; Name of the key.</li>
 <li><strong>data</strong> (<em>object</em>) &#8211; The data to store.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -321,14 +371,14 @@ A shortcut for manually instantiating a <a class="reference internal" href="riak
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>key</strong> (<em>string</em>) &#8211; Name of the key.</li>
 <li><strong>data</strong> (<em>object</em>) &#8211; The data to store.</li>
 <li><strong>content_type</strong> (<em>string</em>) &#8211; The content type of the object.</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -337,19 +387,20 @@ A shortcut for manually instantiating a <a class="reference internal" href="riak
 
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.get">
-<tt class="descname">get</tt><big>(</big><em>key</em>, <em>r=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get</tt><big>(</big><em>key</em>, <em>r=None</em>, <em>pr=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a JSON-encoded object from Riak.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>key</strong> (<em>string</em>) &#8211; Name of the key.</li>
 <li><strong>r</strong> (<em>integer</em>) &#8211; R-Value of the request (defaults to bucket&#8217;s R)</li>
+<li><strong>pr</strong> (<em>integer</em>) &#8211; PR-Value of the request (defaults to bucket&#8217;s PR)</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -358,19 +409,20 @@ A shortcut for manually instantiating a <a class="reference internal" href="riak
 
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.get_binary">
-<tt class="descname">get_binary</tt><big>(</big><em>key</em>, <em>r=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_binary" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_binary</tt><big>(</big><em>key</em>, <em>r=None</em>, <em>pr=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_binary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a binary/string object from Riak.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>key</strong> (<em>string</em>) &#8211; Name of the key.</li>
 <li><strong>r</strong> (<em>integer</em>) &#8211; R-Value of the request (defaults to bucket&#8217;s R)</li>
+<li><strong>pr</strong> (<em>integer</em>) &#8211; PR-Value of the request (defaults to bucket&#8217;s PR)</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="riak_object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -392,10 +444,7 @@ This should only be used if you know what you are doing.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>nval</strong> (<em>integer</em>) &#8211; The new N-Val.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nval</strong> (<em>integer</em>) &#8211; The new N-Val.</td>
 </tr>
 </tbody>
 </table>
@@ -409,7 +458,7 @@ This should only be used if you know what you are doing.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
 </tbody>
 </table>
@@ -470,10 +519,7 @@ unexpected results.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>bool</strong> (<em>boolean</em>) &#8211; True to store and return conflicting writes.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bool</strong> (<em>boolean</em>) &#8211; True to store and return conflicting writes.</td>
 </tr>
 </tbody>
 </table>
@@ -487,7 +533,7 @@ unexpected results.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body">Boolean</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Boolean</td>
 </tr>
 </tbody>
 </table>
@@ -505,7 +551,7 @@ unexpected results.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>key</strong> (<em>string</em>) &#8211; Property to set.</li>
 <li><strong>value</strong> (<em>mixed</em>) &#8211; Property value.</li>
 </ul>
@@ -518,15 +564,12 @@ unexpected results.</p>
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.get_bool_property">
 <tt class="descname">get_bool_property</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_bool_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a boolean bucket property.  Converts to a <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt> value.</p>
+<dd><p>Get a boolean bucket property.  Converts to a <tt class="docutils literal"><span class="pre">True</span></tt> or <tt class="docutils literal"><span class="pre">False</span></tt> value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<em>string</em>) &#8211; Property to set.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>string</em>) &#8211; Property to set.</td>
 </tr>
 </tbody>
 </table>
@@ -540,13 +583,9 @@ unexpected results.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<em>string</em>) &#8211; The property to retrieve.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>string</em>) &#8211; The property to retrieve.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">mixed</p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
 </tr>
 </tbody>
 </table>
@@ -564,10 +603,7 @@ unexpected results.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>props</strong> (<em>array</em>) &#8211; An associative array of key:value.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>props</strong> (<em>array</em>) &#8211; An associative array of key:value.</td>
 </tr>
 </tbody>
 </table>
@@ -581,7 +617,7 @@ unexpected results.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -596,6 +632,37 @@ unexpected results.</p>
 <p class="last">At current, this is a very expensive operation. Use with caution.</p>
 </div>
 </dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.new_binary_from_file">
+<tt class="descname">new_binary_from_file</tt><big>(</big><em>key</em>, <em>filename</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.new_binary_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new Riak object in the bucket, using the content of the specified file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.search_enabled">
+<tt class="descname">search_enabled</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.search_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the search precommit hook is enabled for this bucket.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.enable_search">
+<tt class="descname">enable_search</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.enable_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable search for this bucket by installing the precommit hook to
+index objects in it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.disable_search">
+<tt class="descname">disable_search</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.disable_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable search for this bucket by removing the precommit hook to
+index objects in it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.search">
+<tt class="descname">search</tt><big>(</big><em>query</em>, <em>**params</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -621,7 +688,7 @@ unexpected results.</p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -647,12 +714,12 @@ unexpected results.</p>
         <li class="right" >
           <a href="client.html" title="RiakClient"
              >previous</a> |</li>
-        <li><a href="index.html">Riak (Python binding) v1.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010, Daniel Lindsley.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+        &copy; Copyright 2010-2012, Basho Technologies.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

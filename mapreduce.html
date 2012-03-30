@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RiakMapReduce &mdash; Riak (Python binding) v1.1.1 documentation</title>
+    <title>RiakMapReduce &mdash; Riak Python Client 1.4.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.1.1',
+        VERSION:     '1.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak (Python binding) v1.1.1 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 1.4.0 documentation" href="index.html" />
     <link rel="prev" title="RiakObject" href="riak_object.html" /> 
   </head>
   <body>
@@ -35,7 +38,7 @@
         <li class="right" >
           <a href="riak_object.html" title="RiakObject"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Riak (Python binding) v1.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -83,10 +86,29 @@ key, and additional arg.
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.add_key_filters">
+<tt class="descname">add_key_filters</tt><big>(</big><em>key_filters</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add_key_filters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.add_key_filter">
+<tt class="descname">add_key_filter</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add_key_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="riak.mapreduce.RiakMapReduce.search">
 <tt class="descname">search</tt><big>(</big><em>bucket</em>, <em>query</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.search" title="Permalink to this definition">¶</a></dt>
-<dd><p>Begin a map/reduce operation using a Search. This command will 
+<dd><p>Begin a map/reduce operation using a Search. This command will
 return an error unless executed against a Riak Search cluster.
+&#64;param bucket - The bucket over which to perform the search.
+&#64;param query - The search query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.index">
+<tt class="descname">index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin a map/reduce operation using a Secondary Index
+query.
 &#64;param bucket - The bucket over which to perform the search.
 &#64;param query - The search query.</p>
 </dd></dl>
@@ -137,6 +159,56 @@ array of RiakLink objects if the last phase is a link phase.
 &#64;param integer timeout - Timeout in milliseconds.
 &#64;return array()</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.map_values">
+<tt class="descname">map_values</tt><big>(</big><em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.map_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.map_values_json">
+<tt class="descname">map_values_json</tt><big>(</big><em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.map_values_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.reduce_sum">
+<tt class="descname">reduce_sum</tt><big>(</big><em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_sum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.reduce_min">
+<tt class="descname">reduce_min</tt><big>(</big><em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.reduce_max">
+<tt class="descname">reduce_max</tt><big>(</big><em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_max" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.reduce_sort">
+<tt class="descname">reduce_sort</tt><big>(</big><em>js_cmp=None</em>, <em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.reduce_numeric_sort">
+<tt class="descname">reduce_numeric_sort</tt><big>(</big><em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_numeric_sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.reduce_limit">
+<tt class="descname">reduce_limit</tt><big>(</big><em>limit</em>, <em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_limit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.reduce_slice">
+<tt class="descname">reduce_slice</tt><big>(</big><em>start</em>, <em>end</em>, <em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_slice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.mapreduce.RiakMapReduce.filter_not_found">
+<tt class="descname">filter_not_found</tt><big>(</big><em>options=None</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.filter_not_found" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -285,7 +357,7 @@ another.</p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -308,12 +380,12 @@ another.</p>
         <li class="right" >
           <a href="riak_object.html" title="RiakObject"
              >previous</a> |</li>
-        <li><a href="index.html">Riak (Python binding) v1.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010, Daniel Lindsley.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+        &copy; Copyright 2010-2012, Basho Technologies.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

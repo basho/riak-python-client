@@ -3,17 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &mdash; Riak (Python binding) v1.1.1 documentation</title>
+    <title>Tutorial &mdash; Riak Python Client 1.4.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.1.1',
+        VERSION:     '1.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak (Python binding) v1.1.1 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 1.4.0 documentation" href="index.html" />
     <link rel="next" title="RiakClient" href="client.html" />
     <link rel="prev" title="Riak (Python binding)" href="index.html" /> 
   </head>
@@ -39,7 +42,7 @@
         <li class="right" >
           <a href="index.html" title="Riak (Python binding)"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Riak (Python binding) v1.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,7 +55,7 @@
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial assumes basic working knowledge of how Riak works &amp; what it can
 do. If you need a more comprehensive overview how to use Riak, please check out
-the <a class="reference external" href="http://wiki.basho.com/display/RIAK/The+Riak+Fast+Track">Riak Fast Track</a>.</p>
+the <a class="reference external" href="http://wiki.basho.com/The-Riak-Fast-Track.html">Riak Fast Track</a>.</p>
 <div class="section" id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
 <p>For the impatient, simple usage of the official Python binding for Riak looks
@@ -177,7 +180,7 @@ etc. Storing binary data looks almost identical:</p>
 
 <span class="c"># We&#39;re storing the photo in a different bucket but keyed off the same</span>
 <span class="c"># username.</span>
-<span class="n">new_user</span> <span class="o">=</span> <span class="n">user_bucket</span><span class="o">.</span><span class="n">new_binary</span><span class="p">(</span><span class="s">&#39;johndoe&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">the_photo_data</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s">&#39;image/jpeg&#39;</span><span class="p">)</span>
+<span class="n">new_user</span> <span class="o">=</span> <span class="n">user_photo_bucket</span><span class="o">.</span><span class="n">new_binary</span><span class="p">(</span><span class="s">&#39;johndoe&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">the_photo_data</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s">&#39;image/jpeg&#39;</span><span class="p">)</span>
 <span class="n">new_user</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -189,8 +192,9 @@ etc. Storing binary data looks almost identical:</p>
 <span class="n">client</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakClient</span><span class="p">()</span>
 <span class="n">status_bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;status&#39;</span><span class="p">)</span>
 
-<span class="c"># We use ``uuid.uuid1()`` here to create a unique identifier for the status.</span>
-<span class="n">new_status</span> <span class="o">=</span> <span class="n">RiakObject</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">status_bucket</span><span class="p">,</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid1</span><span class="p">())</span>
+<span class="c"># We use ``uuid.uuid1().hex`` here to create a unique identifier for the status.</span>
+<span class="n">post_uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid1</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+<span class="n">new_status</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakObject</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">status_bucket</span><span class="p">,</span> <span class="n">post_uuid</span><span class="p">)</span>
 
 <span class="c"># Add in the data you want to store.</span>
 <span class="n">new_status</span><span class="o">.</span><span class="n">set_data</span><span class="p">({</span>
@@ -249,9 +253,9 @@ data out looks like:</p>
 <span class="n">status_bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;status&#39;</span><span class="p">)</span>
 
 <span class="c"># We&#39;re using the UUID generated from the above section.</span>
-<span class="n">first_post_status</span> <span class="o">=</span> <span class="n">RiakObject</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">status_bucket</span><span class="p">,</span> <span class="s">&#39;39fbee54-fb82-11df-a2cf-d49a20c04e6a&#39;</span><span class="p">)</span>
+<span class="n">first_post_status</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakObject</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">status_bucket</span><span class="p">,</span> <span class="n">post_uuid</span><span class="p">)</span>
 <span class="n">first_post_status</span><span class="o">.</span><span class="n">_encode_data</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">r</span> <span class="o">=</span> <span class="n">status_bucket</span><span class="o">.</span><span class="n">get_r</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">status_bucket</span><span class="o">.</span><span class="n">get_r</span><span class="p">()</span>
 
 <span class="c"># Calling ``reload`` will cause the ``RiakObject`` instance to load fresh</span>
 <span class="c"># data/metadata from Riak.</span>
@@ -265,7 +269,7 @@ data out looks like:</p>
 <div class="section" id="fetching-data-via-map-reduce">
 <h2>Fetching Data Via Map/Reduce<a class="headerlink" href="#fetching-data-via-map-reduce" title="Permalink to this headline">¶</a></h2>
 <p>When you need to work with larger sets of data, one of the tools at your
-disposal is <a class="reference external" href="http://wiki.basho.com/display/RIAK/MapReduce">MapReduce</a>. This technique iterates over all of the data, returning
+disposal is <a class="reference external" href="http://wiki.basho.com/MapReduce.html">MapReduce</a>. This technique iterates over all of the data, returning
 data from the map phase &amp; combining all the different maps in the reduce
 phase(s).</p>
 <p>To perform a map operation, such as returning all active users, you can do
@@ -322,7 +326,7 @@ something like:</p>
 </div>
 <div class="section" id="working-with-related-data-via-links">
 <h2>Working With Related Data Via Links<a class="headerlink" href="#working-with-related-data-via-links" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="http://wiki.basho.com/display/RIAK/Links">Links</a> are powerful concept in Riak that allow, within the key/value pair&#8217;s
+<p><a class="reference external" href="http://wiki.basho.com/Links.html">Links</a> are powerful concept in Riak that allow, within the key/value pair&#8217;s
 metadata, relations between objects.</p>
 <p>Adding them to your data is relatively trivial. For instance, we&#8217;ll link a
 user&#8217;s statuses to their user data:</p>
@@ -335,7 +339,7 @@ user&#8217;s statuses to their user data:</p>
 
 <span class="n">johndoe</span> <span class="o">=</span> <span class="n">user_bucket</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;johndoe&#39;</span><span class="p">)</span>
 
-<span class="n">new_status</span> <span class="o">=</span> <span class="n">status_bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid1</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+<span class="n">new_status</span> <span class="o">=</span> <span class="n">status_bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid1</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
     <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="s">&#39;First post!&#39;</span><span class="p">,</span>
     <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
     <span class="s">&#39;is_public&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
@@ -364,40 +368,10 @@ user&#8217;s statuses to their user data:</p>
     <span class="k">print</span> <span class="n">status</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[</span><span class="s">&#39;message&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>As usual, it&#8217;s also possible to do this manually:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">riak</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-
-<span class="n">client</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakClient</span><span class="p">()</span>
-<span class="n">user_bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
-<span class="n">status_bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;status&#39;</span><span class="p">)</span>
-
-<span class="n">johndoe</span> <span class="o">=</span> <span class="n">user_bucket</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;johndoe&#39;</span><span class="p">)</span>
-
-<span class="n">new_status_key</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid1</span><span class="p">()</span>
-<span class="n">new_status</span> <span class="o">=</span> <span class="n">status_bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">new_status_key</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-    <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="s">&#39;First post!&#39;</span><span class="p">,</span>
-    <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
-    <span class="s">&#39;is_public&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
-<span class="p">})</span>
-
-<span class="c"># Add one direction (from status to user)...</span>
-<span class="n">user_link</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakLink</span><span class="p">(</span><span class="n">user_bucket</span><span class="p">,</span> <span class="s">&#39;johndoe&#39;</span><span class="p">)</span>
-<span class="n">new_status</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">user_link</span><span class="p">)</span>
-<span class="n">new_status</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-
-<span class="c"># ... Then add the other direction.</span>
-<span class="n">status_link</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakLink</span><span class="p">(</span><span class="n">status_bucket</span><span class="p">,</span> <span class="n">new_status_key</span><span class="p">)</span>
-<span class="n">johndoe</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">status_link</span><span class="p">)</span>
-<span class="n">johndoe</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-
-<span class="c"># Querying looks the same...</span>
-</pre></div>
-</div>
 </div>
 <div class="section" id="using-search">
 <h2>Using Search<a class="headerlink" href="#using-search" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="http://wiki.basho.com/display/RIAK/Riak+Search">Riak Search</a> is a new feature available as of Riak 0.13. It allows you to create
+<p><a class="reference external" href="http://wiki.basho.com/Riak-Search.html">Riak Search</a> is a new feature available as of Riak 0.13. It allows you to create
 queries that filter on data in the values without writing a MapReduce. It takes
 inspiration from <a class="reference external" href="http://lucene.apache.org/">Lucene</a>, a popular Java-based search library, and incorporates
 a Solr-like interface into Riak. The setup of this is outside the realm of this
@@ -423,6 +397,38 @@ tutorial, but usage of this feature looks like:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="using-secondary-indexes">
+<h2>Using Secondary Indexes<a class="headerlink" href="#using-secondary-indexes" title="Permalink to this headline">¶</a></h2>
+<p>Secondary Indexes is a new feature available as of Riak 1.0. It
+allows you to tag an object with index metadata, and then later find
+the object by querying the metadata, returning a list of matching keys.</p>
+<p>Your Riak cluster must have Secondary Indexes enabled. See the Riak
+documentation for details.</p>
+<p>Usage of this feature looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">riak</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakClient</span><span class="p">()</span>
+<span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;mybucket&#39;</span><span class="p">)</span>
+
+<span class="c"># Create and store the object with indexes...</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;mykey1&#39;</span><span class="p">,</span> <span class="s">&#39;mydata&#39;</span><span class="p">)</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">add_index</span><span class="p">(</span><span class="s">&#39;field1_bin&#39;</span><span class="p">,</span> <span class="s">&#39;val1&#39;</span><span class="p">)</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">add_index</span><span class="p">(</span><span class="s">&#39;field2_int&#39;</span><span class="p">,</span> <span class="mi">1001</span><span class="p">)</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+
+<span class="c"># Query the indexes. The return value is a list of ``RiakLink`` objects.</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;mybucket&#39;</span><span class="p">,</span> <span class="s">&#39;field1_bin&#39;</span><span class="p">,</span> <span class="s">&#39;val1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="c"># Query the indexes using a range...</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;mybucket&#39;</span><span class="p">,</span> <span class="s">&#39;field1_bin&#39;</span><span class="p">,</span> <span class="s">&#39;val1&#39;</span><span class="p">,</span> <span class="s">&#39;val5&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="c"># Remove an index entry...</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;mykey1&#39;</span><span class="p">)</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">remove_index</span><span class="p">(</span><span class="s">&#39;field1_bin&#39;</span><span class="p">,</span> <span class="s">&#39;val1&#39;</span><span class="p">)</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -442,6 +448,7 @@ tutorial, but usage of this feature looks like:</p>
 <li><a class="reference internal" href="#fetching-data-via-map-reduce">Fetching Data Via Map/Reduce</a></li>
 <li><a class="reference internal" href="#working-with-related-data-via-links">Working With Related Data Via Links</a></li>
 <li><a class="reference internal" href="#using-search">Using Search</a></li>
+<li><a class="reference internal" href="#using-secondary-indexes">Using Secondary Indexes</a></li>
 </ul>
 </li>
 </ul>
@@ -460,7 +467,7 @@ tutorial, but usage of this feature looks like:</p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -486,12 +493,12 @@ tutorial, but usage of this feature looks like:</p>
         <li class="right" >
           <a href="index.html" title="Riak (Python binding)"
              >previous</a> |</li>
-        <li><a href="index.html">Riak (Python binding) v1.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010, Daniel Lindsley.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+        &copy; Copyright 2010-2012, Basho Technologies.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>
