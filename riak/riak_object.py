@@ -557,7 +557,7 @@ class RiakObject(object):
         """
         return len(self._siblings)
 
-    def get_sibling(self, i, r=None):
+    def get_sibling(self, i, r=None, pr=None):
         """
         Retrieve a sibling by sibling number.
 
@@ -573,11 +573,12 @@ class RiakObject(object):
         else:
             # Use defaults if not specified.
             r = self._bucket.get_r(r)
+            pr = self._bucket.get_pr(pr)
 
             # Run the request...
             vtag = self._siblings[i]
             obj = RiakObject(self._client, self._bucket, self._key)
-            obj.reload(r, vtag)
+            obj.reload(r=r, pr=pr, vtag=vtag)
 
             # And make sure it knows who it's siblings are
             self._siblings[i] = obj
