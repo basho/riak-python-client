@@ -409,7 +409,7 @@ class RiakHttpTransport(RiakTransport) :
 
         # Add '.../bucket'
         if bucket is not None:
-            path += '/' + urllib.quote_plus(bucket._name)
+            path += '/' + urllib.quote_plus(bucket.name)
 
         # Add '.../key'
         if key is not None:
