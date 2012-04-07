@@ -387,15 +387,12 @@ class RiakClient(object):
         """
         Store data in luwak using filename as the key
         """
-        deprecated("Luwak has been EOL'ed!")
         self._transport.store_file(filename, content_type=content_type, content=data)
 
     def get_file(self, filename):
-        deprecated("Luwak has been EOL'ed!")
         return self._transport.get_file(filename)
 
     def delete_file(self, filename):
-        deprecated("Luwak has been EOL'ed!")
         self._transport.delete_file(filename)
 
     def solr(self):
