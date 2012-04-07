@@ -29,6 +29,7 @@ from riak.search import RiakSearch
 from riak.transports import RiakHttpTransport
 from riak.util import deprecated
 
+from weakref import WeakValueDictionary
 
 class RiakClient(object):
     """
@@ -94,6 +95,8 @@ class RiakClient(object):
         self._solr = None
         self._host = host
         self._port = port
+
+        self._buckets = WeakValueDictionary()
 
     def get_transport(self):
         """
@@ -306,7 +309,12 @@ class RiakClient(object):
 
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
         """
-        return RiakBucket(self, name)
+        if name in self._buckets:
+            return self._buckets[name]
+
+        b = RiakBucket(self, name)
+        self._buckets[name] = b
+        return b
 
     __getitem__ = bucket
 
