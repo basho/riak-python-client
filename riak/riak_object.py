@@ -435,14 +435,15 @@ class RiakObject(object):
         :rtype: self
         """
         # Do the request...
-        r = self._bucket.get_r(r)
-        pr = self._bucket.get_pr(pr)
-        t = self._client.get_transport()
-        Result = t.get(self, r=r, pr=pr, vtag=vtag)
-
         self.clear()
-        if Result is not None:
-            self.populate(Result)
+        if self.get_key() is not None:
+            r = self._bucket.get_r(r)
+            pr = self._bucket.get_pr(pr)
+            t = self._client.get_transport()
+            Result = t.get(self, r=r, pr=pr, vtag=vtag)
+
+            if Result is not None:
+                self.populate(Result)
 
         return self
 
