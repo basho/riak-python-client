@@ -255,12 +255,12 @@ class RiakBucket(object):
         self._decoders[content_type] = decoder
         return self
 
-    def new(self, key, data=None, content_type='application/json'):
+    def new(self, key=None, data=None, content_type='application/json'):
         """
         Create a new :class:`RiakObject <riak.riak_object.RiakObject>` that will be stored as JSON. A shortcut for
         manually instantiating a :class:`RiakObject <riak.riak_object.RiakObject>`.
 
-        :param key: Name of the key.
+        :param key: Name of the key. Leaving this to be None (default) will make Riak generate the key on store.
         :type key: string
         :param data: The data to store.
         :type data: object
