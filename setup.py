@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     setup(
         name='riak',
-        version='1.4.0',
+        version='1.4.1',
         packages = find_packages(),
         install_requires = install_requires,
         tests_require = tests_require,
