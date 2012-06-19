@@ -236,7 +236,8 @@ class RiakHttpTransport(RiakTransport) :
 
         # Do the request...
         url = "/" + self._mapred_prefix
-        response = self.http_request('POST', url, {}, content)
+        headers = {'Content-Type': 'application/json'}
+        response = self.http_request('POST', url, headers, content)
 
         # Make sure the expected status code came back...
         status = response[0]['http_code']
