@@ -1,5 +1,15 @@
 # Riak Python Client Release Notes
 
+## 1.4.1 Patch Release - 2012-06-19
+
+Noteworthy features:
+
+* New Riak objects support Riak-created random keys
+
+Noteworthy bugfixes:
+
+* Map Reduce queries now use "application/json" as the Content-Type
+
 ## 1.4.0 Feature Release - 2012-03-30
 
 Release 1.4.0 is a feature release comprising over 117 individual
