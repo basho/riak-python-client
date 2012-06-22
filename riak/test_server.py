@@ -6,6 +6,7 @@ import string
 import re
 import random
 import shutil
+import socket
 import time
 from subprocess import Popen, PIPE
 from riak.util import deep_merge
