@@ -52,7 +52,7 @@ def erlang_config(hash, depth=1):
     return "[\n%s%s\n%s]" % (padding, values, parent_padding)
 
 
-class TestServer:
+class TestServer(object):
     VM_ARGS_DEFAULTS = {
         "-name": "riaktest%d@127.0.0.1" % random.randint(0, 100000),
         "-setcookie": "%d_%d" % (random.randint(0, 100000), random.randint(0, 100000)),
