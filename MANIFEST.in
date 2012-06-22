@@ -1,5 +1,5 @@
 include docs/*
-include erl_src/*
+include riak/erl_src/*
 include THANKS
 include README.rst
 include LICENSE
