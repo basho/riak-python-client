@@ -2,7 +2,7 @@ from riak.transports import RiakHttpTransport
 from xml.etree import ElementTree
 from xml.dom.minidom import Document
 
-class RiakSearch:
+class RiakSearch(object):
     def __init__(self, client, transport_class=None,
                  host="127.0.0.1", port=8098):
         if transport_class is None:
