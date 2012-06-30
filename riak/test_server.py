@@ -110,6 +110,7 @@ class TestServer:
 
         self.app_config["riak_core"]["ring_state_dir"] = os.path.join(self.temp_dir, "data", "ring")
         self.app_config["riak_core"]["platform_data_dir"] = self.temp_dir
+        self.app_config["lager"] = {"crash_log": os.path.join(self.temp_dir, "log", "crash.log")}
 
     def prepare(self):
         if not self._prepared:
