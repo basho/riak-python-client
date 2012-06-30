@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
-class RiakIndexEntry:
+class RiakIndexEntry(object):
     def __init__(self, field, value):
         self._field = field
         self._value = str(value)

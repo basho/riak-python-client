@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-import types, copy, re
+import types, copy
 from metadata import *
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
