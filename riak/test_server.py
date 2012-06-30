@@ -191,6 +191,8 @@ class TestServer:
                 buffer += line
             if re.search(r"\(%s\)\d+>" % self.vm_args["-name"], buffer):
                 prompted = True
+            if re.search(r'"Kernel pid terminated".*\n', buffer):
+                raise Exception("Riak test server failed to start.")
 
     def write_riak_script(self):
         with open(self._riak_script, "wb") as temp_bin_file:
