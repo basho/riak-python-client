@@ -47,9 +47,9 @@ from riak.transports.transport import RiakTransport
 import riak.util
 
 try:
-    import riakclient_pb2
+    import riak_pb
 except ImportError:
-    riakclient_pb2 = None
+    riak_pb = None
 
 ## Protocol codes
 MSG_CODE_ERROR_RESP           =  0
@@ -77,6 +77,10 @@ MSG_CODE_SET_BUCKET_REQ       = 21
 MSG_CODE_SET_BUCKET_RESP      = 22
 MSG_CODE_MAPRED_REQ           = 23
 MSG_CODE_MAPRED_RESP          = 24
+MSG_CODE_INDEX_QUERY_REQ      = 25
+MSG_CODE_INDEX_QUERY_RES      = 26
+MSG_CODE_SEARCH_QUERY_REQ     = 27
+MSG_CODE_SEARCH_QUERY_RESP    = 28
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -160,7 +164,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Construct a new RiakPbcTransport object.
         """
-        if riakclient_pb2 is None:
+        if riak_pb is None:
             raise RiakError("this transport is not available (no protobuf)")
 
         super(RiakPbcTransport, self).__init__()
@@ -202,7 +206,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Set the client id used by this connection
         """
-        req = riakclient_pb2.RpbSetClientIdReq()
+        req = riak_pb.RpbSetClientIdReq()
         req.client_id = client_id
 
         msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req,
@@ -230,7 +234,7 @@ class RiakPbcTransport(RiakTransport):
 
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbGetReq()
+        req = riak_pb.RpbGetReq()
         req.r = self.translate_rw_val(r)
         req.pr = self.translate_rw_val(pr)
 
@@ -253,7 +257,7 @@ class RiakPbcTransport(RiakTransport):
         """
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbPutReq()
+        req = riak_pb.RpbPutReq()
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
         req.pw = self.translate_rw_val(pw)
@@ -289,7 +293,7 @@ class RiakPbcTransport(RiakTransport):
         """
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbPutReq()
+        req = riak_pb.RpbPutReq()
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
         req.pw = self.translate_rw_val(pw)
@@ -319,7 +323,7 @@ class RiakPbcTransport(RiakTransport):
         """
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbDelReq()
+        req = riak_pb.RpbDelReq()
         req.rw = self.translate_rw_val(rw)
         req.r = self.translate_rw_val(r)
         req.w = self.translate_rw_val(w)
@@ -340,7 +344,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Lists all keys within a bucket.
         """
-        req = riakclient_pb2.RpbListKeysReq()
+        req = riak_pb.RpbListKeysReq()
         req.bucket = bucket.get_name()
 
         keys = []
@@ -364,7 +368,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket property request and deserialize response
         """
-        req = riakclient_pb2.RpbGetBucketReq()
+        req = riak_pb.RpbGetBucketReq()
         req.bucket = bucket.get_name()
 
         msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req,
@@ -381,7 +385,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize set bucket property request and deserialize response
         """
-        req = riakclient_pb2.RpbSetBucketReq()
+        req = riak_pb.RpbSetBucketReq()
         req.bucket = bucket.get_name()
         if not 'n_val' in props and not 'allow_mult' in props:
             return self
@@ -403,7 +407,7 @@ class RiakPbcTransport(RiakTransport):
 
         content = json.dumps(job)
 
-        req = riakclient_pb2.RpbMapRedReq()
+        req = riak_pb.RpbMapRedReq()
         req.request = content
         req.content_type = "application/json"
 
@@ -467,7 +471,7 @@ class RiakPbcTransport(RiakTransport):
                 # If the last client_id used on this connection is different than our
                 # client_id, then set a new ID on the connection.
                 if conn.last_client_id != self._client_id:
-                    req = riakclient_pb2.RpbSetClientIdReq()
+                    req = riak_pb.RpbSetClientIdReq()
                     req.client_id = self._client_id
                     conn.send(self.encode_msg(MSG_CODE_SET_CLIENT_ID_REQ, req))
                     conn.last_client_id = self._client_id
@@ -489,37 +493,43 @@ class RiakPbcTransport(RiakTransport):
         self.recv_pkt(conn)
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code == MSG_CODE_ERROR_RESP:
-            msg = riakclient_pb2.RpbErrorResp()
+            msg = riak_pb.RpbErrorResp()
             msg.ParseFromString(self._inbuf[1:])
             raise Exception(msg.errmsg)
         elif msg_code == MSG_CODE_PING_RESP:
             msg = None
         elif msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
-            msg = riakclient_pb2.RpbGetClientIdResp()
+            msg = riak_pb.RpbGetClientIdResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
             msg = None
         elif msg_code == MSG_CODE_GET_RESP:
-            msg = riakclient_pb2.RpbGetResp()
+            msg = riak_pb.RpbGetResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_PUT_RESP:
-            msg = riakclient_pb2.RpbPutResp()
+            msg = riak_pb.RpbPutResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_DEL_RESP:
             msg = None
         elif msg_code == MSG_CODE_LIST_KEYS_RESP:
-            msg = riakclient_pb2.RpbListKeysResp()
+            msg = riak_pb.RpbListKeysResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_LIST_BUCKETS_RESP:
-            msg = riakclient_pb2.RpbListBucketsResp()
+            msg = riak_pb.RpbListBucketsResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_GET_BUCKET_RESP:
-            msg = riakclient_pb2.RpbGetBucketResp()
+            msg = riak_pb.RpbGetBucketResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_SET_BUCKET_RESP:
             msg = None
         elif msg_code == MSG_CODE_MAPRED_RESP:
-            msg = riakclient_pb2.RpbMapRedResp()
+            msg = riak_pb.RpbMapRedResp()
+            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code == MSG_CODE_INDEX_QUERY_RESP:
+            msg = riak_pb.RpbIndexQueryResp()
+            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code == MSG_CODE_SEARCH_QUERY_RESP:
+            msg = riak_pb.RpbSearchQueryResp()
             msg.ParseFromString(self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s" % msg_code)
