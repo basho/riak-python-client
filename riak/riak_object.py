@@ -309,9 +309,9 @@ class RiakObject(object):
             if isinstance(item, RiakLink):
                 link = item
             elif isinstance(item, RiakObject):
-                link = RiakLink(item._bucket._name, item._key, None)
+                link = RiakLink(item._bucket.name, item._key, None)
             else:
-                link = RiakLink(item[0]._bucket._name, item[0]._key, item[1])
+                link = RiakLink(item[0]._bucket.name, item[0]._key, item[1])
             new_links.append(link)
 
         self._metadata[MD_LINKS] = new_links
@@ -331,7 +331,7 @@ class RiakObject(object):
         if isinstance(obj, RiakLink):
             newlink = obj
         else:
-            newlink = RiakLink(obj._bucket._name, obj._key, tag)
+            newlink = RiakLink(obj._bucket.name, obj._key, tag)
 
         self.remove_link(newlink)
         links = self._metadata[MD_LINKS]
@@ -640,7 +640,7 @@ class RiakObject(object):
         :rtype: RiakMapReduce
         """
         mr = RiakMapReduce(self._client)
-        mr.add(self._bucket._name, self._key)
+        mr.add(self._bucket.name, self._key)
         return apply(mr.link, args)
 
     def map(self, *args):
@@ -651,7 +651,7 @@ class RiakObject(object):
         :rtype: RiakMapReduce
         """
         mr = RiakMapReduce(self._client)
-        mr.add(self._bucket._name, self._key)
+        mr.add(self._bucket.name, self._key)
         return apply(mr.map, args)
 
     def reduce(self, params):

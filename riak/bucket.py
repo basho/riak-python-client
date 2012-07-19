@@ -19,6 +19,8 @@ under the License.
 """
 from riak_object import RiakObject
 import mimetypes
+from copy import copy
+from util import deprecated
 
 class RiakBucket(object):
     """
@@ -45,13 +47,13 @@ class RiakBucket(object):
             raise TypeError('Unicode bucket names are not supported.')
 
         self._client = client
-        self._name = name
-        self._r = None
-        self._w = None
-        self._dw = None
-        self._rw = None
-        self._pr = None
-        self._pw = None
+        self.name = name
+        self.r = self._client.r
+        self.w = self._client.w
+        self.dw = self._client.dw
+        self.rw = self._client.rw
+        self.pr = self._client.pr
+        self.pw = self._client.pw
         self._encoders = {}
         self._decoders = {}
 
@@ -59,7 +61,8 @@ class RiakBucket(object):
         """
         Get the bucket name as a string.
         """
-        return self._name
+        deprecated("bucket.get_name() has been deprecated. Use bucket.name instead!")
+        return self.name
 
     def get_r(self, r=None):
         """
@@ -68,10 +71,11 @@ class RiakBucket(object):
 
         :rtype: integer
         """
+        deprecated("bucket.get_r() has been deprecated. Use bucket.r instead!")
         if (r is not None):
             return r
-        if (self._r is not None):
-            return self._r
+        if (self.r is not None):
+            return self.r
         return self._client.get_r()
 
     def set_r(self, r):
@@ -83,7 +87,8 @@ class RiakBucket(object):
         :type r: integer
         :rtype: self
         """
-        self._r = r
+        deprecated("bucket.set_r() has been deprecated. Use bucket.r instead!")
+        self.r = r
         return self
 
     def get_w(self, w=None):
@@ -93,10 +98,11 @@ class RiakBucket(object):
 
         :rtype: integer
         """
+        deprecated("bucket.get_w() has been deprecated. Use bucket.w instead!")
         if (w is not None):
             return w
-        if (self._w is not None):
-            return self._w
+        if (self.w is not None):
+            return self.w
         return self._client.get_w()
 
     def set_w(self, w):
@@ -108,7 +114,8 @@ class RiakBucket(object):
         :type w: integer
         :rtype: self
         """
-        self._w = w
+        deprecated("bucket.set_w() has been deprecated. Use bucket.w instead!")
+        self.w = w
         return self
 
     def get_dw(self, dw=None):
@@ -118,10 +125,11 @@ class RiakBucket(object):
 
         :rtype: integer
         """
+        deprecated("bucket.get_dw() has been deprecated. Use bucket.dw instead!")
         if (dw is not None):
             return dw
-        if (self._dw is not None):
-            return self._dw
+        if (self.dw is not None):
+            return self.dw
         return self._client.get_dw()
 
     def set_dw(self, dw):
@@ -133,7 +141,8 @@ class RiakBucket(object):
         :type dw: integer
         :rtype: self
         """
-        self._dw = dw
+        deprecated("bucket.set_dw() has been deprecated. Use bucket.dw instead!")
+        self.dw = dw
         return self
 
     def get_rw(self, rw=None):
@@ -143,10 +152,11 @@ class RiakBucket(object):
 
         :rtype: integer
         """
+        deprecated("bucket.get_rw() has been deprecated. Use bucket.rw instead!")
         if (rw is not None):
             return rw
-        if (self._rw is not None):
-            return self._rw
+        if (self.rw is not None):
+            return self.rw
         return self._client.get_rw()
 
     def set_rw(self, rw):
@@ -158,7 +168,8 @@ class RiakBucket(object):
         :type rw: integer
         :rtype: self
         """
-        self._rw = rw
+        deprecated("bucket.set_rw() has been deprecated. Use bucket.rw instead!")
+        self.rw = rw
         return self
 
     def get_pr(self, pr=None):
@@ -168,10 +179,11 @@ class RiakBucket(object):
 
         :rtype: integer
         """
+        deprecated("bucket.get_pr() has been deprecated. Use bucket.pr instead!")
         if (pr is not None):
             return pr
-        if (self._pr is not None):
-            return self._pr
+        if (self.pr is not None):
+            return self.pr
         return self._client.get_pr()
 
     def set_pr(self, pr):
@@ -183,7 +195,8 @@ class RiakBucket(object):
         :type pr: integer
         :rtype: self
         """
-        self._pr = pr
+        deprecated("bucket.set_pr() has been deprecated. Use bucket.pr instead!")
+        self.pr = pr
         return self
 
 
@@ -194,10 +207,11 @@ class RiakBucket(object):
 
         :rtype: integer
         """
+        deprecated("bucket.get_pw() has been deprecated. Use bucket.pw instead!")
         if (pw is not None):
             return pw
-        if (self._pw is not None):
-            return self._pw
+        if (self.pw is not None):
+            return self.pw
         return self._client.get_pw()
 
     def set_pw(self, pw):
@@ -209,7 +223,8 @@ class RiakBucket(object):
         :type pw: integer
         :rtype: self
         """
-        self._pw = pw
+        deprecated("bucket.set_pw() has been deprecated. Use bucket.pw instead!")
+        self.pw = pw
         return self
 
     def get_encoder(self, content_type):
@@ -517,4 +532,4 @@ class RiakBucket(object):
         return True
 
     def search(self, query, **params):
-        return self._client.solr().search(self._name, query, **params)
+        return self._client.solr().search(self.name, query, **params)

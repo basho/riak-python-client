@@ -29,6 +29,7 @@ from riak.search import RiakSearch
 from riak.transports import RiakHttpTransport
 from riak.util import deprecated
 
+from weakref import WeakValueDictionary
 
 class RiakClient(object):
     """
@@ -81,12 +82,12 @@ class RiakClient(object):
             self._cm = None
             self._transport = transport_class(host, port, client_id=client_id)
 
-        self._r = "default"
-        self._w = "default"
-        self._dw = "default"
-        self._rw = "default"
-        self._pr = "default"
-        self._pw = "default"
+        self.r = "default"
+        self.w = "default"
+        self.dw = "default"
+        self.rw = "default"
+        self.pr = "default"
+        self.pw = "default"
         self._encoders = {'application/json': json.dumps,
                           'text/json': json.dumps}
         self._decoders = {'application/json': json.loads,
@@ -94,6 +95,8 @@ class RiakClient(object):
         self._solr = None
         self._host = host
         self._port = port
+
+        self._buckets = WeakValueDictionary()
 
     def get_transport(self):
         """
@@ -107,7 +110,8 @@ class RiakClient(object):
 
         :rtype: integer
         """
-        return self._r
+        deprecated("client.get_r() has been deprecated. Use client.r instead!")
+        return self.r
 
     def set_r(self, r):
         """
@@ -121,7 +125,8 @@ class RiakClient(object):
         :type r: integer
         :rtype: self
         """
-        self._r = r
+        deprecated("client.set_r() has been deprecated. Use client.r instead!")
+        self.r = r
         return self
 
     def get_w(self):
@@ -130,7 +135,8 @@ class RiakClient(object):
 
         :rtype: integer
         """
-        return self._w
+        deprecated("client.get_w() has been deprecated. Use client.w instead!")
+        return self.w
 
     def set_w(self, w):
         """
@@ -141,7 +147,8 @@ class RiakClient(object):
         :type w: integer
         :rtype: self
         """
-        self._w = w
+        deprecated("client.set_w() has been deprecated. Use client.w instead!")
+        self.w = w
         return self
 
     def get_dw(self):
@@ -150,7 +157,8 @@ class RiakClient(object):
 
         :rtype: integer
         """
-        return self._dw
+        deprecated("client.get_dw() has been deprecated. Use client.dw instead!")
+        return self.dw
 
     def set_dw(self, dw):
         """
@@ -161,7 +169,8 @@ class RiakClient(object):
         :type dw: integer
         :rtype: self
         """
-        self._dw = dw
+        deprecated("client.set_dw() has been deprecated. Use client.dw instead!")
+        self.dw = dw
         return self
 
     def get_rw(self):
@@ -170,7 +179,8 @@ class RiakClient(object):
 
         :rtype: integer
         """
-        return self._rw
+        deprecated("client.get_rw() has been deprecated. Use client.rw instead!")
+        return self.rw
 
     def set_rw(self, rw):
         """
@@ -181,7 +191,8 @@ class RiakClient(object):
         :type rw: integer
         :rtype: self
         """
-        self._rw = rw
+        deprecated("client.set_rw() has been deprecated. Use client.rw instead!")
+        self.rw = rw
         return self
 
     def get_pr(self):
@@ -190,7 +201,8 @@ class RiakClient(object):
 
         :rtype: integer
         """
-        return self._pr
+        deprecated("client.get_pr() has been deprecated. Use client.pr instead!")
+        return self.pr
 
     def set_pr(self, pr):
         """
@@ -201,7 +213,8 @@ class RiakClient(object):
         :type pr: integer
         :rtype: self
         """
-        self._pr = pr
+        deprecated("client.set_pr() has been deprecated. Use client.pr instead!")
+        self.pr = pr
         return self
 
     def get_pw(self):
@@ -210,7 +223,8 @@ class RiakClient(object):
 
         :rtype: integer
         """
-        return self._pr
+        deprecated("client.get_pw() has been deprecated. Use client.pw instead!")
+        return self.pw
 
     def set_pw(self, pw):
         """
@@ -221,7 +235,8 @@ class RiakClient(object):
         :type pw: integer
         :rtype: self
         """
-        self._pr = pr
+        deprecated("client.set_pw() has been deprecated. Use client.pw instead!")
+        self.pw = pw
         return self
 
     def get_client_id(self):
@@ -251,8 +266,7 @@ class RiakClient(object):
         """
         Get the encoding function for the provided content type.
         """
-        if content_type in self._encoders:
-            return self._encoders[content_type]
+        return self._encoders.get(content_type, None)
 
     def set_encoder(self, content_type, encoder):
         """
@@ -268,8 +282,7 @@ class RiakClient(object):
         """
         Get the decoding function for the provided content type.
         """
-        if content_type in self._decoders:
-            return self._decoders[content_type]
+        return self._decoders.get(content_type, None)
 
     def set_decoder(self, content_type, decoder):
         """
@@ -296,7 +309,14 @@ class RiakClient(object):
 
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
         """
-        return RiakBucket(self, name)
+        if name in self._buckets:
+            return self._buckets[name]
+
+        b = RiakBucket(self, name)
+        self._buckets[name] = b
+        return b
+
+    __getitem__ = bucket
 
     def is_alive(self):
         """
