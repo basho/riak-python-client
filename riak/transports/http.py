@@ -157,6 +157,8 @@ class RiakHttpTransport(RiakTransport) :
     def delete(self, robj, rw=None, r = None, w = None, dw = None, pr = None, pw = None):
         # Construct the URL...
         params = {'rw' : rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw}
+        if not isinstance(robj.get_key(), basestring):
+            raise TypeError("Object key must be a string!")
         url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                    params=params)
         # TODO: Send vclock of robj if it exists

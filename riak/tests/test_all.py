@@ -203,6 +203,9 @@ class BaseTestCase(object):
         obj.reload()
         self.assertFalse(obj.exists())
 
+        self.assertFalse(bucket.get(None).exists())
+        self.assertRaises(TypeError, bucket.get(None).delete)
+
     def test_set_bucket_properties(self):
         bucket = self.client.bucket('bucket')
         # Test setting allow mult...
@@ -717,7 +720,7 @@ class BaseTestCase(object):
         self.assertEqual(1, len(result))
         self.assertEqual(3, len(bar.get_indexes()))
         self.assertEqual(2, len(bar.get_indexes('bar_int')))
-        
+
         # remove all indexes
         bar = bar.remove_indexes().store()
         result = self.client.index('indexbucket', 'bar_int', 1).run()
