@@ -23,8 +23,9 @@ import random
 import threading
 import platform
 import os
+from feature_detect import FeatureDetection
 
-class RiakTransport(object):
+class RiakTransport(FeatureDetection):
     """
     Class to encapsulate transport details
     """

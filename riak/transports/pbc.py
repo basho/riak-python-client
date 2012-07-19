@@ -173,6 +173,10 @@ class RiakPbcTransport(RiakTransport):
         self._client_id = client_id
         self._max_attempts = max_attempts
 
+    # FeatureDetection API
+    def _server_version(self):
+        return self.get_server_info()['server_version']
+
     def translate_rw_val(self, rw):
         val = self.rw_names.get(rw)
         if val is None:
@@ -193,6 +197,14 @@ class RiakPbcTransport(RiakTransport):
             return 1
         else:
             return 0
+
+    def get_server_info(self):
+        """
+        Get information about the server
+        """
+        msg_code, resp = self.send_msg_code(MSG_CODE_GET_SERVER_INFO_REQ,
+                                            MSG_CODE_GET_SERVER_INFO_RESP)
+        return {'node':resp.node, 'server_version':resp.server_version}
 
     def get_client_id(self):
         """
@@ -498,6 +510,9 @@ class RiakPbcTransport(RiakTransport):
             raise Exception(msg.errmsg)
         elif msg_code == MSG_CODE_PING_RESP:
             msg = None
+        elif msg_code == MSG_CODE_GET_SERVER_INFO_RESP:
+            msg = riak_pb.RpbGetServerInfoResp()
+            msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
             msg = riak_pb.RpbGetClientIdResp()
             msg.ParseFromString(self._inbuf[1:])

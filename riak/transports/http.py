@@ -95,6 +95,40 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('GET', '/ping')
         return(response is not None) and (response[1] == 'OK')
 
+    def stats(self):
+        """
+        Gets performance statistics and server information
+        """
+        # TODO: use resource detection
+        response = self.http_request('GET', '/stats', {'Accept':'application/json'})
+        if response[0]['http_status'] is 200:
+            return json.loads(response[1])
+        else:
+            return None
+
+    # FeatureDetection API - private
+    def _server_version(self):
+        stats = self.stats()
+        if stats is not None:
+            return stats['riak_kv_version']
+        # If stats is disabled, we can't assume the Riak version
+        # is >= 1.1. However, we can assume the new URL scheme is
+        # at least version 1.0
+        elif 'riak_kv_wm_buckets' in self.get_resources():
+            return "1.0.0"
+        else:
+            return "0.14.0"
+
+    def get_resources(self):
+        """
+        Gets a JSON mapping of server-side resource names to paths
+        :rtype dict
+        """
+        response = self.http_request('GET', '/', {'Accept':'application/json'})
+        if response[0]['http_status'] is 200:
+            return json.loads(response[1])
+        else:
+            return dict()
 
     def get(self, robj, r = None, pr = None, vtag = None) :
         """
