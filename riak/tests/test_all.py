@@ -216,6 +216,13 @@ class BaseTestCase(object):
         self.assertFalse(bucket.get_allow_multiples())
         self.assertEqual(bucket.get_n_val(), 2)
 
+    def test_set_quorums(self):
+        bucket = self.client.bucket('bucket')
+        self.assertEquals("quorum", bucket.get_property("r"))
+        bucket.r = 3
+        self.assertEquals(3, bucket.get_property("r"))
+        bucket.r = "quorum"
+
     def test_rw_settings(self):
         bucket = self.client.bucket('rwsettings')
         self.assertEqual(bucket.get_r(), "default")
@@ -717,7 +724,7 @@ class BaseTestCase(object):
         self.assertEqual(1, len(result))
         self.assertEqual(3, len(bar.get_indexes()))
         self.assertEqual(2, len(bar.get_indexes('bar_int')))
-        
+
         # remove all indexes
         bar = bar.remove_indexes().store()
         result = self.client.index('indexbucket', 'bar_int', 1).run()

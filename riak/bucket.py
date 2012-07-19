@@ -46,16 +46,34 @@ class RiakBucket(object):
         except UnicodeError:
             raise TypeError('Unicode bucket names are not supported.')
 
-        self._client = client
+        self.__dict__['_client'] = client
+
+        self.__dict__['quorums'] = {
+            'r' : self._client.r,
+            'w' : self._client.w,
+            'dw' : self._client.dw,
+            'rw' : self._client.rw,
+            'pr' : self._client.pr,
+            'pw' : self._client.pw
+        }
+
         self.name = name
-        self.r = self._client.r
-        self.w = self._client.w
-        self.dw = self._client.dw
-        self.rw = self._client.rw
-        self.pr = self._client.pr
-        self.pw = self._client.pw
+
         self._encoders = {}
         self._decoders = {}
+
+    def __setattr__(self, name, value):
+        if name in self.quorums.keys():
+            self.quorums[name] = value
+            self.set_properties({name : value})
+        else:
+            self.__dict__[name] = value
+
+    def __getattr__(self, name):
+        try:
+            return self.quorums[name]
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, name))
 
     def get_name(self):
         """
@@ -457,7 +475,7 @@ class RiakBucket(object):
         :rtype: mixed
         """
         props = self.get_properties()
-        if (key in props.keys()):
+        if key in props.keys():
             return props[key]
 
     def set_properties(self, props):
