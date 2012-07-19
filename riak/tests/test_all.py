@@ -28,7 +28,7 @@ from riak.mapreduce import RiakLink
 from riak.test_server import TestServer
 
 try:
-    import riak.transports.riakclient_pb2
+    import riak_pb
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
