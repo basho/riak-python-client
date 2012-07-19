@@ -210,7 +210,7 @@ class RiakClient(object):
 
         :rtype: integer
         """
-        return self._pr
+        return self._pw
 
     def set_pw(self, pw):
         """
@@ -221,7 +221,7 @@ class RiakClient(object):
         :type pw: integer
         :rtype: self
         """
-        self._pr = pr
+        self._pw = pw
         return self
 
     def get_client_id(self):
