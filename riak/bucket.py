@@ -64,8 +64,9 @@ class RiakBucket(object):
 
     def __setattr__(self, name, value):
         if name in self.quorums.keys():
-            self.quorums[name] = value
-            self.set_properties({name : value})
+            if value != self.quorums[name]:
+                self.quorums[name] = value
+                self.set_properties({name : value})
         else:
             self.__dict__[name] = value
 
