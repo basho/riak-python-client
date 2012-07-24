@@ -101,7 +101,7 @@ class RiakHttpTransport(RiakTransport) :
         """
         # TODO: use resource detection
         response = self.http_request('GET', '/stats', {'Accept':'application/json'})
-        if response[0]['http_status'] is 200:
+        if response[0]['http_code'] is 200:
             return json.loads(response[1])
         else:
             return None
@@ -128,12 +128,14 @@ class RiakHttpTransport(RiakTransport) :
         if response[0]['http_status'] is 200:
             return json.loads(response[1])
         else:
-            return dict()
+            return {}
 
     def get(self, robj, r = None, pr = None, vtag = None) :
         """
         Get a bucket/key from the server
         """
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'r' : r, 'pr': pr}
         if vtag is not None:
             params['vtag'] = vtag
@@ -146,11 +148,14 @@ class RiakHttpTransport(RiakTransport) :
         """
         Serialize put request and deserialize response
         """
-       # Construct the URL...
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw, 'pw' : pw }
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
         headers = self.build_put_headers(robj)
+        # TODO: use a more general 'prevent_stale_writes' semantics,
+        # which is a superset of the if_none_match semantics.
         if if_none_match:
             headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
@@ -170,10 +175,13 @@ class RiakHttpTransport(RiakTransport) :
 
     def put_new(self, robj, w=None, dw=None, pw=None, return_body=True, if_none_match=False):
         """Put a new object into the Riak store, returning its (new) key."""
-        # Construct the URL...
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw, 'pw' : pw}
         url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
         headers = self.build_put_headers(robj)
+        # TODO: use a more general 'prevent_stale_writes' semantics,
+        # which is a superset of the if_none_match semantics.
         if if_none_match:
             headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
@@ -189,18 +197,25 @@ class RiakHttpTransport(RiakTransport) :
             return key, None, None
 
     def delete(self, robj, rw=None, r = None, w = None, dw = None, pr = None, pw = None):
-        # Construct the URL...
+        """
+        Delete an object.
+        """
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'rw' : rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw}
+        headers = {}
         url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                    params=params)
-        # TODO: Send vclock of robj if it exists
-        # Run the operation..
-        response = self.http_request('DELETE', url)
+        if self.tombstone_vclocks() and robj.vclock() is not None:
+            headers['X-Riak-Vclock'] = robj.vclock()
+        response = self.http_request('DELETE', url, headers)
         self.check_http_code(response, [204, 404])
         return self
 
-
     def get_keys(self, bucket):
+        """
+        Fetch a list of keys for the bucket
+        """
         params = {'props' : 'True', 'keys' : 'true'}
         url = self.build_rest_path(bucket, params=params)
         response = self.http_request('GET', url)
@@ -213,6 +228,9 @@ class RiakHttpTransport(RiakTransport) :
             raise Exception('Error getting bucket properties.')
 
     def get_buckets(self):
+        """
+        Fetch a list of all buckets
+        """
         params = {'buckets': 'true'}
         url = self.build_rest_path(None, params=params)
         response = self.http_request('GET', url)
@@ -225,6 +243,9 @@ class RiakHttpTransport(RiakTransport) :
             raise Exception('Error getting buckets.')
 
     def get_bucket_props(self, bucket):
+        """
+        Get properties for a bucket
+        """
         # Run the request...
         params = {'props' : 'True', 'keys' : 'False'}
         url = self.build_rest_path(bucket, params=params)
@@ -261,6 +282,12 @@ class RiakHttpTransport(RiakTransport) :
         return True
 
     def mapred(self, inputs, query, timeout=None):
+        """
+        Run a MapReduce query.
+        """
+        if not self.phaseless_mapred() and (query is None or len(query) is 0):
+            raise Exception('Phase-less MapReduce is supported by this Riak node')
+
         # Construct the job, optionally set the timeout...
         job = {'inputs':inputs, 'query':query}
         if timeout is not None:
@@ -276,7 +303,8 @@ class RiakHttpTransport(RiakTransport) :
         # Make sure the expected status code came back...
         status = response[0]['http_code']
         if status != 200:
-            raise Exception('Error running MapReduce operation. Status: ' + str(status) + ' : ' + response[1])
+            raise Exception('Error running MapReduce operation. Headers: %s Body: %s' %
+                            (repr(response[0]),repr(response[1])))
 
         result = json.loads(response[1])
         return result
