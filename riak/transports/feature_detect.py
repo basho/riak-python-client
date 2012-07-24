@@ -17,29 +17,13 @@ under the License.
 """
 
 from distutils.version import StrictVersion
+from riak.util import lazy_property
 
 versions = {
     1: StrictVersion("1.0.0"),
     1.1: StrictVersion("1.1.0"),
     1.2: StrictVersion("1.2.0")
     }
-
-class lazy_property(object):
-    '''
-    meant to be used for lazy evaluation of an object attribute.
-    property should represent non-mutable data, as it replaces itself.
-    '''
-
-    def __init__(self,fget):
-        self.fget = fget
-        self.func_name = fget.__name__
-
-    def __get__(self,obj,cls):
-        if obj is None:
-            return None
-        value = self.fget(obj)
-        setattr(obj,self.func_name,value)
-        return value
 
 class FeatureDetection(object):
     def _server_version(self):
