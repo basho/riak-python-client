@@ -37,6 +37,7 @@ from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
 from connection import HTTPConnectionManager
 import riak.util
+from xml.etree import ElementTree
 
 MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
 
@@ -259,7 +260,6 @@ class RiakHttpTransport(RiakTransport) :
         else:
             raise Exception('Error getting bucket properties.')
 
-
     def set_bucket_props(self, bucket, props):
         """
         Set the properties on the bucket object given
@@ -308,6 +308,45 @@ class RiakHttpTransport(RiakTransport) :
 
         result = json.loads(response[1])
         return result
+
+    def get_index(self, bucket, index, startkey, endkey=None):
+        """
+        Performs a secondary index query.
+        """
+        # TODO: use resource detection
+        segments = ["buckets", bucket, "index", index, str(startkey)]
+        if endkey:
+            segments.append(str(endkey))
+        uri = '/%s' % ('/'.join(segments))
+        headers, data = response = self.get_request(uri)
+        self.check_http_code(response, [200])
+        jsonData = json.loads(data)
+        return jsonData[u'keys'][:]
+
+    def search(self, index, query, **params):
+        """
+        Performs a search query.
+        """
+        if index is None:
+            index = 'search'
+
+        options = {'q':query, 'wt':'json'}
+        if 'op' in params:
+            op = params.pop('op')
+            options['q.op'] = op
+
+        options.update(params)
+        # TODO: use resource detection
+        uri = "/solr/%s/select" % index
+        headers, data = response = self.get_request(uri, options)
+        self.check_http_code(response, [200])
+        if 'json' in headers['content-type']:
+            results = json.loads(data)
+            return self._normalize_json_search_response(results)
+        elif 'xml' in headers['content-type']:
+            return self._normalize_xml_search_response(data)
+        else:
+            raise ValueError("Could not decode search response")
 
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
@@ -377,9 +416,10 @@ class RiakHttpTransport(RiakTransport) :
                     for token in line:
                         rie = RiakIndexEntry(field, token)
                         metadata[MD_INDEX].append(rie)
-
             elif header == 'x-riak-vclock':
                 vclock = value
+            elif header == 'x-riak-deleted':
+                metadata[MD_DELETED] = True
         if links:
             metadata[MD_LINKS] = links
 
@@ -561,6 +601,35 @@ class RiakHttpTransport(RiakTransport) :
         # No luck, even with retrying.
         raise RiakError("could not get a response")
 
+    def _normalize_json_search_response(self, json):
+        """
+        Normalizes a JSON search response so that PB and HTTP have the
+        same return value
+        """
+        result = {}
+        if u'response' in json:
+            result['num_found'] = json[u'response'][u'numFound']
+            result['max_score'] = float(json[u'response'][u'maxScore'])
+            docs = []
+            for doc in json[u'response'][u'docs']:
+                resdoc = {u'id': doc[u'id']}
+                if u'fields' in doc:
+                    for k, v in doc[u'fields'].iteritems():
+                        resdoc[k] = v
+                docs.append(resdoc)
+            result['docs'] = docs
+        return result
+
+    def _normalize_xml_search_response(self, xml):
+        """
+        Normalizes an XML search response so that PB and HTTP have the
+        same return value
+        """
+        target = XMLSearchResult()
+        parser = ElementTree.XMLParser(target = target)
+        parser.feed(xml)
+        return parser.close()
+
     @classmethod
     def build_headers(cls, headers):
         return ['%s: %s' % (header, value) for header, value in headers.iteritems()]
@@ -586,3 +655,52 @@ class RiakHttpTransport(RiakTransport) :
             else:
                 retVal[key] = value
         return retVal
+
+class XMLSearchResult(object):
+    # Match tags that are document fields
+    fieldtags = ['str', 'int', 'date']
+
+    def __init__(self):
+        # Results
+        self.num_found = 0
+        self.max_score = 0.0
+        self.docs = []
+
+        # Parser state
+        self.currdoc = None
+        self.currfield = None
+        self.currvalue = None
+
+    def start(self, tag, attrib):
+        if tag == 'result':
+            self.num_found = int(attrib['numFound'])
+            self.max_score = float(attrib['maxScore'])
+        elif tag == 'doc':
+            self.currdoc = {}
+        elif tag in self.fieldtags and self.currdoc is not None:
+            self.currfield = attrib['name']
+
+    def end(self, tag):
+        if tag == 'doc' and self.currdoc is not None:
+            self.docs.append(self.currdoc)
+            self.currdoc = None
+        elif tag in self.fieldtags and self.currdoc is not None:
+            if tag == 'int':
+                self.currvalue = int(self.currvalue)
+            self.currdoc[self.currfield] = self.currvalue
+            self.currfield = None
+            self.currvalue = None
+
+    def data(self, data):
+        if self.currfield:
+            # riak_solr_output adds NL + 6 spaces
+            data = data.rstrip()
+            if self.currvalue:
+                self.currvalue += data
+            else:
+                self.currvalue = data
+
+    def close(self):
+        return {'num_found':self.num_found,
+                'max_score':self.max_score,
+                'docs': self.docs }

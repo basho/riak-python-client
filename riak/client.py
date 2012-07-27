@@ -375,6 +375,9 @@ class RiakClient(object):
     def delete_file(self, filename):
         self._transport.delete_file(filename)
 
+    def get_index(self, bucket, index, startkey, endkey=None):
+        return self._transport.get_index(bucket, index, startkey, endkey)
+
     def solr(self):
         if self._solr is None:
             self._solr = RiakSearch(self, host=self._host, port=self._port)

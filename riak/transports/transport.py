@@ -135,6 +135,68 @@ class RiakTransport(FeatureDetection):
         """
         raise RiakError("not implemented")
 
+    def search(self, index, query, **params):
+        """
+        Performs a search query.
+        """
+        raise RiakError("not implemented")
+
+    def get_index(self, bucket, index, startkey, endkey=None):
+        """
+        Performs a secondary index query.
+        """
+        raise RiakError("not implemented")
+
+    def _search_mapred_emu(self, index, query):
+        """
+        Emulates a search request via MapReduce. Used in the case
+        where the transport supports MapReduce but has no native
+        search capability.
+        """
+        phases = []
+        if not self.phaseless_mapred():
+            phases.append({'language':'erlang',
+                          'module':'riak_kv_mapreduce',
+                          'function':'reduce_identity',
+                          'keep':True})
+        mr_result = self.mapred({'module':'riak_search',
+                            'function':'mapred_search',
+                            'arg':[index, query]},
+                           phases)
+        result = {'num_found': len(mr_result),
+                  'max_score': 0.0,
+                  'docs': []}
+        for bucket, key, data in mr_result:
+            if u'score' in data and data[u'score'][0] > result['max_score']:
+                result['max_score'] = data[u'score'][0]
+            result['docs'].append({u'id': key})
+        return result
+
+    def _get_index_mapred_emu(self, bucket, index, startkey, endkey=None):
+        """
+        Emulates a secondary index request via MapReduce. Used in the
+        case where the transport supports MapReduce but has no native
+        secondary index query capability.
+        """
+        phases = []
+        if not self.phaseless_mapred():
+            phases.append({'language':'erlang',
+                          'module':'riak_kv_mapreduce',
+                          'function':'reduce_identity',
+                          'keep':True})
+        if endkey:
+            result = self.mapred({'bucket':bucket,
+                                'index':index,
+                                'start':startkey,
+                                'end':endkey},
+                                 phases)
+        else:
+            result = self.mapred({'bucket':bucket,
+                                'index':index,
+                                'key':startkey},
+                                 phases)
+        return [ key for bucket, key in result ]
+
     def store_file(self, key, content_type="application/octet-stream", content=None):
         """
         Store a large piece of data in luwak.

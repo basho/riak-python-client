@@ -77,8 +77,8 @@ MSG_CODE_SET_BUCKET_REQ       = 21
 MSG_CODE_SET_BUCKET_RESP      = 22
 MSG_CODE_MAPRED_REQ           = 23
 MSG_CODE_MAPRED_RESP          = 24
-MSG_CODE_INDEX_QUERY_REQ      = 25
-MSG_CODE_INDEX_QUERY_RES      = 26
+MSG_CODE_INDEX_REQ            = 25
+MSG_CODE_INDEX_RESP           = 26
 MSG_CODE_SEARCH_QUERY_REQ     = 27
 MSG_CODE_SEARCH_QUERY_RESP    = 28
 
@@ -248,7 +248,11 @@ class RiakPbcTransport(RiakTransport):
 
         req = riak_pb.RpbGetReq()
         req.r = self.translate_rw_val(r)
-        req.pr = self.translate_rw_val(pr)
+        if self.quorum_controls():
+            req.pr = self.translate_rw_val(pr)
+
+        if self.tombstone_vclocks():
+            req.deletedvclock = 1
 
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
@@ -272,7 +276,8 @@ class RiakPbcTransport(RiakTransport):
         req = riak_pb.RpbPutReq()
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
-        req.pw = self.translate_rw_val(pw)
+        if self.quorum_controls():
+            req.pw = self.translate_rw_val(pw)
 
         if return_body:
             req.return_body = 1
@@ -282,7 +287,7 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
         vclock = robj.vclock()
-        if vclock is not None:
+        if vclock:
             req.vclock = vclock
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
@@ -303,6 +308,7 @@ class RiakPbcTransport(RiakTransport):
 
         @return (key, vclock, metadata)
         """
+        # Note that this won't work on 0.14 nodes.
         bucket = robj.get_bucket()
 
         req = riak_pb.RpbPutReq()
@@ -340,10 +346,13 @@ class RiakPbcTransport(RiakTransport):
         req.r = self.translate_rw_val(r)
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
-        req.pr = self.translate_rw_val(pr)
-        req.pw = self.translate_rw_val(pw)
 
-        # TODO: Set the vclock if present
+        if self.quorum_controls():
+            req.pr = self.translate_rw_val(pr)
+            req.pw = self.translate_rw_val(pw)
+
+        if self.tombstone_vclocks() and robj.vclock():
+            req.vclock = robj.vclock()
 
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
@@ -445,6 +454,67 @@ class RiakPbcTransport(RiakTransport):
         else:
             return result
 
+    def get_index(self, bucket, index, startkey, endkey=None):
+        if not self.pb_indexes():
+            return self._get_index_mapred_emu(bucket, index, startkey, endkey)
+
+        req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
+        if endkey:
+            req.qtype = riak_pb.RpbIndexReq.range
+            req.range_min = str(startkey)
+            req.range_max = str(endkey)
+        else:
+            req.qtype = riak_pb.RpbIndexReq.eq
+            req.key = str(startkey)
+
+        msg_code, resp = self.send_msg(MSG_CODE_INDEX_REQ, req,
+                                       MSG_CODE_INDEX_RESP)
+        return resp.keys
+
+    def search(self, index, query, **params):
+        if not self.pb_search():
+            return self._search_mapred_emu(index, query)
+
+        req = riak_pb.RpbSearchQueryReq(index=index, q=query)
+        if 'rows' in params:
+            req.rows = params['rows']
+        if 'start' in params:
+            req.start = params['start']
+        if 'sort' in params:
+            req.sort = params['sort']
+        if 'filter' in params:
+            req.filter = params['filter']
+        if 'df' in params:
+            req.df = params['df']
+        if 'op' in params:
+            req.op = params['op']
+        if 'q.op' in params:
+            req.op = params['q.op']
+        if 'fl' in params:
+            if isinstance(params['fl'], list):
+                req.fl.extend(params['fl'])
+            else:
+                req.fl.append(params['fl'])
+        if 'presort' in params:
+            req.presort = params['presort']
+
+        msg_code, resp = self.send_msg(MSG_CODE_SEARCH_QUERY_REQ, req,
+                                       MSG_CODE_SEARCH_QUERY_RESP)
+
+        result = {}
+        if resp.HasField('max_score'):
+            result['max_score'] = resp.max_score
+        if resp.HasField('num_found'):
+            result['num_found'] = resp.num_found
+        docs = []
+        for doc in resp.docs:
+            resultdoc = {}
+            for pair in doc.fields:
+                resultdoc[pair.key] = pair.value
+            docs.append(resultdoc)
+        result['docs'] = docs
+        return result
+
     def send_msg_code(self, msg_code, expect):
         with self._cm.withconn() as conn:
             self.send_pkt(conn, struct.pack("!iB", 1, msg_code))
@@ -540,8 +610,8 @@ class RiakPbcTransport(RiakTransport):
         elif msg_code == MSG_CODE_MAPRED_RESP:
             msg = riak_pb.RpbMapRedResp()
             msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_INDEX_QUERY_RESP:
-            msg = riak_pb.RpbIndexQueryResp()
+        elif msg_code == MSG_CODE_INDEX_RESP:
+            msg = riak_pb.RpbIndexResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_SEARCH_QUERY_RESP:
             msg = riak_pb.RpbSearchQueryResp()
@@ -579,6 +649,8 @@ class RiakPbcTransport(RiakTransport):
 
     def decode_content(self, rpb_content):
         metadata = {}
+        if rpb_content.HasField("deleted"):
+            metadata[MD_DELETED] = True
         if rpb_content.HasField("content_type"):
             metadata[MD_CTYPE] = rpb_content.content_type
         if rpb_content.HasField("charset"):
@@ -648,4 +720,3 @@ class RiakPbcTransport(RiakTransport):
                     pb_link.key = link.get_key()
                     pb_link.tag = link.get_tag()
         rpb_content.value = data
-
