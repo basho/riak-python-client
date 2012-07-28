@@ -4,7 +4,7 @@ python:
   - "2.7"
 install: ./setup.py develop
 script: ./setup.py test
-# TODO: get search enabled on Travis' Riak install, or fix the test server
-env: "SKIP_LUWAK=1 SKIP_SEARCH=1"
+before_script: sudo search-cmd install searchbucket
+env: "SKIP_LUWAK=1"
 notifications:
   email: clients@basho.com
