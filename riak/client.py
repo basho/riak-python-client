@@ -53,9 +53,12 @@ class RiakClient(object):
         :type mapred_prefix: string
         :param transport_class: transport class to use
         :type transport_class: :class:`RiakTransport`
-        :param solr_transport_class: HTTP-based transport class for Solr interface queries
+
+        :param solr_transport_class: HTTP-based transport class for
+                                     Solr interface queries
         :type transport_class: :class:`RiakHttpTransport`
-        :param transport_options: Optional key-value args to pass to the transport constuctor
+        :param transport_options: Optional key-value args to pass to
+                                  the transport constuctor
         :type transport_options: dict
         """
         if transport_class is None:
@@ -63,7 +66,7 @@ class RiakClient(object):
 
         api = getattr(transport_class, 'api', 1)
         if api >= 2:
-            hostports = [ (host, port), ]
+            hostports = [(host, port), ]
             self._cm = transport_class.default_cm(hostports)
 
             # If no transport options are provided, then default to the
@@ -111,11 +114,12 @@ class RiakClient(object):
 
     def set_r(self, r):
         """
-        Set the R-value for this ``RiakClient``. This value will be used
-        for any calls to :func:`RiakBucket.get <riak.bucket.RiakBucket.get>`
-        or :func:`RiakBucket.get_binary <riak.bucket.RiakBucket.get_binary>`
-        where 1) no R-value is specified in the method call and 2) no R-value has
-        been set in the :class:`RiakBucket <riak.bucket.RiakBucket>`.
+        Set the R-value for this ``RiakClient``. This value will be
+        used for any calls to :func:`RiakBucket.get
+        <riak.bucket.RiakBucket.get>` or :func:`RiakBucket.get_binary
+        <riak.bucket.RiakBucket.get_binary>` where 1) no R-value is
+        specified in the method call and 2) no R-value has been set in
+        the :class:`RiakBucket <riak.bucket.RiakBucket>`.
 
         :param r: The R value.
         :type r: integer
@@ -126,7 +130,8 @@ class RiakClient(object):
 
     def get_w(self):
         """
-        Get the W-value setting for this ``RiakClient``. (default "quorum")
+        Get the W-value setting for this ``RiakClient``. (default
+        "quorum")
 
         :rtype: integer
         """
@@ -134,8 +139,8 @@ class RiakClient(object):
 
     def set_w(self, w):
         """
-        Set the W-value for this ``RiakClient`` instance. See :func:`set_r` for a
-        description of how these values are used.
+        Set the W-value for this ``RiakClient`` instance. See
+        :func:`set_r` for a description of how these values are used.
 
         :param w: The W value.
         :type w: integer
@@ -146,7 +151,8 @@ class RiakClient(object):
 
     def get_dw(self):
         """
-        Get the DW-value for this ``RiakClient`` instance. (default "quorum")
+        Get the DW-value for this ``RiakClient`` instance. (default
+        "quorum")
 
         :rtype: integer
         """
@@ -154,8 +160,8 @@ class RiakClient(object):
 
     def set_dw(self, dw):
         """
-        Set the DW-value for this ``RiakClient`` instance. See :func:`set_r` for a
-        description of how these values are used.
+        Set the DW-value for this ``RiakClient`` instance. See
+        :func:`set_r` for a description of how these values are used.
 
         :param dw: The DW value.
         :type dw: integer
@@ -166,7 +172,8 @@ class RiakClient(object):
 
     def get_rw(self):
         """
-        Get the RW-value for this ``RiakClient`` instance. (default "quorum")
+        Get the RW-value for this ``RiakClient`` instance. (default
+        "quorum")
 
         :rtype: integer
         """
@@ -174,8 +181,8 @@ class RiakClient(object):
 
     def set_rw(self, rw):
         """
-        Set the RW-value for this ``RiakClient`` instance. See :func:`set_r` for a
-        description of how these values are used.
+        Set the RW-value for this ``RiakClient`` instance. See
+        :func:`set_r` for a description of how these values are used.
 
         :param rw: The RW value.
         :type rw: integer
@@ -194,8 +201,8 @@ class RiakClient(object):
 
     def set_pr(self, pr):
         """
-        Set the PR-value for this ``RiakClient`` instance. See :func:`set_r` for a
-        description of how these values are used.
+        Set the PR-value for this ``RiakClient`` instance. See
+        :func:`set_r` for a description of how these values are used.
 
         :param pr: The PR value.
         :type pr: integer
@@ -214,8 +221,8 @@ class RiakClient(object):
 
     def set_pw(self, pw):
         """
-        Set the PW-value for this ``RiakClient`` instance. See :func:`set_r` for a
-        description of how these values are used.
+        Set the PW-value for this ``RiakClient`` instance. See
+        :func:`set_r` for a description of how these values are used.
 
         :param pw: The W value.
         :type pw: integer
@@ -238,7 +245,9 @@ class RiakClient(object):
 
         .. warning::
 
-           You should not call this method unless you know what you are doing.
+           Refer to
+           http://wiki.basho.com/Client-Implementation-Guide.html#Client-IDs
+           for information on how to set the client_id.
 
         :param client_id: The new client_id.
         :type client_id: string
@@ -308,7 +317,8 @@ class RiakClient(object):
 
     def add(self, *args):
         """
-        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.add`.
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.add`.
 
         :rtype: :class:`RiakMapReduce`
         """
@@ -319,7 +329,8 @@ class RiakClient(object):
         """
         Start assembling a Map/Reduce operation based on search
         results. This command will return an error unless executed
-        against a Riak Search cluster. A shortcut for :func:`RiakMapReduce.search`.
+        against a Riak Search cluster. A shortcut for
+        :func:`RiakMapReduce.search`.
 
         :rtype: :class:`RiakMapReduce`
         """
@@ -338,7 +349,8 @@ class RiakClient(object):
 
     def link(self, *args):
         """
-        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.link`.
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.link`.
 
         :rtype: :class:`RiakMapReduce`
         """
@@ -347,7 +359,8 @@ class RiakClient(object):
 
     def map(self, *args):
         """
-        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.map`.
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.map`.
 
         :rtype: :class:`RiakMapReduce`
         """
@@ -356,18 +369,21 @@ class RiakClient(object):
 
     def reduce(self, *args):
         """
-        Start assembling a Map/Reduce operation. A shortcut for :func:`RiakMapReduce.reduce`.
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.reduce`.
 
         :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return apply(mr.reduce, args)
 
-    def store_file(self, filename, data, content_type="application/octet-stream"):
+    def store_file(self, filename, data,
+                   content_type="application/octet-stream"):
         """
         Store data in luwak using filename as the key
         """
-        self._transport.store_file(filename, content_type=content_type, content=data)
+        self._transport.store_file(filename, content_type=content_type,
+                                   content=data)
 
     def get_file(self, filename):
         return self._transport.get_file(filename)

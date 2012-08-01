@@ -6,9 +6,11 @@ except ImportError:
     # compatibility with Python 2.5
     Mapping = dict
 
+
 def quacks_like_dict(object):
     """Check if object is dict-like"""
     return isinstance(object, Mapping)
+
 
 def deep_merge(a, b):
     """Merge two deep dicts non-destructively
@@ -31,7 +33,8 @@ def deep_merge(a, b):
             if key not in current_dst:
                 current_dst[key] = current_src[key]
             else:
-                if quacks_like_dict(current_src[key]) and quacks_like_dict(current_dst[key]) :
+                if (quacks_like_dict(current_src[key])
+                    and quacks_like_dict(current_dst[key])):
                     stack.append((current_dst[key], current_src[key]))
                 else:
                     current_dst[key] = current_src[key]
@@ -41,19 +44,20 @@ def deep_merge(a, b):
 def deprecated(message, stacklevel=3):
     warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
 
+
 class lazy_property(object):
     '''
     meant to be used for lazy evaluation of an object attribute.
     property should represent non-mutable data, as it replaces itself.
     '''
 
-    def __init__(self,fget):
+    def __init__(self, fget):
         self.fget = fget
         self.func_name = fget.__name__
 
-    def __get__(self,obj,cls):
+    def __get__(self, obj, cls):
         if obj is None:
             return None
         value = self.fget(obj)
-        setattr(obj,self.func_name,value)
+        setattr(obj, self.func_name, value)
         return value

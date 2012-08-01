@@ -1,6 +1,7 @@
 from riak.test_server import TestServer
 import unittest
 
+
 class TestServerTestCase(unittest.TestCase):
     def setUp(self):
         self.test_server = TestServer()
@@ -9,33 +10,41 @@ class TestServerTestCase(unittest.TestCase):
         pass
 
     def test_options_defaults(self):
-        self.assertEquals(self.test_server.app_config["riak_core"]["handoff_port"], 9001)
-        self.assertEquals(self.test_server.app_config["riak_kv"]["pb_ip"], "127.0.0.1")
+        self.assertEquals(
+            self.test_server.app_config["riak_core"]["handoff_port"], 9001)
+        self.assertEquals(
+            self.test_server.app_config["riak_kv"]["pb_ip"], "127.0.0.1")
 
     def test_merge_riak_core_options(self):
         self.test_server = TestServer(riak_core={"handoff_port": 10000})
-        self.assertEquals(self.test_server.app_config["riak_core"]["handoff_port"], 10000)
+        self.assertEquals(
+            self.test_server.app_config["riak_core"]["handoff_port"], 10000)
 
     def test_merge_luwak_options(self):
         self.test_server = TestServer(luwak={"enabled": False})
-        self.assertEquals(self.test_server.app_config["luwak"]["enabled"], False)
+        self.assertEquals(
+            self.test_server.app_config["luwak"]["enabled"], False)
 
     def test_merge_riak_search_options(self):
-        self.test_server = TestServer(riak_search={"search_backend": "riak_search_backend"})
-        self.assertEquals(self.test_server.app_config["riak_search"]["search_backend"],
-                "riak_search_backend")
+        self.test_server = TestServer(
+            riak_search={"search_backend": "riak_search_backend"})
+        self.assertEquals(
+            self.test_server.app_config["riak_search"]["search_backend"],
+            "riak_search_backend")
 
     def test_merge_riak_kv_options(self):
         self.test_server = TestServer(riak_kv={"pb_ip": "192.168.2.1"})
-        self.assertEquals(self.test_server.app_config["riak_kv"]["pb_ip"], "192.168.2.1")
+        self.assertEquals(self.test_server.app_config["riak_kv"]["pb_ip"],
+                          "192.168.2.1")
 
     def test_merge_vmargs(self):
         self.test_server = TestServer(vm_args={"-P": 65000})
         self.assertEquals(self.test_server.vm_args["-P"], 65000)
 
     def test_set_ring_state_dir(self):
-        self.assertEquals(self.test_server.app_config["riak_core"]["ring_state_dir"],
-                "/tmp/riak/test_server/data/ring")
+        self.assertEquals(
+            self.test_server.app_config["riak_core"]["ring_state_dir"],
+            "/tmp/riak/test_server/data/ring")
 
     def test_set_default_tmp_dir(self):
         self.assertEquals(self.test_server.temp_dir, "/tmp/riak/test_server")
@@ -45,9 +54,8 @@ class TestServerTestCase(unittest.TestCase):
         server = TestServer(tmp_dir=tmp_dir)
         self.assertEquals(server.temp_dir, tmp_dir)
 
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(TestServerTestCase())
     return suite
-
-

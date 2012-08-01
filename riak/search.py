@@ -2,6 +2,7 @@ from riak.transports import RiakHttpTransport
 from xml.etree import ElementTree
 from xml.dom.minidom import Document
 
+
 class RiakSearch(object):
     def __init__(self, client, transport_class=None,
                  host="127.0.0.1", port=8098):
@@ -10,7 +11,7 @@ class RiakSearch(object):
 
         api = getattr(transport_class, 'api', 1)
         if api >= 2:
-            hostports = [ (host, port), ]
+            hostports = [(host, port), ]
             self._cm = transport_class.default_cm(hostports)
             self._transport = transport_class(self._cm, prefix="/solr")
         else:
@@ -22,9 +23,10 @@ class RiakSearch(object):
 
         self._client = client
         self._decoders = {"text/xml": ElementTree.fromstring}
- 
+
     def get_decoder(self, content_type):
-        decoder = self._client.get_decoder(content_type) or self._decoders[content_type]
+        decoder = (self._client.get_decoder(content_type)
+                   or self._decoders[content_type])
         if not decoder:
             decoder = self.decode
 

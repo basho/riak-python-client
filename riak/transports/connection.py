@@ -21,6 +21,7 @@ import socket
 import contextlib
 import functools
 
+
 class ConnectionManager(object):
 
     # Must be constructable with: connection_class(host, port)
@@ -66,12 +67,13 @@ class ConnectionManager(object):
                 try:
                     self.conns.remove(conn)
                 except ValueError:
-                    # Another thread removed the connection. It won't be coming back,
-                    # so we have nothing to do here.
+                    # Another thread removed the connection. It won't
+                    # be coming back, so we have nothing to do here.
                     pass
                 else:
-                    # If the connection was still present (no ValueError), then we
-                    # should go ahead and close it down.
+                    # If the connection was still present (no
+                    # ValueError), then we should go ahead and close
+                    # it down.
                     conn.close()
 
     # Just in case somebody uses a host/port combo and typos...
@@ -125,22 +127,24 @@ class ConnectionManager(object):
             # No rotation needed.
             return conn
 
-        # Be careful about rotating. We want to append before removing, so that
-        # we never hit a len==0 race condition (which could prevent the creation
-        # of needed connections).
+        # Be careful about rotating. We want to append before
+        # removing, so that we never hit a len==0 race condition
+        # (which could prevent the creation of needed connections).
         self.hostports.append((host, port))
 
-        # RACE: another thread may have appended the same host/port pair. We
-        #   will add another pair. Each thread will remove one (either [0], or
-        #   one that had been appened), resulting in a correct state of a single
-        #   pair in the list.
-        # RACE: another thread may get the host/port pair from hostports[0]
-        #   before we have a chance to remove it. We don't need precision
-        #   round-robin behavior; just something close.
-        # RACE: another thread may have removed hostports[0] (which we are
-        #   also trying to remove), but it will have placed another copy at
-        #   the end before doing so. We have also added a host/port pair, and
-        #   will remove one, leaving the list in a correct state.
+        # RACE: another thread may have appended the same host/port
+        #   pair. We will add another pair. Each thread will remove
+        #   one (either [0], or one that had been appened), resulting
+        #   in a correct state of a single pair in the list.
+        # RACE: another thread may get the host/port pair from
+        #   hostports[0] before we have a chance to remove it. We
+        #   don't need precision round-robin behavior; just something
+        #   close.
+        # RACE: another thread may have removed hostports[0] (which we
+        #   are also trying to remove), but it will have placed
+        #   another copy at the end before doing so. We have also
+        #   added a host/port pair, and will remove one, leaving the
+        #   list in a correct state.
         self.hostports.remove((host, port))
 
         return conn

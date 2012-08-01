@@ -18,6 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
+
 class RiakIndexEntry(object):
     def __init__(self, field, value):
         self._field = field
@@ -30,7 +31,8 @@ class RiakIndexEntry(object):
         return self._value
 
     def __str__(self):
-        return "RiakIndexEntry(field = '%s', value='%s')" % (self._field, self._value)
+        return ("RiakIndexEntry(field = '%s', value='%s')" %
+                (self._field, self._value))
 
     def __eq__(self, other):
         if not isinstance(other, RiakIndexEntry):
@@ -45,7 +47,8 @@ class RiakIndexEntry(object):
             raise TypeError("RiakIndexEntry cannot be compared to None")
 
         if not isinstance(other, RiakIndexEntry):
-            raise TypeError("RiakIndexEntry cannot be compared to %s" % other.__class__.__name__)
+            raise TypeError("RiakIndexEntry cannot be compared to %s" %
+                            other.__class__.__name__)
 
         if self.get_field() < other.get_field():
             return -1

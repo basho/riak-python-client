@@ -52,35 +52,35 @@ except ImportError:
     riak_pb = None
 
 ## Protocol codes
-MSG_CODE_ERROR_RESP           =  0
-MSG_CODE_PING_REQ             =  1
-MSG_CODE_PING_RESP            =  2
-MSG_CODE_GET_CLIENT_ID_REQ    =  3
-MSG_CODE_GET_CLIENT_ID_RESP   =  4
-MSG_CODE_SET_CLIENT_ID_REQ    =  5
-MSG_CODE_SET_CLIENT_ID_RESP   =  6
-MSG_CODE_GET_SERVER_INFO_REQ  =  7
-MSG_CODE_GET_SERVER_INFO_RESP =  8
-MSG_CODE_GET_REQ              =  9
-MSG_CODE_GET_RESP             = 10
-MSG_CODE_PUT_REQ              = 11
-MSG_CODE_PUT_RESP             = 12
-MSG_CODE_DEL_REQ              = 13
-MSG_CODE_DEL_RESP             = 14
-MSG_CODE_LIST_BUCKETS_REQ     = 15
-MSG_CODE_LIST_BUCKETS_RESP    = 16
-MSG_CODE_LIST_KEYS_REQ        = 17
-MSG_CODE_LIST_KEYS_RESP       = 18
-MSG_CODE_GET_BUCKET_REQ       = 19
-MSG_CODE_GET_BUCKET_RESP      = 20
-MSG_CODE_SET_BUCKET_REQ       = 21
-MSG_CODE_SET_BUCKET_RESP      = 22
-MSG_CODE_MAPRED_REQ           = 23
-MSG_CODE_MAPRED_RESP          = 24
-MSG_CODE_INDEX_REQ            = 25
-MSG_CODE_INDEX_RESP           = 26
-MSG_CODE_SEARCH_QUERY_REQ     = 27
-MSG_CODE_SEARCH_QUERY_RESP    = 28
+MSG_CODE_ERROR_RESP = 0
+MSG_CODE_PING_REQ = 1
+MSG_CODE_PING_RESP = 2
+MSG_CODE_GET_CLIENT_ID_REQ = 3
+MSG_CODE_GET_CLIENT_ID_RESP = 4
+MSG_CODE_SET_CLIENT_ID_REQ = 5
+MSG_CODE_SET_CLIENT_ID_RESP = 6
+MSG_CODE_GET_SERVER_INFO_REQ = 7
+MSG_CODE_GET_SERVER_INFO_RESP = 8
+MSG_CODE_GET_REQ = 9
+MSG_CODE_GET_RESP = 10
+MSG_CODE_PUT_REQ = 11
+MSG_CODE_PUT_RESP = 12
+MSG_CODE_DEL_REQ = 13
+MSG_CODE_DEL_RESP = 14
+MSG_CODE_LIST_BUCKETS_REQ = 15
+MSG_CODE_LIST_BUCKETS_RESP = 16
+MSG_CODE_LIST_KEYS_REQ = 17
+MSG_CODE_LIST_KEYS_RESP = 18
+MSG_CODE_GET_BUCKET_REQ = 19
+MSG_CODE_GET_BUCKET_RESP = 20
+MSG_CODE_SET_BUCKET_REQ = 21
+MSG_CODE_SET_BUCKET_RESP = 22
+MSG_CODE_MAPRED_REQ = 23
+MSG_CODE_MAPRED_RESP = 24
+MSG_CODE_INDEX_REQ = 25
+MSG_CODE_INDEX_RESP = 26
+MSG_CODE_SEARCH_QUERY_REQ = 27
+MSG_CODE_SEARCH_QUERY_RESP = 28
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -143,8 +143,8 @@ class SocketWithId(connection.Socket):
 
 class RiakPbcTransport(RiakTransport):
     """
-    The RiakPbcTransport object holds a connection to the protocol buffers interface
-    on the riak server.
+    The RiakPbcTransport object holds a connection to the protocol
+    buffers interface on the riak server.
     """
 
     # We're using the new RiakTransport API
@@ -204,7 +204,7 @@ class RiakPbcTransport(RiakTransport):
         """
         msg_code, resp = self.send_msg_code(MSG_CODE_GET_SERVER_INFO_REQ,
                                             MSG_CODE_GET_SERVER_INFO_RESP)
-        return {'node':resp.node, 'server_version':resp.server_version}
+        return {'node': resp.node, 'server_version': resp.server_version}
 
     def get_client_id(self):
         """
@@ -267,7 +267,8 @@ class RiakPbcTransport(RiakTransport):
         else:
             return None
 
-    def put(self, robj, w=None, dw=None, pw=None, return_body=True, if_none_match=False):
+    def put(self, robj, w=None, dw=None, pw=None, return_body=True,
+            if_none_match=False):
         """
         Serialize get request and deserialize response
         """
@@ -290,7 +291,9 @@ class RiakPbcTransport(RiakTransport):
         if vclock:
             req.vclock = vclock
 
-        self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
+        self.pbify_content(robj.get_metadata(),
+                           robj.get_encoded_data(),
+                           req.content)
 
         msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req,
                                        MSG_CODE_PUT_RESP)
@@ -300,7 +303,8 @@ class RiakPbcTransport(RiakTransport):
                 contents.append(self.decode_content(c))
             return resp.vclock, contents
 
-    def put_new(self, robj, w=None, dw=None, pw=None, return_body=True, if_none_match=False):
+    def put_new(self, robj, w=None, dw=None, pw=None, return_body=True,
+                if_none_match=False):
         """Put a new object into the Riak store, returning its (new) key.
 
         If return_meta is False, then the vlock and metadata return values
@@ -323,7 +327,9 @@ class RiakPbcTransport(RiakTransport):
 
         req.bucket = bucket.get_name()
 
-        self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
+        self.pbify_content(robj.get_metadata(),
+                           robj.get_encoded_data(),
+                           req.content)
 
         msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req,
                                        MSG_CODE_PUT_RESP)
@@ -369,6 +375,7 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
 
         keys = []
+
         def _handle_response(resp):
             for key in resp.keys:
                 keys.append(key)
@@ -435,6 +442,7 @@ class RiakPbcTransport(RiakTransport):
         # dictionary of phase results - each content should be an encoded array
         # which is appended to the result for that phase.
         result = {}
+
         def _handle_response(resp):
             if resp.HasField("phase") and resp.HasField("response"):
                 content = json.loads(resp.response)
@@ -550,8 +558,9 @@ class RiakPbcTransport(RiakTransport):
             try:
                 conn.maybe_connect()
 
-                # If the last client_id used on this connection is different than our
-                # client_id, then set a new ID on the connection.
+                # If the last client_id used on this connection is
+                # different than our client_id, then set a new ID on
+                # the connection.
                 if conn.last_client_id != self._client_id:
                     req = riak_pb.RpbSetClientIdReq()
                     req.client_id = self._client_id
@@ -626,8 +635,9 @@ class RiakPbcTransport(RiakTransport):
     def recv_pkt(self, conn):
         nmsglen = conn.recv(4)
         if len(nmsglen) != 4:
-            raise RiakError("Socket returned short packet length %d - expected 4"
-                            % len(nmsglen))
+            raise RiakError(
+                "Socket returned short packet length %d - expected 4"
+                % len(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
         self._inbuf_len = msglen
         self._inbuf = ''
