@@ -286,7 +286,7 @@ class RiakHttpTransport(RiakTransport) :
         Run a MapReduce query.
         """
         if not self.phaseless_mapred() and (query is None or len(query) is 0):
-            raise Exception('Phase-less MapReduce is supported by this Riak node')
+            raise Exception('Phase-less MapReduce is not supported by this Riak node')
 
         # Construct the job, optionally set the timeout...
         job = {'inputs':inputs, 'query':query}
