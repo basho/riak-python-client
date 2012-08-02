@@ -28,7 +28,7 @@ from riak.mapreduce import RiakLink
 from riak.test_server import TestServer
 
 try:
-    import riak.transports.riakclient_pb2
+    import riak_pb
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
@@ -545,6 +545,34 @@ class BaseTestCase(object):
         o.delete()
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
+    def test_solr_search_from_bucket(self):
+        bucket = self.client.bucket('searchbucket')
+        bucket.new("user", {"username": "roidrage"}).store()
+        results = bucket.search("username:roidrage")
+        self.assertEquals(1, len(results['docs']))
+
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
+    def test_solr_search_with_params_from_bucket(self):
+        bucket = self.client.bucket('searchbucket')
+        bucket.new("user", {"username": "roidrage"}).store()
+        results = bucket.search("username:roidrage", wt="xml")
+        self.assertEquals(1, len(results['docs']))
+
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
+    def test_solr_search_with_params(self):
+        bucket = self.client.bucket('searchbucket')
+        bucket.new("user", {"username": "roidrage"}).store()
+        results = self.client.solr().search("searchbucket", "username:roidrage", wt="xml")
+        self.assertEquals(1, len(results['docs']))
+
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
+    def test_solr_search(self):
+        bucket = self.client.bucket('searchbucket')
+        bucket.new("user", {"username": "roidrage"}).store()
+        results = self.client.solr().search("searchbucket", "username:roidrage")
+        self.assertEquals(1, len(results["docs"]))
+
+    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_search_integration(self):
         # Create some objects to search across...
         bucket = self.client.bucket("searchbucket")
@@ -555,14 +583,14 @@ class BaseTestCase(object):
         bucket.new("five", {"foo":"five", "bar":"yellow"}).store()
 
         # Run some operations...
-        results = self.client.search("searchbucket", "foo:one OR foo:two").run()
+        results = self.client.solr().search("searchbucket", "foo:one OR foo:two")
         if (len(results) == 0):
             print "\n\nNot running test \"testSearchIntegration()\".\n"
             print "Please ensure that you have installed the Riak Search hook on bucket \"searchbucket\" by running \"bin/search-cmd install searchbucket\".\n\n"
             return
-        self.assertEqual(len(results), 2)
-        results = self.client.search("searchbucket", "(foo:one OR foo:two OR foo:three OR foo:four) AND (NOT bar:green)").run()
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results['docs']), 2)
+        results = self.client.solr().search("searchbucket", "(foo:one OR foo:two OR foo:three OR foo:four) AND (NOT bar:green)")
+        self.assertEqual(len(results['docs']), 3)
 
     def test_store_binary_object_from_file(self):
         bucket = self.client.bucket('bucket')
@@ -702,9 +730,9 @@ class BaseTestCase(object):
         self.assertEqual(1, len(result))
         self.assertEqual('foo', result[0].get_key())
 
-        result = self.client.index('indexbucket', 'field1_bin', 'test').run()
+        result = bucket.get_index('field1_bin', 'test')
         self.assertEqual(1, len(result))
-        self.assertEqual('foo', result[0].get_key())
+        self.assertEqual('foo', str(result[0]))
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_remove_indexes(self):
@@ -713,16 +741,16 @@ class BaseTestCase(object):
 
         bucket = self.client.bucket('indexbucket')
         bar = bucket.new('bar', 1).add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
-        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        result = bucket.get_index('bar_int', 1)
         self.assertEqual(1, len(result))
         self.assertEqual(3, len(bar.get_indexes()))
         self.assertEqual(2, len(bar.get_indexes('bar_int')))
-        
+
         # remove all indexes
         bar = bar.remove_indexes().store()
-        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        result = bucket.get_index('bar_int', 1)
         self.assertEqual(0, len(result))
-        result = self.client.index('indexbucket', 'baz_bin', 'baz').run()
+        result = bucket.get_index('baz_bin', 'baz')
         self.assertEqual(0, len(result))
         self.assertEqual(0, len(bar.get_indexes()))
         self.assertEqual(0, len(bar.get_indexes('bar_int')))
@@ -732,11 +760,11 @@ class BaseTestCase(object):
         bar = bar.add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
         # remove all index with field='bar_int'
         bar = bar.remove_index(field='bar_int').store()
-        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        result = bucket.get_index('bar_int', 1)
         self.assertEqual(0, len(result))
-        result = self.client.index('indexbucket', 'bar_int', 2).run()
+        result = bucket.get_index('bar_int', 2)
         self.assertEqual(0, len(result))
-        result = self.client.index('indexbucket', 'baz_bin', 'baz').run()
+        result = bucket.get_index('baz_bin', 'baz')
         self.assertEqual(1, len(result))
         self.assertEqual(1, len(bar.get_indexes()))
         self.assertEqual(0, len(bar.get_indexes('bar_int')))
@@ -746,11 +774,11 @@ class BaseTestCase(object):
         bar = bar.add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
         # remove an index field value pair
         bar = bar.remove_index(field='bar_int', value=2).store()
-        result = self.client.index('indexbucket', 'bar_int', 1).run()
+        result = bucket.get_index('bar_int', 1)
         self.assertEqual(1, len(result))
-        result = self.client.index('indexbucket', 'bar_int', 2).run()
+        result = bucket.get_index('bar_int', 2)
         self.assertEqual(0, len(result))
-        result = self.client.index('indexbucket', 'baz_bin', 'baz').run()
+        result = bucket.get_index('baz_bin', 'baz')
         self.assertEqual(1, len(result))
         self.assertEqual(2, len(bar.get_indexes()))
         self.assertEqual(1, len(bar.get_indexes('bar_int')))
@@ -785,28 +813,24 @@ class BaseTestCase(object):
             store()
 
         # Test an equality query...
-        results = self.client.index('indexbucket', 'field1_bin', 'val2').run()
+        results = bucket.get_index('field1_bin', 'val2')
         self.assertEquals(1, len(results))
-        self.assertEquals('mykey2', results[0].get_key())
+        self.assertEquals('mykey2', str(results[0]))
 
         # Test a range query...
-        results = self.client.index('indexbucket', 'field1_bin', 'val2', 'val4').run()
-        vals = set()
-        for i in results:
-            vals.add(i.get_key())
+        results = bucket.get_index('field1_bin', 'val2', 'val4')
+        vals = set([ str(key) for key in results ])
         self.assertEquals(3, len(results))
         self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
 
         # Test an equality query...
-        results = self.client.index('indexbucket', 'field2_int', 1002).run()
+        results = bucket.get_index('field2_int', 1002)
         self.assertEquals(1, len(results))
-        self.assertEquals('mykey2', results[0].get_key())
+        self.assertEquals('mykey2', str(results[0]))
 
         # Test a range query...
-        results = self.client.index('indexbucket', 'field2_int', 1002, 1004).run()
-        vals = set()
-        for i in results:
-            vals.add(i.get_key())
+        results = bucket.get_index('field2_int', 1002, 1004)
+        vals = set([str(key) for key in results ])
         self.assertEquals(3, len(results))
         self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
 
@@ -1152,69 +1176,37 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
         self.assertIsNone(file)
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
-    def test_solr_search_from_bucket(self):
-        bucket = self.client.bucket('searchbucket')
-        bucket.new("user", {"username": "roidrage"}).store()
-        results = bucket.search("username:roidrage")
-        self.assertEquals(1, len(results["response"]["docs"]))
-
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
-    def test_solr_search_with_params_from_bucket(self):
-        bucket = self.client.bucket('searchbucket')
-        bucket.new("user", {"username": "roidrage"}).store()
-        results = bucket.search("username:roidrage", wt="xml")
-        result = results.find("result")
-        if not hasattr(result, "iter"): setattr(result, "iter", result.getiterator)
-        self.assertEquals(1, len(list(result.iter("doc"))))
-
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
-    def test_solr_search_with_params(self):
-        bucket = self.client.bucket('searchbucket')
-        bucket.new("user", {"username": "roidrage"}).store()
-        results = self.client.solr().search("searchbucket", "username:roidrage", wt="xml")
-        result = results.find("result")
-        if not hasattr(result, "iter"): setattr(result, "iter", result.getiterator)
-        self.assertEquals(1, len(list(result.iter("doc"))))
-
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
-    def test_solr_search(self):
-        bucket = self.client.bucket('searchbucket')
-        bucket.new("user", {"username": "roidrage"}).store()
-        results = self.client.solr().search("searchbucket", "username:roidrage")
-        self.assertEquals(1, len(results["response"]["docs"]))
-
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_document_to_index(self):
         self.client.solr().add("searchbucket", {"id": "doc", "username": "tony"})
         results = self.client.solr().search("searchbucket", "username:tony")
-        self.assertEquals("tony", results["response"]["docs"][0]["fields"]["username"])
+        self.assertEquals("tony", results['docs'][0]['username'])
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_multiple_documents_to_index(self):
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
-        self.assertEquals(2, len(results["response"]["docs"]))
+        self.assertEquals(2, len(results['docs']))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_id(self):
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         self.client.solr().delete("searchbucket", docs=["dizzy"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
-        self.assertEquals(1, len(results["response"]["docs"]))
+        self.assertEquals(1, len(results['docs']))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query(self):
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         self.client.solr().delete("searchbucket", queries=["username:dizzy", "username:russell"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
-        self.assertEquals(0, len(results["response"]["docs"]))
+        self.assertEquals(0, len(results['docs']))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query_and_id(self):
         self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
         self.client.solr().delete("searchbucket", docs=["dizzy"], queries=["username:russell"])
         results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
-        self.assertEquals(0, len(results["response"]["docs"]))
+        self.assertEquals(0, len(results['docs']))
 
     def test_build_rest_path_excludes_empty_query_params(self):
         self.assertEquals(self.client.get_transport().build_rest_path(bucket=self.client.bucket("foo"), key="bar", params={'r': None}), "/riak/foo/bar?")

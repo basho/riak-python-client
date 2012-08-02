@@ -47,9 +47,9 @@ from riak.transports.transport import RiakTransport
 import riak.util
 
 try:
-    import riakclient_pb2
+    import riak_pb
 except ImportError:
-    riakclient_pb2 = None
+    riak_pb = None
 
 ## Protocol codes
 MSG_CODE_ERROR_RESP           =  0
@@ -77,6 +77,10 @@ MSG_CODE_SET_BUCKET_REQ       = 21
 MSG_CODE_SET_BUCKET_RESP      = 22
 MSG_CODE_MAPRED_REQ           = 23
 MSG_CODE_MAPRED_RESP          = 24
+MSG_CODE_INDEX_REQ            = 25
+MSG_CODE_INDEX_RESP           = 26
+MSG_CODE_SEARCH_QUERY_REQ     = 27
+MSG_CODE_SEARCH_QUERY_RESP    = 28
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -160,7 +164,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Construct a new RiakPbcTransport object.
         """
-        if riakclient_pb2 is None:
+        if riak_pb is None:
             raise RiakError("this transport is not available (no protobuf)")
 
         super(RiakPbcTransport, self).__init__()
@@ -168,6 +172,10 @@ class RiakPbcTransport(RiakTransport):
         self._cm = cm
         self._client_id = client_id
         self._max_attempts = max_attempts
+
+    # FeatureDetection API
+    def _server_version(self):
+        return self.get_server_info()['server_version']
 
     def translate_rw_val(self, rw):
         val = self.rw_names.get(rw)
@@ -190,6 +198,14 @@ class RiakPbcTransport(RiakTransport):
         else:
             return 0
 
+    def get_server_info(self):
+        """
+        Get information about the server
+        """
+        msg_code, resp = self.send_msg_code(MSG_CODE_GET_SERVER_INFO_REQ,
+                                            MSG_CODE_GET_SERVER_INFO_RESP)
+        return {'node':resp.node, 'server_version':resp.server_version}
+
     def get_client_id(self):
         """
         Get the client id used by this connection
@@ -202,7 +218,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Set the client id used by this connection
         """
-        req = riakclient_pb2.RpbSetClientIdReq()
+        req = riak_pb.RpbSetClientIdReq()
         req.client_id = client_id
 
         msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req,
@@ -230,9 +246,13 @@ class RiakPbcTransport(RiakTransport):
 
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbGetReq()
+        req = riak_pb.RpbGetReq()
         req.r = self.translate_rw_val(r)
-        req.pr = self.translate_rw_val(pr)
+        if self.quorum_controls():
+            req.pr = self.translate_rw_val(pr)
+
+        if self.tombstone_vclocks():
+            req.deletedvclock = 1
 
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
@@ -253,10 +273,11 @@ class RiakPbcTransport(RiakTransport):
         """
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbPutReq()
+        req = riak_pb.RpbPutReq()
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
-        req.pw = self.translate_rw_val(pw)
+        if self.quorum_controls():
+            req.pw = self.translate_rw_val(pw)
 
         if return_body:
             req.return_body = 1
@@ -266,7 +287,7 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
         vclock = robj.vclock()
-        if vclock is not None:
+        if vclock:
             req.vclock = vclock
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
@@ -287,9 +308,10 @@ class RiakPbcTransport(RiakTransport):
 
         @return (key, vclock, metadata)
         """
+        # Note that this won't work on 0.14 nodes.
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbPutReq()
+        req = riak_pb.RpbPutReq()
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
         req.pw = self.translate_rw_val(pw)
@@ -319,15 +341,18 @@ class RiakPbcTransport(RiakTransport):
         """
         bucket = robj.get_bucket()
 
-        req = riakclient_pb2.RpbDelReq()
+        req = riak_pb.RpbDelReq()
         req.rw = self.translate_rw_val(rw)
         req.r = self.translate_rw_val(r)
         req.w = self.translate_rw_val(w)
         req.dw = self.translate_rw_val(dw)
-        req.pr = self.translate_rw_val(pr)
-        req.pw = self.translate_rw_val(pw)
 
-        # TODO: Set the vclock if present
+        if self.quorum_controls():
+            req.pr = self.translate_rw_val(pr)
+            req.pw = self.translate_rw_val(pw)
+
+        if self.tombstone_vclocks() and robj.vclock():
+            req.vclock = robj.vclock()
 
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
@@ -340,7 +365,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Lists all keys within a bucket.
         """
-        req = riakclient_pb2.RpbListKeysReq()
+        req = riak_pb.RpbListKeysReq()
         req.bucket = bucket.get_name()
 
         keys = []
@@ -364,7 +389,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket property request and deserialize response
         """
-        req = riakclient_pb2.RpbGetBucketReq()
+        req = riak_pb.RpbGetBucketReq()
         req.bucket = bucket.get_name()
 
         msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req,
@@ -381,7 +406,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize set bucket property request and deserialize response
         """
-        req = riakclient_pb2.RpbSetBucketReq()
+        req = riak_pb.RpbSetBucketReq()
         req.bucket = bucket.get_name()
         if not 'n_val' in props and not 'allow_mult' in props:
             return self
@@ -403,7 +428,7 @@ class RiakPbcTransport(RiakTransport):
 
         content = json.dumps(job)
 
-        req = riakclient_pb2.RpbMapRedReq()
+        req = riak_pb.RpbMapRedReq()
         req.request = content
         req.content_type = "application/json"
 
@@ -428,6 +453,67 @@ class RiakPbcTransport(RiakTransport):
             return result[max(result.keys())]
         else:
             return result
+
+    def get_index(self, bucket, index, startkey, endkey=None):
+        if not self.pb_indexes():
+            return self._get_index_mapred_emu(bucket, index, startkey, endkey)
+
+        req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
+        if endkey:
+            req.qtype = riak_pb.RpbIndexReq.range
+            req.range_min = str(startkey)
+            req.range_max = str(endkey)
+        else:
+            req.qtype = riak_pb.RpbIndexReq.eq
+            req.key = str(startkey)
+
+        msg_code, resp = self.send_msg(MSG_CODE_INDEX_REQ, req,
+                                       MSG_CODE_INDEX_RESP)
+        return resp.keys
+
+    def search(self, index, query, **params):
+        if not self.pb_search():
+            return self._search_mapred_emu(index, query)
+
+        req = riak_pb.RpbSearchQueryReq(index=index, q=query)
+        if 'rows' in params:
+            req.rows = params['rows']
+        if 'start' in params:
+            req.start = params['start']
+        if 'sort' in params:
+            req.sort = params['sort']
+        if 'filter' in params:
+            req.filter = params['filter']
+        if 'df' in params:
+            req.df = params['df']
+        if 'op' in params:
+            req.op = params['op']
+        if 'q.op' in params:
+            req.op = params['q.op']
+        if 'fl' in params:
+            if isinstance(params['fl'], list):
+                req.fl.extend(params['fl'])
+            else:
+                req.fl.append(params['fl'])
+        if 'presort' in params:
+            req.presort = params['presort']
+
+        msg_code, resp = self.send_msg(MSG_CODE_SEARCH_QUERY_REQ, req,
+                                       MSG_CODE_SEARCH_QUERY_RESP)
+
+        result = {}
+        if resp.HasField('max_score'):
+            result['max_score'] = resp.max_score
+        if resp.HasField('num_found'):
+            result['num_found'] = resp.num_found
+        docs = []
+        for doc in resp.docs:
+            resultdoc = {}
+            for pair in doc.fields:
+                resultdoc[pair.key] = pair.value
+            docs.append(resultdoc)
+        result['docs'] = docs
+        return result
 
     def send_msg_code(self, msg_code, expect):
         with self._cm.withconn() as conn:
@@ -467,7 +553,7 @@ class RiakPbcTransport(RiakTransport):
                 # If the last client_id used on this connection is different than our
                 # client_id, then set a new ID on the connection.
                 if conn.last_client_id != self._client_id:
-                    req = riakclient_pb2.RpbSetClientIdReq()
+                    req = riak_pb.RpbSetClientIdReq()
                     req.client_id = self._client_id
                     conn.send(self.encode_msg(MSG_CODE_SET_CLIENT_ID_REQ, req))
                     conn.last_client_id = self._client_id
@@ -489,37 +575,46 @@ class RiakPbcTransport(RiakTransport):
         self.recv_pkt(conn)
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code == MSG_CODE_ERROR_RESP:
-            msg = riakclient_pb2.RpbErrorResp()
+            msg = riak_pb.RpbErrorResp()
             msg.ParseFromString(self._inbuf[1:])
             raise Exception(msg.errmsg)
         elif msg_code == MSG_CODE_PING_RESP:
             msg = None
+        elif msg_code == MSG_CODE_GET_SERVER_INFO_RESP:
+            msg = riak_pb.RpbGetServerInfoResp()
+            msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
-            msg = riakclient_pb2.RpbGetClientIdResp()
+            msg = riak_pb.RpbGetClientIdResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
             msg = None
         elif msg_code == MSG_CODE_GET_RESP:
-            msg = riakclient_pb2.RpbGetResp()
+            msg = riak_pb.RpbGetResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_PUT_RESP:
-            msg = riakclient_pb2.RpbPutResp()
+            msg = riak_pb.RpbPutResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_DEL_RESP:
             msg = None
         elif msg_code == MSG_CODE_LIST_KEYS_RESP:
-            msg = riakclient_pb2.RpbListKeysResp()
+            msg = riak_pb.RpbListKeysResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_LIST_BUCKETS_RESP:
-            msg = riakclient_pb2.RpbListBucketsResp()
+            msg = riak_pb.RpbListBucketsResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_GET_BUCKET_RESP:
-            msg = riakclient_pb2.RpbGetBucketResp()
+            msg = riak_pb.RpbGetBucketResp()
             msg.ParseFromString(self._inbuf[1:])
         elif msg_code == MSG_CODE_SET_BUCKET_RESP:
             msg = None
         elif msg_code == MSG_CODE_MAPRED_RESP:
-            msg = riakclient_pb2.RpbMapRedResp()
+            msg = riak_pb.RpbMapRedResp()
+            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code == MSG_CODE_INDEX_RESP:
+            msg = riak_pb.RpbIndexResp()
+            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code == MSG_CODE_SEARCH_QUERY_RESP:
+            msg = riak_pb.RpbSearchQueryResp()
             msg.ParseFromString(self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s" % msg_code)
@@ -554,6 +649,8 @@ class RiakPbcTransport(RiakTransport):
 
     def decode_content(self, rpb_content):
         metadata = {}
+        if rpb_content.HasField("deleted"):
+            metadata[MD_DELETED] = True
         if rpb_content.HasField("content_type"):
             metadata[MD_CTYPE] = rpb_content.content_type
         if rpb_content.HasField("charset"):
@@ -623,4 +720,3 @@ class RiakPbcTransport(RiakTransport):
                     pb_link.key = link.get_key()
                     pb_link.tag = link.get_tag()
         rpb_content.value = data
-

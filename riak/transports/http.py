@@ -37,6 +37,7 @@ from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
 from connection import HTTPConnectionManager
 import riak.util
+from xml.etree import ElementTree
 
 MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
 
@@ -95,11 +96,47 @@ class RiakHttpTransport(RiakTransport) :
         response = self.http_request('GET', '/ping')
         return(response is not None) and (response[1] == 'OK')
 
+    def stats(self):
+        """
+        Gets performance statistics and server information
+        """
+        # TODO: use resource detection
+        response = self.http_request('GET', '/stats', {'Accept':'application/json'})
+        if response[0]['http_code'] is 200:
+            return json.loads(response[1])
+        else:
+            return None
+
+    # FeatureDetection API - private
+    def _server_version(self):
+        stats = self.stats()
+        if stats is not None:
+            return stats['riak_kv_version']
+        # If stats is disabled, we can't assume the Riak version
+        # is >= 1.1. However, we can assume the new URL scheme is
+        # at least version 1.0
+        elif 'riak_kv_wm_buckets' in self.get_resources():
+            return "1.0.0"
+        else:
+            return "0.14.0"
+
+    def get_resources(self):
+        """
+        Gets a JSON mapping of server-side resource names to paths
+        :rtype dict
+        """
+        response = self.http_request('GET', '/', {'Accept':'application/json'})
+        if response[0]['http_status'] is 200:
+            return json.loads(response[1])
+        else:
+            return {}
 
     def get(self, robj, r = None, pr = None, vtag = None) :
         """
         Get a bucket/key from the server
         """
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'r' : r, 'pr': pr}
         if vtag is not None:
             params['vtag'] = vtag
@@ -112,11 +149,14 @@ class RiakHttpTransport(RiakTransport) :
         """
         Serialize put request and deserialize response
         """
-       # Construct the URL...
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw, 'pw' : pw }
         url = self.build_rest_path(bucket=robj.get_bucket(), key=robj.get_key(),
                                    params=params)
         headers = self.build_put_headers(robj)
+        # TODO: use a more general 'prevent_stale_writes' semantics,
+        # which is a superset of the if_none_match semantics.
         if if_none_match:
             headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
@@ -136,10 +176,13 @@ class RiakHttpTransport(RiakTransport) :
 
     def put_new(self, robj, w=None, dw=None, pw=None, return_body=True, if_none_match=False):
         """Put a new object into the Riak store, returning its (new) key."""
-        # Construct the URL...
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'returnbody' : str(return_body).lower(), 'w' : w, 'dw' : dw, 'pw' : pw}
         url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
         headers = self.build_put_headers(robj)
+        # TODO: use a more general 'prevent_stale_writes' semantics,
+        # which is a superset of the if_none_match semantics.
         if if_none_match:
             headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
@@ -155,18 +198,25 @@ class RiakHttpTransport(RiakTransport) :
             return key, None, None
 
     def delete(self, robj, rw=None, r = None, w = None, dw = None, pr = None, pw = None):
-        # Construct the URL...
+        """
+        Delete an object.
+        """
+        # We could detect quorum_controls here but HTTP ignores
+        # unknown flags/params.
         params = {'rw' : rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw}
+        headers = {}
         url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
                                    params=params)
-        # TODO: Send vclock of robj if it exists
-        # Run the operation..
-        response = self.http_request('DELETE', url)
+        if self.tombstone_vclocks() and robj.vclock() is not None:
+            headers['X-Riak-Vclock'] = robj.vclock()
+        response = self.http_request('DELETE', url, headers)
         self.check_http_code(response, [204, 404])
         return self
 
-
     def get_keys(self, bucket):
+        """
+        Fetch a list of keys for the bucket
+        """
         params = {'props' : 'True', 'keys' : 'true'}
         url = self.build_rest_path(bucket, params=params)
         response = self.http_request('GET', url)
@@ -179,6 +229,9 @@ class RiakHttpTransport(RiakTransport) :
             raise Exception('Error getting bucket properties.')
 
     def get_buckets(self):
+        """
+        Fetch a list of all buckets
+        """
         params = {'buckets': 'true'}
         url = self.build_rest_path(None, params=params)
         response = self.http_request('GET', url)
@@ -191,6 +244,9 @@ class RiakHttpTransport(RiakTransport) :
             raise Exception('Error getting buckets.')
 
     def get_bucket_props(self, bucket):
+        """
+        Get properties for a bucket
+        """
         # Run the request...
         params = {'props' : 'True', 'keys' : 'False'}
         url = self.build_rest_path(bucket, params=params)
@@ -203,7 +259,6 @@ class RiakHttpTransport(RiakTransport) :
             return props['props']
         else:
             raise Exception('Error getting bucket properties.')
-
 
     def set_bucket_props(self, bucket, props):
         """
@@ -227,6 +282,12 @@ class RiakHttpTransport(RiakTransport) :
         return True
 
     def mapred(self, inputs, query, timeout=None):
+        """
+        Run a MapReduce query.
+        """
+        if not self.phaseless_mapred() and (query is None or len(query) is 0):
+            raise Exception('Phase-less MapReduce is not supported by this Riak node')
+
         # Construct the job, optionally set the timeout...
         job = {'inputs':inputs, 'query':query}
         if timeout is not None:
@@ -242,10 +303,50 @@ class RiakHttpTransport(RiakTransport) :
         # Make sure the expected status code came back...
         status = response[0]['http_code']
         if status != 200:
-            raise Exception('Error running MapReduce operation. Status: ' + str(status) + ' : ' + response[1])
+            raise Exception('Error running MapReduce operation. Headers: %s Body: %s' %
+                            (repr(response[0]),repr(response[1])))
 
         result = json.loads(response[1])
         return result
+
+    def get_index(self, bucket, index, startkey, endkey=None):
+        """
+        Performs a secondary index query.
+        """
+        # TODO: use resource detection
+        segments = ["buckets", bucket, "index", index, str(startkey)]
+        if endkey:
+            segments.append(str(endkey))
+        uri = '/%s' % ('/'.join(segments))
+        headers, data = response = self.get_request(uri)
+        self.check_http_code(response, [200])
+        jsonData = json.loads(data)
+        return jsonData[u'keys'][:]
+
+    def search(self, index, query, **params):
+        """
+        Performs a search query.
+        """
+        if index is None:
+            index = 'search'
+
+        options = {'q':query, 'wt':'json'}
+        if 'op' in params:
+            op = params.pop('op')
+            options['q.op'] = op
+
+        options.update(params)
+        # TODO: use resource detection
+        uri = "/solr/%s/select" % index
+        headers, data = response = self.get_request(uri, options)
+        self.check_http_code(response, [200])
+        if 'json' in headers['content-type']:
+            results = json.loads(data)
+            return self._normalize_json_search_response(results)
+        elif 'xml' in headers['content-type']:
+            return self._normalize_xml_search_response(data)
+        else:
+            raise ValueError("Could not decode search response")
 
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
@@ -315,9 +416,10 @@ class RiakHttpTransport(RiakTransport) :
                     for token in line:
                         rie = RiakIndexEntry(field, token)
                         metadata[MD_INDEX].append(rie)
-
             elif header == 'x-riak-vclock':
                 vclock = value
+            elif header == 'x-riak-deleted':
+                metadata[MD_DELETED] = True
         if links:
             metadata[MD_LINKS] = links
 
@@ -499,6 +601,35 @@ class RiakHttpTransport(RiakTransport) :
         # No luck, even with retrying.
         raise RiakError("could not get a response")
 
+    def _normalize_json_search_response(self, json):
+        """
+        Normalizes a JSON search response so that PB and HTTP have the
+        same return value
+        """
+        result = {}
+        if u'response' in json:
+            result['num_found'] = json[u'response'][u'numFound']
+            result['max_score'] = float(json[u'response'][u'maxScore'])
+            docs = []
+            for doc in json[u'response'][u'docs']:
+                resdoc = {u'id': doc[u'id']}
+                if u'fields' in doc:
+                    for k, v in doc[u'fields'].iteritems():
+                        resdoc[k] = v
+                docs.append(resdoc)
+            result['docs'] = docs
+        return result
+
+    def _normalize_xml_search_response(self, xml):
+        """
+        Normalizes an XML search response so that PB and HTTP have the
+        same return value
+        """
+        target = XMLSearchResult()
+        parser = ElementTree.XMLParser(target = target)
+        parser.feed(xml)
+        return parser.close()
+
     @classmethod
     def build_headers(cls, headers):
         return ['%s: %s' % (header, value) for header, value in headers.iteritems()]
@@ -524,3 +655,52 @@ class RiakHttpTransport(RiakTransport) :
             else:
                 retVal[key] = value
         return retVal
+
+class XMLSearchResult(object):
+    # Match tags that are document fields
+    fieldtags = ['str', 'int', 'date']
+
+    def __init__(self):
+        # Results
+        self.num_found = 0
+        self.max_score = 0.0
+        self.docs = []
+
+        # Parser state
+        self.currdoc = None
+        self.currfield = None
+        self.currvalue = None
+
+    def start(self, tag, attrib):
+        if tag == 'result':
+            self.num_found = int(attrib['numFound'])
+            self.max_score = float(attrib['maxScore'])
+        elif tag == 'doc':
+            self.currdoc = {}
+        elif tag in self.fieldtags and self.currdoc is not None:
+            self.currfield = attrib['name']
+
+    def end(self, tag):
+        if tag == 'doc' and self.currdoc is not None:
+            self.docs.append(self.currdoc)
+            self.currdoc = None
+        elif tag in self.fieldtags and self.currdoc is not None:
+            if tag == 'int':
+                self.currvalue = int(self.currvalue)
+            self.currdoc[self.currfield] = self.currvalue
+            self.currfield = None
+            self.currvalue = None
+
+    def data(self, data):
+        if self.currfield:
+            # riak_solr_output adds NL + 6 spaces
+            data = data.rstrip()
+            if self.currvalue:
+                self.currvalue += data
+            else:
+                self.currvalue = data
+
+    def close(self):
+        return {'num_found':self.num_found,
+                'max_score':self.max_score,
+                'docs': self.docs }
