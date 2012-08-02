@@ -517,4 +517,13 @@ class RiakBucket(object):
         return True
 
     def search(self, query, **params):
+        """
+        Queries a search index over objects in this bucket/index.
+        """
         return self._client.solr().search(self._name, query, **params)
+
+    def get_index(self, index, startkey, endkey=None):
+        """
+        Queries a secondary index over objects in this bucket, returning keys.
+        """
+        return self._client._transport.get_index(self._name, index, startkey, endkey)

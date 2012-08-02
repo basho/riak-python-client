@@ -78,11 +78,6 @@ class RiakSearch(object):
     remove = delete
 
     def search(self, index, query, **params):
-        options = {'q': query, 'wt': 'json'}
-        options.update(params)
-        uri = "/solr/%s/select" % index
-        headers, results = self._transport.get_request(uri, options)
-        decoder = self.get_decoder(headers['content-type'])
-        return decoder(results)
-    
+        return self._client._transport.search(index, query, **params)
+
     select = search
