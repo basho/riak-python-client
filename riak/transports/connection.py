@@ -17,11 +17,11 @@ under the License.
 """
 
 import httplib
-import socket
 import contextlib
 import functools
 
 from gevent.queue import Queue
+from gevent import socket
 
 class ConnectionManager(object):
 
