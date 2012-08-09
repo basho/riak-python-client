@@ -20,8 +20,10 @@ import httplib
 import contextlib
 import functools
 
-from gevent import socket
+from gevent import monkey
 from gevent.queue import Queue
+
+monkey.patch_socket()
 
 class ConnectionManager(object):
 
