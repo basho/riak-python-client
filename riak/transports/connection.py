@@ -19,6 +19,8 @@ under the License.
 import httplib
 import contextlib
 import functools
+import socket
+import gevent.monkey
 
 from gevent.queue import Queue
 
@@ -40,6 +42,9 @@ class ConnectionManager(object):
         self.hostports = hostports
         
         self.queue = Queue(pool_size)
+        
+        # Patch httplib if we are using that, also patch the sockets
+        gevent.monkey.patch_all(httplib=True)
         
         if type(self.hostports) is list:
             for host, port in self.hostports:
@@ -103,9 +108,6 @@ class Socket(object):
 
     def maybe_connect(self):
         if self.sock is None:
-            # I have no idea why, but it will only work with the import...here
-            from gevent import socket
-            
             self.sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
