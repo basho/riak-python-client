@@ -60,7 +60,7 @@ class RiakClient(object):
         """
         if transport_class is None:
             transport_class = RiakHttpTransport
-
+        
         api = getattr(transport_class, 'api', 1)
         if api >= 2:
             self._cm = transport_class.default_cm(host, pool_size)
@@ -76,7 +76,9 @@ class RiakClient(object):
                                               client_id=client_id,
                                               **transport_options)
         else:
-            raise Exception('please upgrade the transport to the new API')
+            deprecated('please upgrade the transport to the new API')
+            self._cm = None
+            self._transport = transport_class(host[0], host[1], client_id=client_id)
         
         self._r = "default"
         self._w = "default"
