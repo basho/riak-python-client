@@ -20,10 +20,8 @@ import httplib
 import contextlib
 import functools
 
-from gevent import monkey
+#from gevent import socket
 from gevent.queue import Queue
-
-monkey.patch_socket()
 
 class ConnectionManager(object):
 
@@ -106,6 +104,7 @@ class Socket(object):
 
     def maybe_connect(self):
         if self.sock is None:
+            from gevent import socket
             self.sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
