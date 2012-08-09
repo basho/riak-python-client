@@ -20,7 +20,6 @@ import httplib
 import contextlib
 import functools
 
-#from gevent import socket
 from gevent.queue import Queue
 
 class ConnectionManager(object):
@@ -104,7 +103,9 @@ class Socket(object):
 
     def maybe_connect(self):
         if self.sock is None:
+            # I have no idea why, but it will only work with the import...here
             from gevent import socket
+            
             self.sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
