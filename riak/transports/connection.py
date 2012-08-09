@@ -44,7 +44,7 @@ class ConnectionManager(object):
         self.queue = Queue(pool_size)
         
         # Patch httplib if we are using that, also patch the sockets
-        monkey.patch_all(httplib=True)
+        monkey.patch_all()
         
         if type(self.hostports) is list:
             for host, port in self.hostports:
