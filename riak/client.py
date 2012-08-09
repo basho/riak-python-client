@@ -36,7 +36,7 @@ class RiakClient(object):
     Riak. The Riak API uses HTTP, so there is no persistent
     connection, and the ``RiakClient`` object is extremely lightweight.
     """
-    def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
+    def __init__(self, host=('127.0.0.1', 8098), pool_size=10, prefix='riak',
                  mapred_prefix='mapred', transport_class=None,
                  client_id=None, solr_transport_class=None,
                  transport_options=None):
@@ -60,11 +60,10 @@ class RiakClient(object):
         """
         if transport_class is None:
             transport_class = RiakHttpTransport
-
+        
         api = getattr(transport_class, 'api', 1)
         if api >= 2:
-            hostports = [ (host, port), ]
-            self._cm = transport_class.default_cm(hostports)
+            self._cm = transport_class.default_cm(host, pool_size)
 
             # If no transport options are provided, then default to the
             # empty dict, otherwise just pass through what we are provided.
@@ -79,8 +78,8 @@ class RiakClient(object):
         else:
             deprecated('please upgrade the transport to the new API')
             self._cm = None
-            self._transport = transport_class(host, port, client_id=client_id)
-
+            self._transport = transport_class(host[0], host[1], client_id=client_id)
+        
         self._r = "default"
         self._w = "default"
         self._dw = "default"
@@ -93,8 +92,7 @@ class RiakClient(object):
                           'text/json': json.loads}
         self._solr = None
         self._host = host
-        self._port = port
-
+    
     def get_transport(self):
         """
         Get the transport instance the client is using for it's connection.
@@ -380,6 +378,6 @@ class RiakClient(object):
 
     def solr(self):
         if self._solr is None:
-            self._solr = RiakSearch(self, host=self._host, port=self._port)
+            self._solr = RiakSearch(self, host=self._host[0], port=self._host[1])
 
         return self._solr
