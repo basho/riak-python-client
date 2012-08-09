@@ -13,7 +13,8 @@ def make_docs():
         os.rename(name, 'docs/%s' % name)
 
 install_requires = ["riak_pb >=1.2.0, < 1.3.0"]
-requires = ["riak_pb(>=1.2.0,<1.3.0)"]
+requires = ["riak_pb(>=1.2.0,<1.3.0)",
+            "gevent"]
 tests_require = []
 if platform.python_version() < '2.7':
     tests_require.append("unittest2")
