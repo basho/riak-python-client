@@ -21,7 +21,7 @@ if platform.python_version() < '2.7':
 
 setup(
     name='riak',
-    version='1.5.2',
+    version='1.5.0',
     packages = find_packages(),
     requires = requires,
     install_requires = install_requires,
