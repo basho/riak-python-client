@@ -31,7 +31,7 @@ class ConnectionManager(object):
     # Must have a close() method
     connection_class = None
 
-    def __init__(self, hostports, pool_size):
+    def __init__(self, hostports, pool_size=10):
         # We want a private copy of this list: either to detach the argument
         # default, or to detach from the caller's list.
         if type(hostports) is list:
@@ -126,7 +126,7 @@ class Socket(object):
 
 class FactoryConnectionManager(ConnectionManager):
 
-    def __init__(self, connection_class, hostports, pool_size=10):
+    def __init__(self, connection_class, hostports, pool_size):
         self.connection_class = connection_class
         ConnectionManager.__init__(self, hostports, pool_size)
 
