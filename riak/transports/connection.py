@@ -41,7 +41,8 @@ class ConnectionManager(object):
         self.pool_size = pool_size
         self.hostports = hostports
         
-        self.queue = Queue(pool_size)
+        queue_limit = pool_size * len(hostports) if type(hostports) is list else pool_size
+        self.queue = Queue(queue_limit)
         
         # Patch httplib if we are using that, also patch the sockets
         monkey.patch_all()
@@ -49,7 +50,7 @@ class ConnectionManager(object):
         if type(self.hostports) is list:
             for host, port in self.hostports:
                 for i in range(0, pool_size):
-                    self.queue.put_nowait(self.connection_class(host, port))
+                    self.queue.put(self.connection_class(host, port))
         else:
             for i in range(0, pool_size):
                 self.queue.put(self.connection_class(hostports[0], hostports[1]))
