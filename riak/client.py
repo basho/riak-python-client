@@ -36,7 +36,7 @@ class RiakClient(object):
     Riak. The Riak API uses HTTP, so there is no persistent
     connection, and the ``RiakClient`` object is extremely lightweight.
     """
-    def __init__(self, host=('127.0.0.1', 8098), prefix='riak',
+    def __init__(self, host=('127.0.0.1', 8098), pool_size=10, prefix='riak',
                  mapred_prefix='mapred', transport_class=None,
                  client_id=None, solr_transport_class=None,
                  transport_options=None):
@@ -63,7 +63,7 @@ class RiakClient(object):
 
         api = getattr(transport_class, 'api', 1)
         if api >= 2:
-            self._cm = transport_class.default_cm(host)
+            self._cm = transport_class.default_cm(host, pool_size)
 
             # If no transport options are provided, then default to the
             # empty dict, otherwise just pass through what we are provided.
