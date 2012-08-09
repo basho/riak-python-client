@@ -20,7 +20,7 @@ import httplib
 import contextlib
 import functools
 import socket
-import gevent.monkey
+from gevent import monkey
 
 from gevent.queue import Queue
 
@@ -44,7 +44,7 @@ class ConnectionManager(object):
         self.queue = Queue(pool_size)
         
         # Patch httplib if we are using that, also patch the sockets
-        gevent.monkey.patch_all(httplib=True)
+        monkey.patch_all(httplib=True)
         
         if type(self.hostports) is list:
             for host, port in self.hostports:
