@@ -20,8 +20,8 @@ import httplib
 import contextlib
 import functools
 
-from gevent.queue import Queue
 from gevent import socket
+from gevent.queue import Queue
 
 class ConnectionManager(object):
 
