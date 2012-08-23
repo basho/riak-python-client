@@ -21,6 +21,7 @@ import socket
 import contextlib
 import functools
 
+
 class ConnectionManager(object):
 
     # Must be constructable with: connection_class(host, port)
@@ -186,3 +187,4 @@ SocketConnectionManager = cm_using(Socket)
 
 class NoHostsDefined(Exception):
     pass
+

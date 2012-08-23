@@ -5,6 +5,7 @@ import subprocess
 import platform
 from setuptools import setup, find_packages
 
+
 def make_docs():
     if not os.path.exists('docs'):
         os.mkdir('docs')
@@ -15,6 +16,7 @@ def make_docs():
 install_requires = ["riak_pb >=1.2.0, < 1.3.0"]
 requires = ["riak_pb(>=1.2.0,<1.3.0)"]
 tests_require = []
+
 if platform.python_version() < '2.7':
     tests_require.append("unittest2")
 

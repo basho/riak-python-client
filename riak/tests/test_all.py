@@ -27,11 +27,13 @@ from riak.riak_index_entry import RiakIndexEntry
 from riak.mapreduce import RiakLink
 from riak.test_server import TestServer
 
+
 try:
     import riak_pb
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
+
 
 HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
@@ -74,6 +76,7 @@ class NotJsonSerializable(object):
             if value1_args[i] != value2_args[i]:
                 return False
         return True
+
 
 class BaseTestCase(object):
 
@@ -840,6 +843,7 @@ class BaseTestCase(object):
         bucket.get('mykey3').delete()
         bucket.get('mykey4').delete()
 
+
 class MapReduceAliasTestMixIn(object):
     """This tests the map reduce aliases"""
 
@@ -1030,8 +1034,7 @@ class MapReduceAliasTestMixIn(object):
         self.assertEqual(sorted(result), [1,2])
 
 
-class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
-                               unittest.TestCase):
+class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
 
     def setUp(self):
         if not HAVE_PROTO:
@@ -1211,6 +1214,7 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
     def test_build_rest_path_excludes_empty_query_params(self):
         self.assertEquals(self.client.get_transport().build_rest_path(bucket=self.client.bucket("foo"), key="bar", params={'r': None}), "/riak/foo/bar?")
 
+
 class RiakTestFilter(unittest.TestCase):
     def test_simple(self):
         f1 = RiakKeyFilter("tokenize", "-", 1)
@@ -1234,10 +1238,10 @@ class RiakTestFilter(unittest.TestCase):
         f3 = RiakKeyFilter("matches", "-11-")
         f4 = f1 & f2 & f3
         self.assertEqual(list(f4), [["and",
-                                        [["starts_with", "2005-"]],
-                                        [["ends_with", "-01"]],
-                                        [["matches", "-11-"]],
-                                       ]])
+            [["starts_with", "2005-"]],
+            [["ends_with", "-01"]],
+            [["matches", "-11-"]],
+        ]])
 
     def test_or(self):
         f1 = RiakKeyFilter("starts_with", "2005-")
@@ -1252,19 +1256,20 @@ class RiakTestFilter(unittest.TestCase):
         f3 = RiakKeyFilter("matches", "-11-")
         f4 = f1 | f2 | f3
         self.assertEqual(list(f4), [["or",
-                               [["starts_with", "2005-"]],
-                               [["ends_with", "-01"]],
-                               [["matches", "-11-"]],
-                             ]])
+            [["starts_with", "2005-"]],
+            [["ends_with", "-01"]],
+            [["matches", "-11-"]],
+        ]])
 
     def test_chaining(self):
         f1 = key_filter.tokenize("-", 1).eq("2005")
         f2 = key_filter.tokenize("-", 2).eq("05")
         f3 = f1 & f2
         self.assertEqual(list(f3), [["and",
-                                     [["tokenize", "-", 1], ["eq", "2005"]],
-                                     [["tokenize", "-", 2], ["eq", "05"]]
-                                   ]])
+            [["tokenize", "-", 1], ["eq", "2005"]],
+            [["tokenize", "-", 2], ["eq", "05"]]
+        ]])
+
 
 if __name__ == '__main__':
     unittest.main()

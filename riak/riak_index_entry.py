@@ -60,3 +60,4 @@ class RiakIndexEntry(object):
             return 1
 
         return 0
+

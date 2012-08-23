@@ -25,8 +25,10 @@ else:
 
 from riak.transports.feature_detect import FeatureDetection
 
+
 class IncompleteTransport(FeatureDetection):
     pass
+
 
 class DummyTransport(FeatureDetection):
     def __init__(self, version):
@@ -34,6 +36,7 @@ class DummyTransport(FeatureDetection):
 
     def _server_version(self):
         return self._version
+
 
 class FeatureDetectionTest(unittest.TestCase):
     def test_implements_server_version(self):
@@ -81,6 +84,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.quorum_controls())
         self.assertTrue(t.tombstone_vclocks())
         self.assertTrue(t.pb_head())
+
 
 if __name__ == '__main__':
     unittest.main()

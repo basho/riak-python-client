@@ -20,6 +20,7 @@ under the License.
 from riak_object import RiakObject
 import mimetypes
 
+
 class RiakBucket(object):
     """
     The ``RiakBucket`` object allows you to access and change information
@@ -527,3 +528,4 @@ class RiakBucket(object):
         Queries a secondary index over objects in this bucket, returning keys.
         """
         return self._client._transport.get_index(self._name, index, startkey, endkey)
+

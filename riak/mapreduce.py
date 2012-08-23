@@ -21,6 +21,7 @@ import urllib
 from riak_object import RiakObject
 from bucket import RiakBucket
 
+
 class RiakMapReduce(object):
     """
     The RiakMapReduce object allows you to build up and run a
@@ -97,8 +98,8 @@ class RiakMapReduce(object):
         """
         self._input_mode = 'query'
         self._inputs = {'module':'riak_search',
-                       'function':'mapred_search',
-                       'arg':[bucket, query]}
+                'function':'mapred_search',
+                'arg':[bucket, query]}
         return self
 
     def index(self, bucket, index, startkey, endkey = None):
@@ -112,13 +113,13 @@ class RiakMapReduce(object):
 
         if endkey == None:
             self._inputs = {'bucket': bucket,
-                            'index':index,
-                            'key':startkey }
+                    'index':index,
+                    'key':startkey }
         else:
             self._inputs = {'bucket':bucket,
-                            'index':index,
-                            'start':startkey,
-                            'end':endkey }
+                    'index':index,
+                    'start':startkey,
+                    'end':endkey }
         return self
 
     def link(self, bucket='_', tag='_', keep=False):
@@ -154,10 +155,10 @@ class RiakMapReduce(object):
             language='javascript'
 
         mr = RiakMapReducePhase('map',
-                                function,
-                                options.get('language', language),
-                                options.get('keep', False),
-                                options.get('arg', None))
+                function,
+                options.get('language', language),
+                options.get('keep', False),
+                options.get('arg', None))
         self._phases.append(mr)
         return self
 
@@ -179,10 +180,10 @@ class RiakMapReduce(object):
             language='javascript'
 
         mr = RiakMapReducePhase('reduce',
-                                function,
-                                options.get('language', language),
-                                options.get('keep', False),
-                                options.get('arg', None))
+                function,
+                options.get('language', language),
+                options.get('keep', False),
+                options.get('arg', None))
         self._phases.append(mr)
         return self
 
@@ -279,7 +280,7 @@ class RiakMapReduce(object):
         return self.reduce("Riak.reduceSort", options=options)
 
     def reduce_numeric_sort(self, options=None):
-        return self.reduce("Riak.reduceNumericSort", options=options)        
+        return self.reduce("Riak.reduceNumericSort", options=options)
 
     def reduce_limit(self, limit, options=None):
         if options is None:
@@ -356,6 +357,7 @@ class RiakMapReducePhase(object):
 
         return {self._type : stepdef}
 
+
 class RiakLinkPhase(object):
     """
     The RiakLinkPhase object holds information about a Link phase in a
@@ -382,6 +384,7 @@ class RiakLinkPhase(object):
                    'tag':self._tag,
                    'keep':self._keep}
         return {'link':stepdef}
+
 
 class RiakLink(object):
     """
@@ -489,6 +492,7 @@ class RiakLink(object):
         is_equal = (self._bucket == link._bucket) and (self._key == link._key) and (self.get_tag() == link.get_tag())
         return is_equal
 
+
 class RiakKeyFilter(object):
     def __init__(self, *args):
         if args:
@@ -511,7 +515,7 @@ class RiakKeyFilter(object):
             return f
         # Otherwise just create a new RiakKeyFilter() object with an and
         return RiakKeyFilter(op, self._filters, other._filters)
-        
+
     def __and__(self, other):
         return self._bool_op("and", other)
 
@@ -530,3 +534,4 @@ class RiakKeyFilter(object):
 
     def __iter__(self):
         return iter(self._filters)
+

@@ -19,11 +19,13 @@ under the License.
 from distutils.version import StrictVersion
 from riak.util import lazy_property
 
+
 versions = {
     1: StrictVersion("1.0.0"),
     1.1: StrictVersion("1.1.0"),
     1.2: StrictVersion("1.2.0")
     }
+
 
 class FeatureDetection(object):
     def _server_version(self):
@@ -91,3 +93,4 @@ class FeatureDetection(object):
     @lazy_property
     def server_version(self):
         return StrictVersion(self._server_version())
+
