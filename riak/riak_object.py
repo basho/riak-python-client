@@ -662,5 +662,6 @@ class RiakObject(object):
         mr.add(self._bucket._name, self._key)
         return apply(mr.reduce, params)
 
+
 from mapreduce import *
 
