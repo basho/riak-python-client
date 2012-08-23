@@ -1,6 +1,7 @@
 from riak.test_server import TestServer
 import unittest
 
+
 class TestServerTestCase(unittest.TestCase):
     def setUp(self):
         self.test_server = TestServer()
@@ -44,6 +45,7 @@ class TestServerTestCase(unittest.TestCase):
         tmp_dir = '/not/the/default/dir'
         server = TestServer(tmp_dir=tmp_dir)
         self.assertEquals(server.temp_dir, tmp_dir)
+
 
 def suite():
     suite = unittest.TestSuite()

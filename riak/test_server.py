@@ -11,10 +11,12 @@ import time
 from subprocess import Popen, PIPE
 from riak.util import deep_merge
 
+
 try:
   bytes
 except NameError:
   bytes = str
+
 
 class Atom(object):
     def __init__(self, s):
@@ -31,6 +33,7 @@ class Atom(object):
 
     def __cmp__(self, other):
         return cmp(self.str, other)
+
 
 def erlang_config(hash, depth=1):
     def printable(item):
@@ -182,7 +185,6 @@ class TestServer(object):
             else:
                 listening = True
 
-
     def wait_for_erlang_prompt(self):
         prompted = False
         buffer = ""
@@ -235,3 +237,4 @@ if __name__ == "__main__":
     time.sleep(20)
     server.stop()
     server.cleanup()
+

@@ -39,7 +39,9 @@ from connection import HTTPConnectionManager
 import riak.util
 from xml.etree import ElementTree
 
+
 MAX_LINK_HEADER_SIZE = 8192 - 8 # substract length of "Link: " header string and newline
+
 
 class RiakHttpTransport(RiakTransport) :
     """
@@ -656,6 +658,7 @@ class RiakHttpTransport(RiakTransport) :
                 retVal[key] = value
         return retVal
 
+
 class XMLSearchResult(object):
     # Match tags that are document fields
     fieldtags = ['str', 'int', 'date']
@@ -704,3 +707,4 @@ class XMLSearchResult(object):
         return {'num_found':self.num_found,
                 'max_score':self.max_score,
                 'docs': self.docs }
+

@@ -30,12 +30,6 @@ See the unit_tests.py file for example usage.
 @author Jay Baird (@skatterbean) (jay@mochimedia.com)
 """
 
-class RiakError(Exception) :
-        def __init__(self, value):
-                self.value = value
-        def __str__(self):
-                return repr(self.value)
-
 from riak_object import RiakObject
 from bucket import RiakBucket
 from client import RiakClient
@@ -44,10 +38,20 @@ from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase,\
 from transports.pbc import RiakPbcTransport
 from transports.http import RiakHttpTransport
 
+
 ONE = "one"
 ALL = "all"
 QUORUM = "quorum"
 
 key_filter = RiakKeyFilter()
+
+
+class RiakError(Exception):
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
 
 

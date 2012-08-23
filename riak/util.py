@@ -37,9 +37,9 @@ def deep_merge(a, b):
                     current_dst[key] = current_src[key]
     return dst
 
-
 def deprecated(message, stacklevel=3):
     warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
+
 
 class lazy_property(object):
     '''
@@ -57,3 +57,4 @@ class lazy_property(object):
         value = self.fget(obj)
         setattr(obj,self.func_name,value)
         return value
+

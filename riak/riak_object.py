@@ -21,6 +21,8 @@ import types, copy
 from metadata import *
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
+from mapreduce import *
+
 
 class RiakObject(object):
     """
@@ -71,7 +73,6 @@ class RiakObject(object):
         :rtype: string
         """
         return self._key
-
 
     def get_data(self):
         """
@@ -140,7 +141,6 @@ class RiakObject(object):
         else:
             self._data = data
         return self
-
 
     def get_metadata(self):
         """
@@ -422,7 +422,6 @@ class RiakObject(object):
 
         return self
 
-
     def reload(self, r=None, pr=None, vtag=None):
         """
         Reload the object from Riak. When this operation completes, the
@@ -445,7 +444,6 @@ class RiakObject(object):
             self.populate(Result)
 
         return self
-
 
     def delete(self, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """
@@ -665,4 +663,3 @@ class RiakObject(object):
         mr.add(self._bucket._name, self._key)
         return apply(mr.reduce, params)
 
-from mapreduce import *

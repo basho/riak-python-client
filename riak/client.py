@@ -72,10 +72,10 @@ class RiakClient(object):
                 transport_options = {}
 
             self._transport = transport_class(self._cm,
-                                              prefix=prefix,
-                                              mapred_prefix=mapred_prefix,
-                                              client_id=client_id,
-                                              **transport_options)
+                    prefix=prefix,
+                    mapred_prefix=mapred_prefix,
+                    client_id=client_id,
+                    **transport_options)
         else:
             deprecated('please upgrade the transport to the new API')
             self._cm = None
@@ -88,9 +88,9 @@ class RiakClient(object):
         self._pr = "default"
         self._pw = "default"
         self._encoders = {'application/json': json.dumps,
-                          'text/json': json.dumps}
+                'text/json': json.dumps}
         self._decoders = {'application/json': json.loads,
-                          'text/json': json.loads}
+                'text/json': json.loads}
         self._solr = None
         self._host = host
         self._port = port
@@ -383,3 +383,4 @@ class RiakClient(object):
             self._solr = RiakSearch(self, host=self._host, port=self._port)
 
         return self._solr
+

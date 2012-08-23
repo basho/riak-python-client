@@ -25,6 +25,7 @@ import platform
 import os
 from feature_detect import FeatureDetection
 
+
 class RiakTransport(FeatureDetection):
     """
     Class to encapsulate transport details
@@ -219,3 +220,4 @@ class RiakTransport(FeatureDetection):
         key = the object's key
         """
         raise RiakError("luwak not supported by this transport.")
+
