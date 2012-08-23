@@ -21,7 +21,6 @@ import types, copy
 from metadata import *
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
-from mapreduce import *
 
 
 class RiakObject(object):
@@ -662,4 +661,6 @@ class RiakObject(object):
         mr = RiakMapReduce(self._client)
         mr.add(self._bucket._name, self._key)
         return apply(mr.reduce, params)
+
+from mapreduce import *
 
