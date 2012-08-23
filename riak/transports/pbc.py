@@ -39,8 +39,7 @@ from riak.metadata import (
         MD_LASTMOD_USECS,
         MD_LINKS,
         MD_USERMETA,
-        MD_VTAG,
-        )
+        MD_VTAG,)
 from riak.riak_index_entry import RiakIndexEntry
 from riak.transports import connection
 from riak.transports.transport import RiakTransport
@@ -51,36 +50,37 @@ try:
 except ImportError:
     riak_pb = None
 
+
 ## Protocol codes
-MSG_CODE_ERROR_RESP           =  0
-MSG_CODE_PING_REQ             =  1
-MSG_CODE_PING_RESP            =  2
-MSG_CODE_GET_CLIENT_ID_REQ    =  3
-MSG_CODE_GET_CLIENT_ID_RESP   =  4
-MSG_CODE_SET_CLIENT_ID_REQ    =  5
-MSG_CODE_SET_CLIENT_ID_RESP   =  6
-MSG_CODE_GET_SERVER_INFO_REQ  =  7
-MSG_CODE_GET_SERVER_INFO_RESP =  8
-MSG_CODE_GET_REQ              =  9
-MSG_CODE_GET_RESP             = 10
-MSG_CODE_PUT_REQ              = 11
-MSG_CODE_PUT_RESP             = 12
-MSG_CODE_DEL_REQ              = 13
-MSG_CODE_DEL_RESP             = 14
-MSG_CODE_LIST_BUCKETS_REQ     = 15
-MSG_CODE_LIST_BUCKETS_RESP    = 16
-MSG_CODE_LIST_KEYS_REQ        = 17
-MSG_CODE_LIST_KEYS_RESP       = 18
-MSG_CODE_GET_BUCKET_REQ       = 19
-MSG_CODE_GET_BUCKET_RESP      = 20
-MSG_CODE_SET_BUCKET_REQ       = 21
-MSG_CODE_SET_BUCKET_RESP      = 22
-MSG_CODE_MAPRED_REQ           = 23
-MSG_CODE_MAPRED_RESP          = 24
-MSG_CODE_INDEX_REQ            = 25
-MSG_CODE_INDEX_RESP           = 26
-MSG_CODE_SEARCH_QUERY_REQ     = 27
-MSG_CODE_SEARCH_QUERY_RESP    = 28
+MSG_CODE_ERROR_RESP = 0
+MSG_CODE_PING_REQ = 1
+MSG_CODE_PING_RESP = 2
+MSG_CODE_GET_CLIENT_ID_REQ = 3
+MSG_CODE_GET_CLIENT_ID_RESP = 4
+MSG_CODE_SET_CLIENT_ID_REQ = 5
+MSG_CODE_SET_CLIENT_ID_RESP = 6
+MSG_CODE_GET_SERVER_INFO_REQ = 7
+MSG_CODE_GET_SERVER_INFO_RESP = 8
+MSG_CODE_GET_REQ = 9
+MSG_CODE_GET_RESP = 10
+MSG_CODE_PUT_REQ = 11
+MSG_CODE_PUT_RESP = 12
+MSG_CODE_DEL_REQ = 13
+MSG_CODE_DEL_RESP = 14
+MSG_CODE_LIST_BUCKETS_REQ = 15
+MSG_CODE_LIST_BUCKETS_RESP = 16
+MSG_CODE_LIST_KEYS_REQ = 17
+MSG_CODE_LIST_KEYS_RESP = 18
+MSG_CODE_GET_BUCKET_REQ = 19
+MSG_CODE_GET_BUCKET_RESP = 20
+MSG_CODE_SET_BUCKET_REQ = 21
+MSG_CODE_SET_BUCKET_RESP = 22
+MSG_CODE_MAPRED_REQ = 23
+MSG_CODE_MAPRED_RESP = 24
+MSG_CODE_INDEX_REQ = 25
+MSG_CODE_INDEX_RESP = 26
+MSG_CODE_SEARCH_QUERY_REQ = 27
+MSG_CODE_SEARCH_QUERY_RESP = 28
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -93,11 +93,10 @@ RIAKC_RW_DEFAULT = 4294967291
 # usable. On seeing any of these errors, the socket
 # should be closed, and the connection re-established.
 CONN_CLOSED_ERRORS = (
-                        errno.EHOSTUNREACH,
-                        errno.ECONNRESET,
-                        errno.EBADF,
-                        errno.EPIPE
-                     )
+        errno.EHOSTUNREACH,
+        errno.ECONNRESET,
+        errno.EBADF,
+        errno.EPIPE)
 
 
 class SocketWithId(connection.Socket):
@@ -202,16 +201,14 @@ class RiakPbcTransport(RiakTransport):
         """
         Get information about the server
         """
-        msg_code, resp = self.send_msg_code(MSG_CODE_GET_SERVER_INFO_REQ,
-                                            MSG_CODE_GET_SERVER_INFO_RESP)
+        msg_code, resp = self.send_msg_code(MSG_CODE_GET_SERVER_INFO_REQ, MSG_CODE_GET_SERVER_INFO_RESP)
         return {'node':resp.node, 'server_version':resp.server_version}
 
     def get_client_id(self):
         """
         Get the client id used by this connection
         """
-        msg_code, resp = self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ,
-                                            MSG_CODE_GET_CLIENT_ID_RESP)
+        msg_code, resp = self.send_msg_code(MSG_CODE_GET_CLIENT_ID_REQ, MSG_CODE_GET_CLIENT_ID_RESP)
         return resp.client_id
 
     def set_client_id(self, client_id):
@@ -221,8 +218,7 @@ class RiakPbcTransport(RiakTransport):
         req = riak_pb.RpbSetClientIdReq()
         req.client_id = client_id
 
-        msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req,
-                                       MSG_CODE_SET_CLIENT_ID_RESP)
+        msg_code, resp = self.send_msg(MSG_CODE_SET_CLIENT_ID_REQ, req, MSG_CODE_SET_CLIENT_ID_RESP)
 
         # Using different client_id values across connections is a bad idea
         # since you never know which connection you might use for a given
@@ -325,8 +321,7 @@ class RiakPbcTransport(RiakTransport):
 
         self.pbify_content(robj.get_metadata(), robj.get_encoded_data(), req.content)
 
-        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req,
-                                       MSG_CODE_PUT_RESP)
+        msg_code, resp = self.send_msg(MSG_CODE_PUT_REQ, req, MSG_CODE_PUT_RESP)
         if not resp:
             raise RiakError("missing response object")
         if len(resp.content) != 1:
@@ -357,8 +352,7 @@ class RiakPbcTransport(RiakTransport):
         req.bucket = bucket.get_name()
         req.key = robj.get_key()
 
-        msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req,
-                                       MSG_CODE_DEL_RESP)
+        msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req, MSG_CODE_DEL_RESP)
         return self
 
     def get_keys(self, bucket):
@@ -372,8 +366,7 @@ class RiakPbcTransport(RiakTransport):
         def _handle_response(resp):
             for key in resp.keys:
                 keys.append(key)
-        self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req,
-                            MSG_CODE_LIST_KEYS_RESP, _handle_response)
+        self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req, MSG_CODE_LIST_KEYS_RESP, _handle_response)
 
         return keys
 
@@ -381,8 +374,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize bucket listing request and deserialize response
         """
-        msg_code, resp = self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ,
-                                            MSG_CODE_LIST_BUCKETS_RESP)
+        msg_code, resp = self.send_msg_code(MSG_CODE_LIST_BUCKETS_REQ, MSG_CODE_LIST_BUCKETS_RESP)
         return resp.buckets
 
     def get_bucket_props(self, bucket):
@@ -392,8 +384,7 @@ class RiakPbcTransport(RiakTransport):
         req = riak_pb.RpbGetBucketReq()
         req.bucket = bucket.get_name()
 
-        msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req,
-                                       MSG_CODE_GET_BUCKET_RESP)
+        msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req, MSG_CODE_GET_BUCKET_RESP)
         props = {}
         if resp.props.HasField('n_val'):
             props['n_val'] = resp.props.n_val
@@ -416,8 +407,7 @@ class RiakPbcTransport(RiakTransport):
         if 'allow_mult' in props:
             req.props.allow_mult = props['allow_mult']
 
-        msg_code, resp = self.send_msg(MSG_CODE_SET_BUCKET_REQ, req,
-                                       MSG_CODE_SET_BUCKET_RESP)
+        msg_code, resp = self.send_msg(MSG_CODE_SET_BUCKET_REQ, req, MSG_CODE_SET_BUCKET_RESP)
         return self
 
     def mapred(self, inputs, query, timeout=None):
@@ -442,8 +432,7 @@ class RiakPbcTransport(RiakTransport):
                     result[resp.phase] += content
                 else:
                     result[resp.phase] = content
-        self.send_msg_multi(MSG_CODE_MAPRED_REQ, req, MSG_CODE_MAPRED_RESP,
-                            _handle_response)
+        self.send_msg_multi(MSG_CODE_MAPRED_REQ, req, MSG_CODE_MAPRED_RESP, _handle_response)
 
         # If a single result - return the same as the HTTP interface does
         # otherwise return all the phase information
@@ -467,8 +456,7 @@ class RiakPbcTransport(RiakTransport):
             req.qtype = riak_pb.RpbIndexReq.eq
             req.key = str(startkey)
 
-        msg_code, resp = self.send_msg(MSG_CODE_INDEX_REQ, req,
-                                       MSG_CODE_INDEX_RESP)
+        msg_code, resp = self.send_msg(MSG_CODE_INDEX_REQ, req, MSG_CODE_INDEX_RESP)
         return resp.keys
 
     def search(self, index, query, **params):
@@ -498,8 +486,7 @@ class RiakPbcTransport(RiakTransport):
         if 'presort' in params:
             req.presort = params['presort']
 
-        msg_code, resp = self.send_msg(MSG_CODE_SEARCH_QUERY_REQ, req,
-                                       MSG_CODE_SEARCH_QUERY_RESP)
+        msg_code, resp = self.send_msg(MSG_CODE_SEARCH_QUERY_REQ, req, MSG_CODE_SEARCH_QUERY_RESP)
 
         result = {}
         if resp.HasField('max_score'):
@@ -720,3 +707,4 @@ class RiakPbcTransport(RiakTransport):
                     pb_link.key = link.get_key()
                     pb_link.tag = link.get_tag()
         rpb_content.value = data
+
