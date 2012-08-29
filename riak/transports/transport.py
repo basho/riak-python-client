@@ -25,6 +25,7 @@ import platform
 import os
 from feature_detect import FeatureDetection
 
+
 class RiakTransport(FeatureDetection):
     """
     Class to encapsulate transport details
@@ -61,14 +62,14 @@ class RiakTransport(FeatureDetection):
         """
         raise RiakError("not implemented")
 
-    def get(self, robj, r = None, vtag = None):
+    def get(self, robj, r=None, vtag=None):
         """
         Serialize get request and deserialize response
         @return (vclock=None, [(metadata, value)]=None)
         """
         raise RiakError("not implemented")
 
-    def put(self, robj, w = None, dw = None, return_body = True):
+    def put(self, robj, w=None, dw=None, return_body=True):
         """
         Serialize put request and deserialize response - if 'content'
         is true, retrieve the updated metadata/content
@@ -86,28 +87,28 @@ class RiakTransport(FeatureDetection):
         """
         raise RiakError("not implemented")
 
-    def delete(self, robj, rw = None):
+    def delete(self, robj, rw=None):
         """
         Serialize delete request and deserialize response
         @return true
         """
         raise RiakError("not implemented")
 
-    def get_buckets(self) :
+    def get_buckets(self):
         """
         Serialize get buckets request and deserialize response
         @return dict()
         """
         raise RiakError("not implemented")
 
-    def get_bucket_props(self, bucket) :
+    def get_bucket_props(self, bucket):
         """
         Serialize get bucket property request and deserialize response
         @return dict()
         """
         raise RiakError("not implemented")
 
-    def set_bucket_props(self, bucket, props) :
+    def set_bucket_props(self, bucket, props):
         """
         Serialize set bucket property request and deserialize response
         bucket = bucket object
@@ -116,7 +117,7 @@ class RiakTransport(FeatureDetection):
         """
         raise RiakError("not implemented")
 
-    def mapred(self, inputs, query, timeout = None) :
+    def mapred(self, inputs, query, timeout=None):
         """
         Serialize map/reduce request
         """
@@ -124,8 +125,9 @@ class RiakTransport(FeatureDetection):
 
     def set_client_id(self, client_id):
         """
-        Set the client id. This overrides the default, random client id, which is automatically
-        generated when none is specified in when creating the transport object.
+        Set the client id. This overrides the default, random client
+        id, which is automatically generated when none is specified in
+        when creating the transport object.
         """
         raise RiakError("not implemented")
 
@@ -155,13 +157,13 @@ class RiakTransport(FeatureDetection):
         """
         phases = []
         if not self.phaseless_mapred():
-            phases.append({'language':'erlang',
-                          'module':'riak_kv_mapreduce',
-                          'function':'reduce_identity',
-                          'keep':True})
-        mr_result = self.mapred({'module':'riak_search',
-                            'function':'mapred_search',
-                            'arg':[index, query]},
+            phases.append({'language': 'erlang',
+                          'module': 'riak_kv_mapreduce',
+                          'function': 'reduce_identity',
+                          'keep': True})
+        mr_result = self.mapred({'module': 'riak_search',
+                                 'function': 'mapred_search',
+                                 'arg': [index, query]},
                            phases)
         result = {'num_found': len(mr_result),
                   'max_score': 0.0,
@@ -180,24 +182,25 @@ class RiakTransport(FeatureDetection):
         """
         phases = []
         if not self.phaseless_mapred():
-            phases.append({'language':'erlang',
-                          'module':'riak_kv_mapreduce',
-                          'function':'reduce_identity',
-                          'keep':True})
+            phases.append({'language': 'erlang',
+                           'module': 'riak_kv_mapreduce',
+                           'function': 'reduce_identity',
+                           'keep': True})
         if endkey:
-            result = self.mapred({'bucket':bucket,
-                                'index':index,
-                                'start':startkey,
-                                'end':endkey},
+            result = self.mapred({'bucket': bucket,
+                                  'index': index,
+                                  'start': startkey,
+                                  'end': endkey},
                                  phases)
         else:
-            result = self.mapred({'bucket':bucket,
-                                'index':index,
-                                'key':startkey},
+            result = self.mapred({'bucket': bucket,
+                                  'index': index,
+                                  'key': startkey},
                                  phases)
-        return [ key for bucket, key in result ]
+        return [key for bucket, key in result]
 
-    def store_file(self, key, content_type="application/octet-stream", content=None):
+    def store_file(self, key, content_type="application/octet-stream",
+                   content=None):
         """
         Store a large piece of data in luwak.
         key = the key/filename for the object

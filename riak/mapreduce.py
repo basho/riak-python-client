@@ -21,6 +21,7 @@ import urllib
 from riak_object import RiakObject
 from bucket import RiakBucket
 
+
 class RiakMapReduce(object):
     """
     The RiakMapReduce object allows you to build up and run a
@@ -60,7 +61,7 @@ class RiakMapReduce(object):
     def add_object(self, obj):
         return self.add_bucket_key_data(obj._bucket._name, obj._key, None)
 
-    def add_bucket_key_data(self, bucket, key, data) :
+    def add_bucket_key_data(self, bucket, key, data):
         if self._input_mode == 'bucket':
             raise Exception('Already added a bucket, can\'t add an object.')
         elif self._input_mode == 'query':
@@ -69,21 +70,21 @@ class RiakMapReduce(object):
             self._inputs.append([bucket, key, data])
             return self
 
-    def add_bucket(self, bucket) :
+    def add_bucket(self, bucket):
         self._input_mode = 'bucket'
         self._inputs = bucket
         return self
 
-    def add_key_filters(self, key_filters) :
+    def add_key_filters(self, key_filters):
         if self._input_mode == 'query':
-          raise Exception('Key filters are not supported in a query.')
+            raise Exception('Key filters are not supported in a query.')
 
         self._key_filters.extend(key_filters)
         return self
 
-    def add_key_filter(self, *args) :
+    def add_key_filter(self, *args):
         if self._input_mode == 'query':
-          raise Exception('Key filters are not supported in a query.')
+            raise Exception('Key filters are not supported in a query.')
 
         self._key_filters.append(args)
         return self
@@ -96,12 +97,12 @@ class RiakMapReduce(object):
         @param query - The search query.
         """
         self._input_mode = 'query'
-        self._inputs = {'module':'riak_search',
-                       'function':'mapred_search',
-                       'arg':[bucket, query]}
+        self._inputs = {'module': 'riak_search',
+                        'function': 'mapred_search',
+                        'arg': [bucket, query]}
         return self
 
-    def index(self, bucket, index, startkey, endkey = None):
+    def index(self, bucket, index, startkey, endkey=None):
         """
         Begin a map/reduce operation using a Secondary Index
         query.
@@ -112,13 +113,13 @@ class RiakMapReduce(object):
 
         if endkey == None:
             self._inputs = {'bucket': bucket,
-                            'index':index,
-                            'key':startkey }
+                            'index': index,
+                            'key': startkey}
         else:
-            self._inputs = {'bucket':bucket,
-                            'index':index,
-                            'start':startkey,
-                            'end':endkey }
+            self._inputs = {'bucket': bucket,
+                            'index': index,
+                            'start': startkey,
+                            'end': endkey}
         return self
 
     def link(self, bucket='_', tag='_', keep=False):
@@ -151,7 +152,7 @@ class RiakMapReduce(object):
         if isinstance(function, list):
             language = 'erlang'
         else:
-            language='javascript'
+            language = 'javascript'
 
         mr = RiakMapReducePhase('map',
                                 function,
@@ -176,7 +177,7 @@ class RiakMapReduce(object):
         if isinstance(function, list):
             language = 'erlang'
         else:
-            language='javascript'
+            language = 'javascript'
 
         mr = RiakMapReducePhase('reduce',
                                 function,
@@ -212,26 +213,27 @@ class RiakMapReduce(object):
             phase = self._phases[i]
             if (i == (num_phases - 1)) and (not keep_flag):
                 phase._keep = True
-            if phase._keep: keep_flag = True
+            if phase._keep:
+                keep_flag = True
             query.append(phase.to_array())
 
         if (len(self._key_filters) > 0):
-          bucket_name = None
-          if (type(self._inputs) == str):
-            bucket_name = self._inputs
-          elif (type(self._inputs) == RiakBucket):
-            bucket_name = self._inputs.get_name()
+            bucket_name = None
+            if (type(self._inputs) == str):
+                bucket_name = self._inputs
+            elif (type(self._inputs) == RiakBucket):
+                bucket_name = self._inputs.get_name()
 
-          if (bucket_name is not None):
-            self._inputs = {'bucket':       bucket_name,
-                            'key_filters':  self._key_filters}
+            if (bucket_name is not None):
+                self._inputs = {'bucket':       bucket_name,
+                                'key_filters':  self._key_filters}
 
         t = self._client.get_transport()
         result = t.mapred(self._inputs, query, timeout)
 
         # If the last phase is NOT a link phase, then return the result.
-        link_results_flag = link_results_flag or isinstance(self._phases[-1], RiakLinkPhase)
-        if not link_results_flag:
+        if not (link_results_flag
+                or isinstance(self._phases[-1], RiakLinkPhase)):
             return result
 
         # If there are no results, then return an empty list.
@@ -279,7 +281,7 @@ class RiakMapReduce(object):
         return self.reduce("Riak.reduceSort", options=options)
 
     def reduce_numeric_sort(self, options=None):
-        return self.reduce("Riak.reduceNumericSort", options=options)        
+        return self.reduce("Riak.reduceNumericSort", options=options)
 
     def reduce_limit(self, limit, options=None):
         if options is None:
@@ -287,7 +289,7 @@ class RiakMapReduce(object):
 
         options['arg'] = limit
         # reduceLimit is broken in riak_kv
-        code="""function(value, arg) {
+        code = """function(value, arg) {
             return value.slice(0, arg);
         }"""
         return self.reduce(code, options=options)
@@ -337,24 +339,26 @@ class RiakMapReducePhase(object):
         Convert the RiakMapReducePhase to an associative array. Used
         internally.
         """
-        stepdef = {'keep':self._keep,
-                   'language':self._language,
-                   'arg':self._arg}
+        stepdef = {'keep': self._keep,
+                   'language': self._language,
+                   'arg': self._arg}
 
-        if (self._language == 'javascript') and isinstance(self._function, list):
-            stepdef['bucket'] = self._function[0]
-            stepdef['key'] = self._function[1]
-        elif (self._language == 'javascript') and isinstance(self._function, str):
-            if ("{" in self._function):
-                stepdef['source'] = self._function
-            else:
-                stepdef['name'] = self._function
+        if self._language == 'javascript':
+            if isinstance(self._function, list):
+                stepdef['bucket'] = self._function[0]
+                stepdef['key'] = self._function[1]
+            elif isinstance(self._function, str):
+                if ("{" in self._function):
+                    stepdef['source'] = self._function
+                else:
+                    stepdef['name'] = self._function
 
         elif (self._language == 'erlang' and isinstance(self._function, list)):
             stepdef['module'] = self._function[0]
             stepdef['function'] = self._function[1]
 
-        return {self._type : stepdef}
+        return {self._type: stepdef}
+
 
 class RiakLinkPhase(object):
     """
@@ -378,10 +382,11 @@ class RiakLinkPhase(object):
         Convert the RiakLinkPhase to an associative array. Used
         internally.
         """
-        stepdef = {'bucket':self._bucket,
-                   'tag':self._tag,
-                   'keep':self._keep}
-        return {'link':stepdef}
+        stepdef = {'bucket': self._bucket,
+                   'tag': self._tag,
+                   'keep': self._keep}
+        return {'link': stepdef}
+
 
 class RiakLink(object):
     """
@@ -486,8 +491,11 @@ class RiakLink(object):
         @param RiakLink link - A RiakLink object.
         @return boolean
         """
-        is_equal = (self._bucket == link._bucket) and (self._key == link._key) and (self.get_tag() == link.get_tag())
-        return is_equal
+
+        return ((self._bucket == link._bucket) and
+                (self._key == link._key) and
+                (self.get_tag() == link.get_tag()))
+
 
 class RiakKeyFilter(object):
     def __init__(self, *args):
@@ -511,7 +519,7 @@ class RiakKeyFilter(object):
             return f
         # Otherwise just create a new RiakKeyFilter() object with an and
         return RiakKeyFilter(op, self._filters, other._filters)
-        
+
     def __and__(self, other):
         return self._bool_op("and", other)
 

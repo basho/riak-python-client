@@ -20,6 +20,7 @@ under the License.
 from riak_object import RiakObject
 import mimetypes
 
+
 class RiakBucket(object):
     """
     The ``RiakBucket`` object allows you to access and change information
@@ -186,7 +187,6 @@ class RiakBucket(object):
         self._pr = pr
         return self
 
-
     def get_pw(self, pw=None):
         """
         Get the PW-value for this bucket, if it is set, otherwise return
@@ -214,7 +214,8 @@ class RiakBucket(object):
 
     def get_encoder(self, content_type):
         """
-        Get the encoding function for the provided content type for this bucket.
+        Get the encoding function for the provided content type for
+        this bucket.
 
         :param content_type: Content type requested
         """
@@ -225,18 +226,20 @@ class RiakBucket(object):
 
     def set_encoder(self, content_type, encoder):
         """
-        Set the encoding function for the provided content type for this bucket.
+        Set the encoding function for the provided content type for
+        this bucket.
 
         :param content_type: Content type for encoder
-        :param encoder: Function to encode with - will be called with data as single
-                        argument.
+        :param encoder: Function to encode with - will be called with
+                        data as single argument.
         """
         self._encoders[content_type] = encoder
         return self
 
     def get_decoder(self, content_type):
         """
-        Get the decoding function for the provided content type for this bucket.
+        Get the decoding function for the provided content type for
+        this bucket.
 
         :param content_type: Content type for decoder
         """
@@ -247,20 +250,25 @@ class RiakBucket(object):
 
     def set_decoder(self, content_type, decoder):
         """
-        Set the decoding function for the provided content type for this bucket.
+        Set the decoding function for the provided content type for
+        this bucket.
 
         :param content_type: Content type for decoder
-        :param decoder: Function to decode with - will be called with string
+        :param decoder: Function to decode with - will be called with
+                        string
         """
         self._decoders[content_type] = decoder
         return self
 
     def new(self, key=None, data=None, content_type='application/json'):
         """
-        Create a new :class:`RiakObject <riak.riak_object.RiakObject>` that will be stored as JSON. A shortcut for
-        manually instantiating a :class:`RiakObject <riak.riak_object.RiakObject>`.
+        Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
+        that will be stored as JSON. A shortcut for manually
+        instantiating a :class:`RiakObject
+        <riak.riak_object.RiakObject>`.
 
-        :param key: Name of the key. Leaving this to be None (default) will make Riak generate the key on store.
+        :param key: Name of the key. Leaving this to be None (default)
+                    will make Riak generate the key on store.
         :type key: string
         :param data: The data to store.
         :type data: object
@@ -280,8 +288,10 @@ class RiakBucket(object):
 
     def new_binary(self, key, data, content_type='application/octet-stream'):
         """
-        Create a new :class:`RiakObject <riak.riak_object.RiakObject>` that will be stored as plain text/binary.
-        A shortcut for manually instantiating a :class:`RiakObject <riak.riak_object.RiakObject>`.
+        Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
+        that will be stored as plain text/binary. A shortcut for
+        manually instantiating a :class:`RiakObject
+        <riak.riak_object.RiakObject>`.
 
         :param key: Name of the key.
         :type key: string
@@ -387,11 +397,6 @@ class RiakBucket(object):
         and returned to the client. This situation can be detected by
         calling has_siblings() and get_siblings().
 
-        .. warning::
-
-           This should only be used if you know what you are doing, as it can lead to
-           unexpected results.
-
         :param bool: True to store and return conflicting writes.
         :type bool: boolean
         """
@@ -418,11 +423,12 @@ class RiakBucket(object):
         :param value: Property value.
         :type value: mixed
         """
-        return self.set_properties({key : value})
+        return self.set_properties({key: value})
 
     def get_bool_property(self, key):
         """
-        Get a boolean bucket property.  Converts to a ``True`` or ``False`` value.
+        Get a boolean bucket property. Converts to a ``True`` or
+        ``False`` value.
 
         :param key: Property to set.
         :type key: string
@@ -480,7 +486,8 @@ class RiakBucket(object):
 
     def new_binary_from_file(self, key, filename):
         """
-        Create a new Riak object in the bucket, using the content of the specified file.
+        Create a new Riak object in the bucket, using the content of
+        the specified file.
         """
         binary_data = open(filename, "rb").read()
         mimetype, encoding = mimetypes.guess_type(filename)
@@ -490,9 +497,11 @@ class RiakBucket(object):
 
     def search_enabled(self):
         """
-        Returns True if the search precommit hook is enabled for this bucket.
+        Returns True if the search precommit hook is enabled for this
+        bucket.
         """
-        return self.SEARCH_PRECOMMIT_HOOK in (self.get_property("precommit") or [])
+        return self.SEARCH_PRECOMMIT_HOOK in (self.get_property("precommit") or
+                                              [])
 
     def enable_search(self):
         """
@@ -526,4 +535,5 @@ class RiakBucket(object):
         """
         Queries a secondary index over objects in this bucket, returning keys.
         """
-        return self._client._transport.get_index(self._name, index, startkey, endkey)
+        return self._client._transport.get_index(self._name, index, startkey,
+                                                 endkey)

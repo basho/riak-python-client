@@ -12,9 +12,10 @@ from subprocess import Popen, PIPE
 from riak.util import deep_merge
 
 try:
-  bytes
+    bytes
 except NameError:
-  bytes = str
+    bytes = str
+
 
 class Atom(object):
     def __init__(self, s):
@@ -32,6 +33,7 @@ class Atom(object):
     def __cmp__(self, other):
         return cmp(self.str, other)
 
+
 def erlang_config(hash, depth=1):
     def printable(item):
         k, v = item
@@ -47,7 +49,7 @@ def erlang_config(hash, depth=1):
         return "{%s, %s}" % (k, p)
 
     padding = '    ' * depth
-    parent_padding = '    ' * (depth-1)
+    parent_padding = '    ' * (depth - 1)
     values = (",\n%s" % padding).join(map(printable, hash.items()))
     return "[\n%s%s\n%s]" % (padding, values, parent_padding)
 
@@ -55,13 +57,15 @@ def erlang_config(hash, depth=1):
 class TestServer(object):
     VM_ARGS_DEFAULTS = {
         "-name": "riaktest%d@127.0.0.1" % random.randint(0, 100000),
-        "-setcookie": "%d_%d" % (random.randint(0, 100000), random.randint(0, 100000)),
+        "-setcookie": "%d_%d" % (random.randint(0, 100000),
+                                 random.randint(0, 100000)),
         "+K": "true",
         "+A": 64,
         "-smp": "enable",
         "-env ERL_MAX_PORTS": 4096,
         "-env ERL_FULLSWEEP_AFTER": 10,
-        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__), "erl_src"))
+        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                            "erl_src"))
     }
 
     APP_CONFIG_DEFAULTS = {
@@ -107,10 +111,11 @@ class TestServer(object):
         for key, value in options.items():
             if key in self.app_config:
                 self.app_config[key] = deep_merge(self.app_config[key], value)
-
-        self.app_config["riak_core"]["ring_state_dir"] = os.path.join(self.temp_dir, "data", "ring")
+        ring_dir = os.path.join(self.temp_dir, "data", "ring")
+        crash_log = os.path.join(self.temp_dir, "log", "crash.log")
+        self.app_config["riak_core"]["ring_state_dir"] = ring_dir
         self.app_config["riak_core"]["platform_data_dir"] = self.temp_dir
-        self.app_config["lager"] = {"crash_log": os.path.join(self.temp_dir, "log", "crash.log")}
+        self.app_config["lager"] = {"crash_log": crash_log}
 
     def prepare(self):
         if not self._prepared:
@@ -132,7 +137,8 @@ class TestServer(object):
     def start(self):
         if self._prepared and not self._started:
             with self._lock:
-                self._server = Popen([self._riak_script, "console"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+                self._server = Popen([self._riak_script, "console"],
+                                     stdin=PIPE, stdout=PIPE, stderr=PIPE)
                 self._server.stdin.write("\n")
                 self._server.stdin.flush()
                 self.wait_for_erlang_prompt()
@@ -157,7 +163,7 @@ class TestServer(object):
         if self._started:
             with self._lock:
                 stdin = self._server.stdin
-                if self.app_config["riak_kv"]["storage_backend"] == "riak_kv_test_backend":
+                if self._kv_backend() == "riak_kv_test_backend":
                     stdin.write("riak_kv_test_backend:reset().\n")
                     stdin.flush()
                     self.wait_for_erlang_prompt()
@@ -176,12 +182,12 @@ class TestServer(object):
         listening = False
         while not listening:
             try:
-                s = socket.create_connection((self.app_config["riak_core"]["web_ip"], self.app_config["riak_core"]["web_port"]), 1.0)
+                socket.create_connection((self._http_ip(), self._http_port()),
+                                         1.0)
             except socket.error, (value, message):
                 pass
             else:
                 listening = True
-
 
     def wait_for_erlang_prompt(self):
         prompted = False
@@ -199,29 +205,53 @@ class TestServer(object):
         with open(self._riak_script, "wb") as temp_bin_file:
             with open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
                 for line in riak_file.readlines():
-                    line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r'\1%s' % self._temp_bin, line)
-                    line = re.sub("(RUNNER_ETC_DIR=)(.*)", r'\1%s' % self._temp_etc, line)
+                    line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r'\1%s' %
+                                  self._temp_bin,
+                                  line)
+                    line = re.sub("(RUNNER_ETC_DIR=)(.*)", r'\1%s' %
+                                  self._temp_etc, line)
                     line = re.sub("(RUNNER_USER=)(.*)", r'\1', line)
-                    line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' % self._temp_log, line)
-                    line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' % self._temp_pipe, line)
-                    line = re.sub("(PLATFORM_DATA_DIR=)(.*)", r'\1%s' % self.temp_dir, line)
+                    line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' %
+                                  self._temp_log, line)
+                    line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' %
+                                  self._temp_pipe, line)
+                    line = re.sub("(PLATFORM_DATA_DIR=)(.*)", r'\1%s' %
+                                  self.temp_dir, line)
 
-                    if string.strip(line) == "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}":
-                        line = "RUNNER_BASE_DIR=%s\n" % os.path.normpath(os.path.join(self.bin_dir, ".."))
+                    if (string.strip(line) ==
+                        "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}"):
+                        line = ("RUNNER_BASE_DIR=%s\n" %
+                                os.path.normpath(os.path.join(self.bin_dir,
+                                                              "..")))
 
                     temp_bin_file.write(line)
 
                 os.fchmod(temp_bin_file.fileno(), 0755)
 
     def write_vm_args(self):
-        with open(os.path.join(self._temp_etc, "vm.args"), 'wb') as vm_args:
+        with open(self._vm_args_path(), 'wb') as vm_args:
             for arg, value in self.vm_args.items():
                 vm_args.write("%s %s\n" % (arg, value))
 
     def write_app_config(self):
-        with open(os.path.join(self._temp_etc, "app.config"), "wb") as app_config:
+        with open(self._app_config(), "wb") as app_config:
             app_config.write(erlang_config(self.app_config))
             app_config.write(".")
+
+    def _kv_backend(self):
+        return self.app_config["riak_kv"]["storage_backend"]
+
+    def _http_ip(self):
+        return self.app_config["riak_core"]["web_ip"]
+
+    def _http_port(self):
+        return self.app_config["riak_core"]["web_port"]
+
+    def _app_config_path(self):
+        return os.path.join(self._temp_etc, "app.config")
+
+    def _vm_args_path(self):
+        return os.path.join(self._temp_etc, "vm.args")
 
 
 if __name__ == "__main__":
