@@ -1,6 +1,8 @@
-# (c) 2005 Ian Bicking and contributors; written for Paste (http://pythonpaste.org)
-# Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+# (c) 2005 Ian Bicking and contributors; written for Paste
+# (http://pythonpaste.org) Licensed under the MIT license:
+# http://www.opensource.org/licenses/mit-license.php
 from UserDict import DictMixin
+
 
 class MultiDict(DictMixin):
 
@@ -106,7 +108,7 @@ class MultiDict(DictMixin):
     def __delitem__(self, key):
         items = self._items
         found = False
-        for i in range(len(items)-1, -1, -1):
+        for i in range(len(items) - 1, -1, -1):
             if items[i][0] == key:
                 del items[i]
                 found = True
@@ -136,8 +138,8 @@ class MultiDict(DictMixin):
 
     def pop(self, key, *args):
         if len(args) > 1:
-            raise TypeError, "pop expected at most 2 arguments, got "\
-                              + repr(1 + len(args))
+            raise TypeError("pop expected at most 2 arguments, got %s" %
+                            (1 + len(args)))
         for i in range(len(self._items)):
             if self._items[i][0] == key:
                 v = self._items[i][1]
@@ -197,5 +199,3 @@ class MultiDict(DictMixin):
     def itervalues(self):
         for k, v in self._items:
             yield v
-
-

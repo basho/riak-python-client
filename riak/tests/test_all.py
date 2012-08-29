@@ -75,6 +75,7 @@ class NotJsonSerializable(object):
                 return False
         return True
 
+
 class BaseTestCase(object):
 
     @staticmethod
@@ -85,7 +86,8 @@ class BaseTestCase(object):
         host = host or self.host
         port = port or self.port
         transport_class = transport_class or self.transport_class
-        return RiakClient(self.host, self.port, transport_class=self.transport_class)
+        return RiakClient(self.host, self.port,
+                          transport_class=self.transport_class)
 
     def setUp(self):
         self.client = self.create_client()
@@ -160,7 +162,7 @@ class BaseTestCase(object):
         bucket = self.client.bucket("picklin_bucket")
         bucket.set_encoder('application/x-pickle', cPickle.dumps)
         bucket.set_decoder('application/x-pickle', cPickle.loads)
-        data = {'array':[1, 2, 3], 'badforjson': NotJsonSerializable(1,3)}
+        data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
         obj = bucket.new("foo", data, 'application/x-pickle').store()
         obj.store()
         obj2 = bucket.get("foo")
@@ -171,7 +173,7 @@ class BaseTestCase(object):
         bucket = self.client.bucket("picklin_client")
         self.client.set_encoder('application/x-pickle', cPickle.dumps)
         self.client.set_decoder('application/x-pickle', cPickle.loads)
-        data = {'array':[1, 2, 3], 'badforjson':NotJsonSerializable(1,3)}
+        data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
         obj = bucket.new("foo", data, 'application/x-pickle').store()
         obj.store()
         obj2 = bucket.get("foo")
@@ -212,7 +214,7 @@ class BaseTestCase(object):
         bucket.set_n_val(3)
         self.assertEqual(bucket.get_n_val(), 3)
         # Test setting multiple properties...
-        bucket.set_properties({"allow_mult":False, "n_val":2})
+        bucket.set_properties({"allow_mult": False, "n_val": 2})
         self.assertFalse(bucket.get_allow_multiples())
         self.assertEqual(bucket.get_n_val(), 2)
 
@@ -419,7 +421,6 @@ class BaseTestCase(object):
         bucket.new("google-20110103", 2).store()
         bucket.new("yahoo-20090613", 3).store()
 
-
         # compose a chain of key filters using f as the root of
         # two filters ANDed together to ensure that f can be the root
         # of multiple chains
@@ -434,12 +435,12 @@ class BaseTestCase(object):
 
         self.assertEqual(result, ["yahoo-20090613"])
 
-
     def test_key_filters_with_search_query(self):
-        mapreduce = self.client \
-            .search("kftest", "query")
-        self.assertRaises(Exception, mapreduce.add_key_filters, [["tokenize", "-", 2]])
-        self.assertRaises(Exception, mapreduce.add_key_filter, "ends_with", "0613")
+        mapreduce = self.client.search("kftest", "query")
+        self.assertRaises(Exception, mapreduce.add_key_filters,
+                          [["tokenize", "-", 2]])
+        self.assertRaises(Exception, mapreduce.add_key_filter,
+                          "ends_with", "0613")
 
     def test_erlang_map_reduce(self):
         # Create the object...
@@ -530,9 +531,9 @@ class BaseTestCase(object):
         # for json objects
         o = bucket.get("nonexistent_key_json")
         self.assertEqual(o.exists(), False)
-        o.set_data({"foo" : "bar"})
+        o.set_data({"foo": "bar"})
         o = o.store()
-        self.assertEqual(o.get_data(), {"foo" : "bar"})
+        self.assertEqual(o.get_data(), {"foo": "bar"})
         self.assertEqual(o.get_content_type(), "application/json")
         o.delete()
         # for binary objects
@@ -562,34 +563,41 @@ class BaseTestCase(object):
     def test_solr_search_with_params(self):
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
-        results = self.client.solr().search("searchbucket", "username:roidrage", wt="xml")
+        results = self.client.solr().search("searchbucket",
+                                            "username:roidrage", wt="xml")
         self.assertEquals(1, len(results['docs']))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search(self):
         bucket = self.client.bucket('searchbucket')
         bucket.new("user", {"username": "roidrage"}).store()
-        results = self.client.solr().search("searchbucket", "username:roidrage")
+        results = self.client.solr().search("searchbucket",
+                                            "username:roidrage")
         self.assertEquals(1, len(results["docs"]))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_search_integration(self):
         # Create some objects to search across...
         bucket = self.client.bucket("searchbucket")
-        bucket.new("one", {"foo":"one", "bar":"red"}).store()
-        bucket.new("two", {"foo":"two", "bar":"green"}).store()
-        bucket.new("three", {"foo":"three", "bar":"blue"}).store()
-        bucket.new("four", {"foo":"four", "bar":"orange"}).store()
-        bucket.new("five", {"foo":"five", "bar":"yellow"}).store()
+        bucket.new("one", {"foo": "one", "bar": "red"}).store()
+        bucket.new("two", {"foo": "two", "bar": "green"}).store()
+        bucket.new("three", {"foo": "three", "bar": "blue"}).store()
+        bucket.new("four", {"foo": "four", "bar": "orange"}).store()
+        bucket.new("five", {"foo": "five", "bar": "yellow"}).store()
 
         # Run some operations...
-        results = self.client.solr().search("searchbucket", "foo:one OR foo:two")
+        results = self.client.solr().search("searchbucket",
+                                            "foo:one OR foo:two")
         if (len(results) == 0):
             print "\n\nNot running test \"testSearchIntegration()\".\n"
-            print "Please ensure that you have installed the Riak Search hook on bucket \"searchbucket\" by running \"bin/search-cmd install searchbucket\".\n\n"
+            print """Please ensure that you have installed the Riak
+            Search hook on bucket \"searchbucket\" by running
+            \"bin/search-cmd install searchbucket\".\n\n"""
             return
         self.assertEqual(len(results['docs']), 2)
-        results = self.client.solr().search("searchbucket", "(foo:one OR foo:two OR foo:three OR foo:four) AND (NOT bar:green)")
+        query = "(foo:one OR foo:two OR foo:three OR foo:four) AND\
+                 (NOT bar:green)"
+        results = self.client.solr().search("searchbucket", query)
         self.assertEqual(len(results['docs']), 3)
 
     def test_store_binary_object_from_file(self):
@@ -624,25 +632,26 @@ class BaseTestCase(object):
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
         bucket = self.client.bucket('bucket')
         rand = str(self.randint())
-        self.assertRaises(IOError, bucket.new_binary_from_file, 'not_found_from_file', 'FILE_NOT_FOUND')
+        self.assertRaises(IOError, bucket.new_binary_from_file,
+                          'not_found_from_file', 'FILE_NOT_FOUND')
         obj = bucket.get_binary('not_found_from_file')
         self.assertEqual(obj.get_data(), None)
 
     def test_list_buckets(self):
         bucket = self.client.bucket("list_bucket")
-        bucket.new("one", {"foo":"one", "bar":"red"}).store()
+        bucket.new("one", {"foo": "one", "bar": "red"}).store()
         buckets = self.client.get_buckets()
         self.assertTrue("list_bucket" in buckets)
 
     def is_2i_supported(self):
         # Immediate test to see if 2i is even supported w/ the backend
         try:
-            self.client.index('foo','bar_bin','baz').run()
+            self.client.index('foo', 'bar_bin', 'baz').run()
             return True
         except Exception as e:
             if "indexes_not_supported" in str(e):
                 return False
-            return True # it failed, but is supported!
+            return True  # it failed, but is supported!
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_store(self):
@@ -669,8 +678,10 @@ class BaseTestCase(object):
 
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
-        self.assertEqual(['val1a', 'val1b'], sorted(obj.get_indexes('field1_bin')))
-        self.assertEqual(['1011', '1012'], sorted(obj.get_indexes('field1_int')))
+        self.assertEqual(['val1a', 'val1b'],
+                         sorted(obj.get_indexes('field1_bin')))
+        self.assertEqual(['1011', '1012'],
+                         sorted(obj.get_indexes('field1_int')))
 
         # Check the get_indexes() function...
         self.assertEqual([
@@ -740,7 +751,8 @@ class BaseTestCase(object):
             return True
 
         bucket = self.client.bucket('indexbucket')
-        bar = bucket.new('bar', 1).add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
+        bar = bucket.new('bar', 1).add_index('bar_int', 1)\
+            .add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
         result = bucket.get_index('bar_int', 1)
         self.assertEqual(1, len(result))
         self.assertEqual(3, len(bar.get_indexes()))
@@ -757,7 +769,8 @@ class BaseTestCase(object):
         self.assertEqual(0, len(bar.get_indexes('baz_bin')))
 
         # add index again
-        bar = bar.add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
+        bar = bar.add_index('bar_int', 1).add_index('bar_int', 2)\
+            .add_index('baz_bin', 'baz').store()
         # remove all index with field='bar_int'
         bar = bar.remove_index(field='bar_int').store()
         result = bucket.get_index('bar_int', 1)
@@ -771,7 +784,8 @@ class BaseTestCase(object):
         self.assertEqual(1, len(bar.get_indexes('baz_bin')))
 
         # add index again
-        bar = bar.add_index('bar_int', 1).add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
+        bar = bar.add_index('bar_int', 1).add_index('bar_int', 2)\
+            .add_index('baz_bin', 'baz').store()
         # remove an index field value pair
         bar = bar.remove_index(field='bar_int', value=2).store()
         result = bucket.get_index('bar_int', 1)
@@ -819,7 +833,7 @@ class BaseTestCase(object):
 
         # Test a range query...
         results = bucket.get_index('field1_bin', 'val2', 'val4')
-        vals = set([ str(key) for key in results ])
+        vals = set([str(key) for key in results])
         self.assertEquals(3, len(results))
         self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
 
@@ -830,7 +844,7 @@ class BaseTestCase(object):
 
         # Test a range query...
         results = bucket.get_index('field2_int', 1002, 1004)
-        vals = set([str(key) for key in results ])
+        vals = set([str(key) for key in results])
         self.assertEquals(3, len(results))
         self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
 
@@ -839,6 +853,7 @@ class BaseTestCase(object):
         bucket.get('mykey2').delete()
         bucket.get('mykey3').delete()
         bucket.get('mykey4').delete()
+
 
 class MapReduceAliasTestMixIn(object):
     """This tests the map reduce aliases"""
@@ -939,7 +954,7 @@ class MapReduceAliasTestMixIn(object):
         # Use the map_values alias
         result = mr.map_values_json().reduce_sort().run()
 
-        self.assertEqual(result, ["value1","value2"])
+        self.assertEqual(result, ["value1", "value2"])
 
     def test_reduce_sort_custom(self):
         # Add a value to the bucket
@@ -957,7 +972,7 @@ class MapReduceAliasTestMixIn(object):
            return x > y ? -1 : 1;
         }""").run()
 
-        self.assertEqual(result, ["value2","value1"])
+        self.assertEqual(result, ["value2", "value1"])
 
     def test_reduce_numeric_sort(self):
         # Add a value to the bucket
@@ -972,7 +987,7 @@ class MapReduceAliasTestMixIn(object):
         # Use the map_values alias
         result = mr.map_values_json().reduce_numeric_sort().run()
 
-        self.assertEqual(result, [1,2])
+        self.assertEqual(result, [1, 2])
 
     def test_reduce_limit(self):
         # Add a value to the bucket
@@ -1004,7 +1019,7 @@ class MapReduceAliasTestMixIn(object):
         # Use the map_values alias
         result = mr.map_values_json()\
                    .reduce_numeric_sort()\
-                   .reduce_slice(1,2).run()
+                   .reduce_slice(1, 2).run()
 
         self.assertEqual(result, [2])
 
@@ -1027,7 +1042,7 @@ class MapReduceAliasTestMixIn(object):
                    .filter_not_found()\
                    .run()
 
-        self.assertEqual(sorted(result), [1,2])
+        self.assertEqual(sorted(result), [1, 2])
 
 
 class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
@@ -1035,7 +1050,7 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
 
     def setUp(self):
         if not HAVE_PROTO:
-          self.skipTest('protobuf is unavailable')
+            self.skipTest('protobuf is unavailable')
         self.host = PB_HOST
         self.port = PB_PORT
         self.transport_class = RiakPbcTransport
@@ -1046,12 +1061,12 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
         self.port = PB_PORT
         zero_client_id = "\0\0\0\0"
         c = RiakClient(PB_HOST, PB_PORT,
-                            transport_class = RiakPbcTransport,
-                            client_id = zero_client_id)
-        self.assertEqual(zero_client_id, c.get_client_id()) #
+                       transport_class=RiakPbcTransport,
+                       client_id=zero_client_id)
+        self.assertEqual(zero_client_id, c.get_client_id())
 
     def test_close_underlying_socket_fails(self):
-        c = RiakClient(PB_HOST, PB_PORT, transport_class = RiakPbcTransport)
+        c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport)
 
         bucket = c.bucket('bucket_test_close')
         rand = self.randint()
@@ -1100,7 +1115,8 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
         self.assertEqual(obj.get_data(), rand)
 
 
-class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.TestCase):
+class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
+                                unittest.TestCase):
 
     def setUp(self):
         self.host = HTTP_HOST
@@ -1136,9 +1152,11 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
     def test_disable_search_commit_hook(self):
         bucket = self.client.bucket("no_search_bucket")
         bucket.enable_search()
-        self.assertTrue(self.client.bucket("no_search_bucket").search_enabled())
+        self.assertTrue(self.client.bucket("no_search_bucket")\
+                            .search_enabled())
         bucket.disable_search()
-        self.assertFalse(self.client.bucket("no_search_bucket").search_enabled())
+        self.assertFalse(self.client.bucket("no_search_bucket")\
+                             .search_enabled())
 
     @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
     def test_store_file_with_luwak(self):
@@ -1177,39 +1195,61 @@ class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn, unittest.
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_document_to_index(self):
-        self.client.solr().add("searchbucket", {"id": "doc", "username": "tony"})
+        self.client.solr().add("searchbucket",
+                               {"id": "doc", "username": "tony"})
         results = self.client.solr().search("searchbucket", "username:tony")
         self.assertEquals("tony", results['docs'][0]['username'])
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_multiple_documents_to_index(self):
-        self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
-        results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
+        self.client.solr().add("searchbucket",
+                               {"id": "dizzy", "username": "dizzy"},
+                               {"id": "russell", "username": "russell"})
+        results = self.client.solr()\
+            .search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(2, len(results['docs']))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_id(self):
-        self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
+        self.client.solr().add("searchbucket",
+                               {"id": "dizzy", "username": "dizzy"},
+                               {"id": "russell", "username": "russell"})
         self.client.solr().delete("searchbucket", docs=["dizzy"])
-        results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
+        results = self.client.solr()\
+            .search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(1, len(results['docs']))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query(self):
-        self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
-        self.client.solr().delete("searchbucket", queries=["username:dizzy", "username:russell"])
-        results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
+        self.client.solr().add("searchbucket",
+                               {"id": "dizzy", "username": "dizzy"},
+                               {"id": "russell", "username": "russell"})
+        self.client.solr()\
+            .delete("searchbucket",
+                    queries=["username:dizzy", "username:russell"])
+        results = self.client.solr()\
+            .search("searchbucket", "username:russell OR username:dizzy")
         self.assertEquals(0, len(results['docs']))
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query_and_id(self):
-        self.client.solr().add("searchbucket", {"id": "dizzy", "username": "dizzy"}, {"id": "russell", "username": "russell"})
-        self.client.solr().delete("searchbucket", docs=["dizzy"], queries=["username:russell"])
-        results = self.client.solr().search("searchbucket", "username:russell OR username:dizzy")
+        self.client.solr().add("searchbucket",
+                               {"id": "dizzy", "username": "dizzy"},
+                               {"id": "russell", "username": "russell"})
+        self.client.solr().delete("searchbucket",
+                                  docs=["dizzy"],
+                                  queries=["username:russell"])
+        results = self.client.solr()\
+            .search("searchbucket",
+                    "username:russell OR username:dizzy")
         self.assertEquals(0, len(results['docs']))
 
     def test_build_rest_path_excludes_empty_query_params(self):
-        self.assertEquals(self.client.get_transport().build_rest_path(bucket=self.client.bucket("foo"), key="bar", params={'r': None}), "/riak/foo/bar?")
+        self.assertEquals(
+            self.client.get_transport().build_rest_path(
+                bucket=self.client.bucket("foo"),
+                key="bar", params={'r': None}), "/riak/foo/bar?")
+
 
 class RiakTestFilter(unittest.TestCase):
     def test_simple(self):
@@ -1226,7 +1266,10 @@ class RiakTestFilter(unittest.TestCase):
         f1 = RiakKeyFilter("starts_with", "2005-")
         f2 = RiakKeyFilter("ends_with", "-01")
         f3 = f1 & f2
-        self.assertEqual(list(f3), [["and", [["starts_with", "2005-"]], [["ends_with", "-01"]]]])
+        self.assertEqual(list(f3),
+                         [["and",
+                           [["starts_with", "2005-"]],
+                           [["ends_with", "-01"]]]])
 
     def test_multi_and(self):
         f1 = RiakKeyFilter("starts_with", "2005-")
