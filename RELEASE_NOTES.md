@@ -1,5 +1,33 @@
 # Riak Python Client Release Notes
 
+## 1.5.0 Feature Release - 2012-08-29
+
+Release 1.5.0 is a feature release that supports Riak 1.2.
+
+Noteworthy features:
+
+* Riak 1.2 features are now supported, including Search and 2I queries
+  over Protocol Buffers transport. The Protocol Buffers message
+  definitions now exist as a separate package, available on
+  [PyPi](http://pypi.python.org/pypi/riak_pb/1.2.0).
+
+  **NOTE:** The return value of search queries over HTTP and MapReduce
+  were changed to be compatible with the results returned from the
+  Protocol Buffers interface.
+* The client will use a version-based feature detection scheme to
+  enable or disable various features, including the new Riak 1.2
+  features. This enables compatibility with older nodes during a
+  rolling upgrade, or usage of the newer client with older clusters.
+
+Noteworthy bugfixes:
+
+* The code formatting and style was adjusted to fit PEP8 standards.
+* All classes in the package are now "new-style".
+* The PW accessor methods on RiakClient now get and set the right
+  instance variable.
+* Various fixes were made to the TestServer and it will throw an
+  exception when it fails to start.
+
 ## 1.4.1 Patch Release - 2012-06-19
 
 Noteworthy features:
