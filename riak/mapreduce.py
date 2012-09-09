@@ -107,7 +107,9 @@ class RiakMapReduce(object):
         Begin a map/reduce operation using a Secondary Index
         query.
         @param bucket - The bucket over which to perform the search.
-        @param query - The search query.
+        @param index - The index to use for query
+        @param startkey - The start key of index range
+        @param endkey - The end key of index range or blank
         """
         self._input_mode = 'query'
 
