@@ -164,7 +164,7 @@ class Socket(object):
     def maybe_connect(self):
         if self.sock is None:
             self.sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            if "timeout" in options:
+            if "timeout" in self.options:
                 self.sock.settimeout(self.options["timeout"])
 
         try:
