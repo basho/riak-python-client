@@ -152,6 +152,9 @@ class ConnectionManager(object):
 
 class Socket(object):
 
+    # Allow extending classes to affect how sockets are created through options
+    options = {}
+
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -161,6 +164,8 @@ class Socket(object):
     def maybe_connect(self):
         if self.sock is None:
             self.sock = s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if "timeout" in options:
+                self.sock.settimeout(self.options["timeout"])
 
         try:
             s.connect((self.host, self.port))
