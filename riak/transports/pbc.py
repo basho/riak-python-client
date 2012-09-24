@@ -163,9 +163,9 @@ class RiakPbcTransport(RiakTransport):
 
     @staticmethod
     def with_timeout(timeout):
-        socket_with_timeout = type("SocketWithIdAndTimeout", [SocketWithId], {"options":{"timeout":timeout}})
+        socket_with_timeout = type("SocketWithIdAndTimeout", (SocketWithId,), {"options":{"timeout":timeout}})
         cm_with_timeout = connection.cm_using(socket_with_timeout)
-        return type("RiackPbcTransportWithTimeout", [RiakPbcTransport], {"default_cm":cm_with_timeout})
+        return type("RiackPbcTransportWithTimeout", (RiakPbcTransport,), {"default_cm":cm_with_timeout})
 
     def __init__(self, cm, client_id=None, max_attempts=1, **unused_options):
         """
