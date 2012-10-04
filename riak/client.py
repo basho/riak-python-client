@@ -56,7 +56,7 @@ class RiakClient(object):
 
         :param solr_transport_class: HTTP-based transport class for
                                      Solr interface queries
-        :type transport_class: :class:`RiakHttpTransport`
+        :type solr_transport_class: :class:`RiakHttpTransport`
         :param transport_options: Optional key-value args to pass to
                                   the transport constuctor
         :type transport_options: dict
