@@ -27,6 +27,7 @@ from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
 from riak.search import RiakSearch
 from riak.transports import RiakHttpTransport
+from riak.transports import RiakHttpsTransport
 from riak.util import deprecated
 
 
@@ -37,7 +38,7 @@ class RiakClient(object):
     connection, and the ``RiakClient`` object is extremely lightweight.
     """
     def __init__(self, host='127.0.0.1', port=8098, prefix='riak',
-                 mapred_prefix='mapred', transport_class=None,
+                 mapred_prefix='mapred', ssl=False, transport_class=None,
                  client_id=None, solr_transport_class=None,
                  transport_options=None):
         """
@@ -62,7 +63,10 @@ class RiakClient(object):
         :type transport_options: dict
         """
         if transport_class is None:
-            transport_class = RiakHttpTransport
+            if ssl is True:
+                transport_class = RiakHttpsTransport
+            else:
+                transport_class = RiakHttpTransport
 
         api = getattr(transport_class, 'api', 1)
         if api >= 2:

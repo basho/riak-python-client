@@ -61,8 +61,15 @@ no arguments are needed::
 
     client = riak.RiakClient()
 
-The constructor also configuration options such as ``host``, ``port`` &
+The constructor also configuration options such as ``host``, ``port``, ``ssl`` &
 ``prefix``. Please refer to the :doc:`client` documentation for full details.
+
+If your Riak cluster is ssl enabled you can access it via HTTPS by setting
+the ``ssl`` argument to ``True``::
+
+    import riak
+
+        client = riak.RiakClient(port=8091, ssl=True)
 
 To use the Protocol Buffers interface::
 
