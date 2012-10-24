@@ -1,5 +1,13 @@
 # Riak Python Client Release Notes
 
+## 1.5.1 Patch Release - 2012-10-24
+
+Release 1.5.1 fixes one bug and some documentation errors.
+
+* Fix bug where `http_status` is used instead of `http_code`.
+* Fix documentation of `RiakMapReduce.index` method.
+* Fix documentation of `RiakClient.__init__` method.
+
 ## 1.5.0 Feature Release - 2012-08-29
 
 Release 1.5.0 is a feature release that supports Riak 1.2.
