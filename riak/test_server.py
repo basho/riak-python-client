@@ -234,7 +234,7 @@ class TestServer(object):
                 vm_args.write("%s %s\n" % (arg, value))
 
     def write_app_config(self):
-        with open(self._app_config(), "wb") as app_config:
+        with open(self._app_config_path(), "wb") as app_config:
             app_config.write(erlang_config(self.app_config))
             app_config.write(".")
 
