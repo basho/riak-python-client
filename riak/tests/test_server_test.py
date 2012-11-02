@@ -20,11 +20,6 @@ class TestServerTestCase(unittest.TestCase):
         self.assertEquals(
             self.test_server.app_config["riak_core"]["handoff_port"], 10000)
 
-    def test_merge_luwak_options(self):
-        self.test_server = TestServer(luwak={"enabled": False})
-        self.assertEquals(
-            self.test_server.app_config["luwak"]["enabled"], False)
-
     def test_merge_riak_search_options(self):
         self.test_server = TestServer(
             riak_search={"search_backend": "riak_search_backend"})

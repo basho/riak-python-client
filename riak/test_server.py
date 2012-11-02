@@ -90,9 +90,6 @@ class TestServer(object):
           "enabled": True,
           "search_backend": Atom("riak_search_test_backend")
       },
-      "luwak": {
-          "enabled": True
-      }
     }
 
     def __init__(self, tmp_dir="/tmp/riak/test_server",
