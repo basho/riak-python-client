@@ -4,7 +4,7 @@ python:
   - "2.7"
 install: ./setup.py develop
 script: ./setup.py test
-before_script: sudo search-cmd install searchbucket
+before_script: sudo /usr/sbin/search-cmd install searchbucket
 env: "SKIP_LUWAK=1"
 notifications:
   email: clients@basho.com
