@@ -99,10 +99,13 @@ class Pool(object):
         :param default: a value that will be used instead of calling
             create_resource if a new resource needs to be created
         """
-        element = None
-        if not callable(_filter):
+        if not _filter:
             def _filter(obj):
                 return True
+        elif not callable(_filter):
+            raise TypeError("_filter is not a callable")
+
+        element = None
         with self.lock:
             for e in self.elements:
                 if not e.claimed and _filter(e.object):

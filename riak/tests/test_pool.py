@@ -106,6 +106,14 @@ class PoolTest(unittest.TestCase):
         with pool.take(_filter=filtereven) as f:
             self.assertEqual([2], f)
 
+    def test_requires_filter_to_be_callable(self):
+        badfilter = 'foo'
+        pool = SimplePool()
+
+        with self.assertRaises(TypeError):
+            with pool.take(_filter=badfilter) as resource:
+                pass
+
     def test_yields_default_when_empty(self):
         pool = SimplePool()
         with pool.take(default='default') as x:
