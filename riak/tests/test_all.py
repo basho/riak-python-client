@@ -156,12 +156,12 @@ class RiakPbcTransportTestCase(BasicKVTests,
 
     def test_bucket_search_enabled(self):
         bucket = self.client.bucket("unsearch_bucket")
-        self.assertRaises(NotImplemented)
+        self.assertRaises(NotImplementedError)
 
     def test_enable_search_commit_hook(self):
         bucket = self.client.bucket("search_bucket")
         bucket.enable_search()
-        self.assertRaises(NotImplemented)
+        self.assertRaises(NotImplementedError)
 
 class RiakHttpTransportTestCase(BasicKVTests,
                                 KVFileTests,
