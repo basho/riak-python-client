@@ -1114,6 +1114,15 @@ class RiakPbcTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
         self.assertEqual(obj.get_key(), 'barbaz')
         self.assertEqual(obj.get_data(), rand)
 
+    def test_bucket_search_enabled(self):
+        bucket = self.client.bucket("unsearch_bucket")
+        self.assertRaises(NotImplemented)
+
+    def test_enable_search_commit_hook(self):
+        bucket = self.client.bucket("search_bucket")
+        bucket.enable_search()
+        self.assertRaises(NotImplemented)
+
 
 class RiakHttpTransportTestCase(BaseTestCase, MapReduceAliasTestMixIn,
                                 unittest.TestCase):
