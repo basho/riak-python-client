@@ -20,6 +20,8 @@ import platform
 from Queue import Queue
 from threading import Thread, currentThread
 from riak.transports.pool import Pool, BadResource
+from random import SystemRandom
+from time import sleep
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -152,6 +154,39 @@ class PoolTest(unittest.TestCase):
         for element in pool.elements:
             self.assertFalse(element.claimed)
             self.assertEqual(1, len(element.object))
+
+    def test_iteration(self):
+        started = Queue()
+        n = 30
+        threads = []
+        touched = []
+        pool = EmptyListPool()
+        rand = SystemRandom()
+
+        def _run():
+            psleep = rand.uniform(0, 0.75)
+            with pool.take() as a:
+                started.put(1)
+                started.join()
+                a.append(rand.uniform(0, 1))
+                sleep(psleep)
+
+        for i in range(n):
+            th = Thread(target=_run)
+            threads.append(th)
+            th.start()
+
+        for i in range(n):
+            started.get()
+            started.task_done()
+
+        for element in pool:
+            touched.append(element)
+
+        for thr in threads:
+            thr.join()
+
+        self.assertItemsEqual(pool.elements, touched)
 
 if __name__ == '__main__':
     unittest.main()

@@ -83,6 +83,7 @@ class Pool(object):
         override the __init__ method in a subclass.
         """
         self.lock = threading.Lock()
+        self.releaser = threading.Condition()
         self.elements = list()
 
     @contextmanager
@@ -124,7 +125,9 @@ class Pool(object):
             self.delete_element(element)
             raise
         finally:
-            element.claimed = False
+            with self.releaser:
+                element.claimed = False
+                self.releaser.notify()
 
     def delete_element(self, element):
         """
@@ -140,12 +143,15 @@ class Pool(object):
         self.destroy_resource(element.object)
         del element
 
+    def __iter__(self):
+        return PoolIterator(self)
+
     def create_resource(self):
         """
         Implemented by subclasses to allocate a new resource for use
         in the pool.
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     def destroy_resource(self, obj):
         """
@@ -157,3 +163,44 @@ class Pool(object):
         :param obj: the resource being removed
         """
         pass
+
+
+class PoolIterator(object):
+    """
+    Iterates over a snapshot of the pool in a thread-safe manner,
+    eventually touching all resources that were known when the
+    iteration started.
+    """
+
+    def __init__(self, pool):
+        self.targets = pool.elements[:]
+        self.unlocked = []
+        self.lock = pool.lock
+        self.releaser = pool.releaser
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if len(self.targets) == 0:
+            raise StopIteration
+        if len(self.unlocked) == 0:
+            self.reclaim()
+        return self.unlocked.pop(0)
+
+    def reclaim(self):
+        with self.lock:
+            if self.all_claimed():
+                with self.releaser:
+                    self.releaser.wait()
+            for element in self.targets[:]:
+                if not element.claimed:
+                    self.targets.remove(element)
+                    self.unlocked.append(element)
+                    element.claimed = True
+
+    def all_claimed(self):
+        for element in self.targets[:]:
+            if not element.claimed:
+                return False
+        return True
