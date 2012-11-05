@@ -60,14 +60,14 @@ class RiakTransport(FeatureDetection):
         Ping the remote server
         @return boolean
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def get(self, robj, r=None, vtag=None):
         """
         Serialize get request and deserialize response
         @return (vclock=None, [(metadata, value)]=None)
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def put(self, robj, w=None, dw=None, return_body=True):
         """
@@ -75,7 +75,7 @@ class RiakTransport(FeatureDetection):
         is true, retrieve the updated metadata/content
         @return (vclock=None, [(metadata, value)]=None)
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def put_new(self, robj, w=None, dw=None, return_meta=True):
         """Put a new object into the Riak store, returning its (new) key.
@@ -85,28 +85,28 @@ class RiakTransport(FeatureDetection):
 
         @return (key, vclock, metadata)
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def delete(self, robj, rw=None):
         """
         Serialize delete request and deserialize response
         @return true
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def get_buckets(self):
         """
         Serialize get buckets request and deserialize response
         @return dict()
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def get_bucket_props(self, bucket):
         """
         Serialize get bucket property request and deserialize response
         @return dict()
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def set_bucket_props(self, bucket, props):
         """
@@ -115,13 +115,13 @@ class RiakTransport(FeatureDetection):
         props = dictionary of properties
         @return boolean
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def mapred(self, inputs, query, timeout=None):
         """
         Serialize map/reduce request
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def set_client_id(self, client_id):
         """
@@ -129,25 +129,25 @@ class RiakTransport(FeatureDetection):
         id, which is automatically generated when none is specified in
         when creating the transport object.
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def get_client_id(self):
         """
         Fetch the client id for the transport.
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def search(self, index, query, **params):
         """
         Performs a search query.
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def get_index(self, bucket, index, startkey, endkey=None):
         """
         Performs a secondary index query.
         """
-        raise RiakError("not implemented")
+        raise NotImplemented
 
     def _search_mapred_emu(self, index, query):
         """
@@ -158,9 +158,9 @@ class RiakTransport(FeatureDetection):
         phases = []
         if not self.phaseless_mapred():
             phases.append({'language': 'erlang',
-                          'module': 'riak_kv_mapreduce',
-                          'function': 'reduce_identity',
-                          'keep': True})
+                           'module': 'riak_kv_mapreduce',
+                           'function': 'reduce_identity',
+                           'keep': True})
         mr_result = self.mapred({'module': 'riak_search',
                                  'function': 'mapred_search',
                                  'arg': [index, query]},
@@ -207,18 +207,18 @@ class RiakTransport(FeatureDetection):
         content_type = the object's content type
         content = the object's data
         """
-        raise RiakError("luwak not supported by this transport.")
+        raise NotImplemented
 
     def get_file(self, key):
         """
         Get an object from luwak.
         key = the object's key
         """
-        raise RiakError("luwak not supported by this transport.")
+        raise NotImplemented
 
     def delete_file(self, key):
         """
         Delete an object in luwak.
         key = the object's key
         """
-        raise RiakError("luwak not supported by this transport.")
+        raise NotImplemented
