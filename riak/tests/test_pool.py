@@ -284,5 +284,41 @@ class PoolTest(unittest.TestCase):
         # Make sure that the pool resources are gone
         self.assertEqual(0, len(pool.elements))
 
+    def test_stress(self):
+        """
+        Runs a large number of threads doing operations with elements
+        checked out, ensuring properties of the pool.
+        """
+        rand = SystemRandom()
+        n = rand.randint(1, 400)
+        passes = rand.randint(1, 20)
+        rounds = rand.randint(1, 200)
+        breaker = rand.uniform(0, 1)
+        pool = EmptyListPool()
+
+        def _run():
+            for i in range(rounds):
+                with pool.take() as a:
+                    self.assertEqual([], a)
+                    a.append(currentThread())
+                    self.assertEqual([currentThread()], a)
+
+                    for p in range(passes):
+                        self.assertEqual([currentThread()], a)
+                        if rand.uniform(0, 1) > breaker:
+                            break
+
+                    a.remove(currentThread())
+
+        threads = []
+
+        for i in range(n):
+            th = Thread(target=_run)
+            threads.append(th)
+            th.start()
+
+        for th in threads:
+            th.join()
+
 if __name__ == '__main__':
     unittest.main()
