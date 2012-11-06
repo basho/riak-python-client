@@ -144,7 +144,18 @@ class Pool(object):
         del element
 
     def __iter__(self):
+        """
+        Iterator callback to iterate over the elements of the pool.
+        """
         return PoolIterator(self)
+
+    def clear(self):
+        """
+        Removes all resources from the pool, calling delete_element
+        with each one so that the resources are cleaned up.
+        """
+        for element in self:
+            self.delete_element(element)
 
     def create_resource(self):
         """
@@ -173,7 +184,8 @@ class PoolIterator(object):
     """
 
     def __init__(self, pool):
-        self.targets = pool.elements[:]
+        with pool.lock:
+            self.targets = pool.elements[:]
         self.unlocked = []
         self.lock = pool.lock
         self.releaser = pool.releaser
@@ -185,10 +197,10 @@ class PoolIterator(object):
         if len(self.targets) == 0:
             raise StopIteration
         if len(self.unlocked) == 0:
-            self.reclaim()
+            self.claim_elements()
         return self.unlocked.pop(0)
 
-    def reclaim(self):
+    def claim_elements(self):
         with self.lock:
             if self.all_claimed():
                 with self.releaser:

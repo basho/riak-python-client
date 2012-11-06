@@ -38,6 +38,9 @@ class SimplePool(Pool):
         self.count += 1
         return [self.count]
 
+    def destroy_resource(self, resource):
+        del resource[:]
+
 
 class EmptyListPool(Pool):
     def create_resource(self):
@@ -46,11 +49,18 @@ class EmptyListPool(Pool):
 
 class PoolTest(unittest.TestCase):
     def test_yields_new_object_when_empty(self):
+        """
+        The pool should create new resources as needed.
+        """
         pool = SimplePool()
         with pool.take() as element:
             self.assertEqual([1], element)
 
     def test_yields_same_object_in_serial_access(self):
+        """
+        The pool should reuse resources that already exist, when used
+        serially.
+        """
         pool = SimplePool()
 
         with pool.take() as element:
@@ -64,6 +74,10 @@ class PoolTest(unittest.TestCase):
         self.assertEqual(1, len(pool.elements))
 
     def test_reentrance(self):
+        """
+        The pool should be re-entrant, that is, yield new resources
+        while one is already claimed in the same code path.
+        """
         pool = SimplePool()
         with pool.take() as first:
             self.assertEqual([1], first)
@@ -73,6 +87,10 @@ class PoolTest(unittest.TestCase):
                     self.assertEqual([3], third)
 
     def test_unlocks_when_exception_raised(self):
+        """
+        The pool should unlock all resources that were previously
+        claimed when an exception occurs.
+        """
         pool = SimplePool()
         try:
             with pool.take() as x:
@@ -84,6 +102,10 @@ class PoolTest(unittest.TestCase):
                 self.assertFalse(e.claimed)
 
     def test_removes_bad_resource(self):
+        """
+        The pool should remove resources that are considered bad by
+        user code throwing a BadResource exception.
+        """
         pool = SimplePool()
         with pool.take() as element:
             self.assertEqual([1], element)
@@ -97,6 +119,10 @@ class PoolTest(unittest.TestCase):
                 self.assertEqual([2], goodie)
 
     def test_filter_skips_unmatching_elements(self):
+        """
+        The _filter parameter should cause the pool to yield the first
+        unclaimed resource that passes the filter.
+        """
         def filtereven(numlist):
             return numlist[0] % 2 == 0
 
@@ -109,6 +135,10 @@ class PoolTest(unittest.TestCase):
             self.assertEqual([2], f)
 
     def test_requires_filter_to_be_callable(self):
+        """
+        The _filter parameter should be required to be a callable, or
+        None.
+        """
         badfilter = 'foo'
         pool = SimplePool()
 
@@ -117,11 +147,18 @@ class PoolTest(unittest.TestCase):
                 pass
 
     def test_yields_default_when_empty(self):
+        """
+        The pool should yield the given default when no existing
+        resources are free.
+        """
         pool = SimplePool()
         with pool.take(default='default') as x:
             self.assertEqual('default', x)
 
     def test_thread_safety(self):
+        """
+        The pool should allocate n objects for n concurrent operations.
+        """
         n = 10
         pool = EmptyListPool()
         readyq = Queue()
@@ -154,8 +191,14 @@ class PoolTest(unittest.TestCase):
         for element in pool.elements:
             self.assertFalse(element.claimed)
             self.assertEqual(1, len(element.object))
+            self.assertIn(element.object[0], threads)
 
     def test_iteration(self):
+        """
+        Iteration over the pool resources, even when some are claimed,
+        should eventually touch all resources (excluding ones created
+        during iteration).
+        """
         started = Queue()
         n = 30
         threads = []
@@ -187,6 +230,59 @@ class PoolTest(unittest.TestCase):
             thr.join()
 
         self.assertItemsEqual(pool.elements, touched)
+
+    def test_clear(self):
+        """
+        Clearing the pool should remove all resources known at the
+        time of the call.
+        """
+        n = 10
+        startq = Queue()
+        finishq = Queue()
+        rand = SystemRandom()
+        threads = []
+        pusher = None
+        pool = SimplePool()
+
+        def worker_run():
+            with pool.take() as a:
+                startq.put(1)
+                startq.join()
+                sleep(rand.uniform(0, 0.5))
+                finishq.get()
+                finishq.task_done()
+
+        def pusher_run():
+            for i in range(n):
+                finishq.put(1)
+                sleep(rand.uniform(0, 0.1))
+            finishq.join()
+
+        # Allocate 10 resources in the pool by spinning up 10 threads
+        for i in range(n):
+            th = Thread(target=worker_run)
+            threads.append(th)
+            th.start()
+
+        # Pull everything off the queue, allowing the workers to run
+        for i in range(n):
+            startq.get()
+            startq.task_done()
+
+        # Start the pusher that will allow them to proceed and exit
+        pusher = Thread(target=pusher_run)
+        threads.append(pusher)
+        pusher.start()
+
+        # Clear the pool
+        pool.clear()
+
+        # Wait for all threads to complete
+        for t in threads:
+            t.join()
+
+        # Make sure that the pool resources are gone
+        self.assertEqual(0, len(pool.elements))
 
 if __name__ == '__main__':
     unittest.main()
