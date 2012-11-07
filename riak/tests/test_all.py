@@ -54,6 +54,7 @@ if USE_TEST_SERVER:
     test_server.prepare()
     test_server.start()
 
+
 class BaseTestCase(object):
 
     @staticmethod
@@ -76,6 +77,7 @@ class BaseTestCase(object):
         o.delete()
         o = bucket.get('nonexistent_key_binary')
         o.delete()
+
 
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
@@ -163,6 +165,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
         bucket.enable_search()
         self.assertRaises(NotImplementedError)
 
+
 class RiakHttpTransportTestCase(BasicKVTests,
                                 KVFileTests,
                                 TwoITests,
@@ -232,7 +235,6 @@ class RiakHttpTransportTestCase(BasicKVTests,
         time.sleep(1)
         file = self.client.get_file(key)
         self.assertIsNone(file)
-
 
 
 class FilterTests(unittest.TestCase):

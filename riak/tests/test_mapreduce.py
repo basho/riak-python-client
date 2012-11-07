@@ -3,6 +3,7 @@
 from riak.mapreduce import RiakLink
 from riak import RiakKeyFilter, key_filter
 
+
 class LinkTests(object):
     def test_store_and_get_links(self):
         # Create the object...

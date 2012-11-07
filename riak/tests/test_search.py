@@ -8,6 +8,7 @@ else:
 
 SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
 
+
 class EnableSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_bucket_search_enabled(self):
