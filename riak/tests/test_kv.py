@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import os 
+import os
 import cPickle
 import copy
 try:
     import json
 except ImportError:
     import simplejson as json
+
 
 class NotJsonSerializable(object):
 

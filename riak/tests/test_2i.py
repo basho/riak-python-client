@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import os, platform
+import os
+import platform
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
@@ -8,6 +9,7 @@ else:
 from riak.riak_index_entry import RiakIndexEntry
 
 SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
+
 
 class TwoITests(object):
     def is_2i_supported(self):
