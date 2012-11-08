@@ -19,8 +19,14 @@ under the License.
 """
 from riak_object import RiakObject
 import mimetypes
+from riak.util import deprecateQuorumAccessors
 
 
+def deprecateBucketQuorumAccessors(klass):
+    return deprecateQuorumAccessors(klass, parent='_client')
+
+
+@deprecateBucketQuorumAccessors
 class RiakBucket(object):
     """
     The ``RiakBucket`` object allows you to access and change information
@@ -47,12 +53,6 @@ class RiakBucket(object):
 
         self._client = client
         self._name = name
-        self._r = None
-        self._w = None
-        self._dw = None
-        self._rw = None
-        self._pr = None
-        self._pw = None
         self._encoders = {}
         self._decoders = {}
 
@@ -61,156 +61,6 @@ class RiakBucket(object):
         Get the bucket name as a string.
         """
         return self._name
-
-    def get_r(self, r=None):
-        """
-        Get the R-value for this bucket, if it is set, otherwise return
-        the R-value for the client.
-
-        :rtype: integer
-        """
-        if (r is not None):
-            return r
-        if (self._r is not None):
-            return self._r
-        return self._client.get_r()
-
-    def set_r(self, r):
-        """
-        Set the R-value for this bucket. This value is used by :func:`get`
-        and :func:`get_binary` operations that do not specify an R-value.
-
-        :param r: The new R-value.
-        :type r: integer
-        :rtype: self
-        """
-        self._r = r
-        return self
-
-    def get_w(self, w=None):
-        """
-        Get the W-value for this bucket, if it is set, otherwise return
-        the W-value for the client.
-
-        :rtype: integer
-        """
-        if (w is not None):
-            return w
-        if (self._w is not None):
-            return self._w
-        return self._client.get_w()
-
-    def set_w(self, w):
-        """
-        Set the W-value for this bucket. See :func:`set_r` for
-        more information.
-
-        :param w: The new W-value.
-        :type w: integer
-        :rtype: self
-        """
-        self._w = w
-        return self
-
-    def get_dw(self, dw=None):
-        """
-        Get the DW-value for this bucket, if it is set, otherwise return
-        the DW-value for the client.
-
-        :rtype: integer
-        """
-        if (dw is not None):
-            return dw
-        if (self._dw is not None):
-            return self._dw
-        return self._client.get_dw()
-
-    def set_dw(self, dw):
-        """
-        Set the DW-value for this bucket. See :func:`set_r` for more
-        information.
-
-        :param dw: The new DW-value
-        :type dw: integer
-        :rtype: self
-        """
-        self._dw = dw
-        return self
-
-    def get_rw(self, rw=None):
-        """
-        Get the RW-value for this bucket, if it is set, otherwise return
-        the RW-value for the client.
-
-        :rtype: integer
-        """
-        if (rw is not None):
-            return rw
-        if (self._rw is not None):
-            return self._rw
-        return self._client.get_rw()
-
-    def set_rw(self, rw):
-        """
-        Set the RW-value for this bucket. See :func:`set_r` for more
-        information.
-
-        :param rw: The new RW-value
-        :type rw: integer
-        :rtype: self
-        """
-        self._rw = rw
-        return self
-
-    def get_pr(self, pr=None):
-        """
-        Get the PR-value for this bucket, if it is set, otherwise return
-        the PR-value for the client.
-
-        :rtype: integer
-        """
-        if (pr is not None):
-            return pr
-        if (self._pr is not None):
-            return self._pr
-        return self._client.get_pr()
-
-    def set_pr(self, pr):
-        """
-        Set the PR-value for this bucket. See :func:`set_r` for more
-        information.
-
-        :param pr: The new PR-value
-        :type pr: integer
-        :rtype: self
-        """
-        self._pr = pr
-        return self
-
-    def get_pw(self, pw=None):
-        """
-        Get the PW-value for this bucket, if it is set, otherwise return
-        the PW-value for the client.
-
-        :rtype: integer
-        """
-        if (pw is not None):
-            return pw
-        if (self._pw is not None):
-            return self._pw
-        return self._client.get_pw()
-
-    def set_pw(self, pw):
-        """
-        Set the PW-value for this bucket. See :func:`set_r` for more
-        information.
-
-        :param pw: The new PR-value
-        :type pw: integer
-        :rtype: self
-        """
-        self._pw = pw
-        return self
 
     def get_encoder(self, content_type):
         """
@@ -321,8 +171,6 @@ class RiakBucket(object):
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = True
-        r = self.get_r(r)
-        pr = self.get_pr(pr)
         return obj.reload(r=r, pr=pr)
 
     def get_binary(self, key, r=None, pr=None):
@@ -339,8 +187,6 @@ class RiakBucket(object):
         """
         obj = RiakObject(self._client, self, key)
         obj._encode_data = False
-        r = self.get_r(r)
-        pr = self.get_pr(pr)
         return obj.reload(r=r, pr=pr)
 
     def set_n_val(self, nval):
