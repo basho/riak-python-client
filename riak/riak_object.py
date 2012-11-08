@@ -417,11 +417,6 @@ class RiakObject(object):
         :type if_none_match: bool
         :rtype: self
         """
-        # Use defaults if not specified...
-        w = self._bucket.get_w(w)
-        dw = self._bucket.get_dw(dw)
-        pw = self._bucket.get_pw(pw)
-
         # Issue the put over our transport
         t = self._client.get_transport()
 
@@ -453,8 +448,6 @@ class RiakObject(object):
         :rtype: self
         """
 
-        r = self._bucket.get_r(r)
-        pr = self._bucket.get_pr(pr)
         t = self._client.get_transport()
         Result = t.get(self, r=r, pr=pr, vtag=vtag)
 
@@ -490,13 +483,6 @@ class RiakObject(object):
         :type pw: integer
         :rtype: self
         """
-        # Use defaults if not specified...
-        rw = self._bucket.get_rw(rw)
-        r = self._bucket.get_r(r)
-        w = self._bucket.get_w(w)
-        dw = self._bucket.get_dw(dw)
-        pr = self._bucket.get_pr(pr)
-        pw = self._bucket.get_pw(pw)
         t = self._client.get_transport()
         Result = t.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
         self.clear()
@@ -590,10 +576,6 @@ class RiakObject(object):
         if isinstance(self._siblings[i], RiakObject):
             return self._siblings[i]
         else:
-            # Use defaults if not specified.
-            r = self._bucket.get_r(r)
-            pr = self._bucket.get_pr(pr)
-
             # Run the request...
             vtag = self._siblings[i]
             obj = RiakObject(self._client, self._bucket, self._key)
