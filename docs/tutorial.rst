@@ -65,11 +65,11 @@ The constructor also configuration options such as ``host``, ``port``, ``ssl`` &
 ``prefix``. Please refer to the :doc:`client` documentation for full details.
 
 If your Riak cluster is ssl enabled you can access it via HTTPS by setting
-the ``ssl`` argument to ``True``::
+the ``transport_class`` argument to ``RiakHttpsTransport``::
 
     import riak
 
-        client = riak.RiakClient(port=8091, ssl=True)
+        client = riak.RiakClient(port=8091, transport_class=riak.RiakHttpsTransport)
 
 To use the Protocol Buffers interface::
 
