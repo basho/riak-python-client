@@ -38,6 +38,7 @@ from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
 from connection import HTTPConnectionManager
+from connection import HTTPSConnectionManager
 import riak.util
 from xml.etree import ElementTree
 
@@ -680,6 +681,16 @@ class RiakHttpTransport(RiakTransport):
             else:
                 retVal[key] = value
         return retVal
+
+
+class RiakHttpsTransport(RiakHttpTransport):
+    """
+    The RiakHttpsTransport object holds information necessary to
+    connect to a Riak cluster running with SSL enabled.
+    """
+
+    # The ConnectionManager class that this transport prefers.
+    default_cm = HTTPSConnectionManager
 
 
 class XMLSearchResult(object):

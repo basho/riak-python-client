@@ -16,6 +16,7 @@ import time
 from riak import RiakClient
 from riak import RiakPbcTransport
 from riak import RiakHttpTransport
+from riak import RiakHttpsTransport
 from riak.mapreduce import RiakLink
 from riak import RiakKeyFilter, key_filter
 
@@ -41,6 +42,8 @@ PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
+
+TEST_SSL = int(os.environ.get('TEST_SSL', '0'))
 
 SKIP_LUWAK = int(os.environ.get('SKIP_LUWAK', '0'))
 
@@ -182,7 +185,10 @@ class RiakHttpTransportTestCase(BasicKVTests,
     def setUp(self):
         self.host = HTTP_HOST
         self.port = HTTP_PORT
-        self.transport_class = RiakHttpTransport
+        if TEST_SSL:
+            self.transport_class = RiakHttpsTransport
+        else:
+            self.transport_class = RiakHttpTransport
         super(RiakHttpTransportTestCase, self).setUp()
 
     def test_no_returnbody(self):
