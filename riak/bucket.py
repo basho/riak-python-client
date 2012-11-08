@@ -19,7 +19,7 @@ under the License.
 """
 from riak_object import RiakObject
 import mimetypes
-from riak.util import deprecateQuorumAccessors as deprecateQuorumAccessors
+from riak.util import deprecateQuorumAccessors
 
 
 def deprecateBucketQuorumAccessors(klass):
