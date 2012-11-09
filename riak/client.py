@@ -28,8 +28,9 @@ from riak.mapreduce import RiakMapReduce
 from riak.search import RiakSearch
 from riak.transports import RiakHttpTransport
 from riak.util import deprecated
+from riak.util import deprecateQuorumAccessors
 
-
+@deprecateQuorumAccessors
 class RiakClient(object):
     """
     The ``RiakClient`` object holds information necessary to connect to
@@ -84,12 +85,6 @@ class RiakClient(object):
             self._cm = None
             self._transport = transport_class(host, port, client_id=client_id)
 
-        self._r = "default"
-        self._w = "default"
-        self._dw = "default"
-        self._rw = "default"
-        self._pr = "default"
-        self._pw = "default"
         self._encoders = {'application/json': json.dumps,
                           'text/json': json.dumps}
         self._decoders = {'application/json': json.loads,
@@ -103,133 +98,6 @@ class RiakClient(object):
         Get the transport instance the client is using for it's connection.
         """
         return self._transport
-
-    def get_r(self):
-        """
-        Get the R-value setting for this ``RiakClient``. (default "quorum")
-
-        :rtype: integer
-        """
-        return self._r
-
-    def set_r(self, r):
-        """
-        Set the R-value for this ``RiakClient``. This value will be
-        used for any calls to :func:`RiakBucket.get
-        <riak.bucket.RiakBucket.get>` or :func:`RiakBucket.get_binary
-        <riak.bucket.RiakBucket.get_binary>` where 1) no R-value is
-        specified in the method call and 2) no R-value has been set in
-        the :class:`RiakBucket <riak.bucket.RiakBucket>`.
-
-        :param r: The R value.
-        :type r: integer
-        :rtype: self
-        """
-        self._r = r
-        return self
-
-    def get_w(self):
-        """
-        Get the W-value setting for this ``RiakClient``. (default
-        "quorum")
-
-        :rtype: integer
-        """
-        return self._w
-
-    def set_w(self, w):
-        """
-        Set the W-value for this ``RiakClient`` instance. See
-        :func:`set_r` for a description of how these values are used.
-
-        :param w: The W value.
-        :type w: integer
-        :rtype: self
-        """
-        self._w = w
-        return self
-
-    def get_dw(self):
-        """
-        Get the DW-value for this ``RiakClient`` instance. (default
-        "quorum")
-
-        :rtype: integer
-        """
-        return self._dw
-
-    def set_dw(self, dw):
-        """
-        Set the DW-value for this ``RiakClient`` instance. See
-        :func:`set_r` for a description of how these values are used.
-
-        :param dw: The DW value.
-        :type dw: integer
-        :rtype: self
-        """
-        self._dw = dw
-        return self
-
-    def get_rw(self):
-        """
-        Get the RW-value for this ``RiakClient`` instance. (default
-        "quorum")
-
-        :rtype: integer
-        """
-        return self._rw
-
-    def set_rw(self, rw):
-        """
-        Set the RW-value for this ``RiakClient`` instance. See
-        :func:`set_r` for a description of how these values are used.
-
-        :param rw: The RW value.
-        :type rw: integer
-        :rtype: self
-        """
-        self._rw = rw
-        return self
-
-    def get_pr(self):
-        """
-        Get the PR-value setting for this ``RiakClient``. (default 0)
-
-        :rtype: integer
-        """
-        return self._pr
-
-    def set_pr(self, pr):
-        """
-        Set the PR-value for this ``RiakClient`` instance. See
-        :func:`set_r` for a description of how these values are used.
-
-        :param pr: The PR value.
-        :type pr: integer
-        :rtype: self
-        """
-        self._pr = pr
-        return self
-
-    def get_pw(self):
-        """
-        Get the PW-value setting for this ``RiakClient``. (default 0)
-
-        :rtype: integer
-        """
-        return self._pw
-
-    def set_pw(self, pw):
-        """
-        Set the PW-value for this ``RiakClient`` instance. See
-        :func:`set_r` for a description of how these values are used.
-
-        :param pw: The W value.
-        :type pw: integer
-        :rtype: self
-        """
-        self._pw = pw
-        return self
 
     def get_client_id(self):
         """

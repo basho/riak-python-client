@@ -44,6 +44,52 @@ def deep_merge(a, b):
 def deprecated(message, stacklevel=3):
     warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
 
+QUORUMS = ['r', 'pr', 'w', 'dw', 'pw', 'rw']
+QDEPMESSAGE = """
+Quorum accessors on type %s are deprecated. Use request-specific
+parameters or bucket properties instead.
+"""
+
+
+def deprecateQuorumAccessors(klass, parent=None):
+    """
+    Adds deprecation warnings for the quorum get_* and set_*
+    accessors, informing the user to switch to the appropriate bucket
+    properties or requests parameters.
+    """
+    for q in QUORUMS:
+        __deprecateQuorumAccessor(klass, parent, q)
+    return klass
+
+
+def __deprecateQuorumAccessor(klass, parent, quorum):
+    propname = "_%s" % quorum
+    getter_name = "get_%s" % quorum
+    setter_name = "set_%s" % quorum
+    if not parent:
+        def getter(self, val=None):
+            deprecated(QDEPMESSAGE % klass.__name__)
+            if val:
+                return val
+            return getattr(self, propname, "default")
+
+    else:
+        def getter(self, val=None):
+            deprecated(QDEPMESSAGE % klass.__name__)
+            if val:
+                return val
+            parentInstance = getattr(self, parent)
+            return getattr(self, propname,
+                           getattr(parentInstance, propname, "default"))
+
+    def setter(self, value):
+        deprecated(QDEPMESSAGE % klass.__name__)
+        setattr(self, propname, value)
+        return self
+
+    setattr(klass, getter_name, getter)
+    setattr(klass, setter_name, setter)
+
 
 class lazy_property(object):
     '''

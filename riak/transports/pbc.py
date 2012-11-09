@@ -247,8 +247,9 @@ class RiakPbcTransport(RiakTransport):
         bucket = robj.get_bucket()
 
         req = riak_pb.RpbGetReq()
-        req.r = self.translate_rw_val(r)
-        if self.quorum_controls():
+        if r:
+            req.r = self.translate_rw_val(r)
+        if self.quorum_controls() and pr:
             req.pr = self.translate_rw_val(pr)
 
         if self.tombstone_vclocks():
@@ -275,9 +276,11 @@ class RiakPbcTransport(RiakTransport):
         bucket = robj.get_bucket()
 
         req = riak_pb.RpbPutReq()
-        req.w = self.translate_rw_val(w)
-        req.dw = self.translate_rw_val(dw)
-        if self.quorum_controls():
+        if w:
+            req.w = self.translate_rw_val(w)
+        if dw:
+            req.dw = self.translate_rw_val(dw)
+        if self.quorum_controls() and pw:
             req.pw = self.translate_rw_val(pw)
 
         if return_body:
@@ -316,9 +319,12 @@ class RiakPbcTransport(RiakTransport):
         bucket = robj.get_bucket()
 
         req = riak_pb.RpbPutReq()
-        req.w = self.translate_rw_val(w)
-        req.dw = self.translate_rw_val(dw)
-        req.pw = self.translate_rw_val(pw)
+        if w:
+            req.w = self.translate_rw_val(w)
+        if dw:
+            req.dw = self.translate_rw_val(dw)
+        if self.quorum_controls() and pw:
+            req.pw = self.translate_rw_val(pw)
 
         if return_body:
             req.return_body = 1
@@ -348,14 +354,20 @@ class RiakPbcTransport(RiakTransport):
         bucket = robj.get_bucket()
 
         req = riak_pb.RpbDelReq()
-        req.rw = self.translate_rw_val(rw)
-        req.r = self.translate_rw_val(r)
-        req.w = self.translate_rw_val(w)
-        req.dw = self.translate_rw_val(dw)
+        if rw:
+            req.rw = self.translate_rw_val(rw)
+        if r:
+            req.r = self.translate_rw_val(r)
+        if w:
+            req.w = self.translate_rw_val(w)
+        if dw:
+            req.dw = self.translate_rw_val(dw)
 
         if self.quorum_controls():
-            req.pr = self.translate_rw_val(pr)
-            req.pw = self.translate_rw_val(pw)
+            if pr:
+                req.pr = self.translate_rw_val(pr)
+            if pw:
+                req.pw = self.translate_rw_val(pw)
 
         if self.tombstone_vclocks() and robj.vclock():
             req.vclock = robj.vclock()
