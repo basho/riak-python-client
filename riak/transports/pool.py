@@ -181,6 +181,13 @@ class PoolIterator(object):
     Iterates over a snapshot of the pool in a thread-safe manner,
     eventually touching all resources that were known when the
     iteration started.
+
+    Note that if claimed resources are not released for long periods,
+    the iterator may hang, waiting for those last resources to be
+    released. The iteration and pool functionality is only meant to be
+    used internally within the client, and resources will be claimed
+    per client operation, making this an unlikely event (although
+    still possible).
     """
 
     def __init__(self, pool):
@@ -197,12 +204,12 @@ class PoolIterator(object):
         if len(self.targets) == 0:
             raise StopIteration
         if len(self.unlocked) == 0:
-            self.claim_elements()
+            self.__claim_elements()
         return self.unlocked.pop(0)
 
-    def claim_elements(self):
+    def __claim_elements(self):
         with self.lock:
-            if self.all_claimed():
+            if self.__all_claimed():
                 with self.releaser:
                     self.releaser.wait()
             for element in self.targets[:]:
@@ -211,7 +218,7 @@ class PoolIterator(object):
                     self.unlocked.append(element)
                     element.claimed = True
 
-    def all_claimed(self):
+    def __all_claimed(self):
         for element in self.targets[:]:
             if not element.claimed:
                 return False
