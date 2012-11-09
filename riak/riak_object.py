@@ -432,7 +432,7 @@ class RiakObject(object):
             Result = t.put(self, w=w, dw=dw, pw=pw, return_body=return_body,
                            if_none_match=if_none_match)
             if Result is not None:
-                self.populate(Result)
+                self._populate(Result)
 
         return self
 
@@ -453,7 +453,7 @@ class RiakObject(object):
 
         self.clear()
         if Result is not None:
-            self.populate(Result)
+            self._populate(Result)
 
         return self
 
@@ -509,7 +509,7 @@ class RiakObject(object):
         """
         return self._vclock
 
-    def populate(self, Result):
+    def _populate(self, Result):
         """
         Populate the object based on the return from get.
 
@@ -523,7 +523,7 @@ class RiakObject(object):
         if Result is None:
             return self
         elif type(Result) == types.ListType:
-            self.set_siblings(Result)
+            self._set_siblings(Result)
         elif type(Result) == types.TupleType:
             (vclock, contents) = Result
             self._vclock = vclock
@@ -542,7 +542,7 @@ class RiakObject(object):
                     sibling.set_encoded_data(data)
                     siblings.append(sibling)
                 for sibling in siblings:
-                    sibling.set_siblings(siblings)
+                    sibling._set_siblings(siblings)
         else:
             raise RiakError("do not know how to handle type %s" % type(Result))
 
@@ -583,7 +583,7 @@ class RiakObject(object):
 
             # And make sure it knows who it's siblings are
             self._siblings[i] = obj
-            obj.set_siblings(self._siblings)
+            obj._set_siblings(self._siblings)
             return obj
 
     def get_siblings(self, r=None):
@@ -600,7 +600,7 @@ class RiakObject(object):
             a.append(self.get_sibling(i, r))
         return a
 
-    def set_siblings(self, siblings):
+    def _set_siblings(self, siblings):
         """
         Set the array of siblings - used internally
 
