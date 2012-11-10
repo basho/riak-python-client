@@ -152,8 +152,16 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.assertTrue(obj.exists())
         self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
         self.assertEqual(obj.get_key(), 'barbaz')
-        self.assertEqual(obj.get_data(), rand) 
+        self.assertEqual(obj.get_data(), rand)
 
+    def test_bucket_search_enabled(self):
+        bucket = self.client.bucket("unsearch_bucket")
+        self.assertRaises(NotImplementedError)
+
+    def test_enable_search_commit_hook(self):
+        bucket = self.client.bucket("search_bucket")
+        bucket.enable_search()
+        self.assertRaises(NotImplementedError)
 
 class RiakHttpTransportTestCase(BasicKVTests,
                                 KVFileTests,
