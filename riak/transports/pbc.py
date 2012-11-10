@@ -22,6 +22,7 @@ from __future__ import with_statement
 import errno
 import socket
 import struct
+import types
 
 try:
     import json
@@ -159,6 +160,13 @@ class RiakPbcTransport(RiakTransport):
 
     # The ConnectionManager class that this transport prefers.
     default_cm = connection.cm_using(SocketWithId)
+
+    @staticmethod
+    def with_timeout(timeout):
+        socket_with_timeout = type("SocketWithIdAndTimeout", (SocketWithId,), {"_options":dict(SocketWithId._options)})
+        socket_with_timeout._options["timeout"] = timeout
+        cm_with_timeout = connection.cm_using(socket_with_timeout)
+        return type("RiackPbcTransportWithTimeout", (RiakPbcTransport,), {"default_cm":cm_with_timeout})
 
     def __init__(self, cm, client_id=None, max_attempts=1, **unused_options):
         """
