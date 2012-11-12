@@ -492,28 +492,6 @@ class RiakHttpTransport(RiakTransport):
         url = self.build_rest_path(bucket=None, params=params, prefix=uri)
         return self.http_request('GET', url)
 
-    def store_file(self, key, content_type="application/octet-stream",
-                   content=None):
-        url = self.build_rest_path(prefix='luwak', key=key)
-        headers = {'Content-Type': content_type,
-                   'X-Riak-ClientId': self._client_id}
-
-        return self.do_put(url, headers, content, key=key)
-
-    def get_file(self, key):
-        url = self.build_rest_path(prefix='luwak', key=key)
-        response = self.http_request('GET', url)
-        result = self.parse_body(response, [200, 300, 404])
-        if result is not None:
-            (vclock, data) = result
-            (headers, body) = data.pop()
-            return body
-
-    def delete_file(self, key):
-        url = self.build_rest_path(prefix='luwak', key=key)
-        response = self.http_request('DELETE', url)
-        self.parse_body(response, [204, 404])
-
     def post_request(self, uri=None, body=None, params=None,
                      content_type="application/json"):
         uri = self.build_rest_path(prefix=uri, params=params)
