@@ -198,27 +198,3 @@ class RiakTransport(FeatureDetection):
                                   'key': startkey},
                                  phases)
         return [key for bucket, key in result]
-
-    def store_file(self, key, content_type="application/octet-stream",
-                   content=None):
-        """
-        Store a large piece of data in luwak.
-        key = the key/filename for the object
-        content_type = the object's content type
-        content = the object's data
-        """
-        raise NotImplementedError
-
-    def get_file(self, key):
-        """
-        Get an object from luwak.
-        key = the object's key
-        """
-        raise NotImplementedError
-
-    def delete_file(self, key):
-        """
-        Delete an object in luwak.
-        key = the object's key
-        """
-        raise NotImplementedError

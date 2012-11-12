@@ -42,8 +42,6 @@ PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 
-SKIP_LUWAK = int(os.environ.get('SKIP_LUWAK', '0'))
-
 USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
 
 if USE_TEST_SERVER:
@@ -200,41 +198,6 @@ class RiakHttpTransportTestCase(BasicKVTests,
         o.store()
         stored_object = bucket.get("lots_of_links")
         self.assertEqual(len(stored_object.get_links()), 400)
-
-    @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
-    def test_store_file_with_luwak(self):
-        file = os.path.join(os.path.dirname(__file__), "test_all.py")
-        with open(file, "r") as input_file:
-            data = input_file.read()
-
-        key = uuid.uuid1().hex
-        self.client.store_file(key, data)
-
-    @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
-    def test_store_get_file_with_luwak(self):
-        file = os.path.join(os.path.dirname(__file__), "test_all.py")
-        with open(file, "r") as input_file:
-            data = input_file.read()
-
-        key = uuid.uuid1().hex
-        self.client.store_file(key, data)
-        time.sleep(1)
-        file = self.client.get_file(key)
-        self.assertEquals(data, file)
-
-    @unittest.skipIf(SKIP_LUWAK, 'SKIP_LUWAK is defined')
-    def test_delete_file_with_luwak(self):
-        file = os.path.join(os.path.dirname(__file__), "test_all.py")
-        with open(file, "r") as input_file:
-            data = input_file.read()
-
-        key = uuid.uuid1().hex
-        self.client.store_file(key, data)
-        time.sleep(1)
-        self.client.delete_file(key)
-        time.sleep(1)
-        file = self.client.get_file(key)
-        self.assertIsNone(file)
 
 
 class FilterTests(unittest.TestCase):
