@@ -185,6 +185,7 @@ def cm_using(connection_class):
     return functools.partial(FactoryConnectionManager, connection_class)
 
 HTTPConnectionManager = cm_using(httplib.HTTPConnection)
+HTTPSConnectionManager = cm_using(httplib.HTTPSConnection)
 SocketConnectionManager = cm_using(Socket)
 
 
