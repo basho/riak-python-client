@@ -45,6 +45,7 @@ from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase,\
     RiakKeyFilter
 from transports.pbc import RiakPbcTransport
 from transports.http import RiakHttpTransport
+from transports.http import RiakHttpsTransport
 
 ONE = "one"
 ALL = "all"

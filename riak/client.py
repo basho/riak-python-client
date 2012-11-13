@@ -396,6 +396,9 @@ class RiakClient(object):
 
     def solr(self):
         if self._solr is None:
-            self._solr = RiakSearch(self, host=self._host, port=self._port)
+            self._solr = RiakSearch(self, 
+                                    host=self._host, 
+                                    port=self._port,
+                                    transport_class=type(self._transport))
 
         return self._solr
