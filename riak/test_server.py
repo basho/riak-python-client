@@ -181,7 +181,7 @@ class TestServer(object):
             try:
                 socket.create_connection((self._http_ip(), self._http_port()),
                                          1.0)
-            except socket.error, (value, message):
+            except socket.error as e:
                 pass
             else:
                 listening = True
@@ -223,7 +223,7 @@ class TestServer(object):
 
                     temp_bin_file.write(line)
 
-                os.fchmod(temp_bin_file.fileno(), 0755)
+                os.fchmod(temp_bin_file.fileno(), 0o755)
 
     def write_vm_args(self):
         with open(self._vm_args_path(), 'wb') as vm_args:

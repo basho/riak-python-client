@@ -191,7 +191,7 @@ class RiakClient(object):
         :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
-        return apply(mr.add, args)
+        return mr.add(*args)
 
     def search(self, *args):
         """
@@ -203,7 +203,7 @@ class RiakClient(object):
         :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
-        return apply(mr.search, args)
+        return mr.search(*args)
 
     def index(self, *args):
         """
@@ -213,7 +213,7 @@ class RiakClient(object):
         :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
-        return apply(mr.index, args)
+        return mr.index(*args)
 
     def link(self, *args):
         """
@@ -223,7 +223,7 @@ class RiakClient(object):
         :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
-        return apply(mr.link, args)
+        return mr.link(*args)
 
     def map(self, *args):
         """
@@ -233,7 +233,7 @@ class RiakClient(object):
         :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
-        return apply(mr.map, args)
+        return mr.map(*args)
 
     def reduce(self, *args):
         """
@@ -243,7 +243,7 @@ class RiakClient(object):
         :rtype: :class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
-        return apply(mr.reduce, args)
+        return mr.reduce(*args)
 
     def get_index(self, bucket, index, startkey, endkey=None):
         return self._transport.get_index(bucket, index, startkey, endkey)

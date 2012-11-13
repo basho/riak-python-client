@@ -15,8 +15,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-
-import httplib
+import platform
+if platform.python_version() > '3.0':
+    import http.client as httplib
+else:
+    import httplib
 import socket
 import contextlib
 import functools
