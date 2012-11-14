@@ -22,7 +22,6 @@ from __future__ import with_statement
 import errno
 import socket
 import struct
-
 try:
     import json
 except ImportError:
@@ -255,7 +254,7 @@ class RiakPbcTransport(RiakTransport):
         if self.tombstone_vclocks():
             req.deletedvclock = 1
 
-        req.bucket = bucket.get_name()
+        req.bucket = bucket.name
         req.key = robj.get_key()
 
         # An expected response code of None implies "any response is valid".
@@ -288,7 +287,7 @@ class RiakPbcTransport(RiakTransport):
         if if_none_match:
             req.if_none_match = 1
 
-        req.bucket = bucket.get_name()
+        req.bucket = bucket.name
         req.key = robj.get_key()
         vclock = robj.vclock()
         if vclock:
@@ -331,7 +330,7 @@ class RiakPbcTransport(RiakTransport):
         if if_none_match:
             req.if_none_match = 1
 
-        req.bucket = bucket.get_name()
+        req.bucket = bucket.name
 
         self.pbify_content(robj.get_metadata(),
                            robj.get_encoded_data(),
@@ -372,7 +371,7 @@ class RiakPbcTransport(RiakTransport):
         if self.tombstone_vclocks() and robj.vclock():
             req.vclock = robj.vclock()
 
-        req.bucket = bucket.get_name()
+        req.bucket = bucket.name
         req.key = robj.get_key()
 
         msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req,
@@ -384,7 +383,7 @@ class RiakPbcTransport(RiakTransport):
         Lists all keys within a bucket.
         """
         req = riak_pb.RpbListKeysReq()
-        req.bucket = bucket.get_name()
+        req.bucket = bucket.name
 
         keys = []
 
@@ -409,7 +408,7 @@ class RiakPbcTransport(RiakTransport):
         Serialize bucket property request and deserialize response
         """
         req = riak_pb.RpbGetBucketReq()
-        req.bucket = bucket.get_name()
+        req.bucket = bucket.name
 
         msg_code, resp = self.send_msg(MSG_CODE_GET_BUCKET_REQ, req,
                                        MSG_CODE_GET_BUCKET_RESP)
@@ -426,9 +425,10 @@ class RiakPbcTransport(RiakTransport):
         Serialize set bucket property request and deserialize response
         """
         req = riak_pb.RpbSetBucketReq()
-        req.bucket = bucket.get_name()
-        if not 'n_val' in props and not 'allow_mult' in props:
-            return self
+        req.bucket = bucket.name
+        for key in props:
+            if key not in ['n_val', 'allow_mult']:
+                raise NotImplementedError
 
         if 'n_val' in props:
             req.props.n_val = props['n_val']

@@ -25,7 +25,6 @@ from riak.util import deprecateQuorumAccessors
 def deprecateBucketQuorumAccessors(klass):
     return deprecateQuorumAccessors(klass, parent='_client')
 
-
 @deprecateBucketQuorumAccessors
 class RiakBucket(object):
     """
@@ -52,15 +51,9 @@ class RiakBucket(object):
             raise TypeError('Unicode bucket names are not supported.')
 
         self._client = client
-        self._name = name
+        self.name = name
         self._encoders = {}
         self._decoders = {}
-
-    def get_name(self):
-        """
-        Get the bucket name as a string.
-        """
-        return self._name
 
     def get_encoder(self, content_type):
         """
@@ -189,72 +182,72 @@ class RiakBucket(object):
         obj._encode_data = False
         return obj.reload(r=r, pr=pr)
 
-    def set_n_val(self, nval):
-        """
-        Set the N-value for this bucket, which is the number of replicas
-        that will be written of each object in the bucket.
-
-        .. warning::
-
-           Set this once before you write any data to the bucket, and never
-           change it again, otherwise unpredictable things could happen.
-           This should only be used if you know what you are doing.
-
-        :param nval: The new N-Val.
-        :type nval: integer
-        """
+    def _set_n_val(self, nval):
         return self.set_property('n_val', nval)
-
-    def get_n_val(self):
-        """
-        Retrieve the N-value for this bucket.
-
-        :rtype: integer
-        """
+    def _get_n_val(self):
         return self.get_property('n_val')
+    n_val = property(_get_n_val, _set_n_val, doc = 
+    """
+    N-value for this bucket, which is the number of replicas
+    that will be written of each object in the bucket.
+    
+    .. warning::
+    
+    Set this once before you write any data to the bucket, and never
+    change it again, otherwise unpredictable things could happen.
+    This should only be used if you know what you are doing.
 
-    def set_default_r_val(self, rval):
-        return self.set_property('r', rval)
+    :type nval: integer
+    """)
 
-    def get_default_r_val(self):
-        return self.get_property('r')
-
-    def set_default_w_val(self, wval):
-        return self.set_property('w', wval)
-
-    def get_default_w_val(self):
-        return self.get_property('w')
-
-    def set_default_dw_val(self, dwval):
-        return self.set_property('dw', dwval)
-
-    def get_default_dw_val(self):
-        return self.get_property('dw')
-
-    def set_default_rw_val(self, rwval):
-        return self.set_property('rw', rwval)
-
-    def get_default_rw_val(self):
-        return self.get_property('rw')
-
-    def set_allow_multiples(self, bool):
-        """
-        If set to True, then writes with conflicting data will be stored
-        and returned to the client. This situation can be detected by
-        calling has_siblings() and get_siblings().
-
-        :param bool: True to store and return conflicting writes.
-        :type bool: boolean
-        """
+    def _set_allow_mult(self, bool):
         return self.set_property('allow_mult', bool)
+    def _get_allow_mult(self):
+        return self.get_property('allow_mult')
+    allow_mult = property(_get_allow_mult, _set_allow_mult, doc =
+    """
+    If set to True, then writes with conflicting data will be stored
+    and returned to the client. This situation can be detected by
+    calling has_siblings() and get_siblings().
+    
+    :type bool: boolean
+    """)
 
-    def get_allow_multiples(self):
-        """
-        Retrieve the 'allow multiples' setting.
+    def _set_r(self, val):
+        return self.set_property('r', val)
+    def _get_r(self):
+        return self.get_property('r')
+    r = property(_get_r, _set_r)
 
-        :rtype: Boolean
-        """
-        return self.get_bool_property('allow_mult')
+    def _set_pr(self, val):
+        return self.set_property('pr', val)
+    def _get_pr(self):
+        return self.get_property('pr')
+    pr = property(_get_pr, _set_pr)
+
+    def _set_rw(self, val):
+        return self.set_property('rw', val)
+    def _get_rw(self):
+        return self.get_property('rw')
+    rw = property(_get_rw, _set_rw)
+
+    def _set_w(self, val):
+        return self.set_property('w', val)
+    def _get_w(self):
+        return self.get_property('w')
+    w = property(_get_w, _set_w)
+
+    def _set_dw(self, val):
+        return self.set_property('dw', val)
+    def _get_dw(self):
+        return self.get_property('dw')
+    dw = property(_get_dw, _set_dw)
+
+    def _set_pw(self, val):
+        return self.set_property('pw', val)
+    def _get_pw(self):
+        return self.get_property('pw')
+    pw = property(_get_pw, _set_pw)
 
     def set_property(self, key, value):
         """
@@ -271,20 +264,6 @@ class RiakBucket(object):
         """
         return self.set_properties({key: value})
 
-    def get_bool_property(self, key):
-        """
-        Get a boolean bucket property. Converts to a ``True`` or
-        ``False`` value.
-
-        :param key: Property to set.
-        :type key: string
-        """
-        prop = self.get_property(key)
-        if prop == True or prop > 0:
-            return True
-        else:
-            return False
-
     def get_property(self, key):
         """
         Retrieve a bucket property.
@@ -293,9 +272,10 @@ class RiakBucket(object):
         :type key: string
         :rtype: mixed
         """
-        props = self.get_properties()
-        if (key in props.keys()):
-            return props[key]
+        try:
+            return self.get_properties()[key]
+        except KeyError:
+            raise NotImplementedError
 
     def set_properties(self, props):
         """
@@ -375,11 +355,11 @@ class RiakBucket(object):
         """
         Queries a search index over objects in this bucket/index.
         """
-        return self._client.solr().search(self._name, query, **params)
+        return self._client.solr().search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None):
         """
         Queries a secondary index over objects in this bucket, returning keys.
         """
-        return self._client._transport.get_index(self._name, index, startkey,
+        return self._client._transport.get_index(self.name, index, startkey,
                                                  endkey)

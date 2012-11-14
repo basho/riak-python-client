@@ -25,7 +25,8 @@ from riak.tests.test_search import SearchTests, \
     EnableSearchTests, SolrSearchTests
 from riak.tests.test_mapreduce import MapReduceAliasTests, \
     ErlangMapReduceTests, JSMapReduceTests, LinkTests
-from riak.tests.test_kv import BasicKVTests, KVFileTests
+from riak.tests.test_kv import BasicKVTests, KVFileTests, \
+    HTTPBucketPropsTest, PbcBucketPropsTest
 from riak.tests.test_2i import TwoITests
 
 try:
@@ -79,6 +80,7 @@ class BaseTestCase(object):
 
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
+                               PbcBucketPropsTest,
                                TwoITests,
                                LinkTests,
                                ErlangMapReduceTests,
@@ -114,7 +116,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
         obj.store()
         obj = bucket.get('foo')
         self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
+        self.assertEqual(obj.get_bucket().name, 'bucket_test_close')
         self.assertEqual(obj.get_key(), 'foo')
         self.assertEqual(obj.get_data(), rand)
 
@@ -137,7 +139,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
         obj.store()
         obj = bucket.get('barbaz')
         self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
+        self.assertEqual(obj.get_bucket().name, 'bucket_test_close')
         self.assertEqual(obj.get_key(), 'barbaz')
         self.assertEqual(obj.get_data(), rand)
 
@@ -150,22 +152,24 @@ class RiakPbcTransportTestCase(BasicKVTests,
         # This should work, since we have a retry
         obj = bucket.get('barbaz')
         self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
+        self.assertEqual(obj.get_bucket().name, 'bucket_test_close')
         self.assertEqual(obj.get_key(), 'barbaz')
         self.assertEqual(obj.get_data(), rand)
 
     def test_bucket_search_enabled(self):
-        bucket = self.client.bucket("unsearch_bucket")
-        self.assertRaises(NotImplementedError)
-
+        with self.assertRaises(NotImplementedError):
+            bucket = self.client.bucket("unsearch_bucket")
+            test = bucket.search_enabled()
+        
     def test_enable_search_commit_hook(self):
-        bucket = self.client.bucket("search_bucket")
-        bucket.enable_search()
-        self.assertRaises(NotImplementedError)
+        with self.assertRaises(NotImplementedError):
+            bucket = self.client.bucket("search_bucket")
+            bucket.enable_search()
 
 
 class RiakHttpTransportTestCase(BasicKVTests,
                                 KVFileTests,
+                                HTTPBucketPropsTest,
                                 TwoITests,
                                 LinkTests,
                                 ErlangMapReduceTests,
