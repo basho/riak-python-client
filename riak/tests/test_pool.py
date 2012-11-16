@@ -48,7 +48,6 @@ class EmptyListPool(Pool):
 
 
 class PoolTest(unittest.TestCase):
-    maxDiff = None
     def test_yields_new_object_when_empty(self):
         """
         The pool should create new resources as needed.
