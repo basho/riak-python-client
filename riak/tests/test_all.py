@@ -59,24 +59,33 @@ class BaseTestCase(object):
     def randint():
         return random.randint(1, 999999)
 
+    @staticmethod
+    def randname(length = 12):
+        out = ''
+        for i in range(length):
+            out += chr(random.randint(ord('a'), ord('z')))
+        return out
+
     def create_client(self, host=None, port=None, transport_class=None):
         host = host or self.host
         port = port or self.port
         transport_class = transport_class or self.transport_class
-        return RiakClient(self.host, self.port,
-                          transport_class=self.transport_class)
+        return RiakClient(host, port,
+                          transport_class=transport_class)
 
     def setUp(self):
+        self.bucket_name = self.randname()
+        self.key_name = self.randname()
+        if not getattr(self, 'search_bucket', None):
+            print repr(self), 'creating search bucket'
+            self.search_bucket = self.randname()
+            c = self.create_client(HTTP_HOST, HTTP_PORT, 
+                                   RiakHttpTransport)
+            b = c.bucket(self.search_bucket)
+            b.enable_search()
+
         self.client = self.create_client()
-
-        # make sure these are not left over from a previous, failed run
-        bucket = self.client.bucket('bucket')
-        o = bucket.get('nonexistent_key_json')
-        o.delete()
-        o = bucket.get('nonexistent_key_binary')
-        o.delete()
-
-
+            
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
                                TwoITests,
@@ -94,6 +103,8 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.host = PB_HOST
         self.port = PB_PORT
         self.transport_class = RiakPbcTransport
+        self.http_client = self.create_client(HTTP_HOST, HTTP_PORT,
+                                              RiakHttpTransport)
         super(RiakPbcTransportTestCase, self).setUp()
 
     def test_uses_client_id_if_given(self):
@@ -107,15 +118,14 @@ class RiakPbcTransportTestCase(BasicKVTests,
 
     def test_close_underlying_socket_fails(self):
         c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport)
-
-        bucket = c.bucket('bucket_test_close')
+        bucket = c.bucket(self.bucket_name)
         rand = self.randint()
-        obj = bucket.new('foo', rand)
+        obj = bucket.new(self.key_name, rand)
         obj.store()
-        obj = bucket.get('foo')
+        obj = bucket.get(self.key_name)
         self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
-        self.assertEqual(obj.get_key(), 'foo')
+        self.assertEqual(obj.get_bucket().get_name(), self.bucket_name)
+        self.assertEqual(obj.get_key(), self.key_name)
         self.assertEqual(obj.get_data(), rand)
 
         # Close the underlying socket. This gets a bit sketchy,
@@ -130,15 +140,15 @@ class RiakPbcTransportTestCase(BasicKVTests,
     def test_close_underlying_socket_retry(self):
         c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport,
                                          transport_options={"max_attempts": 2})
-
-        bucket = c.bucket('bucket_test_close')
+        bucket = c.bucket(self.bucket_name)
         rand = self.randint()
-        obj = bucket.new('barbaz', rand)
+        obj = bucket.new(self.key_name, rand)
         obj.store()
-        obj = bucket.get('barbaz')
+
+        obj = bucket.get(self.key_name)
         self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
-        self.assertEqual(obj.get_key(), 'barbaz')
+        self.assertEqual(obj.get_bucket().get_name(), self.bucket_name)
+        self.assertEqual(obj.get_key(), self.key_name)
         self.assertEqual(obj.get_data(), rand)
 
         # Close the underlying socket. This gets a bit sketchy,
@@ -148,20 +158,20 @@ class RiakPbcTransportTestCase(BasicKVTests,
         conns[0].sock.close()
 
         # This should work, since we have a retry
-        obj = bucket.get('barbaz')
+        obj = bucket.get(self.key_name)
         self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().get_name(), 'bucket_test_close')
-        self.assertEqual(obj.get_key(), 'barbaz')
+        self.assertEqual(obj.get_bucket().get_name(), self.bucket_name)
+        self.assertEqual(obj.get_key(), self.key_name)
         self.assertEqual(obj.get_data(), rand)
 
     def test_bucket_search_enabled(self):
-        bucket = self.client.bucket("unsearch_bucket")
+        bucket = self.client.bucket(self.bucket_name)
         self.assertRaises(NotImplementedError)
 
     def test_enable_search_commit_hook(self):
-        bucket = self.client.bucket("search_bucket")
-        bucket.enable_search()
-        self.assertRaises(NotImplementedError)
+        bucket = self.client.bucket(self.bucket_name)
+        bucket.enable_search() 
+        self.assertRaises(NotImplementedError)       
 
 
 class RiakHttpTransportTestCase(BasicKVTests,
@@ -184,12 +194,12 @@ class RiakHttpTransportTestCase(BasicKVTests,
         super(RiakHttpTransportTestCase, self).setUp()
 
     def test_no_returnbody(self):
-        bucket = self.client.bucket("bucket")
-        o = bucket.new("foo", "bar").store(return_body=False)
+        bucket = self.client.bucket(self.bucket_name)
+        o = bucket.new(self.key_name, "bar").store(return_body=False)
         self.assertEqual(o.vclock(), None)
 
     def test_too_many_link_headers_shouldnt_break_http(self):
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         o = bucket.new("lots_of_links", "My god, it's full of links!")
         for i in range(0, 400):
             link = RiakLink("other", "key%d" % i, "next")
