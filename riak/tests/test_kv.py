@@ -152,7 +152,6 @@ class BasicKVTests(object):
         self.assertFalse(bucket.allow_mult)
         self.assertEqual(bucket.n_val, 2)
 
-
     def test_if_none_match(self):
         bucket = self.client.bucket('if_none_match_test')
         obj = bucket.get('obj')
@@ -245,6 +244,7 @@ class BasicKVTests(object):
         buckets = self.client.get_buckets()
         self.assertTrue("list_bucket" in buckets)
 
+
 class HTTPBucketPropsTest(object):
     def test_rw_settings(self):
         bucket = self.client.bucket('rwsettings')
@@ -264,7 +264,7 @@ class HTTPBucketPropsTest(object):
 
         bucket.rw = "one"
         self.assertEqual(bucket.rw, "one")
-        
+
     def test_primary_quora(self):
         bucket = self.client.bucket('primary_quora')
         self.assertEqual(bucket.pr, 0)

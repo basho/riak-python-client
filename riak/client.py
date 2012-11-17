@@ -30,6 +30,7 @@ from riak.transports import RiakHttpTransport
 from riak.util import deprecated
 from riak.util import deprecateQuorumAccessors
 
+
 @deprecateQuorumAccessors
 class RiakClient(object):
     """

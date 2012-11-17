@@ -25,6 +25,7 @@ from riak.util import deprecateQuorumAccessors
 def deprecateBucketQuorumAccessors(klass):
     return deprecateQuorumAccessors(klass, parent='_client')
 
+
 @deprecateBucketQuorumAccessors
 class RiakBucket(object):
     """
@@ -184,15 +185,17 @@ class RiakBucket(object):
 
     def _set_n_val(self, nval):
         return self.set_property('n_val', nval)
+
     def _get_n_val(self):
         return self.get_property('n_val')
-    n_val = property(_get_n_val, _set_n_val, doc = 
-    """
+
+    n_val = property(_get_n_val, _set_n_val, doc=
+                     """
     N-value for this bucket, which is the number of replicas
     that will be written of each object in the bucket.
-    
+
     .. warning::
-    
+
     Set this once before you write any data to the bucket, and never
     change it again, otherwise unpredictable things could happen.
     This should only be used if you know what you are doing.
@@ -202,51 +205,65 @@ class RiakBucket(object):
 
     def _set_allow_mult(self, bool):
         return self.set_property('allow_mult', bool)
+
     def _get_allow_mult(self):
         return self.get_property('allow_mult')
-    allow_mult = property(_get_allow_mult, _set_allow_mult, doc =
-    """
+
+    allow_mult = property(_get_allow_mult, _set_allow_mult, doc=
+                          """
     If set to True, then writes with conflicting data will be stored
     and returned to the client. This situation can be detected by
     calling has_siblings() and get_siblings().
-    
+
     :type bool: boolean
     """)
 
     def _set_r(self, val):
         return self.set_property('r', val)
+
     def _get_r(self):
         return self.get_property('r')
+
     r = property(_get_r, _set_r)
 
     def _set_pr(self, val):
         return self.set_property('pr', val)
+
     def _get_pr(self):
         return self.get_property('pr')
+
     pr = property(_get_pr, _set_pr)
 
     def _set_rw(self, val):
         return self.set_property('rw', val)
+
     def _get_rw(self):
         return self.get_property('rw')
+
     rw = property(_get_rw, _set_rw)
 
     def _set_w(self, val):
         return self.set_property('w', val)
+
     def _get_w(self):
         return self.get_property('w')
+
     w = property(_get_w, _set_w)
 
     def _set_dw(self, val):
         return self.set_property('dw', val)
+
     def _get_dw(self):
         return self.get_property('dw')
+
     dw = property(_get_dw, _set_dw)
 
     def _set_pw(self, val):
         return self.set_property('pw', val)
+
     def _get_pw(self):
         return self.get_property('pw')
+
     pw = property(_get_pw, _set_pw)
 
     def set_property(self, key, value):
@@ -337,7 +354,8 @@ class RiakBucket(object):
         precommit_hooks = self.get_property("precommit") or []
         if self.SEARCH_PRECOMMIT_HOOK not in precommit_hooks:
             self.set_properties({"precommit":
-                precommit_hooks + [self.SEARCH_PRECOMMIT_HOOK]})
+                                 precommit_hooks +
+                                 [self.SEARCH_PRECOMMIT_HOOK]})
         return True
 
     def disable_search(self):

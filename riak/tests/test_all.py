@@ -160,7 +160,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
         with self.assertRaises(NotImplementedError):
             bucket = self.client.bucket("unsearch_bucket")
             test = bucket.search_enabled()
-        
+
     def test_enable_search_commit_hook(self):
         with self.assertRaises(NotImplementedError):
             bucket = self.client.bucket("search_bucket")
