@@ -157,7 +157,7 @@ class JSMapReduceTests(object):
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add(bucket.get_name()) \
+            .add(bucket.name) \
             .map("Riak.mapValuesJson") \
             .reduce("Riak.reduceSum") \
             .run()
