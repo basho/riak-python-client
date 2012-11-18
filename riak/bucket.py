@@ -189,8 +189,7 @@ class RiakBucket(object):
     def _get_n_val(self):
         return self.get_property('n_val')
 
-    n_val = property(_get_n_val, _set_n_val, doc=
-                     """
+    n_val = property(_get_n_val, _set_n_val, doc="""
     N-value for this bucket, which is the number of replicas
     that will be written of each object in the bucket.
 
@@ -209,8 +208,7 @@ class RiakBucket(object):
     def _get_allow_mult(self):
         return self.get_property('allow_mult')
 
-    allow_mult = property(_get_allow_mult, _set_allow_mult, doc=
-                          """
+    allow_mult = property(_get_allow_mult, _set_allow_mult, doc="""
     If set to True, then writes with conflicting data will be stored
     and returned to the client. This situation can be detected by
     calling has_siblings() and get_siblings().
