@@ -265,6 +265,11 @@ class HTTPBucketPropsTest(object):
         bucket.rw = "one"
         self.assertEqual(bucket.rw, "one")
 
+        bucket.set_properties({'w': 'quorum',
+                               'r': 'quorom',
+                               'dw': 'quorum',
+                               'rw': 'quorum'})
+
     def test_primary_quora(self):
         bucket = self.client.bucket('primary_quora')
         self.assertEqual(bucket.pr, 0)
@@ -275,6 +280,8 @@ class HTTPBucketPropsTest(object):
 
         bucket.pw = "quorum"
         self.assertEqual(bucket.pw, "quorum")
+
+        bucket.set_properties({'pr': 0, 'pw': 0})
 
 
 class PbcBucketPropsTest(object):
