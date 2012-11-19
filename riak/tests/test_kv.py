@@ -266,7 +266,7 @@ class HTTPBucketPropsTest(object):
         self.assertEqual(bucket.rw, "one")
 
         bucket.set_properties({'w': 'quorum',
-                               'r': 'quorom',
+                               'r': 'quorum',
                                'dw': 'quorum',
                                'rw': 'quorum'})
 
