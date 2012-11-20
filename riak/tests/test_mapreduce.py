@@ -229,6 +229,66 @@ class JSMapReduceTests(object):
         result = obj.map("Riak.mapValuesJson").run()
         self.assertEqual(result, [2])
 
+    def test_mr_list_add(self):
+        bucket = self.client.bucket("abucket")
+        for x in range(20):
+            bucket.new('baz' + str(x),
+                       'bazval' + str(x)).store()
+        mr = self.client.add('abucket', ['baz' + str(x)
+                                         for x in range(2, 5)])
+        results = mr.map_values().run()
+        results.sort()
+        self.assertEqual(results,
+                         [u'"bazval2"',
+                          u'"bazval3"',
+                          u'"bazval4"'])
+
+    def test_mr_list_add_two_buckets(self):
+        bucket = self.client.bucket("bucket_a")
+        for x in range(10):
+            bucket.new('foo' + str(x),
+                       'fooval' + str(x)).store()
+        bucket = self.client.bucket("bucket_b")
+        for x in range(10):
+            bucket.new('bar' + str(x),
+                       'barval' + str(x)).store()
+
+        mr = self.client.add('bucket_a', ['foo' + str(x)
+                                          for x in range(2, 4)])
+        mr.add('bucket_b', ['bar' + str(x)
+                            for x in range(5, 7)])
+        results = mr.map_values().run()
+        results.sort()
+
+        self.assertEqual(results,
+                         [u'"barval5"',
+                          u'"barval6"',
+                          u'"fooval2"',
+                          u'"fooval3"'])
+
+    def test_mr_list_add_mix(self):
+        bucket = self.client.bucket("bucket_a")
+        for x in range(10):
+            bucket.new('foo' + str(x),
+                       'fooval' + str(x)).store()
+        bucket = self.client.bucket("bucket_b")
+        for x in range(10):
+            bucket.new('bar' + str(x),
+                       'barval' + str(x)).store()
+
+        mr = self.client.add('bucket_a', ['foo' + str(x)
+                                          for x in range(2, 4)])
+        mr.add('bucket_b', 'bar9')
+        mr.add('bucket_b', 'bar2')
+        results = mr.map_values().run()
+        results.sort()
+
+        self.assertEqual(results,
+                         [u'"barval2"',
+                          u'"barval9"',
+                          u'"fooval2"',
+                          u'"fooval3"'])
+
 
 class MapReduceAliasTests(object):
     """This tests the map reduce aliases"""

@@ -20,6 +20,7 @@ under the License.
 import urllib
 from riak_object import RiakObject
 from bucket import RiakBucket
+from collections import Iterable
 
 
 class RiakMapReduce(object):
@@ -46,7 +47,7 @@ class RiakMapReduce(object):
         specify either a RiakObject, a string bucket name, or a bucket,
         key, and additional arg.
         @param mixed arg1 - RiakObject or Bucket
-        @param mixed arg2 - Key or blank
+        @param mixed arg2 - Key or List or blank
         @param mixed arg3 - Arg or blank
         @return RiakMapReduce
         """
@@ -63,11 +64,16 @@ class RiakMapReduce(object):
 
     def add_bucket_key_data(self, bucket, key, data):
         if self._input_mode == 'bucket':
-            raise Exception('Already added a bucket, can\'t add an object.')
+            raise RiakError('Already added a bucket, can\'t add an object.')
         elif self._input_mode == 'query':
-            raise Exception('Already added a query, can\'t add an object.')
+            raise RiakError('Already added a query, can\'t add an object.')
         else:
-            self._inputs.append([bucket, key, data])
+            if isinstance(key, Iterable) and \
+                    not isinstance(key, basestring):
+                for k in key:
+                    self._inputs.append([bucket, k, data])
+            else:
+                self._inputs.append([bucket, key, data])
             return self
 
     def add_bucket(self, bucket):
