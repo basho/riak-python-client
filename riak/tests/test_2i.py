@@ -28,7 +28,7 @@ class TwoITests(object):
             return True
 
         # Create a new object with indexes...
-        bucket = self.client.bucket('indexbucket')
+        bucket = self.client.bucket(self.bucket_name)
         rand = self.randint()
         obj = bucket.new('mykey1', rand)
         obj.add_index('field1_bin', 'val1a')
@@ -103,10 +103,10 @@ class TwoITests(object):
         if not self.is_2i_supported():
             return True
 
-        bucket = self.client.bucket('indexbucket')
+        bucket = self.client.bucket(self.bucket_name)
         foo = bucket.new('foo', 1)
         foo.set_indexes((('field1_bin', 'test'), ('field2_int', 1337))).store()
-        result = self.client.index('indexbucket', 'field2_int', 1337).run()
+        result = self.client.index(self.bucket_name, 'field2_int', 1337).run()
         self.assertEqual(1, len(result))
         self.assertEqual('foo', result[0].get_key())
 
@@ -119,7 +119,7 @@ class TwoITests(object):
         if not self.is_2i_supported():
             return True
 
-        bucket = self.client.bucket('indexbucket')
+        bucket = self.client.bucket(self.bucket_name)
         bar = bucket.new('bar', 1).add_index('bar_int', 1)\
             .add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
         result = bucket.get_index('bar_int', 1)
@@ -172,7 +172,7 @@ class TwoITests(object):
         if not self.is_2i_supported():
             return True
 
-        bucket = self.client.bucket('indexbucket')
+        bucket = self.client.bucket(self.bucket_name)
 
         bucket.\
             new('mykey1', 'data1').\

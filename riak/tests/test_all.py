@@ -52,6 +52,7 @@ if USE_TEST_SERVER:
     test_server.prepare()
     test_server.start()
 
+testrun_search_bucket = None
 
 class BaseTestCase(object):
 
@@ -74,15 +75,17 @@ class BaseTestCase(object):
                           transport_class=transport_class)
 
     def setUp(self):
+        global testrun_search_bucket
         self.bucket_name = self.randname()
         self.key_name = self.randname()
-        if not getattr(self, 'search_bucket', None):
-            print repr(self), 'creating search bucket'
-            self.search_bucket = self.randname()
+        if not testrun_search_bucket:
+            self.search_bucket = testrun_search_bucket = self.randname()
             c = self.create_client(HTTP_HOST, HTTP_PORT, 
                                    RiakHttpTransport)
             b = c.bucket(self.search_bucket)
             b.enable_search()
+        else:
+            self.search_bucket = testrun_search_bucket
 
         self.client = self.create_client()
             
