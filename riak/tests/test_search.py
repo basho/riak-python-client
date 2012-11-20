@@ -37,7 +37,8 @@ class SolrSearchTests(object):
     def test_add_document_to_index(self):
         self.client.solr().add(self.search_bucket,
                                {"id": "doc", "username": "tony"})
-        results = self.client.solr().search(self.search_bucket, "username:tony")
+        results = self.client.solr().search(self.search_bucket,
+                                            "username:tony")
         self.assertEquals("tony", results['docs'][0]['username'])
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
@@ -61,7 +62,7 @@ class SolrSearchTests(object):
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query(self):
-        self.client.solr().add(self.search_bucket, 
+        self.client.solr().add(self.search_bucket,
                                {"id": "dizzy", "username": "dizzy"},
                                {"id": "russell", "username": "russell"})
         self.client.solr()\
@@ -88,7 +89,8 @@ class SolrSearchTests(object):
         self.assertEquals(
             self.client.get_transport().build_rest_path(
                 bucket=self.client.bucket(self.search_bucket),
-                key="bar", params={'r': None}), "/riak/"+self.search_bucket+"/bar?")
+                key="bar", params={'r': None}),
+            "/riak/" + self.search_bucket + "/bar?")
 
 
 class SearchTests(object):

@@ -54,6 +54,7 @@ if USE_TEST_SERVER:
 
 testrun_search_bucket = None
 
+
 class BaseTestCase(object):
 
     @staticmethod
@@ -61,7 +62,7 @@ class BaseTestCase(object):
         return random.randint(1, 999999)
 
     @staticmethod
-    def randname(length = 12):
+    def randname(length=12):
         out = ''
         for i in range(length):
             out += chr(random.randint(ord('a'), ord('z')))
@@ -80,7 +81,7 @@ class BaseTestCase(object):
         self.key_name = self.randname()
         if not testrun_search_bucket:
             self.search_bucket = testrun_search_bucket = self.randname()
-            c = self.create_client(HTTP_HOST, HTTP_PORT, 
+            c = self.create_client(HTTP_HOST, HTTP_PORT,
                                    RiakHttpTransport)
             b = c.bucket(self.search_bucket)
             b.enable_search()
@@ -88,7 +89,8 @@ class BaseTestCase(object):
             self.search_bucket = testrun_search_bucket
 
         self.client = self.create_client()
-            
+
+
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
                                TwoITests,
@@ -173,8 +175,8 @@ class RiakPbcTransportTestCase(BasicKVTests,
 
     def test_enable_search_commit_hook(self):
         bucket = self.client.bucket(self.bucket_name)
-        bucket.enable_search() 
-        self.assertRaises(NotImplementedError)       
+        bucket.enable_search()
+        self.assertRaises(NotImplementedError)
 
 
 class RiakHttpTransportTestCase(BasicKVTests,

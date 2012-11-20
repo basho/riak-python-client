@@ -29,6 +29,7 @@ else:
     import unittest
 import os
 
+
 class SimplePool(Pool):
     def __init__(self):
         self.count = 0
@@ -47,7 +48,7 @@ class EmptyListPool(Pool):
         return []
 
 
-@unittest.skipIf(os.environ.get('SKIP_POOL'), 
+@unittest.skipIf(os.environ.get('SKIP_POOL'),
                  'Skipping connection pool tests')
 class PoolTest(unittest.TestCase):
     def test_yields_new_object_when_empty(self):
