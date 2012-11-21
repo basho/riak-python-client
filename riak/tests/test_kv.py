@@ -43,7 +43,7 @@ class BasicKVTests(object):
         obj.store()
         obj = bucket.get('foo')
         self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().get_name(), self.bucket_name)
+        self.assertEqual(obj.get_bucket().name, self.bucket_name)
         self.assertEqual(obj.get_key(), 'foo')
         self.assertEqual(obj.get_data(), rand)
 
@@ -143,45 +143,16 @@ class BasicKVTests(object):
     def test_set_bucket_properties(self):
         bucket = self.client.bucket(self.bucket_name)
         # Test setting allow mult...
-        bucket.set_allow_multiples(True)
-        self.assertTrue(bucket.get_allow_multiples())
+        bucket.allow_mult = True
+        self.assertTrue(bucket.allow_mult)
         # Test setting nval...
-        bucket.set_n_val(3)
-        self.assertEqual(bucket.get_n_val(), 3)
+        bucket.n_val = 3
+        self.assertEqual(bucket.n_val, 3)
         # Test setting multiple properties...
         bucket.set_properties({"allow_mult": False, "n_val": 2})
-        self.assertFalse(bucket.get_allow_multiples())
-        self.assertEqual(bucket.get_n_val(), 2)
 
-    def test_rw_settings(self):
-        bucket = self.client.bucket(self.bucket_name)
-        self.assertEqual(bucket.get_r(), "default")
-        self.assertEqual(bucket.get_w(), "default")
-        self.assertEqual(bucket.get_dw(), "default")
-        self.assertEqual(bucket.get_rw(), "default")
-
-        bucket.set_w(1)
-        self.assertEqual(bucket.get_w(), 1)
-
-        bucket.set_r("quorum")
-        self.assertEqual(bucket.get_r(), "quorum")
-
-        bucket.set_dw("all")
-        self.assertEqual(bucket.get_dw(), "all")
-
-        bucket.set_rw("one")
-        self.assertEqual(bucket.get_rw(), "one")
-
-    def test_primary_quora(self):
-        bucket = self.client.bucket(self.bucket_name)
-        self.assertEqual(bucket.get_pr(), "default")
-        self.assertEqual(bucket.get_pw(), "default")
-
-        bucket.set_pr(1)
-        self.assertEqual(bucket.get_pr(), 1)
-
-        bucket.set_pw("quorum")
-        self.assertEqual(bucket.get_pw(), "quorum")
+        self.assertFalse(bucket.allow_mult)
+        self.assertEqual(bucket.n_val, 2)
 
     def test_if_none_match(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -199,9 +170,10 @@ class BasicKVTests(object):
 
     def test_siblings(self):
         # Set up the bucket, clear any existing object...
-        self.create_client().bucket(self.bucket_name).set_allow_multiples(True)
         bucket = self.client.bucket(self.bucket_name)
+        bucket.allow_mult = True
         obj = bucket.get_binary(self.key_name)
+
         # Even if it previously existed, let's store a base resolved version
         # from which we can diverge by sending a stale vclock.
         obj.set_data('start')
@@ -274,6 +246,79 @@ class BasicKVTests(object):
         bucket.new("one", {"foo": "one", "bar": "red"}).store()
         buckets = self.client.get_buckets()
         self.assertTrue(self.bucket_name in buckets)
+
+
+class HTTPBucketPropsTest(object):
+    def test_rw_settings(self):
+        bucket = self.client.bucket(self.bucket_name)
+        self.assertEqual(bucket.r, "quorum")
+        self.assertEqual(bucket.w, "quorum")
+        self.assertEqual(bucket.dw, "quorum")
+        self.assertEqual(bucket.rw, "quorum")
+
+        bucket.w = 1
+        self.assertEqual(bucket.w, 1)
+
+        bucket.r = "quorum"
+        self.assertEqual(bucket.r, "quorum")
+
+        bucket.dw = "all"
+        self.assertEqual(bucket.dw, "all")
+
+        bucket.rw = "one"
+        self.assertEqual(bucket.rw, "one")
+
+        bucket.set_properties({'w': 'quorum',
+                               'r': 'quorum',
+                               'dw': 'quorum',
+                               'rw': 'quorum'})
+
+    def test_primary_quora(self):
+        bucket = self.client.bucket(self.bucket_name)
+        self.assertEqual(bucket.pr, 0)
+        self.assertEqual(bucket.pw, 0)
+
+        bucket.pr = 1
+        self.assertEqual(bucket.pr, 1)
+
+        bucket.pw = "quorum"
+        self.assertEqual(bucket.pw, "quorum")
+
+        bucket.set_properties({'pr': 0, 'pw': 0})
+
+
+class PbcBucketPropsTest(object):
+    def test_rw_settings(self):
+        bucket = self.client.bucket('rwsettings')
+        with self.assertRaises(NotImplementedError):
+            test = bucket.r
+        with self.assertRaises(NotImplementedError):
+            test = bucket.w
+        with self.assertRaises(NotImplementedError):
+            test = bucket.dw
+        with self.assertRaises(NotImplementedError):
+            test = bucket.rw
+
+        with self.assertRaises(NotImplementedError):
+            bucket.r = 2
+        with self.assertRaises(NotImplementedError):
+            bucket.w = 2
+        with self.assertRaises(NotImplementedError):
+            bucket.dw = 2
+        with self.assertRaises(NotImplementedError):
+            bucket.rw = 2
+
+    def test_primary_quora(self):
+        bucket = self.client.bucket('primary_quora')
+        with self.assertRaises(NotImplementedError):
+            test = bucket.pr
+        with self.assertRaises(NotImplementedError):
+            test = bucket.pw
+
+        with self.assertRaises(NotImplementedError):
+            bucket.pr = 2
+        with self.assertRaises(NotImplementedError):
+            bucket.pw = 2
 
 
 class KVFileTests(object):
