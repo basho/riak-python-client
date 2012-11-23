@@ -193,6 +193,9 @@ class RiakObject(object):
         :type value: string or integer
         :rtype: self
         """
+        if field[-4:] not in ("_bin", "_int"):
+            raise RiakError("Riak 2i fields must end with either '_bin' or '_int'.")
+
         rie = RiakIndexEntry(field, value)
         if not rie in self._metadata[MD_INDEX]:
             self._metadata[MD_INDEX].append(rie)
