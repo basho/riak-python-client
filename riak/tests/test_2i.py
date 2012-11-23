@@ -231,5 +231,5 @@ class TwoITests(object):
 
         bucket = self.client.bucket('indexbucket')
 
-        testlambda = lambda: bucket.new('k', 'a').add_index('field1', 'value1')
-        self.assertRaises(RiakError, testlambda)
+        with self.assertRaises(RiakError):
+            bucket.new('k', 'a').add_index('field1', 'value1')
