@@ -7,6 +7,7 @@ else:
     import unittest
 
 from riak.riak_index_entry import RiakIndexEntry
+from riak import RiakError
 
 SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
 
@@ -222,3 +223,13 @@ class TwoITests(object):
         bucket.get('mykey2').delete()
         bucket.get('mykey3').delete()
         bucket.get('mykey4').delete()
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    def test_secondary_index_invalid_name(self):
+        if not self.is_2i_supported():
+            return True
+
+        bucket = self.client.bucket('indexbucket')
+
+        with self.assertRaises(RiakError):
+            bucket.new('k', 'a').add_index('field1', 'value1')
