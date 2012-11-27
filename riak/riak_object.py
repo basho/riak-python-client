@@ -17,12 +17,19 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+
+from __future__ import absolute_import
+
 import types
 import copy
-from metadata import *
+from .metadata import *
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 
+try:
+    unicode
+except:
+    basestring = unicode = str
 
 class RiakObject(object):
     """
@@ -525,9 +532,9 @@ class RiakObject(object):
         self.clear()
         if Result is None:
             return self
-        elif type(Result) == types.ListType:
+        elif type(Result) == list:
             self._set_siblings(Result)
-        elif type(Result) == types.TupleType:
+        elif type(Result) == tuple:
             (vclock, contents) = Result
             self._vclock = vclock
             if len(contents) > 0:
@@ -669,4 +676,4 @@ class RiakObject(object):
         mr.add(self._bucket.name, self._key)
         return apply(mr.reduce, params)
 
-from mapreduce import *
+from .mapreduce import *

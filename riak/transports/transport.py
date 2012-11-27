@@ -17,13 +17,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+
+from __future__ import absolute_import
+
 from riak import RiakError
 import base64
 import random
 import threading
 import platform
 import os
-from feature_detect import FeatureDetection
+from .feature_detect import FeatureDetection
 
 
 class RiakTransport(FeatureDetection):
@@ -42,7 +45,11 @@ class RiakTransport(FeatureDetection):
         """
         Returns a random client identifier
         """
-        return 'py_%s' % base64.b64encode(
+        if platform.python_version() >= '3.0':
+            return 'py_%s' % base64.b64encode(
+                bytes(str(random.randint(1, 0x40000000)), 'utf8'))
+        else:
+            return 'py_%s' % base64.b64encode(
                 str(random.randint(1, 0x40000000)))
 
     @classmethod

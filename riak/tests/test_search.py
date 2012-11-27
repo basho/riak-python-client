@@ -136,10 +136,10 @@ class SearchTests(object):
         results = self.client.solr().search("searchbucket",
                                             "foo:one OR foo:two")
         if (len(results) == 0):
-            print "\n\nNot running test \"testSearchIntegration()\".\n"
-            print """Please ensure that you have installed the Riak
+            print("\n\nNot running test \"testSearchIntegration()\".\n")
+            print("""Please ensure that you have installed the Riak
             Search hook on bucket \"searchbucket\" by running
-            \"bin/search-cmd install searchbucket\".\n\n"""
+            \"bin/search-cmd install searchbucket\".\n\n""")
             return
         self.assertEqual(len(results['docs']), 2)
         query = "(foo:one OR foo:two OR foo:three OR foo:four) AND\

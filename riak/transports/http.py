@@ -18,12 +18,19 @@ specific language governing permissions and limitations
 under the License.
 """
 from __future__ import with_statement
+from __future__ import absolute_import
 
-import urllib
 import re
 import csv
-from cStringIO import StringIO
-import httplib
+import platform 
+if platform.python_version() >= '3.0':
+    from io import StringIO
+    import http as httplib
+    import urllib.parse as urllib
+else:
+    from cStringIO import StringIO
+    import httplib
+    import urllib
 import socket
 import errno
 try:
@@ -31,13 +38,13 @@ try:
 except ImportError:
     import simplejson as json
 
-from transport import RiakTransport
+from .transport import RiakTransport
 from riak.metadata import *
 from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
-from connection import HTTPConnectionManager
+from .connection import HTTPConnectionManager
 import riak.util
 from xml.etree import ElementTree
 
@@ -408,7 +415,7 @@ class RiakHttpTransport(RiakTransport):
         vclock = None
         metadata = {MD_USERMETA: {}, MD_INDEX: []}
         links = []
-        for header, value in headers.iteritems():
+        for header, value in headers.items():
             if header == 'content-type':
                 metadata[MD_CTYPE] = value
             elif header == 'charset':
@@ -545,8 +552,7 @@ class RiakHttpTransport(RiakTransport):
 
         # Create the header from metadata
         links = self.add_links_for_riak_object(robj, headers)
-
-        for key, value in robj.get_usermeta().iteritems():
+        for key, value in robj.get_usermeta().items():
             headers['X-Riak-Meta-%s' % key] = value
 
         for rie in robj.get_indexes():
@@ -587,7 +593,7 @@ class RiakHttpTransport(RiakTransport):
                         response.close()
 
                     return response_headers, response_body
-                except socket.error, e:
+                except socket.error as e:
                     conn.close()
                     if e[0] == errno.ECONNRESET:
                         # Grab another connection and try again.
@@ -615,7 +621,7 @@ class RiakHttpTransport(RiakTransport):
             for doc in json[u'response'][u'docs']:
                 resdoc = {u'id': doc[u'id']}
                 if u'fields' in doc:
-                    for k, v in doc[u'fields'].iteritems():
+                    for k, v in doc[u'fields'].items():
                         resdoc[k] = v
                 docs.append(resdoc)
             result['docs'] = docs
@@ -634,7 +640,7 @@ class RiakHttpTransport(RiakTransport):
     @classmethod
     def build_headers(cls, headers):
         return ['%s: %s' % (header, value)
-                for header, value in headers.iteritems()]
+                for header, value in headers.items()]
 
     @classmethod
     def parse_http_headers(cls, headers):

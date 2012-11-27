@@ -17,10 +17,17 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak_object import RiakObject
+
+from __future__ import absolute_import
+
+from .riak_object import RiakObject
 import mimetypes
 from riak.util import deprecateQuorumAccessors
 
+try:
+    basestring
+except:
+    basestring = unicode = str
 
 def deprecateBucketQuorumAccessors(klass):
     return deprecateQuorumAccessors(klass, parent='_client')

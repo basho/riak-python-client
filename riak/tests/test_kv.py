@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+
 import os
-import cPickle
+import platform
+if platform.python_version() > '3.0':
+    import pickle as cPickle
+else:
+    import cPickle
 import copy
 try:
     import json
@@ -26,7 +31,7 @@ class NotJsonSerializable(object):
         value2_args = copy.copy(other.args)
         value1_args.sort()
         value2_args.sort()
-        for i in xrange(len(value1_args)):
+        for i in range(len(value1_args)):
             if value1_args[i] != value2_args[i]:
                 return False
         return True

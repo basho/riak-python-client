@@ -40,7 +40,7 @@ class RiakSearch(object):
         root = xml.createElement('add')
         for doc in docs:
             doc_element = xml.createElement('doc')
-            for key, value in doc.iteritems():
+            for key, value in doc.items():
                 field = xml.createElement('field')
                 field.setAttribute("name", key)
                 text = xml.createTextNode(value)

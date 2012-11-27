@@ -114,7 +114,7 @@ class SocketWithId(connection.Socket):
     def send(self, pkt):
         try:
             self.sock.sendall(pkt)
-        except socket.error, e:
+        except socket.error as e:
             # If the socket is in a bad state, close it and allow it
             # to re-connect on the next try
             if e[0] in CONN_CLOSED_ERRORS:
@@ -132,7 +132,7 @@ class SocketWithId(connection.Socket):
 
             return res
 
-        except socket.error, e:
+        except socket.error as e:
             # If the socket is in a bad state, close it and allow it
             # to re-connect on the next try
             if e[0] in CONN_CLOSED_ERRORS:
@@ -582,7 +582,7 @@ class RiakPbcTransport(RiakTransport):
 
                 conn.send(pkt)
                 break
-            except socket.error, e:
+            except socket.error as e:
                 # If this is some unknown socket error bail out
                 # instead of retrying
                 if e[0] not in CONN_CLOSED_ERRORS:

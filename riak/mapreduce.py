@@ -17,9 +17,17 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+
+from __future__ import absolute_import
+
+try:
+    unicode
+except:
+    unicode = basestring = str
+
 import urllib
-from riak_object import RiakObject
-from bucket import RiakBucket
+from .riak_object import RiakObject
+from .bucket import RiakBucket
 
 
 class RiakMapReduce(object):
