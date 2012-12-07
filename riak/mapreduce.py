@@ -359,6 +359,9 @@ class RiakMapReducePhase(object):
             stepdef['module'] = self._function[0]
             stepdef['function'] = self._function[1]
 
+        elif (self._language == 'erlang' and isinstance(self._function, str)):
+            stepdef['source'] = self._function
+
         return {self._type: stepdef}
 
 
