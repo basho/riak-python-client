@@ -86,5 +86,16 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.tombstone_vclocks())
         self.assertTrue(t.pb_head())
 
+    def test_12_loose(self):
+        t = DummyTransport("1.2.1p3")
+        self.assertTrue(t.phaseless_mapred())
+        self.assertTrue(t.pb_indexes())
+        self.assertTrue(t.pb_search())
+        self.assertTrue(t.pb_conditionals())
+        self.assertTrue(t.quorum_controls())
+        self.assertTrue(t.tombstone_vclocks())
+        self.assertTrue(t.pb_head())
+
+
 if __name__ == '__main__':
     unittest.main()

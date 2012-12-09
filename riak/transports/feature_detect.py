@@ -16,14 +16,14 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from distutils.version import StrictVersion
+from distutils.version import LooseVersion
 from riak.util import lazy_property
 
 
 versions = {
-    1: StrictVersion("1.0.0"),
-    1.1: StrictVersion("1.1.0"),
-    1.2: StrictVersion("1.2.0")
+    1: LooseVersion("1.0.0"),
+    1.1: LooseVersion("1.1.0"),
+    1.2: LooseVersion("1.2.0")
     }
 
 
@@ -92,4 +92,4 @@ class FeatureDetection(object):
 
     @lazy_property
     def server_version(self):
-        return StrictVersion(self._server_version())
+        return LooseVersion(self._server_version())
