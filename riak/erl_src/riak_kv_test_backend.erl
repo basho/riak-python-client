@@ -40,6 +40,8 @@
 
 %% KV Backend API
 -export([api_version/0,
+         capabilities/1,
+         capabilities/2,
          start/2,
          stop/1,
          get/3,
@@ -90,6 +92,20 @@ reset() ->
 -spec api_version() -> {integer(), [atom()]}.
 api_version() ->
     {?API_VERSION, ?CAPABILITIES}.
+
+
+%% @doc Return the capabilities of the backend.
+-spec capabilities(state()) -> {ok, [atom()]}.
+capabilities(_) ->
+    {ok, ?CAPABILITIES}.
+
+%% @doc Return the capabilities of the backend.
+-spec capabilities(riak_object:bucket(), state()) -> {ok, [atom()]}.
+capabilities(_, _) ->
+    {ok, ?CAPABILITIES}.
+
+
+
 
 %% @doc Start the memory backend
 -spec start(integer(), config()) -> {ok, state()}.
