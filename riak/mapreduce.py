@@ -64,9 +64,9 @@ class RiakMapReduce(object):
 
     def add_bucket_key_data(self, bucket, key, data):
         if self._input_mode == 'bucket':
-            raise RiakError('Already added a bucket, can\'t add an object.')
+            raise ValueError('Already added a bucket, can\'t add an object.')
         elif self._input_mode == 'query':
-            raise RiakError('Already added a query, can\'t add an object.')
+            raise ValueError('Already added a query, can\'t add an object.')
         else:
             if isinstance(key, Iterable) and \
                     not isinstance(key, basestring):
