@@ -83,14 +83,14 @@ class RiakMapReduce(object):
 
     def add_key_filters(self, key_filters):
         if self._input_mode == 'query':
-            raise Exception('Key filters are not supported in a query.')
+            raise ValueError('Key filters are not supported in a query.')
 
         self._key_filters.extend(key_filters)
         return self
 
     def add_key_filter(self, *args):
         if self._input_mode == 'query':
-            raise Exception('Key filters are not supported in a query.')
+            raise ValueError('Key filters are not supported in a query.')
 
         self._key_filters.append(args)
         return self

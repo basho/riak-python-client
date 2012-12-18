@@ -83,6 +83,27 @@ class ErlangMapReduceTests(object):
             .run()
         self.assertEqual(len(result), 2)
 
+    def test_client_exceptional_paths(self):
+        bucket = self.client.bucket('bucket')
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 2).store()
+        bucket.new("baz", 4).store()
+
+        #adding a b-key pair to a bucket input
+        with self.assertRaises(ValueError):
+            mr = self.client.add('bucket')
+            mr.add('bucket', 'bar')
+
+        #adding a b-key pair to a query input
+        with self.assertRaises(ValueError):
+            mr = self.client.search('bucket', 'fleh')
+            mr.add('bucket', 'bar')
+
+        #adding a key filter to a query input
+        with self.assertRaises(ValueError):
+            mr = self.client.search('bucket', 'fleh')
+            mr.add_key_filter("tokenize", "-", 1)
+ 
 
 class JSMapReduceTests(object):
     def test_javascript_source_map(self):
