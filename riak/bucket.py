@@ -125,8 +125,8 @@ class RiakBucket(object):
             raise TypeError('Unicode data values are not supported.')
 
         obj = RiakObject(self._client, self, key)
-        obj.set_data(data)
-        obj.set_content_type(content_type)
+        obj.data = data
+        obj.content_type = content_type
         obj._encode_data = True
         return obj
 
@@ -146,8 +146,8 @@ class RiakBucket(object):
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
-        obj.set_data(data)
-        obj.set_content_type(content_type)
+        obj.data = data
+        obj.content_type = content_type
         obj._encode_data = False
         return obj
 

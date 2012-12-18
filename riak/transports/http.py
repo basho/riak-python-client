@@ -146,7 +146,7 @@ class RiakHttpTransport(RiakTransport):
         params = {'r': r, 'pr': pr}
         if vtag is not None:
             params['vtag'] = vtag
-        url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+        url = self.build_rest_path(robj.bucket, robj.key,
                                    params=params)
         response = self.http_request('GET', url)
         return self.parse_body(response, [200, 300, 404])
@@ -160,8 +160,8 @@ class RiakHttpTransport(RiakTransport):
         # unknown flags/params.
         params = {'returnbody': str(return_body).lower(),
                   'w': w, 'dw': dw, 'pw': pw}
-        url = self.build_rest_path(bucket=robj.get_bucket(),
-                                   key=robj.get_key(),
+        url = self.build_rest_path(bucket=robj.bucket,
+                                   key=robj.key,
                                    params=params)
         headers = self.build_put_headers(robj)
         # TODO: use a more general 'prevent_stale_writes' semantics,
@@ -170,7 +170,7 @@ class RiakHttpTransport(RiakTransport):
             headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
         return self.do_put(url, headers, content, return_body,
-                           key=robj.get_key())
+                           key=robj.key)
 
     def do_put(self, url, headers, content, return_body=False, key=None):
         if key is None:
@@ -191,7 +191,7 @@ class RiakHttpTransport(RiakTransport):
         # unknown flags/params.
         params = {'returnbody': str(return_body).lower(), 'w': w, 'dw': dw,
                   'pw': pw}
-        url = self.build_rest_path(bucket=robj.get_bucket(), params=params)
+        url = self.build_rest_path(bucket=robj.bucket, params=params)
         headers = self.build_put_headers(robj)
         # TODO: use a more general 'prevent_stale_writes' semantics,
         # which is a superset of the if_none_match semantics.
@@ -217,10 +217,10 @@ class RiakHttpTransport(RiakTransport):
         # unknown flags/params.
         params = {'rw': rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw}
         headers = {}
-        url = self.build_rest_path(robj.get_bucket(), robj.get_key(),
+        url = self.build_rest_path(robj.bucket, robj.key,
                                    params=params)
-        if self.tombstone_vclocks() and robj.vclock() is not None:
-            headers['X-Riak-Vclock'] = robj.vclock()
+        if self.tombstone_vclocks() and robj.vclock is not None:
+            headers['X-Riak-Vclock'] = robj.vclock
         response = self.http_request('DELETE', url, headers)
         self.check_http_code(response, [204, 404])
         return self
@@ -536,17 +536,17 @@ class RiakHttpTransport(RiakTransport):
 
         # Construct the headers...
         headers = MultiDict({'Accept': 'text/plain, */*; q=0.5',
-                             'Content-Type': robj.get_content_type(),
+                             'Content-Type': robj.content_type,
                              'X-Riak-ClientId': self._client_id})
 
         # Add the vclock if it exists...
-        if robj.vclock() is not None:
-            headers['X-Riak-Vclock'] = robj.vclock()
+        if robj.vclock is not None:
+            headers['X-Riak-Vclock'] = robj.vclock
 
         # Create the header from metadata
         links = self.add_links_for_riak_object(robj, headers)
 
-        for key, value in robj.get_usermeta().iteritems():
+        for key, value in robj.usermeta.iteritems():
             headers['X-Riak-Meta-%s' % key] = value
 
         for rie in robj.get_indexes():
