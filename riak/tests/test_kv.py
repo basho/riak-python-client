@@ -42,10 +42,10 @@ class BasicKVTests(object):
         obj = bucket.new('foo', rand)
         obj.store()
         obj = bucket.get('foo')
-        self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().name, 'bucket')
-        self.assertEqual(obj.get_key(), 'foo')
-        self.assertEqual(obj.get_data(), rand)
+        self.assertTrue(obj.exists)
+        self.assertEqual(obj.bucket.name, 'bucket')
+        self.assertEqual(obj.key, 'foo')
+        self.assertEqual(obj.data, rand)
 
         # unicode objects are fine, as long as they don't
         # contain any non-ASCII chars
@@ -68,11 +68,11 @@ class BasicKVTests(object):
         bucket = self.client.bucket('random_key_bucket')
         existing_keys = bucket.get_keys()
         o = bucket.new(None, data={})
-        self.assertIsNone(o.get_key())
+        self.assertIsNone(o.key)
         o.store()
-        self.assertIsNotNone(o.get_key())
-        self.assertNotIn('/', o.get_key())
-        self.assertNotIn(o.get_key(), existing_keys)
+        self.assertIsNotNone(o.key)
+        self.assertNotIn('/', o.key)
+        self.assertNotIn(o.key, existing_keys)
         self.assertEqual(len(bucket.get_keys()), len(existing_keys) + 1)
 
     def test_binary_store_and_get(self):
@@ -82,14 +82,14 @@ class BasicKVTests(object):
         obj = bucket.new_binary('foo1', rand)
         obj.store()
         obj = bucket.get_binary('foo1')
-        self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_data(), rand)
+        self.assertTrue(obj.exists)
+        self.assertEqual(obj.data, rand)
         # Store as JSON, retrieve as binary, JSON-decode, then compare...
         data = [self.randint(), self.randint(), self.randint()]
         obj = bucket.new('foo2', data)
         obj.store()
         obj = bucket.get_binary('foo2')
-        self.assertEqual(data, json.loads(obj.get_data()))
+        self.assertEqual(data, json.loads(obj.data))
 
     def test_custom_bucket_encoder_decoder(self):
         # Teach the bucket how to pickle
@@ -97,10 +97,10 @@ class BasicKVTests(object):
         bucket.set_encoder('application/x-pickle', cPickle.dumps)
         bucket.set_decoder('application/x-pickle', cPickle.loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
-        obj = bucket.new("foo", data, 'application/x-pickle').store()
+        obj = bucket.new("foo", data, 'application/x-pickle')
         obj.store()
         obj2 = bucket.get("foo")
-        self.assertEqual(data, obj2.get_data())
+        self.assertEqual(data, obj2.data)
 
     def test_custom_client_encoder_decoder(self):
         # Teach the bucket how to pickle
@@ -108,10 +108,10 @@ class BasicKVTests(object):
         self.client.set_encoder('application/x-pickle', cPickle.dumps)
         self.client.set_decoder('application/x-pickle', cPickle.loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
-        obj = bucket.new("foo", data, 'application/x-pickle').store()
+        obj = bucket.new("foo", data, 'application/x-pickle')
         obj.store()
         obj2 = bucket.get("foo")
-        self.assertEqual(data, obj2.get_data())
+        self.assertEqual(data, obj2.data)
 
     def test_unknown_content_type_encoder_decoder(self):
         # Teach the bucket how to pickle
@@ -120,13 +120,13 @@ class BasicKVTests(object):
         obj = bucket.new("foo", data, 'application/x-frobnicator').store()
         obj.store()
         obj2 = bucket.get("foo")
-        self.assertEqual(data, obj2.get_data())
+        self.assertEqual(data, obj2.data)
 
     def test_missing_object(self):
         bucket = self.client.bucket('bucket')
         obj = bucket.get("missing")
-        self.assertFalse(obj.exists())
-        self.assertEqual(obj.get_data(), None)
+        self.assertFalse(obj.exists)
+        self.assertEqual(obj.data, None)
 
     def test_delete(self):
         bucket = self.client.bucket('bucket')
@@ -134,10 +134,10 @@ class BasicKVTests(object):
         obj = bucket.new('foo', rand)
         obj.store()
         obj = bucket.get('foo')
-        self.assertTrue(obj.exists())
+        self.assertTrue(obj.exists)
         obj.delete()
         obj.reload()
-        self.assertFalse(obj.exists())
+        self.assertFalse(obj.exists)
 
     def test_set_bucket_properties(self):
         bucket = self.client.bucket('bucket')
@@ -158,11 +158,11 @@ class BasicKVTests(object):
         obj.delete()
 
         obj.reload()
-        self.assertFalse(obj.exists())
-        obj.set_data(["first store"])
+        self.assertFalse(obj.exists)
+        obj.data = ["first store"]
         obj.store()
 
-        obj.set_data(["second store"])
+        obj.data = ["second store"]
         with self.assertRaises(Exception):
             obj.store(if_none_match=True)
 
@@ -173,8 +173,10 @@ class BasicKVTests(object):
         obj = bucket.get_binary('foo')
         # Even if it previously existed, let's store a base resolved version
         # from which we can diverge by sending a stale vclock.
-        obj.set_data('start')
+        obj.data = 'start'
         obj.store()
+
+        print obj.vclock
 
         # Store the same object five times...
         vals = set()
@@ -187,19 +189,20 @@ class BasicKVTests(object):
                     break
 
             other_obj = other_bucket.new_binary('foo', str(randval))
-            other_obj._vclock = obj._vclock
+            other_obj.vclock = obj.vclock
             other_obj.store()
             vals.add(str(randval))
 
         # Make sure the object has itself plus four siblings...
         obj.reload()
-        self.assertTrue(obj.has_siblings())
-        self.assertEqual(obj.get_sibling_count(), 5)
+        print obj.siblings
+        self.assertTrue(bool(obj.siblings))
+        self.assertEqual(len(obj.siblings), 5)
 
         # Get each of the values - make sure they match what was assigned
         vals2 = set()
         for i in range(5):
-            vals2.add(obj.get_sibling(i).get_data())
+            vals2.add(obj.get_sibling(i).data)
         self.assertEqual(vals, vals2)
 
         # Resolve the conflict, and then do a get...
@@ -207,36 +210,36 @@ class BasicKVTests(object):
         obj3.store()
 
         obj.reload()
-        self.assertEqual(obj.get_sibling_count(), 0)
-        self.assertEqual(obj.get_data(), obj3.get_data())
+        self.assertEqual(len(obj.siblings), 0)
+        self.assertEqual(obj.data, obj3.data)
 
     def test_store_of_missing_object(self):
         bucket = self.client.bucket("bucket")
         # for json objects
         o = bucket.get("nonexistent_key_json")
-        self.assertEqual(o.exists(), False)
-        o.set_data({"foo": "bar"})
+        self.assertEqual(o.exists, False)
+        o.data = {"foo": "bar"}
         o = o.store()
-        self.assertEqual(o.get_data(), {"foo": "bar"})
-        self.assertEqual(o.get_content_type(), "application/json")
+        self.assertEqual(o.data, {"foo": "bar"})
+        self.assertEqual(o.content_type, "application/json")
         o.delete()
         # for binary objects
         o = bucket.get_binary("nonexistent_key_binary")
-        self.assertEqual(o.exists(), False)
-        o.set_data("1234567890")
+        self.assertEqual(o.exists, False)
+        o.data = "1234567890"
         o = o.store()
-        self.assertEqual(o.get_data(), "1234567890")
-        self.assertEqual(o.get_content_type(), "application/octet-stream")
+        self.assertEqual(o.data, "1234567890")
+        self.assertEqual(o.content_type, "application/octet-stream")
         o.delete()
 
     def test_store_metadata(self):
         bucket = self.client.bucket('bucket')
         rand = self.randint()
         obj = bucket.new('fooster', rand)
-        obj.set_usermeta({'custom': 'some metadata'})
+        obj.usermeta = {'custom': 'some metadata'}
         obj.store()
         obj = bucket.get('fooster')
-        self.assertEqual('some metadata', obj.get_usermeta()['custom'])
+        self.assertEqual('some metadata', obj.usermeta['custom'])
 
     def test_list_buckets(self):
         bucket = self.client.bucket("list_bucket")
@@ -326,8 +329,8 @@ class KVFileTests(object):
         obj = bucket.new_binary_from_file('foo_from_file', filepath)
         obj.store()
         obj = bucket.get_binary('foo_from_file')
-        self.assertNotEqual(obj.get_data(), None)
-        self.assertEqual(obj.get_content_type(), "text/x-python")
+        self.assertNotEqual(obj.data, None)
+        self.assertEqual(obj.content_type, "text/x-python")
 
     def test_store_binary_object_from_file_should_use_default_mimetype(self):
         bucket = self.client.bucket('bucket')
@@ -337,7 +340,7 @@ class KVFileTests(object):
         obj = bucket.new_binary_from_file('foo_from_file', filepath)
         obj.store()
         obj = bucket.get_binary('foo_from_file')
-        self.assertEqual(obj.get_content_type(), 'application/octet-stream')
+        self.assertEqual(obj.content_type, 'application/octet-stream')
 
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
         bucket = self.client.bucket('bucket')
@@ -345,4 +348,4 @@ class KVFileTests(object):
         self.assertRaises(IOError, bucket.new_binary_from_file,
                           'not_found_from_file', 'FILE_NOT_FOUND')
         obj = bucket.get_binary('not_found_from_file')
-        self.assertEqual(obj.get_data(), None)
+        self.assertEqual(obj.data, None)

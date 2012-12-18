@@ -243,7 +243,7 @@ class RiakPbcTransport(RiakTransport):
         if vtag is not None:
             raise RiakError("PB transport does not support vtags")
 
-        bucket = robj.get_bucket()
+        bucket = robj.bucket
 
         req = riak_pb.RpbGetReq()
         if r:
@@ -255,7 +255,7 @@ class RiakPbcTransport(RiakTransport):
             req.deletedvclock = 1
 
         req.bucket = bucket.name
-        req.key = robj.get_key()
+        req.key = robj.key
 
         # An expected response code of None implies "any response is valid".
         msg_code, resp = self.send_msg(MSG_CODE_GET_REQ, req, None)
@@ -272,7 +272,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize get request and deserialize response
         """
-        bucket = robj.get_bucket()
+        bucket = robj.bucket
 
         req = riak_pb.RpbPutReq()
         if w:
@@ -288,12 +288,12 @@ class RiakPbcTransport(RiakTransport):
             req.if_none_match = 1
 
         req.bucket = bucket.name
-        req.key = robj.get_key()
-        vclock = robj.vclock()
+        req.key = robj.key
+        vclock = robj.vclock
         if vclock:
             req.vclock = vclock
 
-        self.pbify_content(robj.get_metadata(),
+        self.pbify_content(robj.metadata,
                            robj.get_encoded_data(),
                            req.content)
 
@@ -315,7 +315,7 @@ class RiakPbcTransport(RiakTransport):
         @return (key, vclock, metadata)
         """
         # Note that this won't work on 0.14 nodes.
-        bucket = robj.get_bucket()
+        bucket = robj.bucket
 
         req = riak_pb.RpbPutReq()
         if w:
@@ -332,7 +332,7 @@ class RiakPbcTransport(RiakTransport):
 
         req.bucket = bucket.name
 
-        self.pbify_content(robj.get_metadata(),
+        self.pbify_content(robj.metadata,
                            robj.get_encoded_data(),
                            req.content)
 
@@ -350,7 +350,7 @@ class RiakPbcTransport(RiakTransport):
         """
         Serialize get request and deserialize response
         """
-        bucket = robj.get_bucket()
+        bucket = robj.bucket
 
         req = riak_pb.RpbDelReq()
         if rw:
@@ -368,11 +368,11 @@ class RiakPbcTransport(RiakTransport):
             if pw:
                 req.pw = self.translate_rw_val(pw)
 
-        if self.tombstone_vclocks() and robj.vclock():
-            req.vclock = robj.vclock()
+        if self.tombstone_vclocks() and robj.vclock:
+            req.vclock = robj.vclock
 
         req.bucket = bucket.name
-        req.key = robj.get_key()
+        req.key = robj.key
 
         msg_code, resp = self.send_msg(MSG_CODE_DEL_REQ, req,
                                        MSG_CODE_DEL_RESP)

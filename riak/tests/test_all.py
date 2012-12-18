@@ -115,10 +115,10 @@ class RiakPbcTransportTestCase(BasicKVTests,
         obj = bucket.new('foo', rand)
         obj.store()
         obj = bucket.get('foo')
-        self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().name, 'bucket_test_close')
-        self.assertEqual(obj.get_key(), 'foo')
-        self.assertEqual(obj.get_data(), rand)
+        self.assertTrue(obj.exists)
+        self.assertEqual(obj.bucket.name, 'bucket_test_close')
+        self.assertEqual(obj.key, 'foo')
+        self.assertEqual(obj.data, rand)
 
         # Close the underlying socket. This gets a bit sketchy,
         # since we are reaching into the internals, but there is
@@ -138,10 +138,10 @@ class RiakPbcTransportTestCase(BasicKVTests,
         obj = bucket.new('barbaz', rand)
         obj.store()
         obj = bucket.get('barbaz')
-        self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().name, 'bucket_test_close')
-        self.assertEqual(obj.get_key(), 'barbaz')
-        self.assertEqual(obj.get_data(), rand)
+        self.assertTrue(obj.exists)
+        self.assertEqual(obj.bucket.name, 'bucket_test_close')
+        self.assertEqual(obj.key, 'barbaz')
+        self.assertEqual(obj.data, rand)
 
         # Close the underlying socket. This gets a bit sketchy,
         # since we are reaching into the internals, but there is
@@ -151,10 +151,10 @@ class RiakPbcTransportTestCase(BasicKVTests,
 
         # This should work, since we have a retry
         obj = bucket.get('barbaz')
-        self.assertTrue(obj.exists())
-        self.assertEqual(obj.get_bucket().name, 'bucket_test_close')
-        self.assertEqual(obj.get_key(), 'barbaz')
-        self.assertEqual(obj.get_data(), rand)
+        self.assertTrue(obj.exists)
+        self.assertEqual(obj.bucket.name, 'bucket_test_close')
+        self.assertEqual(obj.key, 'barbaz')
+        self.assertEqual(obj.data, rand)
 
     def test_bucket_search_enabled(self):
         with self.assertRaises(NotImplementedError):
@@ -190,7 +190,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
     def test_no_returnbody(self):
         bucket = self.client.bucket("bucket")
         o = bucket.new("foo", "bar").store(return_body=False)
-        self.assertEqual(o.vclock(), None)
+        self.assertEqual(o.vclock, None)
 
     def test_too_many_link_headers_shouldnt_break_http(self):
         bucket = self.client.bucket("bucket")
