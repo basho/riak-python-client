@@ -176,8 +176,6 @@ class BasicKVTests(object):
         obj.data = 'start'
         obj.store()
 
-        print obj.vclock
-
         # Store the same object five times...
         vals = set()
         for i in range(5):
@@ -195,7 +193,6 @@ class BasicKVTests(object):
 
         # Make sure the object has itself plus four siblings...
         obj.reload()
-        print obj.siblings
         self.assertTrue(bool(obj.siblings))
         self.assertEqual(len(obj.siblings), 5)
 
