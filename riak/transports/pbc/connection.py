@@ -20,18 +20,7 @@ import errno
 import socket
 import struct
 from contextlib import contextmanager
-
-# These are a specific set of socket errors
-# that could be raised on send/recv that indicate
-# that the socket is closed or reset, and is not
-# usable. On seeing any of these errors, the socket
-# should be closed, and the connection re-established.
-CONN_CLOSED_ERRORS = (
-                        errno.EHOSTUNREACH,
-                        errno.ECONNRESET,
-                        errno.EBADF,
-                        errno.EPIPE
-                     )
+from riak import RiakError
 
 
 class RiakPbcConnection(object):

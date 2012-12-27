@@ -31,7 +31,7 @@ class RiakClientOperations(object):
         NOTE: Do not use this in production, as it requires traversing through
         all keys stored in a cluster.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return [RiakBucket(self, name) for name in transport.get_buckets()]
 
     def ping(self):
@@ -40,7 +40,7 @@ class RiakClientOperations(object):
 
         :rtype: boolean
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.ping()
 
     is_alive = ping
@@ -49,28 +49,28 @@ class RiakClientOperations(object):
         """
         Queries a secondary index, returning matching keys.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.get_index(bucket, index, startkey, endkey)
 
     def get_bucket_props(self, bucket):
         """
         Fetches bucket properties for the given bucket.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.get_bucket_props(bucket)
 
     def set_bucket_props(self, bucket, props):
         """
         Sets bucket properties for the given bucket.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.set_bucket_props(bucket, props)
 
     def get_keys(self, bucket):
         """
         Lists all keys in a bucket.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.get_keys(bucket)
 
     def stream_keys(self, bucket):
@@ -78,7 +78,7 @@ class RiakClientOperations(object):
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             for keylist in return transport.stream_keys(bucket):
                 yield keylist
 
@@ -87,7 +87,7 @@ class RiakClientOperations(object):
         """
         Stores an object in the Riak cluster.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.put(robj, w=w, dw=dw, pw=pw,
                                  return_body=return_body,
                                  if_none_match=if_none_match)
@@ -97,7 +97,7 @@ class RiakClientOperations(object):
         """
         Stores an object in the Riak cluster with a generated key.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.put_new(robj, w=w, dw=dw, pw=pw,
                                      return_body=return_body,
                                      if_none_match=if_none_match)
@@ -106,14 +106,14 @@ class RiakClientOperations(object):
         """
         Fetches the contents of a Riak object.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.get(robj, r=r, pr=pr, vtag=vtag)
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """
         Deletes an object from Riak.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.delete(robj, rw=rw, r=r, w=w, dw=dw=, pr=pr,
                                     pw=pw)
 
@@ -121,7 +121,7 @@ class RiakClientOperations(object):
         """
         Executes a MapReduce query
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.mapred(inputs, query, timeout)
 
     def stream_mapred(self, inputs, query, timeout):
@@ -129,7 +129,7 @@ class RiakClientOperations(object):
         Streams a MapReduce query as (phase, data) pairs. This is a
         generator method which should be iterated over.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             for phase, data in transport.stream_mapred(inputs, query, timeout):
                 yield phase, data
 
@@ -137,19 +137,19 @@ class RiakClientOperations(object):
         """
         Performs a full-text search query.
         """
-        with self.transport() as transport:
+        with self._transport() as transport:
             return transport.search(index, query, **params)
 
     def fulltext_add(self, index, docs):
         """
         Adds documents to the full-text index.
         """
-        with self._http_pool.take() as transport:
+        with self._transport(protocol='http') as transport:
             transport.fulltext_add(self, index, docs)
 
     def fulltext_delete(self, index, docs=None, queries=None):
         """
         Removes documents from the full-text index.
         """
-        with self._http_pool.take() as transport:
+        with self._transport(protocol='http') as transport:
             transport.fulltext_delete(index, docs, queries)

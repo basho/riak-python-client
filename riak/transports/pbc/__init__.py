@@ -19,7 +19,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
-
+import errno
 from riak.transports.pool import Pool
 from riak.transports.pbc.transport import RiakPbcTransport
 
@@ -41,3 +41,31 @@ class RiakPbcPool(Pool):
 
     def destroy_resource(self, pbc):
         pbc.close()
+
+# These are a specific set of socket errors
+# that could be raised on send/recv that indicate
+# that the socket is closed or reset, and is not
+# usable. On seeing any of these errors, the socket
+# should be closed, and the connection re-established.
+CONN_CLOSED_ERRORS = (
+                        errno.EHOSTUNREACH,
+                        errno.ECONNRESET,
+                        errno.ECONNREFUSED,
+                        errno.ECONNABORTED,
+                        errno.ETIMEDOUT,
+                        errno.EBADF,
+                        errno.EPIPE
+                     )
+
+
+def is_retryable(err):
+    """
+    Determines if the given exception is something that is
+    network/socket-related and should thus cause the PBC connection to
+    close and the operation retried on another node.
+    """
+    if isinstance(err, socket.error):
+        code = err.args[0]
+        return code in CONN_CLOSED_ERRORS
+    else:
+        return False

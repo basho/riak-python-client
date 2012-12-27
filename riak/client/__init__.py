@@ -27,6 +27,7 @@ except ImportError:
 from contextlib import contextmanager
 from weakref import WeakValueDictionary
 from riak.client.operations import RiakClientOperations
+from riak.client.transport import RiakClientTransport
 from riak.node import RiakNode
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduce
@@ -40,7 +41,8 @@ from riak.util import lazy_property
 
 
 @deprecateQuorumAccessors
-class RiakClient(RiakMapReduceChain, RiakClientOperations):
+class RiakClient(RiakMapReduceChain, RiakClientOperations,
+                 RiakClientTransport):
     """
     The ``RiakClient`` object holds information necessary to connect
     to Riak. Requests can be made to Riak directly through the client
@@ -229,16 +231,3 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return min(nodes, key=_error_rate)
         else:
             return random.choice(good)
-
-    @contextmanager
-    def transport(self, protocol=self.protocol):
-        if protocol in ['http', 'https']:
-            pool = self._http_pool
-        elif protocol is 'pbc':
-            pool = self._pb_pool
-        else:
-            raise ValueError("invalid protocol %s" % protocol)
-
-        # Replace with recovery logic later
-        with pool.take() as transport:
-            yield transport

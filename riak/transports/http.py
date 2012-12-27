@@ -755,3 +755,22 @@ class XMLSearchResult(object):
         return {'num_found': self.num_found,
                 'max_score': self.max_score,
                 'docs': self.docs}
+
+
+CONN_CLOSED_ERRORS = (
+    httplib.NotConnected,
+    httplib.IncompleteRead,
+    httplib.ImproperConnectionState
+    )
+
+
+def is_retryable(err):
+    """
+    Determines if the given exception is something that is
+    network/socket-related and should thus cause the HTTP connection
+    to close and the operation retried on another node.
+    """
+    for errtype in CONN_CLOSED_ERRORS:
+        if isinstance(err, errtype):
+            return True
+    return False
