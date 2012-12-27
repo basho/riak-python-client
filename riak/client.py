@@ -229,3 +229,16 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return min(nodes, key=_error_rate)
         else:
             return random.choice(good)
+
+    @contextmanager
+    def transport(self, protocol=self.protocol):
+        if protocol in ['http', 'https']:
+            pool = self._http_pool
+        elif protocol is 'pbc':
+            pool = self._pb_pool
+        else:
+            raise ValueError("invalid protocol %s" % protocol)
+
+        # Replace with recovery logic later
+        with pool.take() as transport:
+            yield transport
