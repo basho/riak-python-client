@@ -124,5 +124,9 @@ class RiakPbcConnection(object):
             raise RiakError("Socket returned short packet %d - expected %d"
                             % (len(self._inbuf), self._inbuf_len))
 
+    def _connect(self):
+        self._socket = socket.create_connection(self._address,
+                                                self._timeouts.connect)
+
     def close(self):
         self._socket.shutdown(socket.SHUT_RDWR)

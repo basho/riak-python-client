@@ -55,6 +55,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._address = (node.host, node.pb_port)
         self._timeouts = {'connect': connect_timeout,
                           'request': request_timeout}
+        self._connect()
 
     # FeatureDetection API
     def _server_version(self):
