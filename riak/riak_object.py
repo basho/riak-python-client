@@ -18,7 +18,8 @@ specific language governing permissions and limitations
 under the License.
 """
 import copy
-from metadata import *
+from riak.metadata import *
+from riak.mapreduce import *
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 
@@ -125,8 +126,8 @@ class RiakObject(object):
     def _set_usermeta(self, usermeta):
         self.metadata[MD_USERMETA] = usermeta
         return self
-    
-    usermeta = property(_get_usermeta, _set_usermeta, 
+
+    usermeta = property(_get_usermeta, _set_usermeta,
                         doc="""
         The custom user metadata on this object. This doesn't
         include things like content type and links, but only
@@ -148,7 +149,8 @@ class RiakObject(object):
         :rtype: self
         """
         if field[-4:] not in ("_bin", "_int"):
-            raise RiakError("Riak 2i fields must end with either '_bin' or '_int'.")
+            raise RiakError(
+                "Riak 2i fields must end with either '_bin' or '_int'.")
 
         rie = RiakIndexEntry(field, value)
         if not rie in self.metadata[MD_INDEX]:
@@ -367,19 +369,21 @@ class RiakObject(object):
                             "store one of the siblings instead")
 
         # Issue the put over our transport
-        t = self.client.get_transport()
+        # t = self.client.get_transport()
 
         if self.key is None:
-            key, vclock, metadata = t.put_new(self, w=w, dw=dw, pw=pw,
-                                              return_body=return_body,
-                                              if_none_match=if_none_match)
+            key, vclock, metadata = self.client.put_new(
+                self, w=w, dw=dw, pw=pw,
+                return_body=return_body,
+                if_none_match=if_none_match)
             self.exists = True
             self.key = key
             self.vclock = vclock
             self.metadata = metadata
         else:
-            result = t.put(self, w=w, dw=dw, pw=pw, return_body=return_body,
-                           if_none_match=if_none_match)
+            result = self.client.put(self, w=w, dw=dw, pw=pw,
+                                     return_body=return_body,
+                                     if_none_match=if_none_match)
             if result is not None and result != ('', []):
                 self._populate(result)
 
@@ -397,8 +401,7 @@ class RiakObject(object):
         :rtype: self
         """
 
-        t = self.client.get_transport()
-        result = t.get(self, r=r, pr=pr, vtag=vtag)
+        result = self.client.get(self, r=r, pr=pr, vtag=vtag)
 
         self.clear()
         if result is not None and result != ('', []):
@@ -432,8 +435,8 @@ class RiakObject(object):
         :type pw: integer
         :rtype: self
         """
-        t = self.client.get_transport()
-        result = t.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
+
+        result = self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
         self.clear()
         return self
 
@@ -576,5 +579,3 @@ class RiakObject(object):
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
         return apply(mr.reduce, params)
-
-from mapreduce import *

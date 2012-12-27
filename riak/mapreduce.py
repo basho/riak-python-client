@@ -202,15 +202,45 @@ class RiakMapReduce(object):
         @param integer timeout - Timeout in milliseconds.
         @return array()
         """
+        query, link_results_flag = self._normalize_query()
+
+        result = self.client.mapred(self._inputs, query, timeout)
+
+        # If the last phase is NOT a link phase, then return the result.
+        if not (link_results_flag
+                or isinstance(self._phases[-1], RiakLinkPhase)):
+            return result
+
+        # If there are no results, then return an empty list.
+        if result == None:
+            return []
+
+        # Otherwise, if the last phase IS a link phase, then convert the
+        # results to RiakLink objects.
+        a = []
+        for r in result:
+            if (len(r) == 2):
+                link = RiakLink(r[0], r[1])
+            elif (len(r) == 3):
+                link = RiakLink(r[0], r[1], r[2])
+            link._client = self._client
+            a.append(link)
+
+        return a
+
+    def stream(self, timeout=None):
+        """
+        Streams the MapReduce query (returns an iterator).
+        """
+        query, lrf = self._normalize_query()
+        return self.client.stream_mapred(self._inputs, query, timeout)
+
+    def _normalize_query(self):
         num_phases = len(self._phases)
 
-        # If there are no phases, then just echo the inputs back to the user.
-        if (num_phases == 0):
-            self.reduce(["riak_kv_mapreduce", "reduce_identity"])
-            num_phases = 1
+        # If there are no phases, return the keys as links
+        if num_phases is 0:
             link_results_flag = True
-        else:
-            link_results_flag = False
 
         # Convert all phases to associative arrays. Also,
         # if none of the phases are accumulating, then set the last one to
@@ -236,30 +266,7 @@ class RiakMapReduce(object):
                 self._inputs = {'bucket':       bucket_name,
                                 'key_filters':  self._key_filters}
 
-        t = self._client.get_transport()
-        result = t.mapred(self._inputs, query, timeout)
-
-        # If the last phase is NOT a link phase, then return the result.
-        if not (link_results_flag
-                or isinstance(self._phases[-1], RiakLinkPhase)):
-            return result
-
-        # If there are no results, then return an empty list.
-        if result == None:
-            return []
-
-        # Otherwise, if the last phase IS a link phase, then convert the
-        # results to RiakLink objects.
-        a = []
-        for r in result:
-            if (len(r) == 2):
-                link = RiakLink(r[0], r[1])
-            elif (len(r) == 3):
-                link = RiakLink(r[0], r[1], r[2])
-            link._client = self._client
-            a.append(link)
-
-        return a
+        return query, link_results_flag
 
     ##
     # Start Shortcuts to built-ins
@@ -546,3 +553,71 @@ class RiakKeyFilter(object):
 
     def __iter__(self):
         return iter(self._filters)
+
+
+class RiakMapReduceChain(object):
+    """
+    Mixin to add chaining from the client object directly into a
+    MapReduce operation.
+    """
+    def add(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.add`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.add, args)
+
+    def search(self, *args):
+        """
+        Start assembling a Map/Reduce operation based on search
+        results. This command will return an error unless executed
+        against a Riak Search cluster. A shortcut for
+        :func:`RiakMapReduce.search`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.search, args)
+
+    def index(self, *args):
+        """
+        Start assembling a Map/Reduce operation based on secondary
+        index query results.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.index, args)
+
+    def link(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.link`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.link, args)
+
+    def map(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.map`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.map, args)
+
+    def reduce(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.reduce`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.reduce, args)

@@ -17,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from __future__ import with_statement
 
 import urllib
 import re
@@ -31,67 +30,70 @@ try:
 except ImportError:
     import simplejson as json
 
-from transport import RiakTransport
+from riak.transports.transport import RiakTransport
+from riak.transports.pool import Pool, BadResource
 from riak.metadata import *
 from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
-from connection import HTTPConnectionManager
 import riak.util
 from xml.etree import ElementTree
+from xml.dom.minidom import Document
+
 
 # subtract length of "Link: " header string and newline
 MAX_LINK_HEADER_SIZE = 8192 - 8
 
 
+class RiakHttpPool(Pool):
+    """
+    A pool of HTTP(S) transport connections.
+    """
+    def __init__(self, client, **options):
+        self.client = client
+        self.transport_options = options
+        if client.protocol is 'https':
+            self.connection_class = httplib.HTTPConnection
+        else:
+            self.connection_class = httplib.HTTPSConnection
+        super(RiakHttpPool, self).__init__()
+
+    def create_resource(self):
+        node = self.client.choose_node()
+        return RiakHttpTransport(node=node,
+                                 client=self.client,
+                                 connection_class=self.connection_class,
+                                 **self.options)
+
+    def destroy_resource(self, transport):
+        transport.close()
+
+
 class RiakHttpTransport(RiakTransport):
     """
     The RiakHttpTransport object holds information necessary to
-    connect to Riak. The Riak API uses HTTP, so there is no persistent
-    connection, and the RiakClient object is extremely lightweight.
+    connect to Riak via HTTP.
     """
 
-    # We're using the new RiakTransport API
-    api = 2
+    api = 3
 
-    # The ConnectionManager class that this transport prefers.
-    default_cm = HTTPConnectionManager
-
-    # How many times to retry a request
-    RETRY_COUNT = 3
-
-    def __init__(self, cm,
-                 prefix='riak', mapred_prefix='mapred', client_id=None,
+    def __init__(self, node=None,
+                 client=None,
+                 connection_class=httplib.HTTPConnection
+                 client_id=None,
                  **unused_options):
         """
-        Construct a new RiakClient object.
-        @param string host - Hostname or IP address (default '127.0.0.1')
-        @param int port - Port number (default 8098)
-        @param string prefix - Interface prefix (default 'riak')
-        @param string mapred_prefix - MapReduce prefix (default 'mapred')
-        @param string client_id - client id to use for vector clocks
+        Construct a new HTTP connection to Riak.
         """
         super(RiakHttpTransport, self).__init__()
-        self._conns = cm
-        self._prefix = prefix
-        self._mapred_prefix = mapred_prefix
+
+        self._client = client
+        self._node = node
+        self._connection_class = connection_class
         self._client_id = client_id
         if not self._client_id:
             self._client_id = self.make_random_client_id()
-
-    def __copy__(self):
-        ### not implemented right now
-        raise Exception('not implemented')
-        ### we don't have _host and _port. will fix after some refactoring...
-        return RiakHttpTransport(self._host, self._port, self._prefix,
-                                 self._mapred_prefix)
-
-    def set_client_id(self, client_id):
-        self._client_id = client_id
-
-    def get_client_id(self):
-        return self._client_id
 
     def ping(self):
         """
@@ -361,6 +363,51 @@ class RiakHttpTransport(RiakTransport):
             return self._normalize_xml_search_response(data)
         else:
             raise ValueError("Could not decode search response")
+
+    def fulltext_add(self, index, docs):
+        """
+        Adds documents to the search index.
+        """
+        xml = Document()
+        root = xml.createElement('add')
+        for doc in docs:
+            doc_element = xml.createElement('doc')
+            for key in doc:
+                value = doc[key]
+                field = xml.createElement('field')
+                field.setAttribute("name", key)
+                text = xml.createTextNode(value)
+                field.appendChild(text)
+                doc_element.appendChild(field)
+            root.appendChild(doc_element)
+        xml.appendChild(root)
+
+        url = "/solr/%s/update" % index
+        self.post_request(uri=url, body=xml.toxml(), content_type="text/xml")
+
+    def fulltext_delete(self, index, docs=None, queries=None):
+        """
+        Removes documents from the full-text index.
+        """
+        xml = Document()
+        root = xml.createElement('delete')
+        if docs:
+            for doc in docs:
+                doc_element = xml.createElement('id')
+                text = xml.createTextNode(doc)
+                doc_element.appendChild(text)
+                root.appendChild(doc_element)
+        if queries:
+            for query in queries:
+                query_element = xml.createElement('query')
+                text = xml.createTextNode(query)
+                query_element.appendChild(text)
+                root.appendChild(query_element)
+
+        xml.appendChild(root)
+
+        url = "/solr/%s/update" % index
+        self.post_request(uri=url, body=xml.toxml(), content_type="text/xml")
 
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']

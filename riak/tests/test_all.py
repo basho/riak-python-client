@@ -56,16 +56,24 @@ if USE_TEST_SERVER:
 
 class BaseTestCase(object):
 
+    host = None
+    pb_port = None
+    http_port = None
+
     @staticmethod
     def randint():
         return random.randint(1, 999999)
 
-    def create_client(self, host=None, port=None, transport_class=None):
-        host = host or self.host
-        port = port or self.port
-        transport_class = transport_class or self.transport_class
-        return RiakClient(self.host, self.port,
-                          transport_class=self.transport_class)
+    def create_client(self, host=None, http_port=None, pb_port=None,
+                      protocol=None, **client_args):
+        host = host or self.host or HOST
+        http_port = http_port or self.http_port or HTTP_PORT
+        pb_port = pb_port or self.pb_port or PB_PORT
+        protocol = protocol or self.protocol
+        return RiakClient(protocol=protocol,
+                          host=host,
+                          http_port=http_port,
+                          pb_port=pb_port, **client_args)
 
     def setUp(self):
         self.client = self.create_client()
@@ -94,21 +102,18 @@ class RiakPbcTransportTestCase(BasicKVTests,
         if not HAVE_PROTO:
             self.skipTest('protobuf is unavailable')
         self.host = PB_HOST
-        self.port = PB_PORT
-        self.transport_class = RiakPbcTransport
+        self.pb_port = PB_PORT
+        self.protocol = 'pbc'
         super(RiakPbcTransportTestCase, self).setUp()
 
     def test_uses_client_id_if_given(self):
-        self.host = PB_HOST
-        self.port = PB_PORT
         zero_client_id = "\0\0\0\0"
-        c = RiakClient(PB_HOST, PB_PORT,
-                       transport_class=RiakPbcTransport,
-                       client_id=zero_client_id)
+        c = self.create_client(client_id=zero_client_id)
         self.assertEqual(zero_client_id, c.get_client_id())
 
     def test_close_underlying_socket_fails(self):
-        c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport)
+        self.skipTest("TODO: No longer using connection manager, replace")
+        c = self.create_client()
 
         bucket = c.bucket('bucket_test_close')
         rand = self.randint()
@@ -130,6 +135,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.assertRaises(socket.error, bucket.get, 'foo')
 
     def test_close_underlying_socket_retry(self):
+        self.skipTest("TODO: No longer using bare transport, replace")
         c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport,
                                          transport_options={"max_attempts": 2})
 
@@ -183,8 +189,8 @@ class RiakHttpTransportTestCase(BasicKVTests,
 
     def setUp(self):
         self.host = HTTP_HOST
-        self.port = HTTP_PORT
-        self.transport_class = RiakHttpTransport
+        self.http_port = HTTP_PORT
+        self.protocol = 'http'
         super(RiakHttpTransportTestCase, self).setUp()
 
     def test_no_returnbody(self):

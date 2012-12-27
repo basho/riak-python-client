@@ -103,7 +103,7 @@ class ErlangMapReduceTests(object):
         with self.assertRaises(ValueError):
             mr = self.client.search('bucket', 'fleh')
             mr.add_key_filter("tokenize", "-", 1)
- 
+
 
 class JSMapReduceTests(object):
     def test_javascript_source_map(self):
