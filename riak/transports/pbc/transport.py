@@ -41,8 +41,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     buffers interface on the riak server.
     """
 
-    api = 3
-
     def __init__(self, node=None, client=None, connect_timeout=None,
                  request_timeout=None, **unused_options):
         """
