@@ -25,7 +25,7 @@ except ImportError:
     import simplejson as json
 
 from contextlib import contextmanager
-
+from weakref import WeakValueDictionary
 from riak.client.operations import RiakClientOperations
 from riak.node import RiakNode
 from riak.bucket import RiakBucket
@@ -86,7 +86,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                           'text/json': json.dumps}
         self._decoders = {'application/json': json.loads,
                           'text/json': json.loads}
-        self._buckets = {}
+        self._buckets = WeakValueDictionary()
 
     @property
     def protocol(self):
@@ -94,7 +94,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
     @property.setter
     def protocol(self, value):
-        if protocol and protocol not in self.PROTOCOLS:
+        if value not in self.PROTOCOLS:
             raise ValueError("protocol option is invalid, must be one of %s" %
                              repr(self.PROTOCOLS))
         self._protocol = value
