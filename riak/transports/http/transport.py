@@ -32,6 +32,7 @@ import httplib
 import socket
 import errno
 from riak.transports.transport import RiakTransport
+from riak.transports.http.resources import RiakHttpResources
 from riak.transports.http.search import XMLSearchResult
 from riak.metadata import *
 from riak.mapreduce import RiakLink
@@ -43,7 +44,7 @@ from xml.etree import ElementTree
 from xml.dom.minidom import Document
 
 
-class RiakHttpTransport(RiakTransport):
+class RiakHttpTransport(RiakHttpResources, RiakTransport):
     """
     The RiakHttpTransport object holds information necessary to
     connect to Riak via HTTP.
