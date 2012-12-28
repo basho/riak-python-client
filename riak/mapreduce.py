@@ -18,8 +18,6 @@ specific language governing permissions and limitations
 under the License.
 """
 import urllib
-from riak_object import RiakObject
-from bucket import RiakBucket
 from collections import Iterable
 
 
@@ -202,42 +200,9 @@ class RiakMapReduce(object):
         @param integer timeout - Timeout in milliseconds.
         @return array()
         """
-        num_phases = len(self._phases)
+        query, link_results_flag = self._normalize_query()
 
-        # If there are no phases, then just echo the inputs back to the user.
-        if (num_phases == 0):
-            self.reduce(["riak_kv_mapreduce", "reduce_identity"])
-            num_phases = 1
-            link_results_flag = True
-        else:
-            link_results_flag = False
-
-        # Convert all phases to associative arrays. Also,
-        # if none of the phases are accumulating, then set the last one to
-        # accumulate.
-        keep_flag = False
-        query = []
-        for i in range(num_phases):
-            phase = self._phases[i]
-            if (i == (num_phases - 1)) and (not keep_flag):
-                phase._keep = True
-            if phase._keep:
-                keep_flag = True
-            query.append(phase.to_array())
-
-        if (len(self._key_filters) > 0):
-            bucket_name = None
-            if (type(self._inputs) == str):
-                bucket_name = self._inputs
-            elif (type(self._inputs) == RiakBucket):
-                bucket_name = self._inputs.get_name()
-
-            if (bucket_name is not None):
-                self._inputs = {'bucket':       bucket_name,
-                                'key_filters':  self._key_filters}
-
-        t = self._client.get_transport()
-        result = t.mapred(self._inputs, query, timeout)
+        result = self._client.mapred(self._inputs, query, timeout)
 
         # If the last phase is NOT a link phase, then return the result.
         if not (link_results_flag
@@ -260,6 +225,48 @@ class RiakMapReduce(object):
             a.append(link)
 
         return a
+
+    def stream(self, timeout=None):
+        """
+        Streams the MapReduce query (returns an iterator).
+        """
+        query, lrf = self._normalize_query()
+        return self._client.stream_mapred(self._inputs, query, timeout)
+
+    def _normalize_query(self):
+        num_phases = len(self._phases)
+
+        # If there are no phases, return the keys as links
+        if num_phases is 0:
+            link_results_flag = True
+        else:
+            link_results_flag = False
+
+        # Convert all phases to associative arrays. Also,
+        # if none of the phases are accumulating, then set the last one to
+        # accumulate.
+        keep_flag = False
+        query = []
+        for i in range(num_phases):
+            phase = self._phases[i]
+            if (i == (num_phases - 1)) and (not keep_flag):
+                phase._keep = True
+            if phase._keep:
+                keep_flag = True
+            query.append(phase.to_array())
+
+        if (len(self._key_filters) > 0):
+            bucket_name = None
+            if (type(self._inputs) == str):
+                bucket_name = self._inputs
+            elif (type(self._inputs) == RiakBucket):
+                bucket_name = self._inputs.name
+
+            if (bucket_name is not None):
+                self._inputs = {'bucket':       bucket_name,
+                                'key_filters':  self._key_filters}
+
+        return query, link_results_flag
 
     ##
     # Start Shortcuts to built-ins
@@ -546,3 +553,74 @@ class RiakKeyFilter(object):
 
     def __iter__(self):
         return iter(self._filters)
+
+
+class RiakMapReduceChain(object):
+    """
+    Mixin to add chaining from the client object directly into a
+    MapReduce operation.
+    """
+    def add(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.add`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.add, args)
+
+    def search(self, *args):
+        """
+        Start assembling a Map/Reduce operation based on search
+        results. This command will return an error unless executed
+        against a Riak Search cluster. A shortcut for
+        :func:`RiakMapReduce.search`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.search, args)
+
+    def index(self, *args):
+        """
+        Start assembling a Map/Reduce operation based on secondary
+        index query results.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.index, args)
+
+    def link(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.link`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.link, args)
+
+    def map(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.map`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.map, args)
+
+    def reduce(self, *args):
+        """
+        Start assembling a Map/Reduce operation. A shortcut for
+        :func:`RiakMapReduce.reduce`.
+
+        :rtype: :class:`RiakMapReduce`
+        """
+        mr = RiakMapReduce(self)
+        return apply(mr.reduce, args)
+
+from riak.riak_object import RiakObject
+from riak.bucket import RiakBucket

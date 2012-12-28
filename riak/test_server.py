@@ -92,6 +92,11 @@ class TestServer(object):
       },
     }
 
+    _temp_bin = None
+    _temp_etc = None
+    _temp_log = None
+    _temp_pipe = None
+
     def __init__(self, tmp_dir="/tmp/riak/test_server",
                  bin_dir=os.path.expanduser("~/.riak/install/riak-0.14.2/bin"),
                  vm_args=None, **options):

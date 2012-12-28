@@ -303,8 +303,7 @@ class RiakBucket(object):
         :param props: An associative array of key:value.
         :type props: array
         """
-        t = self._client.get_transport()
-        t.set_bucket_props(self, props)
+        self._client.set_bucket_props(self, props)
 
     def get_properties(self):
         """
@@ -312,8 +311,7 @@ class RiakBucket(object):
 
         :rtype: array
         """
-        t = self._client.get_transport()
-        return t.get_bucket_props(self)
+        return self._client.get_bucket_props(self)
 
     def get_keys(self):
         """
@@ -323,7 +321,17 @@ class RiakBucket(object):
 
            At current, this is a very expensive operation. Use with caution.
         """
-        return self._client.get_transport().get_keys(self)
+        return self._client.get_keys(self)
+
+    def stream_keys(self):
+        """
+        Return all keys within the bucket.
+
+        .. warning::
+
+           At current, this is a very expensive operation. Use with caution.
+        """
+        return self._client.stream_keys(self)
 
     def new_binary_from_file(self, key, filename):
         """
@@ -371,11 +379,10 @@ class RiakBucket(object):
         """
         Queries a search index over objects in this bucket/index.
         """
-        return self._client.solr().search(self.name, query, **params)
+        return self._client.solr.search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None):
         """
         Queries a secondary index over objects in this bucket, returning keys.
         """
-        return self._client._transport.get_index(self.name, index, startkey,
-                                                 endkey)
+        return self._client.get_index(self.name, index, startkey, endkey)

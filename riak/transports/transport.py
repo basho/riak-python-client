@@ -17,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak import RiakError
 import base64
 import random
 import threading
@@ -31,11 +30,14 @@ class RiakTransport(FeatureDetection):
     Class to encapsulate transport details
     """
 
-    # Subclasses should specify their API level.
-    #   * missing or 1: the API used up and through 1.3.x.
-    #   * 2: the API introduced with 1.4.x
-    #
-    # api = 2
+    def _get_client_id(self):
+        return self._client_id
+
+    def _set_client_id(self, value):
+        self._client_id = value
+
+    client_id = property(_get_client_id, _set_client_id,
+                         doc="""the client ID for this connection""")
 
     @classmethod
     def make_random_client_id(self):
@@ -146,6 +148,18 @@ class RiakTransport(FeatureDetection):
     def get_index(self, bucket, index, startkey, endkey=None):
         """
         Performs a secondary index query.
+        """
+        raise NotImplementedError
+
+    def fulltext_add(self, index, *docs):
+        """
+        Adds documents to the full-text index.
+        """
+        raise NotImplementedError
+
+    def fulltext_delete(self, index, docs=None, queries=None):
+        """
+        Removes documents from the full-text index.
         """
         raise NotImplementedError
 
