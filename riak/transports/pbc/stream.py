@@ -63,7 +63,7 @@ class RiakPbcKeyStream(RiakPbcStream):
     _expect = MSG_CODE_LIST_KEYS_RESP
 
     def next(self):
-        response = super(RiakPbcKeyStream, self).__next__()
+        response = super(RiakPbcKeyStream, self).next()
         return response.keys
 
     def _is_done(self, response):

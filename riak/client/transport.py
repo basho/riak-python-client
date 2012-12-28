@@ -41,7 +41,7 @@ class RiakClientTransport(object):
         else:
             raise ValueError("invalid protocol %s" % protocol)
 
-        with self._retryable(pool) as transport:
+        with pool.take() as transport:
             yield transport
 
     @contextmanager
@@ -57,19 +57,20 @@ class RiakClientTransport(object):
                     try:
                         yield transport
                     except (IOError, httplib.HTTPException) as e:
-                        if is_pbc_retryable(e) or is_http_retryable(e):
+                        if is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
                             raise BadResource(e)
                         else:
                             raise e
             except BadResource as br:
-                if retry < (self.RETRY_COUNT - 1):
-                    continue
-                else:
-                    raise br.args[0]
+                continue
 
     # These will be set or redefined by the RiakClient initializer
     protocol = 'http'
     _http_pool = None
     _pb_pool = None
+
+
+def is_retryable(error):
+    return is_pbc_retryable(error) or is_http_retryable(error)

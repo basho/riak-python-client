@@ -22,12 +22,12 @@ class RiakSearch(object):
         self._client = client
 
     def add(self, index, *docs):
-        self._client.fulltext_add(index, docs)
+        self._client.fulltext_add(index, docs=docs)
 
     index = add
 
     def delete(self, index, docs=None, queries=None):
-        self._client.fulltext_delete(index, docs, queries)
+        self._client.fulltext_delete(index, docs=docs, queries=queries)
 
     remove = delete
 

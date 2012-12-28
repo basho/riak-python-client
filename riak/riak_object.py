@@ -30,12 +30,12 @@ from riak.metadata import (
         # MD_VTAG,
         # MD_DELETED
         )
-from mapreduce import (
+from riak.mapreduce import (
     RiakMapReduce,
     RiakLink
     )
 from riak import RiakError
-from riak_index_entry import RiakIndexEntry
+from riak.riak_index_entry import RiakIndexEntry
 
 
 class RiakObject(object):
@@ -81,6 +81,8 @@ class RiakObject(object):
                 self.content_type = "application/json"
             else:
                 self.content_type = "application/octet-stream"
+        if content_type:
+            self.content_type = content_type
         self._data = data
         return self
 
@@ -381,9 +383,6 @@ class RiakObject(object):
         if self.siblings and not self.data and not self.vclock:
             raise RiakError("Attempting to store an invalid object,"
                             "store one of the siblings instead")
-
-        # Issue the put over our transport
-        # t = self.client.get_transport()
 
         if self.key is None:
             key, vclock, metadata = self.client.put_new(

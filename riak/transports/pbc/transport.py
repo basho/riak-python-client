@@ -175,7 +175,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req.bucket = bucket.name
         req.key = robj.key
-        vclock = robj.vclock()
+        vclock = robj.vclock
         if vclock:
             req.vclock = vclock
 
@@ -223,7 +223,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                             req.content)
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
-                                      MSG_CODE_PUT_RESP)
+                                       MSG_CODE_PUT_RESP)
         if not resp:
             raise RiakError("missing response object")
         if len(resp.content) != 1:
@@ -254,8 +254,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             if pw:
                 req.pw = self.translate_rw_val(pw)
 
-        if self.tombstone_vclocks() and robj.vclock():
-            req.vclock = robj.vclock()
+        if self.tombstone_vclocks() and robj.vclock:
+            req.vclock = robj.vclock
 
         req.bucket = bucket.name
         req.key = robj.key
@@ -291,7 +291,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         Serialize bucket listing request and deserialize response
         """
         msg_code, resp = self._request(MSG_CODE_LIST_BUCKETS_REQ,
-                                      MSG_CODE_LIST_BUCKETS_RESP)
+                                       expect=MSG_CODE_LIST_BUCKETS_RESP)
         return resp.buckets
 
     def get_bucket_props(self, bucket):

@@ -31,13 +31,13 @@ class RiakHttpPool(Pool):
         self.client = client
         self.options = options
         if client.protocol is 'https':
-            self.connection_class = httplib.HTTPConnection
-        else:
             self.connection_class = httplib.HTTPSConnection
+        else:
+            self.connection_class = httplib.HTTPConnection
         super(RiakHttpPool, self).__init__()
 
     def create_resource(self):
-        node = self.client.choose_node()
+        node = self.client._choose_node()
         return RiakHttpTransport(node=node,
                                  client=self.client,
                                  connection_class=self.connection_class,

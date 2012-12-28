@@ -379,7 +379,7 @@ class RiakBucket(object):
         """
         Queries a search index over objects in this bucket/index.
         """
-        return self._client.solr().search(self.name, query, **params)
+        return self._client.solr.search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None):
         """

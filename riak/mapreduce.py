@@ -18,8 +18,6 @@ specific language governing permissions and limitations
 under the License.
 """
 import urllib
-from riak_object import RiakObject
-from bucket import RiakBucket
 from collections import Iterable
 
 
@@ -241,6 +239,8 @@ class RiakMapReduce(object):
         # If there are no phases, return the keys as links
         if num_phases is 0:
             link_results_flag = True
+        else:
+            link_results_flag = False
 
         # Convert all phases to associative arrays. Also,
         # if none of the phases are accumulating, then set the last one to
@@ -621,3 +621,6 @@ class RiakMapReduceChain(object):
         """
         mr = RiakMapReduce(self)
         return apply(mr.reduce, args)
+
+from riak.riak_object import RiakObject
+from riak.bucket import RiakBucket

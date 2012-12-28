@@ -10,9 +10,9 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-from riak import RiakClient
-from riak.mapreduce import RiakLink
-from riak import RiakKeyFilter, key_filter
+from riak.client import RiakClient
+from riak.mapreduce import RiakLink, RiakKeyFilter
+from riak import key_filter
 
 from riak.test_server import TestServer
 
@@ -104,7 +104,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
     def test_uses_client_id_if_given(self):
         zero_client_id = "\0\0\0\0"
         c = self.create_client(client_id=zero_client_id)
-        self.assertEqual(zero_client_id, c.get_client_id())
+        self.assertEqual(zero_client_id, c.client_id)
 
     # def test_close_underlying_socket_fails(self):
     #     self.skipTest("TODO: No longer using connection manager, replace")

@@ -146,7 +146,7 @@ class RiakClientOperations(RiakClientTransport):
         Adds documents to the full-text index.
         """
         with self._transport(protocol='http') as transport:
-            transport.fulltext_add(self, index, docs)
+            transport.fulltext_add(index, docs)
 
     def fulltext_delete(self, index, docs=None, queries=None):
         """

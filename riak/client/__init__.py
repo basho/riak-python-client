@@ -128,7 +128,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
     def _get_client_id(self):
         with self._transport() as transport:
-            return transport.get_client_id()
+            return transport.client_id
 
     def _set_client_id(self, client_id):
         for http in self._http_pool:

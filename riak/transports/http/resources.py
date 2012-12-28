@@ -109,7 +109,7 @@ class RiakHttpResources(object):
 
     @lazy_property
     def riak_kv_wm_buckets(self):
-        return self.resources.get('riak_kv_wm_buckets')
+        return self.resources.get('riak_kv_wm_index')
 
     @lazy_property
     def riak_kv_wm_raw(self):
@@ -159,12 +159,15 @@ def mkpath(*segments, **query):
     pathstring = '/'.join(segments)
     # Remove extra slashes
     pathstring = re.sub('/+', '/', pathstring)
+
     # Add the query string if it exists
-    if len(query) > 0:
-        for key in query.keys():
-            if query[key] is None:
-                query.pop(key)
-        pathstring += "?" + urlencode(query).lower()
+    _query = {}
+    for key in query:
+        if query[key] is not None:
+            _query[key] = query[key]
+
+    if len(_query) > 0:
+        pathstring += "?" + urlencode(_query).lower()
 
     if not pathstring.startswith('/'):
         pathstring = '/' + pathstring

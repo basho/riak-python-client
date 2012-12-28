@@ -120,8 +120,8 @@ class RiakPbcConnection(object):
         else:
             raise Exception("unknown msg code %s" % msg_code)
         if expect and msg_code != expect:
-            raise RiakError("unexpected protocol buffer message code: %d"
-                            % msg_code)
+            raise RiakError("unexpected protocol buffer message code: %d, %s"
+                            % (msg_code, repr(msg)))
         return msg_code, msg
 
     def _recv_pkt(self):

@@ -45,6 +45,7 @@ class RiakHttpConnection(object):
         and return a 2-tuple containing a dictionary of response headers
         and the response body.
         """
+        response = None
         try:
             self._connection.request(method, uri, body, headers)
             response = self._connection.getresponse()
@@ -56,7 +57,8 @@ class RiakHttpConnection(object):
             # TODO: Support streaming responses
             response_body = response.read()
         finally:
-            response.close()
+            if response:
+                response.close()
 
         return response_headers, response_body
 
