@@ -28,6 +28,8 @@ class RiakClientTransport(class):
     Methods for RiakClient related to transport selection and retries.
     """
 
+    RETRY_COUNT = 3
+
     @contextmanager
     def _transport(self, protocol=self.protocol):
         if protocol in ['http', 'https']:
@@ -43,27 +45,24 @@ class RiakClientTransport(class):
     @contextmanager
     def _retryable(self, pool):
         skip_nodes = []
-        # TODO: Make a property?
-        retries = 3
 
         def _skip_bad_nodes(transport):
             return transport._node not in skip_nodes
 
-        while retries > 0:
+        for retry in range(self.RETRY_COUNT):
             try:
                 with pool.take(_filter=_skip_bad_nodes) as transport:
                     try:
                         yield transport
                     except (IOError, httplib.HTTPException) as e:
                         if is_pbc_retryable(e) or is_http_retryable(e):
-                            retries -= 1
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
                             raise BadResource(e)
                         else:
                             raise e
             except BadResource as br:
-                if retries > 0:
+                if retry < (self.RETRY_COUNT - 1):
                     continue
                 else:
                     raise br.args[0]
