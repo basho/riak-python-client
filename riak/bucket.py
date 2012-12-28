@@ -56,6 +56,21 @@ class RiakBucket(object):
         self._encoders = {}
         self._decoders = {}
 
+    def __hash__(self):
+        return hash((self.name, self._client))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+        else:
+            return False
+
+    def __nq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) != hash(other)
+        else:
+            return True
+
     def get_encoder(self, content_type):
         """
         Get the encoding function for the provided content type for
