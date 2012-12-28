@@ -34,10 +34,10 @@ class RiakHttpConnection(object):
         return self._request('PUT', uri, headers, body)
 
     def DELETE(self, uri, headers={}, body=''):
-        return self.request('DELETE', uri, headers, body)
+        return self._request('DELETE', uri, headers, body)
 
     def HEAD(self, uri, headers={}):
-        return self.request('HEAD', uri, headers, '')
+        return self._request('HEAD', uri, headers, '')
 
     def _request(self, method, uri, headers={}, body=''):
         """
@@ -69,3 +69,7 @@ class RiakHttpConnection(object):
             self._connection.close()
         except httplib.NotConnected:
             pass
+
+    # These are set by the RiakHttpTransport initializer
+    _connection_class = httplib.HTTPConnection
+    _node = None

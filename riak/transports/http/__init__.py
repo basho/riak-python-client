@@ -18,12 +18,9 @@ specific language governing permissions and limitations
 under the License.
 """
 
+import httplib
 from riak.transports.pool import Pool
 from riak.transports.http.transport import RiakHttpTransport
-
-
-# subtract length of "Link: " header string and newline
-MAX_LINK_HEADER_SIZE = 8192 - 8
 
 
 class RiakHttpPool(Pool):

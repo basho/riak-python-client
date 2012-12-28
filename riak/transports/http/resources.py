@@ -17,7 +17,7 @@ under the License.
 """
 
 import re
-from urllib import quote_plus
+from urllib import quote_plus, urlencode
 from riak import RiakError
 from riak.util import lazy_property
 
@@ -35,7 +35,7 @@ class RiakHttpResources(object):
         return mkpath(self.riak_kv_wm_stats)
 
     def mapred_path(self, **options):
-        return mkpath(self.kv_wm_mapred, **options)
+        return mkpath(self.riak_kv_wm_mapred, **options)
 
     def bucket_list_path(self, **options):
         query = options.copy()
@@ -164,7 +164,7 @@ def mkpath(*segments, **query):
         for key in query.keys():
             if query[key] is None:
                 query.pop(key)
-        pathstring += "?" + urllib.urlencode(query).lower()
+        pathstring += "?" + urlencode(query).lower()
 
     if not pathstring.startswith('/'):
         pathstring = '/' + pathstring

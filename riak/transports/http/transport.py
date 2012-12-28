@@ -19,30 +19,37 @@ specific language governing permissions and limitations
 under the License.
 """
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
+import json
 import urllib
 import re
 import csv
-from cStringIO import StringIO
 import httplib
-import socket
-import errno
 from riak.transports.transport import RiakTransport
 from riak.transports.http.resources import RiakHttpResources
 from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.search import XMLSearchResult
-from riak.metadata import *
+from riak.metadata import (
+        MD_CHARSET,
+        MD_CTYPE,
+        # MD_ENCODING,
+        MD_INDEX,
+        MD_LASTMOD,
+        # MD_LASTMOD_USECS,
+        MD_LINKS,
+        MD_USERMETA,
+        MD_VTAG,
+        MD_DELETED
+        )
 from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
-import riak.util
 from xml.etree import ElementTree
 from xml.dom.minidom import Document
+
+
+# subtract length of "Link: " header string and newline
+MAX_LINK_HEADER_SIZE = 8192 - 8
 
 
 class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
@@ -53,7 +60,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
     def __init__(self, node=None,
                  client=None,
-                 connection_class=httplib.HTTPConnection
+                 connection_class=httplib.HTTPConnection,
                  client_id=None,
                  **unused_options):
         """
@@ -446,12 +453,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """
         Convert this RiakLink object to a link header string. Used internally.
         """
-        header = ''
-        header += '</'
-        header += self._prefix + '/'
-        header += urllib.quote_plus(link.get_bucket()) + '/'
-        header += urllib.quote_plus(link.get_key()) + '>; riaktag="'
-        header += urllib.quote_plus(link.get_tag()) + '"'
+        url = self.object_path(link.get_bucket(), link.get_key())
+        header = '<%s>; riaktag="%s"' % (url, link.get_tag())
         return header
 
     def parse_links(self, links, linkHeaders):
@@ -505,7 +508,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             headers['X-Riak-Vclock'] = robj.vclock
 
         # Create the header from metadata
-        links = self.add_links_for_riak_object(robj, headers)
+        self.add_links_for_riak_object(robj, headers)
 
         for key, value in robj.usermeta.iteritems():
             headers['X-Riak-Meta-%s' % key] = value

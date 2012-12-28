@@ -25,12 +25,12 @@ from riak.metadata import (
         MD_LINKS,
         MD_USERMETA,
         MD_VTAG,
+        MD_DELETED
         )
 
-try:
-    import riak_pb
-except ImportError:
-    riak_pb = None
+import riak_pb
+from riak.riak_index_entry import RiakIndexEntry
+from riak.mapreduce import RiakLink
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293

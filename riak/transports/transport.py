@@ -17,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak import RiakError
 import base64
 import random
 import threading
@@ -31,14 +30,14 @@ class RiakTransport(FeatureDetection):
     Class to encapsulate transport details
     """
 
-    @property
-    def client_id(self):
-        """the client ID for this connection"""
+    def _get_client_id(self):
         return self._client_id
 
-    @client_id.setter
-    def client_id(self, value):
+    def _set_client_id(self, value):
         self._client_id = value
+
+    client_id = property(_get_client_id, _set_client_id,
+                         doc="""the client ID for this connection""")
 
     @classmethod
     def make_random_client_id(self):

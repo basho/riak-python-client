@@ -204,7 +204,7 @@ class RiakMapReduce(object):
         """
         query, link_results_flag = self._normalize_query()
 
-        result = self.client.mapred(self._inputs, query, timeout)
+        result = self._client.mapred(self._inputs, query, timeout)
 
         # If the last phase is NOT a link phase, then return the result.
         if not (link_results_flag
@@ -233,7 +233,7 @@ class RiakMapReduce(object):
         Streams the MapReduce query (returns an iterator).
         """
         query, lrf = self._normalize_query()
-        return self.client.stream_mapred(self._inputs, query, timeout)
+        return self._client.stream_mapred(self._inputs, query, timeout)
 
     def _normalize_query(self):
         num_phases = len(self._phases)
@@ -260,7 +260,7 @@ class RiakMapReduce(object):
             if (type(self._inputs) == str):
                 bucket_name = self._inputs
             elif (type(self._inputs) == RiakBucket):
-                bucket_name = self._inputs.get_name()
+                bucket_name = self._inputs.name
 
             if (bucket_name is not None):
                 self._inputs = {'bucket':       bucket_name,

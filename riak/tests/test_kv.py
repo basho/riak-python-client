@@ -2,10 +2,7 @@
 import os
 import cPickle
 import copy
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import json
 
 
 class NotJsonSerializable(object):
@@ -288,13 +285,13 @@ class PbcBucketPropsTest(object):
     def test_rw_settings(self):
         bucket = self.client.bucket('rwsettings')
         with self.assertRaises(NotImplementedError):
-            test = bucket.r
+            bucket.r
         with self.assertRaises(NotImplementedError):
-            test = bucket.w
+            bucket.w
         with self.assertRaises(NotImplementedError):
-            test = bucket.dw
+            bucket.dw
         with self.assertRaises(NotImplementedError):
-            test = bucket.rw
+            bucket.rw
 
         with self.assertRaises(NotImplementedError):
             bucket.r = 2
@@ -308,9 +305,9 @@ class PbcBucketPropsTest(object):
     def test_primary_quora(self):
         bucket = self.client.bucket('primary_quora')
         with self.assertRaises(NotImplementedError):
-            test = bucket.pr
+            bucket.pr
         with self.assertRaises(NotImplementedError):
-            test = bucket.pw
+            bucket.pw
 
         with self.assertRaises(NotImplementedError):
             bucket.pr = 2
@@ -321,7 +318,6 @@ class PbcBucketPropsTest(object):
 class KVFileTests(object):
     def test_store_binary_object_from_file(self):
         bucket = self.client.bucket('bucket')
-        rand = str(self.randint())
         filepath = os.path.join(os.path.dirname(__file__), 'test_all.py')
         obj = bucket.new_binary_from_file('foo_from_file', filepath)
         obj.store()
@@ -331,7 +327,6 @@ class KVFileTests(object):
 
     def test_store_binary_object_from_file_should_use_default_mimetype(self):
         bucket = self.client.bucket('bucket')
-        rand = str(self.randint())
         filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 os.pardir, os.pardir, 'THANKS')
         obj = bucket.new_binary_from_file('foo_from_file', filepath)
@@ -341,7 +336,6 @@ class KVFileTests(object):
 
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
         bucket = self.client.bucket('bucket')
-        rand = str(self.randint())
         self.assertRaises(IOError, bucket.new_binary_from_file,
                           'not_found_from_file', 'FILE_NOT_FOUND')
         obj = bucket.get_binary('not_found_from_file')

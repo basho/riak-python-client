@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from riak.mapreduce import RiakLink
-from riak import RiakKeyFilter, key_filter
+from riak import key_filter
 
 
 class LinkTests(object):
@@ -44,7 +44,7 @@ class LinkTests(object):
     def test_set_links_all_links(self):
         bucket = self.client.bucket("bucket")
         foo1 = bucket.new("foo", 1)
-        foo2 = bucket.new("foo2", 2).store()
+        bucket.new("foo2", 2).store()
         links = [RiakLink("bucket", "foo2")]
         foo1.set_links(links, True)
         links = foo1.get_links()

@@ -18,10 +18,24 @@ specific language governing permissions and limitations
 under the License.
 """
 import copy
-from riak.metadata import *
-from riak.mapreduce import *
+from riak.metadata import (
+        # MD_CHARSET,
+        MD_CTYPE,
+        # MD_ENCODING,
+        MD_INDEX,
+        # MD_LASTMOD,
+        # MD_LASTMOD_USECS,
+        MD_LINKS,
+        MD_USERMETA
+        # MD_VTAG,
+        # MD_DELETED
+        )
+from mapreduce import (
+    RiakMapReduce,
+    RiakLink
+    )
 from riak import RiakError
-from riak.riak_index_entry import RiakIndexEntry
+from riak_index_entry import RiakIndexEntry
 
 
 class RiakObject(object):
@@ -436,7 +450,7 @@ class RiakObject(object):
         :rtype: self
         """
 
-        result = self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
+        self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
         self.clear()
         return self
 
@@ -488,7 +502,7 @@ class RiakObject(object):
                 for sibling in siblings:
                     sibling._set_siblings(siblings)
         else:
-            raise RiakError("do not know how to handle type %s" % type(Result))
+            raise RiakError("do not know how to handle type %s" % type(result))
 
     def get_sibling(self, i, r=None, pr=None):
         """

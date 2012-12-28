@@ -23,7 +23,7 @@ from riak.transports.http import is_retryable as is_http_retryable
 import httplib
 
 
-class RiakClientTransport(class):
+class RiakClientTransport(object):
     """
     Methods for RiakClient related to transport selection and retries.
     """
@@ -31,7 +31,9 @@ class RiakClientTransport(class):
     RETRY_COUNT = 3
 
     @contextmanager
-    def _transport(self, protocol=self.protocol):
+    def _transport(self, protocol=None):
+        if not protocol:
+            protocol = self.protocol
         if protocol in ['http', 'https']:
             pool = self._http_pool
         elif protocol is 'pbc':
@@ -66,3 +68,8 @@ class RiakClientTransport(class):
                     continue
                 else:
                     raise br.args[0]
+
+    # These will be set or redefined by the RiakClient initializer
+    protocol = 'http'
+    _http_pool = None
+    _pb_pool = None

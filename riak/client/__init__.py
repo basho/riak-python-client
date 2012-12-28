@@ -19,18 +19,12 @@ specific language governing permissions and limitations
 under the License.
 """
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
-from contextlib import contextmanager
+import json
+import random
 from weakref import WeakValueDictionary
 from riak.client.operations import RiakClientOperations
-from riak.client.transport import RiakClientTransport
 from riak.node import RiakNode
 from riak.bucket import RiakBucket
-from riak.mapreduce import RiakMapReduce
 from riak.mapreduce import RiakMapReduceChain
 from riak.search import RiakSearch
 from riak.transports.http import RiakHttpPool
@@ -41,8 +35,7 @@ from riak.util import lazy_property
 
 
 @deprecateQuorumAccessors
-class RiakClient(RiakMapReduceChain, RiakClientOperations,
-                 RiakClientTransport):
+class RiakClient(RiakMapReduceChain, RiakClientOperations):
     """
     The ``RiakClient`` object holds information necessary to connect
     to Riak. Requests can be made to Riak directly through the client
@@ -90,16 +83,17 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations,
                           'text/json': json.loads}
         self._buckets = WeakValueDictionary()
 
-    @property
-    def protocol(self):
+    def _get_protocol(self):
         return self._protocol
 
-    @property.setter
-    def protocol(self, value):
+    def _set_protocol(self, value):
         if value not in self.PROTOCOLS:
             raise ValueError("protocol option is invalid, must be one of %s" %
                              repr(self.PROTOCOLS))
         self._protocol = value
+
+    protocol = property(_get_protocol, _set_protocol,
+                        doc="""which protocol to prefer""")
 
     def get_transport(self):
         """
@@ -132,22 +126,18 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations,
         self.client_id = client_id
         return self
 
-    @property
-    def client_id(self):
-        """
-        The client ID for this client instance
-
-        :rtype: string
-        """
-        with self.transport() as transport:
+    def _get_client_id(self):
+        with self._transport() as transport:
             return transport.get_client_id()
 
-    @client_id.setter
-    def client_id(self, client_id):
+    def _set_client_id(self, client_id):
         for http in self._http_pool:
             http.client_id = client_id
         for pb in self._pb_pool:
             pb.client_id = client_id
+
+    client_id = property(_get_client_id, _set_client_id,
+                         doc="""The client ID for this client instance""")
 
     def get_encoder(self, content_type):
         """
@@ -214,16 +204,20 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations,
             raise TypeError("%s is not a valid node configuration"
                             % repr(n))
 
-    def _choose_node(self, nodes=self.nodes):
+    def _choose_node(self, nodes=None):
         """
         Chooses a random node from the list of nodes in the client,
         taking into account each node's recent error rate.
         :rtype RiakNode
         """
+        if not nodes:
+            nodes = self.nodes
+
         # Prefer nodes which have gone a reasonable time without
         # errors
         def _error_rate(node):
             return node.error_rate.value()
+
         good = [n for n in nodes if _error_rate(n) < 0.1]
 
         if len(good) is 0:

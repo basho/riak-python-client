@@ -19,20 +19,47 @@ specific language governing permissions and limitations
 under the License.
 """
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
+import json
+import riak_pb
 from riak import RiakError
-from riak.mapreduce import RiakLink
-from riak.riak_index_entry import RiakIndexEntry
 from riak.transports.transport import RiakTransport
-from riak.transports.pbc.connection import RiakPbcConnection
-from riak.transports.pbc.stream import RiakPbcKeyStream, RiakPbcMapredStream
-from riak.transports.pbc.codec import RiakPbcCodec
-from riak.transports.pbc.messages import *
-import riak.util
+from connection import RiakPbcConnection
+from stream import RiakPbcKeyStream, RiakPbcMapredStream
+from codec import RiakPbcCodec
+from messages import (
+    # MSG_CODE_ERROR_RESP,
+    MSG_CODE_PING_REQ,
+    MSG_CODE_PING_RESP,
+    MSG_CODE_GET_CLIENT_ID_REQ,
+    MSG_CODE_GET_CLIENT_ID_RESP,
+    MSG_CODE_SET_CLIENT_ID_REQ,
+    MSG_CODE_SET_CLIENT_ID_RESP,
+    MSG_CODE_GET_SERVER_INFO_REQ,
+    MSG_CODE_GET_SERVER_INFO_RESP,
+    MSG_CODE_GET_REQ,
+    MSG_CODE_GET_RESP,
+    MSG_CODE_PUT_REQ,
+    MSG_CODE_PUT_RESP,
+    MSG_CODE_DEL_REQ,
+    MSG_CODE_DEL_RESP,
+    MSG_CODE_LIST_BUCKETS_REQ,
+    MSG_CODE_LIST_BUCKETS_RESP,
+    MSG_CODE_LIST_KEYS_REQ,
+    # MSG_CODE_LIST_KEYS_RESP,
+    MSG_CODE_GET_BUCKET_REQ,
+    MSG_CODE_GET_BUCKET_RESP,
+    MSG_CODE_SET_BUCKET_REQ,
+    MSG_CODE_SET_BUCKET_RESP,
+    MSG_CODE_MAPRED_REQ,
+    # MSG_CODE_MAPRED_RESP,
+    MSG_CODE_INDEX_REQ,
+    MSG_CODE_INDEX_RESP,
+    MSG_CODE_SEARCH_QUERY_REQ,
+    MSG_CODE_SEARCH_QUERY_RESP
+    )
+
+
+# from messages import *
 
 
 class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
@@ -79,15 +106,12 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                                       expect=MSG_CODE_GET_SERVER_INFO_RESP)
         return {'node': resp.node, 'server_version': resp.server_version}
 
-    @property
-    def client_id(self):
-        """the client ID for this connection"""
+    def _get_client_id(self):
         msg_code, resp = self._request(MSG_CODE_GET_CLIENT_ID_REQ,
                                        expect=MSG_CODE_GET_CLIENT_ID_RESP)
         return resp.client_id
 
-    @client_id.setter
-    def client_id(self, client_id):
+    def _set_client_id(self, client_id):
         req = riak_pb.RpbSetClientIdReq()
         req.client_id = client_id
 
@@ -95,6 +119,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                                       MSG_CODE_SET_CLIENT_ID_RESP)
 
         self._client_id = client_id
+
+    client_id = property(_get_client_id, _set_client_id,
+                         doc="""the client ID for this connection""")
 
     def get(self, robj, r=None, pr=None, vtag=None):
         """
@@ -152,9 +179,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if vclock:
             req.vclock = vclock
 
-        self.pbify_content(robj.metadata,
-                           robj.get_encoded_data(),
-                           req.content)
+        self.encode_content(robj.metadata,
+                            robj.get_encoded_data(),
+                            req.content)
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
                                       MSG_CODE_PUT_RESP)
@@ -191,9 +218,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req.bucket = bucket.name
 
-        self.pbify_content(robj.metadata,
-                           robj.get_encoded_data(),
-                           req.content)
+        self.encode_content(robj.metadata,
+                            robj.get_encoded_data(),
+                            req.content)
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
                                       MSG_CODE_PUT_RESP)

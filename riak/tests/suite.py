@@ -1,4 +1,3 @@
-import riak.tests.test_server_test
 import os.path
 import platform
 

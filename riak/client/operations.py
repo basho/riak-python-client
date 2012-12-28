@@ -17,9 +17,10 @@ under the License.
 """
 
 from riak.bucket import RiakBucket
+from transport import RiakClientTransport
 
 
-class RiakClientOperations(object):
+class RiakClientOperations(RiakClientTransport):
     """
     Methods for RiakClient that result in requests sent to the Riak
     cluster.
@@ -79,7 +80,7 @@ class RiakClientOperations(object):
         method which should be iterated over.
         """
         with self._transport() as transport:
-            for keylist in return transport.stream_keys(bucket):
+            for keylist in transport.stream_keys(bucket):
                 yield keylist
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=None,
@@ -114,7 +115,7 @@ class RiakClientOperations(object):
         Deletes an object from Riak.
         """
         with self._transport() as transport:
-            return transport.delete(robj, rw=rw, r=r, w=w, dw=dw=, pr=pr,
+            return transport.delete(robj, rw=rw, r=r, w=w, dw=dw, pr=pr,
                                     pw=pw)
 
     def mapred(self, inputs, query, timeout):

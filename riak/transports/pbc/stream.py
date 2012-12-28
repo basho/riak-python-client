@@ -16,20 +16,20 @@ specific language governing permissions and limitations
 under the License.
 """
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
 
+import json
 from riak.transports.pbc.messages import MSG_CODE_LIST_KEYS_RESP
 from riak.transports.pbc.messages import MSG_CODE_MAPRED_RESP
 
 
-class RiakPbcStream(class):
+class RiakPbcStream(object):
     """
     Used internally by RiakPbcTransport to implement streaming
     operations. Implements the iterator interface.
     """
+
+    _expect = None
+
     def __init__(self, transport):
         self.transport = transport
 
@@ -80,7 +80,7 @@ class RiakPbcMapredStream(RiakPbcStream):
 
     def next(self):
         response = super(RiakPbcMapredStream, self).next()
-        return (response.phase, json.loads(response.response))
+        return response.phase, json.loads(response.response)
 
     def _is_done(self, response):
         return response.done

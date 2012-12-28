@@ -20,6 +20,7 @@ under the License.
 """
 
 import errno
+import socket
 from riak.transports.pool import Pool
 from riak.transports.pbc.transport import RiakPbcTransport
 

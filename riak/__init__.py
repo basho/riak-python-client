@@ -38,13 +38,7 @@ class RiakError(Exception):
     def __str__(self):
         return repr(self.value)
 
-from riak_object import RiakObject
-from bucket import RiakBucket
-from client import RiakClient
-from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase,\
-    RiakKeyFilter
-from transports.pbc import RiakPbcTransport
-from transports.http import RiakHttpTransport
+from mapreduce import RiakKeyFilter
 
 ONE = "one"
 ALL = "all"

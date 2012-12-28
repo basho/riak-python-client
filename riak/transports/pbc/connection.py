@@ -16,11 +16,41 @@ specific language governing permissions and limitations
 under the License.
 """
 
-import errno
 import socket
 import struct
-from contextlib import contextmanager
+import riak_pb
 from riak import RiakError
+from messages import (
+    MSG_CODE_ERROR_RESP,
+    # MSG_CODE_PING_REQ,
+    MSG_CODE_PING_RESP,
+    # MSG_CODE_GET_CLIENT_ID_REQ,
+    MSG_CODE_GET_CLIENT_ID_RESP,
+    # MSG_CODE_SET_CLIENT_ID_REQ,
+    MSG_CODE_SET_CLIENT_ID_RESP,
+    # MSG_CODE_GET_SERVER_INFO_REQ,
+    MSG_CODE_GET_SERVER_INFO_RESP,
+    # MSG_CODE_GET_REQ,
+    MSG_CODE_GET_RESP,
+    # MSG_CODE_PUT_REQ,
+    MSG_CODE_PUT_RESP,
+    # MSG_CODE_DEL_REQ,
+    MSG_CODE_DEL_RESP,
+    # MSG_CODE_LIST_BUCKETS_REQ,
+    MSG_CODE_LIST_BUCKETS_RESP,
+    # MSG_CODE_LIST_KEYS_REQ,
+    MSG_CODE_LIST_KEYS_RESP,
+    # MSG_CODE_GET_BUCKET_REQ,
+    MSG_CODE_GET_BUCKET_RESP,
+    # MSG_CODE_SET_BUCKET_REQ,
+    MSG_CODE_SET_BUCKET_RESP,
+    # MSG_CODE_MAPRED_REQ,
+    MSG_CODE_MAPRED_RESP,
+    # MSG_CODE_INDEX_REQ,
+    MSG_CODE_INDEX_RESP,
+    # MSG_CODE_SEARCH_QUERY_REQ,
+    MSG_CODE_SEARCH_QUERY_RESP
+    )
 
 
 class RiakPbcConnection(object):
@@ -40,15 +70,15 @@ class RiakPbcConnection(object):
         return self._recv_msg(expect)
 
     def _send_msg(self, msg_code, msg):
-        self._socket.send(self.encode_msg(msg_code, msg))
+        self._socket.send(self._encode_msg(msg_code, msg))
 
     def _recv_msg(self, expect=None):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code == MSG_CODE_ERROR_RESP:
-            msg = riak_pb.RpbErrorResp()
-            msg.ParseFromString(self._inbuf[1:])
-            raise Exception(msg.errmsg)
+            err = riak_pb.RpbErrorResp()
+            err.ParseFromString(self._inbuf[1:])
+            raise RiakError(err.errmsg)
         elif msg_code == MSG_CODE_PING_RESP:
             msg = None
         elif msg_code == MSG_CODE_GET_SERVER_INFO_RESP:
@@ -105,7 +135,7 @@ class RiakPbcConnection(object):
         self._inbuf = ''
         while len(self._inbuf) < msglen:
             want_len = min(8192, msglen - len(self._inbuf))
-            recv_buf = conn.recv(want_len)
+            recv_buf = self._socket.recv(want_len)
             if not recv_buf:
                 break
             self._inbuf += recv_buf
@@ -115,7 +145,11 @@ class RiakPbcConnection(object):
 
     def _connect(self):
         self._socket = socket.create_connection(self._address,
-                                                self._timeouts.connect)
+                                                self._timeouts['connect'])
 
     def close(self):
         self._socket.shutdown(socket.SHUT_RDWR)
+
+    # These are set in the RiakPbcTransport initializer
+    _address = None
+    _timeouts = {}
