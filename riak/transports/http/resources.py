@@ -21,6 +21,7 @@ from urllib import quote_plus
 from riak import RiakError
 from riak.util import lazy_property
 
+
 class RiakHttpResources(object):
     """
     Methods for RiakHttpTransport related to URL generation, i.e.
@@ -160,6 +161,9 @@ def mkpath(*segments, **query):
     pathstring = re.sub('/+', '/', pathstring)
     # Add the query string if it exists
     if len(query) > 0:
+        for key in query.keys():
+            if query[key] is None:
+                query.pop(key)
         pathstring += "?" + urllib.urlencode(query).lower()
 
     if not pathstring.startswith('/'):
