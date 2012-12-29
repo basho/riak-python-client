@@ -64,8 +64,8 @@ class BaseTestCase(object):
         host = host or self.host
         port = port or self.port
         transport_class = transport_class or self.transport_class
-        return RiakClient(self.host, self.port,
-                          transport_class=self.transport_class)
+        return RiakClient(host, port,
+                          transport_class=transport_class)
 
     def setUp(self):
         self.client = self.create_client()
