@@ -163,11 +163,13 @@ def mkpath(*segments, **query):
     # Add the query string if it exists
     _query = {}
     for key in query:
-        if query[key] is not None:
+        if query[key] in [False, True]:
+            _query[key] = str(query[key]).lower()
+        elif query[key] is not None:
             _query[key] = query[key]
 
     if len(_query) > 0:
-        pathstring += "?" + urlencode(_query).lower()
+        pathstring += "?" + urlencode(_query)
 
     if not pathstring.startswith('/'):
         pathstring = '/' + pathstring
