@@ -340,6 +340,10 @@ class RiakBucket(object):
         """
         binary_data = open(filename, "rb").read()
         mimetype, encoding = mimetypes.guess_type(filename)
+        if encoding:
+            binary_data = bytearray(binary_data, encoding)
+        else:
+            binary_data = bytearray(binary_data)
         if not mimetype:
             mimetype = 'application/octet-stream'
         return self.new_binary(key, binary_data, mimetype)

@@ -140,4 +140,4 @@ class RiakPbcCodec(object):
                     pb_link.bucket = link.get_bucket()
                     pb_link.key = link.get_key()
                     pb_link.tag = link.get_tag()
-        rpb_content.value = data
+        rpb_content.value = str(data)
