@@ -82,7 +82,8 @@ class RiakHttpResources(object):
         if finish:
             finish = quote_plus(str(finish))
         return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket),
-                      "index", quote_plus(str(start)), finish, **options)
+                      "index", quote_plus(index), quote_plus(str(start)),
+                      finish, **options)
 
     def solr_select_path(self, index, query, **options):
         if not self.riak_solr_searcher_wm:
