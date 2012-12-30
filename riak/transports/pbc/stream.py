@@ -31,28 +31,26 @@ class RiakPbcStream(object):
     _expect = None
 
     def __init__(self, transport):
+        self.finished = False
         self.transport = transport
 
     def __iter__(self):
         return self
 
     def next(self):
-        expect = self._expect
-        try:
-            resp = self.transport._recv_msg(expect)
-            if(self._is_done(resp)):
-                raise StopIteration
-            else:
-                return resp
-        except StopIteration:
-            pass
-        except:
-            # TODO: which exceptions do we expect to be generated?
-            # Should we raise BadResource?
+        if self.finished:
             raise StopIteration
 
+        msg_code, resp = self.transport._recv_msg(self._expect)
+        if(self._is_done(resp)):
+            self.finished = True
+
+        return resp
+
     def _is_done(self, response):
-        raise NotImplementedError
+        # This could break if new messages don't name the field the
+        # same thing.
+        return response.done
 
 
 class RiakPbcKeyStream(RiakPbcStream):
@@ -64,10 +62,11 @@ class RiakPbcKeyStream(RiakPbcStream):
 
     def next(self):
         response = super(RiakPbcKeyStream, self).next()
-        return response.keys
 
-    def _is_done(self, response):
-        return response.done
+        if response.done and not response.HasField('keys'):
+            raise StopIteration
+
+        return response.keys
 
 
 class RiakPbcMapredStream(RiakPbcStream):
@@ -80,7 +79,8 @@ class RiakPbcMapredStream(RiakPbcStream):
 
     def next(self):
         response = super(RiakPbcMapredStream, self).next()
-        return response.phase, json.loads(response.response)
 
-    def _is_done(self, response):
-        return response.done
+        if response.done and not response.HasField('response'):
+            raise StopIteration
+
+        return response.phase, json.loads(response.response)
