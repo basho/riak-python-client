@@ -16,7 +16,6 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from riak.bucket import RiakBucket
 from transport import RiakClientTransport
 
 

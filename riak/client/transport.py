@@ -30,6 +30,11 @@ class RiakClientTransport(object):
 
     RETRY_COUNT = 3
 
+    # These will be set or redefined by the RiakClient initializer
+    protocol = 'http'
+    _http_pool = None
+    _pb_pool = None
+
     @contextmanager
     def _transport(self, protocol=None):
         if not protocol:
@@ -63,13 +68,8 @@ class RiakClientTransport(object):
                             raise BadResource(e)
                         else:
                             raise e
-            except BadResource as br:
+            except BadResource:
                 continue
-
-    # These will be set or redefined by the RiakClient initializer
-    protocol = 'http'
-    _http_pool = None
-    _pb_pool = None
 
 
 def is_retryable(error):
