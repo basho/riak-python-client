@@ -63,7 +63,7 @@ class RiakPbcKeyStream(RiakPbcStream):
     def next(self):
         response = super(RiakPbcKeyStream, self).next()
 
-        if response.done and not response.HasField('keys'):
+        if response.done and len(response.keys) is 0:
             raise StopIteration
 
         return response.keys

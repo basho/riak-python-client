@@ -270,7 +270,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         keys = []
         for keylist in self.stream_keys(bucket):
-            keys = keys + keylist
+            for key in keylist:
+                keys.append(key)
 
         return keys
 
