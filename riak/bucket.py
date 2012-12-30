@@ -386,3 +386,6 @@ class RiakBucket(object):
         Queries a secondary index over objects in this bucket, returning keys.
         """
         return self._client.get_index(self.name, index, startkey, endkey)
+
+    def __str__(self):
+        return '<RiakBucket "{0}">'.format(self.name)
