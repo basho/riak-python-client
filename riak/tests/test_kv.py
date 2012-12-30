@@ -239,7 +239,7 @@ class BasicKVTests(object):
         bucket = self.client.bucket("list_bucket")
         bucket.new("one", {"foo": "one", "bar": "red"}).store()
         buckets = self.client.get_buckets()
-        self.assertTrue("list_bucket" in buckets)
+        self.assertTrue(bucket in buckets)
 
 
 class HTTPBucketPropsTest(object):

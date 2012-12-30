@@ -33,7 +33,7 @@ class RiakClientOperations(RiakClientTransport):
         all keys stored in a cluster.
         """
         with self._transport() as transport:
-            return [RiakBucket(self, name) for name in transport.get_buckets()]
+            return [self.bucket(name) for name in transport.get_buckets()]
 
     def ping(self):
         """
