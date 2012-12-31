@@ -72,6 +72,18 @@ class BasicKVTests(object):
         self.assertNotIn(o.key, existing_keys)
         self.assertEqual(len(bucket.get_keys()), len(existing_keys) + 1)
 
+    def test_stream_keys(self):
+        bucket = self.client.bucket('random_key_bucket')
+        regular_keys = bucket.get_keys()
+        self.assertNotEqual(len(regular_keys), 0)
+        streamed_keys = []
+        for keylist in bucket.stream_keys():
+            self.assertNotEqual([], keylist)
+            for key in keylist:
+                self.assertIsInstance(key, basestring)
+            streamed_keys += keylist
+        self.assertEqual(sorted(regular_keys), sorted(streamed_keys))
+
     def test_binary_store_and_get(self):
         bucket = self.client.bucket('bucket')
         # Store as binary, retrieve as binary, then compare...
