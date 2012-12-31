@@ -80,7 +80,8 @@ class RiakClientOperations(RiakClientTransport):
         """
         with self._transport() as transport:
             for keylist in transport.stream_keys(bucket):
-                yield keylist
+                if len(keylist) > 0:
+                    yield keylist
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=None,
             if_none_match=None):

@@ -49,18 +49,14 @@ class RiakHttpKeyStream(RiakHttpStream):
     """
 
     def next(self):
-        while True:
-            while '}' not in self.buffer and not self.response_done:
-                self.read()
+        while '}' not in self.buffer and not self.response_done:
+            self.read()
 
-            if '}' in self.buffer:
-                idx = string.index(self.buffer, '}') + 1
-                chunk = self.buffer[:idx]
-                self.buffer = self.buffer[idx:]
-                keys = json.loads(chunk)[u'keys']
-                if len(keys) is 0:
-                    continue
-                else:
-                    return keys
-            else:
-                raise StopIteration
+        if '}' in self.buffer:
+            idx = string.index(self.buffer, '}') + 1
+            chunk = self.buffer[:idx]
+            self.buffer = self.buffer[idx:]
+            keys = json.loads(chunk)[u'keys']
+            return keys
+        else:
+            raise StopIteration
