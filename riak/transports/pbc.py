@@ -32,6 +32,7 @@ from riak.mapreduce import RiakLink
 from riak.metadata import (
         MD_CHARSET,
         MD_CTYPE,
+        MD_DELETED,
         MD_ENCODING,
         MD_INDEX,
         MD_LASTMOD,
