@@ -28,6 +28,7 @@ from riak.transports.transport import RiakTransport
 from riak.transports.http.resources import RiakHttpResources
 from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.search import XMLSearchResult
+from riak.transports.http.stream import RiakHttpKeyStream
 from riak.metadata import (
         MD_CHARSET,
         MD_CTYPE,
@@ -207,10 +208,20 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         response = self._request('GET', url)
 
         headers, encoded_props = response[0:2]
-        if headers['http_code'] == 200:
+        if headers['http_code'] is 200:
             props = json.loads(encoded_props)
             return props['keys']
         else:
+            raise Exception('Error listing keys.')
+
+    def stream_keys(self, bucket):
+        url = self.key_list_path(bucket.name, keys='stream')
+        headers, response = self._request('GET', url, stream=True)
+
+        if headers['http_code'] is 200:
+            return RiakHttpKeyStream(response)
+        else:
+            stream.close()
             raise Exception('Error listing keys.')
 
     def get_buckets(self):

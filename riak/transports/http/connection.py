@@ -24,7 +24,7 @@ class RiakHttpConnection(object):
     Connection and low-level request methods for RiakHttpTransport.
     """
 
-    def _request(self, method, uri, headers={}, body=''):
+    def _request(self, method, uri, headers={}, body='', stream=False):
         """
         Given a Method, URL, Headers, and Body, perform and HTTP request,
         and return a 2-tuple containing a dictionary of response headers
@@ -39,10 +39,14 @@ class RiakHttpConnection(object):
             for (key, value) in response.getheaders():
                 response_headers[key.lower()] = value
 
-            # TODO: Support streaming responses
-            response_body = response.read()
+            if stream:
+                # The caller is responsible for fully reading the
+                # response and closing it when streaming.
+                response_body = response
+            else:
+                response_body = response.read()
         finally:
-            if response:
+            if response and not stream:
                 response.close()
 
         return response_headers, response_body

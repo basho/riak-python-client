@@ -55,8 +55,8 @@ class RiakHttpResources(object):
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), **query)
 
     def key_list_path(self, bucket, **options):
-        query = options.copy()
-        query.update(keys=True, props=False)
+        query = {'keys': True, 'props': False}
+        query.update(options)
         if self.riak_kv_wm_buckets:
             return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket), "keys",
                           **query)
