@@ -28,7 +28,10 @@ from riak.transports.transport import RiakTransport
 from riak.transports.http.resources import RiakHttpResources
 from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.search import XMLSearchResult
-from riak.transports.http.stream import RiakHttpKeyStream
+from riak.transports.http.stream import (
+    RiakHttpKeyStream,
+    RiakHttpMapReduceStream
+    )
 from riak.metadata import (
         MD_CHARSET,
         MD_CTYPE,
@@ -279,16 +282,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """
         Run a MapReduce query.
         """
-        if not self.phaseless_mapred() and (query is None or len(query) is 0):
-            raise Exception(
-                'Phase-less MapReduce is not supported by Riak node')
-
         # Construct the job, optionally set the timeout...
-        job = {'inputs': inputs, 'query': query}
-        if timeout is not None:
-            job['timeout'] = timeout
-
-        content = json.dumps(job)
+        content = self._construct_mapred_json(inputs, query, timeout)
 
         # Do the request...
         url = self.mapred_path()
@@ -304,6 +299,21 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         result = json.loads(response[1])
         return result
+
+    def stream_mapred(self, inputs, query, timeout=None):
+        content = self._construct_mapred_json(inputs, query, timeout)
+
+        url = self.mapred_path(chunked=True)
+        reqheaders = {'Content-Type': 'application/json'}
+        headers, response = self._request('POST', url, reqheaders,
+                                          content, stream=True)
+
+        if headers['http_code'] is 200:
+            return RiakHttpMapReduceStream(response)
+        else:
+            raise Exception(
+                    'Error running MapReduce operation. Headers: %s Body: %s' %
+                    (repr(headers), repr(response.read())))
 
     def get_index(self, bucket, index, startkey, endkey=None):
         """

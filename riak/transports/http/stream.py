@@ -18,6 +18,9 @@ under the License.
 
 import json
 import string
+import re
+from cgi import parse_header
+from email import message_from_string
 
 class RiakHttpStream(object):
     """
@@ -60,3 +63,57 @@ class RiakHttpKeyStream(RiakHttpStream):
             return keys
         else:
             raise StopIteration
+
+class RiakHttpMultipartStream(RiakHttpStream):
+    """
+    Streaming iterator for multipart messages over HTTP
+    """
+    def __init__(self, response):
+        super(RiakHttpMultipartStream, self).__init__(response)
+        ctypehdr = response.getheader('content-type')
+        _, params = parse_header(ctypehdr)
+        self.boundary_re = re.compile('\r?\n--%s(?:--)?\r?\n' %
+                                      re.escape(params['boundary']))
+        self.next_boundary = None
+        self.seen_first = False
+
+    def next(self):
+        # multipart/mixed starts with a boundary, then the first part.
+        if not self.seen_first:
+            self.read_until_boundary()
+            self.advance_buffer()
+            self.seen_first = True
+
+        self.read_until_boundary()
+
+        if self.next_boundary:
+            part = self.advance_buffer()
+            message = message_from_string(part)
+            return message
+        else:
+            raise StopIteration
+
+    def try_match(self):
+        self.next_boundary = self.boundary_re.search(self.buffer)
+        return self.next_boundary
+
+    def advance_buffer(self):
+        part = self.buffer[:self.next_boundary.start()]
+        self.buffer = self.buffer[self.next_boundary.end():]
+        self.next_boundary = None
+        return part
+
+    def read_until_boundary(self):
+        while not self.try_match() and not self.response_done:
+            self.read()
+
+
+class RiakHttpMapReduceStream(RiakHttpMultipartStream):
+    """
+    Streaming iterator for MapReduce over HTTP
+    """
+
+    def next(self):
+        message = super(RiakHttpMapReduceStream, self).next()
+        payload = json.loads(message.get_payload())
+        return payload['phase'], payload['data']

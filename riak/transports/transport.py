@@ -22,6 +22,7 @@ import random
 import threading
 import platform
 import os
+import json
 from feature_detect import FeatureDetection
 
 
@@ -230,3 +231,15 @@ class RiakTransport(FeatureDetection):
                                   'key': startkey},
                                  phases)
         return [key for bucket, key in result]
+
+    def _construct_mapred_json(self, inputs, query, timeout=None):
+        if not self.phaseless_mapred() and (query is None or len(query) is 0):
+            raise Exception(
+                'Phase-less MapReduce is not supported by Riak node')
+
+        job = {'inputs': inputs, 'query': query}
+        if timeout is not None:
+            job['timeout'] = timeout
+
+        content = json.dumps(job)
+        return content

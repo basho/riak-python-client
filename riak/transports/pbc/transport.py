@@ -352,11 +352,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def stream_mapred(self, inputs, query, timeout=None):
         # Construct the job, optionally set the timeout...
-        job = {'inputs': inputs, 'query': query}
-        if timeout is not None:
-            job['timeout'] = timeout
-
-        content = json.dumps(job)
+        content = self._construct_mapred_json(inputs, query, timeout)
 
         req = riak_pb.RpbMapRedReq()
         req.request = content
