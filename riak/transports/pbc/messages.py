@@ -16,7 +16,10 @@ specific language governing permissions and limitations
 under the License.
 """
 
-## Protocol codes
+import riak_pb
+
+
+# Protocol codes
 MSG_CODE_ERROR_RESP = 0
 MSG_CODE_PING_REQ = 1
 MSG_CODE_PING_RESP = 2
@@ -46,3 +49,44 @@ MSG_CODE_INDEX_REQ = 25
 MSG_CODE_INDEX_RESP = 26
 MSG_CODE_SEARCH_QUERY_REQ = 27
 MSG_CODE_SEARCH_QUERY_RESP = 28
+
+# These responses don't include messages
+EMPTY_RESPONSES = [
+    MSG_CODE_PING_RESP,
+    MSG_CODE_SET_CLIENT_ID_RESP,
+    MSG_CODE_DEL_RESP,
+    MSG_CODE_SET_BUCKET_RESP
+]
+
+# Mapping from code to protobuf class
+MESSAGE_CLASSES = {
+    MSG_CODE_ERROR_RESP: riak_pb.RpbErrorResp,
+    MSG_CODE_PING_REQ: None,
+    MSG_CODE_PING_RESP: None,
+    MSG_CODE_GET_CLIENT_ID_REQ: None,
+    MSG_CODE_GET_CLIENT_ID_RESP: riak_pb.RpbGetClientIdResp,
+    MSG_CODE_SET_CLIENT_ID_REQ: riak_pb.RpbSetClientIdReq,
+    MSG_CODE_SET_CLIENT_ID_RESP: None,
+    MSG_CODE_GET_SERVER_INFO_REQ: None,
+    MSG_CODE_GET_SERVER_INFO_RESP: riak_pb.RpbGetServerInfoResp,
+    MSG_CODE_GET_REQ: riak_pb.RpbGetReq,
+    MSG_CODE_GET_RESP: riak_pb.RpbGetResp,
+    MSG_CODE_PUT_REQ: riak_pb.RpbPutReq,
+    MSG_CODE_PUT_RESP: riak_pb.RpbPutResp,
+    MSG_CODE_DEL_REQ: riak_pb.RpbDelReq,
+    MSG_CODE_DEL_RESP: None,
+    MSG_CODE_LIST_BUCKETS_REQ: None,
+    MSG_CODE_LIST_BUCKETS_RESP: riak_pb.RpbListBucketsResp,
+    MSG_CODE_LIST_KEYS_REQ: riak_pb.RpbListKeysReq,
+    MSG_CODE_LIST_KEYS_RESP: riak_pb.RpbListKeysResp,
+    MSG_CODE_GET_BUCKET_REQ: riak_pb.RpbGetBucketReq,
+    MSG_CODE_GET_BUCKET_RESP: riak_pb.RpbGetBucketResp,
+    MSG_CODE_SET_BUCKET_REQ: riak_pb.RpbSetBucketReq,
+    MSG_CODE_SET_BUCKET_RESP: None,
+    MSG_CODE_MAPRED_REQ: riak_pb.RpbMapRedReq,
+    MSG_CODE_MAPRED_RESP: riak_pb.RpbMapRedResp,
+    MSG_CODE_INDEX_REQ: riak_pb.RpbIndexReq,
+    MSG_CODE_INDEX_RESP: riak_pb.RpbIndexResp,
+    MSG_CODE_SEARCH_QUERY_REQ: riak_pb.RpbSearchQueryReq,
+    MSG_CODE_SEARCH_QUERY_RESP: riak_pb.RpbSearchQueryResp
+}

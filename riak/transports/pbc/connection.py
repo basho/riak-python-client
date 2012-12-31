@@ -18,38 +18,10 @@ under the License.
 
 import socket
 import struct
-import riak_pb
 from riak import RiakError
 from messages import (
-    MSG_CODE_ERROR_RESP,
-    # MSG_CODE_PING_REQ,
-    MSG_CODE_PING_RESP,
-    # MSG_CODE_GET_CLIENT_ID_REQ,
-    MSG_CODE_GET_CLIENT_ID_RESP,
-    # MSG_CODE_SET_CLIENT_ID_REQ,
-    MSG_CODE_SET_CLIENT_ID_RESP,
-    # MSG_CODE_GET_SERVER_INFO_REQ,
-    MSG_CODE_GET_SERVER_INFO_RESP,
-    # MSG_CODE_GET_REQ,
-    MSG_CODE_GET_RESP,
-    # MSG_CODE_PUT_REQ,
-    MSG_CODE_PUT_RESP,
-    # MSG_CODE_DEL_REQ,
-    MSG_CODE_DEL_RESP,
-    # MSG_CODE_LIST_BUCKETS_REQ,
-    MSG_CODE_LIST_BUCKETS_RESP,
-    # MSG_CODE_LIST_KEYS_REQ,
-    MSG_CODE_LIST_KEYS_RESP,
-    # MSG_CODE_GET_BUCKET_REQ,
-    MSG_CODE_GET_BUCKET_RESP,
-    # MSG_CODE_SET_BUCKET_REQ,
-    MSG_CODE_SET_BUCKET_RESP,
-    # MSG_CODE_MAPRED_REQ,
-    MSG_CODE_MAPRED_RESP,
-    # MSG_CODE_INDEX_REQ,
-    MSG_CODE_INDEX_RESP,
-    # MSG_CODE_SEARCH_QUERY_REQ,
-    MSG_CODE_SEARCH_QUERY_RESP
+    MESSAGE_CLASSES,
+    MSG_CODE_ERROR_RESP
     )
 
 
@@ -57,6 +29,7 @@ class RiakPbcConnection(object):
     """
     Connection-related methods for RiakPbcTransport.
     """
+
     def _encode_msg(self, msg_code, msg=None):
         if msg is None:
             return struct.pack("!iB", 1, msg_code)
@@ -75,53 +48,18 @@ class RiakPbcConnection(object):
     def _recv_msg(self, expect=None):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
-        if msg_code == MSG_CODE_ERROR_RESP:
-            err = riak_pb.RpbErrorResp()
-            err.ParseFromString(self._inbuf[1:])
+
+        if msg_code is MSG_CODE_ERROR_RESP:
+            err = self._parse_msg(msg_code, self._inbuf[1:])
             raise RiakError(err.errmsg)
-        elif msg_code == MSG_CODE_PING_RESP:
-            msg = None
-        elif msg_code == MSG_CODE_GET_SERVER_INFO_RESP:
-            msg = riak_pb.RpbGetServerInfoResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_GET_CLIENT_ID_RESP:
-            msg = riak_pb.RpbGetClientIdResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_SET_CLIENT_ID_RESP:
-            msg = None
-        elif msg_code == MSG_CODE_GET_RESP:
-            msg = riak_pb.RpbGetResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_PUT_RESP:
-            msg = riak_pb.RpbPutResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_DEL_RESP:
-            msg = None
-        elif msg_code == MSG_CODE_LIST_KEYS_RESP:
-            msg = riak_pb.RpbListKeysResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_LIST_BUCKETS_RESP:
-            msg = riak_pb.RpbListBucketsResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_GET_BUCKET_RESP:
-            msg = riak_pb.RpbGetBucketResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_SET_BUCKET_RESP:
-            msg = None
-        elif msg_code == MSG_CODE_MAPRED_RESP:
-            msg = riak_pb.RpbMapRedResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_INDEX_RESP:
-            msg = riak_pb.RpbIndexResp()
-            msg.ParseFromString(self._inbuf[1:])
-        elif msg_code == MSG_CODE_SEARCH_QUERY_RESP:
-            msg = riak_pb.RpbSearchQueryResp()
-            msg.ParseFromString(self._inbuf[1:])
+        elif msg_code in MESSAGE_CLASSES:
+            msg = self._parse_msg(msg_code, self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s" % msg_code)
+
         if expect and msg_code != expect:
-            raise RiakError("unexpected protocol buffer message code: %d, %s"
-                            % (msg_code, repr(msg)))
+            raise RiakError("unexpected protocol buffer message code: %d, %r"
+                            % (msg_code, msg))
         return msg_code, msg
 
     def _recv_pkt(self):
@@ -149,6 +87,19 @@ class RiakPbcConnection(object):
 
     def close(self):
         self._socket.shutdown(socket.SHUT_RDWR)
+
+    def _parse_msg(self, code, packet):
+        try:
+            pbclass = MESSAGE_CLASSES[code]
+        except KeyError:
+            pbclass = None
+
+        if pbclass is None:
+            return None
+
+        pbo = pbclass()
+        pbo.ParseFromString(packet)
+        return pbo
 
     # These are set in the RiakPbcTransport initializer
     _address = None
