@@ -119,9 +119,27 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def get_keys(self, bucket):
+        """
+        Lists all keys within the given bucket.
+        """
+        raise NotImplementedError
+
+    def stream_keys(self, bucket):
+        """
+        Streams the list of keys for the bucket through an iterator.
+        """
+        raise NotImplementedError
+
     def mapred(self, inputs, query, timeout=None):
         """
-        Serialize map/reduce request
+        Sends a MapReduce request synchronously.
+        """
+        raise NotImplementedError
+
+    def stream_mapred(self, inputs, query, timeout=None):
+        """
+        Streams the results of a MapReduce request through an iterator.
         """
         raise NotImplementedError
 
