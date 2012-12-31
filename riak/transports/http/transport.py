@@ -80,14 +80,15 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """
         Check server is alive over HTTP
         """
-        response = self.GET(self.ping_path())
+        response = self._request('GET', self.ping_path())
         return(response is not None) and (response[1] == 'OK')
 
     def stats(self):
         """
         Gets performance statistics and server information
         """
-        response = self.GET(self.stats_path(), {'Accept': 'application/json'})
+        response = self._request('GET', self.stats_path(),
+                                 {'Accept': 'application/json'})
         if response[0]['http_code'] is 200:
             return json.loads(response[1])
         else:
@@ -111,7 +112,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         Gets a JSON mapping of server-side resource names to paths
         :rtype dict
         """
-        response = self.GET('/', {'Accept': 'application/json'})
+        response = self._request('GET', '/', {'Accept': 'application/json'})
         if response[0]['http_code'] is 200:
             return json.loads(response[1])
         else:
@@ -125,7 +126,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         # unknown flags/params.
         params = {'r': r, 'pr': pr, 'vtag': vtag}
         url = self.object_path(robj.bucket.name, robj.key, **params)
-        response = self.GET(url)
+        response = self._request('GET', url)
         return self.parse_body(response, [200, 300, 404])
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=True,
@@ -149,9 +150,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
     def do_put(self, url, headers, content, return_body=False, key=None):
         if key is None:
-            response = self.POST(url, headers, content)
+            response = self._request('POST', url, headers, content)
         else:
-            response = self.PUT(url, headers, content)
+            response = self._request('PUT', url, headers, content)
 
         if return_body:
             return self.parse_body(response, [200, 201, 300])
@@ -172,7 +173,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         if if_none_match:
             headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
-        response = self.POST(url, headers, content)
+        response = self._request('POST', url, headers, content)
         location = response[0]['location']
         idx = location.rindex('/')
         key = location[(idx + 1):]
@@ -194,7 +195,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         url = self.object_path(robj.bucket.name, robj.key, **params)
         if self.tombstone_vclocks() and robj.vclock is not None:
             headers['X-Riak-Vclock'] = robj.vclock
-        response = self.DELETE(url, headers)
+        response = self._request('DELETE', url, headers)
         self.check_http_code(response, [204, 404])
         return self
 
@@ -203,7 +204,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         Fetch a list of keys for the bucket
         """
         url = self.key_list_path(bucket.name)
-        response = self.GET(url)
+        response = self._request('GET', url)
 
         headers, encoded_props = response[0:2]
         if headers['http_code'] == 200:
@@ -217,7 +218,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         Fetch a list of all buckets
         """
         url = self.bucket_list_path()
-        response = self.GET(url)
+        response = self._request('GET', url)
 
         headers, encoded_props = response[0:2]
         if headers['http_code'] == 200:
@@ -232,7 +233,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """
         # Run the request...
         url = self.bucket_properties_path(bucket.name)
-        response = self.GET(url)
+        response = self._request('GET', url)
 
         headers = response[0]
         encoded_props = response[1]
@@ -251,7 +252,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         content = json.dumps({'props': props})
 
         # Run the request...
-        response = self.PUT(url, headers, content)
+        response = self._request('PUT', url, headers, content)
 
         # Handle the response...
         if response is None:
@@ -281,7 +282,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         # Do the request...
         url = self.mapred_path()
         headers = {'Content-Type': 'application/json'}
-        response = self.POST(url, headers, content)
+        response = self._request('POST', url, headers, content)
 
         # Make sure the expected status code came back...
         status = response[0]['http_code']
@@ -297,7 +298,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """
         Performs a secondary index query.
         """
-        response = self.GET(self.index_path(bucket, index, startkey, endkey))
+        url = self.index_path(bucket, index, startkey, endkey)
+        response = self._request('GET', url)
         headers, data = response
         self.check_http_code(response, [200])
         jsonData = json.loads(data)
@@ -316,7 +318,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             options['q.op'] = op
 
         options.update(params)
-        response = self.GET(self.solr_select_path(index, query, **options))
+        url = self.solr_select_path(index, query, **options)
+        response = self._request('GET', url)
         headers, data = response
         self.check_http_code(response, [200])
         if 'json' in headers['content-type']:
@@ -345,9 +348,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             root.appendChild(doc_element)
         xml.appendChild(root)
 
-        self.POST(self.solr_update_path(index),
-                  {'Content-Type': 'text/xml'},
-                  xml.toxml())
+        self._request('POST', self.solr_update_path(index),
+                      {'Content-Type': 'text/xml'},
+                      xml.toxml())
 
     def fulltext_delete(self, index, docs=None, queries=None):
         """
@@ -370,9 +373,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         xml.appendChild(root)
 
-        self.POST(self.solr_update_path(index),
-                  {'Content-Type': 'text/xml'},
-                  xml.toxml())
+        self._request('POST', self.solr_update_path(index),
+                      {'Content-Type': 'text/xml'},
+                      xml.toxml())
 
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']

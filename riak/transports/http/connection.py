@@ -24,21 +24,6 @@ class RiakHttpConnection(object):
     Connection and low-level request methods for RiakHttpTransport.
     """
 
-    def GET(self, uri, headers={}):
-        return self._request('GET', uri, headers, '')
-
-    def POST(self, uri, headers={}, body=''):
-        return self._request('POST', uri, headers, body)
-
-    def PUT(self, uri, headers={}, body=''):
-        return self._request('PUT', uri, headers, body)
-
-    def DELETE(self, uri, headers={}, body=''):
-        return self._request('DELETE', uri, headers, body)
-
-    def HEAD(self, uri, headers={}):
-        return self._request('HEAD', uri, headers, '')
-
     def _request(self, method, uri, headers={}, body=''):
         """
         Given a Method, URL, Headers, and Body, perform and HTTP request,
