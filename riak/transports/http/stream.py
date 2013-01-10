@@ -39,7 +39,7 @@ class RiakHttpStream(object):
 
     def read(self):
         chunk = self.response.read(self.BLOCK_SIZE)
-        if chunk is '':
+        if chunk == '':
             self.response_done = True
         self.buffer += chunk
 
