@@ -25,18 +25,18 @@
         ]).
 
 -include_lib("riak_search/include/riak_search.hrl").
-
+-define(T(P), list_to_atom("rs" ++ integer_to_list(P))).
 -record(state, {partition, table}).
 
 reset() ->
     {ok, Ring} = riak_core_ring_manager:get_my_ring(),
-    [ ets:delete_all_objects(list_to_atom("rs" ++ integer_to_list(P))) ||
+    [ catch ets:delete_all_objects(?T(P)) ||
         P <- riak_core_ring:my_indices(Ring) ],
     riak_search_config:clear(),
     ok.
 
 start(Partition, _Config) ->
-    Table = ets:new(list_to_atom("rs" ++ integer_to_list(Partition)),
+    Table = ets:new(?T(Partition),
                     [named_table, public, ordered_set]),
     {ok, #state{partition=Partition, table=Table}}.
 
