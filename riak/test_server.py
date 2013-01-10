@@ -84,7 +84,11 @@ class TestServer(object):
           "js_thread_stack": 16,
           "riak_kv_stat": True,
           "map_cache_size": 0,
-          "vnode_cache_entries": 0
+          "vnode_cache_entries": 0,
+          "test": True,
+          "memory_backend": {
+                "test": True,
+                },
       },
       "riak_search": {
           "enabled": True,
