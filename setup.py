@@ -28,6 +28,7 @@ setup(
     package_data = {'riak' : ['erl_src/*']},
     description='Python client for Riak',
     zip_safe=True,
+    options={'easy_install': {'allow_hosts': 'pypi.python.org'}},
     include_package_data=True,
     license='Apache 2',
     platforms='Platform Independent',
