@@ -94,6 +94,21 @@ class RiakClient(object):
         self._host = host
         self._port = port
 
+    def __hash__(self):
+        return hash(frozenset(self._cm.hostports))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+        else:
+            return False
+
+    def __nq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) != hash(other)
+        else:
+            return True
+
     def get_transport(self):
         """
         Get the transport instance the client is using for it's connection.
