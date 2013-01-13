@@ -57,6 +57,21 @@ class RiakObject(object):
         self.siblings = []
         self.exists = False
 
+    def __hash__(self):
+        return hash((self.key, self.bucket, self.vclock))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+        else:
+            return False
+
+    def __nq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) != hash(other)
+        else:
+            return True
+
     def _get_data(self):
         return self._data
 
@@ -125,7 +140,7 @@ class RiakObject(object):
     def _set_usermeta(self, usermeta):
         self.metadata[MD_USERMETA] = usermeta
         return self
-    
+
     usermeta = property(_get_usermeta, _set_usermeta, 
                         doc="""
         The custom user metadata on this object. This doesn't
