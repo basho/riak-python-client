@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RiakClient &mdash; Riak Python Client 1.4.0 documentation</title>
+    <title>RiakClient &mdash; Riak Python Client 1.5.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.4.0',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak Python Client 1.4.0 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 1.5.1 documentation" href="index.html" />
     <link rel="next" title="RiakBucket" href="bucket.html" />
     <link rel="prev" title="Tutorial" href="tutorial.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="tutorial.html" title="Tutorial"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -69,9 +69,11 @@ connection, and the <tt class="docutils literal"><span class="pre">RiakClient</s
 <li><strong>port</strong> (<em>integer</em>) &#8211; Port number</li>
 <li><strong>prefix</strong> (<em>string</em>) &#8211; Interface prefix</li>
 <li><strong>mapred_prefix</strong> (<em>string</em>) &#8211; MapReduce prefix</li>
-<li><strong>transport_class</strong> (<tt class="xref py py-class docutils literal"><span class="pre">RiakHttpTransport</span></tt>) &#8211; transport class to use</li>
-<li><strong>solr_transport_class</strong> &#8211; HTTP-based transport class for Solr interface queries</li>
-<li><strong>transport_options</strong> (<em>dict</em>) &#8211; Optional key-value args to pass to the transport constuctor</li>
+<li><strong>transport_class</strong> (<tt class="xref py py-class docutils literal"><span class="pre">RiakTransport</span></tt>) &#8211; transport class to use</li>
+<li><strong>solr_transport_class</strong> (<tt class="xref py py-class docutils literal"><span class="pre">RiakHttpTransport</span></tt>) &#8211; HTTP-based transport class for
+Solr interface queries</li>
+<li><strong>transport_options</strong> (<em>dict</em>) &#8211; Optional key-value args to pass to
+the transport constuctor</li>
 </ul>
 </td>
 </tr>
@@ -100,11 +102,10 @@ connection, and the <tt class="docutils literal"><span class="pre">RiakClient</s
 <dl class="method">
 <dt id="riak.client.RiakClient.set_r">
 <tt class="descname">set_r</tt><big>(</big><em>r</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.set_r" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the R-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt>. This value will be used
-for any calls to <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get</span></tt></a>
-or <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_binary" title="riak.bucket.RiakBucket.get_binary"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get_binary</span></tt></a>
-where 1) no R-value is specified in the method call and 2) no R-value has
-been set in the <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></tt></a>.</p>
+<dd><p>Set the R-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt>. This value will be
+used for any calls to <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get</span></tt></a> or <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_binary" title="riak.bucket.RiakBucket.get_binary"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get_binary</span></tt></a> where 1) no R-value is
+specified in the method call and 2) no R-value has been set in
+the <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></tt></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -120,7 +121,8 @@ been set in the <a class="reference internal" href="bucket.html#riak.bucket.Riak
 <dl class="method">
 <dt id="riak.client.RiakClient.get_w">
 <tt class="descname">get_w</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.RiakClient.get_w" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the W-value setting for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt>. (default &#8220;quorum&#8221;)</p>
+<dd><p>Get the W-value setting for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt>. (default
+&#8220;quorum&#8221;)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -134,8 +136,8 @@ been set in the <a class="reference internal" href="bucket.html#riak.bucket.Riak
 <dl class="method">
 <dt id="riak.client.RiakClient.set_w">
 <tt class="descname">set_w</tt><big>(</big><em>w</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.set_w" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the W-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See <a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a
-description of how these values are used.</p>
+<dd><p>Set the W-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See
+<a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a description of how these values are used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -151,7 +153,8 @@ description of how these values are used.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.get_dw">
 <tt class="descname">get_dw</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.RiakClient.get_dw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the DW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. (default &#8220;quorum&#8221;)</p>
+<dd><p>Get the DW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. (default
+&#8220;quorum&#8221;)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -165,8 +168,8 @@ description of how these values are used.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.set_dw">
 <tt class="descname">set_dw</tt><big>(</big><em>dw</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.set_dw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the DW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See <a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a
-description of how these values are used.</p>
+<dd><p>Set the DW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See
+<a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a description of how these values are used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -182,7 +185,8 @@ description of how these values are used.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.get_rw">
 <tt class="descname">get_rw</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.RiakClient.get_rw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the RW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. (default &#8220;quorum&#8221;)</p>
+<dd><p>Get the RW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. (default
+&#8220;quorum&#8221;)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -196,8 +200,8 @@ description of how these values are used.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.set_rw">
 <tt class="descname">set_rw</tt><big>(</big><em>rw</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.set_rw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the RW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See <a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a
-description of how these values are used.</p>
+<dd><p>Set the RW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See
+<a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a description of how these values are used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -227,8 +231,8 @@ description of how these values are used.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.set_pr">
 <tt class="descname">set_pr</tt><big>(</big><em>pr</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.set_pr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the PR-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See <a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a
-description of how these values are used.</p>
+<dd><p>Set the PR-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See
+<a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a description of how these values are used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -258,8 +262,8 @@ description of how these values are used.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.set_pw">
 <tt class="descname">set_pw</tt><big>(</big><em>pw</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.set_pw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the PW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See <a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a
-description of how these values are used.</p>
+<dd><p>Set the PW-value for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance. See
+<a class="reference internal" href="#riak.client.RiakClient.set_r" title="riak.client.RiakClient.set_r"><tt class="xref py py-func docutils literal"><span class="pre">set_r()</span></tt></a> for a description of how these values are used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -292,7 +296,9 @@ description of how these values are used.</p>
 <dd><p>Set the client_id for this <tt class="docutils literal"><span class="pre">RiakClient</span></tt> instance.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">You should not call this method unless you know what you are doing.</p>
+<p class="last">Refer to
+<a class="reference external" href="http://wiki.basho.com/Client-Implementation-Guide.html#Client-IDs">http://wiki.basho.com/Client-Implementation-Guide.html#Client-IDs</a>
+for information on how to set the client_id.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -386,7 +392,8 @@ this will always return a <a class="reference internal" href="bucket.html#riak.b
 <dl class="method">
 <dt id="riak.client.RiakClient.add">
 <tt class="descname">add</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation. A shortcut for <tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.add()</span></tt>.</p>
+<dd><p>Start assembling a Map/Reduce operation. A shortcut for
+<tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.add()</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -402,7 +409,8 @@ this will always return a <a class="reference internal" href="bucket.html#riak.b
 <tt class="descname">search</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start assembling a Map/Reduce operation based on search
 results. This command will return an error unless executed
-against a Riak Search cluster. A shortcut for <tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.search()</span></tt>.</p>
+against a Riak Search cluster. A shortcut for
+<tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.search()</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -431,7 +439,8 @@ index query results.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.link">
 <tt class="descname">link</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.link" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation. A shortcut for <tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.link()</span></tt>.</p>
+<dd><p>Start assembling a Map/Reduce operation. A shortcut for
+<tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.link()</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -445,7 +454,8 @@ index query results.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.map">
 <tt class="descname">map</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation. A shortcut for <tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.map()</span></tt>.</p>
+<dd><p>Start assembling a Map/Reduce operation. A shortcut for
+<tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.map()</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -459,7 +469,8 @@ index query results.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.reduce">
 <tt class="descname">reduce</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.reduce" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation. A shortcut for <tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.reduce()</span></tt>.</p>
+<dd><p>Start assembling a Map/Reduce operation. A shortcut for
+<tt class="xref py py-func docutils literal"><span class="pre">RiakMapReduce.reduce()</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -484,6 +495,11 @@ index query results.</p>
 <dl class="method">
 <dt id="riak.client.RiakClient.delete_file">
 <tt class="descname">delete_file</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.delete_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="riak.client.RiakClient.get_index">
+<tt class="descname">get_index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.get_index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -541,12 +557,12 @@ index query results.</p>
         <li class="right" >
           <a href="tutorial.html" title="Tutorial"
              >previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010-2012, Basho Technologies.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RiakObject &mdash; Riak Python Client 1.4.0 documentation</title>
+    <title>RiakObject &mdash; Riak Python Client 1.5.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.4.0',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak Python Client 1.4.0 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 1.5.1 documentation" href="index.html" />
     <link rel="next" title="RiakMapReduce" href="mapreduce.html" />
     <link rel="prev" title="RiakBucket" href="bucket.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="bucket.html" title="RiakBucket"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -191,9 +191,9 @@ array</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.set_usermeta">
 <tt class="descname">set_usermeta</tt><big>(</big><em>usermeta</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.set_usermeta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the custom user metadata on this object. This doesn&#8217;t include things
-like content type and links, but only user-defined meta attributes stored
-with the Riak object.</p>
+<dd><p>Sets the custom user metadata on this object. This doesn&#8217;t
+include things like content type and links, but only
+user-defined meta attributes stored with the Riak object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -209,7 +209,8 @@ with the Riak object.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.add_index">
 <tt class="descname">add_index</tt><big>(</big><em>field</em>, <em>value</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.add_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tag this object with the specified field/value pair for indexing.</p>
+<dd><p>Tag this object with the specified field/value pair for
+indexing.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -230,7 +231,8 @@ with the Riak object.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.remove_index">
 <tt class="descname">remove_index</tt><big>(</big><em>field=None</em>, <em>value=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.remove_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the specified field/value pair as an index on this object.</p>
+<dd><p>Remove the specified field/value pair as an index on this
+object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -251,7 +253,8 @@ with the Riak object.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.remove_indexes">
 <tt class="descname">remove_indexes</tt><big>(</big><em>field=None</em>, <em>value=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.remove_indexes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the specified field/value pair as an index on this object.</p>
+<dd><p>Remove the specified field/value pair as an index on this
+object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -272,13 +275,14 @@ with the Riak object.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.set_indexes">
 <tt class="descname">set_indexes</tt><big>(</big><em>indexes</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.set_indexes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Replaces all indexes on a Riak object. Currenly supports an iterable of 2 item tuples,
-(field, value)</p>
+<dd><p>Replaces all indexes on a Riak object. Currenly supports an
+iterable of 2 item tuples, (field, value)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>indexes</strong> &#8211; iterable of 2 item tuples consisting the field and value.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>indexes</strong> &#8211; iterable of 2 item tuples consisting the field
+and value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">self</td>
 </tr>
@@ -289,7 +293,8 @@ with the Riak object.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.get_indexes">
 <tt class="descname">get_indexes</tt><big>(</big><em>field=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.get_indexes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of the index entries for this object. If a field is provided, returns a list</p>
+<dd><p>Get a list of the index entries for this object. If a field is
+provided, returns a list</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -305,10 +310,9 @@ with the Riak object.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.exists">
 <tt class="descname">exists</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return True if the object exists, False otherwise. Allows you to
-detect a <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get</span></tt></a> or
-<a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_binary" title="riak.bucket.RiakBucket.get_binary"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get_binary</span></tt></a>
-operation where the object is missing.</p>
+<dd><p>Return True if the object exists, False otherwise. Allows you
+to detect a <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get</span></tt></a> or <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_binary" title="riak.bucket.RiakBucket.get_binary"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.get_binary</span></tt></a> operation where the
+object is missing.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -322,9 +326,9 @@ operation where the object is missing.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.get_content_type">
 <tt class="descname">get_content_type</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.get_content_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the content type of this object. This is either <tt class="docutils literal"><span class="pre">application/json</span></tt>, or
-the provided content type if the object was created via
-<a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.new_binary" title="riak.bucket.RiakBucket.new_binary"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.new_binary</span></tt></a>.</p>
+<dd><p>Get the content type of this object. This is either
+<tt class="docutils literal"><span class="pre">application/json</span></tt>, or the provided content type if the
+object was created via <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.new_binary" title="riak.bucket.RiakBucket.new_binary"><tt class="xref py py-func docutils literal"><span class="pre">RiakBucket.new_binary</span></tt></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -360,11 +364,13 @@ the provided content type if the object was created via
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>links</strong> &#8211; An iterable of 2-item tuples, consisting of (RiakObject, tag). This could also be an iterable of
-just a RiakObject, instead of the tuple, then a tag of None would be used. Lastly, it could also be an
-iterable of RiakLink. They have tags built-in.</li>
-<li><strong>all_link</strong> &#8211; A boolean indicates if links are all RiakLink objects
-This speeds up the operation.</li>
+<li><strong>links</strong> &#8211; An iterable of 2-item tuples, consisting of
+(RiakObject, tag). This could also be an iterable of just
+a RiakObject, instead of the tuple, then a tag of None
+would be used. Lastly, it could also be an iterable of
+RiakLink. They have tags built-in.</li>
+<li><strong>all_link</strong> &#8211; A boolean indicates if links are all RiakLink
+objects This speeds up the operation.</li>
 </ul>
 </td>
 </tr>
@@ -446,11 +452,12 @@ vector clock.</p>
 before returning to client.</li>
 <li><strong>dw</strong> (<em>integer</em>) &#8211; DW-value, wait for this many partitions to
 confirm the write before returning to client.</li>
-<li><strong>pw</strong> (<em>integer</em>) &#8211; PW-value, require this many primary partitions to be available
-before performing the put</li>
-<li><strong>return_body</strong> (<em>bool</em>) &#8211; if the newly stored object should be retrieved</li>
-<li><strong>if_none_match</strong> (<em>bool</em>) &#8211; Should the object be stored only if there is no
-key previously defined</li>
+<li><strong>pw</strong> (<em>integer</em>) &#8211; PW-value, require this many primary partitions to
+be available before performing the put</li>
+<li><strong>return_body</strong> (<em>bool</em>) &#8211; if the newly stored object should be
+retrieved</li>
+<li><strong>if_none_match</strong> (<em>bool</em>) &#8211; Should the object be stored only if
+there is no key previously defined</li>
 </ul>
 </td>
 </tr>
@@ -490,17 +497,19 @@ before returning to client.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>rw</strong> (<em>integer</em>) &#8211; RW-value. Wait until this many partitions have
-deleted the object before responding. (deprecated in Riak 1.0+, use R/W/DW)</li>
+deleted the object before responding. (deprecated in Riak
+1.0+, use R/W/DW)</li>
 <li><strong>r</strong> (<em>integer</em>) &#8211; R-value, wait for this many partitions to read object
 before performing the put</li>
 <li><strong>w</strong> (<em>integer</em>) &#8211; W-value, wait for this many partitions to respond
 before returning to client.</li>
 <li><strong>dw</strong> (<em>integer</em>) &#8211; DW-value, wait for this many partitions to
 confirm the write before returning to client.</li>
-<li><strong>pr</strong> (<em>integer</em>) &#8211; PR-value, require this many primary partitions to be available
-before performing the read that precedes the put</li>
-<li><strong>pr</strong> &#8211; PW-value, require this many primary partitions to be available
-before performing the put</li>
+<li><strong>pr</strong> (<em>integer</em>) &#8211; PR-value, require this many primary partitions to
+be available before performing the read that
+precedes the put</li>
+<li><strong>pw</strong> (<em>integer</em>) &#8211; PW-value, require this many primary partitions to
+be available before performing the put</li>
 </ul>
 </td>
 </tr>
@@ -537,17 +546,6 @@ before performing the put</li>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.riak_object.RiakObject.populate">
-<tt class="descname">populate</tt><big>(</big><em>Result</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.populate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Populate the object based on the return from get.</p>
-<p>If None returned, then object is not found
-If a tuple of vclock, contents then one or more
-whole revisions of the key were found
-If a list of vtags is returned there are multiple
-sibling that need to be retrieved with get.</p>
 </dd></dl>
 
 <dl class="method">
@@ -615,17 +613,6 @@ responded before returning to client.</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.riak_object.RiakObject.set_siblings">
-<tt class="descname">set_siblings</tt><big>(</big><em>siblings</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.set_siblings" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the array of siblings - used internally</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Make sure this object is at index 0 so get_siblings(0) always returns
-the current object</p>
-</div>
 </dd></dl>
 
 <dl class="method">
@@ -738,12 +725,12 @@ A shortcut for <tt class="xref py py-func docutils literal"><span class="pre">Ri
         <li class="right" >
           <a href="bucket.html" title="RiakBucket"
              >previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010-2012, Basho Technologies.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

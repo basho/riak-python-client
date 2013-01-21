@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RiakMapReduce &mdash; Riak Python Client 1.4.0 documentation</title>
+    <title>RiakMapReduce &mdash; Riak Python Client 1.5.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.4.0',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak Python Client 1.4.0 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 1.5.1 documentation" href="index.html" />
     <link rel="prev" title="RiakObject" href="riak_object.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="riak_object.html" title="RiakObject"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -110,7 +110,9 @@ return an error unless executed against a Riak Search cluster.
 <dd><p>Begin a map/reduce operation using a Secondary Index
 query.
 &#64;param bucket - The bucket over which to perform the search.
-&#64;param query - The search query.</p>
+&#64;param index - The index to use for query
+&#64;param startkey - The start key of index range
+&#64;param endkey - The end key of index range or blank</p>
 </dd></dl>
 
 <dl class="method">
@@ -380,12 +382,12 @@ another.</p>
         <li class="right" >
           <a href="riak_object.html" title="RiakObject"
              >previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010-2012, Basho Technologies.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

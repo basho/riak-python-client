@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &mdash; Riak Python Client 1.4.0 documentation</title>
+    <title>Tutorial &mdash; Riak Python Client 1.5.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.4.0',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak Python Client 1.4.0 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 1.5.1 documentation" href="index.html" />
     <link rel="next" title="RiakClient" href="client.html" />
-    <link rel="prev" title="Riak (Python binding)" href="index.html" /> 
+    <link rel="prev" title="Riak Python Client" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,9 +40,9 @@
           <a href="client.html" title="RiakClient"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Riak (Python binding)"
+          <a href="index.html" title="Riak Python Client"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -99,8 +99,14 @@ no arguments are needed:</p>
 <span class="n">client</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakClient</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The constructor also configuration options such as <tt class="docutils literal"><span class="pre">host</span></tt>, <tt class="docutils literal"><span class="pre">port</span></tt> &amp;
+<p>The constructor also configuration options such as <tt class="docutils literal"><span class="pre">host</span></tt>, <tt class="docutils literal"><span class="pre">port</span></tt>, <tt class="docutils literal"><span class="pre">ssl</span></tt> &amp;
 <tt class="docutils literal"><span class="pre">prefix</span></tt>. Please refer to the <a class="reference internal" href="client.html"><em>RiakClient</em></a> documentation for full details.</p>
+<p>If your Riak cluster is ssl enabled you can access it via HTTPS by setting
+the <tt class="docutils literal"><span class="pre">transport_class</span></tt> argument to <tt class="docutils literal"><span class="pre">RiakHttpsTransport</span></tt>:</p>
+<div class="highlight-python"><pre>import riak
+
+    client = riak.RiakClient(port=8091, transport_class=riak.RiakHttpsTransport)</pre>
+</div>
 <p>To use the Protocol Buffers interface:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">riak</span>
 
@@ -455,7 +461,7 @@ documentation for details.</p>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
-                        title="previous chapter">Riak (Python binding)</a></p>
+                        title="previous chapter">Riak Python Client</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="client.html"
                         title="next chapter">RiakClient</a></p>
@@ -491,14 +497,14 @@ documentation for details.</p>
           <a href="client.html" title="RiakClient"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Riak (Python binding)"
+          <a href="index.html" title="Riak Python Client"
              >previous</a> |</li>
-        <li><a href="index.html">Riak Python Client 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Riak Python Client 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010-2012, Basho Technologies.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
