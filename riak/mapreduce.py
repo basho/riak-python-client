@@ -197,7 +197,9 @@ class RiakMapReduce(object):
 
     def run(self, timeout=None, stream_to=None):
         """
-        Run the map/reduce operation. Returns an array of results, or an
+        Run the map/reduce operation.
+        
+        If `stream_to` is None, returns an array of results, or an
         array of RiakLink objects if the last phase is a link phase.
         
         If `stream_to` callable is provided, every result will be passed into
