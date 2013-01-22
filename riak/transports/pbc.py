@@ -452,7 +452,7 @@ class RiakPbcTransport(RiakTransport):
                                        MSG_CODE_SET_BUCKET_RESP)
         return self
 
-    def mapred(self, inputs, query, timeout=None):
+    def mapred(self, inputs, query, timeout=None, stream_to=None):
         # Construct the job, optionally set the timeout...
         job = {'inputs': inputs, 'query': query}
         if timeout is not None:
@@ -471,7 +471,10 @@ class RiakPbcTransport(RiakTransport):
         def _handle_response(resp):
             if resp.HasField("phase") and resp.HasField("response"):
                 content = json.loads(resp.response)
-                if resp.phase in result:
+                if stream_to:
+                    for entry in content:
+                        stream_to(resp.phase, entry)
+                elif resp.phase in result:
                     result[resp.phase] += content
                 else:
                     result[resp.phase] = content

@@ -293,13 +293,17 @@ class RiakHttpTransport(RiakTransport):
             raise Exception('Error setting bucket properties.')
         return True
 
-    def mapred(self, inputs, query, timeout=None):
+    def mapred(self, inputs, query, timeout=None, stream_to=None):
         """
         Run a MapReduce query.
         """
         if not self.phaseless_mapred() and (query is None or len(query) is 0):
             raise Exception(
                 'Phase-less MapReduce is not supported by Riak node')
+        
+        if stream_to:
+            raise Exception(
+                'Mapred streaming is not supported, use protobuf instead')
 
         # Construct the job, optionally set the timeout...
         job = {'inputs': inputs, 'query': query}
