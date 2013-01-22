@@ -395,6 +395,19 @@ class RiakPbcTransport(RiakTransport):
 
         return keys
 
+    def stream_keys(self, bucket, handler):
+        """
+        Stream all keys within a bucket through handler.
+        """
+        req = riak_pb.RpbListKeysReq()
+        req.bucket = bucket.name
+
+        def _handle_response(resp):
+            for key in resp.keys:
+                handler(key)
+        self.send_msg_multi(MSG_CODE_LIST_KEYS_REQ, req,
+                            MSG_CODE_LIST_KEYS_RESP, _handle_response)
+
     def get_buckets(self):
         """
         Serialize bucket listing request and deserialize response

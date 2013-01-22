@@ -340,6 +340,16 @@ class RiakBucket(object):
         """
         return self._client.get_transport().get_keys(self)
 
+    def stream_keys(self, handler):
+        """
+        Stream all keys within the bucket.
+        This way of key listing is preferable if your bucket contains rather
+        large amount of keys.
+        
+        :param handler: Function of one argument to be called for each key
+        """
+        self._client.get_transport().stream_keys(self, handler)
+
     def new_binary_from_file(self, key, filename):
         """
         Create a new Riak object in the bucket, using the content of
