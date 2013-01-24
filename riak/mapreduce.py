@@ -195,11 +195,19 @@ class RiakMapReduce(object):
         self._phases.append(mr)
         return self
 
-    def run(self, timeout=None):
+    def run(self, timeout=None, stream_to=None):
         """
-        Run the map/reduce operation. Returns an array of results, or an
+        Run the map/reduce operation.
+        
+        If `stream_to` is None, returns an array of results, or an
         array of RiakLink objects if the last phase is a link phase.
+        
+        If `stream_to` callable is provided, every result will be passed into
+        it instead of being accumulated. Thus, when streaming feature is
+        used, return value will be None.
+        
         @param integer timeout - Timeout in milliseconds.
+        @param callable(phase,data) stream_to - Optional callback
         @return array()
         """
         num_phases = len(self._phases)
@@ -237,7 +245,11 @@ class RiakMapReduce(object):
                                 'key_filters':  self._key_filters}
 
         t = self._client.get_transport()
-        result = t.mapred(self._inputs, query, timeout)
+        result = t.mapred(self._inputs, query, timeout, stream_to)
+        
+        # If callback is in charge, return value should be None
+        if stream_to:
+            return None
 
         # If the last phase is NOT a link phase, then return the result.
         if not (link_results_flag
