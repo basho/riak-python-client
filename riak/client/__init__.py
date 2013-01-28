@@ -19,7 +19,11 @@ specific language governing permissions and limitations
 under the License.
 """
 
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 import random
 from weakref import WeakValueDictionary
 from riak.client.operations import RiakClientOperations
