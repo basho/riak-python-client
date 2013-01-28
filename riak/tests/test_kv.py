@@ -3,9 +3,9 @@ import os
 import cPickle
 import copy
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 
 class NotJsonSerializable(object):
