@@ -224,7 +224,6 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         if headers['http_code'] is 200:
             return RiakHttpKeyStream(response)
         else:
-            stream.close()
             raise Exception('Error listing keys.')
 
     def get_buckets(self):

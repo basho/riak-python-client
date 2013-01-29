@@ -19,7 +19,6 @@ specific language governing permissions and limitations
 under the License.
 """
 
-import json
 import riak_pb
 from riak import RiakError
 from riak.transports.transport import RiakTransport
