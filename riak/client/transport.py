@@ -16,7 +16,6 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from contextlib import contextmanager
 from riak.transports.pool import BadResource
 from riak.transports.pbc import is_retryable as is_pbc_retryable
 from riak.transports.http import is_retryable as is_http_retryable
@@ -35,22 +34,7 @@ class RiakClientTransport(object):
     _http_pool = None
     _pb_pool = None
 
-    @contextmanager
-    def _transport(self, protocol=None):
-        if not protocol:
-            protocol = self.protocol
-        if protocol in ['http', 'https']:
-            pool = self._http_pool
-        elif protocol == 'pbc':
-            pool = self._pb_pool
-        else:
-            raise ValueError("invalid protocol %s" % protocol)
-
-        with pool.take() as transport:
-            yield transport
-
-    @contextmanager
-    def _retryable(self, pool):
+    def _with_retries(self, pool, fn):
         skip_nodes = []
 
         def _skip_bad_nodes(transport):
@@ -60,7 +44,7 @@ class RiakClientTransport(object):
             try:
                 with pool.take(_filter=_skip_bad_nodes) as transport:
                     try:
-                        yield transport
+                        return fn(transport)
                     except (IOError, httplib.HTTPException) as e:
                         if is_retryable(e):
                             transport._node.error_rate.incr(1)
@@ -71,6 +55,30 @@ class RiakClientTransport(object):
             except BadResource:
                 continue
 
+    def _choose_pool(self, protocol=None):
+        if not protocol:
+            protocol = self.protocol
+        if protocol in ['http', 'https']:
+            pool = self._http_pool
+        elif protocol == 'pbc':
+            pool = self._pb_pool
+        else:
+            raise ValueError("invalid protocol %s" % protocol)
+        return pool
+
 
 def is_retryable(error):
     return is_pbc_retryable(error) or is_http_retryable(error)
+
+
+def retryable(fn, protocol=None):
+    def wrapper(self, *args, **kwargs):
+        pool = self._choose_pool(protocol)
+        def thunk(transport):
+            return fn(self, transport, *args, **kwargs)
+        return self._with_retries(pool, thunk)
+    return wrapper
+
+
+def retryableHttpOnly(fn):
+    return retryable(fn, protocol='http')

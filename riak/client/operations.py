@@ -16,141 +16,145 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from transport import RiakClientTransport
-
+from transport import RiakClientTransport, retryable, retryableHttpOnly
 
 class RiakClientOperations(RiakClientTransport):
     """
     Methods for RiakClient that result in requests sent to the Riak
     cluster.
+
+    Note that all of these methods have an implicit 'transport'
+    argument that will be prepended automatically as part of the retry
+    logic, and does not need to be supplied by the user.
     """
 
-    def get_buckets(self):
+    @retryable
+    def get_buckets(self, transport):
         """
         Get the list of buckets as RiakBucket instances.
         NOTE: Do not use this in production, as it requires traversing through
         all keys stored in a cluster.
         """
-        with self._transport() as transport:
-            return [self.bucket(name) for name in transport.get_buckets()]
+        return [self.bucket(name) for name in transport.get_buckets()]
 
-    def ping(self):
+    @retryable
+    def ping(self, transport):
         """
         Check if the Riak server for this ``RiakClient`` instance is alive.
 
         :rtype: boolean
         """
-        with self._transport() as transport:
-            return transport.ping()
+        return transport.ping()
 
     is_alive = ping
 
-    def get_index(self, bucket, index, startkey, endkey=None):
+    @retryable
+    def get_index(self, transport, bucket, index, startkey, endkey=None):
         """
         Queries a secondary index, returning matching keys.
         """
-        with self._transport() as transport:
-            return transport.get_index(bucket, index, startkey, endkey)
+        return transport.get_index(bucket, index, startkey, endkey)
 
-    def get_bucket_props(self, bucket):
+    @retryable
+    def get_bucket_props(self, transport, bucket):
         """
         Fetches bucket properties for the given bucket.
         """
-        with self._transport() as transport:
-            return transport.get_bucket_props(bucket)
+        return transport.get_bucket_props(bucket)
 
-    def set_bucket_props(self, bucket, props):
+    @retryable
+    def set_bucket_props(self, transport, bucket, props):
         """
         Sets bucket properties for the given bucket.
         """
-        with self._transport() as transport:
-            return transport.set_bucket_props(bucket, props)
+        return transport.set_bucket_props(bucket, props)
 
-    def get_keys(self, bucket):
+    @retryable
+    def get_keys(self, transport, bucket):
         """
         Lists all keys in a bucket.
         """
-        with self._transport() as transport:
-            return transport.get_keys(bucket)
+        return transport.get_keys(bucket)
 
-    def stream_keys(self, bucket):
+    @retryable
+    def stream_keys(self, transport, bucket):
         """
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
         """
-        with self._transport() as transport:
-            for keylist in transport.stream_keys(bucket):
-                if len(keylist) > 0:
-                    yield keylist
+        for keylist in transport.stream_keys(bucket):
+            if len(keylist) > 0:
+                yield keylist
 
-    def put(self, robj, w=None, dw=None, pw=None, return_body=None,
+    @retryable
+    def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
             if_none_match=None):
         """
         Stores an object in the Riak cluster.
         """
-        with self._transport() as transport:
-            return transport.put(robj, w=w, dw=dw, pw=pw,
-                                 return_body=return_body,
-                                 if_none_match=if_none_match)
+        return transport.put(robj, w=w, dw=dw, pw=pw,
+                             return_body=return_body,
+                             if_none_match=if_none_match)
 
-    def put_new(self, robj, w=None, dw=None, pw=None, return_body=None,
+    @retryable
+    def put_new(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
                 if_none_match=None):
         """
         Stores an object in the Riak cluster with a generated key.
         """
-        with self._transport() as transport:
-            return transport.put_new(robj, w=w, dw=dw, pw=pw,
-                                     return_body=return_body,
-                                     if_none_match=if_none_match)
+        return transport.put_new(robj, w=w, dw=dw, pw=pw,
+                                 return_body=return_body,
+                                 if_none_match=if_none_match)
 
-    def get(self, robj, r=None, pr=None, vtag=None):
+    @retryable
+    def get(self, transport, robj, r=None, pr=None, vtag=None):
         """
         Fetches the contents of a Riak object.
         """
-        with self._transport() as transport:
-            return transport.get(robj, r=r, pr=pr, vtag=vtag)
+        return transport.get(robj, r=r, pr=pr, vtag=vtag)
 
-    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
+    @retryable
+    def delete(self, transport, robj, rw=None, r=None, w=None, dw=None, pr=None,
+               pw=None):
         """
         Deletes an object from Riak.
         """
-        with self._transport() as transport:
-            return transport.delete(robj, rw=rw, r=r, w=w, dw=dw, pr=pr,
-                                    pw=pw)
+        return transport.delete(robj, rw=rw, r=r, w=w, dw=dw, pr=pr,
+                                pw=pw)
 
-    def mapred(self, inputs, query, timeout):
+    @retryable
+    def mapred(self, transport, inputs, query, timeout):
         """
         Executes a MapReduce query
         """
-        with self._transport() as transport:
-            return transport.mapred(inputs, query, timeout)
+        return transport.mapred(inputs, query, timeout)
 
-    def stream_mapred(self, inputs, query, timeout):
+    @retryable
+    def stream_mapred(self, transport, inputs, query, timeout):
         """
         Streams a MapReduce query as (phase, data) pairs. This is a
         generator method which should be iterated over.
         """
-        with self._transport() as transport:
-            for phase, data in transport.stream_mapred(inputs, query, timeout):
-                yield phase, data
+        for phase, data in transport.stream_mapred(inputs, query, timeout):
+            yield phase, data
 
-    def fulltext_search(self, index, query, **params):
+    @retryableHttpOnly
+    def fulltext_search(self, transport, index, query, **params):
         """
         Performs a full-text search query.
         """
-        with self._transport() as transport:
-            return transport.search(index, query, **params)
+        return transport.search(index, query, **params)
 
-    def fulltext_add(self, index, docs):
+    @retryableHttpOnly
+    def fulltext_add(self, transport, index, docs):
         """
         Adds documents to the full-text index.
         """
-        with self._transport(protocol='http') as transport:
-            transport.fulltext_add(index, docs)
+        transport.fulltext_add(index, docs)
 
-    def fulltext_delete(self, index, docs=None, queries=None):
+    @retryableHttpOnly
+    def fulltext_delete(self, transport, index, docs=None, queries=None):
         """
         Removes documents from the full-text index.
         """
-        with self._transport(protocol='http') as transport:
-            transport.fulltext_delete(index, docs, queries)
+        transport.fulltext_delete(index, docs, queries)
