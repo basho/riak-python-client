@@ -82,9 +82,13 @@ class RiakClientOperations(RiakClientTransport):
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
         """
-        for keylist in transport.stream_keys(bucket):
-            if len(keylist) > 0:
-                yield keylist
+        stream = transport.stream_keys(bucket)
+        try:
+            for keylist in stream:
+                if len(keylist) > 0:
+                    yield keylist
+        finally:
+            stream.close()
 
     @retryable
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
@@ -135,8 +139,12 @@ class RiakClientOperations(RiakClientTransport):
         Streams a MapReduce query as (phase, data) pairs. This is a
         generator method which should be iterated over.
         """
-        for phase, data in transport.stream_mapred(inputs, query, timeout):
-            yield phase, data
+        stream = transport.stream_mapred(inputs, query, timeout)
+        try:
+            for phase, data in stream:
+                yield phase, data
+        finally:
+            stream.close()
 
     @retryableHttpOnly
     def fulltext_search(self, transport, index, query, **params):

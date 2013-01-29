@@ -19,7 +19,7 @@ from riak.test_server import TestServer
 from riak.tests.test_search import SearchTests, \
     EnableSearchTests, SolrSearchTests
 from riak.tests.test_mapreduce import MapReduceAliasTests, \
-    ErlangMapReduceTests, JSMapReduceTests, LinkTests
+    ErlangMapReduceTests, JSMapReduceTests, LinkTests, MapReduceStreamTests
 from riak.tests.test_kv import BasicKVTests, KVFileTests, \
     HTTPBucketPropsTest, PbcBucketPropsTest
 from riak.tests.test_2i import TwoITests
@@ -89,6 +89,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                ErlangMapReduceTests,
                                JSMapReduceTests,
                                MapReduceAliasTests,
+                               MapReduceStreamTests,
                                SearchTests,
                                BaseTestCase,
                                unittest.TestCase):
@@ -176,6 +177,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 ErlangMapReduceTests,
                                 JSMapReduceTests,
                                 MapReduceAliasTests,
+                                MapReduceStreamTests,
                                 EnableSearchTests,
                                 SolrSearchTests,
                                 SearchTests,

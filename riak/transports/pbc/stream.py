@@ -18,8 +18,9 @@ under the License.
 
 
 import json
-from riak.transports.pbc.messages import MSG_CODE_LIST_KEYS_RESP
-from riak.transports.pbc.messages import MSG_CODE_MAPRED_RESP
+from riak.transports.pbc.messages import (
+    MSG_CODE_LIST_KEYS_RESP, MSG_CODE_MAPRED_RESP
+    )
 
 
 class RiakPbcStream(object):
@@ -52,6 +53,15 @@ class RiakPbcStream(object):
         # same thing.
         return response.done
 
+    def close(self):
+        # We have to drain the socket to make sure that we don't get
+        # weird responses when the some other request comes after a
+        # failed/prematurely-terminated one.
+        try:
+            while self.next():
+                pass
+        except StopIteration:
+            pass
 
 class RiakPbcKeyStream(RiakPbcStream):
     """

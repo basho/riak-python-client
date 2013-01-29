@@ -46,6 +46,10 @@ class RiakHttpStream(object):
     def next(self):
         raise NotImplementedError
 
+    def close(self):
+        pass
+
+
 class RiakHttpKeyStream(RiakHttpStream):
     """
     Streaming iterator for list-keys over HTTP
@@ -63,6 +67,7 @@ class RiakHttpKeyStream(RiakHttpStream):
             return keys
         else:
             raise StopIteration
+
 
 class RiakHttpMultipartStream(RiakHttpStream):
     """

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from riak.mapreduce import RiakLink
+from riak.mapreduce import RiakLink, RiakMapReduce
 from riak import key_filter
 
 
@@ -499,3 +499,34 @@ class MapReduceAliasTests(object):
                    .run()
 
         self.assertEqual(sorted(result), [1, 2])
+
+class MapReduceStreamTests(object):
+    def test_stream_results(self):
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        mr = RiakMapReduce(self.client).add('bucket', 'one').add('bucket', 'two')
+        mr.map_values_json()
+        results = []
+        for phase, data in mr.stream():
+            results.extend(data)
+
+        self.assertEqual(sorted(results), [1,2])
+
+    def test_stream_cleanup(self):
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        mr = RiakMapReduce(self.client).add('bucket', 'one').add('bucket', 'two')
+        mr.map_values_json()
+        try:
+            for phase, data in mr.stream():
+                raise RuntimeError("woops")
+        except RuntimeError:
+            pass
+
+        # This should not raise an exception
+        obj = bucket.get('one')
+        self.assertEqual(1, obj.data)
