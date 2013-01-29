@@ -500,26 +500,29 @@ class MapReduceAliasTests(object):
 
         self.assertEqual(sorted(result), [1, 2])
 
+
 class MapReduceStreamTests(object):
     def test_stream_results(self):
         bucket = self.client.bucket('bucket')
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
-        mr = RiakMapReduce(self.client).add('bucket', 'one').add('bucket', 'two')
+        mr = RiakMapReduce(self.client).add('bucket', 'one')\
+                                       .add('bucket', 'two')
         mr.map_values_json()
         results = []
         for phase, data in mr.stream():
             results.extend(data)
 
-        self.assertEqual(sorted(results), [1,2])
+        self.assertEqual(sorted(results), [1, 2])
 
-    def test_stream_cleanup(self):
+    def test_stream_cleanoperationsup(self):
         bucket = self.client.bucket('bucket')
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
-        mr = RiakMapReduce(self.client).add('bucket', 'one').add('bucket', 'two')
+        mr = RiakMapReduce(self.client).add('bucket', 'one')\
+                                       .add('bucket', 'two')
         mr.map_values_json()
         try:
             for phase, data in mr.stream():

@@ -18,6 +18,7 @@ under the License.
 
 from transport import RiakClientTransport, retryable, retryableHttpOnly
 
+
 class RiakClientOperations(RiakClientTransport):
     """
     Methods for RiakClient that result in requests sent to the Riak
@@ -101,8 +102,8 @@ class RiakClientOperations(RiakClientTransport):
                              if_none_match=if_none_match)
 
     @retryable
-    def put_new(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
-                if_none_match=None):
+    def put_new(self, transport, robj, w=None, dw=None, pw=None,
+                return_body=None, if_none_match=None):
         """
         Stores an object in the Riak cluster with a generated key.
         """
@@ -118,8 +119,8 @@ class RiakClientOperations(RiakClientTransport):
         return transport.get(robj, r=r, pr=pr, vtag=vtag)
 
     @retryable
-    def delete(self, transport, robj, rw=None, r=None, w=None, dw=None, pr=None,
-               pw=None):
+    def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,
+               pr=None, pw=None):
         """
         Deletes an object from Riak.
         """

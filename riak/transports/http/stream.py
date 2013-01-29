@@ -22,6 +22,7 @@ import re
 from cgi import parse_header
 from email import message_from_string
 
+
 class RiakHttpStream(object):
     """
     Base class for HTTP streaming iterators.

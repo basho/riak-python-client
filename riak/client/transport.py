@@ -80,9 +80,12 @@ def is_retryable(error):
 def retryable(fn, protocol=None):
     def wrapper(self, *args, **kwargs):
         pool = self._choose_pool(protocol)
+
         def thunk(transport):
             return fn(self, transport, *args, **kwargs)
+
         return self._with_retries(pool, thunk)
+
     return wrapper
 
 

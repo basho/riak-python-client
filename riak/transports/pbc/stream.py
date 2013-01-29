@@ -63,6 +63,7 @@ class RiakPbcStream(object):
         except StopIteration:
             pass
 
+
 class RiakPbcKeyStream(RiakPbcStream):
     """
     Used internally by RiakPbcTransport to implement key-list streams.
