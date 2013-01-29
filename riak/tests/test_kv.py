@@ -84,6 +84,20 @@ class BasicKVTests(object):
             streamed_keys += keylist
         self.assertEqual(sorted(regular_keys), sorted(streamed_keys))
 
+    def test_stream_keys_abort(self):
+        bucket = self.client.bucket('random_key_bucket')
+        regular_keys = bucket.get_keys()
+        self.assertNotEqual(len(regular_keys), 0)
+        try:
+            for keylist in bucket.stream_keys():
+                raise RuntimeError("abort")
+        except RuntimeError:
+            pass
+
+        # If the stream was closed correctly, this will not error
+        robj = bucket.get(regular_keys[0])
+        self.assertEqual(True, robj.exists)
+
     def test_binary_store_and_get(self):
         bucket = self.client.bucket('bucket')
         # Store as binary, retrieve as binary, then compare...
