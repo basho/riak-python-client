@@ -15,7 +15,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-
+from contextlib import contextmanager
 from riak.transports.pool import BadResource
 from riak.transports.pbc import is_retryable as is_pbc_retryable
 from riak.transports.http import is_retryable as is_http_retryable
@@ -33,6 +33,12 @@ class RiakClientTransport(object):
     protocol = 'http'
     _http_pool = None
     _pb_pool = None
+
+    @contextmanager
+    def _transport(self):
+        pool = self._choose_pool()
+        with pool.take() as transport:
+            yield transport
 
     def _with_retries(self, pool, fn):
         skip_nodes = []
