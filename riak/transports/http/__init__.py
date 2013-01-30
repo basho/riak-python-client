@@ -59,6 +59,8 @@ def is_retryable(err):
     Determines if the given exception is something that is
     network/socket-related and should thus cause the HTTP connection
     to close and the operation retried on another node.
+
+    :rtype: boolean
     """
     for errtype in CONN_CLOSED_ERRORS:
         if isinstance(err, errtype):

@@ -222,7 +222,11 @@ class RiakBucket(object):
     def _get_r(self):
         return self.get_property('r')
 
-    r = property(_get_r, _set_r)
+    r = property(_get_r, _set_r, doc="""
+    The default 'read' quorum for this bucket (how many replicas must
+    reply for a successful read). This should be an integer less than
+    the 'n_val' property, or a string of 'one', 'quorum', 'all', or
+    'default'""")
 
     def _set_pr(self, val):
         return self.set_property('pr', val)
@@ -230,7 +234,11 @@ class RiakBucket(object):
     def _get_pr(self):
         return self.get_property('pr')
 
-    pr = property(_get_pr, _set_pr)
+    pr = property(_get_pr, _set_pr, doc="""
+    The default 'primary read' quorum for this bucket (how many
+    primary replicas are required for a successful read). This should
+    be an integer less than the 'n_val' property, or a string of
+    'one', 'quorum', 'all', or 'default'""")
 
     def _set_rw(self, val):
         return self.set_property('rw', val)
@@ -238,7 +246,11 @@ class RiakBucket(object):
     def _get_rw(self):
         return self.get_property('rw')
 
-    rw = property(_get_rw, _set_rw)
+    rw = property(_get_rw, _set_rw, doc="""
+    The default 'read' and 'write' quorum for this bucket (equivalent
+    to 'r' and 'w' but for deletes). This should be an integer less
+    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
+    or 'default'""")
 
     def _set_w(self, val):
         return self.set_property('w', val)
@@ -246,7 +258,11 @@ class RiakBucket(object):
     def _get_w(self):
         return self.get_property('w')
 
-    w = property(_get_w, _set_w)
+    w = property(_get_w, _set_w, doc="""
+    The default 'write' quorum for this bucket (how many replicas must
+    acknowledge receipt of a write). This should be an integer less
+    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
+    or 'default'""")
 
     def _set_dw(self, val):
         return self.set_property('dw', val)
@@ -254,7 +270,11 @@ class RiakBucket(object):
     def _get_dw(self):
         return self.get_property('dw')
 
-    dw = property(_get_dw, _set_dw)
+    dw = property(_get_dw, _set_dw, doc="""
+    The default 'durable write' quorum for this bucket (how many
+    replicas must commit the write). This should be an integer less
+    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
+    or 'default'""")
 
     def _set_pw(self, val):
         return self.set_property('pw', val)
@@ -262,15 +282,15 @@ class RiakBucket(object):
     def _get_pw(self):
         return self.get_property('pw')
 
-    pw = property(_get_pw, _set_pw)
+    pw = property(_get_pw, _set_pw, doc="""
+    The default 'primary write' quorum for this bucket (how many
+    primary replicas are required for a successful write). This should
+    be an integer less than the 'n_val' property, or a string of
+    'one', 'quorum', 'all', or 'default'""")
 
     def set_property(self, key, value):
         """
         Set a bucket property.
-
-        .. warning::
-
-           This should only be used if you know what you are doing.
 
         :param key: Property to set.
         :type key: string
@@ -296,12 +316,8 @@ class RiakBucket(object):
         """
         Set multiple bucket properties in one call.
 
-        .. warning::
-
-           This should only be used if you know what you are doing.
-
-        :param props: An associative array of key:value.
-        :type props: array
+        :param props: A dictionary of properties
+        :type props: dict
         """
         self._client.set_bucket_props(self, props)
 

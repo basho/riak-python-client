@@ -32,6 +32,9 @@ See the unit_tests.py file for example usage.
 
 
 class RiakError(Exception):
+    """
+    Base class for exceptions generated in the Riak API.
+    """
     def __init__(self, value):
         self.value = value
 

@@ -107,57 +107,6 @@ class RiakPbcTransportTestCase(BasicKVTests,
         c = self.create_client(client_id=zero_client_id)
         self.assertEqual(zero_client_id, c.client_id)
 
-    # def test_close_underlying_socket_fails(self):
-    #     self.skipTest("TODO: No longer using connection manager, replace")
-    #     c = self.create_client()
-
-    #     bucket = c.bucket('bucket_test_close')
-    #     rand = self.randint()
-    #     obj = bucket.new('foo', rand)
-    #     obj.store()
-    #     obj = bucket.get('foo')
-    #     self.assertTrue(obj.exists)
-    #     self.assertEqual(obj.bucket.name, 'bucket_test_close')
-    #     self.assertEqual(obj.key, 'foo')
-    #     self.assertEqual(obj.data, rand)
-
-    #     # Close the underlying socket. This gets a bit sketchy,
-    #     # since we are reaching into the internals, but there is
-    #     # no other way to get at the socket
-    #     conns = c._cm.conns
-    #     conns[0].sock.close()
-
-    #     # This shoud fail with a socket error now
-    #     self.assertRaises(socket.error, bucket.get, 'foo')
-
-    # def test_close_underlying_socket_retry(self):
-    #     self.skipTest("TODO: No longer using bare transport, replace")
-    #     c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport,
-    #                                 transport_options={"max_attempts": 2})
-
-    #     bucket = c.bucket('bucket_test_close')
-    #     rand = self.randint()
-    #     obj = bucket.new('barbaz', rand)
-    #     obj.store()
-    #     obj = bucket.get('barbaz')
-    #     self.assertTrue(obj.exists)
-    #     self.assertEqual(obj.bucket.name, 'bucket_test_close')
-    #     self.assertEqual(obj.key, 'barbaz')
-    #     self.assertEqual(obj.data, rand)
-
-    #     # Close the underlying socket. This gets a bit sketchy,
-    #     # since we are reaching into the internals, but there is
-    #     # no other way to get at the socket
-    #     conns = c._cm.conns
-    #     conns[0].sock.close()
-
-    #     # This should work, since we have a retry
-    #     obj = bucket.get('barbaz')
-    #     self.assertTrue(obj.exists)
-    #     self.assertEqual(obj.bucket.name, 'bucket_test_close')
-    #     self.assertEqual(obj.key, 'barbaz')
-    #     self.assertEqual(obj.data, rand)
-
     def test_bucket_search_enabled(self):
         with self.assertRaises(NotImplementedError):
             bucket = self.client.bucket("unsearch_bucket")

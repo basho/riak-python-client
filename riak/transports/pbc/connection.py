@@ -86,6 +86,9 @@ class RiakPbcConnection(object):
                                                 self._timeouts['connect'])
 
     def close(self):
+        """
+        Closes the underlying socket of the PB connection.
+        """
         self._socket.shutdown(socket.SHUT_RDWR)
 
     def _parse_msg(self, code, packet):

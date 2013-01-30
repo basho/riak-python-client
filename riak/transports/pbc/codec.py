@@ -56,6 +56,14 @@ class RiakPbcCodec(object):
         super(RiakPbcCodec, self).__init__(**unused_args)
 
     def translate_rw_val(self, rw):
+        """
+        Converts a symbolic quorum value into its on-the-wire
+        equivalent.
+
+        :param rw: the quorum
+        :type rw: string, integer
+        :rtype: integer
+        """
         val = self.rw_names.get(rw)
         if val is None:
             return rw
@@ -65,9 +73,19 @@ class RiakPbcCodec(object):
             return None
 
     def decode_contents(self, rpb_contents):
+        """
+        Decodes the multiple contents (siblings) of a RiakObject from
+        its protobuf representation.
+        """
         return [self.decode_content(rpb_c) for rpb_c in rpb_contents]
 
     def decode_content(self, rpb_content):
+        """
+        Decodes a single sibling from the protobuf representation into
+        its metadata and value.
+
+        :rtype: (dict, string)
+        """
         metadata = {}
         if rpb_content.HasField("deleted"):
             metadata[MD_DELETED] = True
@@ -114,6 +132,10 @@ class RiakPbcCodec(object):
         return metadata, rpb_content.value
 
     def encode_content(self, metadata, data, rpb_content):
+        """
+        Fills an RpbContent message with the appropriate data and
+        metadata from a RiakObject.
+        """
         # Convert the broken out fields, building up
         # pbmetadata for any unknown ones
         for k in metadata:

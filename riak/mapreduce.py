@@ -24,13 +24,15 @@ from collections import Iterable
 class RiakMapReduce(object):
     """
     The RiakMapReduce object allows you to build up and run a
-    map/reduce operation on Riak.
+    map/reduce operation on Riak. Most methods return the object on
+    which it was called, modified with new information, so you can
+    chain calls together to build the job.
     """
     def __init__(self, client):
         """
         Construct a Map/Reduce object.
-        @param RiakClient client - A RiakClient object.
-        @return RiakMapReduce
+        :param client: A RiakClient object.
+        :type client: RiakClient
         """
         self._client = client
         self._phases = []
@@ -44,10 +46,14 @@ class RiakMapReduce(object):
         different forms, depending on the provided inputs. You can
         specify either a RiakObject, a string bucket name, or a bucket,
         key, and additional arg.
-        @param mixed arg1 - RiakObject or Bucket
-        @param mixed arg2 - Key or List or blank
-        @param mixed arg3 - Arg or blank
-        @return RiakMapReduce
+
+        :param arg1: the object or bucket to add
+        :type arg1: RiakObject, string
+        :param arg2: a key or list of keys to add (if a bucket is given in arg1)
+        :type arg2: string, list, None
+        :param arg3: key data for this input (must be convertible to JSON)
+        :type arg3: string, list, dict, None
+        :rtype: RiakMapReduce
         """
         if (arg2 is None) and (arg3 is None):
             if isinstance(arg1, RiakObject):
@@ -58,9 +64,27 @@ class RiakMapReduce(object):
             return self.add_bucket_key_data(arg1, arg2, arg3)
 
     def add_object(self, obj):
+        """
+        Adds a RiakObject to the inputs.
+
+        :param obj: the object to add
+        :type obj: RiakObject
+        :rtype: RiakMapReduce
+        """
         return self.add_bucket_key_data(obj._bucket._name, obj._key, None)
 
     def add_bucket_key_data(self, bucket, key, data):
+        """
+        Adds a bucket/key/keydata triple to the inputs.
+
+        :param bucket: the bucket
+        :type bucket: string
+        :param key: the key or list of keys
+        :type key: string
+        :param data: the key-specific data
+        :type data: string, list, dict, None
+        :rtype: RiakMapReduce
+        """
         if self._input_mode == 'bucket':
             raise ValueError('Already added a bucket, can\'t add an object.')
         elif self._input_mode == 'query':
@@ -75,11 +99,25 @@ class RiakMapReduce(object):
             return self
 
     def add_bucket(self, bucket):
+        """
+        Adds all keys in a bucket to the inputs.
+
+        :param bucket: the bucket
+        :type bucket: string
+        :rtype: RiakMapReduce
+        """
         self._input_mode = 'bucket'
         self._inputs = bucket
         return self
 
     def add_key_filters(self, key_filters):
+        """
+        Adds key filters to the inputs.
+
+        :param key_filters: a list of filters
+        :type key_filters: list
+        :rtype: RiakMapReduce
+        """
         if self._input_mode == 'query':
             raise ValueError('Key filters are not supported in a query.')
 
@@ -87,6 +125,13 @@ class RiakMapReduce(object):
         return self
 
     def add_key_filter(self, *args):
+        """
+        Add a single key filter to the inputs.
+
+        :param args: a filter
+        :type args: list
+        :rtype: RiakMapReduce
+        """
         if self._input_mode == 'query':
             raise ValueError('Key filters are not supported in a query.')
 
@@ -97,8 +142,12 @@ class RiakMapReduce(object):
         """
         Begin a map/reduce operation using a Search. This command will
         return an error unless executed against a Riak Search cluster.
-        @param bucket - The bucket over which to perform the search.
-        @param query - The search query.
+
+        :param bucket: The bucket over which to perform the search
+        :type bucket: string
+        :param query: The search query
+        :type query: string
+        :rtype: RiakMapReduce
         """
         self._input_mode = 'query'
         self._inputs = {'module': 'riak_search',
@@ -110,10 +159,16 @@ class RiakMapReduce(object):
         """
         Begin a map/reduce operation using a Secondary Index
         query.
-        @param bucket - The bucket over which to perform the search.
-        @param index - The index to use for query
-        @param startkey - The start key of index range
-        @param endkey - The end key of index range or blank
+
+        :param bucket: The bucket over which to perform the query
+        :type bucket: string
+        :param index: The index to use for query
+        :type index: string
+        :param startkey: The start key of index range, or the
+           value which all entries must equal
+        :type startkey: string, integer
+        :param endkey: The end key of index range (if doing a range query)
+        :type endkey: string, integer, None
         """
         self._input_mode = 'query'
 
@@ -131,13 +186,17 @@ class RiakMapReduce(object):
     def link(self, bucket='_', tag='_', keep=False):
         """
         Add a link phase to the map/reduce operation.
-        @param string bucket - Bucket name (default '_', which means all
+
+        :param bucket: Bucket name (default '_', which means all
         buckets)
-        @param string tag - Tag (default '_', which means any tag)
-        @param boolean keep - Flag whether to keep results from this
-        stage in the map/reduce. (default False, unless this is the last
-        step in the phase)
-        @return self
+        :type bucket: string
+        :param tag:  Tag (default '_', which means any tag)
+        :type tag: string
+        :param keep: Flag whether to keep results from this stage in
+          the map/reduce. (default False, unless this is the last step
+          in the phase)
+        :type keep: boolean
+        :rtype: RiakMapReduce
         """
         self._phases.append(RiakLinkPhase(bucket, tag, keep))
         return self
@@ -145,13 +204,16 @@ class RiakMapReduce(object):
     def map(self, function, options=None):
         """
         Add a map phase to the map/reduce operation.
-        @param mixed function - Either a named Javascript function (ie:
-        'Riak.mapValues'), or an anonymous javascript function (ie:
-        'function(...)  ... ' or an array ['erlang_module',
-        'function'].
-        @param array() options - An optional associative array
-        containing 'language', 'keep' flag, and/or 'arg'.
-        @return self
+
+        :param function: Either a named Javascript function (ie:
+          'Riak.mapValues'), or an anonymous javascript function (ie:
+          'function(...) ... ' or an array ['erlang_module',
+          'function'].
+        :type function: string, list
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        :rtype: RiakMapReduce
         """
         if options is None:
             options = dict()
@@ -171,12 +233,15 @@ class RiakMapReduce(object):
     def reduce(self, function, options=None):
         """
         Add a reduce phase to the map/reduce operation.
-        @param mixed function - Either a named Javascript function (ie.
-        'Riak.mapValues'), or an anonymous javascript function(ie:
-        'function(...) { ... }' or an array ['erlang_module', 'function'].
-        @param array() options - An optional associative array
-        containing 'language', 'keep' flag, and/or 'arg'.
-        @return self
+
+        :param function: Either a named Javascript function (ie.
+          'Riak.reduceSum'), or an anonymous javascript function(ie:
+          'function(...) { ... }' or an array ['erlang_module',
+          'function'].
+        :type function: string, list
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :rtype: RiakMapReduce
         """
         if options is None:
             options = dict()
@@ -195,10 +260,13 @@ class RiakMapReduce(object):
 
     def run(self, timeout=None):
         """
-        Run the map/reduce operation. Returns an array of results, or an
-        array of RiakLink objects if the last phase is a link phase.
-        @param integer timeout - Timeout in milliseconds.
-        @return array()
+        Run the map/reduce operation synchronously. Returns a list of
+        results, or a list of RiakLink objects if the last phase is a
+        link phase.
+
+        :param timeout: Timeout in milliseconds
+        :type timeout: integer, None
+        :rtype: list
         """
         query, link_results_flag = self._normalize_query()
 
@@ -229,6 +297,10 @@ class RiakMapReduce(object):
     def stream(self, timeout=None):
         """
         Streams the MapReduce query (returns an iterator).
+
+        :param timeout: Timeout in milliseconds
+        :type timeout: integer
+        :rtype: iterator
         """
         query, lrf = self._normalize_query()
         return self._client.stream_mapred(self._inputs, query, timeout)
@@ -272,21 +344,72 @@ class RiakMapReduce(object):
     # Start Shortcuts to built-ins
     ##
     def map_values(self, options=None):
+        """
+        Adds the Javascript built-in ``Riak.mapValues`` to the query
+        as a map phase.
+
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         return self.map("Riak.mapValues", options=options)
 
     def map_values_json(self, options=None):
+        """
+        Adds the Javascript built-in ``Riak.mapValuesJson`` to the
+        query as a map phase.
+
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         return self.map("Riak.mapValuesJson", options=options)
 
     def reduce_sum(self, options=None):
+        """
+        Adds the Javascript built-in ``Riak.reduceSum`` to the query
+        as a reduce phase.
+
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         return self.reduce("Riak.reduceSum", options=options)
 
     def reduce_min(self, options=None):
+        """
+        Adds the Javascript built-in ``Riak.reduceMin`` to the query
+        as a reduce phase.
+
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         return self.reduce("Riak.reduceMin", options=options)
 
     def reduce_max(self, options=None):
+        """
+        Adds the Javascript built-in ``Riak.reduceMax`` to the query
+        as a reduce phase.
+
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         return self.reduce("Riak.reduceMax", options=options)
 
     def reduce_sort(self, js_cmp=None, options=None):
+        """
+        Adds the Javascript built-in ``Riak.reduceSort`` to the query
+        as a reduce phase.
+
+        :param js_cmp: A Javascript comparator function as specified by
+          Array.sort()
+        :type js_cmp: string
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         if options is None:
             options = dict()
 
@@ -296,9 +419,27 @@ class RiakMapReduce(object):
         return self.reduce("Riak.reduceSort", options=options)
 
     def reduce_numeric_sort(self, options=None):
+        """
+        Adds the Javascript built-in ``Riak.reduceNumericSort`` to the
+        query as a reduce phase.
+
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         return self.reduce("Riak.reduceNumericSort", options=options)
 
     def reduce_limit(self, limit, options=None):
+        """
+        Adds the Javascript built-in ``Riak.reduceLimit`` to the query
+        as a reduce phase.
+
+        :param limit: the maximum number of results to return
+        :type limit: integer
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         if options is None:
             options = dict()
 
@@ -310,6 +451,18 @@ class RiakMapReduce(object):
         return self.reduce(code, options=options)
 
     def reduce_slice(self, start, end, options=None):
+        """
+        Adds the Javascript built-in ``Riak.reduceSlice`` to the
+        query as a reduce phase.
+
+        :param start: the beginning of the slice
+        :type start: integer
+        :param end: the end of the slice
+        :type end: integer
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         if options is None:
             options = dict()
 
@@ -317,25 +470,42 @@ class RiakMapReduce(object):
         return self.reduce("Riak.reduceSlice", options=options)
 
     def filter_not_found(self, options=None):
+        """
+        Adds the Javascript built-in ``Riak.filterNotFound`` to the query
+        as a reduce phase.
+
+        :param options: phase options, containing 'language', 'keep'
+          flag, and/or 'arg'.
+        :type options: dict
+        """
         return self.reduce("Riak.filterNotFound", options=options)
 
 
 class RiakMapReducePhase(object):
     """
-    The RiakMapReducePhase holds information about a Map phase or
-    Reduce phase in a RiakMapReduce operation.
+    The RiakMapReducePhase holds information about a Map or Reduce
+    phase in a RiakMapReduce operation.
+
+    Normally you won't need to use this object directly, but instead
+    call methods on RiakMapReduce objects to add instances to the
+    query.
     """
 
     def __init__(self, type, function, language, keep, arg):
         """
         Construct a RiakMapReducePhase object.
-        @param string type - 'map'placeholder149'reduce'
-        @param mixed function - string or array():
-        @param string language - 'javascript'placeholder149'erlang'
-        @param boolean keep - True to return the output of this phase in
-        the results.
-        @param mixed arg - Additional value to pass into the map or
-        reduce function.
+
+        :param type: the phase type - 'map', 'reduce', 'link'
+        :type type: string
+        :param function: the function to execute
+        :type function: string, list
+        :param language: 'javascript' or 'erlang'
+        :type language: string
+        :param keep: whether to return the output of this phase in the results.
+        :type keep: boolean
+        :param arg: Additional static value to pass into the map or
+          reduce function.
+        :type arg: string, dict, list
         """
         try:
             if isinstance(function, basestring):
@@ -351,8 +521,10 @@ class RiakMapReducePhase(object):
 
     def to_array(self):
         """
-        Convert the RiakMapReducePhase to an associative array. Used
-        internally.
+        Convert the RiakMapReducePhase to a format that can be output
+        into JSON. Used internally.
+
+        :rtype: dict
         """
         stepdef = {'keep': self._keep,
                    'language': self._language,
@@ -379,14 +551,21 @@ class RiakLinkPhase(object):
     """
     The RiakLinkPhase object holds information about a Link phase in a
     map/reduce operation.
+
+    Normally you won't need to use this object directly, but instead
+    call ``link`` on RiakMapReduce objects to add instances to the
+    query.
     """
 
     def __init__(self, bucket, tag, keep):
         """
         Construct a RiakLinkPhase object.
-        @param string bucket - The bucket name.
-        @param string tag - The tag.
-        @param boolean keep - True to return results of this phase.
+        :param bucket: - The bucket name
+        :type bucket: string
+        :param tag: The tag
+        :type tag: string
+        :param keep: whether to return results of this phase.
+        :type keep: boolean
         """
         self._bucket = bucket
         self._tag = tag
@@ -394,8 +573,8 @@ class RiakLinkPhase(object):
 
     def to_array(self):
         """
-        Convert the RiakLinkPhase to an associative array. Used
-        internally.
+        Convert the RiakLinkPhase to a format that can be output into
+        JSON. Used internally.
         """
         stepdef = {'bucket': self._bucket,
                    'tag': self._tag,
@@ -412,9 +591,13 @@ class RiakLink(object):
     def __init__(self, bucket, key, tag=None):
         """
         Construct a RiakLink object.
-        @param string bucket - The bucket name.
-        @param string key - The key.
-        @param string tag - The tag.
+
+        :param bucket: the bucket name
+        :type bucket: string
+        :param key: the key
+        :type key: string
+        :param tag: the tag
+        :type tag: string
         """
         self._bucket = bucket
         self._key = key
@@ -424,31 +607,38 @@ class RiakLink(object):
     def get(self, r=None):
         """
         Retrieve the RiakObject to which this link points.
-        @param integer r - The R-value to use.
-        @return RiakObject
+
+        :param r: the read quorum to use
+        :type r: string, integer
+        :rtype: RiakObject
         """
         return self._client.bucket(self._bucket).get(self._key, r)
 
     def get_binary(self, r=None):
         """
         Retrieve the RiakObject to which this link points, as a binary.
-        @param integer r - The R-value to use.
-        @return RiakObject
+
+        :param r: the read quorum to use
+        :type r: string, integer
+        :rtype: RiakObject
         """
         return self._client.bucket(self._bucket).get_binary(self._key, r)
 
     def get_bucket(self):
         """
         Get the bucket name of this link.
-        @return string
+
+        :rtype: string
         """
         return self._bucket
 
     def set_bucket(self, name):
         """
         Set the bucket name of this link.
-        @param string name - The bucket name.
-        @return self
+
+        :param name: the bucket name
+        :type name: string
+        :rtype: RiakLink
         """
         self._bucket = name
         return self
@@ -456,15 +646,18 @@ class RiakLink(object):
     def get_key(self):
         """
         Get the key of this link.
-        @return string
+
+        :rtype: string
         """
         return self._key
 
     def set_key(self, key):
         """
         Set the key of this link.
-        @param string key - The key.
-        @return self
+
+        :param key: the key
+        :type key: string
+        :rtype: RiakLink
         """
         self._key = key
         return self
@@ -472,7 +665,8 @@ class RiakLink(object):
     def get_tag(self):
         """
         Get the tag of this link.
-        @return string
+
+        :rtype: string
         """
         if (self._tag is None):
             return self._bucket
@@ -482,15 +676,20 @@ class RiakLink(object):
     def set_tag(self, tag):
         """
         Set the tag of this link.
-        @param string tag - The tag.
-        @return self
+
+        :param tag: the tag
+        :type tag: string
+        :rtype: RiakLink
         """
         self._tag = tag
         return self
 
     def to_link_header(self, client):
         """
-        Convert this RiakLink object to a link header string. Used internally.
+        Convert this RiakLink object to a link header string. Used
+        internally.
+
+        :rtype: string
         """
         link = ''
         link += '</'
@@ -502,11 +701,12 @@ class RiakLink(object):
 
     def isEqual(self, link):
         """
-        Return True if the links are equal.
-        @param RiakLink link - A RiakLink object.
-        @return boolean
-        """
+        Returns True if the links are equal.
 
+        :param link: some other link
+        :type link: RiakLink
+        :rtype: boolean
+        """
         return ((self._bucket == link._bucket) and
                 (self._key == link._key) and
                 (self.get_tag() == link.get_tag()))

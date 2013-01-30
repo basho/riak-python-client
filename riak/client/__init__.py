@@ -93,11 +93,12 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._protocol = value
 
     protocol = property(_get_protocol, _set_protocol,
-                        doc="""which protocol to prefer""")
+                        doc="""Which protocol to prefer, one of PROTOCOLS""")
 
     def get_transport(self):
         """
-        Get the transport instance the client is using for it's connection.
+        Get the transport instance the client is using for it's
+        connection. DEPRECATED
         """
         deprecated("get_transport is deprecated, use client, " +
                    "bucket, or object methods instead")
@@ -117,6 +118,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def set_client_id(self, client_id):
         """
         Set the client_id for this ``RiakClient`` instance.
+        DEPRECATED
 
         :param client_id: The new client_id.
         :type client_id: string

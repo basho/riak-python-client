@@ -99,6 +99,8 @@ class RiakObject(object):
     def get_encoded_data(self):
         """
         Get the data encoded for storing
+
+        :rtype: string
         """
         if self._encode_data == True:
             content_type = self.content_type
@@ -119,6 +121,10 @@ class RiakObject(object):
         """
         Set the object data from an encoded string. Make sure
         the metadata has been set correctly first.
+
+        :param data: the encoded data
+        :type data: string
+        :rtype: RiakObject
         """
         if self._encode_data == True:
             content_type = self.content_type
@@ -162,7 +168,7 @@ class RiakObject(object):
         :type field: string
         :param value: The index value.
         :type value: string or integer
-        :rtype: self
+        :rtype: RiakObject
         """
         if field[-4:] not in ("_bin", "_int"):
             raise RiakError(
@@ -183,7 +189,7 @@ class RiakObject(object):
         :type field: string
         :param value: The index value.
         :type value: string or integer
-        :rtype: self
+        :rtype: RiakObject
         """
         if not field and not value:
             ries = self.metadata[MD_INDEX][:]
@@ -210,7 +216,7 @@ class RiakObject(object):
 
         :param indexes: iterable of 2 item tuples consisting the field
                         and value.
-        :rtype: self
+        :rtype: RiakObject
         """
         new_indexes = []
         for field, value in indexes:
@@ -324,7 +330,7 @@ class RiakObject(object):
         :param tag: Optional link tag. Defaults to bucket name. It is ignored
             if ``obj`` is a RiakLink instance.
         :type tag: string
-        :rtype: self
+        :rtype: RiakObject
         """
         if isinstance(obj, RiakLink):
             oldlink = obj
@@ -344,7 +350,7 @@ class RiakObject(object):
         """
         Return an array of RiakLink objects.
 
-        :rtype: array()
+        :rtype: list
         """
         # Set the clients before returning...
         if MD_LINKS in self.metadata:
@@ -379,7 +385,7 @@ class RiakObject(object):
         :param if_none_match: Should the object be stored only if
                               there is no key previously defined
         :type if_none_match: bool
-        :rtype: self """
+        :rtype: RiakObject """
         if self.siblings and not self.data and not self.vclock:
             raise RiakError("Attempting to store an invalid object,"
                             "store one of the siblings instead")
@@ -411,7 +417,7 @@ class RiakObject(object):
         :param r: R-Value, wait for this many partitions to respond
          before returning to client.
         :type r: integer
-        :rtype: self
+        :rtype: RiakObject
         """
 
         result = self.client.get(self, r=r, pr=pr, vtag=vtag)
@@ -446,7 +452,7 @@ class RiakObject(object):
         :param pw: PW-value, require this many primary partitions to
                    be available before performing the put
         :type pw: integer
-        :rtype: self
+        :rtype: RiakObject
         """
 
         self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
@@ -457,7 +463,7 @@ class RiakObject(object):
         """
         Reset this object.
 
-        :rtype: self
+        :rtype: RiakObject
         """
         self.headers = []
         self.links = []

@@ -56,6 +56,9 @@ class RiakHttpConnection(object):
                                                   self._node.http_port)
 
     def close(self):
+        """
+        Closes the underlying HTTP connection.
+        """
         try:
             self._connection.close()
         except httplib.NotConnected:

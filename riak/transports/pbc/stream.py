@@ -55,7 +55,7 @@ class RiakPbcStream(object):
 
     def close(self):
         # We have to drain the socket to make sure that we don't get
-        # weird responses when the some other request comes after a
+        # weird responses when some other request comes after a
         # failed/prematurely-terminated one.
         try:
             while self.next():

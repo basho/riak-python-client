@@ -36,11 +36,23 @@ class RiakClientTransport(object):
 
     @contextmanager
     def _transport(self):
+        """
+        Yields a single transport to the caller from the default pool,
+        without retries.
+        """
         pool = self._choose_pool()
         with pool.take() as transport:
             yield transport
 
     def _with_retries(self, pool, fn):
+        """
+        Performs the passed function with retries against the given pool.
+
+        :param pool: the connection pool to use
+        :type pool: Pool
+        :param fn: the function to pass a transport
+        :type fn: function
+        """
         skip_nodes = []
 
         def _skip_bad_nodes(transport):
@@ -52,7 +64,7 @@ class RiakClientTransport(object):
                     try:
                         return fn(transport)
                     except (IOError, httplib.HTTPException) as e:
-                        if is_retryable(e):
+                        if _is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
                             raise BadResource(e)
@@ -62,6 +74,14 @@ class RiakClientTransport(object):
                 continue
 
     def _choose_pool(self, protocol=None):
+        """
+        Selects a connection pool according to the default protocol
+        and the passed one.
+
+        :param protocol: the protocol to use
+        :type protocol: string
+        :rtype: Pool
+        """
         if not protocol:
             protocol = self.protocol
         if protocol in ['http', 'https']:
@@ -73,11 +93,23 @@ class RiakClientTransport(object):
         return pool
 
 
-def is_retryable(error):
+def _is_retryable(error):
+    """
+    Determines whether a given error is retryable according to the
+    exceptions allowed to be retried by each transport.
+
+    :param error: the error to check
+    :type error: Exception
+    :rtype: boolean
+    """
     return is_pbc_retryable(error) or is_http_retryable(error)
 
 
 def retryable(fn, protocol=None):
+    """
+    Wraps a client operation that can be retried according to the set
+    RETRY_COUNT. Used internally.
+    """
     def wrapper(self, *args, **kwargs):
         pool = self._choose_pool(protocol)
 
@@ -90,4 +122,8 @@ def retryable(fn, protocol=None):
 
 
 def retryableHttpOnly(fn):
+    """
+    Wraps a retryable client operation that is only valid over HTTP.
+    Used internally.
+    """
     return retryable(fn, protocol='http')

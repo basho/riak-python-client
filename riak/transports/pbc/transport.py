@@ -58,9 +58,6 @@ from messages import (
     )
 
 
-# from messages import *
-
-
 class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     """
     The RiakPbcTransport object holds a connection to the protocol
@@ -88,14 +85,13 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     def ping(self):
         """
         Ping the remote server
-        @return boolean
         """
 
         msg_code, msg = self._request(MSG_CODE_PING_REQ)
         if msg_code == MSG_CODE_PING_RESP:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     def get_server_info(self):
         """

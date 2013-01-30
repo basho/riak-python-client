@@ -53,6 +53,16 @@ class RiakClientOperations(RiakClientTransport):
     def get_index(self, transport, bucket, index, startkey, endkey=None):
         """
         Queries a secondary index, returning matching keys.
+
+        :param bucket: the bucket whose index will be queried
+        :type bucket: RiakBucket
+        :param index: the index to query
+        :type index: string
+        :param startkey: the sole key to query, or beginning of the query range
+        :type startkey: string, integer
+        :param endkey: the end of the query range (optional if equality)
+        :type endkey: string, integer
+        :rtype: list
         """
         return transport.get_index(bucket, index, startkey, endkey)
 
@@ -60,6 +70,10 @@ class RiakClientOperations(RiakClientTransport):
     def get_bucket_props(self, transport, bucket):
         """
         Fetches bucket properties for the given bucket.
+
+        :param bucket: the bucket whose properties will be fetched
+        :type bucket: RiakBucket
+        :rtype: dict
         """
         return transport.get_bucket_props(bucket)
 
@@ -67,6 +81,11 @@ class RiakClientOperations(RiakClientTransport):
     def set_bucket_props(self, transport, bucket, props):
         """
         Sets bucket properties for the given bucket.
+
+        :param bucket: the bucket whose properties will be set
+        :type bucket: RiakBucket
+        :param props: the properties to set
+        :type props: dict
         """
         return transport.set_bucket_props(bucket, props)
 
@@ -74,6 +93,10 @@ class RiakClientOperations(RiakClientTransport):
     def get_keys(self, transport, bucket):
         """
         Lists all keys in a bucket.
+
+        :param bucket: the bucket whose properties will be set
+        :type bucket: RiakBucket
+        :rtype: list
         """
         return transport.get_keys(bucket)
 
@@ -82,6 +105,11 @@ class RiakClientOperations(RiakClientTransport):
         """
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
+
+
+        :param bucket: the bucket whose properties will be set
+        :type bucket: RiakBucket
+        :rtype: iterator
         """
         stream = transport.stream_keys(bucket)
         try:
@@ -96,6 +124,21 @@ class RiakClientOperations(RiakClientTransport):
             if_none_match=None):
         """
         Stores an object in the Riak cluster.
+
+        :param robj: the object to store
+        :type robj: RiakObject
+        :param w: the write quorum
+        :type w: integer, string, None
+        :param dw: the durable write quorum
+        :type dw: integer, string, None
+        :param pw: the primary write quorum
+        :type pw: integer, string, None
+        :param return_body: whether to return the resulting object
+           after the write
+        :type return_body: boolean
+        :param if_none_match: whether to fail the write if the object
+          exists
+        :type if_none_match: boolean
         """
         return transport.put(robj, w=w, dw=dw, pw=pw,
                              return_body=return_body,
@@ -106,6 +149,21 @@ class RiakClientOperations(RiakClientTransport):
                 return_body=None, if_none_match=None):
         """
         Stores an object in the Riak cluster with a generated key.
+
+        :param robj: the object to store
+        :type robj: RiakObject
+        :param w: the write quorum
+        :type w: integer, string, None
+        :param dw: the durable write quorum
+        :type dw: integer, string, None
+        :param pw: the primary write quorum
+        :type pw: integer, string, None
+        :param return_body: whether to return the resulting object
+           after the write
+        :type return_body: boolean
+        :param if_none_match: whether to fail the write if the object
+          exists
+        :type if_none_match: boolean
         """
         return transport.put_new(robj, w=w, dw=dw, pw=pw,
                                  return_body=return_body,
@@ -115,6 +173,15 @@ class RiakClientOperations(RiakClientTransport):
     def get(self, transport, robj, r=None, pr=None, vtag=None):
         """
         Fetches the contents of a Riak object.
+
+        :param robj: the object to fetch
+        :type robj: RiakObject
+        :param r: the read quorum
+        :type r: integer, string, None
+        :param pr: the primary read quorum
+        :type pr: integer, string, None
+        :param vtag: the specific sibling to fetch
+        :type vtag: string
         """
         return transport.get(robj, r=r, pr=pr, vtag=vtag)
 
@@ -123,6 +190,21 @@ class RiakClientOperations(RiakClientTransport):
                pr=None, pw=None):
         """
         Deletes an object from Riak.
+
+        :param robj: the object to store
+        :type robj: RiakObject
+        :param rw: the read/write (delete) quorum
+        :type rw: integer, string, None
+        :param r: the read quorum
+        :type r: integer, string, None
+        :param pr: the primary read quorum
+        :type pr: integer, string, None
+        :param w: the write quorum
+        :type w: integer, string, None
+        :param dw: the durable write quorum
+        :type dw: integer, string, None
+        :param pw: the primary write quorum
+        :type pw: integer, string, None
         """
         return transport.delete(robj, rw=rw, r=r, w=w, dw=dw, pr=pr,
                                 pw=pw)
@@ -130,7 +212,15 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def mapred(self, transport, inputs, query, timeout):
         """
-        Executes a MapReduce query
+        Executes a MapReduce query.
+
+        :param inputs: the input list/structure
+        :type inputs: list, dict
+        :param query: the list of query phases
+        :type query: list
+        :param timeout: the query timeout
+        :type timeout: integer, None
+        :rtype: mixed
         """
         return transport.mapred(inputs, query, timeout)
 
@@ -139,6 +229,14 @@ class RiakClientOperations(RiakClientTransport):
         """
         Streams a MapReduce query as (phase, data) pairs. This is a
         generator method which should be iterated over.
+
+        :param inputs: the input list/structure
+        :type inputs: list, dict
+        :param query: the list of query phases
+        :type query: list
+        :param timeout: the query timeout
+        :type timeout: integer, None
+        :rtype: iterator
         """
         stream = transport.stream_mapred(inputs, query, timeout)
         try:
@@ -151,6 +249,13 @@ class RiakClientOperations(RiakClientTransport):
     def fulltext_search(self, transport, index, query, **params):
         """
         Performs a full-text search query.
+
+        :param index: the bucket/index to search over
+        :type index: string
+        :param query: the search query
+        :type query: string
+        :param params: additional query flags
+        :type params: dict
         """
         return transport.search(index, query, **params)
 
@@ -158,6 +263,11 @@ class RiakClientOperations(RiakClientTransport):
     def fulltext_add(self, transport, index, docs):
         """
         Adds documents to the full-text index.
+
+        :param index: the bucket/index in which to index these docs
+        :type index: string
+        :param docs: the list of documents
+        :type docs: list
         """
         transport.fulltext_add(index, docs)
 
@@ -165,5 +275,12 @@ class RiakClientOperations(RiakClientTransport):
     def fulltext_delete(self, transport, index, docs=None, queries=None):
         """
         Removes documents from the full-text index.
+
+        :param index: the bucket/index from which to delete
+        :type index: string
+        :param docs: a list of documents (with ids)
+        :type docs: list
+        :param queries: a list of queries to match and delete
+        :type queries: list
         """
         transport.fulltext_delete(index, docs, queries)

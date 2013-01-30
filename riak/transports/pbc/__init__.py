@@ -64,6 +64,8 @@ def is_retryable(err):
     Determines if the given exception is something that is
     network/socket-related and should thus cause the PBC connection to
     close and the operation retried on another node.
+
+    :rtype: boolean
     """
     if isinstance(err, socket.error):
         code = err.args[0]

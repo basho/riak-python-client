@@ -49,6 +49,9 @@ class Decaying(object):
     def incr(self, d):
         """
         Increases the value by the argument.
+
+        :param d: the value to increase by
+        :type d: float
         """
         with self.lock:
             self.p = self.value() + d
@@ -56,6 +59,8 @@ class Decaying(object):
     def value(self):
         """
         Returns the current value (adjusted for the time decay)
+
+        :rtype: float
         """
         with self.lock:
             now = time.time()
@@ -76,6 +81,13 @@ class RiakNode(object):
                  **unused_args):
         """
         Creates a node.
+
+        :param host: an IP address or hostname
+        :type host: string
+        :param http_port: the HTTP port of the node
+        :type http_port: integer
+        :param pb_port: the Protcol Buffers port of the node
+        :type pb_port: integer
         """
 
         if 'port' in unused_args:
