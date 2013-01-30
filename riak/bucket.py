@@ -323,9 +323,9 @@ class RiakBucket(object):
 
     def get_properties(self):
         """
-        Retrieve an associative array of all bucket properties.
+        Retrieve a dict of all bucket properties.
 
-        :rtype: array
+        :rtype: dict
         """
         return self._client.get_bucket_props(self)
 
@@ -341,11 +341,13 @@ class RiakBucket(object):
 
     def stream_keys(self):
         """
-        Return all keys within the bucket.
+        Streams all keys within the bucket through an iterator.
 
         .. warning::
 
            At current, this is a very expensive operation. Use with caution.
+
+        :rtype: iterator
         """
         return self._client.stream_keys(self)
 
