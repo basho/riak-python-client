@@ -165,8 +165,8 @@ class RiakObject(object):
         :rtype: RiakObject
         """
         if field[-4:] not in ("_bin", "_int"):
-            raise RiakError(
-                "Riak 2i fields must end with either '_bin' or '_int'.")
+            raise RiakError("Riak 2i fields must end with either '_bin'"
+                            " or '_int'.")
 
         rie = RiakIndexEntry(field, value)
         if not rie in self.metadata[MD_INDEX]:
