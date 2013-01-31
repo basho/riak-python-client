@@ -1,5 +1,18 @@
 # Riak Python Client Release Notes
 
+## 1.5.2 Patch Release - 2013-01-31
+
+Release 1.5.2 fixes some bugs and adds HTTPS/SSL support.
+
+* Added support for HTTPS.
+* Fixed writing of the `app.config` for the `TestServer`.
+* Reorganized the tests into multiple files and cases.
+* Some methods on `RiakObject` were made private where appropriate.
+* The version comparison used in feature detection was loosened to
+  support pre-release versions of Riak.
+* Prevent fetching the `protobuf` package from Google Code.
+* Prefer `simplejson` over `json` when present.
+
 ## 1.5.1 Patch Release - 2012-10-24
 
 Release 1.5.1 fixes one bug and some documentation errors.
