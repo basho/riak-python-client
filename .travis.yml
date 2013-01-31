@@ -2,7 +2,9 @@ language: python
 python:
   - "2.6"
   - "2.7"
-install: ./setup.py develop
+install:
+  - ./setup.py develop
+  - ./setup.py easy_install protobuf
 script: ./setup.py test
 before_script: sudo /usr/sbin/search-cmd install searchbucket
 notifications:

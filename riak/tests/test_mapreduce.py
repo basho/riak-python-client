@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from riak.mapreduce import RiakLink
-from riak import RiakKeyFilter, key_filter
+from riak.mapreduce import RiakLink, RiakMapReduce
+from riak import key_filter
 
 
 class LinkTests(object):
@@ -44,7 +44,7 @@ class LinkTests(object):
     def test_set_links_all_links(self):
         bucket = self.client.bucket("bucket")
         foo1 = bucket.new("foo", 1)
-        foo2 = bucket.new("foo2", 2).store()
+        bucket.new("foo2", 2).store()
         links = [RiakLink("bucket", "foo2")]
         foo1.set_links(links, True)
         links = foo1.get_links()
@@ -103,7 +103,7 @@ class ErlangMapReduceTests(object):
         with self.assertRaises(ValueError):
             mr = self.client.search('bucket', 'fleh')
             mr.add_key_filter("tokenize", "-", 1)
- 
+
 
 class JSMapReduceTests(object):
     def test_javascript_source_map(self):
@@ -499,3 +499,37 @@ class MapReduceAliasTests(object):
                    .run()
 
         self.assertEqual(sorted(result), [1, 2])
+
+
+class MapReduceStreamTests(object):
+    def test_stream_results(self):
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        mr = RiakMapReduce(self.client).add('bucket', 'one')\
+                                       .add('bucket', 'two')
+        mr.map_values_json()
+        results = []
+        for phase, data in mr.stream():
+            results.extend(data)
+
+        self.assertEqual(sorted(results), [1, 2])
+
+    def test_stream_cleanoperationsup(self):
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        mr = RiakMapReduce(self.client).add('bucket', 'one')\
+                                       .add('bucket', 'two')
+        mr.map_values_json()
+        try:
+            for phase, data in mr.stream():
+                raise RuntimeError("woops")
+        except RuntimeError:
+            pass
+
+        # This should not raise an exception
+        obj = bucket.get('one')
+        self.assertEqual(1, obj.data)

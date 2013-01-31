@@ -3,34 +3,29 @@ from __future__ import with_statement
 
 import os
 import random
-import socket
 import platform
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
-import uuid
-import time
 
-from riak import RiakClient
-from riak import RiakPbcTransport
-from riak import RiakHttpTransport
-from riak.mapreduce import RiakLink
-from riak import RiakKeyFilter, key_filter
+from riak.client import RiakClient
+from riak.mapreduce import RiakLink, RiakKeyFilter
+from riak import key_filter
 
 from riak.test_server import TestServer
 
 from riak.tests.test_search import SearchTests, \
     EnableSearchTests, SolrSearchTests
 from riak.tests.test_mapreduce import MapReduceAliasTests, \
-    ErlangMapReduceTests, JSMapReduceTests, LinkTests
+    ErlangMapReduceTests, JSMapReduceTests, LinkTests, MapReduceStreamTests
 from riak.tests.test_kv import BasicKVTests, KVFileTests, \
     HTTPBucketPropsTest, PbcBucketPropsTest
 from riak.tests.test_2i import TwoITests
 
 try:
-    import riak_pb
+    __import__('riak_pb')
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
@@ -56,16 +51,24 @@ if USE_TEST_SERVER:
 
 class BaseTestCase(object):
 
+    host = None
+    pb_port = None
+    http_port = None
+
     @staticmethod
     def randint():
         return random.randint(1, 999999)
 
-    def create_client(self, host=None, port=None, transport_class=None):
-        host = host or self.host
-        port = port or self.port
-        transport_class = transport_class or self.transport_class
-        return RiakClient(host, port,
-                          transport_class=transport_class)
+    def create_client(self, host=None, http_port=None, pb_port=None,
+                      protocol=None, **client_args):
+        host = host or self.host or HOST
+        http_port = http_port or self.http_port or HTTP_PORT
+        pb_port = pb_port or self.pb_port or PB_PORT
+        protocol = protocol or self.protocol
+        return RiakClient(protocol=protocol,
+                          host=host,
+                          http_port=http_port,
+                          pb_port=pb_port, **client_args)
 
     def setUp(self):
         self.client = self.create_client()
@@ -86,6 +89,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                ErlangMapReduceTests,
                                JSMapReduceTests,
                                MapReduceAliasTests,
+                               MapReduceStreamTests,
                                SearchTests,
                                BaseTestCase,
                                unittest.TestCase):
@@ -94,72 +98,19 @@ class RiakPbcTransportTestCase(BasicKVTests,
         if not HAVE_PROTO:
             self.skipTest('protobuf is unavailable')
         self.host = PB_HOST
-        self.port = PB_PORT
-        self.transport_class = RiakPbcTransport
+        self.pb_port = PB_PORT
+        self.protocol = 'pbc'
         super(RiakPbcTransportTestCase, self).setUp()
 
     def test_uses_client_id_if_given(self):
-        self.host = PB_HOST
-        self.port = PB_PORT
         zero_client_id = "\0\0\0\0"
-        c = RiakClient(PB_HOST, PB_PORT,
-                       transport_class=RiakPbcTransport,
-                       client_id=zero_client_id)
-        self.assertEqual(zero_client_id, c.get_client_id())
-
-    def test_close_underlying_socket_fails(self):
-        c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport)
-
-        bucket = c.bucket('bucket_test_close')
-        rand = self.randint()
-        obj = bucket.new('foo', rand)
-        obj.store()
-        obj = bucket.get('foo')
-        self.assertTrue(obj.exists)
-        self.assertEqual(obj.bucket.name, 'bucket_test_close')
-        self.assertEqual(obj.key, 'foo')
-        self.assertEqual(obj.data, rand)
-
-        # Close the underlying socket. This gets a bit sketchy,
-        # since we are reaching into the internals, but there is
-        # no other way to get at the socket
-        conns = c._cm.conns
-        conns[0].sock.close()
-
-        # This shoud fail with a socket error now
-        self.assertRaises(socket.error, bucket.get, 'foo')
-
-    def test_close_underlying_socket_retry(self):
-        c = RiakClient(PB_HOST, PB_PORT, transport_class=RiakPbcTransport,
-                                         transport_options={"max_attempts": 2})
-
-        bucket = c.bucket('bucket_test_close')
-        rand = self.randint()
-        obj = bucket.new('barbaz', rand)
-        obj.store()
-        obj = bucket.get('barbaz')
-        self.assertTrue(obj.exists)
-        self.assertEqual(obj.bucket.name, 'bucket_test_close')
-        self.assertEqual(obj.key, 'barbaz')
-        self.assertEqual(obj.data, rand)
-
-        # Close the underlying socket. This gets a bit sketchy,
-        # since we are reaching into the internals, but there is
-        # no other way to get at the socket
-        conns = c._cm.conns
-        conns[0].sock.close()
-
-        # This should work, since we have a retry
-        obj = bucket.get('barbaz')
-        self.assertTrue(obj.exists)
-        self.assertEqual(obj.bucket.name, 'bucket_test_close')
-        self.assertEqual(obj.key, 'barbaz')
-        self.assertEqual(obj.data, rand)
+        c = self.create_client(client_id=zero_client_id)
+        self.assertEqual(zero_client_id, c.client_id)
 
     def test_bucket_search_enabled(self):
         with self.assertRaises(NotImplementedError):
             bucket = self.client.bucket("unsearch_bucket")
-            test = bucket.search_enabled()
+            bucket.search_enabled()
 
     def test_enable_search_commit_hook(self):
         with self.assertRaises(NotImplementedError):
@@ -175,6 +126,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 ErlangMapReduceTests,
                                 JSMapReduceTests,
                                 MapReduceAliasTests,
+                                MapReduceStreamTests,
                                 EnableSearchTests,
                                 SolrSearchTests,
                                 SearchTests,
@@ -183,8 +135,8 @@ class RiakHttpTransportTestCase(BasicKVTests,
 
     def setUp(self):
         self.host = HTTP_HOST
-        self.port = HTTP_PORT
-        self.transport_class = RiakHttpTransport
+        self.http_port = HTTP_PORT
+        self.protocol = 'http'
         super(RiakHttpTransportTestCase, self).setUp()
 
     def test_no_returnbody(self):
