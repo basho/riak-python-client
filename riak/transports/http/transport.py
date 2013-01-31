@@ -211,7 +211,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         response = self._request('GET', url)
 
         headers, encoded_props = response[0:2]
-        if headers['http_code'] is 200:
+        if headers['http_code'] == 200:
             props = json.loads(encoded_props)
             return props['keys']
         else:
@@ -221,7 +221,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         url = self.key_list_path(bucket.name, keys='stream')
         headers, response = self._request('GET', url, stream=True)
 
-        if headers['http_code'] is 200:
+        if headers['http_code'] == 200:
             return RiakHttpKeyStream(response)
         else:
             raise Exception('Error listing keys.')
