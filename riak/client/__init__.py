@@ -227,3 +227,18 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return min(nodes, key=_error_rate)
         else:
             return random.choice(good)
+
+    def __hash__(self):
+        return hash(frozenset([ (n.host, n.http_port, n.pb_port) for n in self.nodes]))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+        else:
+            return False
+
+    def __nq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) != hash(other)
+        else:
+            return True

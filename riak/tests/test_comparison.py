@@ -5,7 +5,6 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-from riak import RiakHttpTransport
 from riak.client import RiakClient
 from riak.riak_object import RiakObject
 from riak.bucket import RiakBucket
@@ -55,24 +54,24 @@ class RiakObjectComparisonTest(unittest.TestCase):
 
 class RiakClientComparisonTest(unittest.TestCase, BaseTestCase):
     def test_client_eq(self):
-        self.transport_class = RiakHttpTransport
-        a = self.create_client('host1', 11)
-        b = self.create_client('host1', 11)
+        self.protocol = 'http'
+        a = self.create_client(host='host1', http_port=11)
+        b = self.create_client(host='host1', http_port=11)
         self.assertEqual(a, b)
 
     def test_client_nq(self):
-        self.transport_class = RiakHttpTransport
-        a = self.create_client('host1', 11)
-        b = self.create_client('host2', 11)
-        c = self.create_client('host1', 12)
+        self.protocol = 'http'
+        a = self.create_client(host='host1', http_port=11)
+        b = self.create_client(host='host1', http_port=11)
+        c = self.create_client(host='host1', http_port=12)
         self.assertNotEqual(a, b, 'matched with different hosts')
         self.assertNotEqual(a, c, 'matched with different ports')
 
     def test_client_hash(self):
-        self.transport_class = RiakHttpTransport
-        a = self.create_client('host1', 11)
-        b = self.create_client('host1', 11)
-        c = self.create_client('host2', 11)
+        self.protocol = 'http'
+        a = self.create_client(host='host1', http_port=11)
+        b = self.create_client(host='host1', http_port=11)
+        c = self.create_client(host='host2', http_port=11)
         self.assertEqual(hash(a), hash(b), 'same object has different hashes')
         self.assertNotEqual(hash(a), hash(c), 'different object has same hash')
 
