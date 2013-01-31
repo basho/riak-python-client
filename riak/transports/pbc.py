@@ -24,9 +24,9 @@ import socket
 import struct
 
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 from riak import RiakError
 from riak.mapreduce import RiakLink
