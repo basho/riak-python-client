@@ -49,7 +49,8 @@ class RiakMapReduce(object):
 
         :param arg1: the object or bucket to add
         :type arg1: RiakObject, string
-        :param arg2: a key or list of keys to add (if a bucket is given in arg1)
+        :param arg2: a key or list of keys to add (if a bucket is
+          given in arg1)
         :type arg2: string, list, None
         :param arg3: key data for this input (must be convertible to JSON)
         :type arg3: string, list, dict, None
