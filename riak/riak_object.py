@@ -19,16 +19,10 @@ under the License.
 """
 import copy
 from riak.metadata import (
-        # MD_CHARSET,
         MD_CTYPE,
-        # MD_ENCODING,
         MD_INDEX,
-        # MD_LASTMOD,
-        # MD_LASTMOD_USECS,
         MD_LINKS,
         MD_USERMETA
-        # MD_VTAG,
-        # MD_DELETED
         )
 from riak.mapreduce import (
     RiakMapReduce,
