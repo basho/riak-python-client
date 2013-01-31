@@ -229,7 +229,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return random.choice(good)
 
     def __hash__(self):
-        return hash(frozenset([ (n.host, n.http_port, n.pb_port) for n in self.nodes]))
+        return hash(frozenset([(n.host, n.http_port, n.pb_port)
+                               for n in self.nodes]))
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

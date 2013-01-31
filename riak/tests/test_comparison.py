@@ -5,7 +5,6 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-from riak.client import RiakClient
 from riak.riak_object import RiakObject
 from riak.bucket import RiakBucket
 from riak.tests.test_all import BaseTestCase
@@ -20,7 +19,6 @@ class RiakBucketRichComparisonTest(unittest.TestCase):
     def test_bucket_nq(self):
         a = RiakBucket('client', 'a')
         b = RiakBucket('client', 'b')
-        c = RiakBucket('client', 'a')
         self.assertNotEqual(a, b, 'matched with a different bucket')
 
     def test_bucket_hash(self):
