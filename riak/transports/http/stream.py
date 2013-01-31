@@ -38,7 +38,7 @@ class RiakHttpStream(object):
     def __iter__(self):
         return self
 
-    def read(self):
+    def _read(self):
         chunk = self.response.read(self.BLOCK_SIZE)
         if chunk == '':
             self.response_done = True
@@ -58,7 +58,7 @@ class RiakHttpKeyStream(RiakHttpStream):
 
     def next(self):
         while '}' not in self.buffer and not self.response_done:
-            self.read()
+            self._read()
 
         if '}' in self.buffer:
             idx = string.index(self.buffer, '}') + 1
@@ -111,7 +111,7 @@ class RiakHttpMultipartStream(RiakHttpStream):
 
     def read_until_boundary(self):
         while not self.try_match() and not self.response_done:
-            self.read()
+            self._read()
 
 
 class RiakHttpMapReduceStream(RiakHttpMultipartStream):
