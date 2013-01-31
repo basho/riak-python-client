@@ -100,8 +100,7 @@ class RiakClientOperations(RiakClientTransport):
         """
         return transport.get_keys(bucket)
 
-    @retryable
-    def stream_keys(self, transport, bucket):
+    def stream_keys(self, bucket):
         """
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
@@ -111,13 +110,14 @@ class RiakClientOperations(RiakClientTransport):
         :type bucket: RiakBucket
         :rtype: iterator
         """
-        stream = transport.stream_keys(bucket)
-        try:
-            for keylist in stream:
-                if len(keylist) > 0:
-                    yield keylist
-        finally:
-            stream.close()
+        with self._transport() as transport:
+            stream = transport.stream_keys(bucket)
+            try:
+                for keylist in stream:
+                    if len(keylist) > 0:
+                        yield keylist
+            finally:
+                stream.close()
 
     @retryable
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
@@ -224,8 +224,7 @@ class RiakClientOperations(RiakClientTransport):
         """
         return transport.mapred(inputs, query, timeout)
 
-    @retryable
-    def stream_mapred(self, transport, inputs, query, timeout):
+    def stream_mapred(self, inputs, query, timeout):
         """
         Streams a MapReduce query as (phase, data) pairs. This is a
         generator method which should be iterated over.
@@ -238,12 +237,13 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: integer, None
         :rtype: iterator
         """
-        stream = transport.stream_mapred(inputs, query, timeout)
-        try:
-            for phase, data in stream:
-                yield phase, data
-        finally:
-            stream.close()
+        with self._transport() as transport:
+            stream = transport.stream_mapred(inputs, query, timeout)
+            try:
+                for phase, data in stream:
+                    yield phase, data
+            finally:
+                stream.close()
 
     @retryableHttpOnly
     def fulltext_search(self, transport, index, query, **params):
