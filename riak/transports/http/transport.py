@@ -323,8 +323,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         response = self._request('GET', url)
         headers, data = response
         self.check_http_code(response, [200])
-        jsonData = json.loads(data)
-        return jsonData[u'keys'][:]
+        json_data = json.loads(data)
+        return json_data[u'keys'][:]
 
     def search(self, index, query, **params):
         """
