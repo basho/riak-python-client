@@ -29,8 +29,6 @@ from riak.mapreduce import (
     RiakLink
     )
 from riak import RiakError
-from riak.riak_index_entry import RiakIndexEntry
-
 
 class RiakObject(object):
     """
@@ -183,7 +181,7 @@ class RiakObject(object):
             raise RiakError("Riak 2i fields must end with either '_bin'"
                             " or '_int'.")
 
-        rie = RiakIndexEntry(field, value)
+        rie = (field, value)
         if not rie in self.metadata[MD_INDEX]:
             self.metadata[MD_INDEX].append(rie)
 
@@ -204,35 +202,34 @@ class RiakObject(object):
             ries = self.metadata[MD_INDEX][:]
         elif field and not value:
             ries = [x for x in self.metadata[MD_INDEX]
-                    if x.get_field() == field]
+                    if x[0] == field]
         elif field and value:
-            ries = [RiakIndexEntry(field, value)]
+            ries = [(field, value)]
         else:
             raise RiakError("Cannot pass value without a field"
                             " name while removing index")
 
-        for rie in ries:
-            if rie in self.metadata[MD_INDEX]:
-                self.metadata[MD_INDEX].remove(rie)
+
+        # This removes the index entries that's in the ries list.
+        # Done because this is preferred over metadata[MD_INDEX].remove(rie)
+        self.metadata[MD_INDEX] = [rie for rie in self.metadata[MD_INDEX]
+                                    if rie not in ries]
         return self
 
     remove_indexes = remove_index
 
     def set_indexes(self, indexes):
         """
-        Replaces all indexes on a Riak object. Currenly supports an
-        iterable of 2 item tuples, (field, value)
+        Replaces all indexes on a Riak object. Currently supports an
+        iterable of 2 item tuples, (field, value).
 
         :param indexes: iterable of 2 item tuples consisting the field
-                        and value.
+                        and value. Both the field and the value must be a string.
         :rtype: RiakObject
         """
-        new_indexes = []
-        for field, value in indexes:
-            rie = RiakIndexEntry(field, value)
-            new_indexes.append(rie)
-        self.metadata[MD_INDEX] = new_indexes
-
+        # makes a copy and does type conversion
+        # this seems rather slow
+        self.metadata[MD_INDEX] = indexes[:]
         return self
 
     def get_indexes(self, field=None):
@@ -242,13 +239,13 @@ class RiakObject(object):
 
         :param field: The index field.
         :type field: string or None
-        :rtype: (array of RiakIndexEntry) or (array of string or integer)
+        :rtype: (array of 2 element tuples with field, value) or
+                (array of string or integer)
         """
         if field == None:
             return self.metadata[MD_INDEX]
         else:
-            return [x.get_value() for x in self.metadata[MD_INDEX]
-                    if x.get_field() == field]
+            return [v for f, v in self.metadata[MD_INDEX] if f == field]
 
     def _get_content_type(self):
         try:
