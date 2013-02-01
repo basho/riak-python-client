@@ -573,7 +573,7 @@ class RiakObject(object):
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
-        return apply(mr.add, args)
+        return mr.add(*args)
 
     def link(self, *args):
         """
@@ -584,7 +584,7 @@ class RiakObject(object):
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
-        return apply(mr.link, args)
+        return mr.link(*args)
 
     def map(self, *args):
         """
@@ -595,9 +595,9 @@ class RiakObject(object):
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
-        return apply(mr.map, args)
+        return mr.map(*args)
 
-    def reduce(self, params):
+    def reduce(self, *args):
         """
         Start assembling a Map/Reduce operation.
         A shortcut for :func:`RiakMapReduce.reduce`.
@@ -606,4 +606,4 @@ class RiakObject(object):
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
-        return apply(mr.reduce, params)
+        return mr.reduce(*args)
