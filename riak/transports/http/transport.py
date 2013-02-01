@@ -48,7 +48,7 @@ from riak.metadata import (
         )
 from riak.mapreduce import RiakLink
 from riak import RiakError
-from riak.riak_index_entry import RiakIndexEntry
+from riak.util import RiakIndexEntry
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
 from xml.dom.minidom import Document
@@ -538,12 +538,12 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         for key, value in robj.usermeta.iteritems():
             headers['X-Riak-Meta-%s' % key] = value
 
-        for rie in robj.get_indexes():
-            key = 'X-Riak-Index-%s' % rie.get_field()
+        for field, value in robj.get_indexes():
+            key = 'X-Riak-Index-%s' % field
             if key in headers:
-                headers[key] += ", " + rie.get_value()
+                headers[key] += ", " + value
             else:
-                headers[key] = rie.get_value()
+                headers[key] = value
 
         return headers
 

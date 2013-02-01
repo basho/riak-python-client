@@ -29,7 +29,7 @@ from riak.metadata import (
         )
 
 import riak_pb
-from riak.riak_index_entry import RiakIndexEntry
+from riak.util import RiakIndexEntry
 from riak.mapreduce import RiakLink
 
 RIAKC_RW_ONE = 4294967294
@@ -152,10 +152,10 @@ class RiakPbcCodec(object):
                     pair.key = uk
                     pair.value = v[uk]
             elif k == MD_INDEX:
-                for rie in v:
+                for field, value in v:
                     pair = rpb_content.indexes.add()
-                    pair.key = rie.get_field()
-                    pair.value = rie.get_value()
+                    pair.key = field
+                    pair.value = value
             elif k == MD_LINKS:
                 for link in v:
                     pb_link = rpb_content.links.add()

@@ -6,7 +6,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-from riak.riak_index_entry import RiakIndexEntry
+from riak.util import RiakIndexEntry
 from riak import RiakError
 
 SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
