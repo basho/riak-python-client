@@ -48,7 +48,6 @@ from riak.metadata import (
         )
 from riak.mapreduce import RiakLink
 from riak import RiakError
-from riak.riak_index_entry import RiakIndexEntry
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
 from xml.dom.minidom import Document
@@ -324,8 +323,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         response = self._request('GET', url)
         headers, data = response
         self.check_http_code(response, [200])
-        jsonData = json.loads(data)
-        return jsonData[u'keys'][:]
+        json_data = json.loads(data)
+        return json_data[u'keys'][:]
 
     def search(self, index, query, **params):
         """
@@ -463,7 +462,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
                 reader = csv.reader([value], skipinitialspace=True)
                 for line in reader:
                     for token in line:
-                        rie = RiakIndexEntry(field, token)
+                        if field.endswith("_int"):
+                            token = int(token)
+                        rie = (field, token)
                         metadata[MD_INDEX].append(rie)
             elif header == 'x-riak-vclock':
                 vclock = value
@@ -538,12 +539,12 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         for key, value in robj.usermeta.iteritems():
             headers['X-Riak-Meta-%s' % key] = value
 
-        for rie in robj.get_indexes():
-            key = 'X-Riak-Index-%s' % rie.get_field()
+        for field, value in robj.get_indexes():
+            key = 'X-Riak-Index-%s' % field
             if key in headers:
-                headers[key] += ", " + rie.get_value()
+                headers[key] += ", " + str(value)
             else:
-                headers[key] = rie.get_value()
+                headers[key] = str(value)
 
         return headers
 

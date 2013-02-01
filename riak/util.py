@@ -19,7 +19,6 @@ under the License.
 import warnings
 from collections import Mapping
 
-
 def quacks_like_dict(object):
     """Check if object is dict-like"""
     return isinstance(object, Mapping)
