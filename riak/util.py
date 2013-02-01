@@ -19,8 +19,6 @@ under the License.
 import warnings
 from collections import Mapping
 
-RiakIndexEntry = lambda field, value: (field, str(value))
-
 def quacks_like_dict(object):
     """Check if object is dict-like"""
     return isinstance(object, Mapping)

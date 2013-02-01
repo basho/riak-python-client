@@ -48,7 +48,6 @@ from riak.metadata import (
         )
 from riak.mapreduce import RiakLink
 from riak import RiakError
-from riak.util import RiakIndexEntry
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
 from xml.dom.minidom import Document
@@ -463,7 +462,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
                 reader = csv.reader([value], skipinitialspace=True)
                 for line in reader:
                     for token in line:
-                        rie = RiakIndexEntry(field, token)
+                        if field.endswith("_int"):
+                            token = int(token)
+                        rie = (field, token)
                         metadata[MD_INDEX].append(rie)
             elif header == 'x-riak-vclock':
                 vclock = value
@@ -541,9 +542,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         for field, value in robj.get_indexes():
             key = 'X-Riak-Index-%s' % field
             if key in headers:
-                headers[key] += ", " + value
+                headers[key] += ", " + str(value)
             else:
-                headers[key] = value
+                headers[key] = str(value)
 
         return headers
 

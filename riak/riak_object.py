@@ -29,7 +29,6 @@ from riak.mapreduce import (
     RiakLink
     )
 from riak import RiakError
-from riak.util import RiakIndexEntry
 
 class RiakObject(object):
     """
@@ -182,7 +181,7 @@ class RiakObject(object):
             raise RiakError("Riak 2i fields must end with either '_bin'"
                             " or '_int'.")
 
-        rie = RiakIndexEntry(field, value)
+        rie = (field, value)
         if not rie in self.metadata[MD_INDEX]:
             self.metadata[MD_INDEX].append(rie)
 
@@ -205,7 +204,7 @@ class RiakObject(object):
             ries = [x for x in self.metadata[MD_INDEX]
                     if x[0] == field]
         elif field and value:
-            ries = [RiakIndexEntry(field, value)]
+            ries = [(field, value)]
         else:
             raise RiakError("Cannot pass value without a field"
                             " name while removing index")
@@ -230,8 +229,7 @@ class RiakObject(object):
         """
         # makes a copy and does type conversion
         # this seems rather slow
-        new_indexes = [RiakIndexEntry(field, value) for field, value in indexes]
-        self.metadata[MD_INDEX] = new_indexes
+        self.metadata[MD_INDEX] = indexes[:]
         return self
 
     def get_indexes(self, field=None):
@@ -241,7 +239,8 @@ class RiakObject(object):
 
         :param field: The index field.
         :type field: string or None
-        :rtype: (array of RiakIndexEntry) or (array of string or integer)
+        :rtype: (array of 2 element tuples with field, value) or
+                (array of string or integer)
         """
         if field == None:
             return self.metadata[MD_INDEX]

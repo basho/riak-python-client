@@ -29,7 +29,6 @@ from riak.metadata import (
         )
 
 import riak_pb
-from riak.util import RiakIndexEntry
 from riak.mapreduce import RiakLink
 
 RIAKC_RW_ONE = 4294967294
@@ -125,7 +124,11 @@ class RiakPbcCodec(object):
             metadata[MD_USERMETA] = usermeta
         indexes = []
         for index in rpb_content.indexes:
-            rie = RiakIndexEntry(index.key, index.value)
+            if index.key.endswith("_int"):
+                value = int(index.value)
+            else:
+                value = index.value
+            rie = (index.key, value)
             indexes.append(rie)
         if len(indexes) > 0:
             metadata[MD_INDEX] = indexes
@@ -155,7 +158,7 @@ class RiakPbcCodec(object):
                 for field, value in v:
                     pair = rpb_content.indexes.add()
                     pair.key = field
-                    pair.value = value
+                    pair.value = str(value)
             elif k == MD_LINKS:
                 for link in v:
                     pb_link = rpb_content.links.add()
