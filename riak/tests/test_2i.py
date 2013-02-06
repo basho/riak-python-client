@@ -6,7 +6,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-from riak.riak_index_entry import RiakIndexEntry
+from riak import RiakError
 
 SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
 
@@ -38,7 +38,7 @@ class TwoITests(object):
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
         self.assertEqual(['val1a'], sorted(obj.get_indexes('field1_bin')))
-        self.assertEqual(['1011'], sorted(obj.get_indexes('field1_int')))
+        self.assertEqual([1011], sorted(obj.get_indexes('field1_int')))
 
         # Add more indexes and save...
         obj.add_index('field1_bin', 'val1b')
@@ -49,15 +49,15 @@ class TwoITests(object):
         obj = bucket.get('mykey1')
         self.assertEqual(['val1a', 'val1b'],
                          sorted(obj.get_indexes('field1_bin')))
-        self.assertEqual(['1011', '1012'],
+        self.assertEqual([1011, 1012],
                          sorted(obj.get_indexes('field1_int')))
 
         # Check the get_indexes() function...
         self.assertEqual([
-                RiakIndexEntry('field1_bin', 'val1a'),
-                RiakIndexEntry('field1_bin', 'val1b'),
-                RiakIndexEntry('field1_int', 1011),
-                RiakIndexEntry('field1_int', 1012)
+                ('field1_bin', 'val1a'),
+                ('field1_bin', 'val1b'),
+                ('field1_int', 1011),
+                ('field1_int', 1012)
                 ], sorted(obj.get_indexes()))
 
         # Delete an index...
@@ -68,7 +68,7 @@ class TwoITests(object):
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
         self.assertEqual(['val1b'], sorted(obj.get_indexes('field1_bin')))
-        self.assertEqual(['1012'], sorted(obj.get_indexes('field1_int')))
+        self.assertEqual([1012], sorted(obj.get_indexes('field1_int')))
 
         # Check duplicate entries...
         obj.add_index('field1_bin', 'val1a')
@@ -79,20 +79,20 @@ class TwoITests(object):
         obj.add_index('field1_int', 1011)
 
         self.assertEqual([
-                RiakIndexEntry('field1_bin', 'val1a'),
-                RiakIndexEntry('field1_bin', 'val1b'),
-                RiakIndexEntry('field1_int', 1011),
-                RiakIndexEntry('field1_int', 1012)
+                ('field1_bin', 'val1a'),
+                ('field1_bin', 'val1b'),
+                ('field1_int', 1011),
+                ('field1_int', 1012)
                 ], sorted(obj.get_indexes()))
 
         obj.store()
         obj = bucket.get('mykey1')
 
         self.assertEqual([
-                RiakIndexEntry('field1_bin', 'val1a'),
-                RiakIndexEntry('field1_bin', 'val1b'),
-                RiakIndexEntry('field1_int', 1011),
-                RiakIndexEntry('field1_int', 1012)
+                ('field1_bin', 'val1a'),
+                ('field1_bin', 'val1b'),
+                ('field1_int', 1011),
+                ('field1_int', 1012)
                 ], sorted(obj.get_indexes()))
 
         # Clean up...
@@ -108,7 +108,7 @@ class TwoITests(object):
         foo.set_indexes((('field1_bin', 'test'), ('field2_int', 1337))).store()
         result = self.client.index(self.bucket_name, 'field2_int', 1337).run()
         self.assertEqual(1, len(result))
-        self.assertEqual('foo', result[0].get_key())
+        self.assertEqual('foo', result[0].key)
 
         result = bucket.get_index('field1_bin', 'test')
         self.assertEqual(1, len(result))
@@ -222,3 +222,13 @@ class TwoITests(object):
         bucket.get('mykey2').delete()
         bucket.get('mykey3').delete()
         bucket.get('mykey4').delete()
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    def test_secondary_index_invalid_name(self):
+        if not self.is_2i_supported():
+            return True
+
+        bucket = self.client.bucket('indexbucket')
+
+        with self.assertRaises(RiakError):
+            bucket.new('k', 'a').add_index('field1', 'value1')

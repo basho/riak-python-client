@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from riak.mapreduce import RiakLink
-from riak import RiakKeyFilter, key_filter
+from riak.mapreduce import RiakLink, RiakMapReduce
+from riak import key_filter
 
 
 class LinkTests(object):
@@ -17,14 +17,14 @@ class LinkTests(object):
         links = obj.get_links()
         self.assertEqual(len(links), 3)
         for l in links:
-            if (l.get_key() == "foo1"):
-                self.assertEqual(l.get_tag(), self.bucket_name)
-            elif (l.get_key() == "foo2"):
-                self.assertEqual(l.get_tag(), "tag")
-            elif (l.get_key() == "foo3"):
-                self.assertEqual(l.get_tag(), "tag2!@#%^&*)")
+            if (l.key == "foo1"):
+                self.assertEqual(l.tag, self.bucket_name)
+            elif (l.key == "foo2"):
+                self.assertEqual(l.tag, "tag")
+            elif (l.key == "foo3"):
+                self.assertEqual(l.tag, "tag2!@#%^&*)")
             else:
-                self.assertEqual("unknown key", l.get_key())
+                self.assertEqual("unknown key", l.key)
 
     def test_set_links(self):
         # Create the object
@@ -33,23 +33,23 @@ class LinkTests(object):
             (bucket.new("foo2"), "tag"),
             RiakLink(self.bucket_name, "foo2", "tag2")]).store()
         obj = bucket.get("foo")
-        links = sorted(obj.get_links(), key=lambda x: x.get_key())
+        links = sorted(obj.get_links(), key=lambda x: x.key)
         self.assertEqual(len(links), 3)
-        self.assertEqual(links[0].get_key(), "foo1")
-        self.assertEqual(links[1].get_key(), "foo2")
-        self.assertEqual(links[1].get_tag(), "tag")
-        self.assertEqual(links[2].get_key(), "foo2")
-        self.assertEqual(links[2].get_tag(), "tag2")
+        self.assertEqual(links[0].key, "foo1")
+        self.assertEqual(links[1].key, "foo2")
+        self.assertEqual(links[1].tag, "tag")
+        self.assertEqual(links[2].key, "foo2")
+        self.assertEqual(links[2].tag, "tag2")
 
     def test_set_links_all_links(self):
         bucket = self.client.bucket(self.bucket_name)
         foo1 = bucket.new("foo", 1)
-        foo2 = bucket.new("foo2", 2).store()
+        bucket.new("foo2", 2).store()
         links = [RiakLink(self.bucket_name, "foo2")]
         foo1.set_links(links, True)
         links = foo1.get_links()
         self.assertEqual(len(links), 1)
-        self.assertEqual(links[0].get_key(), "foo2")
+        self.assertEqual(links[0].key, "foo2")
 
     def test_link_walking(self):
         # Create the object...
@@ -82,6 +82,27 @@ class ErlangMapReduceTests(object):
             .reduce(["riak_kv_mapreduce", "reduce_set_union"]) \
             .run()
         self.assertEqual(len(result), 2)
+
+    def test_client_exceptional_paths(self):
+        bucket = self.client.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 2).store()
+        bucket.new("baz", 4).store()
+
+        #adding a b-key pair to a bucket input
+        with self.assertRaises(ValueError):
+            mr = self.client.add(self.bucket_name)
+            mr.add(self.bucket_name, 'bar')
+
+        #adding a b-key pair to a query input
+        with self.assertRaises(ValueError):
+            mr = self.client.search(self.bucket_name, 'fleh')
+            mr.add(self.bucket_name, 'bar')
+
+        #adding a key filter to a query input
+        with self.assertRaises(ValueError):
+            mr = self.client.search(self.bucket_name, 'fleh')
+            mr.add_key_filter("tokenize", "-", 1)
 
 
 class JSMapReduceTests(object):
@@ -228,6 +249,66 @@ class JSMapReduceTests(object):
         obj = bucket.get("foo")
         result = obj.map("Riak.mapValuesJson").run()
         self.assertEqual(result, [2])
+
+    def test_mr_list_add(self):
+        bucket = self.client.bucket("abucket")
+        for x in range(20):
+            bucket.new('baz' + str(x),
+                       'bazval' + str(x)).store()
+        mr = self.client.add('abucket', ['baz' + str(x)
+                                         for x in range(2, 5)])
+        results = mr.map_values().run()
+        results.sort()
+        self.assertEqual(results,
+                         [u'"bazval2"',
+                          u'"bazval3"',
+                          u'"bazval4"'])
+
+    def test_mr_list_add_two_buckets(self):
+        bucket = self.client.bucket("bucket_a")
+        for x in range(10):
+            bucket.new('foo' + str(x),
+                       'fooval' + str(x)).store()
+        bucket = self.client.bucket("bucket_b")
+        for x in range(10):
+            bucket.new('bar' + str(x),
+                       'barval' + str(x)).store()
+
+        mr = self.client.add('bucket_a', ['foo' + str(x)
+                                          for x in range(2, 4)])
+        mr.add('bucket_b', ['bar' + str(x)
+                            for x in range(5, 7)])
+        results = mr.map_values().run()
+        results.sort()
+
+        self.assertEqual(results,
+                         [u'"barval5"',
+                          u'"barval6"',
+                          u'"fooval2"',
+                          u'"fooval3"'])
+
+    def test_mr_list_add_mix(self):
+        bucket = self.client.bucket("bucket_a")
+        for x in range(10):
+            bucket.new('foo' + str(x),
+                       'fooval' + str(x)).store()
+        bucket = self.client.bucket("bucket_b")
+        for x in range(10):
+            bucket.new('bar' + str(x),
+                       'barval' + str(x)).store()
+
+        mr = self.client.add('bucket_a', ['foo' + str(x)
+                                          for x in range(2, 4)])
+        mr.add('bucket_b', 'bar9')
+        mr.add('bucket_b', 'bar2')
+        results = mr.map_values().run()
+        results.sort()
+
+        self.assertEqual(results,
+                         [u'"barval2"',
+                          u'"barval9"',
+                          u'"fooval2"',
+                          u'"fooval3"'])
 
 
 class MapReduceAliasTests(object):
@@ -415,3 +496,37 @@ class MapReduceAliasTests(object):
                    .run()
 
         self.assertEqual(sorted(result), [1, 2])
+
+
+class MapReduceStreamTests(object):
+    def test_stream_results(self):
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        mr = RiakMapReduce(self.client).add('bucket', 'one')\
+                                       .add('bucket', 'two')
+        mr.map_values_json()
+        results = []
+        for phase, data in mr.stream():
+            results.extend(data)
+
+        self.assertEqual(sorted(results), [1, 2])
+
+    def test_stream_cleanoperationsup(self):
+        bucket = self.client.bucket('bucket')
+        bucket.new('one', data=1).store()
+        bucket.new('two', data=2).store()
+
+        mr = RiakMapReduce(self.client).add('bucket', 'one')\
+                                       .add('bucket', 'two')
+        mr.map_values_json()
+        try:
+            for phase, data in mr.stream():
+                raise RuntimeError("woops")
+        except RuntimeError:
+            pass
+
+        # This should not raise an exception
+        obj = bucket.get('one')
+        self.assertEqual(1, obj.data)

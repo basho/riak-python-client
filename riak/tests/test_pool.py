@@ -72,7 +72,7 @@ class PoolTest(unittest.TestCase):
 
         with pool.take() as element2:
             self.assertEqual(1, len(pool.elements))
-            self.assertEqual([1, 2], element)
+            self.assertEqual([1, 2], element2)
 
         self.assertEqual(1, len(pool.elements))
 
@@ -96,8 +96,8 @@ class PoolTest(unittest.TestCase):
         """
         pool = SimplePool()
         try:
-            with pool.take() as x:
-                with pool.take() as y:
+            with pool.take():
+                with pool.take():
                     raise RuntimeError
         except:
             self.assertEqual(2, len(pool.elements))
@@ -114,7 +114,7 @@ class PoolTest(unittest.TestCase):
             self.assertEqual([1], element)
             element.append(2)
         try:
-            with pool.take() as baddie:
+            with pool.take():
                 raise BadResource
         except BadResource:
             self.assertEqual(0, len(pool.elements))
@@ -130,8 +130,8 @@ class PoolTest(unittest.TestCase):
             return numlist[0] % 2 == 0
 
         pool = SimplePool()
-        with pool.take() as x:
-            with pool.take() as y:
+        with pool.take():
+            with pool.take():
                 pass
 
         with pool.take(_filter=filtereven) as f:
@@ -146,7 +146,7 @@ class PoolTest(unittest.TestCase):
         pool = SimplePool()
 
         with self.assertRaises(TypeError):
-            with pool.take(_filter=badfilter) as resource:
+            with pool.take(_filter=badfilter):
                 pass
 
     def test_yields_default_when_empty(self):
@@ -248,7 +248,7 @@ class PoolTest(unittest.TestCase):
         pool = SimplePool()
 
         def worker_run():
-            with pool.take() as a:
+            with pool.take():
                 startq.put(1)
                 startq.join()
                 sleep(rand.uniform(0, 0.5))

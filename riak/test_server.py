@@ -84,13 +84,22 @@ class TestServer(object):
           "js_thread_stack": 16,
           "riak_kv_stat": True,
           "map_cache_size": 0,
-          "vnode_cache_entries": 0
+          "vnode_cache_entries": 0,
+          "test": True,
+          "memory_backend": {
+                "test": True,
+                },
       },
       "riak_search": {
           "enabled": True,
           "search_backend": Atom("riak_search_test_backend")
       },
     }
+
+    _temp_bin = None
+    _temp_etc = None
+    _temp_log = None
+    _temp_pipe = None
 
     def __init__(self, tmp_dir="/tmp/riak/test_server",
                  bin_dir=os.path.expanduser("~/.riak/install/riak-0.14.2/bin"),

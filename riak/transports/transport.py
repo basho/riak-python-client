@@ -17,12 +17,12 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak import RiakError
 import base64
 import random
 import threading
 import platform
 import os
+import json
 from feature_detect import FeatureDetection
 
 
@@ -31,11 +31,14 @@ class RiakTransport(FeatureDetection):
     Class to encapsulate transport details
     """
 
-    # Subclasses should specify their API level.
-    #   * missing or 1: the API used up and through 1.3.x.
-    #   * 2: the API introduced with 1.4.x
-    #
-    # api = 2
+    def _get_client_id(self):
+        return self._client_id
+
+    def _set_client_id(self, value):
+        self._client_id = value
+
+    client_id = property(_get_client_id, _set_client_id,
+                         doc="""the client ID for this connection""")
 
     @classmethod
     def make_random_client_id(self):
@@ -117,9 +120,27 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def get_keys(self, bucket):
+        """
+        Lists all keys within the given bucket.
+        """
+        raise NotImplementedError
+
+    def stream_keys(self, bucket):
+        """
+        Streams the list of keys for the bucket through an iterator.
+        """
+        raise NotImplementedError
+
     def mapred(self, inputs, query, timeout=None):
         """
-        Serialize map/reduce request
+        Sends a MapReduce request synchronously.
+        """
+        raise NotImplementedError
+
+    def stream_mapred(self, inputs, query, timeout=None):
+        """
+        Streams the results of a MapReduce request through an iterator.
         """
         raise NotImplementedError
 
@@ -146,6 +167,18 @@ class RiakTransport(FeatureDetection):
     def get_index(self, bucket, index, startkey, endkey=None):
         """
         Performs a secondary index query.
+        """
+        raise NotImplementedError
+
+    def fulltext_add(self, index, *docs):
+        """
+        Adds documents to the full-text index.
+        """
+        raise NotImplementedError
+
+    def fulltext_delete(self, index, docs=None, queries=None):
+        """
+        Removes documents from the full-text index.
         """
         raise NotImplementedError
 
@@ -198,3 +231,15 @@ class RiakTransport(FeatureDetection):
                                   'key': startkey},
                                  phases)
         return [key for bucket, key in result]
+
+    def _construct_mapred_json(self, inputs, query, timeout=None):
+        if not self.phaseless_mapred() and (query is None or len(query) is 0):
+            raise Exception(
+                'Phase-less MapReduce is not supported by Riak node')
+
+        job = {'inputs': inputs, 'query': query}
+        if timeout is not None:
+            job['timeout'] = timeout
+
+        content = json.dumps(job)
+        return content

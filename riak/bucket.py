@@ -56,6 +56,21 @@ class RiakBucket(object):
         self._encoders = {}
         self._decoders = {}
 
+    def __hash__(self):
+        return hash((self.name, self._client))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+        else:
+            return False
+
+    def __nq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) != hash(other)
+        else:
+            return True
+
     def get_encoder(self, content_type):
         """
         Get the encoding function for the provided content type for
@@ -125,8 +140,8 @@ class RiakBucket(object):
             raise TypeError('Unicode data values are not supported.')
 
         obj = RiakObject(self._client, self, key)
-        obj.set_data(data)
-        obj.set_content_type(content_type)
+        obj.data = data
+        obj.content_type = content_type
         obj._encode_data = True
         return obj
 
@@ -146,8 +161,8 @@ class RiakBucket(object):
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
-        obj.set_data(data)
-        obj.set_content_type(content_type)
+        obj.data = data
+        obj.content_type = content_type
         obj._encode_data = False
         return obj
 
@@ -222,7 +237,11 @@ class RiakBucket(object):
     def _get_r(self):
         return self.get_property('r')
 
-    r = property(_get_r, _set_r)
+    r = property(_get_r, _set_r, doc="""
+    The default 'read' quorum for this bucket (how many replicas must
+    reply for a successful read). This should be an integer less than
+    the 'n_val' property, or a string of 'one', 'quorum', 'all', or
+    'default'""")
 
     def _set_pr(self, val):
         return self.set_property('pr', val)
@@ -230,7 +249,11 @@ class RiakBucket(object):
     def _get_pr(self):
         return self.get_property('pr')
 
-    pr = property(_get_pr, _set_pr)
+    pr = property(_get_pr, _set_pr, doc="""
+    The default 'primary read' quorum for this bucket (how many
+    primary replicas are required for a successful read). This should
+    be an integer less than the 'n_val' property, or a string of
+    'one', 'quorum', 'all', or 'default'""")
 
     def _set_rw(self, val):
         return self.set_property('rw', val)
@@ -238,7 +261,11 @@ class RiakBucket(object):
     def _get_rw(self):
         return self.get_property('rw')
 
-    rw = property(_get_rw, _set_rw)
+    rw = property(_get_rw, _set_rw, doc="""
+    The default 'read' and 'write' quorum for this bucket (equivalent
+    to 'r' and 'w' but for deletes). This should be an integer less
+    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
+    or 'default'""")
 
     def _set_w(self, val):
         return self.set_property('w', val)
@@ -246,7 +273,11 @@ class RiakBucket(object):
     def _get_w(self):
         return self.get_property('w')
 
-    w = property(_get_w, _set_w)
+    w = property(_get_w, _set_w, doc="""
+    The default 'write' quorum for this bucket (how many replicas must
+    acknowledge receipt of a write). This should be an integer less
+    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
+    or 'default'""")
 
     def _set_dw(self, val):
         return self.set_property('dw', val)
@@ -254,7 +285,11 @@ class RiakBucket(object):
     def _get_dw(self):
         return self.get_property('dw')
 
-    dw = property(_get_dw, _set_dw)
+    dw = property(_get_dw, _set_dw, doc="""
+    The default 'durable write' quorum for this bucket (how many
+    replicas must commit the write). This should be an integer less
+    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
+    or 'default'""")
 
     def _set_pw(self, val):
         return self.set_property('pw', val)
@@ -262,15 +297,15 @@ class RiakBucket(object):
     def _get_pw(self):
         return self.get_property('pw')
 
-    pw = property(_get_pw, _set_pw)
+    pw = property(_get_pw, _set_pw, doc="""
+    The default 'primary write' quorum for this bucket (how many
+    primary replicas are required for a successful write). This should
+    be an integer less than the 'n_val' property, or a string of
+    'one', 'quorum', 'all', or 'default'""")
 
     def set_property(self, key, value):
         """
         Set a bucket property.
-
-        .. warning::
-
-           This should only be used if you know what you are doing.
 
         :param key: Property to set.
         :type key: string
@@ -296,24 +331,18 @@ class RiakBucket(object):
         """
         Set multiple bucket properties in one call.
 
-        .. warning::
-
-           This should only be used if you know what you are doing.
-
-        :param props: An associative array of key:value.
-        :type props: array
+        :param props: A dictionary of properties
+        :type props: dict
         """
-        t = self._client.get_transport()
-        t.set_bucket_props(self, props)
+        self._client.set_bucket_props(self, props)
 
     def get_properties(self):
         """
-        Retrieve an associative array of all bucket properties.
+        Retrieve a dict of all bucket properties.
 
-        :rtype: array
+        :rtype: dict
         """
-        t = self._client.get_transport()
-        return t.get_bucket_props(self)
+        return self._client.get_bucket_props(self)
 
     def get_keys(self):
         """
@@ -323,7 +352,19 @@ class RiakBucket(object):
 
            At current, this is a very expensive operation. Use with caution.
         """
-        return self._client.get_transport().get_keys(self)
+        return self._client.get_keys(self)
+
+    def stream_keys(self):
+        """
+        Streams all keys within the bucket through an iterator.
+
+        .. warning::
+
+           At current, this is a very expensive operation. Use with caution.
+
+        :rtype: iterator
+        """
+        return self._client.stream_keys(self)
 
     def new_binary_from_file(self, key, filename):
         """
@@ -332,6 +373,10 @@ class RiakBucket(object):
         """
         binary_data = open(filename, "rb").read()
         mimetype, encoding = mimetypes.guess_type(filename)
+        if encoding:
+            binary_data = bytearray(binary_data, encoding)
+        else:
+            binary_data = bytearray(binary_data)
         if not mimetype:
             mimetype = 'application/octet-stream'
         return self.new_binary(key, binary_data, mimetype)
@@ -371,11 +416,13 @@ class RiakBucket(object):
         """
         Queries a search index over objects in this bucket/index.
         """
-        return self._client.solr().search(self.name, query, **params)
+        return self._client.solr.search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None):
         """
         Queries a secondary index over objects in this bucket, returning keys.
         """
-        return self._client._transport.get_index(self.name, index, startkey,
-                                                 endkey)
+        return self._client.get_index(self.name, index, startkey, endkey)
+
+    def __str__(self):
+        return '<RiakBucket "{0}">'.format(self.name)

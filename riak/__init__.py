@@ -32,19 +32,16 @@ See the unit_tests.py file for example usage.
 
 
 class RiakError(Exception):
+    """
+    Base class for exceptions generated in the Riak API.
+    """
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
         return repr(self.value)
 
-from riak_object import RiakObject
-from bucket import RiakBucket
-from client import RiakClient
-from mapreduce import RiakMapReduce, RiakMapReducePhase, RiakLinkPhase,\
-    RiakKeyFilter
-from transports.pbc import RiakPbcTransport
-from transports.http import RiakHttpTransport
+from mapreduce import RiakKeyFilter
 
 ONE = "one"
 ALL = "all"
