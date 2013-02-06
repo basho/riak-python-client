@@ -30,6 +30,7 @@ from riak.mapreduce import (
     )
 from riak import RiakError
 
+
 class RiakObject(object):
     """
     The RiakObject holds meta information about a Riak object, plus the
@@ -209,7 +210,6 @@ class RiakObject(object):
             raise RiakError("Cannot pass value without a field"
                             " name while removing index")
 
-
         # This removes the index entries that's in the ries list.
         # Done because this is preferred over metadata[MD_INDEX].remove(rie)
         self.metadata[MD_INDEX] = [rie for rie in self.metadata[MD_INDEX]
@@ -224,7 +224,8 @@ class RiakObject(object):
         iterable of 2 item tuples, (field, value).
 
         :param indexes: iterable of 2 item tuples consisting the field
-                        and value. Both the field and the value must be a string.
+                        and value. Both the field and the value must
+                        be a string.
         :rtype: RiakObject
         """
         # makes a copy and does type conversion
