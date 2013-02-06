@@ -346,7 +346,7 @@ class RiakObject(object):
         a = []
         links = self.metadata.get(MD_LINKS, [])
         for link in links:
-            if not link.isEqual(oldlink):
+            if not link == oldlink:
                 a.append(link)
 
         self.metadata[MD_LINKS] = a

@@ -162,7 +162,7 @@ class RiakPbcCodec(object):
             elif k == MD_LINKS:
                 for link in v:
                     pb_link = rpb_content.links.add()
-                    pb_link.bucket = link.get_bucket()
-                    pb_link.key = link.get_key()
-                    pb_link.tag = link.get_tag()
+                    pb_link.bucket = link.bucket
+                    pb_link.key = link.key
+                    pb_link.tag = link.tag
         rpb_content.value = str(data)
