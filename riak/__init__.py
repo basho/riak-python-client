@@ -31,8 +31,9 @@ See the unit_tests.py file for example usage.
 """
 
 __all__ = ['RiakClient', 'RiakBucket', 'RiakNode', 'RiakObject',
-           'RiakMapReduce', 'RiakKeyFilter', 'RiakError', 'ONE',
-           'ALL', 'QUORUM', 'key_filter']
+           'RiakMapReduce', 'RiakKeyFilter', 'RiakLink', 'RiakError',
+           'ONE', 'ALL', 'QUORUM', 'key_filter']
+
 
 class RiakError(Exception):
     """
@@ -48,7 +49,7 @@ from client import RiakClient
 from bucket import RiakBucket
 from node import RiakNode
 from riak_object import RiakObject
-from mapreduce import RiakKeyFilter, RiakMapReduce
+from mapreduce import RiakKeyFilter, RiakMapReduce, RiakLink
 
 ONE = "one"
 ALL = "all"
