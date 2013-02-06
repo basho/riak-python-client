@@ -685,22 +685,7 @@ class RiakLink(object):
         self._tag = tag
         return self
 
-    def to_link_header(self, client):
-        """
-        Convert this RiakLink object to a link header string. Used
-        internally.
-
-        :rtype: string
-        """
-        link = ''
-        link += '</'
-        link += client._prefix + '/'
-        link += urllib.quote_plus(self._bucket) + '/'
-        link += urllib.quote_plus(self._key) + '>; riaktag="'
-        link += urllib.quote_plus(self.get_tag()) + '"'
-        return link
-
-    def isEqual(self, link):
+    def __eq__(self, other):
         """
         Returns True if the links are equal.
 
@@ -708,9 +693,9 @@ class RiakLink(object):
         :type link: RiakLink
         :rtype: boolean
         """
-        return ((self._bucket == link._bucket) and
-                (self._key == link._key) and
-                (self.get_tag() == link.get_tag()))
+        return ((self._bucket == other._bucket) and
+                (self._key == other._key) and
+                (self.get_tag() == other.get_tag()))
 
 
 class RiakKeyFilter(object):
