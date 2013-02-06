@@ -55,7 +55,7 @@ def deep_merge(a, b):
 
 
 def deprecated(message, stacklevel=3):
-    warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
+    warnings.warn(message, UserWarning, stacklevel=stacklevel)
 
 QUORUMS = ['r', 'pr', 'w', 'dw', 'pw', 'rw']
 QDEPMESSAGE = """
