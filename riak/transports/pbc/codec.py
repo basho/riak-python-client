@@ -148,7 +148,7 @@ class RiakPbcCodec(object):
             elif k == MD_CHARSET:
                 rpb_content.charset = v
             elif k == MD_ENCODING:
-                rpb_content.charset = v
+                rpb_content.content_encoding = v
             elif k == MD_USERMETA:
                 for uk in v:
                     pair = rpb_content.usermeta.add()
