@@ -39,6 +39,7 @@ from riak.transports.http.stream import (
 from riak.metadata import (
         MD_CHARSET,
         MD_CTYPE,
+        MD_ENCODING,
         MD_INDEX,
         MD_LASTMOD,
         MD_LINKS,
@@ -447,7 +448,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             elif header == 'charset':
                 metadata[MD_CHARSET] = value
             elif header == 'content-encoding':
-                metadata[MD_CTYPE] = value
+                metadata[MD_ENCODING] = value
             elif header == 'etag':
                 metadata[MD_VTAG] = value
             elif header == 'link':
