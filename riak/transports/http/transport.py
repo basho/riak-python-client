@@ -479,8 +479,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """
         Convert this RiakLink object to a link header string. Used internally.
         """
-        url = self.object_path(link.get_bucket(), link.get_key())
-        header = '<%s>; riaktag="%s"' % (url, link.get_tag())
+        url = self.object_path(link.bucket, link.key)
+        header = '<%s>; riaktag="%s"' % (url, link.tag)
         return header
 
     def parse_links(self, links, linkHeaders):

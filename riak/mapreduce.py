@@ -600,9 +600,9 @@ class RiakLink(object):
         :param tag: the tag
         :type tag: string
         """
-        self._bucket = bucket
-        self._key = key
-        self._tag = tag
+        self.bucket = bucket
+        self.key = key
+        self.tag = tag if tag else bucket
         self._client = None
 
     def get(self, r=None):
@@ -613,7 +613,7 @@ class RiakLink(object):
         :type r: string, integer
         :rtype: RiakObject
         """
-        return self._client.bucket(self._bucket).get(self._key, r)
+        return self._client.bucket(self.bucket).get(self.key, r)
 
     def get_binary(self, r=None):
         """
@@ -623,67 +623,7 @@ class RiakLink(object):
         :type r: string, integer
         :rtype: RiakObject
         """
-        return self._client.bucket(self._bucket).get_binary(self._key, r)
-
-    def get_bucket(self):
-        """
-        Get the bucket name of this link.
-
-        :rtype: string
-        """
-        return self._bucket
-
-    def set_bucket(self, name):
-        """
-        Set the bucket name of this link.
-
-        :param name: the bucket name
-        :type name: string
-        :rtype: RiakLink
-        """
-        self._bucket = name
-        return self
-
-    def get_key(self):
-        """
-        Get the key of this link.
-
-        :rtype: string
-        """
-        return self._key
-
-    def set_key(self, key):
-        """
-        Set the key of this link.
-
-        :param key: the key
-        :type key: string
-        :rtype: RiakLink
-        """
-        self._key = key
-        return self
-
-    def get_tag(self):
-        """
-        Get the tag of this link.
-
-        :rtype: string
-        """
-        if (self._tag is None):
-            return self._bucket
-        else:
-            return self._tag
-
-    def set_tag(self, tag):
-        """
-        Set the tag of this link.
-
-        :param tag: the tag
-        :type tag: string
-        :rtype: RiakLink
-        """
-        self._tag = tag
-        return self
+        return self._client.bucket(self.bucket).get_binary(self.key, r)
 
     def __eq__(self, other):
         """
@@ -693,9 +633,9 @@ class RiakLink(object):
         :type link: RiakLink
         :rtype: boolean
         """
-        return ((self._bucket == other._bucket) and
-                (self._key == other._key) and
-                (self.get_tag() == other.get_tag()))
+        return ((self.bucket == other.bucket) and
+                (self.key == other.key) and
+                (self.tag == other.tag))
 
 
 class RiakKeyFilter(object):

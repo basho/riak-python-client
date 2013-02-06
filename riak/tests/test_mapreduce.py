@@ -17,14 +17,14 @@ class LinkTests(object):
         links = obj.get_links()
         self.assertEqual(len(links), 3)
         for l in links:
-            if (l.get_key() == "foo1"):
-                self.assertEqual(l.get_tag(), "bucket")
-            elif (l.get_key() == "foo2"):
-                self.assertEqual(l.get_tag(), "tag")
-            elif (l.get_key() == "foo3"):
-                self.assertEqual(l.get_tag(), "tag2!@#%^&*)")
+            if (l.key == "foo1"):
+                self.assertEqual(l.tag, "bucket")
+            elif (l.key == "foo2"):
+                self.assertEqual(l.tag, "tag")
+            elif (l.key == "foo3"):
+                self.assertEqual(l.tag, "tag2!@#%^&*)")
             else:
-                self.assertEqual("unknown key", l.get_key())
+                self.assertEqual("unknown key", l.key)
 
     def test_set_links(self):
         # Create the object
@@ -33,13 +33,13 @@ class LinkTests(object):
             (bucket.new("foo2"), "tag"),
             RiakLink("bucket", "foo2", "tag2")]).store()
         obj = bucket.get("foo")
-        links = sorted(obj.get_links(), key=lambda x: x.get_key())
+        links = sorted(obj.get_links(), key=lambda x: x.key)
         self.assertEqual(len(links), 3)
-        self.assertEqual(links[0].get_key(), "foo1")
-        self.assertEqual(links[1].get_key(), "foo2")
-        self.assertEqual(links[1].get_tag(), "tag")
-        self.assertEqual(links[2].get_key(), "foo2")
-        self.assertEqual(links[2].get_tag(), "tag2")
+        self.assertEqual(links[0].key, "foo1")
+        self.assertEqual(links[1].key, "foo2")
+        self.assertEqual(links[1].tag, "tag")
+        self.assertEqual(links[2].key, "foo2")
+        self.assertEqual(links[2].tag, "tag2")
 
     def test_set_links_all_links(self):
         bucket = self.client.bucket("bucket")
@@ -49,7 +49,7 @@ class LinkTests(object):
         foo1.set_links(links, True)
         links = foo1.get_links()
         self.assertEqual(len(links), 1)
-        self.assertEqual(links[0].get_key(), "foo2")
+        self.assertEqual(links[0].key, "foo2")
 
     def test_link_walking(self):
         # Create the object...
