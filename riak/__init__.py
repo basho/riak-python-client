@@ -30,6 +30,9 @@ See the unit_tests.py file for example usage.
 @author Jay Baird (@skatterbean) (jay@mochimedia.com)
 """
 
+__all__ = ['RiakClient', 'RiakBucket', 'RiakNode', 'RiakObject',
+           'RiakMapReduce', 'RiakKeyFilter', 'RiakError', 'ONE',
+           'ALL', 'QUORUM', 'key_filter']
 
 class RiakError(Exception):
     """
@@ -41,7 +44,11 @@ class RiakError(Exception):
     def __str__(self):
         return repr(self.value)
 
-from mapreduce import RiakKeyFilter
+from client import RiakClient
+from bucket import RiakBucket
+from node import RiakNode
+from riak_object import RiakObject
+from mapreduce import RiakKeyFilter, RiakMapReduce
 
 ONE = "one"
 ALL = "all"
