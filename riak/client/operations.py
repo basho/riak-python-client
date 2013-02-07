@@ -90,6 +90,16 @@ class RiakClientOperations(RiakClientTransport):
         return transport.set_bucket_props(bucket, props)
 
     @retryable
+    def clear_bucket_props(self, transport, bucket):
+        """
+        Resets bucket properties for the given bucket.
+
+        :param bucket: the bucket whose properties will be set
+        :type bucket: RiakBucket
+        """
+        return transport.clear_bucket_props(bucket)
+
+    @retryable
     def get_keys(self, transport, bucket):
         """
         Lists all keys in a bucket.
