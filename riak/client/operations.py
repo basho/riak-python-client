@@ -89,7 +89,7 @@ class RiakClientOperations(RiakClientTransport):
         """
         return transport.set_bucket_props(bucket, props)
 
-    @retryable
+    @retryableHttpOnly
     def clear_bucket_props(self, transport, bucket):
         """
         Resets bucket properties for the given bucket.

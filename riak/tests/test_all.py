@@ -157,14 +157,13 @@ class RiakHttpTransportTestCase(BasicKVTests,
 
     def test_clear_bucket_properties(self):
         bucket = self.client.bucket('bucket')
-        # Test setting allow mult...
         bucket.allow_mult = True
         self.assertTrue(bucket.allow_mult)
-        # Test setting nval...
         bucket.n_val = 1
         self.assertEqual(bucket.n_val, 1)
-        # Test setting multiple properties...
-        bucket.clear_properties()
+        # Test setting clearing properties...
+
+        self.assertTrue(bucket.clear_properties())
         self.assertFalse(bucket.allow_mult)
         self.assertEqual(bucket.n_val, 3)
 

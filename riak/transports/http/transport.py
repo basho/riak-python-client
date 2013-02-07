@@ -295,7 +295,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         # Check the response value...
         status = response[0]['http_code']
-        if status != 204:
+        if status == 204:
+            return True
+        elif status == 405:
+            return False
+        else:
             raise Exception('Error %s clearing bucket properties.'
                             % status)
 
