@@ -251,12 +251,12 @@ class JSMapReduceTests(object):
         self.assertEqual(result, [2])
 
     def test_mr_list_add(self):
-        bucket = self.client.bucket("abucket")
+        bucket = self.client.bucket(self.bucket_name)
         for x in range(20):
             bucket.new('baz' + str(x),
                        'bazval' + str(x)).store()
-        mr = self.client.add('abucket', ['baz' + str(x)
-                                         for x in range(2, 5)])
+        mr = self.client.add(self.bucket_name, ['baz' + str(x)
+                                                for x in range(2, 5)])
         results = mr.map_values().run()
         results.sort()
         self.assertEqual(results,
@@ -265,19 +265,20 @@ class JSMapReduceTests(object):
                           u'"bazval4"'])
 
     def test_mr_list_add_two_buckets(self):
-        bucket = self.client.bucket("bucket_a")
+        bucket = self.client.bucket(self.bucket_name)
+        name2 = self.randname()
         for x in range(10):
             bucket.new('foo' + str(x),
                        'fooval' + str(x)).store()
-        bucket = self.client.bucket("bucket_b")
+        bucket = self.client.bucket(name2)
         for x in range(10):
             bucket.new('bar' + str(x),
                        'barval' + str(x)).store()
 
-        mr = self.client.add('bucket_a', ['foo' + str(x)
-                                          for x in range(2, 4)])
-        mr.add('bucket_b', ['bar' + str(x)
-                            for x in range(5, 7)])
+        mr = self.client.add(self.bucket_name, ['foo' + str(x)
+                                                for x in range(2, 4)])
+        mr.add(name2, ['bar' + str(x)
+                       for x in range(5, 7)])
         results = mr.map_values().run()
         results.sort()
 
@@ -500,12 +501,12 @@ class MapReduceAliasTests(object):
 
 class MapReduceStreamTests(object):
     def test_stream_results(self):
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
-        mr = RiakMapReduce(self.client).add('bucket', 'one')\
-                                       .add('bucket', 'two')
+        mr = RiakMapReduce(self.client).add(self.bucket_name, 'one')\
+                                       .add(self.bucket_name, 'two')
         mr.map_values_json()
         results = []
         for phase, data in mr.stream():
@@ -514,12 +515,12 @@ class MapReduceStreamTests(object):
         self.assertEqual(sorted(results), [1, 2])
 
     def test_stream_cleanoperationsup(self):
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
-        mr = RiakMapReduce(self.client).add('bucket', 'one')\
-                                       .add('bucket', 'two')
+        mr = RiakMapReduce(self.client).add(self.bucket_name, 'one')\
+                                       .add(self.bucket_name, 'two')
         mr.map_values_json()
         try:
             for phase, data in mr.stream():

@@ -228,7 +228,7 @@ class TwoITests(object):
         if not self.is_2i_supported():
             return True
 
-        bucket = self.client.bucket('indexbucket')
+        bucket = self.client.bucket(self.bucket_name)
 
         with self.assertRaises(RiakError):
             bucket.new('k', 'a').add_index('field1', 'value1')
