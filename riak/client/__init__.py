@@ -63,9 +63,19 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                                   the transport constuctor
         :type transport_options: dict
         """
+        unused_args = unused_args.copy()
+
         if 'port' in unused_args:
             deprecated("port option is deprecated, use http_port or pb_port,"
-                      + " or the nodes option")
+                       " or the nodes option. Your given port of %r will be "
+                       "used as the %s port unless already set" %
+                       (unused_args['port'], protocol))
+            unused_args['already_warned_port'] = True
+            if (protocol in ['http', 'https'] and
+                'http_port' not in unused_args):
+                unused_args['http_port'] = unused_args['port']
+            elif protocol == 'pbc' and 'pb_port' not in unused_args:
+                unused_args['pb_port'] = unused_args['port']
 
         if 'transport_class' in unused_args:
             deprecated(
