@@ -170,6 +170,18 @@ class RiakHttpTransportTestCase(BasicKVTests,
         stored_object = bucket.get("lots_of_links")
         self.assertEqual(len(stored_object.get_links()), 400)
 
+    def test_clear_bucket_properties(self):
+        bucket = self.client.bucket('bucket')
+        bucket.allow_mult = True
+        self.assertTrue(bucket.allow_mult)
+        bucket.n_val = 1
+        self.assertEqual(bucket.n_val, 1)
+        # Test setting clearing properties...
+
+        self.assertTrue(bucket.clear_properties())
+        self.assertFalse(bucket.allow_mult)
+        self.assertEqual(bucket.n_val, 3)
+
 
 class FilterTests(unittest.TestCase):
     def test_simple(self):

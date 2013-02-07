@@ -120,6 +120,13 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def clear_bucket_props(self, bucket):
+        """
+        Reset bucket properties to their defaults
+        bucket = bucket object
+        """
+        raise NotImplementedError
+
     def get_keys(self, bucket):
         """
         Lists all keys within the given bucket.

@@ -19,6 +19,7 @@ under the License.
 import warnings
 from collections import Mapping
 
+
 def quacks_like_dict(object):
     """Check if object is dict-like"""
     return isinstance(object, Mapping)
@@ -54,7 +55,7 @@ def deep_merge(a, b):
 
 
 def deprecated(message, stacklevel=3):
-    warnings.warn(message, DeprecationWarning, stacklevel=stacklevel)
+    warnings.warn(message, UserWarning, stacklevel=stacklevel)
 
 QUORUMS = ['r', 'pr', 'w', 'dw', 'pw', 'rw']
 QDEPMESSAGE = """
@@ -79,20 +80,23 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
     getter_name = "get_%s" % quorum
     setter_name = "set_%s" % quorum
     if not parent:
-        def getter(self, val=None):
+        def direct_getter(self, val=None):
             deprecated(QDEPMESSAGE % klass.__name__)
             if val:
                 return val
             return getattr(self, propname, "default")
 
+        getter = direct_getter
     else:
-        def getter(self, val=None):
+        def parent_getter(self, val=None):
             deprecated(QDEPMESSAGE % klass.__name__)
             if val:
                 return val
             parentInstance = getattr(self, parent)
             return getattr(self, propname,
                            getattr(parentInstance, propname, "default"))
+
+        getter = parent_getter
 
     def setter(self, value):
         deprecated(QDEPMESSAGE % klass.__name__)
