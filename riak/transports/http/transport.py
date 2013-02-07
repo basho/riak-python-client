@@ -279,6 +279,30 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             raise Exception('Error setting bucket properties.')
         return True
 
+    def clear_bucket_props(self, bucket):
+        """
+        reset the properties on the bucket object given
+        """
+        url = self.bucket_properties_path(bucket.name)
+        headers = {'Content-Type': 'application/json'}
+
+        # Run the request...
+        response = self._request('DELETE', url, headers, None)
+
+        # Handle the response...
+        if response is None:
+            raise Exception('Error clearing bucket properties.')
+
+        # Check the response value...
+        status = response[0]['http_code']
+        if status == 204:
+            return True
+        elif status == 405:
+            return False
+        else:
+            raise Exception('Error %s clearing bucket properties.'
+                            % status)
+
     def mapred(self, inputs, query, timeout=None):
         """
         Run a MapReduce query.
