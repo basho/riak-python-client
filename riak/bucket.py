@@ -344,6 +344,13 @@ class RiakBucket(object):
         """
         return self._client.get_bucket_props(self)
 
+    def clear_properties(self):
+        """
+        Reset all bucket properties to their defaults.
+
+        """
+        return self._client.clear_bucket_props(self)
+
     def get_keys(self):
         """
         Return all keys within the bucket.
