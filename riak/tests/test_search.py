@@ -17,19 +17,23 @@ class EnableSearchTests(object):
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_enable_search_commit_hook(self):
-        bucket = self.client.bucket(self.bucket_name)
+        bucket = self.client.bucket(self.search_bucket)
+        bucket.clear_properties()
+        self.assertFalse(self.create_client().bucket(self.search_bucket).search_enabled())
         bucket.enable_search()
-        self.assertTrue(self.client.bucket(self.bucket_name).search_enabled())
+        self.assertTrue(self.create_client().bucket(self.search_bucket).search_enabled())
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_disable_search_commit_hook(self):
-        bucket = self.client.bucket(self.bucket_name)
+        bucket = self.client.bucket(self.search_bucket)
+        bucket.clear_properties()
         bucket.enable_search()
-        self.assertTrue(self.client.bucket(self.bucket_name)\
+        self.assertTrue(self.create_client().bucket(self.search_bucket)\
                             .search_enabled())
         bucket.disable_search()
-        self.assertFalse(self.client.bucket(self.bucket_name)\
+        self.assertFalse(self.create_client().bucket(self.search_bucket)\
                              .search_enabled())
+        bucket.enable_search()
 
 
 class SolrSearchTests(object):

@@ -49,7 +49,33 @@ if USE_TEST_SERVER:
     test_server.start()
 
 testrun_search_bucket = None
+testrun_props_bucket = None
+testrun_sibs_bucket = None
 
+def setUpModule():
+    global testrun_search_bucket, testrun_props_bucket, \
+        testrun_sibs_bucket
+
+    c = RiakClient(transport='http', http_port=HTTP_PORT)
+
+    testrun_props_bucket = 'propsbucket'
+    testrun_sibs_bucket = 'sibsbucket'
+    c.bucket(testrun_sibs_bucket).allow_mult = True
+
+    if not int(os.environ.get('SKIP_SEARCH', '0')):
+        testrun_search_bucket = 'searchbucket' 
+        b = c.bucket(testrun_search_bucket)
+        b.enable_search()
+
+def tearDownModule():
+    c = RiakClient(transport='http', http_port=HTTP_PORT)
+    if not int(os.environ.get('SKIP_SEARCH', '0')):
+        b = c.bucket(testrun_search_bucket)
+        b.clear_properties()
+    b = c.bucket(testrun_sibs_bucket)
+    b.clear_properties()
+    b = c.bucket(testrun_props_bucket)
+    b.clear_properties()
 
 class BaseTestCase(object):
 
@@ -80,16 +106,11 @@ class BaseTestCase(object):
                           pb_port=pb_port, **client_args)
 
     def setUp(self):
-        global testrun_search_bucket
         self.bucket_name = self.randname()
         self.key_name = self.randname()
-        if not testrun_search_bucket:
-            self.search_bucket = testrun_search_bucket = self.randname()
-            c = self.create_client(HTTP_HOST, http_port=HTTP_PORT)
-            b = c.bucket(self.search_bucket)
-            b.enable_search()
-        else:
-            self.search_bucket = testrun_search_bucket
+        self.search_bucket = testrun_search_bucket
+        self.sibs_bucket = testrun_sibs_bucket
+        self.props_bucket = testrun_props_bucket
 
         self.client = self.create_client()
 
@@ -171,7 +192,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
         self.assertEqual(len(stored_object.get_links()), 400)
 
     def test_clear_bucket_properties(self):
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.props_bucket)
         bucket.allow_mult = True
         self.assertTrue(bucket.allow_mult)
         bucket.n_val = 1

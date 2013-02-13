@@ -2,6 +2,7 @@
 import os
 import cPickle
 import copy
+
 try:
     import simplejson as json
 except ImportError:
@@ -168,18 +169,21 @@ class BasicKVTests(object):
         self.assertFalse(obj.exists)
 
     def test_set_bucket_properties(self):
-        bucket = self.client.bucket(self.bucket_name)
+        bucket = self.client.bucket(self.props_bucket)
         # Test setting allow mult...
         bucket.allow_mult = True
-        self.assertTrue(bucket.allow_mult)
         # Test setting nval...
-        bucket.n_val = 3
-        self.assertEqual(bucket.n_val, 3)
+        bucket.n_val = 1
+        
+        bucket2 = self.create_client().bucket(self.props_bucket)
+        self.assertTrue(bucket2.allow_mult)
+        self.assertEqual(bucket2.n_val, 1)
         # Test setting multiple properties...
         bucket.set_properties({"allow_mult": False, "n_val": 2})
 
-        self.assertFalse(bucket.allow_mult)
-        self.assertEqual(bucket.n_val, 2)
+        bucket3 = self.create_client().bucket(self.props_bucket)
+        self.assertFalse(bucket3.allow_mult)
+        self.assertEqual(bucket3.n_val, 2)
 
     def test_if_none_match(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -197,9 +201,9 @@ class BasicKVTests(object):
 
     def test_siblings(self):
         # Set up the bucket, clear any existing object...
-        bucket = self.client.bucket(self.bucket_name)
-        bucket.allow_mult = True
+        bucket = self.client.bucket(self.sibs_bucket)
         obj = bucket.get_binary(self.key_name)
+        bucket.allow_mult = True
 
         # Even if it previously existed, let's store a base resolved version
         # from which we can diverge by sending a stale vclock.
@@ -210,7 +214,7 @@ class BasicKVTests(object):
         vals = set()
         for i in range(5):
             other_client = self.create_client()
-            other_bucket = other_client.bucket(self.bucket_name)
+            other_bucket = other_client.bucket(self.sibs_bucket)
             while True:
                 randval = self.randint()
                 if randval not in vals:
@@ -223,7 +227,7 @@ class BasicKVTests(object):
 
         # Make sure the object has itself plus four siblings...
         obj.reload()
-        self.assertTrue(bool(obj.siblings))
+        #self.assertTrue(bool(obj.siblings))
         self.assertEqual(len(obj.siblings), 5)
 
         # Get each of the values - make sure they match what was assigned
@@ -279,7 +283,7 @@ class BasicKVTests(object):
 
 class HTTPBucketPropsTest(object):
     def test_rw_settings(self):
-        bucket = self.client.bucket(self.bucket_name)
+        bucket = self.client.bucket(self.props_bucket)
         self.assertEqual(bucket.r, "quorum")
         self.assertEqual(bucket.w, "quorum")
         self.assertEqual(bucket.dw, "quorum")
@@ -301,9 +305,10 @@ class HTTPBucketPropsTest(object):
                                'r': 'quorum',
                                'dw': 'quorum',
                                'rw': 'quorum'})
+        bucket.clear_properties()
 
     def test_primary_quora(self):
-        bucket = self.client.bucket(self.bucket_name)
+        bucket = self.client.bucket(self.props_bucket)
         self.assertEqual(bucket.pr, 0)
         self.assertEqual(bucket.pw, 0)
 
@@ -314,11 +319,12 @@ class HTTPBucketPropsTest(object):
         self.assertEqual(bucket.pw, "quorum")
 
         bucket.set_properties({'pr': 0, 'pw': 0})
+        bucket.clear_properties()
 
 
 class PbcBucketPropsTest(object):
     def test_rw_settings(self):
-        bucket = self.client.bucket('rwsettings')
+        bucket = self.client.bucket(self.props_bucket)
         with self.assertRaises(NotImplementedError):
             bucket.r
         with self.assertRaises(NotImplementedError):
@@ -336,9 +342,11 @@ class PbcBucketPropsTest(object):
             bucket.dw = 2
         with self.assertRaises(NotImplementedError):
             bucket.rw = 2
+        with self.assertRaises(NotImplementedError):
+            bucket.clear_properties()
 
     def test_primary_quora(self):
-        bucket = self.client.bucket('primary_quora')
+        bucket = self.client.bucket(self.props_bucket)
         with self.assertRaises(NotImplementedError):
             bucket.pr
         with self.assertRaises(NotImplementedError):
