@@ -29,7 +29,6 @@ from riak.metadata import (
         )
 
 import riak_pb
-from riak.mapreduce import RiakLink
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -110,7 +109,7 @@ class RiakPbcCodec(object):
                 tag = link.tag
             else:
                 tag = None
-            links.append(RiakLink(bucket, key, tag))
+            links.append((bucket, key, tag))
         if links:
             metadata[MD_LINKS] = links
         if rpb_content.HasField("last_mod"):
@@ -160,9 +159,10 @@ class RiakPbcCodec(object):
                     pair.key = field
                     pair.value = str(value)
             elif k == MD_LINKS:
-                for link in v:
+                for bucket, key, tag in v:
+                    tag = tag if tag is not None else bucket
                     pb_link = rpb_content.links.add()
-                    pb_link.bucket = link.bucket
-                    pb_link.key = link.key
-                    pb_link.tag = link.tag
+                    pb_link.bucket = bucket
+                    pb_link.key = key
+                    pb_link.tag = tag
         rpb_content.value = str(data)

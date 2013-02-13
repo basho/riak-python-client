@@ -47,7 +47,6 @@ from riak.metadata import (
         MD_VTAG,
         MD_DELETED
         )
-from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
@@ -502,10 +501,12 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
     def to_link_header(self, link):
         """
-        Convert this RiakLink object to a link header string. Used internally.
+        Convert the link tuple to a link header string. Used internally.
         """
-        url = self.object_path(link.bucket, link.key)
-        header = '<%s>; riaktag="%s"' % (url, link.tag)
+        bucket, key, tag = link
+        tag = tag if tag is not None else bucket
+        url = self.object_path(bucket, key)
+        header = '<%s>; riaktag="%s"' % (url, tag)
         return header
 
     def parse_links(self, links, linkHeaders):
@@ -520,9 +521,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             matches = (re.match(oldform, linkHeader) or
                        re.match(newform, linkHeader))
             if matches is not None:
-                link = RiakLink(urllib.unquote_plus(matches.group(2)),
-                                urllib.unquote_plus(matches.group(3)),
-                                urllib.unquote_plus(matches.group(4)))
+                link = (urllib.unquote_plus(matches.group(2)),
+                        urllib.unquote_plus(matches.group(3)),
+                        urllib.unquote_plus(matches.group(4)))
                 links.append(link)
         return self
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from riak.mapreduce import RiakLink, RiakMapReduce
+from riak.mapreduce import RiakMapReduce
 from riak import key_filter
 
 
@@ -16,40 +16,40 @@ class LinkTests(object):
         obj = bucket.get("test_store_and_get_links")
         links = obj.get_links()
         self.assertEqual(len(links), 3)
-        for l in links:
-            if (l.key == "foo1"):
-                self.assertEqual(l.tag, self.bucket_name)
-            elif (l.key == "foo2"):
-                self.assertEqual(l.tag, "tag")
-            elif (l.key == "foo3"):
-                self.assertEqual(l.tag, "tag2!@#%^&*)")
+        for bucket, key, tag in links:
+            if (key == "foo1"):
+                self.assertEqual(bucket, "bucket")
+            elif (key == "foo2"):
+                self.assertEqual(tag, "tag")
+            elif (key == "foo3"):
+                self.assertEqual(tag, "tag2!@#%^&*)")
             else:
-                self.assertEqual("unknown key", l.key)
+                self.assertEqual(key, "unknown key")
 
     def test_set_links(self):
         # Create the object
         bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).set_links([bucket.new("foo1"),
             (bucket.new("foo2"), "tag"),
-            RiakLink(self.bucket_name, "foo2", "tag2")]).store()
+            ("bucket", "foo2", "tag2")]).store()
         obj = bucket.get("foo")
-        links = sorted(obj.get_links(), key=lambda x: x.key)
+        links = sorted(obj.get_links(), key=lambda x: x[1])
         self.assertEqual(len(links), 3)
-        self.assertEqual(links[0].key, "foo1")
-        self.assertEqual(links[1].key, "foo2")
-        self.assertEqual(links[1].tag, "tag")
-        self.assertEqual(links[2].key, "foo2")
-        self.assertEqual(links[2].tag, "tag2")
+        self.assertEqual(links[0][1], "foo1")
+        self.assertEqual(links[1][1], "foo2")
+        self.assertEqual(links[1][2], "tag")
+        self.assertEqual(links[2][1], "foo2")
+        self.assertEqual(links[2][2], "tag2")
 
     def test_set_links_all_links(self):
         bucket = self.client.bucket(self.bucket_name)
         foo1 = bucket.new("foo", 1)
         bucket.new("foo2", 2).store()
-        links = [RiakLink(self.bucket_name, "foo2")]
+        links = [("bucket", "foo2", None)]
         foo1.set_links(links, True)
         links = foo1.get_links()
         self.assertEqual(len(links), 1)
-        self.assertEqual(links[0].key, "foo2")
+        self.assertEqual(links[0][1], "foo2")
 
     def test_link_walking(self):
         # Create the object...
