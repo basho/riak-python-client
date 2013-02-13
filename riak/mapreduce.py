@@ -18,8 +18,9 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from collections import Iterable
+from collections import Iterable, namedtuple
 
+RiakLink = namedtuple("RiakLink", ("bucket", "key", "tag"))
 
 class RiakMapReduce(object):
     """
