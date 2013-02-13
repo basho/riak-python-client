@@ -11,7 +11,7 @@ else:
     import unittest
 
 from riak.client import RiakClient
-from riak.mapreduce import RiakLink, RiakKeyFilter
+from riak.mapreduce import RiakKeyFilter
 from riak import key_filter
 
 from riak.test_server import TestServer
@@ -148,7 +148,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
         bucket = self.client.bucket("bucket")
         o = bucket.new("lots_of_links", "My god, it's full of links!")
         for i in range(0, 400):
-            link = RiakLink("other", "key%d" % i, "next")
+            link = ("other", "key%d" % i, "next")
             o.add_link(link)
 
         o.store()
