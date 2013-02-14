@@ -50,18 +50,18 @@ class TwoITests(object):
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
         self.assertEqual(['val1a', 'val1b'],
-                         sorted([y for (x, y) in obj.indexes 
+                         sorted([y for (x, y) in obj.indexes
                                  if x == 'field1_bin']))
         self.assertEqual([1011, 1012],
-                         sorted([y for (x, y) in obj.indexes 
+                         sorted([y for (x, y) in obj.indexes
                                  if x == 'field1_int']))
 
-        self.assertEqual([
-                ('field1_bin', 'val1a'),
-                ('field1_bin', 'val1b'),
-                ('field1_int', 1011),
-                ('field1_int', 1012)
-                ], sorted(obj.indexes))
+        self.assertEqual(
+            [('field1_bin', 'val1a'),
+             ('field1_bin', 'val1b'),
+             ('field1_int', 1011),
+             ('field1_int', 1012)
+             ], sorted(obj.indexes))
 
         # Delete an index...
         obj.remove_index('field1_bin', 'val1a')
@@ -83,22 +83,22 @@ class TwoITests(object):
         obj.add_index('field1_int', 1011)
         obj.add_index('field1_int', 1011)
 
-        self.assertEqual([
-                ('field1_bin', 'val1a'),
-                ('field1_bin', 'val1b'),
-                ('field1_int', 1011),
-                ('field1_int', 1012)
-                ], sorted(obj.indexes))
+        self.assertEqual(
+            [('field1_bin', 'val1a'),
+             ('field1_bin', 'val1b'),
+             ('field1_int', 1011),
+             ('field1_int', 1012)
+             ], sorted(obj.indexes))
 
         obj.store()
         obj = bucket.get('mykey1')
 
-        self.assertEqual([
-                ('field1_bin', 'val1a'),
-                ('field1_bin', 'val1b'),
-                ('field1_int', 1011),
-                ('field1_int', 1012)
-                ], sorted(obj.indexes))
+        self.assertEqual(
+            [('field1_bin', 'val1a'),
+             ('field1_bin', 'val1b'),
+             ('field1_int', 1011),
+             ('field1_int', 1012)
+             ], sorted(obj.indexes))
 
         # Clean up...
         bucket.get('mykey1').delete()
