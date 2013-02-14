@@ -37,8 +37,10 @@ class TwoITests(object):
 
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
-        self.assertEqual(['val1a'], sorted(obj.get_indexes('field1_bin')))
-        self.assertEqual([1011], sorted(obj.get_indexes('field1_int')))
+        self.assertEqual(['val1a'], [y for (x, y) in obj.indexes
+                                     if x == 'field1_bin'])
+        self.assertEqual([1011], [y for (x, y) in obj.indexes
+                                  if x == 'field1_int'])
 
         # Add more indexes and save...
         obj.add_index('field1_bin', 'val1b')
@@ -48,17 +50,18 @@ class TwoITests(object):
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
         self.assertEqual(['val1a', 'val1b'],
-                         sorted(obj.get_indexes('field1_bin')))
+                         sorted([y for (x, y) in obj.indexes 
+                                 if x == 'field1_bin']))
         self.assertEqual([1011, 1012],
-                         sorted(obj.get_indexes('field1_int')))
+                         sorted([y for (x, y) in obj.indexes 
+                                 if x == 'field1_int']))
 
-        # Check the get_indexes() function...
         self.assertEqual([
                 ('field1_bin', 'val1a'),
                 ('field1_bin', 'val1b'),
                 ('field1_int', 1011),
                 ('field1_int', 1012)
-                ], sorted(obj.get_indexes()))
+                ], sorted(obj.indexes))
 
         # Delete an index...
         obj.remove_index('field1_bin', 'val1a')
@@ -67,8 +70,10 @@ class TwoITests(object):
 
         # Retrieve the object, check that the correct indexes exist...
         obj = bucket.get('mykey1')
-        self.assertEqual(['val1b'], sorted(obj.get_indexes('field1_bin')))
-        self.assertEqual([1012], sorted(obj.get_indexes('field1_int')))
+        self.assertEqual(['val1b'], sorted([y for (x, y) in obj.indexes
+                                            if x == 'field1_bin']))
+        self.assertEqual([1012], sorted([y for (x, y) in obj.indexes
+                                         if x == 'field1_int']))
 
         # Check duplicate entries...
         obj.add_index('field1_bin', 'val1a')
@@ -83,7 +88,7 @@ class TwoITests(object):
                 ('field1_bin', 'val1b'),
                 ('field1_int', 1011),
                 ('field1_int', 1012)
-                ], sorted(obj.get_indexes()))
+                ], sorted(obj.indexes))
 
         obj.store()
         obj = bucket.get('mykey1')
@@ -93,7 +98,7 @@ class TwoITests(object):
                 ('field1_bin', 'val1b'),
                 ('field1_int', 1011),
                 ('field1_int', 1012)
-                ], sorted(obj.get_indexes()))
+                ], sorted(obj.indexes))
 
         # Clean up...
         bucket.get('mykey1').delete()
@@ -105,7 +110,8 @@ class TwoITests(object):
 
         bucket = self.client.bucket('indexbucket')
         foo = bucket.new('foo', 1)
-        foo.set_indexes((('field1_bin', 'test'), ('field2_int', 1337))).store()
+        foo.indexes = [('field1_bin', 'test'), ('field2_int', 1337)]
+        foo.store()
         result = self.client.index('indexbucket', 'field2_int', 1337).run()
         self.assertEqual(1, len(result))
         self.assertEqual('foo', result[0].key)
@@ -124,8 +130,9 @@ class TwoITests(object):
             .add_index('bar_int', 2).add_index('baz_bin', 'baz').store()
         result = bucket.get_index('bar_int', 1)
         self.assertEqual(1, len(result))
-        self.assertEqual(3, len(bar.get_indexes()))
-        self.assertEqual(2, len(bar.get_indexes('bar_int')))
+        self.assertEqual(3, len(bar.indexes))
+        self.assertEqual(2, len([x for x in bar.indexes
+                                 if x[0] == 'bar_int']))
 
         # remove all indexes
         bar = bar.remove_indexes().store()
@@ -133,9 +140,11 @@ class TwoITests(object):
         self.assertEqual(0, len(result))
         result = bucket.get_index('baz_bin', 'baz')
         self.assertEqual(0, len(result))
-        self.assertEqual(0, len(bar.get_indexes()))
-        self.assertEqual(0, len(bar.get_indexes('bar_int')))
-        self.assertEqual(0, len(bar.get_indexes('baz_bin')))
+        self.assertEqual(0, len(bar.indexes))
+        self.assertEqual(0, len([x for x in bar.indexes
+                                 if x[0] == 'bar_int']))
+        self.assertEqual(0, len([x for x in bar.indexes
+                                 if x[0] == 'baz_bin']))
 
         # add index again
         bar = bar.add_index('bar_int', 1).add_index('bar_int', 2)\
@@ -148,9 +157,11 @@ class TwoITests(object):
         self.assertEqual(0, len(result))
         result = bucket.get_index('baz_bin', 'baz')
         self.assertEqual(1, len(result))
-        self.assertEqual(1, len(bar.get_indexes()))
-        self.assertEqual(0, len(bar.get_indexes('bar_int')))
-        self.assertEqual(1, len(bar.get_indexes('baz_bin')))
+        self.assertEqual(1, len(bar.indexes))
+        self.assertEqual(0, len([x for x in bar.indexes
+                                 if x[0] == 'bar_int']))
+        self.assertEqual(1, len([x for x in bar.indexes
+                                 if x[0] == 'baz_bin']))
 
         # add index again
         bar = bar.add_index('bar_int', 1).add_index('bar_int', 2)\
@@ -163,9 +174,11 @@ class TwoITests(object):
         self.assertEqual(0, len(result))
         result = bucket.get_index('baz_bin', 'baz')
         self.assertEqual(1, len(result))
-        self.assertEqual(2, len(bar.get_indexes()))
-        self.assertEqual(1, len(bar.get_indexes('bar_int')))
-        self.assertEqual(1, len(bar.get_indexes('baz_bin')))
+        self.assertEqual(2, len(bar.indexes))
+        self.assertEqual(1, len([x for x in bar.indexes
+                                 if x[0] == 'bar_int']))
+        self.assertEqual(1, len([x for x in bar.indexes
+                                 if x[0] == 'baz_bin']))
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):

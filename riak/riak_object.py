@@ -182,9 +182,8 @@ class RiakObject(object):
             raise RiakError("Riak 2i fields must end with either '_bin'"
                             " or '_int'.")
 
-        rie = (field, value)
-        if not rie in self.metadata[MD_INDEX]:
-            self.metadata[MD_INDEX].append(rie)
+        if not [x for x in self.indexes if x == (field,value)]:
+            self.indexes.append((field, value))
 
         return self
 
@@ -200,54 +199,34 @@ class RiakObject(object):
         :rtype: RiakObject
         """
         if not field and not value:
-            ries = self.metadata[MD_INDEX][:]
+            remove = self.metadata[MD_INDEX][:]
         elif field and not value:
-            ries = [x for x in self.metadata[MD_INDEX]
-                    if x[0] == field]
+            remove = [x for x in self.metadata[MD_INDEX]
+                      if x[0] == field]
         elif field and value:
-            ries = [(field, value)]
+            remove = [(field, value)]
         else:
             raise RiakError("Cannot pass value without a field"
                             " name while removing index")
 
-        # This removes the index entries that's in the ries list.
-        # Done because this is preferred over metadata[MD_INDEX].remove(rie)
-        self.metadata[MD_INDEX] = [rie for rie in self.metadata[MD_INDEX]
-                                    if rie not in ries]
+        self.metadata[MD_INDEX] = [keep for keep in self.metadata[MD_INDEX]
+                                   if keep not in remove]
+        self.indexes = self.metadata[MD_INDEX]
+
         return self
 
     remove_indexes = remove_index
 
-    def set_indexes(self, indexes):
-        """
-        Replaces all indexes on a Riak object. Currently supports an
-        iterable of 2 item tuples, (field, value).
-
-        :param indexes: iterable of 2 item tuples consisting the field
-                        and value. Both the field and the value must
-                        be a string.
-        :rtype: RiakObject
-        """
-        # makes a copy and does type conversion
-        # this seems rather slow
+    def _set_indexes(self, indexes):
         self.metadata[MD_INDEX] = indexes[:]
-        return self
+    
+    def _get_indexes(self):
+        return self.metadata[MD_INDEX]
 
-    def get_indexes(self, field=None):
-        """
-        Get a list of the index entries for this object. If a field is
-        provided, returns a list
-
-        :param field: The index field.
-        :type field: string or None
-        :rtype: (array of 2 element tuples with field, value) or
-                (array of string or integer)
-        """
-        if field == None:
-            return self.metadata[MD_INDEX]
-        else:
-            return [v for f, v in self.metadata[MD_INDEX] if f == field]
-
+    indexes = property(_get_indexes, _set_indexes, 
+                       doc="List of the index entries for this object.")
+    indices = indexes
+        
     def _get_content_type(self):
         try:
             return self.metadata[MD_CTYPE]

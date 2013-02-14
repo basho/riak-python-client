@@ -564,7 +564,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         for key, value in robj.usermeta.iteritems():
             headers['X-Riak-Meta-%s' % key] = value
 
-        for field, value in robj.get_indexes():
+        for field, value in robj.indexes:
             key = 'X-Riak-Index-%s' % field
             if key in headers:
                 headers[key] += ", " + str(value)
