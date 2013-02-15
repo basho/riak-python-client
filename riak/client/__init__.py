@@ -38,6 +38,14 @@ from riak.util import deprecateQuorumAccessors
 from riak.util import lazy_property
 
 
+def default_encoder(obj):
+    """
+    Default encoder for JSON datatypes, which returns UTF-8 encoded
+    json instead of the default bloated \uXXXX escaped ASCII strings.
+    """
+    return json.dumps(obj, ensure_ascii=False).encode("utf-8")
+
+
 @deprecateQuorumAccessors
 class RiakClient(RiakMapReduceChain, RiakClientOperations):
     """
@@ -91,8 +99,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._http_pool = RiakHttpPool(self, **transport_options)
         self._pb_pool = RiakPbcPool(self, **transport_options)
 
-        self._encoders = {'application/json': json.dumps,
-                          'text/json': json.dumps}
+        self._encoders = {'application/json': default_encoder,
+                          'text/json': default_encoder}
         self._decoders = {'application/json': json.loads,
                           'text/json': json.loads}
         self._buckets = WeakValueDictionary()
