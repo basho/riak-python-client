@@ -7,7 +7,7 @@ from riak import key_filter
 class LinkTests(object):
     def test_store_and_get_links(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new_binary("test_store_and_get_links", '2') \
             .add_link(bucket.new("foo1")) \
             .add_link(bucket.new("foo2"), "tag") \
@@ -18,7 +18,7 @@ class LinkTests(object):
         self.assertEqual(len(links), 3)
         for l in links:
             if (l.key == "foo1"):
-                self.assertEqual(l.tag, "bucket")
+                self.assertEqual(l.tag, self.bucket_name)
             elif (l.key == "foo2"):
                 self.assertEqual(l.tag, "tag")
             elif (l.key == "foo3"):
@@ -28,10 +28,10 @@ class LinkTests(object):
 
     def test_set_links(self):
         # Create the object
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).set_links([bucket.new("foo1"),
             (bucket.new("foo2"), "tag"),
-            RiakLink("bucket", "foo2", "tag2")]).store()
+            RiakLink(self.bucket_name, "foo2", "tag2")]).store()
         obj = bucket.get("foo")
         links = sorted(obj.get_links(), key=lambda x: x.key)
         self.assertEqual(len(links), 3)
@@ -42,10 +42,10 @@ class LinkTests(object):
         self.assertEqual(links[2].tag, "tag2")
 
     def test_set_links_all_links(self):
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         foo1 = bucket.new("foo", 1)
         bucket.new("foo2", 2).store()
-        links = [RiakLink("bucket", "foo2")]
+        links = [RiakLink(self.bucket_name, "foo2")]
         foo1.set_links(links, True)
         links = foo1.get_links()
         self.assertEqual(len(links), 1)
@@ -53,65 +53,65 @@ class LinkTests(object):
 
     def test_link_walking(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2) \
             .add_link(bucket.new("foo1", "test1").store()) \
             .add_link(bucket.new("foo2", "test2").store(), "tag") \
             .add_link(bucket.new("foo3", "test3").store(), "tag2!@#%^&*)") \
             .store()
         obj = bucket.get("foo")
-        results = obj.link("bucket").run()
+        results = obj.link(self.bucket_name).run()
         self.assertEqual(len(results), 3)
-        results = obj.link("bucket", "tag").run()
+        results = obj.link(self.bucket_name, "tag").run()
         self.assertEqual(len(results), 1)
 
 
 class ErlangMapReduceTests(object):
     def test_erlang_map_reduce(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 2).store()
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add("bucket", "foo") \
-            .add("bucket", "bar") \
-            .add("bucket", "baz") \
+            .add(self.bucket_name, "foo") \
+            .add(self.bucket_name, "bar") \
+            .add(self.bucket_name, "baz") \
             .map(["riak_kv_mapreduce", "map_object_value"]) \
             .reduce(["riak_kv_mapreduce", "reduce_set_union"]) \
             .run()
         self.assertEqual(len(result), 2)
 
     def test_client_exceptional_paths(self):
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 2).store()
         bucket.new("baz", 4).store()
 
         #adding a b-key pair to a bucket input
         with self.assertRaises(ValueError):
-            mr = self.client.add('bucket')
-            mr.add('bucket', 'bar')
+            mr = self.client.add(self.bucket_name)
+            mr.add(self.bucket_name, 'bar')
 
         #adding a b-key pair to a query input
         with self.assertRaises(ValueError):
-            mr = self.client.search('bucket', 'fleh')
-            mr.add('bucket', 'bar')
+            mr = self.client.search(self.bucket_name, 'fleh')
+            mr.add(self.bucket_name, 'bar')
 
         #adding a key filter to a query input
         with self.assertRaises(ValueError):
-            mr = self.client.search('bucket', 'fleh')
+            mr = self.client.search(self.bucket_name, 'fleh')
             mr.add_key_filter("tokenize", "-", 1)
 
 
 class JSMapReduceTests(object):
     def test_javascript_source_map(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         # Run the map...
-        mr = self.client.add("bucket", "foo")
+        mr = self.client.add(self.bucket_name, "foo")
         result = mr.map(
             "function (v) { return [JSON.parse(v.values[0].data)]; }").run()
         self.assertEqual(result, [2])
@@ -129,26 +129,26 @@ class JSMapReduceTests(object):
 
     def test_javascript_named_map(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         # Run the map...
         result = self.client \
-            .add("bucket", "foo") \
+            .add(self.bucket_name, "foo") \
             .map("Riak.mapValuesJson") \
             .run()
         self.assertEqual(result, [2])
 
     def test_javascript_source_map_reduce(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 3).store()
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add("bucket", "foo") \
-            .add("bucket", "bar") \
-            .add("bucket", "baz") \
+            .add(self.bucket_name, "foo") \
+            .add(self.bucket_name, "bar") \
+            .add(self.bucket_name, "baz") \
             .map("function (v) { return [1]; }") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -156,15 +156,15 @@ class JSMapReduceTests(object):
 
     def test_javascript_named_map_reduce(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 3).store()
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add("bucket", "foo") \
-            .add("bucket", "bar") \
-            .add("bucket", "baz") \
+            .add(self.bucket_name, "foo") \
+            .add(self.bucket_name, "bar") \
+            .add(self.bucket_name, "baz") \
             .map("Riak.mapValuesJson") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -186,15 +186,15 @@ class JSMapReduceTests(object):
 
     def test_javascript_arg_map_reduce(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         # Run the map...
         result = self.client \
-            .add("bucket", "foo", 5) \
-            .add("bucket", "foo", 10) \
-            .add("bucket", "foo", 15) \
-            .add("bucket", "foo", -15) \
-            .add("bucket", "foo", -5) \
+            .add(self.bucket_name, "foo", 5) \
+            .add(self.bucket_name, "foo", 10) \
+            .add(self.bucket_name, "foo", 15) \
+            .add(self.bucket_name, "foo", -15) \
+            .add(self.bucket_name, "foo", -5) \
             .map("function(v, arg) { return [arg]; }") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -244,19 +244,19 @@ class JSMapReduceTests(object):
 
     def test_map_reduce_from_object(self):
         # Create the object...
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         obj = bucket.get("foo")
         result = obj.map("Riak.mapValuesJson").run()
         self.assertEqual(result, [2])
 
     def test_mr_list_add(self):
-        bucket = self.client.bucket("abucket")
+        bucket = self.client.bucket(self.bucket_name)
         for x in range(20):
             bucket.new('baz' + str(x),
                        'bazval' + str(x)).store()
-        mr = self.client.add('abucket', ['baz' + str(x)
-                                         for x in range(2, 5)])
+        mr = self.client.add(self.bucket_name, ['baz' + str(x)
+                                                for x in range(2, 5)])
         results = mr.map_values().run()
         results.sort()
         self.assertEqual(results,
@@ -265,19 +265,20 @@ class JSMapReduceTests(object):
                           u'"bazval4"'])
 
     def test_mr_list_add_two_buckets(self):
-        bucket = self.client.bucket("bucket_a")
+        bucket = self.client.bucket(self.bucket_name)
+        name2 = self.randname()
         for x in range(10):
             bucket.new('foo' + str(x),
                        'fooval' + str(x)).store()
-        bucket = self.client.bucket("bucket_b")
+        bucket = self.client.bucket(name2)
         for x in range(10):
             bucket.new('bar' + str(x),
                        'barval' + str(x)).store()
 
-        mr = self.client.add('bucket_a', ['foo' + str(x)
-                                          for x in range(2, 4)])
-        mr.add('bucket_b', ['bar' + str(x)
-                            for x in range(5, 7)])
+        mr = self.client.add(self.bucket_name, ['foo' + str(x)
+                                                for x in range(2, 4)])
+        mr.add(name2, ['bar' + str(x)
+                       for x in range(5, 7)])
         results = mr.map_values().run()
         results.sort()
 
@@ -316,13 +317,13 @@ class MapReduceAliasTests(object):
 
     def test_map_values(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new_binary('one', data='value_1').store()
         bucket.new_binary('two', data='value_2').store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values().run()
@@ -335,13 +336,13 @@ class MapReduceAliasTests(object):
 
     def test_map_values_json(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data={'val': 'value_1'}).store()
         bucket.new('two', data={'val': 'value_2'}).store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json().run()
@@ -354,13 +355,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_sum(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json().reduce_sum().run()
@@ -369,13 +370,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_min(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json().reduce_min().run()
@@ -384,13 +385,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_max(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json().reduce_max().run()
@@ -399,13 +400,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_sort(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data="value1").store()
         bucket.new('two', data="value2").store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json().reduce_sort().run()
@@ -414,13 +415,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_sort_custom(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data="value1").store()
         bucket.new('two', data="value2").store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json().reduce_sort("""function(x,y) {
@@ -432,13 +433,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_numeric_sort(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json().reduce_numeric_sort().run()
@@ -447,13 +448,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_limit(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json()\
@@ -464,13 +465,13 @@ class MapReduceAliasTests(object):
 
     def test_reduce_slice(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')
 
         # Use the map_values alias
         result = mr.map_values_json()\
@@ -481,17 +482,14 @@ class MapReduceAliasTests(object):
 
     def test_filter_not_found(self):
         # Add a value to the bucket
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
-        # Make sure "three" does not exist
-        bucket.get('three').delete()
-
         # Create a map reduce object and use one and two as inputs
-        mr = self.client.add('bucket', 'one')\
-                        .add('bucket', 'two')\
-                        .add('bucket', 'three')
+        mr = self.client.add(self.bucket_name, 'one')\
+                        .add(self.bucket_name, 'two')\
+                        .add(self.bucket_name, self.key_name)
 
         # Use the map_values alias
         result = mr.map_values_json()\
@@ -503,12 +501,12 @@ class MapReduceAliasTests(object):
 
 class MapReduceStreamTests(object):
     def test_stream_results(self):
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
-        mr = RiakMapReduce(self.client).add('bucket', 'one')\
-                                       .add('bucket', 'two')
+        mr = RiakMapReduce(self.client).add(self.bucket_name, 'one')\
+                                       .add(self.bucket_name, 'two')
         mr.map_values_json()
         results = []
         for phase, data in mr.stream():
@@ -517,12 +515,12 @@ class MapReduceStreamTests(object):
         self.assertEqual(sorted(results), [1, 2])
 
     def test_stream_cleanoperationsup(self):
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
         bucket.new('two', data=2).store()
 
-        mr = RiakMapReduce(self.client).add('bucket', 'one')\
-                                       .add('bucket', 'two')
+        mr = RiakMapReduce(self.client).add(self.bucket_name, 'one')\
+                                       .add(self.bucket_name, 'two')
         mr.map_values_json()
         try:
             for phase, data in mr.stream():
