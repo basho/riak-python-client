@@ -48,6 +48,34 @@ if USE_TEST_SERVER:
     test_server.prepare()
     test_server.start()
 
+testrun_search_bucket = None
+testrun_props_bucket = None
+testrun_sibs_bucket = None
+
+def setUpModule():
+    global testrun_search_bucket, testrun_props_bucket, \
+        testrun_sibs_bucket
+
+    c = RiakClient(transport='http', http_port=HTTP_PORT)
+
+    testrun_props_bucket = 'propsbucket'
+    testrun_sibs_bucket = 'sibsbucket'
+    c.bucket(testrun_sibs_bucket).allow_mult = True
+
+    if not int(os.environ.get('SKIP_SEARCH', '0')):
+        testrun_search_bucket = 'searchbucket' 
+        b = c.bucket(testrun_search_bucket)
+        b.enable_search()
+
+def tearDownModule():
+    c = RiakClient(transport='http', http_port=HTTP_PORT)
+    if not int(os.environ.get('SKIP_SEARCH', '0')):
+        b = c.bucket(testrun_search_bucket)
+        b.clear_properties()
+    b = c.bucket(testrun_sibs_bucket)
+    b.clear_properties()
+    b = c.bucket(testrun_props_bucket)
+    b.clear_properties()
 
 class BaseTestCase(object):
 
@@ -58,6 +86,13 @@ class BaseTestCase(object):
     @staticmethod
     def randint():
         return random.randint(1, 999999)
+
+    @staticmethod
+    def randname(length=12):
+        out = ''
+        for i in range(length):
+            out += chr(random.randint(ord('a'), ord('z')))
+        return out
 
     def create_client(self, host=None, http_port=None, pb_port=None,
                       protocol=None, **client_args):
@@ -71,14 +106,13 @@ class BaseTestCase(object):
                           pb_port=pb_port, **client_args)
 
     def setUp(self):
-        self.client = self.create_client()
+        self.bucket_name = self.randname()
+        self.key_name = self.randname()
+        self.search_bucket = testrun_search_bucket
+        self.sibs_bucket = testrun_sibs_bucket
+        self.props_bucket = testrun_props_bucket
 
-        # make sure these are not left over from a previous, failed run
-        bucket = self.client.bucket('bucket')
-        o = bucket.get('nonexistent_key_json')
-        o.delete()
-        o = bucket.get('nonexistent_key_binary')
-        o.delete()
+        self.client = self.create_client()
 
 
 class RiakPbcTransportTestCase(BasicKVTests,
@@ -100,6 +134,8 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.host = PB_HOST
         self.pb_port = PB_PORT
         self.protocol = 'pbc'
+        self.http_client = self.create_client(HTTP_HOST, 
+                                              http_port=HTTP_PORT)
         super(RiakPbcTransportTestCase, self).setUp()
 
     def test_uses_client_id_if_given(self):
@@ -109,12 +145,12 @@ class RiakPbcTransportTestCase(BasicKVTests,
 
     def test_bucket_search_enabled(self):
         with self.assertRaises(NotImplementedError):
-            bucket = self.client.bucket("unsearch_bucket")
+            bucket = self.client.bucket(self.bucket_name)
             bucket.search_enabled()
 
     def test_enable_search_commit_hook(self):
         with self.assertRaises(NotImplementedError):
-            bucket = self.client.bucket("search_bucket")
+            bucket = self.client.bucket(self.bucket_name)
             bucket.enable_search()
 
 
@@ -140,12 +176,12 @@ class RiakHttpTransportTestCase(BasicKVTests,
         super(RiakHttpTransportTestCase, self).setUp()
 
     def test_no_returnbody(self):
-        bucket = self.client.bucket("bucket")
-        o = bucket.new("foo", "bar").store(return_body=False)
+        bucket = self.client.bucket(self.bucket_name)
+        o = bucket.new(self.key_name, "bar").store(return_body=False)
         self.assertEqual(o.vclock, None)
 
     def test_too_many_link_headers_shouldnt_break_http(self):
-        bucket = self.client.bucket("bucket")
+        bucket = self.client.bucket(self.bucket_name)
         o = bucket.new("lots_of_links", "My god, it's full of links!")
         for i in range(0, 400):
             link = RiakLink("other", "key%d" % i, "next")
@@ -156,7 +192,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
         self.assertEqual(len(stored_object.get_links()), 400)
 
     def test_clear_bucket_properties(self):
-        bucket = self.client.bucket('bucket')
+        bucket = self.client.bucket(self.props_bucket)
         bucket.allow_mult = True
         self.assertTrue(bucket.allow_mult)
         bucket.n_val = 1

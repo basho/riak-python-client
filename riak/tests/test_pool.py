@@ -27,6 +27,7 @@ if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
+import os
 
 
 class SimplePool(Pool):
@@ -47,6 +48,8 @@ class EmptyListPool(Pool):
         return []
 
 
+@unittest.skipIf(os.environ.get('SKIP_POOL'),
+                 'Skipping connection pool tests')
 class PoolTest(unittest.TestCase):
     def test_yields_new_object_when_empty(self):
         """
