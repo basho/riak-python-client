@@ -91,6 +91,18 @@ class BasicKVTests(object):
         obj = bucket.get_binary('foo2')
         self.assertEqual(data, json.loads(obj.get_data()))
 
+    def test_blank_binary_204(self):
+        bucket = self.client.bucket('bucket')
+        # Store as binary, retrieve as binary, then compare...
+        rand = str(self.randint())
+        
+        # this should *not* raise an error
+        obj = bucket.new_binary('foo2', '')
+        obj.store()
+        obj = bucket.get_binary('foo2')
+        self.assertTrue(obj.exists())
+        self.assertEqual(obj.get_data(), '')
+
     def test_custom_bucket_encoder_decoder(self):
         # Teach the bucket how to pickle
         bucket = self.client.bucket("picklin_bucket")
