@@ -110,7 +110,7 @@ class TwoITests(object):
 
         bucket = self.client.bucket('indexbucket')
         foo = bucket.new('foo', 1)
-        foo.indexes = [('field1_bin', 'test'), ('field2_int', 1337)]
+        foo.indexes = set([('field1_bin', 'test'), ('field2_int', 1337)])
         foo.store()
         result = self.client.index('indexbucket', 'field2_int', 1337).run()
         self.assertEqual(1, len(result))

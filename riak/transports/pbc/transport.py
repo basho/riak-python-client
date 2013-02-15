@@ -174,9 +174,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if vclock:
             req.vclock = vclock
 
-        self.encode_content(robj.metadata,
-                            robj.get_encoded_data(),
-                            req.content)
+        self.encode_content(robj, req.content)
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
                                       MSG_CODE_PUT_RESP)
@@ -213,9 +211,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req.bucket = bucket.name
 
-        self.encode_content(robj.metadata,
-                            robj.get_encoded_data(),
-                            req.content)
+        self.encode_content(robj, req.content)
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
                                        MSG_CODE_PUT_RESP)

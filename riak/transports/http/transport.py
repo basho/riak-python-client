@@ -464,7 +464,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         # Parse the headers...
         vclock = None
-        metadata = {MD_USERMETA: {}, MD_INDEX: []}
+        metadata = {MD_USERMETA: {}, MD_INDEX: set()}
         links = []
         for header, value in headers.iteritems():
             if header == 'content-type':
@@ -489,8 +489,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
                     for token in line:
                         if field.endswith("_int"):
                             token = int(token)
-                        rie = (field, token)
-                        metadata[MD_INDEX].append(rie)
+                        index = (field, token)
+                        metadata[MD_INDEX].add(index)
             elif header == 'x-riak-vclock':
                 vclock = value
             elif header == 'x-riak-deleted':

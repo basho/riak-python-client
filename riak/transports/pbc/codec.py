@@ -122,27 +122,25 @@ class RiakPbcCodec(object):
             usermeta[usermd.key] = usermd.value
         if len(usermeta) > 0:
             metadata[MD_USERMETA] = usermeta
-        indexes = []
+        indexes = set()
         for index in rpb_content.indexes:
             if index.key.endswith("_int"):
-                value = int(index.value)
+                indexes.add((index.key, int(index.value)))
             else:
-                value = index.value
-            rie = (index.key, value)
-            indexes.append(rie)
+                indexes.add((index.key, index.value))
+
         if len(indexes) > 0:
             metadata[MD_INDEX] = indexes
         return metadata, rpb_content.value
 
-    def encode_content(self, metadata, data, rpb_content):
+    def encode_content(self, robj, rpb_content):
         """
         Fills an RpbContent message with the appropriate data and
         metadata from a RiakObject.
         """
         # Convert the broken out fields, building up
         # pbmetadata for any unknown ones
-        for k in metadata:
-            v = metadata[k]
+        for k, v in robj.metadata.iteritems():
             if k == MD_CTYPE:
                 rpb_content.content_type = v
             elif k == MD_CHARSET:
@@ -154,15 +152,16 @@ class RiakPbcCodec(object):
                     pair = rpb_content.usermeta.add()
                     pair.key = uk
                     pair.value = v[uk]
-            elif k == MD_INDEX:
-                for field, value in v:
-                    pair = rpb_content.indexes.add()
-                    pair.key = field
-                    pair.value = str(value)
             elif k == MD_LINKS:
                 for link in v:
                     pb_link = rpb_content.links.add()
                     pb_link.bucket = link.bucket
                     pb_link.key = link.key
                     pb_link.tag = link.tag
-        rpb_content.value = str(data)
+
+        for field, value in robj.indexes:
+                    pair = rpb_content.indexes.add()
+                    pair.key = field
+                    pair.value = str(value)
+
+        rpb_content.value = str(robj.get_encoded_data())

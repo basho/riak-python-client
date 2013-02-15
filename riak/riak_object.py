@@ -60,7 +60,8 @@ class RiakObject(object):
         self._encode_data = True
         self._data = None
         self.vclock = None
-        self.metadata = {MD_USERMETA: {}, MD_INDEX: []}
+        self.metadata = {MD_USERMETA: {}}
+        self.indexes = set()
         self.links = []
         self.siblings = []
         self.exists = False
@@ -182,8 +183,7 @@ class RiakObject(object):
             raise RiakError("Riak 2i fields must end with either '_bin'"
                             " or '_int'.")
 
-        if not [x for x in self.indexes if x == (field,value)]:
-            self.indexes.append((field, value))
+        self.indexes.add((field, value))
 
         return self
 
@@ -199,34 +199,20 @@ class RiakObject(object):
         :rtype: RiakObject
         """
         if not field and not value:
-            remove = self.metadata[MD_INDEX][:]
+            self.indexes.clear()
         elif field and not value:
-            remove = [x for x in self.metadata[MD_INDEX]
-                      if x[0] == field]
+            for index in [x for x in self.indexes if x[0] == field]:
+                self.indexes.remove(index)
         elif field and value:
-            remove = [(field, value)]
+            self.indexes.remove((field, value))
         else:
             raise RiakError("Cannot pass value without a field"
                             " name while removing index")
-
-        self.metadata[MD_INDEX] = [keep for keep in self.metadata[MD_INDEX]
-                                   if keep not in remove]
-        self.indexes = self.metadata[MD_INDEX]
 
         return self
 
     remove_indexes = remove_index
 
-    def _set_indexes(self, indexes):
-        self.metadata[MD_INDEX] = indexes[:]
-    
-    def _get_indexes(self):
-        return self.metadata[MD_INDEX]
-
-    indexes = property(_get_indexes, _set_indexes, 
-                       doc="List of the index entries for this object.")
-    indices = indexes
-        
     def _get_content_type(self):
         try:
             return self.metadata[MD_CTYPE]
@@ -385,6 +371,9 @@ class RiakObject(object):
             self.key = key
             self.vclock = vclock
             self.metadata = metadata
+            self.indexes = metadata.get(MD_INDEX)
+            if not self.indexes:
+                self.indexes = set()
         else:
             result = self.client.put(self, w=w, dw=dw, pw=pw,
                                      return_body=return_body,
@@ -480,14 +469,21 @@ class RiakObject(object):
                 (metadata, data) = contents.pop(0)
                 self.exists = True
                 if not MD_INDEX in metadata:
-                    metadata[MD_INDEX] = []
+                    self.indexes = set()                    
+                else:
+                    self.indexes = metadata[MD_INDEX].copy()
                 self.metadata = metadata
+
                 self.set_encoded_data(data)
                 # Create objects for all siblings
                 siblings = [self]
                 for (metadata, data) in contents:
                     sibling = copy.copy(self)
                     sibling.metadata = metadata
+                    if not MD_INDEX in metadata:
+                        sibling.indexes = set()                    
+                    else:
+                        sibling.indexes = metadata[MD_INDEX].copy()
                     sibling.data = data
                     siblings.append(sibling)
                 for sibling in siblings:
