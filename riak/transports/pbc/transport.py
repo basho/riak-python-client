@@ -26,7 +26,6 @@ from connection import RiakPbcConnection
 from stream import RiakPbcKeyStream, RiakPbcMapredStream
 from codec import RiakPbcCodec
 from messages import (
-    # MSG_CODE_ERROR_RESP,
     MSG_CODE_PING_REQ,
     MSG_CODE_PING_RESP,
     MSG_CODE_GET_CLIENT_ID_REQ,
@@ -44,18 +43,16 @@ from messages import (
     MSG_CODE_LIST_BUCKETS_REQ,
     MSG_CODE_LIST_BUCKETS_RESP,
     MSG_CODE_LIST_KEYS_REQ,
-    # MSG_CODE_LIST_KEYS_RESP,
     MSG_CODE_GET_BUCKET_REQ,
     MSG_CODE_GET_BUCKET_RESP,
     MSG_CODE_SET_BUCKET_REQ,
     MSG_CODE_SET_BUCKET_RESP,
     MSG_CODE_MAPRED_REQ,
-    # MSG_CODE_MAPRED_RESP,
     MSG_CODE_INDEX_REQ,
     MSG_CODE_INDEX_RESP,
     MSG_CODE_SEARCH_QUERY_REQ,
     MSG_CODE_SEARCH_QUERY_RESP
-    )
+)
 
 
 class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
@@ -98,7 +95,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         Get information about the server
         """
         msg_code, resp = self._request(MSG_CODE_GET_SERVER_INFO_REQ,
-                                      expect=MSG_CODE_GET_SERVER_INFO_RESP)
+                                       expect=MSG_CODE_GET_SERVER_INFO_RESP)
         return {'node': resp.node, 'server_version': resp.server_version}
 
     def _get_client_id(self):
@@ -111,7 +108,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req.client_id = client_id
 
         msg_code, resp = self._request(MSG_CODE_SET_CLIENT_ID_REQ, req,
-                                      MSG_CODE_SET_CLIENT_ID_RESP)
+                                       MSG_CODE_SET_CLIENT_ID_RESP)
 
         self._client_id = client_id
 
@@ -179,7 +176,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                             req.content)
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
-                                      MSG_CODE_PUT_RESP)
+                                       MSG_CODE_PUT_RESP)
         if resp is not None:
             contents = []
             for c in resp.content:
@@ -256,7 +253,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req.key = robj.key
 
         msg_code, resp = self._request(MSG_CODE_DEL_REQ, req,
-                                      MSG_CODE_DEL_RESP)
+                                       MSG_CODE_DEL_RESP)
         return self
 
     def get_keys(self, bucket):
@@ -298,7 +295,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req.bucket = bucket.name
 
         msg_code, resp = self._request(MSG_CODE_GET_BUCKET_REQ, req,
-                                      MSG_CODE_GET_BUCKET_RESP)
+                                       MSG_CODE_GET_BUCKET_RESP)
         props = {}
         if resp.props.HasField('n_val'):
             props['n_val'] = resp.props.n_val
@@ -323,7 +320,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.props.allow_mult = props['allow_mult']
 
         msg_code, resp = self._request(MSG_CODE_SET_BUCKET_REQ, req,
-                                      MSG_CODE_SET_BUCKET_RESP)
+                                       MSG_CODE_SET_BUCKET_RESP)
         return self
 
     def mapred(self, inputs, query, timeout=None):
@@ -371,7 +368,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.key = str(startkey)
 
         msg_code, resp = self._request(MSG_CODE_INDEX_REQ, req,
-                                      MSG_CODE_INDEX_RESP)
+                                       MSG_CODE_INDEX_RESP)
         return resp.keys
 
     def search(self, index, query, **params):
@@ -402,7 +399,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.presort = params['presort']
 
         msg_code, resp = self._request(MSG_CODE_SEARCH_QUERY_REQ, req,
-                                      MSG_CODE_SEARCH_QUERY_RESP)
+                                       MSG_CODE_SEARCH_QUERY_RESP)
 
         result = {}
         if resp.HasField('max_score'):

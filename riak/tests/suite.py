@@ -12,5 +12,5 @@ def additional_tests():
     start_dir = os.path.dirname(__file__)
     suite = unittest.TestSuite()
     suite.addTest(unittest.TestLoader().discover(start_dir,
-        top_level_dir=top_level))
+                                                 top_level_dir=top_level))
     return suite

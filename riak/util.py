@@ -47,7 +47,7 @@ def deep_merge(a, b):
                 current_dst[key] = current_src[key]
             else:
                 if (quacks_like_dict(current_src[key])
-                    and quacks_like_dict(current_dst[key])):
+                        and quacks_like_dict(current_dst[key])):
                     stack.append((current_dst[key], current_src[key]))
                 else:
                     current_dst[key] = current_src[key]

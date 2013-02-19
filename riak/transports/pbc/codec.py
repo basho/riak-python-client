@@ -16,17 +16,17 @@ specific language governing permissions and limitations
 under the License.
 """
 from riak.metadata import (
-        MD_CHARSET,
-        MD_CTYPE,
-        MD_ENCODING,
-        MD_INDEX,
-        MD_LASTMOD,
-        MD_LASTMOD_USECS,
-        MD_LINKS,
-        MD_USERMETA,
-        MD_VTAG,
-        MD_DELETED
-        )
+    MD_CHARSET,
+    MD_CTYPE,
+    MD_ENCODING,
+    MD_INDEX,
+    MD_LASTMOD,
+    MD_LASTMOD_USECS,
+    MD_LINKS,
+    MD_USERMETA,
+    MD_VTAG,
+    MD_DELETED
+)
 
 import riak_pb
 
@@ -46,7 +46,7 @@ class RiakPbcCodec(object):
         'all': RIAKC_RW_ALL,
         'quorum': RIAKC_RW_QUORUM,
         'one': RIAKC_RW_ONE
-        }
+    }
 
     def __init__(self, **unused_args):
         if riak_pb is None:

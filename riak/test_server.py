@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import os.path
 import threading
 import string
@@ -69,32 +67,34 @@ class TestServer(object):
     }
 
     APP_CONFIG_DEFAULTS = {
-      "riak_core": {
-          "web_ip": "127.0.0.1",
-          "web_port": 9000,
-          "handoff_port": 9001,
-          "ring_creation_size": 64
-      },
-      "riak_kv": {
-          "storage_backend": Atom("riak_kv_test_backend"),
-          "pb_ip": "127.0.0.1",
-          "pb_port": 9002,
-          "js_vm_count": 8,
-          "js_max_vm_mem": 8,
-          "js_thread_stack": 16,
-          "riak_kv_stat": True,
-          "map_cache_size": 0,
-          "vnode_cache_entries": 0,
-          "test": True,
-          "memory_backend": {
+        "riak_core": {
+            "web_ip": "127.0.0.1",
+            "web_port": 9000,
+            "handoff_port": 9001,
+            "ring_creation_size": 64
+        },
+        "riak_kv": {
+            "storage_backend": Atom("riak_kv_test_backend"),
+            "pb_ip": "127.0.0.1",
+            "pb_port": 9002,
+            "js_vm_count": 8,
+            "js_max_vm_mem": 8,
+            "js_thread_stack": 16,
+            "riak_kv_stat": True,
+            "map_cache_size": 0,
+            "vnode_cache_entries": 0,
+            "test": True,
+            "memory_backend": {
                 "test": True,
-                },
-      },
-      "riak_search": {
-          "enabled": True,
-          "search_backend": Atom("riak_search_test_backend")
-      },
+            },
+        },
+        "riak_search": {
+            "enabled": True,
+            "search_backend": Atom("riak_search_test_backend")
+        },
     }
+
+    DEFAULT_BASE_DIR = "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}"
 
     _temp_bin = None
     _temp_etc = None
@@ -224,8 +224,7 @@ class TestServer(object):
                     line = re.sub("(PLATFORM_DATA_DIR=)(.*)", r'\1%s' %
                                   self.temp_dir, line)
 
-                    if (string.strip(line) ==
-                        "RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}"):
+                    if (string.strip(line) == self.DEFAULT_BASE_DIR):
                         line = ("RUNNER_BASE_DIR=%s\n" %
                                 os.path.normpath(os.path.join(self.bin_dir,
                                                               "..")))

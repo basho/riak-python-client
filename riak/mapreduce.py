@@ -22,6 +22,7 @@ from collections import Iterable, namedtuple
 
 RiakLink = namedtuple("RiakLink", ("bucket", "key", "tag"))
 
+
 class RiakMapReduce(object):
     """
     The RiakMapReduce object allows you to build up and run a
@@ -174,7 +175,7 @@ class RiakMapReduce(object):
         """
         self._input_mode = 'query'
 
-        if endkey == None:
+        if endkey is None:
             self._inputs = {'bucket': bucket,
                             'index': index,
                             'key': startkey}
@@ -280,7 +281,7 @@ class RiakMapReduce(object):
             return result
 
         # If there are no results, then return an empty list.
-        if result == None:
+        if result is None:
             return []
 
         # Otherwise, if the last phase IS a link phase, then convert the

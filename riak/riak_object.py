@@ -19,11 +19,10 @@ under the License.
 """
 import copy
 from riak.metadata import (
-        MD_CTYPE,
-        MD_INDEX,
-        MD_LINKS,
-        MD_USERMETA
-        )
+    MD_CTYPE,
+    MD_INDEX,
+    MD_LINKS,
+    MD_USERMETA)
 from riak import RiakError
 
 
@@ -106,7 +105,7 @@ class RiakObject(object):
 
         :rtype: string
         """
-        if self._encode_data == True:
+        if self._encode_data:
             content_type = self.content_type
             encoder = self.bucket.get_encoder(content_type)
             if encoder is None:
@@ -130,7 +129,7 @@ class RiakObject(object):
         :type data: string
         :rtype: RiakObject
         """
-        if self._encode_data == True:
+        if self._encode_data:
             content_type = self.content_type
             decoder = self.bucket.get_decoder(content_type)
             if decoder is None:
@@ -209,7 +208,7 @@ class RiakObject(object):
         # This removes the index entries that's in the ries list.
         # Done because this is preferred over metadata[MD_INDEX].remove(rie)
         self.metadata[MD_INDEX] = [rie for rie in self.metadata[MD_INDEX]
-                                    if rie not in ries]
+                                   if rie not in ries]
         return self
 
     remove_indexes = remove_index
@@ -239,7 +238,7 @@ class RiakObject(object):
         :rtype: (array of 2 element tuples with field, value) or
                 (array of string or integer)
         """
-        if field == None:
+        if field is None:
             return self.metadata[MD_INDEX]
         else:
             return [v for f, v in self.metadata[MD_INDEX] if f == field]

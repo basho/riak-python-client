@@ -80,7 +80,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                        (unused_args['port'], protocol))
             unused_args['already_warned_port'] = True
             if (protocol in ['http', 'https'] and
-                'http_port' not in unused_args):
+                    'http_port' not in unused_args):
                 unused_args['http_port'] = unused_args['port']
             elif protocol == 'pbc' and 'pb_port' not in unused_args:
                 unused_args['pb_port'] = unused_args['port']

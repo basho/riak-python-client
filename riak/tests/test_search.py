@@ -19,19 +19,23 @@ class EnableSearchTests(object):
     def test_enable_search_commit_hook(self):
         bucket = self.client.bucket(self.search_bucket)
         bucket.clear_properties()
-        self.assertFalse(self.create_client().bucket(self.search_bucket).search_enabled())
+        self.assertFalse(self.create_client().
+                         bucket(self.search_bucket).
+                         search_enabled())
         bucket.enable_search()
-        self.assertTrue(self.create_client().bucket(self.search_bucket).search_enabled())
+        self.assertTrue(self.create_client().
+                        bucket(self.search_bucket).
+                        search_enabled())
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_disable_search_commit_hook(self):
         bucket = self.client.bucket(self.search_bucket)
         bucket.clear_properties()
         bucket.enable_search()
-        self.assertTrue(self.create_client().bucket(self.search_bucket)\
+        self.assertTrue(self.create_client().bucket(self.search_bucket)
                             .search_enabled())
         bucket.disable_search()
-        self.assertFalse(self.create_client().bucket(self.search_bucket)\
+        self.assertFalse(self.create_client().bucket(self.search_bucket)
                              .search_enabled())
         bucket.enable_search()
 
@@ -40,16 +44,16 @@ class SolrSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_document_to_index(self):
         self.client.solr.add(self.search_bucket,
-                               {"id": "doc", "username": "tony"})
+                             {"id": "doc", "username": "tony"})
         results = self.client.solr.search(self.search_bucket,
-                                            "username:tony")
+                                          "username:tony")
         self.assertEquals("tony", results['docs'][0]['username'])
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_multiple_documents_to_iindex(self):
         self.client.solr.add(self.search_bucket,
-                               {"id": "dizzy", "username": "dizzy"},
-                               {"id": "russell", "username": "russell"})
+                             {"id": "dizzy", "username": "dizzy"},
+                             {"id": "russell", "username": "russell"})
         results = self.client.solr\
             .search(self.search_bucket, "username:russell OR username:dizzy")
         self.assertEquals(2, len(results['docs']))
@@ -57,8 +61,8 @@ class SolrSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_id(self):
         self.client.solr.add(self.search_bucket,
-                               {"id": "dizzy", "username": "dizzy"},
-                               {"id": "russell", "username": "russell"})
+                             {"id": "dizzy", "username": "dizzy"},
+                             {"id": "russell", "username": "russell"})
         self.client.solr.delete(self.search_bucket, docs=["dizzy"])
         results = self.client.solr\
             .search(self.search_bucket, "username:russell OR username:dizzy")
@@ -67,8 +71,8 @@ class SolrSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query(self):
         self.client.solr.add(self.search_bucket,
-                               {"id": "dizzy", "username": "dizzy"},
-                               {"id": "russell", "username": "russell"})
+                             {"id": "dizzy", "username": "dizzy"},
+                             {"id": "russell", "username": "russell"})
         self.client.solr\
             .delete(self.search_bucket,
                     queries=["username:dizzy", "username:russell"])
@@ -79,11 +83,11 @@ class SolrSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query_and_id(self):
         self.client.solr.add(self.search_bucket,
-                               {"id": "dizzy", "username": "dizzy"},
-                               {"id": "russell", "username": "russell"})
+                             {"id": "dizzy", "username": "dizzy"},
+                             {"id": "russell", "username": "russell"})
         self.client.solr.delete(self.search_bucket,
-                                  docs=["dizzy"],
-                                  queries=["username:russell"])
+                                docs=["dizzy"],
+                                queries=["username:russell"])
         results = self.client.solr\
             .search(self.search_bucket,
                     "username:russell OR username:dizzy")
@@ -112,7 +116,7 @@ class SearchTests(object):
         results = self.client.solr.search(self.search_bucket,
                                           "username:roidrage", wt="xml")
         self.assertEquals(1, len(results['docs']))
-        
+
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search(self):
         bucket = self.client.bucket(self.search_bucket)

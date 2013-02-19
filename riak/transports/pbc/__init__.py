@@ -49,14 +49,14 @@ class RiakPbcPool(Pool):
 # usable. On seeing any of these errors, the socket
 # should be closed, and the connection re-established.
 CONN_CLOSED_ERRORS = (
-                        errno.EHOSTUNREACH,
-                        errno.ECONNRESET,
-                        errno.ECONNREFUSED,
-                        errno.ECONNABORTED,
-                        errno.ETIMEDOUT,
-                        errno.EBADF,
-                        errno.EPIPE
-                     )
+    errno.EHOSTUNREACH,
+    errno.ECONNRESET,
+    errno.ECONNREFUSED,
+    errno.ECONNABORTED,
+    errno.ETIMEDOUT,
+    errno.EBADF,
+    errno.EPIPE
+)
 
 
 def is_retryable(err):

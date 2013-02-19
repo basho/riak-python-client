@@ -30,8 +30,8 @@ class LinkTests(object):
         # Create the object
         bucket = self.client.bucket(self.bucket_name)
         bucket.new("foo", 2).set_links([bucket.new("foo1"),
-            (bucket.new("foo2"), "tag"),
-            ("bucket", "foo2", "tag2")]).store()
+                                        (bucket.new("foo2"), "tag"),
+                                        ("bucket", "foo2", "tag2")]).store()
         obj = bucket.get("foo")
         links = sorted(obj.get_links(), key=lambda x: x[1])
         self.assertEqual(len(links), 3)
@@ -121,11 +121,18 @@ class JSMapReduceTests(object):
 
         # test non-ASCII-encodable unicode is rejected
         self.assertRaises(TypeError, mr.map,
-            u"function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
+                          u"""
+                          function (v) {
+                          /* æ */
+                            return [JSON.parse(v.values[0].data)];
+                          }""")
 
         # test non-ASCII-encodable string is rejected
         self.assertRaises(TypeError, mr.map,
-            "function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
+                          """function (v) {
+                               /* æ */
+                               return [JSON.parse(v.values[0].data)];
+                             }""")
 
     def test_javascript_named_map(self):
         # Create the object...

@@ -52,6 +52,7 @@ testrun_search_bucket = None
 testrun_props_bucket = None
 testrun_sibs_bucket = None
 
+
 def setUpModule():
     global testrun_search_bucket, testrun_props_bucket, \
         testrun_sibs_bucket
@@ -63,9 +64,10 @@ def setUpModule():
     c.bucket(testrun_sibs_bucket).allow_mult = True
 
     if not int(os.environ.get('SKIP_SEARCH', '0')):
-        testrun_search_bucket = 'searchbucket' 
+        testrun_search_bucket = 'searchbucket'
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
+
 
 def tearDownModule():
     c = RiakClient(transport='http', http_port=HTTP_PORT)
@@ -76,6 +78,7 @@ def tearDownModule():
     b.clear_properties()
     b = c.bucket(testrun_props_bucket)
     b.clear_properties()
+
 
 class BaseTestCase(object):
 
@@ -134,7 +137,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.host = PB_HOST
         self.pb_port = PB_PORT
         self.protocol = 'pbc'
-        self.http_client = self.create_client(HTTP_HOST, 
+        self.http_client = self.create_client(HTTP_HOST,
                                               http_port=HTTP_PORT)
         super(RiakPbcTransportTestCase, self).setUp()
 
@@ -230,17 +233,17 @@ class FilterTests(unittest.TestCase):
         f3 = RiakKeyFilter("matches", "-11-")
         f4 = f1 & f2 & f3
         self.assertEqual(list(f4), [["and",
-                                        [["starts_with", "2005-"]],
-                                        [["ends_with", "-01"]],
-                                        [["matches", "-11-"]],
-                                       ]])
+                                     [["starts_with", "2005-"]],
+                                     [["ends_with", "-01"]],
+                                     [["matches", "-11-"]],
+                                     ]])
 
     def test_or(self):
         f1 = RiakKeyFilter("starts_with", "2005-")
         f2 = RiakKeyFilter("ends_with", "-01")
         f3 = f1 | f2
         self.assertEqual(list(f3), [["or", [["starts_with", "2005-"]],
-                                        [["ends_with", "-01"]]]])
+                                     [["ends_with", "-01"]]]])
 
     def test_multi_or(self):
         f1 = RiakKeyFilter("starts_with", "2005-")
@@ -248,10 +251,10 @@ class FilterTests(unittest.TestCase):
         f3 = RiakKeyFilter("matches", "-11-")
         f4 = f1 | f2 | f3
         self.assertEqual(list(f4), [["or",
-                               [["starts_with", "2005-"]],
-                               [["ends_with", "-01"]],
-                               [["matches", "-11-"]],
-                             ]])
+                                     [["starts_with", "2005-"]],
+                                     [["ends_with", "-01"]],
+                                     [["matches", "-11-"]],
+                                     ]])
 
     def test_chaining(self):
         f1 = key_filter.tokenize("-", 1).eq("2005")
@@ -260,7 +263,7 @@ class FilterTests(unittest.TestCase):
         self.assertEqual(list(f3), [["and",
                                      [["tokenize", "-", 1], ["eq", "2005"]],
                                      [["tokenize", "-", 2], ["eq", "05"]]
-                                   ]])
+                                     ]])
 
 if __name__ == '__main__':
     unittest.main()

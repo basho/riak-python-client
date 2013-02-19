@@ -35,18 +35,18 @@ from riak.transports.http.search import XMLSearchResult
 from riak.transports.http.stream import (
     RiakHttpKeyStream,
     RiakHttpMapReduceStream
-    )
+)
 from riak.metadata import (
-        MD_CHARSET,
-        MD_CTYPE,
-        MD_ENCODING,
-        MD_INDEX,
-        MD_LASTMOD,
-        MD_LINKS,
-        MD_USERMETA,
-        MD_VTAG,
-        MD_DELETED
-        )
+    MD_CHARSET,
+    MD_CTYPE,
+    MD_ENCODING,
+    MD_INDEX,
+    MD_LASTMOD,
+    MD_LINKS,
+    MD_USERMETA,
+    MD_VTAG,
+    MD_DELETED
+)
 from riak import RiakError
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
@@ -336,8 +336,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             return RiakHttpMapReduceStream(response)
         else:
             raise Exception(
-                    'Error running MapReduce operation. Headers: %s Body: %s' %
-                    (repr(headers), repr(response.read())))
+                'Error running MapReduce operation. Headers: %s Body: %s' %
+                (repr(headers), repr(response.read())))
 
     def get_index(self, bucket, index, startkey, endkey=None):
         """
@@ -623,7 +623,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             key = matches.group(1).lower()
             value = matches.group(2).strip()
             if key in retVal.keys():
-                if  isinstance(retVal[key], list):
+                if isinstance(retVal[key], list):
                     retVal[key].append(value)
                 else:
                     retVal[key] = [retVal[key]].append(value)

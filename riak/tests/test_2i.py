@@ -54,11 +54,11 @@ class TwoITests(object):
 
         # Check the get_indexes() function...
         self.assertEqual([
-                ('field1_bin', 'val1a'),
-                ('field1_bin', 'val1b'),
-                ('field1_int', 1011),
-                ('field1_int', 1012)
-                ], sorted(obj.get_indexes()))
+            ('field1_bin', 'val1a'),
+            ('field1_bin', 'val1b'),
+            ('field1_int', 1011),
+            ('field1_int', 1012)
+        ], sorted(obj.get_indexes()))
 
         # Delete an index...
         obj.remove_index('field1_bin', 'val1a')
@@ -79,21 +79,21 @@ class TwoITests(object):
         obj.add_index('field1_int', 1011)
 
         self.assertEqual([
-                ('field1_bin', 'val1a'),
-                ('field1_bin', 'val1b'),
-                ('field1_int', 1011),
-                ('field1_int', 1012)
-                ], sorted(obj.get_indexes()))
+            ('field1_bin', 'val1a'),
+            ('field1_bin', 'val1b'),
+            ('field1_int', 1011),
+            ('field1_int', 1012)
+        ], sorted(obj.get_indexes()))
 
         obj.store()
         obj = bucket.get('mykey1')
 
         self.assertEqual([
-                ('field1_bin', 'val1a'),
-                ('field1_bin', 'val1b'),
-                ('field1_int', 1011),
-                ('field1_int', 1012)
-                ], sorted(obj.get_indexes()))
+            ('field1_bin', 'val1a'),
+            ('field1_bin', 'val1b'),
+            ('field1_int', 1011),
+            ('field1_int', 1012)
+        ], sorted(obj.get_indexes()))
 
         # Clean up...
         bucket.get('mykey1').delete()
