@@ -167,7 +167,10 @@ def mkpath(*segments, **query):
         if query[key] in [False, True]:
             _query[key] = str(query[key]).lower()
         elif query[key] is not None:
-            _query[key] = query[key]
+            if isinstance(query[key], unicode):
+                _query[key] = query[key].encode('utf-8')
+            else:
+                _query[key] = query[key]
 
     if len(_query) > 0:
         pathstring += "?" + urlencode(_query)

@@ -396,7 +396,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         self._request('POST', self.solr_update_path(index),
                       {'Content-Type': 'text/xml'},
-                      xml.toxml())
+                      xml.toxml().encode('utf-8'))
 
     def fulltext_delete(self, index, docs=None, queries=None):
         """
@@ -421,7 +421,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         self._request('POST', self.solr_update_path(index),
                       {'Content-Type': 'text/xml'},
-                      xml.toxml())
+                      xml.toxml().encode('utf-8'))
 
     def check_http_code(self, response, expected_statuses):
         status = response[0]['http_code']
