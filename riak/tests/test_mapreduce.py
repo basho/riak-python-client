@@ -18,7 +18,7 @@ class LinkTests(object):
         self.assertEqual(len(links), 3)
         for bucket, key, tag in links:
             if (key == "foo1"):
-                self.assertEqual(bucket, "bucket")
+                self.assertEqual(bucket, self.bucket_name)
             elif (key == "foo2"):
                 self.assertEqual(tag, "tag")
             elif (key == "foo3"):

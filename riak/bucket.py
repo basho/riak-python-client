@@ -64,7 +64,7 @@ class RiakBucket(object):
         else:
             return False
 
-    def __nq__(self, other):
+    def __ne__(self, other):
         if isinstance(other, self.__class__):
             return hash(self) != hash(other)
         else:
