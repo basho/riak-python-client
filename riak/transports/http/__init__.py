@@ -50,7 +50,8 @@ class RiakHttpPool(Pool):
 CONN_CLOSED_ERRORS = (
     httplib.NotConnected,
     httplib.IncompleteRead,
-    httplib.ImproperConnectionState
+    httplib.ImproperConnectionState,
+    httplib.BadStatusLine
     )
 
 
