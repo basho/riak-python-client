@@ -154,21 +154,20 @@ class RiakPbcTransportTestCase(BasicKVTests,
             bucket.enable_search()
 
 
-class RiakHttpTransportTestCase():
-#     BasicKVTests,
-#                                 KVFileTests,
-#                                 HTTPBucketPropsTest,
-#                                 TwoITests,
-#                                 LinkTests,
-#                                 ErlangMapReduceTests,
-#                                 JSMapReduceTests,
-#                                 MapReduceAliasTests,
-#                                 MapReduceStreamTests,
-#                                 EnableSearchTests,
-#                                 SolrSearchTests,
-#                                 SearchTests,
-#                                 BaseTestCase,
-#                                 unittest.TestCase):
+class RiakHttpTransportTestCase(BasicKVTests,
+                                KVFileTests,
+                                HTTPBucketPropsTest,
+                                TwoITests,
+                                LinkTests,
+                                ErlangMapReduceTests,
+                                JSMapReduceTests,
+                                MapReduceAliasTests,
+                                MapReduceStreamTests,
+                                EnableSearchTests,
+                                SolrSearchTests,
+                                SearchTests,
+                                BaseTestCase,
+                                unittest.TestCase):
 
     def setUp(self):
         self.host = HTTP_HOST
