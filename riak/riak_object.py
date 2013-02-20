@@ -60,7 +60,10 @@ class RiakObject(object):
         self._encode_data = True
         self._data = None
         self.vclock = None
-        self.metadata = {MD_USERMETA: {}}
+        self.charset = None
+        self.content_type = ''
+        self.content_encoding = None
+        self.usermeta = {}
         self.indexes = set()
         self.links = []
         self.siblings = []
@@ -85,7 +88,7 @@ class RiakObject(object):
         return self._data
 
     def _set_data(self, data, content_type=None):
-        if MD_CTYPE not in self.metadata:
+        if not self.content_type:
             if self._encode_data:
                 self.content_type = "application/json"
             else:
@@ -148,26 +151,6 @@ class RiakObject(object):
             self.data = data
         return self
 
-    def _get_usermeta(self):
-        if MD_USERMETA in self.metadata:
-            return self.metadata[MD_USERMETA]
-        else:
-            return {}
-
-    def _set_usermeta(self, usermeta):
-        self.metadata[MD_USERMETA] = usermeta
-        return self
-
-    usermeta = property(_get_usermeta, _set_usermeta,
-                        doc="""
-        The custom user metadata on this object. This doesn't
-        include things like content type and links, but only
-        user-defined meta attributes stored with the Riak object.
-
-        :param userdata: The user metadata to store.
-        :type userdata: dict
-        """)
-
     def add_index(self, field, value):
         """
         Tag this object with the specified field/value pair for
@@ -213,65 +196,6 @@ class RiakObject(object):
 
     remove_indexes = remove_index
 
-    def _get_content_type(self):
-        try:
-            return self.metadata[MD_CTYPE]
-        except KeyError:
-            if self._encode_data:
-                return "application/json"
-            else:
-                return "application/octet-stream"
-
-    def _set_content_type(self, content_type):
-        """
-        Set the content type of this object.
-
-        :param content_type: The new content type.
-        :type content_type: string
-        :rtype: self
-        """
-        self.metadata[MD_CTYPE] = content_type
-        return self
-
-    content_type = property(_get_content_type, _set_content_type,
-                            doc="""
-        The content type of this object. This is either
-        ``application/json``, or the provided content type if the
-        object was created via :func:`RiakBucket.new_binary
-        <riak.bucket.RiakBucket.new_binary>`.
-
-        :rtype: string """)
-
-    def set_links(self, links, all_link=False):
-        """
-        Replaces all links to a RiakObject
-
-        :param links: An iterable of 2-item tuples, consisting of
-            (RiakObject, tag). This could also be an iterable of just
-            a RiakObject, instead of the tuple, then a tag of None
-            would be used. Lastly, it could also be an iterable of
-            RiakLink. They have tags built-in.
-
-        :param all_link: A boolean indicates if links are all RiakLink
-            objects This speeds up the operation.
-        """
-        if all_link:
-            self.metadata[MD_LINKS] = links
-            return self
-
-        new_links = []
-        for item in links:
-            if isinstance(item, RiakLink):
-                link = item
-            elif isinstance(item, RiakObject):
-                link = RiakLink(item.bucket.name, item.key, None)
-            else:
-                link = RiakLink(item[0].bucket.name, item[0].key, item[1])
-            new_links.append(link)
-
-        self.metadata[MD_LINKS] = new_links
-        return self
-
     def add_link(self, obj, tag=None):
         """
         Add a link to a RiakObject.
@@ -288,50 +212,8 @@ class RiakObject(object):
         else:
             newlink = RiakLink(obj.bucket.name, obj.key, tag)
 
-        self.remove_link(newlink)
-        links = self.metadata[MD_LINKS]
-        links.append(newlink)
+        self.links.append(newlink)
         return self
-
-    def remove_link(self, obj, tag=None):
-        """
-        Remove a link to a RiakObject.
-
-        :param obj: Either a RiakObject or a RiakLink object.
-        :type obj: mixed
-        :param tag: Optional link tag. Defaults to bucket name. It is ignored
-            if ``obj`` is a RiakLink instance.
-        :type tag: string
-        :rtype: RiakObject
-        """
-        if isinstance(obj, RiakLink):
-            oldlink = obj
-        else:
-            oldlink = RiakLink(obj.bucket.name, obj.key, tag)
-
-        a = []
-        links = self.metadata.get(MD_LINKS, [])
-        for link in links:
-            if not link == oldlink:
-                a.append(link)
-
-        self.metadata[MD_LINKS] = a
-        return self
-
-    def get_links(self):
-        """
-        Return an array of RiakLink objects.
-
-        :rtype: list
-        """
-        # Set the clients before returning...
-        if MD_LINKS in self.metadata:
-            links = self.metadata[MD_LINKS]
-            for link in links:
-                link._client = self.client
-            return links
-        else:
-            return []
 
     def store(self, w=None, dw=None, pw=None, return_body=True,
               if_none_match=False):
@@ -363,17 +245,11 @@ class RiakObject(object):
                             "store one of the siblings instead")
 
         if self.key is None:
-            key, vclock, metadata = self.client.put_new(
+            result  = self.client.put_new(
                 self, w=w, dw=dw, pw=pw,
                 return_body=return_body,
                 if_none_match=if_none_match)
-            self.exists = True
-            self.key = key
-            self.vclock = vclock
-            self.metadata = metadata
-            self.indexes = metadata.get(MD_INDEX)
-            if not self.indexes:
-                self.indexes = set()
+            self._populate(result)
         else:
             result = self.client.put(self, w=w, dw=dw, pw=pw,
                                      return_body=return_body,
@@ -396,10 +272,11 @@ class RiakObject(object):
         """
 
         result = self.client.get(self, r=r, pr=pr, vtag=vtag)
-
-        self.clear()
-        if result is not None and result != ('', []):
+        if result and result != ('', []):
+            self.clear()
             self._populate(result)
+        else:
+            self.clear()
 
         return self
 
@@ -457,37 +334,12 @@ class RiakObject(object):
         If a list of vtags is returned there are multiple
         sibling that need to be retrieved with get.
         """
-        self.clear()
+
         if result is None:
             return self
-        elif type(result) is list:
-            self._set_siblings(result)
-        elif type(result) is tuple:
-            (vclock, contents) = result
-            self.vclock = vclock
-            if len(contents) > 0:
-                (metadata, data) = contents.pop(0)
-                self.exists = True
-                if not MD_INDEX in metadata:
-                    self.indexes = set()                    
-                else:
-                    self.indexes = metadata[MD_INDEX].copy()
-                self.metadata = metadata
-
-                self.set_encoded_data(data)
-                # Create objects for all siblings
-                siblings = [self]
-                for (metadata, data) in contents:
-                    sibling = copy.copy(self)
-                    sibling.metadata = metadata
-                    if not MD_INDEX in metadata:
-                        sibling.indexes = set()                    
-                    else:
-                        sibling.indexes = metadata[MD_INDEX].copy()
-                    sibling.data = data
-                    siblings.append(sibling)
-                for sibling in siblings:
-                    sibling._set_siblings(siblings)
+        elif type(result) is RiakObject:
+            self.clear()
+            self.__dict__ = result.__dict__.copy()
         else:
             raise RiakError("do not know how to handle type %s" % type(result))
 
@@ -514,28 +366,6 @@ class RiakObject(object):
             self.siblings[i] = obj
             obj._set_siblings(self.siblings)
             return obj
-
-    def _set_siblings(self, siblings):
-        """
-        Set the array of siblings - used internally
-
-        .. warning::
-
-            Make sure this object is at index 0 so get_siblings(0)
-            always returns the current object
-        """
-        try:
-            i = siblings.index(self)
-            if i != 0:
-                siblings.pop(i)
-                siblings.insert(0, self)
-        except ValueError:
-            pass
-
-        if len(siblings) > 1:
-            self.siblings = siblings
-        else:
-            self.siblings = []
 
     def add(self, *args):
         """

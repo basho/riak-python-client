@@ -30,7 +30,7 @@ See the unit_tests.py file for example usage.
 @author Jay Baird (@skatterbean) (jay@mochimedia.com)
 """
 
-__all__ = ['RiakClient', 'RiakBucket', 'RiakNode', 'RiakObject',
+__all__ = ['RiakBucket', 'RiakNode', 'RiakObject', 'RiakClient',
            'RiakMapReduce', 'RiakKeyFilter', 'RiakLink', 'RiakError',
            'ONE', 'ALL', 'QUORUM', 'key_filter']
 

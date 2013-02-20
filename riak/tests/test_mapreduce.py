@@ -14,7 +14,7 @@ class LinkTests(object):
             .add_link(bucket.new("foo3"), "tag2!@#%^&*)") \
             .store()
         obj = bucket.get("test_store_and_get_links")
-        links = obj.get_links()
+        links = obj.links
         self.assertEqual(len(links), 3)
         for l in links:
             if (l.key == "foo1"):
@@ -29,27 +29,19 @@ class LinkTests(object):
     def test_set_links(self):
         # Create the object
         bucket = self.client.bucket(self.bucket_name)
-        bucket.new("foo", 2).set_links([bucket.new("foo1"),
-            (bucket.new("foo2"), "tag"),
-            RiakLink(self.bucket_name, "foo2", "tag2")]).store()
-        obj = bucket.get("foo")
-        links = sorted(obj.get_links(), key=lambda x: x.key)
+        o = bucket.new(self.key_name, 2)
+        o.links = [RiakLink("foo1", "foo1"),
+                   RiakLink("foo2", "foo2", "tag"),
+                   RiakLink("bucket", "foo2", "tag2")]
+        o.store()
+        obj = bucket.get(self.key_name)
+        links = sorted(obj.links, key=lambda x: x.key)
         self.assertEqual(len(links), 3)
         self.assertEqual(links[0].key, "foo1")
         self.assertEqual(links[1].key, "foo2")
         self.assertEqual(links[1].tag, "tag")
         self.assertEqual(links[2].key, "foo2")
         self.assertEqual(links[2].tag, "tag2")
-
-    def test_set_links_all_links(self):
-        bucket = self.client.bucket(self.bucket_name)
-        foo1 = bucket.new("foo", 1)
-        bucket.new("foo2", 2).store()
-        links = [RiakLink(self.bucket_name, "foo2")]
-        foo1.set_links(links, True)
-        links = foo1.get_links()
-        self.assertEqual(len(links), 1)
-        self.assertEqual(links[0].key, "foo2")
 
     def test_link_walking(self):
         # Create the object...
