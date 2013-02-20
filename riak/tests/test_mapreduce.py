@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from riak.mapreduce import RiakLink, RiakMapReduce
+from riak.mapreduce import RiakMapReduce
 from riak import key_filter
 
 
@@ -16,32 +16,32 @@ class LinkTests(object):
         obj = bucket.get("test_store_and_get_links")
         links = obj.links
         self.assertEqual(len(links), 3)
-        for l in links:
-            if (l.key == "foo1"):
-                self.assertEqual(l.tag, self.bucket_name)
-            elif (l.key == "foo2"):
-                self.assertEqual(l.tag, "tag")
-            elif (l.key == "foo3"):
-                self.assertEqual(l.tag, "tag2!@#%^&*)")
+        for bucket, key, tag in links:
+            if (key == "foo1"):
+                self.assertEqual(bucket, self.bucket_name)
+            elif (key == "foo2"):
+                self.assertEqual(tag, "tag")
+            elif (key == "foo3"):
+                self.assertEqual(tag, "tag2!@#%^&*)")
             else:
-                self.assertEqual("unknown key", l.key)
+                self.assertEqual(key, "unknown key")
 
     def test_set_links(self):
         # Create the object
         bucket = self.client.bucket(self.bucket_name)
         o = bucket.new(self.key_name, 2)
-        o.links = [RiakLink("foo1", "foo1"),
-                   RiakLink("foo2", "foo2", "tag"),
-                   RiakLink("bucket", "foo2", "tag2")]
+        o.links = [(self.bucket_name, "foo1", None),
+                   (self.bucket_name, "foo2", "tag"),
+                   ("bucket", "foo2", "tag2")]
         o.store()
         obj = bucket.get(self.key_name)
-        links = sorted(obj.links, key=lambda x: x.key)
+        links = sorted(obj.links, key=lambda x: x[1])
         self.assertEqual(len(links), 3)
-        self.assertEqual(links[0].key, "foo1")
-        self.assertEqual(links[1].key, "foo2")
-        self.assertEqual(links[1].tag, "tag")
-        self.assertEqual(links[2].key, "foo2")
-        self.assertEqual(links[2].tag, "tag2")
+        self.assertEqual(links[0][1], "foo1")
+        self.assertEqual(links[1][1], "foo2")
+        self.assertEqual(links[1][2], "tag")
+        self.assertEqual(links[2][1], "foo2")
+        self.assertEqual(links[2][2], "tag2")
 
     def test_link_walking(self):
         # Create the object...
@@ -113,11 +113,18 @@ class JSMapReduceTests(object):
 
         # test non-ASCII-encodable unicode is rejected
         self.assertRaises(TypeError, mr.map,
-            u"function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
+                          u"""
+                          function (v) {
+                          /* æ */
+                            return [JSON.parse(v.values[0].data)];
+                          }""")
 
         # test non-ASCII-encodable string is rejected
         self.assertRaises(TypeError, mr.map,
-            "function (v) { /* æ */ return [JSON.parse(v.values[0].data)]; }")
+                          """function (v) {
+                               /* æ */
+                               return [JSON.parse(v.values[0].data)];
+                             }""")
 
     def test_javascript_named_map(self):
         # Create the object...

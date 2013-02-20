@@ -22,7 +22,7 @@ from riak import RiakError
 from messages import (
     MESSAGE_CLASSES,
     MSG_CODE_ERROR_RESP
-    )
+)
 
 
 class RiakPbcConnection(object):

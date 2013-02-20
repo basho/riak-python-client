@@ -119,6 +119,16 @@ class BasicKVTests(object):
         obj = bucket.get_binary(key2)
         self.assertEqual(data, json.loads(obj.data))
 
+    def test_blank_binary_204(self):
+        bucket = self.client.bucket(self.bucket_name)
+
+        # this should *not* raise an error
+        obj = bucket.new_binary('foo2', '')
+        obj.store()
+        obj = bucket.get_binary('foo2')
+        self.assertTrue(obj.exists)
+        self.assertEqual(obj.data, '')
+
     def test_custom_bucket_encoder_decoder(self):
         bucket = self.client.bucket(self.bucket_name)
         # Teach the bucket how to pickle
@@ -173,7 +183,7 @@ class BasicKVTests(object):
         bucket.allow_mult = True
         # Test setting nval...
         bucket.n_val = 1
-        
+
         bucket2 = self.create_client().bucket(self.props_bucket)
         self.assertTrue(bucket2.allow_mult)
         self.assertEqual(bucket2.n_val, 1)

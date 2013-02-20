@@ -24,7 +24,7 @@ versions = {
     1: LooseVersion("1.0.0"),
     1.1: LooseVersion("1.1.0"),
     1.2: LooseVersion("1.2.0")
-    }
+}
 
 
 class FeatureDetection(object):

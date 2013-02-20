@@ -19,8 +19,9 @@ under the License.
 
 import json
 from riak.transports.pbc.messages import (
-    MSG_CODE_LIST_KEYS_RESP, MSG_CODE_MAPRED_RESP
-    )
+    MSG_CODE_LIST_KEYS_RESP,
+    MSG_CODE_MAPRED_RESP
+)
 
 
 class RiakPbcStream(object):

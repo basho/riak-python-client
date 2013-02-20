@@ -45,8 +45,8 @@ class RiakTransport(FeatureDetection):
         """
         Returns a random client identifier
         """
-        return 'py_%s' % base64.b64encode(
-                str(random.randint(1, 0x40000000)))
+        return ('py_%s' %
+                base64.b64encode(str(random.randint(1, 0x40000000))))
 
     @classmethod
     def make_fixed_client_id(self):
@@ -204,7 +204,7 @@ class RiakTransport(FeatureDetection):
         mr_result = self.mapred({'module': 'riak_search',
                                  'function': 'mapred_search',
                                  'arg': [index, query]},
-                           phases)
+                                phases)
         result = {'num_found': len(mr_result),
                   'max_score': 0.0,
                   'docs': []}
@@ -237,7 +237,7 @@ class RiakTransport(FeatureDetection):
                                   'index': index,
                                   'key': startkey},
                                  phases)
-        return [key for bucket, key in result]
+        return [key for resultbucket, key in result]
 
     def _construct_mapred_json(self, inputs, query, timeout=None):
         if not self.phaseless_mapred() and (query is None or len(query) is 0):

@@ -36,7 +36,6 @@ from riak.transports.http.stream import (
     RiakHttpKeyStream,
     RiakHttpMapReduceStream
     )
-from riak.mapreduce import RiakLink
 from riak import RiakError
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
@@ -324,8 +323,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             return RiakHttpMapReduceStream(response)
         else:
             raise Exception(
-                    'Error running MapReduce operation. Headers: %s Body: %s' %
-                    (repr(headers), repr(response.read())))
+                'Error running MapReduce operation. Headers: %s Body: %s' %
+                (repr(headers), repr(response.read())))
 
     def get_index(self, bucket, index, startkey, endkey=None):
         """
@@ -495,10 +494,15 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
     def to_link_header(self, link):
         """
-        Convert this RiakLink object to a link header string. Used internally.
+        Convert the link tuple to a link header string. Used internally.
         """
-        url = self.object_path(link.bucket, link.key)
-        header = '<%s>; riaktag="%s"' % (url, link.tag)
+        try: 
+            bucket, key, tag = link
+        except ValueError:
+            raise RiakError("Invalid link tuple %s" % link)
+        tag = tag if tag is not None else bucket
+        url = self.object_path(bucket, key)
+        header = '<%s>; riaktag="%s"' % (url, tag)
         return header
 
     def _parse_links(self, links, linkHeaders):
@@ -509,9 +513,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             matches = (re.match(oldform, linkHeader) or
                        re.match(newform, linkHeader))
             if matches is not None:
-                link = RiakLink(urllib.unquote_plus(matches.group(2)),
-                                urllib.unquote_plus(matches.group(3)),
-                                urllib.unquote_plus(matches.group(4)))
+                link = (urllib.unquote_plus(matches.group(2)),
+                        urllib.unquote_plus(matches.group(3)),
+                        urllib.unquote_plus(matches.group(4)))
                 links.append(link)
         return links
 
@@ -610,7 +614,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             key = matches.group(1).lower()
             value = matches.group(2).strip()
             if key in retVal.keys():
-                if  isinstance(retVal[key], list):
+                if isinstance(retVal[key], list):
                     retVal[key].append(value)
                 else:
                     retVal[key] = [retVal[key]].append(value)

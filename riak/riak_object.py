@@ -19,15 +19,10 @@ under the License.
 """
 import copy
 from riak.metadata import (
-        MD_CTYPE,
-        MD_INDEX,
-        MD_LINKS,
-        MD_USERMETA
-        )
-from riak.mapreduce import (
-    RiakMapReduce,
-    RiakLink
-    )
+    MD_CTYPE,
+    MD_INDEX,
+    MD_LINKS,
+    MD_USERMETA)
 from riak import RiakError
 
 
@@ -78,7 +73,7 @@ class RiakObject(object):
         else:
             return False
 
-    def __nq__(self, other):
+    def __ne__(self, other):
         if isinstance(other, self.__class__):
             return hash(self) != hash(other)
         else:
@@ -114,7 +109,7 @@ class RiakObject(object):
 
         :rtype: string
         """
-        if self._encode_data == True:
+        if self._encode_data:
             encoder = self.bucket.get_encoder(self.content_type)
             if encoder is None:
                 if isinstance(self.data, basestring):
@@ -137,7 +132,7 @@ class RiakObject(object):
         :type data: string
         :rtype: RiakObject
         """
-        if self._encode_data == True:
+        if self._encode_data:
             decoder = self.bucket.get_decoder(self.content_type)
             if decoder is None:
                 # if no decoder, just set as string data for
@@ -198,17 +193,18 @@ class RiakObject(object):
         """
         Add a link to a RiakObject.
 
-        :param obj: Either a RiakObject or a RiakLink object.
+        :param obj: Either a RiakObject or 3 item link tuple consisting
+            of (bucket, key, tag).
         :type obj: mixed
         :param tag: Optional link tag. Defaults to bucket name. It is ignored
-            if ``obj`` is a RiakLink instance.
+            if ``obj`` is a 3 item link tuple.
         :type tag: string
         :rtype: RiakObject
         """
-        if isinstance(obj, RiakLink):
+        if isinstance(obj, tuple):
             newlink = obj
         else:
-            newlink = RiakLink(obj.bucket.name, obj.key, tag)
+            newlink = (obj.bucket.name, obj.key, tag)
 
         self.links.append(newlink)
         return self
@@ -406,3 +402,5 @@ class RiakObject(object):
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
         return mr.reduce(*args)
+
+from riak.mapreduce import RiakMapReduce

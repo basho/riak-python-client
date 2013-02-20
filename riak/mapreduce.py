@@ -17,8 +17,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-import urllib
-from collections import Iterable
+
+from collections import Iterable, namedtuple
+
+RiakLink = namedtuple("RiakLink", ("bucket", "key", "tag"))
 
 
 class RiakMapReduce(object):
@@ -173,7 +175,7 @@ class RiakMapReduce(object):
         """
         self._input_mode = 'query'
 
-        if endkey == None:
+        if endkey is None:
             self._inputs = {'bucket': bucket,
                             'index': index,
                             'key': startkey}
@@ -262,7 +264,7 @@ class RiakMapReduce(object):
     def run(self, timeout=None):
         """
         Run the map/reduce operation synchronously. Returns a list of
-        results, or a list of RiakLink objects if the last phase is a
+        results, or a list of links if the last phase is a
         link phase.
 
         :param timeout: Timeout in milliseconds
@@ -279,18 +281,17 @@ class RiakMapReduce(object):
             return result
 
         # If there are no results, then return an empty list.
-        if result == None:
+        if result is None:
             return []
 
         # Otherwise, if the last phase IS a link phase, then convert the
-        # results to RiakLink objects.
+        # results to link tuples.
         a = []
         for r in result:
             if (len(r) == 2):
-                link = RiakLink(r[0], r[1])
+                link = (r[0], r[1], None)
             elif (len(r) == 3):
-                link = RiakLink(r[0], r[1], r[2])
-            link._client = self._client
+                link = (r[0], r[1], r[2])
             a.append(link)
 
         return a
@@ -581,61 +582,6 @@ class RiakLinkPhase(object):
                    'tag': self._tag,
                    'keep': self._keep}
         return {'link': stepdef}
-
-
-class RiakLink(object):
-    """
-    The RiakLink object represents a link from one Riak object to
-    another.
-    """
-
-    def __init__(self, bucket, key, tag=None):
-        """
-        Construct a RiakLink object.
-
-        :param bucket: the bucket name
-        :type bucket: string
-        :param key: the key
-        :type key: string
-        :param tag: the tag
-        :type tag: string
-        """
-        self.bucket = bucket
-        self.key = key
-        self.tag = tag if tag else bucket
-        self._client = None
-
-    def get(self, r=None):
-        """
-        Retrieve the RiakObject to which this link points.
-
-        :param r: the read quorum to use
-        :type r: string, integer
-        :rtype: RiakObject
-        """
-        return self._client.bucket(self.bucket).get(self.key, r)
-
-    def get_binary(self, r=None):
-        """
-        Retrieve the RiakObject to which this link points, as a binary.
-
-        :param r: the read quorum to use
-        :type r: string, integer
-        :rtype: RiakObject
-        """
-        return self._client.bucket(self.bucket).get_binary(self.key, r)
-
-    def __eq__(self, other):
-        """
-        Returns True if the links are equal.
-
-        :param link: some other link
-        :type link: RiakLink
-        :rtype: boolean
-        """
-        return ((self.bucket == other.bucket) and
-                (self.key == other.key) and
-                (self.tag == other.tag))
 
 
 class RiakKeyFilter(object):

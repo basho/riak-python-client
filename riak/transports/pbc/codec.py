@@ -15,21 +15,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak.metadata import (
-        MD_CHARSET,
-        MD_CTYPE,
-        MD_ENCODING,
-        MD_INDEX,
-        MD_LASTMOD,
-        MD_LASTMOD_USECS,
-        MD_LINKS,
-        MD_USERMETA,
-        MD_VTAG,
-        MD_DELETED
-        )
-
 import riak_pb
-from riak.mapreduce import RiakLink
 from riak.riak_object import RiakObject
 
 RIAKC_RW_ONE = 4294967294
@@ -48,7 +34,7 @@ class RiakPbcCodec(object):
         'all': RIAKC_RW_ALL,
         'quorum': RIAKC_RW_QUORUM,
         'one': RIAKC_RW_ONE
-        }
+    }
 
     def __init__(self, **unused_args):
         if riak_pb is None:
@@ -104,7 +90,7 @@ class RiakPbcCodec(object):
                 tag = link.tag
             else:
                 tag = None
-            links.append(RiakLink(bucket, key, tag))
+            links.append((bucket, key, tag))
         if links:
             robj.links = links
         if rpb_content.HasField("last_mod"):
@@ -148,9 +134,17 @@ class RiakPbcCodec(object):
             pair.value = robj.usermeta[uk]
         for link in robj.links:
             pb_link = rpb_content.links.add()
-            pb_link.bucket = link.bucket
-            pb_link.key = link.key
-            pb_link.tag = link.tag
+            try: 
+                bucket, key, tag = link
+            except ValueError:
+                raise RiakError("Invalid link tuple %s" % link)
+
+            pb_link.bucket = bucket
+            pb_link.key = key
+            if tag:
+                pb_link.tag = tag
+            else:
+                pb_link.tag = ''
 
         for field, value in robj.indexes:
                     pair = rpb_content.indexes.add()
@@ -158,3 +152,4 @@ class RiakPbcCodec(object):
                     pair.value = str(value)
 
         rpb_content.value = str(robj.get_encoded_data())
+

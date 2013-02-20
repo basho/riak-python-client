@@ -17,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak_object import RiakObject
 import mimetypes
 from riak.util import deprecateQuorumAccessors
 
@@ -65,7 +64,7 @@ class RiakBucket(object):
         else:
             return False
 
-    def __nq__(self, other):
+    def __ne__(self, other):
         if isinstance(other, self.__class__):
             return hash(self) != hash(other)
         else:
@@ -433,3 +432,5 @@ class RiakBucket(object):
 
     def __str__(self):
         return '<RiakBucket "{0}">'.format(self.name)
+
+from riak_object import RiakObject
