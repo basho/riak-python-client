@@ -189,7 +189,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
 
         o.store()
         stored_object = bucket.get("lots_of_links")
-        self.assertEqual(len(stored_object.get_links()), 400)
+        self.assertEqual(len(stored_object.links), 400)
 
     def test_clear_bucket_properties(self):
         bucket = self.client.bucket(self.props_bucket)

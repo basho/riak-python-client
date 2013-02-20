@@ -202,7 +202,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         If return_meta is False, then the vlock and metadata return values
         will be None.
 
-        @return (key, vclock, metadata)
+        @return robj
         """
         # Note that this won't work on 0.14 nodes.
         bucket = robj.bucket

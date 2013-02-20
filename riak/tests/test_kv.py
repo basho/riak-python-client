@@ -120,8 +120,8 @@ class BasicKVTests(object):
         self.assertEqual(data, json.loads(obj.data))
 
     def test_custom_bucket_encoder_decoder(self):
-        # Teach the bucket how to pickle
         bucket = self.client.bucket(self.bucket_name)
+        # Teach the bucket how to pickle
         bucket.set_encoder('application/x-pickle', cPickle.dumps)
         bucket.set_decoder('application/x-pickle', cPickle.loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
@@ -131,8 +131,8 @@ class BasicKVTests(object):
         self.assertEqual(data, obj2.data)
 
     def test_custom_client_encoder_decoder(self):
-        # Teach the bucket how to pickle
         bucket = self.client.bucket(self.bucket_name)
+        # Teach the client how to pickle
         self.client.set_encoder('application/x-pickle', cPickle.dumps)
         self.client.set_decoder('application/x-pickle', cPickle.loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
@@ -146,7 +146,6 @@ class BasicKVTests(object):
         bucket = self.client.bucket(self.bucket_name)
         data = "some funny data"
         obj = bucket.new(self.key_name, data, 'application/x-frobnicator').store()
-        obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.data)
 
@@ -219,7 +218,7 @@ class BasicKVTests(object):
                 if randval not in vals:
                     break
 
-            other_client = self.create_client(protocol='pbc')
+            other_client = self.create_client()
             other_bucket = other_client.bucket(self.sibs_bucket)
             other_obj = other_bucket.new_binary(self.key_name, str(randval))
             other_obj.vclock = obj.vclock

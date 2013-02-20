@@ -115,8 +115,7 @@ class RiakObject(object):
         :rtype: string
         """
         if self._encode_data == True:
-            content_type = self.content_type
-            encoder = self.bucket.get_encoder(content_type)
+            encoder = self.bucket.get_encoder(self.content_type)
             if encoder is None:
                 if isinstance(self.data, basestring):
                     return self.data.encode()
@@ -139,8 +138,7 @@ class RiakObject(object):
         :rtype: RiakObject
         """
         if self._encode_data == True:
-            content_type = self.content_type
-            decoder = self.bucket.get_decoder(content_type)
+            decoder = self.bucket.get_decoder(self.content_type)
             if decoder is None:
                 # if no decoder, just set as string data for
                 # application to handle
@@ -273,7 +271,6 @@ class RiakObject(object):
 
         result = self.client.get(self, r=r, pr=pr, vtag=vtag)
         if result and result != ('', []):
-            self.clear()
             self._populate(result)
         else:
             self.clear()
@@ -334,8 +331,7 @@ class RiakObject(object):
         If a list of vtags is returned there are multiple
         sibling that need to be retrieved with get.
         """
-
-        if result is None:
+        if result is None or result is self:
             return self
         elif type(result) is RiakObject:
             self.clear()
@@ -364,7 +360,7 @@ class RiakObject(object):
 
             # And make sure it knows who its siblings are
             self.siblings[i] = obj
-            obj._set_siblings(self.siblings)
+            obj.siblings = self.siblings
             return obj
 
     def add(self, *args):
