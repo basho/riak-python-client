@@ -34,8 +34,7 @@ from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.search import XMLSearchResult
 from riak.transports.http.stream import (
     RiakHttpKeyStream,
-    RiakHttpMapReduceStream
-    )
+    RiakHttpMapReduceStream)
 from riak import RiakError
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
@@ -496,7 +495,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """
         Convert the link tuple to a link header string. Used internally.
         """
-        try: 
+        try:
             bucket, key, tag = link
         except ValueError:
             raise RiakError("Invalid link tuple %s" % link)

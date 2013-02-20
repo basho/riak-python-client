@@ -134,7 +134,7 @@ class RiakPbcCodec(object):
             pair.value = robj.usermeta[uk]
         for link in robj.links:
             pb_link = rpb_content.links.add()
-            try: 
+            try:
                 bucket, key, tag = link
             except ValueError:
                 raise RiakError("Invalid link tuple %s" % link)
@@ -152,4 +152,3 @@ class RiakPbcCodec(object):
                     pair.value = str(value)
 
         rpb_content.value = str(robj.get_encoded_data())
-

@@ -239,7 +239,7 @@ class RiakObject(object):
                             "store one of the siblings instead")
 
         if self.key is None:
-            result  = self.client.put_new(
+            result = self.client.put_new(
                 self, w=w, dw=dw, pw=pw,
                 return_body=return_body,
                 if_none_match=if_none_match)

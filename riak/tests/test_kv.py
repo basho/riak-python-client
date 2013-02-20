@@ -155,7 +155,8 @@ class BasicKVTests(object):
         # Teach the bucket how to pickle
         bucket = self.client.bucket(self.bucket_name)
         data = "some funny data"
-        obj = bucket.new(self.key_name, data, 'application/x-frobnicator').store()
+        obj = bucket.new(self.key_name, data, 'application/x-frobnicator')
+        obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.data)
 

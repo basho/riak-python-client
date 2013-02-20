@@ -159,7 +159,7 @@ class RiakBucket(object):
         :type content_type: string
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        obj = RiakObject(self._client, self, key) 
+        obj = RiakObject(self._client, self, key)
         obj._encode_data = False
         obj.content_type = content_type
         obj.data = data
