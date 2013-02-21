@@ -203,14 +203,14 @@ class PoolTest(unittest.TestCase):
         during iteration).
         """
 
-        for i in range(50):
+        for i in range(25):
             started = Queue()
             n = 1000
             threads = []
             touched = []
             pool = EmptyListPool()
             rand = SystemRandom()
-            
+
             def _run():
                 psleep = rand.uniform(0.05, 0.1)
                 with pool.take() as a:
@@ -230,7 +230,7 @@ class PoolTest(unittest.TestCase):
 
             for element in pool:
                 touched.append(element)
-                
+
             for thr in threads:
                 thr.join()
 

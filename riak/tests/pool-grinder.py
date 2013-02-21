@@ -8,6 +8,7 @@ from pool import Pool, BadResource
 from random import SystemRandom
 from time import sleep
 
+
 class SimplePool(Pool):
     def __init__(self):
         self.count = 0
@@ -25,6 +26,7 @@ class EmptyListPool(Pool):
     def create_resource(self):
         return []
 
+
 def test():
     started = Queue()
     n = 1000
@@ -32,7 +34,7 @@ def test():
     touched = []
     pool = EmptyListPool()
     rand = SystemRandom()
-    
+
     def _run():
         psleep = rand.uniform(0.05, 0.1)
         with pool.take() as a:
@@ -42,7 +44,7 @@ def test():
             if psleep > 1:
                 print psleep
             sleep(psleep)
-            
+
     for i in range(n):
         th = Thread(target=_run)
         threads.append(th)
@@ -67,12 +69,12 @@ def test():
 ret = True
 count = 0
 while ret:
-    ret = test() 
+    ret = test()
     count += 1
     print count
 
 
-# INSTRUMENTED FUNCTION 
+# INSTRUMENTED FUNCTION
 
 #     def __claim_elements(self):
 #         #print 'waiting for self lock'
@@ -97,4 +99,3 @@ while ret:
 #                     self.targets.remove(element)
 #                     self.unlocked.append(element)
 #                     element.claimed = True
-
