@@ -141,7 +141,6 @@ class RiakBucket(object):
         obj = RiakObject(self._client, self, key)
         obj.data = data
         obj.content_type = content_type
-        obj._encode_data = True
         return obj
 
     def new_binary(self, key, data, content_type='application/octet-stream'):
@@ -160,9 +159,8 @@ class RiakBucket(object):
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
-        obj.data = data
+        obj.encoded_data = data
         obj.content_type = content_type
-        obj._encode_data = False
         return obj
 
     def get(self, key, r=None, pr=None):
