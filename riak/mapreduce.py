@@ -19,6 +19,7 @@ under the License.
 """
 
 from collections import Iterable, namedtuple
+from riak import RiakError
 
 RiakLink = namedtuple("RiakLink", ("bucket", "key", "tag"))
 
@@ -273,7 +274,14 @@ class RiakMapReduce(object):
         """
         query, link_results_flag = self._normalize_query()
 
-        result = self._client.mapred(self._inputs, query, timeout)
+        try:
+            result = self._client.mapred(self._inputs, query, timeout)
+        except RiakError as e:
+            for phase in self._phases:
+                if phase._language == 'erlang':
+                    if type(phase._function) is str:
+                        raise RiakError('may have tried erlang strfun when not allowed')
+            raise e
 
         # If the last phase is NOT a link phase, then return the result.
         if not (link_results_flag

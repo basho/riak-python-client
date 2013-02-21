@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from riak.mapreduce import RiakMapReduce
-from riak import key_filter
+from riak import key_filter, RiakError
 
 
 class LinkTests(object):
@@ -82,6 +82,28 @@ class ErlangMapReduceTests(object):
             .reduce(["riak_kv_mapreduce", "reduce_set_union"]) \
             .run()
         self.assertEqual(len(result), 2)
+
+    def test_erlang_source_map_reduce(self):
+        # Create the object...
+        bucket = self.client.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 3).store()
+        bucket.new("baz", 4).store()
+        strfun_allowed = True
+        # Run the map...
+        try:
+            result = self.client \
+                .add(self.bucket_name, "foo") \
+                .add(self.bucket_name, "bar") \
+                .add(self.bucket_name, "baz") \
+                .map("""fun(Object, _KD, _A) ->
+            Value = riak_object:get_value(Object),
+            [Value]
+        end.""", {'language': 'erlang'}).run()
+        except RiakError as e:
+            strfun_allowed = False
+        if strfun_allowed:
+            self.assertEqual(result, ['2', '3', '4'])
 
     def test_client_exceptional_paths(self):
         bucket = self.client.bucket(self.bucket_name)
