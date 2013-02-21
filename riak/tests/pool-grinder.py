@@ -1,7 +1,9 @@
-
+#!/usr/bin/env python
 
 from Queue import Queue
 from threading import Thread, currentThread
+import sys
+sys.path.append("../transports/")
 from pool import Pool, BadResource
 from random import SystemRandom
 from time import sleep
@@ -32,7 +34,7 @@ def test():
     rand = SystemRandom()
     
     def _run():
-        psleep = rand.uniform(0.6, 0.75)
+        psleep = rand.uniform(0.05, 0.1)
         with pool.take() as a:
             started.put(1)
             started.join()
