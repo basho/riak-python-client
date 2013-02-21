@@ -46,8 +46,6 @@ class Element(object):
         self.object = obj
         """Whether the resource is currently in use."""
         self.claimed = False
-        """Whether the object has been deleted."""
-        self.tomb = False
 
 
 class Pool(object):
@@ -84,8 +82,8 @@ class Pool(object):
         Creates a new Pool. This should be called manually if you
         override the __init__ method in a subclass.
         """
-        self.lock = threading.Lock()
-        self.releaser = threading.Condition()
+        self.lock = threading.RLock()
+        self.releaser = threading.Condition(self.lock)
         self.elements = list()
 
     @contextmanager
@@ -142,8 +140,8 @@ class Pool(object):
         """
         with self.lock:
             self.elements.remove(element)
-            element.tomb = True
         self.destroy_resource(element.object)
+        del element
 
     def __iter__(self):
         """
@@ -205,20 +203,15 @@ class PoolIterator(object):
     def next(self):
         if len(self.targets) == 0:
             raise StopIteration
-        while len(self.unlocked) == 0:
+        if len(self.unlocked) == 0:
             self.__claim_elements()
-        ele = None
-        while not ele:
-            ele = self.unlocked.pop(0)
-            if ele.tomb:
-                ele = None
-        return ele
+        return self.unlocked.pop(0)
 
     def __claim_elements(self):
         with self.lock:
-            if self.__all_claimed():
-                with self.releaser:
-                    self.releaser.wait(.05)
+            with self.releaser:
+                if self.__all_claimed():
+                    self.releaser.wait()
             for element in self.targets:
                 if not element.claimed:
                     self.targets.remove(element)
