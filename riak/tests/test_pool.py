@@ -202,37 +202,39 @@ class PoolTest(unittest.TestCase):
         should eventually touch all resources (excluding ones created
         during iteration).
         """
-        started = Queue()
-        n = 30
-        threads = []
-        touched = []
-        pool = EmptyListPool()
-        rand = SystemRandom()
 
-        def _run():
-            psleep = rand.uniform(0, 0.75)
-            with pool.take() as a:
-                started.put(1)
-                started.join()
-                a.append(rand.uniform(0, 1))
-                sleep(psleep)
+        for i in range(25):
+            started = Queue()
+            n = 1000
+            threads = []
+            touched = []
+            pool = EmptyListPool()
+            rand = SystemRandom()
 
-        for i in range(n):
-            th = Thread(target=_run)
-            threads.append(th)
-            th.start()
+            def _run():
+                psleep = rand.uniform(0.05, 0.1)
+                with pool.take() as a:
+                    started.put(1)
+                    started.join()
+                    a.append(rand.uniform(0, 1))
+                    sleep(psleep)
 
-        for i in range(n):
-            started.get()
-            started.task_done()
+            for i in range(n):
+                th = Thread(target=_run)
+                threads.append(th)
+                th.start()
 
-        for element in pool:
-            touched.append(element)
+            for i in range(n):
+                started.get()
+                started.task_done()
 
-        for thr in threads:
-            thr.join()
+            for element in pool:
+                touched.append(element)
 
-        self.assertItemsEqual(pool.elements, touched)
+            for thr in threads:
+                thr.join()
+
+            self.assertItemsEqual(pool.elements, touched)
 
     def test_clear(self):
         """
