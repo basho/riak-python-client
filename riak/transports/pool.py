@@ -82,8 +82,8 @@ class Pool(object):
         Creates a new Pool. This should be called manually if you
         override the __init__ method in a subclass.
         """
-        self.lock = threading.Lock()
-        self.releaser = threading.Condition()
+        self.lock = threading.RLock()
+        self.releaser = threading.Condition(self.lock)
         self.elements = list()
 
     @contextmanager
@@ -127,7 +127,7 @@ class Pool(object):
         finally:
             with self.releaser:
                 element.claimed = False
-                self.releaser.notify()
+                self.releaser.notify_all()
 
     def delete_element(self, element):
         """
@@ -209,17 +209,17 @@ class PoolIterator(object):
 
     def __claim_elements(self):
         with self.lock:
-            if self.__all_claimed():
-                with self.releaser:
+            with self.releaser:
+                if self.__all_claimed():
                     self.releaser.wait()
-            for element in self.targets[:]:
+            for element in self.targets:
                 if not element.claimed:
                     self.targets.remove(element)
                     self.unlocked.append(element)
                     element.claimed = True
 
     def __all_claimed(self):
-        for element in self.targets[:]:
+        for element in self.targets:
             if not element.claimed:
                 return False
         return True
