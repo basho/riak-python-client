@@ -277,10 +277,13 @@ class RiakMapReduce(object):
         try:
             result = self._client.mapred(self._inputs, query, timeout)
         except RiakError as e:
-            for phase in self._phases:
-                if phase._language == 'erlang':
-                    if type(phase._function) is str:
-                        raise RiakError('may have tried erlang strfun when not allowed')
+            if 'worker_startup_failed' in e.value:
+                for phase in self._phases:
+                    if phase._language == 'erlang':
+                        if type(phase._function) is str:
+                            raise RiakError('May have tried erlang strfun '
+                                            'when not allowed\n'
+                                            'original error: ' + e.value)
             raise e
 
         # If the last phase is NOT a link phase, then return the result.
