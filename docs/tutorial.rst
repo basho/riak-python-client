@@ -61,14 +61,15 @@ no arguments are needed::
 
     client = riak.RiakClient()
 
-The constructor also configuration options such as ``host``, ``port`` &
-``prefix``. Please refer to the :doc:`client` documentation for full details.
+The constructor also configuration options such as ``host``, ``http_port``,
+``pb_port`` & ``prefix``. Please refer to the :doc:`client` documentation
+for full details.
 
 To use the Protocol Buffers interface::
 
     import riak
 
-    client = riak.RiakClient(port=8087, transport_class=riak.RiakPbcTransport)
+    client = riak.RiakClient(pb_port=8087, protocol='pbc')
 
 .. warning:
 
@@ -78,9 +79,9 @@ To use the Protocol Buffers interface::
   data to the effect of ``RiakError: 'Socket returned short read 135 -
   expected 8192'``.
 
-The ``transport_class`` argument indicates to the client which backend to use.
-We didn't need to specify it in the HTTP example because
-``riak.RiakHttpTransport`` is the default class.
+The ``protocol`` argument indicates to the client which backend to use.
+We didn't need to specify it in the HTTP example because ``http`` is the
+default class. Available options are: ``http``, ``https``, & ``pbc``.
 
 
 Using Buckets
