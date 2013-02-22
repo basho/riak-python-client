@@ -34,19 +34,7 @@ from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.search import XMLSearchResult
 from riak.transports.http.stream import (
     RiakHttpKeyStream,
-    RiakHttpMapReduceStream
-)
-from riak.metadata import (
-    MD_CHARSET,
-    MD_CTYPE,
-    MD_ENCODING,
-    MD_INDEX,
-    MD_LASTMOD,
-    MD_LINKS,
-    MD_USERMETA,
-    MD_VTAG,
-    MD_DELETED
-)
+    RiakHttpMapReduceStream)
 from riak import RiakError
 from riak.multidict import MultiDict
 from xml.etree import ElementTree
@@ -132,7 +120,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         params = {'r': r, 'pr': pr, 'vtag': vtag}
         url = self.object_path(robj.bucket.name, robj.key, **params)
         response = self._request('GET', url)
-        return self.parse_body(response, [200, 300, 404])
+        return self.parse_body(robj, response, [200, 300, 404])
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=True,
             if_none_match=False):
@@ -143,24 +131,23 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         # unknown flags/params.
         params = {'returnbody': return_body, 'w': w, 'dw': dw, 'pw': pw}
         url = self.object_path(robj.bucket.name, robj.key, **params)
-        headers = self.build_put_headers(robj)
+        headers = self._build_put_headers(robj)
 
         # TODO: use a more general 'prevent_stale_writes' semantics,
         # which is a superset of the if_none_match semantics.
         if if_none_match:
             headers["If-None-Match"] = "*"
         content = robj.get_encoded_data()
-        return self.do_put(url, headers, content, return_body,
-                           key=robj.key)
+        return self.do_put(url, headers, content, robj, return_body)
 
-    def do_put(self, url, headers, content, return_body=False, key=None):
-        if key is None:
+    def do_put(self, url, headers, content, robj, return_body=False):
+        if robj.key is None:
             response = self._request('POST', url, headers, content)
         else:
             response = self._request('PUT', url, headers, content)
 
         if return_body:
-            return self.parse_body(response, [200, 201, 204, 300])
+            return self.parse_body(robj, response, [200, 201, 204, 300])
         else:
             self.check_http_code(response, [204])
             return None
@@ -172,7 +159,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         # unknown flags/params.
         params = {'returnbody': return_body, 'w': w, 'dw': dw, 'pw': pw}
         url = self.object_path(robj.bucket.name, **params)
-        headers = self.build_put_headers(robj)
+        headers = self._build_put_headers(robj)
         # TODO: use a more general 'prevent_stale_writes' semantics,
         # which is a superset of the if_none_match semantics.
         if if_none_match:
@@ -181,13 +168,12 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         response = self._request('POST', url, headers, content)
         location = response[0]['location']
         idx = location.rindex('/')
-        key = location[(idx + 1):]
+        robj.key = location[(idx + 1):]
         if return_body:
-            vclock, [(metadata, data)] = self.parse_body(response, [201])
-            return key, vclock, metadata
+            return self.parse_body(robj, response, [201])
         else:
             self.check_http_code(response, [201])
-            return key, None, None
+            return None
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """
@@ -428,13 +414,13 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             raise Exception('Expected status %s, received %s : %s' %
                             (expected_statuses, status, response[1]))
 
-    def parse_body(self, response, expected_statuses):
+    def parse_body(self, robj, response, expected_statuses):
         """
         Parse the body of an object response and populate the object.
         """
         # If no response given, then return.
         if response is None:
-            return self
+            return None
 
         # Make sure expected code came back
         self.check_http_code(response, expected_statuses)
@@ -459,28 +445,32 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
             # Parse and get rid of 'Siblings:' string in element 0
             siblings = data.strip().split('\n')
             siblings.pop(0)
-            return siblings
+            robj.siblings = siblings
+            robj.exists = True
+            robj.vclock = headers['x-riak-vclock']
+            return robj
+
+        #no sibs
+        robj.siblings = []
 
         # Parse the headers...
-        vclock = None
-        metadata = {MD_USERMETA: {}, MD_INDEX: []}
         links = []
         for header, value in headers.iteritems():
             if header == 'content-type':
-                metadata[MD_CTYPE] = value
+                robj.content_type = value
             elif header == 'charset':
-                metadata[MD_CHARSET] = value
+                robj.charset = value
             elif header == 'content-encoding':
-                metadata[MD_ENCODING] = value
+                robj.content_encoding = value
             elif header == 'etag':
-                metadata[MD_VTAG] = value
+                robj.etag = value
             elif header == 'link':
-                self.parse_links(links, headers['link'])
+                self._parse_links(links, headers['link'])
             elif header == 'last-modified':
-                metadata[MD_LASTMOD] = value
+                robj.last_modified = value
             elif header.startswith('x-riak-meta-'):
                 metakey = header.replace('x-riak-meta-', '')
-                metadata[MD_USERMETA][metakey] = value
+                robj.usermeta[metakey] = value
             elif header.startswith('x-riak-index-'):
                 field = header.replace('x-riak-index-', '')
                 reader = csv.reader([value], skipinitialspace=True)
@@ -488,32 +478,33 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
                     for token in line:
                         if field.endswith("_int"):
                             token = int(token)
-                        rie = (field, token)
-                        metadata[MD_INDEX].append(rie)
+                        robj.add_index(field, token)
             elif header == 'x-riak-vclock':
-                vclock = value
+                robj.vclock = value
             elif header == 'x-riak-deleted':
-                metadata[MD_DELETED] = True
+                robj.deleted = True
         if links:
-            metadata[MD_LINKS] = links
+            robj.links = links
 
-        return vclock, [(metadata, data)]
+        robj.set_encoded_data(data)
+
+        robj.exists = True
+        return robj
 
     def to_link_header(self, link):
         """
         Convert the link tuple to a link header string. Used internally.
         """
-        bucket, key, tag = link
+        try:
+            bucket, key, tag = link
+        except ValueError:
+            raise RiakError("Invalid link tuple %s" % link)
         tag = tag if tag is not None else bucket
         url = self.object_path(bucket, key)
         header = '<%s>; riaktag="%s"' % (url, tag)
         return header
 
-    def parse_links(self, links, linkHeaders):
-        """
-        Private.
-        @return self
-        """
+    def _parse_links(self, links, linkHeaders):
         oldform = "</([^/]+)/([^/]+)/([^/]+)>; ?riaktag=\"([^\"]+)\""
         newform = "</(buckets)/([^/]+)/keys/([^/]+)>; ?riaktag=\"([^\"]+)\""
         for linkHeader in linkHeaders.strip().split(','):
@@ -525,10 +516,10 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
                         urllib.unquote_plus(matches.group(3)),
                         urllib.unquote_plus(matches.group(4)))
                 links.append(link)
-        return self
+        return links
 
-    def add_links_for_riak_object(self, robject, headers):
-        links = robject.get_links()
+    def _add_links_for_riak_object(self, robject, headers):
+        links = robject.links
         if links:
             current_header = ''
             for link in links:
@@ -547,25 +538,24 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
     # Utility functions used by Riak library.
 
-    def build_put_headers(self, robj):
+    def _build_put_headers(self, robj):
         """Build the headers for a POST/PUT request."""
 
         # Construct the headers...
         headers = MultiDict({'Accept': 'text/plain, */*; q=0.5',
                              'Content-Type': robj.content_type,
                              'X-Riak-ClientId': self._client_id})
-
         # Add the vclock if it exists...
         if robj.vclock is not None:
             headers['X-Riak-Vclock'] = robj.vclock
 
         # Create the header from metadata
-        self.add_links_for_riak_object(robj, headers)
+        self._add_links_for_riak_object(robj, headers)
 
         for key, value in robj.usermeta.iteritems():
             headers['X-Riak-Meta-%s' % key] = value
 
-        for field, value in robj.get_indexes():
+        for field, value in robj.indexes:
             key = 'X-Riak-Index-%s' % field
             if key in headers:
                 headers[key] += ", " + str(value)

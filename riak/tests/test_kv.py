@@ -130,8 +130,8 @@ class BasicKVTests(object):
         self.assertEqual(obj.data, '')
 
     def test_custom_bucket_encoder_decoder(self):
-        # Teach the bucket how to pickle
         bucket = self.client.bucket(self.bucket_name)
+        # Teach the bucket how to pickle
         bucket.set_encoder('application/x-pickle', cPickle.dumps)
         bucket.set_decoder('application/x-pickle', cPickle.loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
@@ -141,8 +141,8 @@ class BasicKVTests(object):
         self.assertEqual(data, obj2.data)
 
     def test_custom_client_encoder_decoder(self):
-        # Teach the bucket how to pickle
         bucket = self.client.bucket(self.bucket_name)
+        # Teach the client how to pickle
         self.client.set_encoder('application/x-pickle', cPickle.dumps)
         self.client.set_decoder('application/x-pickle', cPickle.loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
@@ -155,8 +155,7 @@ class BasicKVTests(object):
         # Teach the bucket how to pickle
         bucket = self.client.bucket(self.bucket_name)
         data = "some funny data"
-        obj = bucket.new(self.key_name, data,
-                         'application/x-frobnicator').store()
+        obj = bucket.new(self.key_name, data, 'application/x-frobnicator')
         obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.data)
@@ -222,28 +221,30 @@ class BasicKVTests(object):
         obj.store()
 
         # Store the same object five times...
+        # First run through should overwrite the datum 'start' above
         vals = set()
         for i in range(5):
-            other_client = self.create_client()
-            other_bucket = other_client.bucket(self.sibs_bucket)
             while True:
                 randval = self.randint()
                 if randval not in vals:
                     break
 
+            other_client = self.create_client()
+            other_bucket = other_client.bucket(self.sibs_bucket)
             other_obj = other_bucket.new_binary(self.key_name, str(randval))
             other_obj.vclock = obj.vclock
             other_obj.store()
             vals.add(str(randval))
 
         # Make sure the object has itself plus four siblings...
+        obj = bucket.get_binary(self.key_name)
         obj.reload()
-        #self.assertTrue(bool(obj.siblings))
+        self.assertTrue(bool(obj.siblings))
         self.assertEqual(len(obj.siblings), 5)
 
         # Get each of the values - make sure they match what was assigned
         vals2 = set()
-        for i in range(5):
+        for i in xrange(len(obj.siblings)):
             vals2.add(obj.get_sibling(i).data)
         self.assertEqual(vals, vals2)
 
