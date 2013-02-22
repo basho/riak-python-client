@@ -129,7 +129,7 @@ class RiakObject(object):
         elif isinstance(value, basestring):
             return value.encode()
         else:
-            raise RiakError('No encoder for non-string data '
+            raise TypeError('No encoder for non-string data '
                             'with content type "{0}"'.
                             format(self.content_type))
 
@@ -138,7 +138,7 @@ class RiakObject(object):
         if decoder:
             return decoder(value)
         else:
-            raise RiakError('No decoder for content type "{0}"'.
+            raise TypeError('No decoder for content type "{0}"'.
                             format(self.content_type))
 
     def _get_usermeta(self):
