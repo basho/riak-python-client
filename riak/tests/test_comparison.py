@@ -60,7 +60,7 @@ class RiakClientComparisonTest(unittest.TestCase, BaseTestCase):
     def test_client_nq(self):
         self.protocol = 'http'
         a = self.create_client(host='host1', http_port=11)
-        b = self.create_client(host='host1', http_port=11)
+        b = self.create_client(host='host2', http_port=11)
         c = self.create_client(host='host1', http_port=12)
         self.assertNotEqual(a, b, 'matched with different hosts')
         self.assertNotEqual(a, c, 'matched with different ports')
