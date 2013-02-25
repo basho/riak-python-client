@@ -24,6 +24,7 @@ from riak.metadata import (
     MD_LINKS,
     MD_USERMETA)
 from riak import RiakError
+from riak.util import deprecated
 
 
 class RiakObject(object):
@@ -52,8 +53,8 @@ class RiakObject(object):
         self.client = client
         self.bucket = bucket
         self.key = key
-        self._encode_data = True
         self._data = None
+        self._encoded_data = None
         self.vclock = None
         self.metadata = {MD_USERMETA: {}, MD_INDEX: []}
         self.links = []
@@ -76,71 +77,69 @@ class RiakObject(object):
             return True
 
     def _get_data(self):
+        if self._encoded_data is not None and self._data is None:
+            self._data = self._deserialize(self._encoded_data)
+            self._encoded_data = None
         return self._data
 
-    def _set_data(self, data, content_type=None):
-        if MD_CTYPE not in self.metadata:
-            if self._encode_data:
-                self.content_type = "application/json"
-            else:
-                self.content_type = "application/octet-stream"
-        if content_type:
-            self.content_type = content_type
-        self._data = data
-        return self
+    def _set_data(self, value):
+        self._encoded_data = None
+        self._data = value
 
     data = property(_get_data, _set_data, doc="""
-        The data stored in this object. This data will be
-        JSON encoded on storage unless the object was constructed with
-        :func:`RiakBucket.new_binary <riak.bucket.RiakBucket.new_binary>` or
-        :func:`RiakBucket.get_binary <riak.bucket.RiakBucket.get_binary>`,
-        in which case it will be stored as a string.  On return, it shall
-        either be a dict or a string, depending on its storage type.
-
+        The data stored in this object, as Python objects. For the raw
+        data, use the `encoded_data` property. If unset, accessing
+        this property will result in decoding the `encoded_data`
+        property into Python values. The decoding is dependent on the
+        `content_type` property and the bucket's registered decoders.
         :type mixed """)
 
     def get_encoded_data(self):
-        """
-        Get the data encoded for storing
+        deprecated("`get_encoded_data` is deprecated, use the `encoded_data`"
+                   " property")
+        return self.encoded_data
 
-        :rtype: string
-        """
-        if self._encode_data:
-            content_type = self.content_type
-            encoder = self.bucket.get_encoder(content_type)
-            if encoder is None:
-                if isinstance(self.data, basestring):
-                    return self.data.encode()
-                else:
-                    raise RiakError("No encoder for non-string data "
-                                    "with content type ${0}".
-                                    format(content_type))
-            else:
-                return encoder(self._data)
+    def set_encoded_data(self, value):
+        deprecated("`set_encoded_data` is deprecated, use the `encoded_data`"
+                   " property")
+        self.encoded_data = value
+
+    def _get_encoded_data(self):
+        if self._data is not None and self._encoded_data is None:
+            self._encoded_data = self._serialize(self._data)
+            self._data = None
+        return self._encoded_data
+
+    def _set_encoded_data(self, value):
+        self._data = None
+        self._encoded_data = value
+
+    encoded_data = property(_get_encoded_data, _set_encoded_data, doc="""
+        The raw data stored in this object, essentially the encoded
+        form of the `data` property. If unset, accessing this property
+        will result in encoding the `data` property into a string. The
+        encoding is dependent on the `content_type` property and the
+        bucket's registered encoders.
+        :type basestring""")
+
+    def _serialize(self, value):
+        encoder = self.bucket.get_encoder(self.content_type)
+        if encoder:
+            return encoder(value)
+        elif isinstance(value, basestring):
+            return value.encode()
         else:
-            return self.data
+            raise TypeError('No encoder for non-string data '
+                            'with content type "{0}"'.
+                            format(self.content_type))
 
-    def set_encoded_data(self, data):
-        """
-        Set the object data from an encoded string. Make sure
-        the metadata has been set correctly first.
-
-        :param data: the encoded data
-        :type data: string
-        :rtype: RiakObject
-        """
-        if self._encode_data:
-            content_type = self.content_type
-            decoder = self.bucket.get_decoder(content_type)
-            if decoder is None:
-                # if no decoder, just set as string data for
-                # application to handle
-                self.data = data
-            else:
-                self.data = decoder(data)
+    def _deserialize(self, value):
+        decoder = self.bucket.get_decoder(self.content_type)
+        if decoder:
+            return decoder(value)
         else:
-            self.data = data
-        return self
+            raise TypeError('No decoder for content type "{0}"'.
+                            format(self.content_type))
 
     def _get_usermeta(self):
         if MD_USERMETA in self.metadata:
@@ -247,7 +246,7 @@ class RiakObject(object):
         try:
             return self.metadata[MD_CTYPE]
         except KeyError:
-            if self._encode_data:
+            if self._data:
                 return "application/json"
             else:
                 return "application/octet-stream"
@@ -387,7 +386,8 @@ class RiakObject(object):
                               there is no key previously defined
         :type if_none_match: bool
         :rtype: RiakObject """
-        if self.siblings and not self.data and not self.vclock:
+        if (self.siblings and not self._data
+                and not self._encoded_data and not self.vclock):
             raise RiakError("Attempting to store an invalid object,"
                             "store one of the siblings instead")
 
@@ -497,13 +497,13 @@ class RiakObject(object):
                 if not MD_INDEX in metadata:
                     metadata[MD_INDEX] = []
                 self.metadata = metadata
-                self.set_encoded_data(data)
+                self._encoded_data = data
                 # Create objects for all siblings
                 siblings = [self]
                 for (metadata, data) in contents:
                     sibling = copy.copy(self)
                     sibling.metadata = metadata
-                    sibling.data = data
+                    sibling.encoded_data = data
                     siblings.append(sibling)
                 for sibling in siblings:
                     sibling._set_siblings(siblings)
