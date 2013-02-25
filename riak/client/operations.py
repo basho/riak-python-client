@@ -193,6 +193,10 @@ class RiakClientOperations(RiakClientTransport):
         :param vtag: the specific sibling to fetch
         :type vtag: string
         """
+        if not isinstance(robj.key, basestring):
+            raise TypeError(
+                'key must be a string, instead got {0}'.format(repr(robj.key)))
+
         return transport.get(robj, r=r, pr=pr, vtag=vtag)
 
     @retryable
