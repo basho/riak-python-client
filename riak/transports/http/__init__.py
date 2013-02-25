@@ -52,7 +52,7 @@ CONN_CLOSED_ERRORS = (
     httplib.IncompleteRead,
     httplib.ImproperConnectionState,
     httplib.BadStatusLine
-    )
+)
 
 
 def is_retryable(err):
