@@ -410,7 +410,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         for doc in resp.docs:
             resultdoc = {}
             for pair in doc.fields:
-                resultdoc[pair.key] = pair.value
+                ukey = unicode(pair.key, 'utf-8')
+                uval = unicode(pair.value, 'utf-8')
+                resultdoc[ukey] = uval
             docs.append(resultdoc)
         result['docs'] = docs
         return result
