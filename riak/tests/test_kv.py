@@ -106,9 +106,10 @@ class BasicKVTests(object):
         bucket = self.client.bucket(self.bucket_name)
         # Store as binary, retrieve as binary, then compare...
         rand = str(self.randint())
-        obj = bucket.new_binary(self.key_name, rand)
+        obj = bucket.new(self.key_name, encoded_data=rand,
+                         content_type='text/plain')
         obj.store()
-        obj = bucket.get_binary(self.key_name)
+        obj = bucket.get(self.key_name)
         self.assertTrue(obj.exists)
         self.assertEqual(obj.encoded_data, rand)
         # Store as JSON, retrieve as binary, JSON-decode, then compare...
@@ -116,16 +117,16 @@ class BasicKVTests(object):
         key2 = self.randname()
         obj = bucket.new(key2, data)
         obj.store()
-        obj = bucket.get_binary(key2)
+        obj = bucket.get(key2)
         self.assertEqual(data, json.loads(obj.encoded_data))
 
     def test_blank_binary_204(self):
         bucket = self.client.bucket(self.bucket_name)
 
         # this should *not* raise an error
-        obj = bucket.new_binary('foo2', '')
+        obj = bucket.new('foo2', encoded_data='', content_type='text/plain')
         obj.store()
-        obj = bucket.get_binary('foo2')
+        obj = bucket.get('foo2')
         self.assertTrue(obj.exists)
         self.assertEqual(obj.encoded_data, '')
 
@@ -213,12 +214,13 @@ class BasicKVTests(object):
     def test_siblings(self):
         # Set up the bucket, clear any existing object...
         bucket = self.client.bucket(self.sibs_bucket)
-        obj = bucket.get_binary(self.key_name)
+        obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
         # Even if it previously existed, let's store a base resolved version
         # from which we can diverge by sending a stale vclock.
-        obj.data = 'start'
+        obj.encoded_data = 'start'
+        obj.content_type = 'application/octet-stream'
         obj.store()
 
         # Store the same object five times...
@@ -228,10 +230,12 @@ class BasicKVTests(object):
             other_bucket = other_client.bucket(self.sibs_bucket)
             while True:
                 randval = self.randint()
-                if randval not in vals:
+                if str(randval) not in vals:
                     break
 
-            other_obj = other_bucket.new_binary(self.key_name, str(randval))
+            other_obj = other_bucket.new(key=self.key_name,
+                                         encoded_data=str(randval),
+                                         content_type='text/plain')
             other_obj.vclock = obj.vclock
             other_obj.store()
             vals.add(str(randval))
@@ -261,15 +265,17 @@ class BasicKVTests(object):
         o = bucket.get(self.key_name)
         self.assertEqual(o.exists, False)
         o.data = {"foo": "bar"}
+        o.content_type = 'application/json'
 
         o = o.store()
         self.assertEqual(o.data, {"foo": "bar"})
         self.assertEqual(o.content_type, "application/json")
         o.delete()
         # for binary objects
-        o = bucket.get_binary(self.randname())
+        o = bucket.get(self.randname())
         self.assertEqual(o.exists, False)
         o.encoded_data = "1234567890"
+        o.content_type = 'application/octet-stream'
 
         o = o.store()
         self.assertEqual(o.encoded_data, "1234567890")
@@ -373,9 +379,9 @@ class KVFileTests(object):
     def test_store_binary_object_from_file(self):
         bucket = self.client.bucket(self.bucket_name)
         filepath = os.path.join(os.path.dirname(__file__), 'test_all.py')
-        obj = bucket.new_binary_from_file(self.key_name, filepath)
+        obj = bucket.new_from_file(self.key_name, filepath)
         obj.store()
-        obj = bucket.get_binary(self.key_name)
+        obj = bucket.get(self.key_name)
         self.assertNotEqual(obj.encoded_data, None)
         self.assertEqual(obj.content_type, "text/x-python")
 
@@ -383,14 +389,15 @@ class KVFileTests(object):
         bucket = self.client.bucket(self.bucket_name)
         filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 os.pardir, os.pardir, 'THANKS')
-        obj = bucket.new_binary_from_file(self.key_name, filepath)
+        obj = bucket.new_from_file(self.key_name, filepath)
         obj.store()
-        obj = bucket.get_binary(self.key_name)
+        obj = bucket.get(self.key_name)
         self.assertEqual(obj.content_type, 'application/octet-stream')
 
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
         bucket = self.client.bucket(self.bucket_name)
-        self.assertRaises(IOError, bucket.new_binary_from_file,
-                          'not_found_from_file', 'FILE_NOT_FOUND')
-        obj = bucket.get_binary('not_found_from_file')
-        self.assertEqual(obj.data, None)
+        with self.assertRaises(IOError):
+            bucket.new_from_file('not_found_from_file', 'FILE_NOT_FOUND')
+        obj = bucket.get('not_found_from_file')
+        self.assertEqual(obj.encoded_data, None)
+        self.assertFalse(obj.exists)

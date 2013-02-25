@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 import mimetypes
-from riak.util import deprecateQuorumAccessors
+from riak.util import deprecateQuorumAccessors, deprecated
 
 
 def deprecateBucketQuorumAccessors(klass):
@@ -118,7 +118,8 @@ class RiakBucket(object):
         self._decoders[content_type] = decoder
         return self
 
-    def new(self, key=None, data=None, content_type='application/json'):
+    def new(self, key=None, data=None, content_type='application/json',
+            encoded_data=None):
         """
         Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
         that will be stored as JSON. A shortcut for manually
@@ -139,11 +140,15 @@ class RiakBucket(object):
             raise TypeError('Unicode data values are not supported.')
 
         obj = RiakObject(self._client, self, key)
-        obj.data = data
         obj.content_type = content_type
+        if data is not None:
+            obj.data = data
+        if encoded_data is not None:
+            obj.encoded_data = encoded_data
         return obj
 
-    def new_binary(self, key, data, content_type='application/octet-stream'):
+    def new_binary(self, key=None, data=None,
+                   content_type='application/octet-stream'):
         """
         Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
         that will be stored as plain text/binary. A shortcut for
@@ -158,10 +163,10 @@ class RiakBucket(object):
         :type content_type: string
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        obj = RiakObject(self._client, self, key)
-        obj.encoded_data = data
-        obj.content_type = content_type
-        return obj
+        deprecated('RiakBucket.new_binary is deprecated, '
+                   'use RiakBucket.new with the encoded_data '
+                   'param instead of data')
+        return self.new(key, encoded_data=data, content_type=content_type)
 
     def get(self, key, r=None, pr=None):
         """
@@ -176,7 +181,6 @@ class RiakBucket(object):
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
-        obj._encode_data = True
         return obj.reload(r=r, pr=pr)
 
     def get_binary(self, key, r=None, pr=None):
@@ -191,9 +195,9 @@ class RiakBucket(object):
         :type pr: integer
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        obj = RiakObject(self._client, self, key)
-        obj._encode_data = False
-        return obj.reload(r=r, pr=pr)
+        deprecated('RiakBucket.get_binary is deprecated, '
+                   'use RiakBucket.get')
+        return self.get(key, r=r, pr=pr)
 
     def _set_n_val(self, nval):
         return self.set_property('n_val', nval)
@@ -370,7 +374,7 @@ class RiakBucket(object):
         """
         return self._client.stream_keys(self)
 
-    def new_binary_from_file(self, key, filename):
+    def new_from_file(self, key, filename):
         """
         Create a new Riak object in the bucket, using the content of
         the specified file.
@@ -383,7 +387,12 @@ class RiakBucket(object):
             binary_data = bytearray(binary_data)
         if not mimetype:
             mimetype = 'application/octet-stream'
-        return self.new_binary(key, binary_data, mimetype)
+        return self.new(key, encoded_data=binary_data, content_type=mimetype)
+
+    def new_binary_from_file(self, key, filename):
+        deprecated('RiakBucket.new_binary_from_file is deprecated, use '
+                   'RiakBucket.new_from_file')
+        return self.new_from_file(key, filename)
 
     def search_enabled(self):
         """
