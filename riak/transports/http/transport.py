@@ -317,7 +317,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         # Make sure the expected status code came back...
         status = response[0]['http_code']
         if status != 200:
-            raise Exception(
+            raise RiakError(
                 'Error running MapReduce operation. Headers: %s Body: %s' %
                 (repr(response[0]), repr(response[1])))
 
