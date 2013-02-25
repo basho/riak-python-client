@@ -15,20 +15,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak.metadata import (
-    MD_CHARSET,
-    MD_CTYPE,
-    MD_ENCODING,
-    MD_INDEX,
-    MD_LASTMOD,
-    MD_LASTMOD_USECS,
-    MD_LINKS,
-    MD_USERMETA,
-    MD_VTAG,
-    MD_DELETED
-)
-
 import riak_pb
+from riak.riak_object import RiakObject
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -70,31 +58,24 @@ class RiakPbcCodec(object):
         else:
             return None
 
-    def decode_contents(self, rpb_contents):
-        """
-        Decodes the multiple contents (siblings) of a RiakObject from
-        its protobuf representation.
-        """
-        return [self.decode_content(rpb_c) for rpb_c in rpb_contents]
-
-    def decode_content(self, rpb_content):
+    def decode_content(self, rpb_content, robj):
         """
         Decodes a single sibling from the protobuf representation into
-        its metadata and value.
+        a RiakObject.
 
-        :rtype: (dict, string)
+        :rtype: (RiakObject)
         """
-        metadata = {}
+
         if rpb_content.HasField("deleted"):
-            metadata[MD_DELETED] = True
+            robj.deleted = True
         if rpb_content.HasField("content_type"):
-            metadata[MD_CTYPE] = rpb_content.content_type
+            robj.content_type = rpb_content.content_type
         if rpb_content.HasField("charset"):
-            metadata[MD_CHARSET] = rpb_content.charset
+            robj.charset = rpb_content.charset
         if rpb_content.HasField("content_encoding"):
-            metadata[MD_ENCODING] = rpb_content.content_encoding
+            robj.content_encoding = rpb_content.content_encoding
         if rpb_content.HasField("vtag"):
-            metadata[MD_VTAG] = rpb_content.vtag
+            robj.vtag = rpb_content.vtag
         links = []
         for link in rpb_content.links:
             if link.HasField("bucket"):
@@ -111,58 +92,63 @@ class RiakPbcCodec(object):
                 tag = None
             links.append((bucket, key, tag))
         if links:
-            metadata[MD_LINKS] = links
+            robj.links = links
         if rpb_content.HasField("last_mod"):
-            metadata[MD_LASTMOD] = rpb_content.last_mod
+            robj.last_mod = rpb_content.last_mod
         if rpb_content.HasField("last_mod_usecs"):
-            metadata[MD_LASTMOD_USECS] = rpb_content.last_mod_usecs
+            robj.last_mod_usecs = rpb_content.last_mod_usecs
         usermeta = {}
         for usermd in rpb_content.usermeta:
             usermeta[usermd.key] = usermd.value
         if len(usermeta) > 0:
-            metadata[MD_USERMETA] = usermeta
-        indexes = []
+            robj.usermeta = usermeta
+        indexes = set()
         for index in rpb_content.indexes:
             if index.key.endswith("_int"):
-                value = int(index.value)
+                indexes.add((index.key, int(index.value)))
             else:
-                value = index.value
-            rie = (index.key, value)
-            indexes.append(rie)
-        if len(indexes) > 0:
-            metadata[MD_INDEX] = indexes
-        return metadata, rpb_content.value
+                indexes.add((index.key, index.value))
 
-    def encode_content(self, metadata, data, rpb_content):
+        if len(indexes) > 0:
+            robj.indexes = indexes
+
+        robj.encoded_data = rpb_content.value
+        robj.exists = True
+
+        return robj
+
+    def encode_content(self, robj, rpb_content):
         """
         Fills an RpbContent message with the appropriate data and
         metadata from a RiakObject.
         """
-        # Convert the broken out fields, building up
-        # pbmetadata for any unknown ones
-        for k in metadata:
-            v = metadata[k]
-            if k == MD_CTYPE:
-                rpb_content.content_type = v
-            elif k == MD_CHARSET:
-                rpb_content.charset = v
-            elif k == MD_ENCODING:
-                rpb_content.content_encoding = v
-            elif k == MD_USERMETA:
-                for uk in v:
-                    pair = rpb_content.usermeta.add()
-                    pair.key = uk
-                    pair.value = v[uk]
-            elif k == MD_INDEX:
-                for field, value in v:
+        if robj.content_type:
+            rpb_content.content_type = robj.content_type
+        if robj.charset:
+            rpb_content.charset = robj.charset
+        if robj.content_encoding:
+            rpb_content.content_encoding = robj.content_encoding
+        for uk in robj.usermeta:
+            pair = rpb_content.usermeta.add()
+            pair.key = uk
+            pair.value = robj.usermeta[uk]
+        for link in robj.links:
+            pb_link = rpb_content.links.add()
+            try:
+                bucket, key, tag = link
+            except ValueError:
+                raise RiakError("Invalid link tuple %s" % link)
+
+            pb_link.bucket = bucket
+            pb_link.key = key
+            if tag:
+                pb_link.tag = tag
+            else:
+                pb_link.tag = ''
+
+        for field, value in robj.indexes:
                     pair = rpb_content.indexes.add()
                     pair.key = field
                     pair.value = str(value)
-            elif k == MD_LINKS:
-                for bucket, key, tag in v:
-                    tag = tag if tag is not None else bucket
-                    pb_link = rpb_content.links.add()
-                    pb_link.bucket = bucket
-                    pb_link.key = key
-                    pb_link.tag = tag
-        rpb_content.value = str(data)
+
+        rpb_content.value = str(robj.encoded_data)
