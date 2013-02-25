@@ -246,7 +246,7 @@ class RiakObject(object):
         try:
             return self.metadata[MD_CTYPE]
         except KeyError:
-            if self._encode_data:
+            if self._data:
                 return "application/json"
             else:
                 return "application/octet-stream"
