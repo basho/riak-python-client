@@ -8,7 +8,8 @@ class LinkTests(object):
     def test_store_and_get_links(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
-        bucket.new_binary("test_store_and_get_links", '2') \
+        bucket.new(key="test_store_and_get_links", encoded_data='2',
+                   content_type='application/octet-stream') \
             .add_link(bucket.new("foo1")) \
             .add_link(bucket.new("foo2"), "tag") \
             .add_link(bucket.new("foo3"), "tag2!@#%^&*)") \
@@ -325,8 +326,10 @@ class MapReduceAliasTests(object):
     def test_map_values(self):
         # Add a value to the bucket
         bucket = self.client.bucket(self.bucket_name)
-        bucket.new_binary('one', data='value_1').store()
-        bucket.new_binary('two', data='value_2').store()
+        bucket.new('one', encoded_data='value_1',
+                   content_type='text/plain').store()
+        bucket.new('two', encoded_data='value_2',
+                   content_type='text/plain').store()
 
         # Create a map reduce object and use one and two as inputs
         mr = self.client.add(self.bucket_name, 'one')\

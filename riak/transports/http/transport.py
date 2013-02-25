@@ -149,7 +149,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         # which is a superset of the if_none_match semantics.
         if if_none_match:
             headers["If-None-Match"] = "*"
-        content = robj.get_encoded_data()
+        content = robj.encoded_data
         return self.do_put(url, headers, content, return_body,
                            key=robj.key)
 
@@ -177,7 +177,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         # which is a superset of the if_none_match semantics.
         if if_none_match:
             headers["If-None-Match"] = "*"
-        content = robj.get_encoded_data()
+        content = robj.encoded_data
         response = self._request('POST', url, headers, content)
         location = response[0]['location']
         idx = location.rindex('/')
