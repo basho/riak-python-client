@@ -102,6 +102,18 @@ class BasicKVTests(object):
         robj = bucket.get(regular_keys[0])
         self.assertEqual(True, robj.exists)
 
+    def test_bad_key(self):
+        bucket = self.client.bucket(self.bucket_name)
+        obj = bucket.new()
+        with self.assertRaises(TypeError):
+            bucket.get(None)
+
+        with self.assertRaises(TypeError):
+            self.client.get(obj)
+
+        with self.assertRaises(TypeError):
+            bucket.get(1)
+
     def test_binary_store_and_get(self):
         bucket = self.client.bucket(self.bucket_name)
         # Store as binary, retrieve as binary, then compare...
