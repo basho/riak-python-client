@@ -112,7 +112,7 @@ class RiakPbcCodec(object):
         if len(indexes) > 0:
             robj.indexes = indexes
 
-        robj.set_encoded_data(rpb_content.value)
+        robj.encoded_data = rpb_content.value
         robj.exists = True
 
         return robj

@@ -486,7 +486,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         if links:
             robj.links = links
 
-        robj.set_encoded_data(data)
+        robj.encoded_data = data
 
         robj.exists = True
         return robj

@@ -18,11 +18,6 @@ specific language governing permissions and limitations
 under the License.
 """
 import copy
-from riak.metadata import (
-    MD_CTYPE,
-    MD_INDEX,
-    MD_LINKS,
-    MD_USERMETA)
 from riak import RiakError
 from riak.util import deprecated
 
