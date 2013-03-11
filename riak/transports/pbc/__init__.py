@@ -55,7 +55,8 @@ CONN_CLOSED_ERRORS = (
     errno.ECONNABORTED,
     errno.ETIMEDOUT,
     errno.EBADF,
-    errno.EPIPE
+    errno.EPIPE,
+    errno.EIO
 )
 
 

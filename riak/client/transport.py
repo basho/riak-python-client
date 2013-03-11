@@ -15,12 +15,17 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+import logging
+import time
+import random
+import socket
 from contextlib import contextmanager
 from riak.transports.pool import BadResource
 from riak.transports.pbc import is_retryable as is_pbc_retryable
 from riak.transports.http import is_retryable as is_http_retryable
 import httplib
 
+LOG = logging.getLogger('riak.client.transport')
 
 class RiakClientTransport(object):
     """
@@ -63,14 +68,18 @@ class RiakClientTransport(object):
                 with pool.take(_filter=_skip_bad_nodes) as transport:
                     try:
                         return fn(transport)
-                    except (IOError, httplib.HTTPException) as e:
+                    except (IOError, httplib.HTTPException, socket.error) as e:
                         if _is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
                             raise BadResource(e)
                         else:
                             raise e
-            except BadResource:
+
+            except BadResource, e:
+                LOG.debug("Reconnecting because of %r, try %s/%s",
+                          e, retry+1, self.RETRY_COUNT)
+                time.sleep(random.random())
                 continue
 
     def _choose_pool(self, protocol=None):
