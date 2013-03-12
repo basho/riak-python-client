@@ -36,9 +36,6 @@ class RiakServer(TestServer):
             "map_cache_size": 0,
             "vnode_cache_entries": 0,
             "add_paths": [
-                os.path.join(os.environ['SRS_HOME'], 'riak_modules', 'ebin'),
-                os.path.join(os.environ['SRS_HOME'], 'riak_modules', 'deps', 'msgpack', 'ebin'),
-
             ],
             "http_url_encoding": Atom("on"),
         },
@@ -66,7 +63,9 @@ class RiakServer(TestServer):
 
         self.start_timeout = start_timeout
 
-        riak_location = os.path.join(os.environ['SRS_ENV_PATH'], 'riak', 'dev1', 'bin')
+        riak_location = os.environ.get(
+            'RIAK_BIN_DIR',
+            os.path.expanduser("~/.riak/install/riak-0.14.2/bin"))
 
         tmpdir = tempfile.mkdtemp(prefix='riak-test-')
 
@@ -108,18 +107,6 @@ class RiakServer(TestServer):
         log.info("Restarting the server")
         super(RiakServer, self).start()
         log.info("Server restarted")
-
-    def wait_for_erlang_prompt(self):
-        prompted = False
-        buffer = ""
-        while not prompted:
-            line = self._server.stdout.read(1)
-            if len(line) > 0:
-                buffer += line
-            if re.search(r"\(%s\)\d+>" % self.vm_args["-name"], buffer):
-                prompted = True
-            if re.search(r'"Kernel pid terminated".*\n', buffer):
-                raise Exception("Riak test server failed to start.")
 
 RIAK = RiakServer()
 
