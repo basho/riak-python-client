@@ -586,3 +586,4 @@ suites or in subsequent test runs, be sure to call cleanup() before starting or
 after stopping it.
 
 .. _Ripple: https://github.com/seancribbs/ripple
+
