@@ -79,7 +79,8 @@ class RiakClientTransport(object):
             except BadResource, e:
                 LOG.debug("Reconnecting because of %r, try %s/%s",
                           e, retry+1, self.RETRY_COUNT)
-                time.sleep(random.random())
+                # wait a random time (up to 500ms) before reconnecting
+                time.sleep(random.random()/2)
                 continue
 
     def _choose_pool(self, protocol=None):

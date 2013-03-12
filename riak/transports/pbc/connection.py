@@ -100,6 +100,8 @@ class RiakPbcConnection(object):
             if e.errno == errno.ENOTCONN:
                 # the connection was closed by the peer
                 pass
+            else:
+                raise
 
     def _parse_msg(self, code, packet):
         try:
