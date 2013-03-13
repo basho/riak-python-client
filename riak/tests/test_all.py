@@ -30,7 +30,7 @@ try:
 except ImportError:
     HAVE_PROTO = False
 
-HOST = os.environ.get('RIAK_TEST_HOST', 'localhost')
+HOST = os.environ.get('RIAK_TEST_HOST', '127.0.0.1')
 
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
