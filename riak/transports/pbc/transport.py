@@ -63,8 +63,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     buffers interface on the riak server.
     """
 
-    def __init__(self, node=None, client=None, connect_timeout=None,
-                 request_timeout=None, **unused_options):
+    def __init__(self, node=None, client=None, timeout=None, *unused_options):
         """
         Construct a new RiakPbcTransport object.
         """
@@ -73,8 +72,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._client = client
         self._node = node
         self._address = (node.host, node.pb_port)
-        self._timeouts = {'connect': connect_timeout,
-                          'request': request_timeout}
+        self._timeout = timeout
         self._connect()
 
     # FeatureDetection API
