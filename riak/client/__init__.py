@@ -68,7 +68,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
            'host', 'http_port', and 'pb_port'
         :type nodes: list
         :param transport_options: Optional key-value args to pass to
-                                  the transport constuctor
+                                  the transport constructor
         :type transport_options: dict
         """
         unused_args = unused_args.copy()
