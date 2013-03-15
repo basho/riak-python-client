@@ -1,5 +1,10 @@
 # Riak Python Client Release Notes
 
+## 1.5.2 Patch Release
+
+* Added optional `timeout` parameter to `transport_options` dictionary
+  when creating a RiakClient object with Protocol Buffers.
+
 ## 1.5.1 Patch Release - 2012-10-24
 
 Release 1.5.1 fixes one bug and some documentation errors.
