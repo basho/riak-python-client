@@ -105,7 +105,7 @@ To use the Protocol Buffers interface::
 
     import riak
 
-    client = riak.RiakClient(pb_port=8087, protocol='pbc')
+    client = riak.RiakClient(port=8087, transport_class=RiakPbcTransport)
 
 .. warning:
 
@@ -115,9 +115,9 @@ To use the Protocol Buffers interface::
   data to the effect of ``RiakError: 'Socket returned short read 135 -
   expected 8192'``.
 
-The ``protocol`` argument indicates to the client which backend to use.
-We didn't need to specify it in the HTTP example because ``http`` is the
-default class. Available options are: ``http``, ``https``, & ``pbc``.
+The ``transport_class`` argument indicates to the client which transport protocol to use.
+We didn't need to specify it in the HTTP example because ``RiakHttpConnection`` is the
+default class. Available options are: ``RiakHttpConnection`` and ``RiakPbcTransport``.
 
 
 Using Buckets
