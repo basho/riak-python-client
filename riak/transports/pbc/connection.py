@@ -82,8 +82,10 @@ class RiakPbcConnection(object):
                             % (len(self._inbuf), self._inbuf_len))
 
     def _connect(self):
-        self._socket = socket.create_connection(self._address,
-                                                self._timeouts['connect'])
+        if self._timeout:
+            self._socket = socket.create_connection(self._address, self._timeout)
+        else:
+            self._socket = socket.create_connection(self._address)
 
     def close(self):
         """
@@ -106,4 +108,4 @@ class RiakPbcConnection(object):
 
     # These are set in the RiakPbcTransport initializer
     _address = None
-    _timeouts = {}
+    _timeout = None
