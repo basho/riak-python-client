@@ -105,7 +105,7 @@ To use the Protocol Buffers interface::
 
     import riak
 
-    client = riak.RiakClient(port=8087, transport_class=RiakPbcTransport)
+    client = riak.RiakClient(port=8087, transport_class=riak.RiakPbcTransport)
 
 .. warning:
 
