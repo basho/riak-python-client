@@ -46,7 +46,8 @@ class RiakObject(object):
             raise TypeError('Unicode keys are not supported.')
 
         if key is not None and len(key) == 0:
-            raise ValueError('Key name must either be "None" or a non-empty string.')
+            raise ValueError('Key name must either be "None"'
+                             ' or a non-empty string.')
 
         self.client = client
         self.bucket = bucket
