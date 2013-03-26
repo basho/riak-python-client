@@ -17,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-import copy
 from riak import RiakError
 from riak.util import deprecated
 
@@ -44,6 +43,10 @@ class RiakObject(object):
                 key = key.encode('ascii')
         except UnicodeError:
             raise TypeError('Unicode keys are not supported.')
+
+        if key is not None and len(key) == 0:
+            raise ValueError('Key name must either be "None"'
+                             ' or a non-empty string.')
 
         self.client = client
         self.bucket = bucket
