@@ -45,7 +45,7 @@ class RiakObject(object):
         except UnicodeError:
             raise TypeError('Unicode keys are not supported.')
 
-        if key!=None and len(key) == 0:
+        if key is not None and len(key) == 0:
             raise ValueError('Key name must either be "None" or a non-empty string.')
 
         self.client = client
