@@ -49,6 +49,15 @@ class RiakObjectComparisonTest(unittest.TestCase):
         self.assertEqual(hash(a), hash(b), 'same object has different hashes')
         self.assertNotEqual(hash(a), hash(c), 'different object has same hash')
 
+    def test_object_valid_key(self):
+        a = RiakObject(None, 'bucket', 'key')
+        self.assertIsInstance(a, RiakObject, 'valid key name is rejected')
+        try:
+            b = RiakObject(None, 'bucket', '')
+        except ValueError:
+            b = None
+        self.assertIsNone(b, 'empty object key not allowed')
+
 
 class RiakClientComparisonTest(unittest.TestCase, BaseTestCase):
     def test_client_eq(self):
