@@ -57,7 +57,7 @@ def setUpModule():
     global testrun_search_bucket, testrun_props_bucket, \
         testrun_sibs_bucket
 
-    c = RiakClient(transport='http', host=HTTP_HOST, http_port=HTTP_PORT)
+    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
 
     testrun_props_bucket = 'propsbucket'
     testrun_sibs_bucket = 'sibsbucket'
@@ -68,9 +68,8 @@ def setUpModule():
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
 
-
 def tearDownModule():
-    c = RiakClient(transport='http', host=HTTP_HOST, http_port=HTTP_PORT)
+    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
     if not int(os.environ.get('SKIP_SEARCH', '0')):
         b = c.bucket(testrun_search_bucket)
         b.clear_properties()

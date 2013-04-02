@@ -19,6 +19,7 @@ under the License.
 """
 from riak import RiakError
 from riak.util import deprecated
+import re
 
 
 class RiakObject(object):
@@ -125,7 +126,8 @@ class RiakObject(object):
         :type basestring""")
 
     def _serialize(self, value):
-        encoder = self.bucket.get_encoder(self.content_type)
+        content_type, charset = self._parse_content_type(self.content_type, self.charset)
+        encoder = self.bucket.get_encoder(content_type)
         if encoder:
             return encoder(value)
         elif isinstance(value, basestring):
@@ -133,15 +135,16 @@ class RiakObject(object):
         else:
             raise TypeError('No encoder for non-string data '
                             'with content type "{0}"'.
-                            format(self.content_type))
+                            format(content_type))
 
     def _deserialize(self, value):
-        decoder = self.bucket.get_decoder(self.content_type)
+        content_type, charset = self._parse_content_type(self.content_type, self.charset)
+        decoder = self.bucket.get_decoder(content_type)
         if decoder:
             return decoder(value)
         else:
             raise TypeError('No decoder for content type "{0}"'.
-                            format(self.content_type))
+                            format(content_type))
 
     def add_index(self, field, value):
         """
@@ -402,5 +405,21 @@ class RiakObject(object):
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
         return mr.reduce(*args)
+
+    def _parse_content_type(self, value, oldcharset):
+        """
+        Determine if the charset is embeded in the content-type.
+        If so, then break it out into the appropriate field
+        """
+        charset = oldcharset
+        charpattern = "^(?P<content>[A-Za-z0-9_/]+);\W*(charset|CHARSET)=(?P<charset>[A-Za-z0-9_-]+)"
+        matches = re.match(charpattern, value)
+        if matches is not None:
+            content_type = matches.group('content')
+            charset = matches.group('charset')
+        else:
+            content_type = value
+
+        return content_type, charset
 
 from riak.mapreduce import RiakMapReduce

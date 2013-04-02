@@ -63,6 +63,11 @@ class BasicKVTests(object):
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
 
+        obj2 = bucket.new('baz', rand, 'application/json; charset=UTF-8')
+        obj2.store()
+        obj2 = bucket.get('baz')
+        self.assertEqual(obj2.data, rand)
+
     def test_generate_key(self):
         # Ensure that Riak generates a random key when
         # the key passed to bucket.new() is None.
