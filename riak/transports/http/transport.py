@@ -457,7 +457,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         links = []
         for header, value in headers.iteritems():
             if header == 'content-type':
-                robj.content_type, robj.charset = robj._parse_content_type(value, robj.charset)
+                robj.content_type = value
             elif header == 'charset':
                 robj.charset = value
             elif header == 'content-encoding':
