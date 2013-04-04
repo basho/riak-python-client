@@ -28,6 +28,7 @@ import urllib
 import re
 import csv
 import httplib
+from email.message import Message
 from riak.transports.transport import RiakTransport
 from riak.transports.http.resources import RiakHttpResources
 from riak.transports.http.connection import RiakHttpConnection
@@ -457,9 +458,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         links = []
         for header, value in headers.iteritems():
             if header == 'content-type':
-                robj.content_type = value
-            elif header == 'charset':
-                robj.charset = value
+                robj.content_type, robj.charset = \
+                    self._parse_content_type(value)
             elif header == 'content-encoding':
                 robj.content_encoding = value
             elif header == 'etag':
@@ -542,8 +542,13 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         """Build the headers for a POST/PUT request."""
 
         # Construct the headers...
+        if robj.charset is not None:
+            content_type = ('%s; charset="%s"' %
+                            (robj.content_type, robj.charset))
+        else:
+            content_type = robj.content_type
         headers = MultiDict({'Accept': 'text/plain, */*; q=0.5',
-                             'Content-Type': robj.content_type,
+                             'Content-Type': content_type,
                              'X-Riak-ClientId': self._client_id})
         # Add the vclock if it exists...
         if robj.vclock is not None:
@@ -593,6 +598,22 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         parser.feed(xml)
         return parser.close()
 
+    def _parse_content_type(self, value):
+        """
+        Split the content-type header into two parts:
+        1) Actual main/sub encoding type
+        2) charset
+
+        :param value: Complete MIME content-type string
+        """
+        message = Message()
+        message.set_type(value)
+
+        content_type = message.get_content_type()
+        charset = message.get_content_charset(None)
+
+        return content_type, charset
+
     @classmethod
     def build_headers(cls, headers):
         return ['%s: %s' % (header, value)
@@ -601,7 +622,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
     @classmethod
     def parse_http_headers(cls, headers):
         """
-        Parse an HTTP Header string into an asssociative array of
+        Parse an HTTP Header string into an associative array of
         response headers.
         """
         retVal = {}
