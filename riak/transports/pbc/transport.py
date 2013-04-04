@@ -185,7 +185,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
                                        MSG_CODE_PUT_RESP)
-        contents = []
         if resp is not None:
             return self._decoded_contents(resp, robj)
 
