@@ -25,7 +25,6 @@ except ImportError:
     import json
 
 import random
-from email.message import Message
 from weakref import WeakValueDictionary
 from riak.client.operations import RiakClientOperations
 from riak.node import RiakNode
@@ -105,7 +104,6 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._decoders = {'application/json': json.loads,
                           'text/json': json.loads}
         self._buckets = WeakValueDictionary()
-        self._message = Message()
 
     def _get_protocol(self):
         return self._protocol
@@ -169,8 +167,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         Get the encoding function for the provided content type.
         """
-        self._message.set_type(content_type)
-        return self._encoders.get(self._message.get_content_type())
+        return self._encoders.get(content_type)
 
     def set_encoder(self, content_type, encoder):
         """
@@ -185,8 +182,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         Get the decoding function for the provided content type.
         """
-        self._message.set_type(content_type)
-        return self._decoders.get(self._message.get_content_type())
+        return self._decoders.get(content_type)
 
     def set_decoder(self, content_type, decoder):
         """

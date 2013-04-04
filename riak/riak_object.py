@@ -17,6 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+from email.message import Message
 from riak import RiakError
 from riak.util import deprecated
 
@@ -56,6 +57,7 @@ class RiakObject(object):
         self.vclock = None
         self.charset = None
         self.content_type = 'application/json'
+        self.full_content_type = 'application/json'
         self.content_encoding = None
         self.usermeta = {}
         self.indexes = set()
@@ -123,6 +125,29 @@ class RiakObject(object):
         encoding is dependent on the `content_type` property and the
         bucket's registered encoders.
         :type basestring""")
+
+    def _get_content_type(self):
+        return self.content_type
+
+    def _set_content_type(self, value):
+        """
+        Split the content-type header into two parts:
+        1) Actual main/sub encoding type
+        2) charset
+
+        :param value: Complete MIME content-type string
+        """
+        message = Message()
+        message.set_type(value)
+
+        self.full_content_type = value
+        self.content_type = message.get_content_type()
+        self.charset = message.get_content_charset(None)
+
+    content_type = property(_get_content_type, _set_content_type, doc="""
+        The MIME `content-type` field less the `charset` property.
+        If set, it will set the internal `charset` field on the
+        RiakObject.""")
 
     def _serialize(self, value):
         encoder = self.bucket.get_encoder(self.content_type)

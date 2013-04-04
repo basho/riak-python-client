@@ -458,8 +458,6 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         for header, value in headers.iteritems():
             if header == 'content-type':
                 robj.content_type = value
-            elif header == 'charset':
-                robj.charset = value
             elif header == 'content-encoding':
                 robj.content_encoding = value
             elif header == 'etag':
@@ -543,7 +541,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         # Construct the headers...
         headers = MultiDict({'Accept': 'text/plain, */*; q=0.5',
-                             'Content-Type': robj.content_type,
+                             'Content-Type': robj.full_content_type,
                              'X-Riak-ClientId': self._client_id})
         # Add the vclock if it exists...
         if robj.vclock is not None:
@@ -601,7 +599,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
     @classmethod
     def parse_http_headers(cls, headers):
         """
-        Parse an HTTP Header string into an asssociative array of
+        Parse an HTTP Header string into an associative array of
         response headers.
         """
         retVal = {}
