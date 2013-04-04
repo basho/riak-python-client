@@ -63,7 +63,8 @@ class BasicKVTests(object):
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
         self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
 
-        obj2 = bucket.new('baz', rand, 'application/json; charset=UTF-8')
+        obj2 = bucket.new('baz', rand, 'application/json')
+        obj2.charset = 'UTF-8'
         obj2.store()
         obj2 = bucket.get('baz')
         self.assertEqual(obj2.data, rand)

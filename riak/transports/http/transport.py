@@ -543,7 +543,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         # Construct the headers...
         if robj.charset is not None:
-            content_type = ("%s; charset='%s'" %
+#            content_type = ('%s; charset="%s"' %
+            content_type = ("%s; charset='%s" %
                             (robj.content_type, robj.charset))
         else:
             content_type = robj.content_type
