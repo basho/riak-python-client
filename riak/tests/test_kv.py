@@ -199,6 +199,16 @@ class BasicKVTests(object):
         obj.reload()
         self.assertFalse(obj.exists)
 
+    def test_bucket_delete(self):
+        bucket = self.client.bucket(self.bucket_name)
+        rand = self.randint()
+        obj = bucket.new(self.key_name, rand)
+        obj.store()
+
+        bucket.delete(self.key_name)
+        obj = bucket.get(self.key_name)
+        self.assertFalse(obj.exists)
+
     def test_set_bucket_properties(self):
         bucket = self.client.bucket(self.props_bucket)
         # Test setting allow mult...

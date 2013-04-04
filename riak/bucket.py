@@ -437,6 +437,16 @@ class RiakBucket(object):
         """
         return self._client.get_index(self.name, index, startkey, endkey)
 
+    def delete(self, key, **kwargs):
+        """Deletes an object from riak.
+
+        Short hand for bucket.new(key).delete()
+        :param key: The key for the object
+        :type key: string
+        :rtype: RiakObject
+        """
+        return self.new(key).delete(**kwargs)
+
     def __str__(self):
         return '<RiakBucket "{0}">'.format(self.name)
 
