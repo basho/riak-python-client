@@ -458,7 +458,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
         links = []
         for header, value in headers.iteritems():
             if header == 'content-type':
-                robj.content_type, robj.charset = self._parse_content_type(value)
+                robj.content_type, robj.charset = \
+                    self._parse_content_type(value)
             elif header == 'content-encoding':
                 robj.content_encoding = value
             elif header == 'etag':
@@ -542,7 +543,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakTransport):
 
         # Construct the headers...
         if robj.charset is not None:
-            content_type = "%s; charset=%s" % (robj.content_type, robj.charset)
+            content_type = ("%s; charset='%s'" %
+                            (robj.content_type, robj.charset))
         else:
             content_type = robj.content_type
         headers = MultiDict({'Accept': 'text/plain, */*; q=0.5',

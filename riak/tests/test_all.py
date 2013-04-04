@@ -68,6 +68,7 @@ def setUpModule():
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
 
+
 def tearDownModule():
     c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
     if not int(os.environ.get('SKIP_SEARCH', '0')):
