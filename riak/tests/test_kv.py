@@ -200,7 +200,7 @@ class BasicKVTests(object):
         obj.store()
 
         bucket.delete(self.key_name)
-        obj.reload()
+        obj = bucket.get(self.key_name)
         self.assertFalse(obj.exists)
 
     def test_set_bucket_properties(self):
