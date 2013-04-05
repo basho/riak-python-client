@@ -127,6 +127,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                 ret.siblings = contents[:]
             return ret
         else:
+            old_obj.exists = False
             return old_obj
 
     def get(self, robj, r=None, pr=None, vtag=None):
