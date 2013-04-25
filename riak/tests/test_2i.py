@@ -257,10 +257,10 @@ class TwoITests(object):
         obj.set_index('bar_int', 1)
         obj.set_index('bar2_int', 1)
         self.assertEqual(2, len(obj.indexes))
-        self.assertEqual(set(('bar_int', 1), ('bar2_int', 1)), obj.indexes)
+        self.assertEqual(set((('bar_int', 1), ('bar2_int', 1))), obj.indexes)
 
         obj.set_index('bar_int', 3)
         self.assertEqual(2, len(obj.indexes))
-        self.assertEqual(set(('bar_int', 3), ('bar2_int', 1)), obj.indexes)
+        self.assertEqual(set((('bar_int', 3), ('bar2_int', 1))), obj.indexes)
         obj.set_index('bar2_int', 10)
-        self.assertEqual(set(('bar_int', 3), ('bar2_int', 10)), obj.indexes)
+        self.assertEqual(set((('bar_int', 3), ('bar2_int', 10))), obj.indexes)
