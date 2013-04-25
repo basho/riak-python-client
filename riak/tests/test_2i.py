@@ -246,3 +246,21 @@ class TwoITests(object):
 
         with self.assertRaises(RiakError):
             bucket.new('k', 'a').add_index('field1', 'value1')
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_set_index(self):
+        if not self.is_2i_supported():
+            return True
+
+        bucket = self.client.bucket(self.bucket_name)
+        obj = bucket.new('bar', 1)
+        obj.set_index('bar_int', 1)
+        obj.set_index('bar2_int', 1)
+        self.assertEqual(2, len(obj.indexes))
+        self.assertEqual(set(('bar_int', 1), ('bar2_int', 1)), obj.indexes)
+
+        obj.set_index('bar_int', 3)
+        self.assertEqual(2, len(obj.indexes))
+        self.assertEqual(set(('bar_int', 3), ('bar2_int', 1)), obj.indexes)
+        obj.set_index('bar2_int', 10)
+        self.assertEqual(set(('bar_int', 3), ('bar2_int', 10)), obj.indexes)
