@@ -186,6 +186,21 @@ class RiakObject(object):
 
         return self
 
+    def set_index(self, field, value):
+        """
+        Works like add_index, but ensures that there is only one index on given field.
+        If other found, then removes it first.
+
+        :param field: The index field.
+        :type field: string
+        :param value: The index value.
+        :type value: string or integer
+        :rtype: RiakObject
+        """
+        to_rem = set((x for x in self.indexes if x[0] == field))
+        self.indexes.difference_update(to_rem)
+        return self.add_index(field, value)
+
     remove_indexes = remove_index
 
     def add_link(self, obj, tag=None):
