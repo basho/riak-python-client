@@ -26,18 +26,16 @@ class RiakHttpConnection(object):
 
     def _request(self, method, uri, headers={}, body='', stream=False):
         """
-        Given a Method, URL, Headers, and Body, perform and HTTP request,
-        and return a 2-tuple containing a dictionary of response headers
-        and the response body.
+        Given a Method, URL, Headers, and Body, perform and HTTP
+        request, and return a 3-tuple containing the response status,
+        response headers (as httplib.HTTPMessage), and response body.
         """
         response = None
+        headers.setdefault('Accept',
+                           'multipart/mixed, application/json, */*;q=0.5')
         try:
             self._connection.request(method, uri, body, headers)
             response = self._connection.getresponse()
-
-            response_headers = {'http_code': response.status}
-            for (key, value) in response.getheaders():
-                response_headers[key.lower()] = value
 
             if stream:
                 # The caller is responsible for fully reading the
@@ -49,7 +47,7 @@ class RiakHttpConnection(object):
             if response and not stream:
                 response.close()
 
-        return response_headers, response_body
+        return response.status, response.msg, response_body
 
     def _connect(self):
         self._connection = self._connection_class(self._node.host,

@@ -25,7 +25,6 @@ from riak.transports.transport import RiakTransport
 from connection import RiakPbcConnection
 from stream import RiakPbcKeyStream, RiakPbcMapredStream
 from codec import RiakPbcCodec
-from riak.riak_object import RiakObject
 
 from messages import (
     MSG_CODE_PING_REQ,
@@ -115,28 +114,10 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     client_id = property(_get_client_id, _set_client_id,
                          doc="""the client ID for this connection""")
 
-    def _decoded_contents(self, resp, old_obj):
-        contents = []
-        for c in resp.content:
-            new_obj = RiakObject(old_obj.client, old_obj.bucket, old_obj.key)
-            new_obj.vclock = resp.vclock
-            contents.append(self.decode_content(c, new_obj))
-        if contents:
-            ret = contents[0]
-            if len(contents) > 1:
-                ret.siblings = contents[:]
-            return ret
-        else:
-            old_obj.exists = False
-            return old_obj
-
-    def get(self, robj, r=None, pr=None, vtag=None):
+    def get(self, robj, r=None, pr=None):
         """
         Serialize get request and deserialize response
         """
-        if vtag is not None:
-            raise RiakError("PB transport does not support vtags")
-
         bucket = robj.bucket
 
         req = riak_pb.RpbGetReq()
@@ -178,57 +159,24 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.if_none_match = 1
 
         req.bucket = bucket.name
-        req.key = robj.key
+        if robj.key:
+            req.key = robj.key
         if robj.vclock:
             req.vclock = robj.vclock
 
-        self.encode_content(robj, req.content)
+        self._encode_content(robj, req.content)
 
         msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
                                        MSG_CODE_PUT_RESP)
+
         if resp is not None:
             return self._decoded_contents(resp, robj)
-
-    def put_new(self, robj, w=None, dw=None, pw=None, return_body=True,
-                if_none_match=False):
-        """Put a new object into the Riak store, returning its (new) key.
-
-        If return_meta is False, then the vlock and metadata return values
-        will be None.
-
-        @return robj
-        """
-        # Note that this won't work on 0.14 nodes.
-        bucket = robj.bucket
-
-        req = riak_pb.RpbPutReq()
-        if w:
-            req.w = self.translate_rw_val(w)
-        if dw:
-            req.dw = self.translate_rw_val(dw)
-        if self.quorum_controls() and pw:
-            req.pw = self.translate_rw_val(pw)
-
-        if return_body:
-            req.return_body = 1
-        if if_none_match:
-            req.if_none_match = 1
-
-        req.bucket = bucket.name
-
-        self.encode_content(robj, req.content)
-
-        msg_code, resp = self._request(MSG_CODE_PUT_REQ, req,
-                                       MSG_CODE_PUT_RESP)
-        if not resp:
+        elif not robj.key:
             raise RiakError("missing response object")
-        if len(resp.content) != 1:
-            raise RiakError("siblings were returned from object creation")
+        else:
+            return robj
 
-        robj.key = resp.key
-        robj.vclock = resp.vclock
-        content = self.decode_content(resp.content[0], robj)
-        return content
+    put_new = put
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """

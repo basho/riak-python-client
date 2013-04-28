@@ -1,4 +1,5 @@
 """
+Copyright 2012-2013 Basho Technologies <dev@basho.com>
 Copyright 2010 Rusty Klophaus <rusty@basho.com>
 Copyright 2010 Justin Sheehy <justin@basho.com>
 Copyright 2009 Jay Baird <jay@mochimedia.com>
@@ -17,8 +18,44 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from riak import RiakError
+from riak import ConflictError
+from riak.content import RiakContent
 from riak.util import deprecated
+
+
+def content_property(name, doc=None):
+    """
+    Delegates a property to the first sibling in a RiakObject, raising
+    an error when the object is in conflict.
+    """
+    def _setter(self, value):
+        if len(self.siblings) == 0:
+            # In this case, assume that what the user wants is to
+            # create a new sibling inside an empty object.
+            self.siblings = [RiakContent(self)]
+        if len(self.siblings) != 1:
+            raise ConflictError()
+        setattr(self.siblings[0], name, value)
+
+    def _getter(self):
+        if len(self.siblings) != 1:
+            raise ConflictError()
+        return getattr(self.siblings[0], name)
+
+    return property(_getter, _setter, doc=doc)
+
+
+def content_method(name):
+    """
+    Delegates a method to the first sibling in a RiakObject, raising
+    an error when the object is in conflict.
+    """
+    def _delegate(self, *args, **kwargs):
+        if len(self.siblings) != 1:
+            raise ConflictError()
+        return getattr(self.siblings[0], name).__call__(*args, **kwargs)
+
+    return _delegate
 
 
 class RiakObject(object):
@@ -51,17 +88,8 @@ class RiakObject(object):
         self.client = client
         self.bucket = bucket
         self.key = key
-        self._data = None
-        self._encoded_data = None
         self.vclock = None
-        self.charset = None
-        self.content_type = 'application/json'
-        self.content_encoding = None
-        self.usermeta = {}
-        self.indexes = set()
-        self.links = []
-        self.siblings = []
-        self.exists = False
+        self.siblings = [RiakContent(self)]
 
     def __hash__(self):
         return hash((self.key, self.bucket, self.vclock))
@@ -78,45 +106,14 @@ class RiakObject(object):
         else:
             return True
 
-    def _get_data(self):
-        if self._encoded_data is not None and self._data is None:
-            self._data = self._deserialize(self._encoded_data)
-            self._encoded_data = None
-        return self._data
-
-    def _set_data(self, value):
-        self._encoded_data = None
-        self._data = value
-
-    data = property(_get_data, _set_data, doc="""
+    data = content_property('data', doc="""
         The data stored in this object, as Python objects. For the raw
         data, use the `encoded_data` property. If unset, accessing
         this property will result in decoding the `encoded_data`
         property into Python values. The decoding is dependent on the
         `content_type` property and the bucket's registered decoders.
         :type mixed """)
-
-    def get_encoded_data(self):
-        deprecated("`get_encoded_data` is deprecated, use the `encoded_data`"
-                   " property")
-        return self.encoded_data
-
-    def set_encoded_data(self, value):
-        deprecated("`set_encoded_data` is deprecated, use the `encoded_data`"
-                   " property")
-        self.encoded_data = value
-
-    def _get_encoded_data(self):
-        if self._data is not None and self._encoded_data is None:
-            self._encoded_data = self._serialize(self._data)
-            self._data = None
-        return self._encoded_data
-
-    def _set_encoded_data(self, value):
-        self._data = None
-        self._encoded_data = value
-
-    encoded_data = property(_get_encoded_data, _set_encoded_data, doc="""
+    encoded_data = content_property('encoded_data', doc="""
         The raw data stored in this object, essentially the encoded
         form of the `data` property. If unset, accessing this property
         will result in encoding the `data` property into a string. The
@@ -124,104 +121,56 @@ class RiakObject(object):
         bucket's registered encoders.
         :type basestring""")
 
-    def _serialize(self, value):
-        encoder = self.bucket.get_encoder(self.content_type)
-        if encoder:
-            return encoder(value)
-        elif isinstance(value, basestring):
-            return value.encode()
-        else:
-            raise TypeError('No encoder for non-string data '
-                            'with content type "{0}"'.
-                            format(self.content_type))
+    charset = content_property('charset', doc="""
+        The character set of the encoded data
+        :type string""")
 
-    def _deserialize(self, value):
-        decoder = self.bucket.get_decoder(self.content_type)
-        if decoder:
-            return decoder(value)
-        else:
-            raise TypeError('No decoder for content type "{0}"'.
-                            format(self.content_type))
+    content_type = content_property('content_type', doc="""
+        The MIME media type of the encoded data
+        :type string""")
 
-    def add_index(self, field, value):
-        """
-        Tag this object with the specified field/value pair for
-        indexing.
+    content_encoding = content_property('content_encoding')
 
-        :param field: The index field.
-        :type field: string
-        :param value: The index value.
-        :type value: string or integer
-        :rtype: RiakObject
-        """
-        if field[-4:] not in ("_bin", "_int"):
-            raise RiakError("Riak 2i fields must end with either '_bin'"
-                            " or '_int'.")
+    usermeta = content_property('usermeta', doc="""
+        Arbitrary user-defined metadata, mapping strings to strings.
+        :type dict""")
 
-        self.indexes.add((field, value))
+    links = content_property('links', doc="""
+        A collection of bucket/key/tag 3-tuples representing links to
+        other keys.
+        :type set""")
 
-        return self
+    indexes = content_property('indexes', doc="""
+        The set of secondary index entries, consisting of
+        index-name/value tuples
+        :type set""")
 
-    def remove_index(self, field=None, value=None):
-        """
-        Remove the specified field/value pair as an index on this
-        object.
-
-        :param field: The index field.
-        :type field: string
-        :param value: The index value.
-        :type value: string or integer
-        :rtype: RiakObject
-        """
-        if not field and not value:
-            self.indexes.clear()
-        elif field and not value:
-            for index in [x for x in self.indexes if x[0] == field]:
-                self.indexes.remove(index)
-        elif field and value:
-            self.indexes.remove((field, value))
-        else:
-            raise RiakError("Cannot pass value without a field"
-                            " name while removing index")
-
-        return self
-
-    def set_index(self, field, value):
-        """
-        Works like add_index, but ensures that there is only one index on given field.
-        If other found, then removes it first.
-
-        :param field: The index field.
-        :type field: string
-        :param value: The index value.
-        :type value: string or integer
-        :rtype: RiakObject
-        """
-        to_rem = set((x for x in self.indexes if x[0] == field))
-        self.indexes.difference_update(to_rem)
-        return self.add_index(field, value)
-
+    get_encoded_data = content_method('get_encoded_data')
+    set_encoded_data = content_method('set_encoded_data')
+    add_index = content_method('add_index')
+    remove_index = content_method('remove_index')
     remove_indexes = remove_index
+    set_index = content_method('set_index')
+    add_link = content_method('add_link')
 
-    def add_link(self, obj, tag=None):
-        """
-        Add a link to a RiakObject.
-
-        :param obj: Either a RiakObject or 3 item link tuple consisting
-            of (bucket, key, tag).
-        :type obj: mixed
-        :param tag: Optional link tag. Defaults to bucket name. It is ignored
-            if ``obj`` is a 3 item link tuple.
-        :type tag: string
-        :rtype: RiakObject
-        """
-        if isinstance(obj, tuple):
-            newlink = obj
+    def _exists(self):
+        if len(self.siblings) == 0:
+            return False
+        elif len(self.siblings) > 1:
+            # Even if all of the siblings are tombstones, the object
+            # essentially exists.
+            return True
         else:
-            newlink = (obj.bucket.name, obj.key, tag)
+            return self.siblings[0].exists
 
-        self.links.append(newlink)
-        return self
+    exists = property(_exists, None, doc="""
+       Whether the object exists. This is only true when there is a
+       single sibling and it is neither a tombstone nor unsaved.""")
+
+    def get_sibling(self, index):
+        deprecated("RiakObject.get_sibling is deprecated, use the "
+                   "siblings property instead")
+        return self.siblings[index]
 
     def store(self, w=None, dw=None, pw=None, return_body=True,
               if_none_match=False):
@@ -248,27 +197,23 @@ class RiakObject(object):
                               there is no key previously defined
         :type if_none_match: bool
         :rtype: RiakObject """
-        if (self.siblings and not self._data
-                and not self._encoded_data and not self.vclock):
-            raise RiakError("Attempting to store an invalid object,"
-                            "store one of the siblings instead")
+        if len(self.siblings) != 1:
+            raise ConflictError("Attempting to store an invalid object, "
+                                "resolve the siblings first")
 
         if self.key is None:
-            result = self.client.put_new(
+            self.client.put_new(
                 self, w=w, dw=dw, pw=pw,
                 return_body=return_body,
                 if_none_match=if_none_match)
-            self._populate(result)
         else:
-            result = self.client.put(self, w=w, dw=dw, pw=pw,
-                                     return_body=return_body,
-                                     if_none_match=if_none_match)
-            if result is not None and result != ('', []):
-                self._populate(result)
+            self.client.put(self, w=w, dw=dw, pw=pw,
+                            return_body=return_body,
+                            if_none_match=if_none_match)
 
         return self
 
-    def reload(self, r=None, pr=None, vtag=None):
+    def reload(self, r=None, pr=None):
         """
         Reload the object from Riak. When this operation completes, the
         object could contain new metadata and a new value, if the object
@@ -277,15 +222,14 @@ class RiakObject(object):
         :param r: R-Value, wait for this many partitions to respond
          before returning to client.
         :type r: integer
+        :param pr: PR-value, require this many primary partitions to
+                   be available before performing the read that
+                   precedes the put
+        :type pr: integer
         :rtype: RiakObject
         """
 
-        result = self.client.get(self, r=r, pr=pr, vtag=vtag)
-        if result and result != ('', []):
-            self._populate(result)
-        else:
-            self.clear()
-
+        self.client.get(self, r=r, pr=pr)
         return self
 
     def delete(self, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
@@ -325,54 +269,8 @@ class RiakObject(object):
 
         :rtype: RiakObject
         """
-        self.headers = []
-        self.links = []
-        self.data = None
-        self.exists = False
         self.siblings = []
         return self
-
-    def _populate(self, result):
-        """
-        Populate the object based on the return from get.
-
-        If None returned, then object is not found
-        If a tuple of vclock, contents then one or more
-        whole revisions of the key were found
-        If a list of vtags is returned there are multiple
-        sibling that need to be retrieved with get.
-        """
-        if result is None or result is self:
-            return self
-        elif type(result) is RiakObject:
-            self.clear()
-            self.__dict__ = result.__dict__.copy()
-        else:
-            raise RiakError("do not know how to handle type %s" % type(result))
-
-    def get_sibling(self, i, r=None, pr=None):
-        """
-        Retrieve a sibling by sibling number.
-
-        :param i: Sibling number.
-        :type i: integer
-        :param r: R-Value. Wait until this many partitions
-            have responded before returning to client.
-        :type r: integer
-        :rtype: RiakObject.
-        """
-        if isinstance(self.siblings[i], RiakObject):
-            return self.siblings[i]
-        else:
-            # Run the request...
-            vtag = self.siblings[i]
-            obj = RiakObject(self.client, self.bucket, self.key)
-            obj.reload(r=r, pr=pr, vtag=vtag)
-
-            # And make sure it knows who its siblings are
-            self.siblings[i] = obj
-            obj.siblings = self.siblings
-            return obj
 
     def add(self, *args):
         """

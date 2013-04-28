@@ -65,7 +65,7 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def get(self, robj, r=None, vtag=None):
+    def get(self, robj, r=None):
         """
         Serialize get request and deserialize response
         @return (vclock=None, [(metadata, value)]=None)

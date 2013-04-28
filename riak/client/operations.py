@@ -180,7 +180,7 @@ class RiakClientOperations(RiakClientTransport):
                                  if_none_match=if_none_match)
 
     @retryable
-    def get(self, transport, robj, r=None, pr=None, vtag=None):
+    def get(self, transport, robj, r=None, pr=None):
         """
         Fetches the contents of a Riak object.
 
@@ -190,14 +190,12 @@ class RiakClientOperations(RiakClientTransport):
         :type r: integer, string, None
         :param pr: the primary read quorum
         :type pr: integer, string, None
-        :param vtag: the specific sibling to fetch
-        :type vtag: string
         """
         if not isinstance(robj.key, basestring):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
-        return transport.get(robj, r=r, pr=pr, vtag=vtag)
+        return transport.get(robj, r=r, pr=pr)
 
     @retryable
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,
