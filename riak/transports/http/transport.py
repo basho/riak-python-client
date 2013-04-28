@@ -154,7 +154,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         headers = {}
         url = self.object_path(robj.bucket.name, robj.key, **params)
         if self.tombstone_vclocks() and robj.vclock is not None:
-            headers['X-Riak-Vclock'] = robj.vclock
+            headers['X-Riak-Vclock'] = robj.vclock.encode('base64')
         response = self._request('DELETE', url, headers)
         self.check_http_code(response[0], [204, 404])
         return self

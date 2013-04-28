@@ -162,7 +162,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if robj.key:
             req.key = robj.key
         if robj.vclock:
-            req.vclock = robj.vclock
+            req.vclock = robj.vclock.encode('binary')
 
         self._encode_content(robj, req.content)
 
@@ -201,7 +201,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                 req.pw = self.translate_rw_val(pw)
 
         if self.tombstone_vclocks() and robj.vclock:
-            req.vclock = robj.vclock
+            req.vclock = robj.vclock.encode('binary')
 
         req.bucket = bucket.name
         req.key = robj.key

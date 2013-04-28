@@ -21,6 +21,7 @@ under the License.
 from riak import ConflictError
 from riak.content import RiakContent
 from riak.util import deprecated
+import base64
 
 
 def content_property(name, doc=None):
@@ -56,6 +57,36 @@ def content_method(name):
         return getattr(self.siblings[0], name).__call__(*args, **kwargs)
 
     return _delegate
+
+
+class VClock(object):
+    """
+    A representation of a vector clock received from Riak.
+    """
+
+    _decoders = {
+        'base64': base64.b64decode,
+        'binary': str
+    }
+
+    _encoders = {
+        'base64': base64.b64encode,
+        'binary': str
+    }
+
+    def __init__(self, value, encoding):
+        self._vclock = self._decoders[encoding].__call__(value)
+
+    def encode(self, encoding):
+        if encoding in self._encoders:
+            return self._encoders[encoding].__call__(self._vclock)
+        else:
+            raise ValueError('{} is not a valid vector clock encoding'.
+                             format(encoding))
+
+    def __repr__(self):
+        return '<{} {}>'.format(self.__class__.__name__,
+                                self.encode('base64'))
 
 
 class RiakObject(object):

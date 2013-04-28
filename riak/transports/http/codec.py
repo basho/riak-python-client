@@ -32,6 +32,7 @@ from rfc822 import parsedate_tz, mktime_tz
 from xml.etree import ElementTree
 from riak import RiakError
 from riak.content import RiakContent
+from riak.riak_object import VClock
 from riak.multidict import MultiDict
 from riak.transports.http.search import XMLSearchResult
 
@@ -62,7 +63,7 @@ class RiakHttpCodec(object):
         self.check_http_code(status, expected_statuses)
 
         if 'x-riak-vclock' in headers:
-            robj.vclock = headers['x-riak-vclock']
+            robj.vclock = VClock(headers['x-riak-vclock'], 'base64')
 
         # If 404(Not Found), then clear the object.
         if status == 404:
@@ -191,7 +192,7 @@ class RiakHttpCodec(object):
 
         # Add the vclock if it exists...
         if robj.vclock is not None:
-            headers['X-Riak-Vclock'] = robj.vclock
+            headers['X-Riak-Vclock'] = robj.vclock.encode('base64')
 
         # Create the header from metadata
         self._add_links_for_riak_object(robj, headers)
