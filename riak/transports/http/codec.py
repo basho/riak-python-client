@@ -28,6 +28,7 @@ import csv
 import urllib
 from cgi import parse_header
 from email import message_from_string
+from rfc822 import parsedate_tz, mktime_tz
 from xml.etree import ElementTree
 from riak import RiakError
 from riak.content import RiakContent
@@ -110,7 +111,7 @@ class RiakHttpCodec(object):
             elif header == 'link':
                 sibling.links = self._parse_links(value)
             elif header == 'last-modified':
-                sibling.last_modified = value
+                sibling.last_modified = mktime_tz(parsedate_tz(value))
             elif header.startswith('x-riak-meta-'):
                 metakey = header.replace('x-riak-meta-', '')
                 sibling.usermeta[metakey] = value

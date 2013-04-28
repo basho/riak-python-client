@@ -27,14 +27,15 @@ class RiakContent(object):
     """
     def __init__(self, robject, data=None, encoded_data=None, charset=None,
                  content_type='application/json', content_encoding=None,
-                 etag=None, usermeta=None, links=None, indexes=None,
-                 exists=False):
+                 last_modified=None, etag=None, usermeta=None, links=None,
+                 indexes=None, exists=False):
         self._robject = robject
         self._data = data
         self._encoded_data = encoded_data
         self.charset = charset
         self.content_type = content_type
         self.content_encoding = content_encoding
+        self.last_modified = last_modified
         self.etag = etag
         self.usermeta = usermeta or {}
         self.links = links or []

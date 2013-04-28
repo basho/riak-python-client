@@ -94,9 +94,9 @@ class RiakPbcCodec(object):
         sibling.links = [self._decode_link(link)
                          for link in rpb_content.links]
         if rpb_content.HasField("last_mod"):
-            sibling.last_mod = rpb_content.last_mod
-        if rpb_content.HasField("last_mod_usecs"):
-            sibling.last_mod_usecs = rpb_content.last_mod_usecs
+            sibling.last_modified = float(rpb_content.last_mod)
+            if rpb_content.HasField("last_mod_usecs"):
+                sibling.last_modified += rpb_content.last_mod_usecs / 1000000.0
 
         sibling.usermeta = dict([(usermd.key, usermd.value)
                                  for usermd in rpb_content.usermeta])

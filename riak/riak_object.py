@@ -124,12 +124,20 @@ class RiakObject(object):
     charset = content_property('charset', doc="""
         The character set of the encoded data
         :type string""")
-
     content_type = content_property('content_type', doc="""
         The MIME media type of the encoded data
         :type string""")
+    content_encoding = content_property('content_encoding', doc="""
+        The encoding (compression) of the encoded data. Valid values
+        are identity, deflate, gzip
+        :type string""")
 
-    content_encoding = content_property('content_encoding')
+    last_modified = content_property('last_modified', """
+        The UNIX timestamp of the modification time of this value.
+        :type float""")
+    etag = content_property('etag', """
+        A unique entity-tag for the value.
+        :type string""")
 
     usermeta = content_property('usermeta', doc="""
         Arbitrary user-defined metadata, mapping strings to strings.
