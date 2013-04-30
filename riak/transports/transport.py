@@ -80,16 +80,6 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def put_new(self, robj, w=None, dw=None, return_meta=True):
-        """Put a new object into the Riak store, returning its (new) key.
-
-        If return_meta is False, then the vlock and metadata return values
-        will be None.
-
-        @return (key, vclock, metadata)
-        """
-        raise NotImplementedError
-
     def delete(self, robj, rw=None):
         """
         Serialize delete request and deserialize response

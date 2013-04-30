@@ -240,15 +240,9 @@ class RiakObject(object):
             raise ConflictError("Attempting to store an invalid object, "
                                 "resolve the siblings first")
 
-        if self.key is None:
-            self.client.put_new(
-                self, w=w, dw=dw, pw=pw,
-                return_body=return_body,
-                if_none_match=if_none_match)
-        else:
-            self.client.put(self, w=w, dw=dw, pw=pw,
-                            return_body=return_body,
-                            if_none_match=if_none_match)
+        self.client.put(self, w=w, dw=dw, pw=pw,
+                        return_body=return_body,
+                        if_none_match=if_none_match)
 
         return self
 

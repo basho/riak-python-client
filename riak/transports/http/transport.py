@@ -142,8 +142,6 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             self.check_http_code(response[0], expect)
             return None
 
-    put_new = put
-
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """
         Delete an object.

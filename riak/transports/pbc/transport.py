@@ -176,8 +176,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         else:
             return robj
 
-    put_new = put
-
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """
         Serialize get request and deserialize response
