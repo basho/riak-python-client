@@ -18,7 +18,6 @@ under the License.
 import riak_pb
 from riak import RiakError
 from riak.content import RiakContent
-from riak.mapreduce import RiakLink
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -158,7 +157,7 @@ class RiakPbcCodec(object):
         else:
             tag = None
 
-        return RiakLink(bucket, key, tag)
+        return (bucket, key, tag)
 
     def _decode_index_value(self, index, value):
         """
