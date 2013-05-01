@@ -22,6 +22,7 @@ under the License.
 import riak_pb
 from riak import RiakError
 from riak.transports.transport import RiakTransport
+from riak.riak_object import VClock
 from connection import RiakPbcConnection
 from stream import RiakPbcKeyStream, RiakPbcMapredStream
 from codec import RiakPbcCodec
@@ -132,11 +133,23 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req.bucket = bucket.name
         req.key = robj.key
 
-        msg_code, resp = self._request(MSG_CODE_GET_REQ, req)
-        if msg_code == MSG_CODE_GET_RESP:
-            return self._decoded_contents(resp, robj)
+        msg_code, resp = self._request(MSG_CODE_GET_REQ, req,
+                                       MSG_CODE_GET_RESP)
+
+        # TODO: support if_modified flag
+
+        if resp is not None:
+            if resp.HasField('vclock'):
+                robj.vclock = VClock(resp.vclock, 'binary')
+            # We should do this even if there are no contents, i.e.
+            # the object is tombstoned
+            self._decode_contents(resp.content, robj)
         else:
-            return None
+            # "not found" returns an empty message,
+            # so let's make sure to clear the siblings
+            robj.siblings = []
+
+        return robj
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=True,
             if_none_match=False):
@@ -170,11 +183,16 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                                        MSG_CODE_PUT_RESP)
 
         if resp is not None:
-            return self._decoded_contents(resp, robj)
+            if resp.HasField('key'):
+                robj.key = resp.key
+            if resp.HasField("vclock"):
+                robj.vclock = VClock(resp.vclock, 'binary')
+            if resp.content:
+                self._decode_contents(resp.content, robj)
         elif not robj.key:
             raise RiakError("missing response object")
-        else:
-            return robj
+
+        return robj
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
         """

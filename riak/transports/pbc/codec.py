@@ -17,7 +17,6 @@ under the License.
 """
 import riak_pb
 from riak import RiakError
-from riak.riak_object import VClock
 from riak.content import RiakContent
 from riak.mapreduce import RiakLink
 
@@ -61,14 +60,9 @@ class RiakPbcCodec(object):
         else:
             return None
 
-    def _decoded_contents(self, resp, obj):
-        if type(resp) == riak_pb.RpbPutResp and resp.HasField('key'):
-            obj.key = resp.key
-        if resp.HasField("vclock"):
-            obj.vclock = VClock(resp.vclock, 'binary')
-
+    def _decode_contents(self, contents, obj):
         obj.siblings = [self._decode_content(c, RiakContent(obj))
-                        for c in resp.content]
+                        for c in contents]
         return obj
 
     def _decode_content(self, rpb_content, sibling):
