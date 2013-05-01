@@ -203,8 +203,11 @@ class RiakObject(object):
             return self.siblings[0].exists
 
     exists = property(_exists, None, doc="""
-       Whether the object exists. This is only true when there is a
-       single sibling and it is neither a tombstone nor unsaved.""")
+       Whether the object exists. This is only False when there are no
+       siblings (the object was not found), or the solitary sibling is
+       a tombstone.
+       :type bool
+       """)
 
     def get_sibling(self, index):
         deprecated("RiakObject.get_sibling is deprecated, use the "
