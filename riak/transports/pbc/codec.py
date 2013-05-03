@@ -141,7 +141,7 @@ class RiakPbcCodec(object):
 
     def _decode_link(self, link):
         """
-        Decodes an RpbLink message into a RiakLink named tuple
+        Decodes an RpbLink message into a tuple
         """
 
         if link.HasField("bucket"):
