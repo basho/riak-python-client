@@ -213,7 +213,7 @@ data out looks like::
 
   # You've now got a ``RiakObject``. To get at the values in a dictionary
   # form, call:
-  johndoe_dict = johndoe.get_data()
+  johndoe_dict = johndoe.data
 
 Getting binary data out looks like::
 
@@ -225,7 +225,7 @@ Getting binary data out looks like::
   johndoe = user_photo_bucket.get_binary('johndoe')
 
   # You've now got a ``RiakObject``. To get at the binary data, call:
-  johndoe_headshot = johndoe.get_data()
+  johndoe_headshot = johndoe.data
 
 Manually fetching data is also possible::
 
@@ -244,7 +244,7 @@ Manually fetching data is also possible::
   first_post_status.reload(r)
 
   # Finally, pull out the data.
-  message = first_post_status.get_data()['message']
+  message = first_post_status.data['message']
 
 
 Fetching Data Via Map/Reduce
@@ -355,7 +355,7 @@ Fetching the data is equally simple::
       # Since what we get back are lightweight ``RiakLink`` objects, we need to
       # get the associated ``RiakObject`` to access its data.
       status = status_link.get()
-      print status.get_data()['message']
+      print status.data['message']
 
 
 Using Search
@@ -378,7 +378,7 @@ tutorial, but usage of this feature looks like::
   for result in search_query.run():
       # You get ``RiakLink`` objects back.
       user = result.get()
-      user_data = user.get_data()
+      user_data = user.data
       print "%s %s" % (user_data['first_name'], user_data['last_name'])
 
   # Results in something like:
