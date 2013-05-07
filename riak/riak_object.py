@@ -144,6 +144,7 @@ class RiakObject(object):
         property into Python values. The decoding is dependent on the
         `content_type` property and the bucket's registered decoders.
         :type mixed """)
+
     encoded_data = content_property('encoded_data', doc="""
         The raw data stored in this object, essentially the encoded
         form of the `data` property. If unset, accessing this property
@@ -155,9 +156,11 @@ class RiakObject(object):
     charset = content_property('charset', doc="""
         The character set of the encoded data
         :type string""")
+
     content_type = content_property('content_type', doc="""
         The MIME media type of the encoded data
         :type string""")
+
     content_encoding = content_property('content_encoding', doc="""
         The encoding (compression) of the encoded data. Valid values
         are identity, deflate, gzip
@@ -166,6 +169,7 @@ class RiakObject(object):
     last_modified = content_property('last_modified', """
         The UNIX timestamp of the modification time of this value.
         :type float""")
+
     etag = content_property('etag', """
         A unique entity-tag for the value.
         :type string""")
