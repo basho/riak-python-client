@@ -155,32 +155,7 @@ class RiakClientOperations(RiakClientTransport):
                              if_none_match=if_none_match)
 
     @retryable
-    def put_new(self, transport, robj, w=None, dw=None, pw=None,
-                return_body=None, if_none_match=None):
-        """
-        Stores an object in the Riak cluster with a generated key.
-
-        :param robj: the object to store
-        :type robj: RiakObject
-        :param w: the write quorum
-        :type w: integer, string, None
-        :param dw: the durable write quorum
-        :type dw: integer, string, None
-        :param pw: the primary write quorum
-        :type pw: integer, string, None
-        :param return_body: whether to return the resulting object
-           after the write
-        :type return_body: boolean
-        :param if_none_match: whether to fail the write if the object
-          exists
-        :type if_none_match: boolean
-        """
-        return transport.put_new(robj, w=w, dw=dw, pw=pw,
-                                 return_body=return_body,
-                                 if_none_match=if_none_match)
-
-    @retryable
-    def get(self, transport, robj, r=None, pr=None, vtag=None):
+    def get(self, transport, robj, r=None, pr=None):
         """
         Fetches the contents of a Riak object.
 
@@ -190,14 +165,12 @@ class RiakClientOperations(RiakClientTransport):
         :type r: integer, string, None
         :param pr: the primary read quorum
         :type pr: integer, string, None
-        :param vtag: the specific sibling to fetch
-        :type vtag: string
         """
         if not isinstance(robj.key, basestring):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
-        return transport.get(robj, r=r, pr=pr, vtag=vtag)
+        return transport.get(robj, r=r, pr=pr)
 
     @retryable
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,

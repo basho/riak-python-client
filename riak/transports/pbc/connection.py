@@ -83,7 +83,8 @@ class RiakPbcConnection(object):
 
     def _connect(self):
         if self._timeout:
-            self._socket = socket.create_connection(self._address, self._timeout)
+            self._socket = socket.create_connection(self._address,
+                                                    self._timeout)
         else:
             self._socket = socket.create_connection(self._address)
 

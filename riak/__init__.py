@@ -32,7 +32,7 @@ See the unit_tests.py file for example usage.
 
 __all__ = ['RiakBucket', 'RiakNode', 'RiakObject', 'RiakClient',
            'RiakMapReduce', 'RiakKeyFilter', 'RiakLink', 'RiakError',
-           'ONE', 'ALL', 'QUORUM', 'key_filter']
+           'ConflictError', 'ONE', 'ALL', 'QUORUM', 'key_filter']
 
 
 class RiakError(Exception):
@@ -44,6 +44,16 @@ class RiakError(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
+class ConflictError(RiakError):
+    """
+    Raised when an operation is attempted on a RiakObject that has
+    more than one sibling.
+    """
+    def __init__(self, message="Object in conflict"):
+        super(ConflictError, self).__init__(message)
+
 
 from client import RiakClient
 from bucket import RiakBucket

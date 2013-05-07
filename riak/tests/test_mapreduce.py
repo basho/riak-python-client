@@ -8,13 +8,13 @@ class LinkTests(object):
     def test_store_and_get_links(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
-        bucket.new(key="test_store_and_get_links", encoded_data='2',
+        bucket.new(key=self.key_name, encoded_data='2',
                    content_type='application/octet-stream') \
             .add_link(bucket.new("foo1")) \
             .add_link(bucket.new("foo2"), "tag") \
             .add_link(bucket.new("foo3"), "tag2!@#%^&*)") \
             .store()
-        obj = bucket.get("test_store_and_get_links")
+        obj = bucket.get(self.key_name)
         links = obj.links
         self.assertEqual(len(links), 3)
         for bucket, key, tag in links:
@@ -555,4 +555,4 @@ class MapReduceStreamTests(object):
 
         # This should not raise an exception
         obj = bucket.get('one')
-        self.assertEqual(1, obj.data)
+        self.assertEqual('1', obj.encoded_data)

@@ -2,6 +2,7 @@
 import os
 import cPickle
 import copy
+from riak import ConflictError
 
 try:
     import simplejson as json
@@ -106,6 +107,7 @@ class BasicKVTests(object):
 
         # If the stream was closed correctly, this will not error
         robj = bucket.get(regular_keys[0])
+        self.assertEqual(len(robj.siblings), 1)
         self.assertEqual(True, robj.exists)
 
     def test_bad_key(self):
@@ -185,7 +187,6 @@ class BasicKVTests(object):
         bucket = self.client.bucket(self.bucket_name)
         obj = bucket.get(self.key_name)
         self.assertFalse(obj.exists)
-        self.assertEqual(obj.data, None)
 
     def test_delete(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -272,25 +273,65 @@ class BasicKVTests(object):
             other_obj.store()
             vals.add(str(randval))
 
-        # Make sure the object has itself plus four siblings...
+        # Make sure the object has five siblings...
         obj = bucket.get(self.key_name)
         obj.reload()
-        self.assertTrue(bool(obj.siblings))
         self.assertEqual(len(obj.siblings), 5)
 
-        # Get each of the values - make sure they match what was assigned
-        vals2 = set()
-        for i in xrange(len(obj.siblings)):
-            vals2.add(obj.get_sibling(i).encoded_data)
+        # When the object is in conflict, using the shortcut methods
+        # should raise the ConflictError
+        with self.assertRaises(ConflictError):
+            obj.data
+
+        # Get each of the values - make sure they match what was
+        # assigned
+        vals2 = set([sibling.encoded_data for sibling in obj.siblings])
         self.assertEqual(vals, vals2)
 
         # Resolve the conflict, and then do a get...
-        obj3 = obj.get_sibling(3)
-        obj3.store()
+        resolved_sibling = obj.siblings[3]
+        obj.siblings = [resolved_sibling]
+        obj.store()
 
         obj.reload()
-        self.assertEqual(len(obj.siblings), 0)
-        self.assertEqual(obj.encoded_data, obj3.encoded_data)
+        self.assertEqual(len(obj.siblings), 1)
+        self.assertEqual(obj.encoded_data, resolved_sibling.encoded_data)
+
+    def test_tombstone_siblings(self):
+        # Set up the bucket, clear any existing object...
+        bucket = self.client.bucket(self.sibs_bucket)
+        obj = bucket.get(self.key_name)
+        bucket.allow_mult = True
+
+        obj.encoded_data = 'start'
+        obj.content_type = 'application/octet-stream'
+        obj.store(return_body=True)
+
+        vclock = obj.vclock
+        obj.delete()
+
+        vals = set()
+        for i in range(4):
+            while True:
+                randval = self.randint()
+                if str(randval) not in vals:
+                    break
+
+            other_obj = bucket.new(key=self.key_name,
+                                   encoded_data=str(randval),
+                                   content_type='text/plain')
+            other_obj.vclock = vclock
+            other_obj.store()
+            vals.add(str(randval))
+
+        obj = bucket.get(self.key_name)
+        self.assertEqual(len(obj.siblings), 5)
+        non_tombstones = 0
+        for sib in obj.siblings:
+            if sib.exists:
+                non_tombstones += 1
+            self.assertTrue(sib.encoded_data in vals or not sib.exists)
+        self.assertEqual(non_tombstones, 4)
 
     def test_store_of_missing_object(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -430,7 +471,7 @@ class KVFileTests(object):
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
         bucket = self.client.bucket(self.bucket_name)
         with self.assertRaises(IOError):
-            bucket.new_from_file('not_found_from_file', 'FILE_NOT_FOUND')
-        obj = bucket.get('not_found_from_file')
-        self.assertEqual(obj.encoded_data, None)
+            bucket.new_from_file(self.key_name, 'FILE_NOT_FOUND')
+        obj = bucket.get(self.key_name)
+        # self.assertEqual(obj.encoded_data, None)
         self.assertFalse(obj.exists)
