@@ -297,6 +297,42 @@ class BasicKVTests(object):
         self.assertEqual(len(obj.siblings), 1)
         self.assertEqual(obj.encoded_data, resolved_sibling.encoded_data)
 
+    def test_tombstone_siblings(self):
+        # Set up the bucket, clear any existing object...
+        bucket = self.client.bucket(self.sibs_bucket)
+        obj = bucket.get(self.key_name)
+        bucket.allow_mult = True
+
+        obj.encoded_data = 'start'
+        obj.content_type = 'application/octet-stream'
+        obj.store(return_body=True)
+
+        vclock = obj.vclock
+        obj.delete()
+
+        vals = set()
+        for i in range(4):
+            while True:
+                randval = self.randint()
+                if str(randval) not in vals:
+                    break
+
+            other_obj = bucket.new(key=self.key_name,
+                                   encoded_data=str(randval),
+                                   content_type='text/plain')
+            other_obj.vclock = vclock
+            other_obj.store()
+            vals.add(str(randval))
+
+        obj = bucket.get(self.key_name)
+        self.assertEqual(len(obj.siblings), 5)
+        non_tombstones = 0
+        for sib in obj.siblings:
+            if sib.exists:
+                non_tombstones += 1
+            self.assertTrue(sib.encoded_data in vals or not sib.exists)
+        self.assertEqual(non_tombstones, 4)
+
     def test_store_of_missing_object(self):
         bucket = self.client.bucket(self.bucket_name)
         # for json objects
