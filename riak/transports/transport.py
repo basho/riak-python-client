@@ -65,7 +65,7 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def get(self, robj, r=None, vtag=None):
+    def get(self, robj, r=None):
         """
         Serialize get request and deserialize response
         @return (vclock=None, [(metadata, value)]=None)
@@ -77,16 +77,6 @@ class RiakTransport(FeatureDetection):
         Serialize put request and deserialize response - if 'content'
         is true, retrieve the updated metadata/content
         @return (vclock=None, [(metadata, value)]=None)
-        """
-        raise NotImplementedError
-
-    def put_new(self, robj, w=None, dw=None, return_meta=True):
-        """Put a new object into the Riak store, returning its (new) key.
-
-        If return_meta is False, then the vlock and metadata return values
-        will be None.
-
-        @return (key, vclock, metadata)
         """
         raise NotImplementedError
 

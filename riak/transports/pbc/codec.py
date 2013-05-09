@@ -16,7 +16,8 @@ specific language governing permissions and limitations
 under the License.
 """
 import riak_pb
-from riak.riak_object import RiakObject
+from riak import RiakError
+from riak.content import RiakContent
 
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
@@ -58,7 +59,12 @@ class RiakPbcCodec(object):
         else:
             return None
 
-    def decode_content(self, rpb_content, robj):
+    def _decode_contents(self, contents, obj):
+        obj.siblings = [self._decode_content(c, RiakContent(obj))
+                        for c in contents]
+        return obj
+
+    def _decode_content(self, rpb_content, sibling):
         """
         Decodes a single sibling from the protobuf representation into
         a RiakObject.
@@ -66,58 +72,38 @@ class RiakPbcCodec(object):
         :rtype: (RiakObject)
         """
 
-        if rpb_content.HasField("deleted"):
-            robj.deleted = True
+        if rpb_content.HasField("deleted") and rpb_content.deleted:
+            sibling.exists = False
+        else:
+            sibling.exists = True
         if rpb_content.HasField("content_type"):
-            robj.content_type = rpb_content.content_type
+            sibling.content_type = rpb_content.content_type
         if rpb_content.HasField("charset"):
-            robj.charset = rpb_content.charset
+            sibling.charset = rpb_content.charset
         if rpb_content.HasField("content_encoding"):
-            robj.content_encoding = rpb_content.content_encoding
+            sibling.content_encoding = rpb_content.content_encoding
         if rpb_content.HasField("vtag"):
-            robj.vtag = rpb_content.vtag
-        links = []
-        for link in rpb_content.links:
-            if link.HasField("bucket"):
-                bucket = link.bucket
-            else:
-                bucket = None
-            if link.HasField("key"):
-                key = link.key
-            else:
-                key = None
-            if link.HasField("tag"):
-                tag = link.tag
-            else:
-                tag = None
-            links.append((bucket, key, tag))
-        if links:
-            robj.links = links
+            sibling.etag = rpb_content.vtag
+
+        sibling.links = [self._decode_link(link)
+                         for link in rpb_content.links]
         if rpb_content.HasField("last_mod"):
-            robj.last_mod = rpb_content.last_mod
-        if rpb_content.HasField("last_mod_usecs"):
-            robj.last_mod_usecs = rpb_content.last_mod_usecs
-        usermeta = {}
-        for usermd in rpb_content.usermeta:
-            usermeta[usermd.key] = usermd.value
-        if len(usermeta) > 0:
-            robj.usermeta = usermeta
-        indexes = set()
-        for index in rpb_content.indexes:
-            if index.key.endswith("_int"):
-                indexes.add((index.key, int(index.value)))
-            else:
-                indexes.add((index.key, index.value))
+            sibling.last_modified = float(rpb_content.last_mod)
+            if rpb_content.HasField("last_mod_usecs"):
+                sibling.last_modified += rpb_content.last_mod_usecs / 1000000.0
 
-        if len(indexes) > 0:
-            robj.indexes = indexes
+        sibling.usermeta = dict([(usermd.key, usermd.value)
+                                 for usermd in rpb_content.usermeta])
+        sibling.indexes = set([(index.key,
+                                self._decode_index_value(index.key,
+                                                         index.value))
+                               for index in rpb_content.indexes])
 
-        robj.encoded_data = rpb_content.value
-        robj.exists = True
+        sibling.encoded_data = rpb_content.value
 
-        return robj
+        return sibling
 
-    def encode_content(self, robj, rpb_content):
+    def _encode_content(self, robj, rpb_content):
         """
         Fills an RpbContent message with the appropriate data and
         metadata from a RiakObject.
@@ -147,8 +133,37 @@ class RiakPbcCodec(object):
                 pb_link.tag = ''
 
         for field, value in robj.indexes:
-                    pair = rpb_content.indexes.add()
-                    pair.key = field
-                    pair.value = str(value)
+            pair = rpb_content.indexes.add()
+            pair.key = field
+            pair.value = str(value)
 
         rpb_content.value = str(robj.encoded_data)
+
+    def _decode_link(self, link):
+        """
+        Decodes an RpbLink message into a tuple
+        """
+
+        if link.HasField("bucket"):
+            bucket = link.bucket
+        else:
+            bucket = None
+        if link.HasField("key"):
+            key = link.key
+        else:
+            key = None
+        if link.HasField("tag"):
+            tag = link.tag
+        else:
+            tag = None
+
+        return (bucket, key, tag)
+
+    def _decode_index_value(self, index, value):
+        """
+        Decodes a secondary index value into the correct Python type.
+        """
+        if index.endswith("_int"):
+            return int(value)
+        else:
+            return value
