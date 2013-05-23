@@ -199,7 +199,7 @@ class TestServer(object):
         prompted = False
         buffer = ""
         while not prompted:
-            line = self._server.stdout.read(1)
+            line = self._server.stdout.readline()
             if len(line) > 0:
                 buffer += line
             if re.search(r"\(%s\)\d+>" % self.vm_args["-name"], buffer):
