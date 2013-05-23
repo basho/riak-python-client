@@ -183,6 +183,14 @@ class BasicKVTests(object):
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.encoded_data)
 
+    def test_text_plain_encoder_decoder(self):
+        bucket = self.client.bucket(self.bucket_name)
+        data = "some funny data"
+        obj = bucket.new(self.key_name, data, content_type='text/plain')
+        obj.store()
+        obj2 = bucket.get(self.key_name)
+        self.assertEqual(data, obj2.data)
+
     def test_missing_object(self):
         bucket = self.client.bucket(self.bucket_name)
         obj = bucket.get(self.key_name)
