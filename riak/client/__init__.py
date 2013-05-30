@@ -100,7 +100,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._pb_pool = RiakPbcPool(self, **transport_options)
 
         self._encoders = {'application/json': default_encoder,
-                          'text/json': default_encoder}
+                          'text/json': default_encoder,
+                          'text/plain': str}
         self._decoders = {'application/json': json.loads,
                           'text/json': json.loads,
                           'text/plain': str}
