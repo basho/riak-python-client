@@ -100,11 +100,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._pb_pool = RiakPbcPool(self, **transport_options)
 
         self._encoders = {'application/json': default_encoder,
-                          'text/json': default_encoder,
-                          'text/plain': unicode}
+                          'text/json': default_encoder}
         self._decoders = {'application/json': json.loads,
                           'text/json': json.loads,
-                          'text/plain': unicode}
+                          'text/plain': str}
         self._buckets = WeakValueDictionary()
 
     def _get_protocol(self):
