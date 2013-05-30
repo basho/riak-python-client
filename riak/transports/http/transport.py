@@ -126,7 +126,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         params = {'returnbody': return_body, 'w': w, 'dw': dw, 'pw': pw}
         url = self.object_path(robj.bucket.name, robj.key, **params)
         headers = self._build_put_headers(robj, if_none_match=if_none_match)
-        content = robj.encoded_data
+        content = bytearray(robj.encoded_data)
 
         if robj.key is None:
             expect = [201]

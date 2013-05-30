@@ -70,6 +70,24 @@ class BasicKVTests(object):
         obj2 = bucket.get('baz')
         self.assertEqual(obj2.data, rand)
 
+    def test_store_obj_with_unicode(self):
+        bucket = self.client.bucket(self.bucket_name)
+        data = {u'føø': u'éå'}
+        obj = bucket.new('foo', data)
+        obj.store()
+        obj = bucket.get('foo')
+        self.assertEqual(obj.data, data)
+
+    def test_store_unicode_string(self):
+        bucket = self.client.bucket(self.bucket_name)
+        data = u"some unicode data: \u00c6"
+        obj = bucket.new(self.key_name, encoded_data=data.encode('utf-8'),
+                         content_type='text/plain')
+        obj.charset = 'utf-8'
+        obj.store()
+        obj2 = bucket.get(self.key_name)
+        self.assertEqual(data, obj2.encoded_data.decode('utf-8'))
+
     def test_generate_key(self):
         # Ensure that Riak generates a random key when
         # the key passed to bucket.new() is None.
