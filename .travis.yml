@@ -15,5 +15,3 @@ script: ./setup.py test
 before_script: sudo /usr/sbin/search-cmd install searchbucket
 notifications:
   email: clients@basho.com
-# services:
-#   - riak
