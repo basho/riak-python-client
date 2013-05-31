@@ -7,7 +7,7 @@ before_install:
   - 'sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"'
   - "sudo apt-get update"
   - "yes n | sudo apt-get install riak"
-  - "sudo service start riak"
+  - "sudo service riak start"
 install:
   - ./setup.py develop
   - ./setup.py easy_install protobuf
