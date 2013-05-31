@@ -2,6 +2,12 @@ language: python
 python:
   - "2.6"
   - "2.7"
+before_install:
+  - "curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -"
+  - 'sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"'
+  - "sudo apt-get update"
+  - "sudo apt-get upgrade riak"
+  - "sudo service start riak"
 install:
   - ./setup.py develop
   - ./setup.py easy_install protobuf
@@ -9,5 +15,5 @@ script: ./setup.py test
 before_script: sudo /usr/sbin/search-cmd install searchbucket
 notifications:
   email: clients@basho.com
-services:
-  - riak
+# services:
+#   - riak
