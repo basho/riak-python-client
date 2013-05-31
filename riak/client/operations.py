@@ -232,7 +232,7 @@ class RiakClientOperations(RiakClientTransport):
             finally:
                 stream.close()
 
-    @retryableHttpOnly
+    @retryable
     def fulltext_search(self, transport, index, query, **params):
         """
         Performs a full-text search query.
@@ -246,7 +246,7 @@ class RiakClientOperations(RiakClientTransport):
         """
         return transport.search(index, query, **params)
 
-    @retryableHttpOnly
+    @retryable
     def fulltext_add(self, transport, index, docs):
         """
         Adds documents to the full-text index.
@@ -258,7 +258,7 @@ class RiakClientOperations(RiakClientTransport):
         """
         transport.fulltext_add(index, docs)
 
-    @retryableHttpOnly
+    @retryable
     def fulltext_delete(self, transport, index, docs=None, queries=None):
         """
         Removes documents from the full-text index.
