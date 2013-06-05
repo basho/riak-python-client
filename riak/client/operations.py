@@ -232,7 +232,7 @@ class RiakClientOperations(RiakClientTransport):
             finally:
                 stream.close()
 
-    @retryableHttpOnly
+    @retryable
     def fulltext_search(self, transport, index, query, **params):
         """
         Performs a full-text search query.
