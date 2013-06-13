@@ -2,8 +2,9 @@
 import os
 import cPickle
 import copy
+from time import sleep
 from riak import ConflictError
-
+from riak.resolver import default_resolver, last_written_resolver
 try:
     import simplejson as json
 except ImportError:
@@ -322,6 +323,73 @@ class BasicKVTests(object):
         obj.reload()
         self.assertEqual(len(obj.siblings), 1)
         self.assertEqual(obj.encoded_data, resolved_sibling.encoded_data)
+
+    def test_resolution(self):
+        bucket = self.client.bucket(self.sibs_bucket)
+        obj = bucket.get(self.key_name)
+        bucket.allow_mult = True
+
+        # Even if it previously existed, let's store a base resolved version
+        # from which we can diverge by sending a stale vclock.
+        obj.encoded_data = 'start'
+        obj.content_type = 'text/plain'
+        obj.store()
+
+        # Store the same object five times...
+        # First run through should overwrite the datum 'start' above
+        other_client = self.create_client()
+        other_bucket = other_client.bucket(self.sibs_bucket)
+
+        vals = []
+        for i in range(5):
+            while True:
+                randval = self.randint()
+                if str(randval) not in vals:
+                    break
+
+            other_obj = other_bucket.new(key=self.key_name,
+                                         encoded_data=str(randval),
+                                         content_type='text/plain')
+            other_obj.vclock = obj.vclock
+            other_obj.store()
+            vals.append(str(randval))
+            # TODO: This sleep exists so that last_written_resolver
+            # will find timestamps in different seconds. HTTP dates do
+            # not have enough significant digits for sub-second
+            # differences.
+            sleep(0.75)
+
+        # Make sure the object has five siblings when using the
+        # default resolver
+        obj = bucket.get(self.key_name)
+        obj.reload()
+        self.assertEqual(len(obj.siblings), 5)
+
+        # Setting the resolver on the client object to use the
+        # "last-write-wins" behavior
+        self.client.resolver = last_written_resolver
+        obj.reload()
+        self.assertEqual(obj.resolver, last_written_resolver)
+        self.assertEqual(1, len(obj.siblings))
+        self.assertEqual(obj.data, vals[-1])
+
+        # Set the resolver on the bucket to the default resolver,
+        # overriding the resolver on the client
+        bucket.resolver = default_resolver
+        obj.reload()
+        self.assertEqual(obj.resolver, default_resolver)
+        self.assertEqual(len(obj.siblings), 5)
+
+        # Define our own custom resolver on the object that returns
+        # the maximum value, overriding the bucket and client resolvers
+        def max_value_resolver(obj):
+            datafun = lambda s: s.data
+            obj.siblings = [max(obj.siblings, key=datafun), ]
+
+        obj.resolver = max_value_resolver
+        obj.reload()
+        self.assertEqual(obj.resolver, max_value_resolver)
+        self.assertEqual(obj.data, max(vals))
 
     def test_tombstone_siblings(self):
         # Set up the bucket, clear any existing object...

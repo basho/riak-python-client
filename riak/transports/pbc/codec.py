@@ -62,6 +62,9 @@ class RiakPbcCodec(object):
     def _decode_contents(self, contents, obj):
         obj.siblings = [self._decode_content(c, RiakContent(obj))
                         for c in contents]
+        # Invoke sibling-resolution logic
+        if len(obj.siblings) > 1 and obj.resolver is not None:
+            obj.resolver(obj)
         return obj
 
     def _decode_content(self, rpb_content, sibling):
