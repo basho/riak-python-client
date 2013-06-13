@@ -223,7 +223,10 @@ class RiakObject(object):
             raise TypeError("resolver is not a function")
 
     def _set_resolver(self, value):
-        self._resolver = value
+        if value is None or callable(value):
+            self._resolver = value
+        else:
+            raise TypeError("resolver is not a function")
 
     resolver = property(_get_resolver, _set_resolver, doc=
                         """The sibling-resolution function for this
