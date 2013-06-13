@@ -281,24 +281,7 @@ class BasicKVTests(object):
         obj.content_type = 'application/octet-stream'
         obj.store()
 
-        # Store the same object five times...
-        # First run through should overwrite the datum 'start' above
-        other_client = self.create_client()
-        other_bucket = other_client.bucket(self.sibs_bucket)
-
-        vals = set()
-        for i in range(5):
-            while True:
-                randval = self.randint()
-                if str(randval) not in vals:
-                    break
-
-            other_obj = other_bucket.new(key=self.key_name,
-                                         encoded_data=str(randval),
-                                         content_type='text/plain')
-            other_obj.vclock = obj.vclock
-            other_obj.store()
-            vals.add(str(randval))
+        vals = set(self.generate_siblings(obj, count=5))
 
         # Make sure the object has five siblings...
         obj = bucket.get(self.key_name)
@@ -335,29 +318,7 @@ class BasicKVTests(object):
         obj.content_type = 'text/plain'
         obj.store()
 
-        # Store the same object five times...
-        # First run through should overwrite the datum 'start' above
-        other_client = self.create_client()
-        other_bucket = other_client.bucket(self.sibs_bucket)
-
-        vals = []
-        for i in range(5):
-            while True:
-                randval = self.randint()
-                if str(randval) not in vals:
-                    break
-
-            other_obj = other_bucket.new(key=self.key_name,
-                                         encoded_data=str(randval),
-                                         content_type='text/plain')
-            other_obj.vclock = obj.vclock
-            other_obj.store()
-            vals.append(str(randval))
-            # TODO: This sleep exists so that last_written_resolver
-            # will find timestamps in different seconds. HTTP dates do
-            # not have enough significant digits for sub-second
-            # differences.
-            sleep(0.75)
+        vals = self.generate_siblings(obj, count=5, delay=0.75)
 
         # Make sure the object has five siblings when using the
         # default resolver
@@ -401,22 +362,9 @@ class BasicKVTests(object):
         obj.content_type = 'application/octet-stream'
         obj.store(return_body=True)
 
-        vclock = obj.vclock
         obj.delete()
 
-        vals = set()
-        for i in range(4):
-            while True:
-                randval = self.randint()
-                if str(randval) not in vals:
-                    break
-
-            other_obj = bucket.new(key=self.key_name,
-                                   encoded_data=str(randval),
-                                   content_type='text/plain')
-            other_obj.vclock = vclock
-            other_obj.store()
-            vals.add(str(randval))
+        vals = set(self.generate_siblings(obj, count=4))
 
         obj = bucket.get(self.key_name)
         self.assertEqual(len(obj.siblings), 5)
@@ -464,6 +412,24 @@ class BasicKVTests(object):
         bucket.new("one", {"foo": "one", "bar": "red"}).store()
         buckets = self.client.get_buckets()
         self.assertTrue(self.bucket_name in [x.name for x in buckets])
+
+    def generate_siblings(self, original, count=5, delay=None):
+        vals = []
+        for i in range(count):
+            while True:
+                randval = self.randint()
+                if str(randval) not in vals:
+                    break
+
+            other_obj = original.bucket.new(key=original.key,
+                                            encoded_data=str(randval),
+                                            content_type='text/plain')
+            other_obj.vclock = original.vclock
+            other_obj.store()
+            vals.append(str(randval))
+            if delay:
+                sleep(delay)
+        return vals
 
 
 class HTTPBucketPropsTest(object):
