@@ -17,6 +17,7 @@ under the License.
 """
 
 import socket
+import errno
 import struct
 from riak import RiakError
 from messages import (
@@ -24,6 +25,10 @@ from messages import (
     MSG_CODE_ERROR_RESP
 )
 
+class RiakPbcError(RiakError, socket.error):
+    def __init__(self, value):
+        socket.error.__init__(self, errno.EIO, value)
+        RiakError.__init__(self, value)
 
 class RiakPbcConnection(object):
     """
@@ -65,7 +70,7 @@ class RiakPbcConnection(object):
     def _recv_pkt(self):
         nmsglen = self._socket.recv(4)
         if len(nmsglen) != 4:
-            raise RiakError(
+            raise RiakPbcError(
                 "Socket returned short packet length %d - expected 4"
                 % len(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
@@ -78,7 +83,7 @@ class RiakPbcConnection(object):
                 break
             self._inbuf += recv_buf
         if len(self._inbuf) != self._inbuf_len:
-            raise RiakError("Socket returned short packet %d - expected %d"
+            raise RiakPbcError("Socket returned short packet %d - expected %d"
                             % (len(self._inbuf), self._inbuf_len))
 
     def _connect(self):
@@ -92,7 +97,14 @@ class RiakPbcConnection(object):
         """
         Closes the underlying socket of the PB connection.
         """
-        self._socket.shutdown(socket.SHUT_RDWR)
+        try:
+            self._socket.shutdown(socket.SHUT_RDWR)
+        except socket.error, e:
+            if e.errno == errno.ENOTCONN:
+                # the connection was closed by the peer
+                pass
+            else:
+                raise
 
     def _parse_msg(self, code, packet):
         try:
