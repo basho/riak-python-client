@@ -54,6 +54,7 @@ class RiakBucket(object):
         self.name = name
         self._encoders = {}
         self._decoders = {}
+        self._resolver = None
 
     def __hash__(self):
         return hash((self.name, self._client))
@@ -198,6 +199,26 @@ class RiakBucket(object):
         deprecated('RiakBucket.get_binary is deprecated, '
                    'use RiakBucket.get')
         return self.get(key, r=r, pr=pr)
+
+    def _get_resolver(self):
+        if callable(self._resolver):
+            return self._resolver
+        elif self._resolver is None:
+            return self._client.resolver
+        else:
+            raise TypeError("resolver is not a function")
+
+    def _set_resolver(self, value):
+        if value is None or callable(value):
+            self._resolver = value
+        else:
+            raise TypeError("resolver is not a function")
+
+    resolver = property(_get_resolver, _set_resolver, doc=
+                        """The sibling-resolution function for this
+                           bucket. If the resolver is not set, the
+                           client's resolver will be used. :type
+                           callable""")
 
     def _set_n_val(self, nval):
         return self.set_property('n_val', nval)

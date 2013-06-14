@@ -85,6 +85,11 @@ class RiakHttpCodec(object):
                                                      part.items(),
                                                      part.get_payload())
                                  for part in parts]
+
+                # Invoke sibling-resolution logic
+                if robj.resolver is not None:
+                    robj.resolver(robj)
+
                 return robj
             else:
                 raise Exception('unexpected sibling response format: {0}'.
@@ -92,6 +97,7 @@ class RiakHttpCodec(object):
 
         robj.siblings = [self._parse_sibling(RiakContent(robj),
                                              headers.items(), data)]
+
         return robj
 
     def _parse_sibling(self, sibling, headers, data):

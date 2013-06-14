@@ -116,6 +116,7 @@ class RiakObject(object):
             raise ValueError('Key name must either be "None"'
                              ' or a non-empty string.')
 
+        self._resolver = None
         self.client = client
         self.bucket = bucket
         self.key = key
@@ -212,6 +213,26 @@ class RiakObject(object):
        a tombstone.
        :type bool
        """)
+
+    def _get_resolver(self):
+        if callable(self._resolver):
+            return self._resolver
+        elif self._resolver is None:
+            return self.bucket.resolver
+        else:
+            raise TypeError("resolver is not a function")
+
+    def _set_resolver(self, value):
+        if value is None or callable(value):
+            self._resolver = value
+        else:
+            raise TypeError("resolver is not a function")
+
+    resolver = property(_get_resolver, _set_resolver, doc=
+                        """The sibling-resolution function for this
+                           object. If the resolver is not set, the
+                           bucket's resolver will be used. :type
+                           callable""")
 
     def get_sibling(self, index):
         deprecated("RiakObject.get_sibling is deprecated, use the "

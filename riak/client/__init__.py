@@ -30,6 +30,7 @@ from riak.client.operations import RiakClientOperations
 from riak.node import RiakNode
 from riak.bucket import RiakBucket
 from riak.mapreduce import RiakMapReduceChain
+from riak.resolver import default_resolver
 from riak.search import RiakSearch
 from riak.transports.http import RiakHttpPool
 from riak.transports.pbc import RiakPbcPool
@@ -95,7 +96,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             self.nodes = [self._create_node(n) for n in nodes]
 
         self.protocol = protocol or 'http'
-
+        self.resolver = default_resolver
         self._http_pool = RiakHttpPool(self, **transport_options)
         self._pb_pool = RiakPbcPool(self, **transport_options)
 
