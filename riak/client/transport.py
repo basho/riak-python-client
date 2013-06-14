@@ -66,14 +66,18 @@ class RiakClientTransport(object):
                     try:
                         return fn(transport)
                     except (IOError, httplib.HTTPException) as e:
-                        transport._node.error_rate.incr(1)
-                        if retry < (retry_count - 1) and _is_retryable(e):
+                        if _is_retryable(e):
+                            transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
                             raise BadResource(e)
                         else:
                             raise
-            except BadResource:
-                continue
+            except BadResource as e:
+                if retry < (retry_count - 1):
+                    continue
+                else:
+                    # Re-raise the inner exception
+                    raise e.args[0]
 
     def _choose_pool(self, protocol=None):
         """
