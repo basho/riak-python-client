@@ -39,11 +39,11 @@ class RiakPbcConnection(object):
         return hdr + msgstr
 
     def _request(self, msg_code, msg=None, expect=None):
-        self._connect()
         self._send_msg(msg_code, msg)
         return self._recv_msg(expect)
 
     def _send_msg(self, msg_code, msg):
+        self._connect()
         self._socket.send(self._encode_msg(msg_code, msg))
 
     def _recv_msg(self, expect=None):
