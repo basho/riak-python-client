@@ -118,7 +118,19 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._protocol = value
 
     protocol = property(_get_protocol, _set_protocol,
-                        doc="""Which protocol to prefer, one of PROTOCOLS""")
+                        doc=
+                        """
+                        Which protocol to prefer, one of PROTOCOLS.
+                        Please note that when one protocol is
+                        selected, the other protocols MAY NOT attempt
+                        to connect. Changing to another protocol will
+                        cause a connection on the next request.
+
+                        Some requests are only valid over 'http' or
+                        'https', and will always be sent via those
+                        transports, regardless of which protocol is
+                        preferred.
+                         """)
 
     def get_transport(self):
         """
