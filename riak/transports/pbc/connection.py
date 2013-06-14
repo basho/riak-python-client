@@ -39,6 +39,7 @@ class RiakPbcConnection(object):
         return hdr + msgstr
 
     def _request(self, msg_code, msg=None, expect=None):
+        self._connect()
         self._send_msg(msg_code, msg)
         return self._recv_msg(expect)
 
@@ -82,17 +83,19 @@ class RiakPbcConnection(object):
                             % (len(self._inbuf), self._inbuf_len))
 
     def _connect(self):
-        if self._timeout:
-            self._socket = socket.create_connection(self._address,
-                                                    self._timeout)
-        else:
-            self._socket = socket.create_connection(self._address)
+        if not self._socket:
+            if self._timeout:
+                self._socket = socket.create_connection(self._address,
+                                                        self._timeout)
+            else:
+                self._socket = socket.create_connection(self._address)
 
     def close(self):
         """
         Closes the underlying socket of the PB connection.
         """
-        self._socket.shutdown(socket.SHUT_RDWR)
+        if self._socket:
+            self._socket.shutdown(socket.SHUT_RDWR)
 
     def _parse_msg(self, code, packet):
         try:

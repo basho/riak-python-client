@@ -73,7 +73,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._node = node
         self._address = (node.host, node.pb_port)
         self._timeout = timeout
-        self._connect()
+        self._socket = None
 
     # FeatureDetection API
     def _server_version(self):
