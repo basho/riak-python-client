@@ -58,18 +58,20 @@ class RiakClientTransport(object):
         def _skip_bad_nodes(transport):
             return transport._node not in skip_nodes
 
-        for retry in range(self.RETRY_COUNT):
+        retry_count = self.RETRY_COUNT
+
+        for retry in range(retry_count):
             try:
                 with pool.take(_filter=_skip_bad_nodes) as transport:
                     try:
                         return fn(transport)
                     except (IOError, httplib.HTTPException) as e:
-                        if _is_retryable(e):
-                            transport._node.error_rate.incr(1)
+                        transport._node.error_rate.incr(1)
+                        if retry < (retry_count - 1) and _is_retryable(e):
                             skip_nodes.append(transport._node)
                             raise BadResource(e)
                         else:
-                            raise e
+                            raise
             except BadResource:
                 continue
 
