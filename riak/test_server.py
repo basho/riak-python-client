@@ -250,7 +250,8 @@ class TestServer(object):
         # least once. Running the `chkconfig` command is innocuous
         # enough to accomplish this without other side-effects.
         script = os.path.join(self.bin_dir, "riak")
-        Popen([script, "chkconfig"]).wait()
+        Popen([script, "chkconfig"],
+              stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate()
 
     def _kv_backend(self):
         return self.app_config["riak_kv"]["storage_backend"]
