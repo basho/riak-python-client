@@ -58,7 +58,9 @@ class RiakClientTransport(object):
         def _skip_bad_nodes(transport):
             return transport._node not in skip_nodes
 
-        for retry in range(self.RETRY_COUNT):
+        retry_count = self.RETRY_COUNT
+
+        for retry in range(retry_count):
             try:
                 with pool.take(_filter=_skip_bad_nodes) as transport:
                     try:
@@ -69,9 +71,13 @@ class RiakClientTransport(object):
                             skip_nodes.append(transport._node)
                             raise BadResource(e)
                         else:
-                            raise e
-            except BadResource:
-                continue
+                            raise
+            except BadResource as e:
+                if retry < (retry_count - 1):
+                    continue
+                else:
+                    # Re-raise the inner exception
+                    raise e.args[0]
 
     def _choose_pool(self, protocol=None):
         """

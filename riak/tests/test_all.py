@@ -118,6 +118,17 @@ class BaseTestCase(object):
         self.client = self.create_client()
 
 
+class ClientTests(object):
+    def test_request_retries(self):
+        # We guess at some ports that will be unused by Riak or
+        # anything else.
+        client = self.create_client(http_port=1023, pb_port=1022)
+
+        # If retries are exhausted, the final result should also be an
+        # error.
+        self.assertRaises(IOError, client.ping)
+
+
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
                                PbcBucketPropsTest,
@@ -128,6 +139,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                MapReduceAliasTests,
                                MapReduceStreamTests,
                                SearchTests,
+                               ClientTests,
                                BaseTestCase,
                                unittest.TestCase):
 
@@ -169,6 +181,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 EnableSearchTests,
                                 SolrSearchTests,
                                 SearchTests,
+                                ClientTests,
                                 BaseTestCase,
                                 unittest.TestCase):
 
