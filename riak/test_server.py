@@ -125,6 +125,7 @@ class TestServer(object):
 
     def prepare(self):
         if not self._prepared:
+            self.touch_ssl_distribution_args()
             self.create_temp_directories()
             self._riak_script = os.path.join(self._temp_bin, "riak")
             self.write_riak_script()
@@ -242,6 +243,15 @@ class TestServer(object):
         with open(self._app_config_path(), "wb") as app_config:
             app_config.write(erlang_config(self.app_config))
             app_config.write(".")
+
+    def touch_ssl_distribution_args(self):
+        # To make sure that the ssl_distribution.args file is present,
+        # the control script in the source node has to have been run at
+        # least once. Running the `chkconfig` command is innocuous
+        # enough to accomplish this without other side-effects.
+        script = os.path.join(self.bin_dir, "riak")
+        Popen([script, "chkconfig"],
+              stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate()
 
     def _kv_backend(self):
         return self.app_config["riak_kv"]["storage_backend"]
