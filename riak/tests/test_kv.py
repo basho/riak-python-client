@@ -2,6 +2,7 @@
 import os
 import cPickle
 import copy
+import platform
 from time import sleep
 from riak import ConflictError
 from riak.resolver import default_resolver, last_written_resolver
@@ -9,6 +10,11 @@ try:
     import simplejson as json
 except ImportError:
     import json
+
+if platform.python_version() < '2.7':
+    unittest = __import__('unittest2')
+else:
+    import unittest
 
 
 class NotJsonSerializable(object):
@@ -307,6 +313,8 @@ class BasicKVTests(object):
         self.assertEqual(len(obj.siblings), 1)
         self.assertEqual(obj.encoded_data, resolved_sibling.encoded_data)
 
+    @unittest.skipIf(os.environ.get('SKIP_RESOLVE', '0') == '1',
+                     "skip requested for resolvers test")
     def test_resolution(self):
         bucket = self.client.bucket(self.sibs_bucket)
         obj = bucket.get(self.key_name)
@@ -318,7 +326,7 @@ class BasicKVTests(object):
         obj.content_type = 'text/plain'
         obj.store()
 
-        vals = self.generate_siblings(obj, count=5, delay=0.75)
+        vals = self.generate_siblings(obj, count=5, delay=1.01)
 
         # Make sure the object has five siblings when using the
         # default resolver
