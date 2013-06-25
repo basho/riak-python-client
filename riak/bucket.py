@@ -200,6 +200,21 @@ class RiakBucket(object):
                    'use RiakBucket.get')
         return self.get(key, r=r, pr=pr)
 
+    def multiget(self, keys, r=None, pr=None):
+        """
+        Retrieves a list of keys belonging to this bucket in parallel.
+
+        :param keys: the keys to fetch
+        :type keys: list
+        :param r: R-Value for the requests (defaults to bucket's R)
+        :type r: integer
+        :param pr: PR-Value for the requests (defaults to bucket's PR)
+        :type pr: integer
+        :rtype list of :class:`RiakObject <riak.riak_object.RiakObject>`
+        """
+        bkeys = [(self.name, key) for key in keys]
+        return self._client.multiget(bkeys, r=r, pr=pr)
+
     def _get_resolver(self):
         if callable(self._resolver):
             return self._resolver
