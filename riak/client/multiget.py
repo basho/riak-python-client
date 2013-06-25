@@ -25,7 +25,7 @@ __all__ = ['multiget']
 
 
 try:
-    POOL_SIZE = cpu_count() * 2
+    POOL_SIZE = cpu_count()
 except NotImplementedError:
     # Make an educated guess
     POOL_SIZE = 6
@@ -170,8 +170,10 @@ if __name__ == '__main__':
     # Run a benchmark!
     from riak import RiakClient
     import riak.benchmark as benchmark
-    client = RiakClient()
+    client = RiakClient(protocol='pbc')
     bkeys = [ ('multiget', str(key)) for key in xrange(10000) ]
+
+    data = open(__file__).read()
 
     print "Benchmarking multiget:"
     print "      CPUs: {0}".format(cpu_count())
@@ -182,7 +184,7 @@ if __name__ == '__main__':
     with benchmark.bm() as b:
         with b.report('populate'):
             for bucket, key in bkeys:
-                client.bucket(bucket).new(key, encoded_data=key,
+                client.bucket(bucket).new(key, encoded_data=data,
                                           content_type='text/plain'
                                           ).store()
     for b in benchmark.bmbm():
