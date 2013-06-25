@@ -165,3 +165,39 @@ def multiget(client, keys, **options):
         outq.task_done()
 
     return results
+
+if __name__ == '__main__':
+    # Run a benchmark!
+    from riak import RiakClient
+    import riak.benchmark as benchmark
+    client = RiakClient()
+    bkeys = [ ('multiget', str(key)) for key in xrange(10000) ]
+
+    print "Benchmarking multiget:"
+    print "      CPUs: {0}".format(cpu_count())
+    print "   Threads: {0}".format(POOL_SIZE)
+    print "      Keys: {0}".format(len(bkeys))
+    print
+
+    with benchmark.bm() as b:
+        with b.report('populate'):
+            for bucket, key in bkeys:
+                client.bucket(bucket).new(key, encoded_data=key,
+                                          content_type='text/plain'
+                                          ).store()
+    for b in benchmark.bmbm():
+        client.protocol = 'http'
+        with b.report('http seq'):
+            for bucket, key in bkeys:
+                client.bucket(bucket).get(key)
+
+        with b.report('http multi'):
+            multiget(client, bkeys)
+
+        client.protocol = 'pbc'
+        with b.report('pbc seq'):
+            for bucket, key in bkeys:
+                client.bucket(bucket).get(key)
+
+        with b.report('pbc multi'):
+            multiget(client, bkeys)
