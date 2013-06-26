@@ -19,15 +19,15 @@ under the License.
 import os
 import gc
 
-__all__ = ['bm', 'bmbm']
+__all__ = ['measure', 'measure_with_rehearsal']
 
 
-def bmbm():
+def measure_with_rehearsal():
     """
     Runs a benchmark when used as an iterator, injecting a garbage
     collection between iterations. Example:
 
-        for b in benchmark.bmbm():
+        for b in benchmark.measure_with_rehearsal():
             with b.report("pow"):
                 for _ in range(10000):
                     math.pow(2,10000)
@@ -38,11 +38,11 @@ def bmbm():
     return Benchmark(True)
 
 
-def bm():
+def measure():
     """
     Runs a benchmark once when used as a context manager. Example:
 
-        with benchmark.bm() as b:
+        with benchmark.measure() as b:
             with b.report("pow"):
                 for _ in range(10000):
                     math.pow(2,10000)
@@ -56,7 +56,7 @@ def bm():
 class Benchmark(object):
     """
     A benchmarking run, which may consist of multiple steps. See
-    bmbm() and bm() for examples.
+    measure_with_rehearsal() and measure() for examples.
     """
     def __init__(self, rehearse=False):
         """
@@ -75,8 +75,9 @@ class Benchmark(object):
 
     def __enter__(self):
         if self.rehearse:
-            raise ValueError("bmbm() cannot be used in with statements, "
-                             "use bm() or the for..in statement")
+            raise ValueError("measure_with_rehearsal() cannot be used in with "
+                             "statements, use measure() or the for..in "
+                             "statement")
         print_header()
         self._report = BenchmarkReport()
         self._report.__enter__()
@@ -103,7 +104,8 @@ class Benchmark(object):
         else:
             if self.rehearse:
                 gc.collect()
-                print "-----------------------------------------------------------\n"
+                print ("-" * 59)
+                print
             print_header()
 
         self.count -= 1
@@ -136,7 +138,8 @@ def print_header():
     """
     Prints the header for the normal phase of a benchmark.
     """
-    print "{:<12s} {:<12s} {:<12s} ( {:<12s} )".format('', 'user', 'system', 'real')
+    print "{:<12s} {:<12s} {:<12s} ( {:<12s} )"\
+        .format('', 'user', 'system', 'real')
 
 
 class BenchmarkReport(object):

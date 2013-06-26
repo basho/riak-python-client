@@ -77,8 +77,7 @@ class MultiGetPool(object):
                 # threads, set the started flag, and release the lock.
                 for i in range(self._size):
                     name = "riak.client.multiget-worker-{0}".format(i)
-                    worker = Thread(target=self._fetcher, args=(name,),
-                                    name=name)
+                    worker = Thread(target=self._fetcher, name=name)
                     worker.daemon = True
                     worker.start()
                     self._workers.append(worker)
@@ -109,7 +108,7 @@ class MultiGetPool(object):
         # shutting down.
         self.stop()
 
-    def _fetcher(self, name):
+    def _fetcher(self):
         """
         The body of the multi-get worker.
         """
@@ -152,8 +151,7 @@ def multiget(client, keys, **options):
 
     RIAK_MULTIGET_POOL.start()
     for bucket, key in keys:
-        task = Task(client=client, outq=outq, options=options,
-                    bucket=bucket, key=key)
+        task = Task(client, outq, bucket, key, options)
         RIAK_MULTIGET_POOL.enq(task)
 
     results = []
@@ -181,13 +179,13 @@ if __name__ == '__main__':
     print "      Keys: {0}".format(len(bkeys))
     print
 
-    with benchmark.bm() as b:
+    with benchmark.measure() as b:
         with b.report('populate'):
             for bucket, key in bkeys:
                 client.bucket(bucket).new(key, encoded_data=data,
                                           content_type='text/plain'
                                           ).store()
-    for b in benchmark.bmbm():
+    for b in benchmark.measure_with_rehearsal():
         client.protocol = 'http'
         with b.report('http seq'):
             for bucket, key in bkeys:
