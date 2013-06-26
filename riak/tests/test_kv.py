@@ -440,7 +440,7 @@ class BasicKVTests(object):
         return vals
 
 
-class HTTPBucketPropsTest(object):
+class BucketPropsTest(object):
     def test_rw_settings(self):
         bucket = self.client.bucket(self.props_bucket)
         self.assertEqual(bucket.r, "quorum")
@@ -480,41 +480,17 @@ class HTTPBucketPropsTest(object):
         bucket.set_properties({'pr': 0, 'pw': 0})
         bucket.clear_properties()
 
-
-class PbcBucketPropsTest(object):
-    def test_rw_settings(self):
+    def test_clear_bucket_properties(self):
         bucket = self.client.bucket(self.props_bucket)
-        with self.assertRaises(NotImplementedError):
-            bucket.r
-        with self.assertRaises(NotImplementedError):
-            bucket.w
-        with self.assertRaises(NotImplementedError):
-            bucket.dw
-        with self.assertRaises(NotImplementedError):
-            bucket.rw
+        bucket.allow_mult = True
+        self.assertTrue(bucket.allow_mult)
+        bucket.n_val = 1
+        self.assertEqual(bucket.n_val, 1)
+        # Test setting clearing properties...
 
-        with self.assertRaises(NotImplementedError):
-            bucket.r = 2
-        with self.assertRaises(NotImplementedError):
-            bucket.w = 2
-        with self.assertRaises(NotImplementedError):
-            bucket.dw = 2
-        with self.assertRaises(NotImplementedError):
-            bucket.rw = 2
-        with self.assertRaises(NotImplementedError):
-            bucket.clear_properties()
-
-    def test_primary_quora(self):
-        bucket = self.client.bucket(self.props_bucket)
-        with self.assertRaises(NotImplementedError):
-            bucket.pr
-        with self.assertRaises(NotImplementedError):
-            bucket.pw
-
-        with self.assertRaises(NotImplementedError):
-            bucket.pr = 2
-        with self.assertRaises(NotImplementedError):
-            bucket.pw = 2
+        self.assertTrue(bucket.clear_properties())
+        self.assertFalse(bucket.allow_mult)
+        self.assertEqual(bucket.n_val, 3)
 
 
 class KVFileTests(object):
