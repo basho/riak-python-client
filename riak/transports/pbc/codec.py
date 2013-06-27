@@ -96,7 +96,18 @@ class RiakPbcCodec(object):
             return QUORUM_TO_PY[rw]
         else:
             return rw
+
     def _decode_contents(self, contents, obj):
+        """
+        Decodes the list of siblings from the protobuf representation
+        into the object.
+
+        :param contents: a list of RpbContent messages
+        :type contents: list
+        :param obj: a RiakObject
+        :type obj: RiakObject
+        :rtype RiakObject
+        """
         obj.siblings = [self._decode_content(c, RiakContent(obj))
                         for c in contents]
         # Invoke sibling-resolution logic
@@ -109,7 +120,11 @@ class RiakPbcCodec(object):
         Decodes a single sibling from the protobuf representation into
         a RiakObject.
 
-        :rtype: (RiakObject)
+        :param rpb_content: a single RpbContent message
+        :type rpb_content: riak_pb.RpbContent
+        :param sibling: a RiakContent sibling container
+        :type sibling: RiakContent
+        :rtype: RiakContent
         """
 
         if rpb_content.HasField("deleted") and rpb_content.deleted:
@@ -147,6 +162,11 @@ class RiakPbcCodec(object):
         """
         Fills an RpbContent message with the appropriate data and
         metadata from a RiakObject.
+
+        :param robj: a RiakObject
+        :type robj: RiakObject
+        :param rpb_content: the protobuf message to fill
+        :type rpb_content: riak_pb.RpbContent
         """
         if robj.content_type:
             rpb_content.content_type = robj.content_type
@@ -182,6 +202,10 @@ class RiakPbcCodec(object):
     def _decode_link(self, link):
         """
         Decodes an RpbLink message into a tuple
+
+        :param link: an RpbLink message
+        :type link: riak_pb.RpbLink
+        :rtype tuple
         """
 
         if link.HasField("bucket"):
@@ -202,6 +226,11 @@ class RiakPbcCodec(object):
     def _decode_index_value(self, index, value):
         """
         Decodes a secondary index value into the correct Python type.
+        :param index: the name of the index
+        :type index: str
+        :param value: the value of the index entry
+        :type  value: str
+        :rtype str or int
         """
         if index.endswith("_int"):
             return int(value)
