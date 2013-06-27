@@ -304,10 +304,7 @@ class RiakBucket(object):
         :type key: string
         :rtype: mixed
         """
-        try:
-            return self.get_properties()[key]
-        except KeyError:
-            raise NotImplementedError
+        return self.get_properties()[key]
 
     def set_properties(self, props):
         """
@@ -380,19 +377,15 @@ class RiakBucket(object):
         Returns True if the search precommit hook is enabled for this
         bucket.
         """
-        return self.SEARCH_PRECOMMIT_HOOK in (self.get_property("precommit") or
-                                              [])
+        return self.get_properties().get('search', False)
 
     def enable_search(self):
         """
         Enable search for this bucket by installing the precommit hook to
         index objects in it.
         """
-        precommit_hooks = self.get_property("precommit") or []
-        if self.SEARCH_PRECOMMIT_HOOK not in precommit_hooks:
-            self.set_properties({"precommit":
-                                 precommit_hooks +
-                                 [self.SEARCH_PRECOMMIT_HOOK]})
+        if not self.search_enabled():
+            self.set_property('search', True)
         return True
 
     def disable_search(self):
@@ -400,10 +393,8 @@ class RiakBucket(object):
         Disable search for this bucket by removing the precommit hook to
         index objects in it.
         """
-        precommit_hooks = self.get_property("precommit") or []
-        if self.SEARCH_PRECOMMIT_HOOK in precommit_hooks:
-            precommit_hooks.remove(self.SEARCH_PRECOMMIT_HOOK)
-            self.set_properties({"precommit": precommit_hooks})
+        if self.search_enabled():
+            self.set_property('search', False)
         return True
 
     def search(self, query, **params):
