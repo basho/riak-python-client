@@ -24,6 +24,14 @@ from riak.util import deprecateQuorumAccessors, deprecated
 def deprecateBucketQuorumAccessors(klass):
     return deprecateQuorumAccessors(klass, parent='_client')
 
+def bucket_property(name, doc=None):
+    def _prop_getter(self):
+        return self.get_property(name)
+
+    def _prop_setter(self, value):
+        return self.set_property(name, value)
+
+    return property(_prop_getter, _prop_setter, doc=doc)
 
 @deprecateBucketQuorumAccessors
 class RiakBucket(object):
@@ -220,13 +228,7 @@ class RiakBucket(object):
                            client's resolver will be used. :type
                            callable""")
 
-    def _set_n_val(self, nval):
-        return self.set_property('n_val', nval)
-
-    def _get_n_val(self):
-        return self.get_property('n_val')
-
-    n_val = property(_get_n_val, _set_n_val, doc="""
+    n_val = bucket_property('n_val', doc="""
     N-value for this bucket, which is the number of replicas
     that will be written of each object in the bucket.
 
@@ -239,13 +241,7 @@ class RiakBucket(object):
     :type nval: integer
     """)
 
-    def _set_allow_mult(self, bool):
-        return self.set_property('allow_mult', bool)
-
-    def _get_allow_mult(self):
-        return self.get_property('allow_mult')
-
-    allow_mult = property(_get_allow_mult, _set_allow_mult, doc="""
+    allow_mult = bucket_property('allow_mult', doc="""
     If set to True, then writes with conflicting data will be stored
     and returned to the client. This situation can be detected by
     calling has_siblings() and get_siblings().
@@ -253,73 +249,37 @@ class RiakBucket(object):
     :type bool: boolean
     """)
 
-    def _set_r(self, val):
-        return self.set_property('r', val)
-
-    def _get_r(self):
-        return self.get_property('r')
-
-    r = property(_get_r, _set_r, doc="""
+    r = bucket_property('r', doc="""
     The default 'read' quorum for this bucket (how many replicas must
     reply for a successful read). This should be an integer less than
     the 'n_val' property, or a string of 'one', 'quorum', 'all', or
     'default'""")
 
-    def _set_pr(self, val):
-        return self.set_property('pr', val)
-
-    def _get_pr(self):
-        return self.get_property('pr')
-
-    pr = property(_get_pr, _set_pr, doc="""
+    pr = bucket_property('pr', doc="""
     The default 'primary read' quorum for this bucket (how many
     primary replicas are required for a successful read). This should
     be an integer less than the 'n_val' property, or a string of
     'one', 'quorum', 'all', or 'default'""")
 
-    def _set_rw(self, val):
-        return self.set_property('rw', val)
-
-    def _get_rw(self):
-        return self.get_property('rw')
-
-    rw = property(_get_rw, _set_rw, doc="""
+    rw = bucket_property('rw', doc="""
     The default 'read' and 'write' quorum for this bucket (equivalent
     to 'r' and 'w' but for deletes). This should be an integer less
     than the 'n_val' property, or a string of 'one', 'quorum', 'all',
     or 'default'""")
 
-    def _set_w(self, val):
-        return self.set_property('w', val)
-
-    def _get_w(self):
-        return self.get_property('w')
-
-    w = property(_get_w, _set_w, doc="""
+    w = bucket_property('w', doc="""
     The default 'write' quorum for this bucket (how many replicas must
     acknowledge receipt of a write). This should be an integer less
     than the 'n_val' property, or a string of 'one', 'quorum', 'all',
     or 'default'""")
 
-    def _set_dw(self, val):
-        return self.set_property('dw', val)
-
-    def _get_dw(self):
-        return self.get_property('dw')
-
-    dw = property(_get_dw, _set_dw, doc="""
+    dw = bucket_property('dw', doc="""
     The default 'durable write' quorum for this bucket (how many
     replicas must commit the write). This should be an integer less
     than the 'n_val' property, or a string of 'one', 'quorum', 'all',
     or 'default'""")
 
-    def _set_pw(self, val):
-        return self.set_property('pw', val)
-
-    def _get_pw(self):
-        return self.get_property('pw')
-
-    pw = property(_get_pw, _set_pw, doc="""
+    pw = bucket_property('pw', doc="""
     The default 'primary write' quorum for this bucket (how many
     primary replicas are required for a successful write). This should
     be an integer less than the 'n_val' property, or a string of
