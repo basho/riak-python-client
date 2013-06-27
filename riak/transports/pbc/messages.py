@@ -49,13 +49,16 @@ MSG_CODE_INDEX_REQ = 25
 MSG_CODE_INDEX_RESP = 26
 MSG_CODE_SEARCH_QUERY_REQ = 27
 MSG_CODE_SEARCH_QUERY_RESP = 28
+MSG_CODE_RESET_BUCKET_REQ = 29
+MSG_CODE_RESET_BUCKET_RESP = 30
 
 # These responses don't include messages
 EMPTY_RESPONSES = [
     MSG_CODE_PING_RESP,
     MSG_CODE_SET_CLIENT_ID_RESP,
     MSG_CODE_DEL_RESP,
-    MSG_CODE_SET_BUCKET_RESP
+    MSG_CODE_SET_BUCKET_RESP,
+    MSG_CODE_RESET_BUCKET_RESP
 ]
 
 # Mapping from code to protobuf class
@@ -88,5 +91,7 @@ MESSAGE_CLASSES = {
     MSG_CODE_INDEX_REQ: riak_pb.RpbIndexReq,
     MSG_CODE_INDEX_RESP: riak_pb.RpbIndexResp,
     MSG_CODE_SEARCH_QUERY_REQ: riak_pb.RpbSearchQueryReq,
-    MSG_CODE_SEARCH_QUERY_RESP: riak_pb.RpbSearchQueryResp
+    MSG_CODE_SEARCH_QUERY_RESP: riak_pb.RpbSearchQueryResp,
+    MSG_CODE_RESET_BUCKET_REQ: riak_pb.RpbResetBucketReq,
+    MSG_CODE_RESET_BUCKET_RESP: None
 }
