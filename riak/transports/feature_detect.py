@@ -23,7 +23,8 @@ from riak.util import lazy_property
 versions = {
     1: LooseVersion("1.0.0"),
     1.1: LooseVersion("1.1.0"),
-    1.2: LooseVersion("1.2.0")
+    1.2: LooseVersion("1.2.0"),
+    1.4: LooseVersion("1.4.0")
 }
 
 
@@ -89,6 +90,22 @@ class FeatureDetection(object):
         :rtype bool
         """
         return self.server_version >= versions[1]
+
+    def pb_clear_bucket_props(self):
+        """
+        Whether bucket properties can be cleared over Protocol
+        Buffers.
+        :rtype bool
+        """
+        return self.server_version >= versions[1.4]
+
+    def pb_all_bucket_props(self):
+        """
+        Whether all normal bucket properties are supported over
+        Protocol Buffers.
+        :rtype bool
+        """
+        return self.server_version >= versions[1.4]
 
     @lazy_property
     def server_version(self):

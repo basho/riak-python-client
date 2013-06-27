@@ -19,10 +19,39 @@ import riak_pb
 from riak import RiakError
 from riak.content import RiakContent
 
+
+def _invert(d):
+    out = {}
+    for key in d:
+        value = d[key]
+        out[value] = key
+    return out
+
+REPL_TO_PY = {riak_pb.RpbBucketProps.FALSE: False,
+              riak_pb.RpbBucketProps.TRUE: True,
+              riak_pb.RpbBucketProps.REALTIME: 'realtime',
+              riak_pb.RpbBucketProps.FULLSYNC: 'fullsync'}
+
+REPL_TO_PB = _invert(REPL_TO_PY)
+
 RIAKC_RW_ONE = 4294967294
 RIAKC_RW_QUORUM = 4294967293
 RIAKC_RW_ALL = 4294967292
 RIAKC_RW_DEFAULT = 4294967291
+
+QUORUM_TO_PB = {'default': RIAKC_RW_DEFAULT,
+                'all': RIAKC_RW_ALL,
+                'quorum': RIAKC_RW_QUORUM,
+                'one': RIAKC_RW_ONE}
+
+QUORUM_TO_PY = _invert(QUORUM_TO_PB)
+
+NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
+                'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
+                'notfound_ok', 'search', 'backend']
+COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
+MODFUN_PROPS = ['chash_keyfun', 'linkfun']
+QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
 
 
 class RiakPbcCodec(object):
@@ -30,19 +59,12 @@ class RiakPbcCodec(object):
     Protobuffs Encoding and decoding methods for RiakPbcTransport.
     """
 
-    rw_names = {
-        'default': RIAKC_RW_DEFAULT,
-        'all': RIAKC_RW_ALL,
-        'quorum': RIAKC_RW_QUORUM,
-        'one': RIAKC_RW_ONE
-    }
-
     def __init__(self, **unused_args):
         if riak_pb is None:
             raise NotImplementedError("this transport is not available")
         super(RiakPbcCodec, self).__init__(**unused_args)
 
-    def translate_rw_val(self, rw):
+    def _encode_quorum(self, rw):
         """
         Converts a symbolic quorum value into its on-the-wire
         equivalent.
@@ -51,15 +73,38 @@ class RiakPbcCodec(object):
         :type rw: string, integer
         :rtype: integer
         """
-        val = self.rw_names.get(rw)
-        if val is None:
-            return rw
+        if rw in QUORUM_TO_PB:
+            return QUORUM_TO_PB[rw]
         elif type(rw) is int and rw >= 0:
-            return val
+            return rw
         else:
             return None
 
+    def _decode_quorum(self, rw):
+        """
+        Converts a protobuf quorum value to a symbolic value if
+        necessary.
+
+        :param rw: the quorum
+        :type rw: int
+        :rtype int or string
+        """
+        if rw in QUORUM_TO_PY:
+            return QUORUM_TO_PY[rw]
+        else:
+            return rw
+
     def _decode_contents(self, contents, obj):
+        """
+        Decodes the list of siblings from the protobuf representation
+        into the object.
+
+        :param contents: a list of RpbContent messages
+        :type contents: list
+        :param obj: a RiakObject
+        :type obj: RiakObject
+        :rtype RiakObject
+        """
         obj.siblings = [self._decode_content(c, RiakContent(obj))
                         for c in contents]
         # Invoke sibling-resolution logic
@@ -72,7 +117,11 @@ class RiakPbcCodec(object):
         Decodes a single sibling from the protobuf representation into
         a RiakObject.
 
-        :rtype: (RiakObject)
+        :param rpb_content: a single RpbContent message
+        :type rpb_content: riak_pb.RpbContent
+        :param sibling: a RiakContent sibling container
+        :type sibling: RiakContent
+        :rtype: RiakContent
         """
 
         if rpb_content.HasField("deleted") and rpb_content.deleted:
@@ -110,6 +159,11 @@ class RiakPbcCodec(object):
         """
         Fills an RpbContent message with the appropriate data and
         metadata from a RiakObject.
+
+        :param robj: a RiakObject
+        :type robj: RiakObject
+        :param rpb_content: the protobuf message to fill
+        :type rpb_content: riak_pb.RpbContent
         """
         if robj.content_type:
             rpb_content.content_type = robj.content_type
@@ -145,6 +199,10 @@ class RiakPbcCodec(object):
     def _decode_link(self, link):
         """
         Decodes an RpbLink message into a tuple
+
+        :param link: an RpbLink message
+        :type link: riak_pb.RpbLink
+        :rtype tuple
         """
 
         if link.HasField("bucket"):
@@ -165,8 +223,153 @@ class RiakPbcCodec(object):
     def _decode_index_value(self, index, value):
         """
         Decodes a secondary index value into the correct Python type.
+        :param index: the name of the index
+        :type index: str
+        :param value: the value of the index entry
+        :type  value: str
+        :rtype str or int
         """
         if index.endswith("_int"):
             return int(value)
         else:
             return value
+
+    def _encode_bucket_props(self, props, msg):
+        """
+        Encodes a dict of bucket properties into the protobuf message.
+
+        :param props: bucket properties
+        :type props: dict
+        :param msg: the protobuf message to fill
+        :type msg: riak_pb.RpbSetBucketReq
+        """
+        for prop in NORMAL_PROPS:
+            if prop in props and props[prop] is not None:
+                setattr(msg.props, prop, props[prop])
+        for prop in COMMIT_HOOK_PROPS:
+            if prop in props:
+                setattr(msg.props, 'has_' + prop, True)
+                self._encode_hooklist(props[prop], getattr(msg.props, prop))
+        for prop in MODFUN_PROPS:
+            if prop in props and props[prop] is not None:
+                self._encode_modfun(props[prop], getattr(msg.props, prop))
+        for prop in QUORUM_PROPS:
+            if prop in props and props[prop] not in (None, 'default'):
+                value = self._encode_quorum(props[prop])
+                if value is not None:
+                    setattr(msg.props, prop, value)
+        if 'repl' in props:
+            msg.props.repl = REPL_TO_PY[props['repl']]
+
+        return msg
+
+    def _decode_bucket_props(self, msg):
+        """
+        Decodes the protobuf bucket properties message into a dict.
+
+        :param msg: the protobuf message to decode
+        :type msg: riak_pb.RpbBucketProps
+        :rtype dict
+        """
+        props = {}
+
+        for prop in NORMAL_PROPS:
+            if msg.HasField(prop):
+                props[prop] = getattr(msg, prop)
+        for prop in COMMIT_HOOK_PROPS:
+            if getattr(msg, 'has_' + prop):
+                props[prop] = self._decode_hooklist(getattr(msg, prop))
+        for prop in MODFUN_PROPS:
+            if msg.HasField(prop):
+                props[prop] = self._decode_modfun(getattr(msg, prop))
+        for prop in QUORUM_PROPS:
+            if msg.HasField(prop):
+                props[prop] = self._decode_quorum(getattr(msg, prop))
+        if msg.HasField('repl'):
+            props['repl'] = REPL_TO_PY[msg.repl]
+
+        return props
+
+    def _decode_modfun(self, modfun):
+        """
+        Decodes a protobuf modfun pair into a dict with 'mod' and
+        'fun' keys. Used in bucket properties.
+
+        :param modfun: the protobuf message to decode
+        :type modfun: riak_pb.RpbModFun
+        :rtype dict
+        """
+        return {'mod': modfun.module,
+                'fun': modfun.function}
+
+    def _encode_modfun(self, props, msg=None):
+        """
+        Encodes a dict with 'mod' and 'fun' keys into a protobuf
+        modfun pair. Used in bucket properties.
+
+        :param props: the module/function pair
+        :type props: dict
+        :param msg: the protobuf message to fill
+        :type msg: riak_pb.RpbModFun
+        :rtype riak_pb.RpbModFun
+        """
+        if msg is None:
+            msg = riak_pb.RpbModFun()
+        msg.module = props['mod']
+        msg.function = props['fun']
+        return msg
+
+    def _decode_hooklist(self, hooklist):
+        """
+        Decodes a list of protobuf commit hooks into their python
+        equivalents. Used in bucket properties.
+
+        :param hooklist: a list of protobuf commit hooks
+        :type hooklist: list
+        :rtype list
+        """
+        return [self._decode_hook(hook) for hook in hooklist]
+
+    def _encode_hooklist(self, hooklist, msg):
+        """
+        Encodes a list of commit hooks into their protobuf equivalent.
+        Used in bucket properties.
+
+        :param hooklist: a list of commit hooks
+        :type hooklist: list
+        :param msg: a protobuf field that is a list of commit hooks
+        """
+        for hook in hooklist:
+            pbhook = msg.add()
+            self._encode_hook(hook, pbhook)
+
+    def _decode_hook(self, hook):
+        """
+        Decodes a protobuf commit hook message into a dict. Used in
+        bucket properties.
+
+        :param hook: the hook to decode
+        :type hook: riak_pb.RpbCommitHook
+        :rtype dict
+        """
+        if hook.HasField('modfun'):
+            return self._decode_modfun(hook.modfun)
+        else:
+            return {'name': hook.name}
+
+    def _encode_hook(self, hook, msg):
+        """
+        Encodes a commit hook dict into the protobuf message. Used in
+        bucket properties.
+
+        :param hook: the hook to encode
+        :type hook: dict
+        :param msg: the protobuf message to fill
+        :type msg: riak_pb.RpbCommitHook
+        :rtype riak_pb.RpbCommitHook
+        """
+        if 'name' in hook:
+            msg.name = hook['name']
+        else:
+            self._encode_modfun(hook, msg.modfun)
+        return msg

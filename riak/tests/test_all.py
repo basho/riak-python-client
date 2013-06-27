@@ -21,7 +21,7 @@ from riak.tests.test_search import SearchTests, \
 from riak.tests.test_mapreduce import MapReduceAliasTests, \
     ErlangMapReduceTests, JSMapReduceTests, LinkTests, MapReduceStreamTests
 from riak.tests.test_kv import BasicKVTests, KVFileTests, \
-    HTTPBucketPropsTest, PbcBucketPropsTest
+    BucketPropsTest
 from riak.tests.test_2i import TwoITests
 
 try:
@@ -131,13 +131,14 @@ class ClientTests(object):
 
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
-                               PbcBucketPropsTest,
+                               BucketPropsTest,
                                TwoITests,
                                LinkTests,
                                ErlangMapReduceTests,
                                JSMapReduceTests,
                                MapReduceAliasTests,
                                MapReduceStreamTests,
+                               EnableSearchTests,
                                SearchTests,
                                ClientTests,
                                BaseTestCase,
@@ -158,20 +159,10 @@ class RiakPbcTransportTestCase(BasicKVTests,
         c = self.create_client(client_id=zero_client_id)
         self.assertEqual(zero_client_id, c.client_id)
 
-    def test_bucket_search_enabled(self):
-        with self.assertRaises(NotImplementedError):
-            bucket = self.client.bucket(self.bucket_name)
-            bucket.search_enabled()
-
-    def test_enable_search_commit_hook(self):
-        with self.assertRaises(NotImplementedError):
-            bucket = self.client.bucket(self.bucket_name)
-            bucket.enable_search()
-
 
 class RiakHttpTransportTestCase(BasicKVTests,
                                 KVFileTests,
-                                HTTPBucketPropsTest,
+                                BucketPropsTest,
                                 TwoITests,
                                 LinkTests,
                                 ErlangMapReduceTests,
@@ -206,18 +197,6 @@ class RiakHttpTransportTestCase(BasicKVTests,
         o.store()
         stored_object = bucket.get("lots_of_links")
         self.assertEqual(len(stored_object.links), 400)
-
-    def test_clear_bucket_properties(self):
-        bucket = self.client.bucket(self.props_bucket)
-        bucket.allow_mult = True
-        self.assertTrue(bucket.allow_mult)
-        bucket.n_val = 1
-        self.assertEqual(bucket.n_val, 1)
-        # Test setting clearing properties...
-
-        self.assertTrue(bucket.clear_properties())
-        self.assertFalse(bucket.allow_mult)
-        self.assertEqual(bucket.n_val, 3)
 
 
 class FilterTests(unittest.TestCase):

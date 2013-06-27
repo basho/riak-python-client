@@ -53,7 +53,9 @@ from messages import (
     MSG_CODE_INDEX_REQ,
     MSG_CODE_INDEX_RESP,
     MSG_CODE_SEARCH_QUERY_REQ,
-    MSG_CODE_SEARCH_QUERY_RESP
+    MSG_CODE_SEARCH_QUERY_RESP,
+    MSG_CODE_RESET_BUCKET_REQ,
+    MSG_CODE_RESET_BUCKET_RESP
 )
 
 
@@ -123,9 +125,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req = riak_pb.RpbGetReq()
         if r:
-            req.r = self.translate_rw_val(r)
+            req.r = self._encode_quorum(r)
         if self.quorum_controls() and pr:
-            req.pr = self.translate_rw_val(pr)
+            req.pr = self._encode_quorum(pr)
 
         if self.tombstone_vclocks():
             req.deletedvclock = 1
@@ -160,11 +162,11 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req = riak_pb.RpbPutReq()
         if w:
-            req.w = self.translate_rw_val(w)
+            req.w = self._encode_quorum(w)
         if dw:
-            req.dw = self.translate_rw_val(dw)
+            req.dw = self._encode_quorum(dw)
         if self.quorum_controls() and pw:
-            req.pw = self.translate_rw_val(pw)
+            req.pw = self._encode_quorum(pw)
 
         if return_body:
             req.return_body = 1
@@ -202,19 +204,19 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req = riak_pb.RpbDelReq()
         if rw:
-            req.rw = self.translate_rw_val(rw)
+            req.rw = self._encode_quorum(rw)
         if r:
-            req.r = self.translate_rw_val(r)
+            req.r = self._encode_quorum(r)
         if w:
-            req.w = self.translate_rw_val(w)
+            req.w = self._encode_quorum(w)
         if dw:
-            req.dw = self.translate_rw_val(dw)
+            req.dw = self._encode_quorum(dw)
 
         if self.quorum_controls():
             if pr:
-                req.pr = self.translate_rw_val(pr)
+                req.pr = self._encode_quorum(pr)
             if pw:
-                req.pw = self.translate_rw_val(pw)
+                req.pw = self._encode_quorum(pw)
 
         if self.tombstone_vclocks() and robj.vclock:
             req.vclock = robj.vclock.encode('binary')
@@ -266,13 +268,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         msg_code, resp = self._request(MSG_CODE_GET_BUCKET_REQ, req,
                                        MSG_CODE_GET_BUCKET_RESP)
-        props = {}
-        if resp.props.HasField('n_val'):
-            props['n_val'] = resp.props.n_val
-        if resp.props.HasField('allow_mult'):
-            props['allow_mult'] = resp.props.allow_mult
 
-        return props
+        return self._decode_bucket_props(resp.props)
 
     def set_bucket_props(self, bucket, props):
         """
@@ -280,18 +277,31 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         req = riak_pb.RpbSetBucketReq()
         req.bucket = bucket.name
-        for key in props:
-            if key not in ['n_val', 'allow_mult']:
-                raise NotImplementedError
 
-        if 'n_val' in props:
-            req.props.n_val = props['n_val']
-        if 'allow_mult' in props:
-            req.props.allow_mult = props['allow_mult']
+        if not self.pb_all_bucket_props():
+            for key in props:
+                if key not in ('n_val', 'allow_mult'):
+                    raise NotImplementedError('Server only supports n_val and '
+                                              'allow_mult properties over PBC')
+
+        self._encode_bucket_props(props, req)
 
         msg_code, resp = self._request(MSG_CODE_SET_BUCKET_REQ, req,
                                        MSG_CODE_SET_BUCKET_RESP)
-        return self
+        return True
+
+    def clear_bucket_props(self, bucket):
+        """
+        Clear bucket properties, resetting them to their defaults
+        """
+        if not self.pb_clear_bucket_props():
+            return False
+
+        req = riak_pb.RpbResetBucketReq()
+        req.bucket = bucket.name
+        self._request(MSG_CODE_RESET_BUCKET_REQ, req,
+                      MSG_CODE_RESET_BUCKET_RESP)
+        return True
 
     def mapred(self, inputs, query, timeout=None):
         # dictionary of phase results - each content should be an encoded array
