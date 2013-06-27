@@ -246,8 +246,6 @@ class RiakPbcCodec(object):
         :param msg: the protobuf message to fill
         :type msg: riak_pb.RpbSetBucketReq
         """
-        msg.props.has_precommit = False
-        msg.props.has_postcommit = False
         for prop in NORMAL_PROPS:
             if prop in props and props[prop] is not None:
                 setattr(msg.props, prop, props[prop])

@@ -277,6 +277,13 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         req = riak_pb.RpbSetBucketReq()
         req.bucket = bucket.name
+
+        if not self.pb_all_bucket_props():
+            for key in props:
+                if key not in ('n_val', 'allow_mult'):
+                    raise NotImplementedError('Server only supports n_val and '
+                                              'allow_mult properties over PBC')
+
         self._encode_bucket_props(props, req)
 
         msg_code, resp = self._request(MSG_CODE_SET_BUCKET_REQ, req,
@@ -287,6 +294,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         Clear bucket properties, resetting them to their defaults
         """
+        if not self.pb_clear_bucket_props():
+            return False
+
         req = riak_pb.RpbResetBucketReq()
         req.bucket = bucket.name
         msg_code = self._request(MSG_CODE_RESET_BUCKET_REQ, req,
