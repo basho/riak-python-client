@@ -19,6 +19,7 @@ import riak_pb
 from riak import RiakError
 from riak.content import RiakContent
 
+
 def _invert(d):
     out = {}
     for key in d:
@@ -26,12 +27,10 @@ def _invert(d):
         out[value] = key
     return out
 
-REPL_TO_PY = {
-    riak_pb.RpbBucketProps.FALSE: False,
-    riak_pb.RpbBucketProps.TRUE: True,
-    riak_pb.RpbBucketProps.REALTIME: 'realtime',
-    riak_pb.RpbBucketProps.FULLSYNC: 'fullsync'
-    }
+REPL_TO_PY = {riak_pb.RpbBucketProps.FALSE: False,
+              riak_pb.RpbBucketProps.TRUE: True,
+              riak_pb.RpbBucketProps.REALTIME: 'realtime',
+              riak_pb.RpbBucketProps.FULLSYNC: 'fullsync'}
 
 REPL_TO_PB = _invert(REPL_TO_PY)
 
@@ -40,18 +39,16 @@ RIAKC_RW_QUORUM = 4294967293
 RIAKC_RW_ALL = 4294967292
 RIAKC_RW_DEFAULT = 4294967291
 
-QUORUM_TO_PB = {
-    'default': RIAKC_RW_DEFAULT,
-    'all': RIAKC_RW_ALL,
-    'quorum': RIAKC_RW_QUORUM,
-    'one': RIAKC_RW_ONE
-    }
+QUORUM_TO_PB = {'default': RIAKC_RW_DEFAULT,
+                'all': RIAKC_RW_ALL,
+                'quorum': RIAKC_RW_QUORUM,
+                'one': RIAKC_RW_ONE}
 
 QUORUM_TO_PY = _invert(QUORUM_TO_PB)
 
 NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
-                'young_vclock','big_vclock', 'small_vclock',
-                'basic_quorum', 'notfound_ok', 'search', 'backend']
+                'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
+                'notfound_ok', 'search', 'backend']
 COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
 MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
@@ -331,7 +328,7 @@ class RiakPbcCodec(object):
         :type hooklist: list
         :rtype list
         """
-        return [ self._decode_hook(hook) for hook in hooklist ]
+        return [self._decode_hook(hook) for hook in hooklist]
 
     def _encode_hooklist(self, hooklist, msg):
         """
@@ -372,7 +369,7 @@ class RiakPbcCodec(object):
         :rtype riak_pb.RpbCommitHook
         """
         if 'name' in hook:
-            msg.name = name
+            msg.name = hook['name']
         else:
             self._encode_modfun(hook, msg.modfun)
         return msg

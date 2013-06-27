@@ -24,6 +24,7 @@ from riak.util import deprecateQuorumAccessors, deprecated
 def deprecateBucketQuorumAccessors(klass):
     return deprecateQuorumAccessors(klass, parent='_client')
 
+
 def bucket_property(name, doc=None):
     def _prop_getter(self):
         return self.get_property(name)
@@ -32,6 +33,7 @@ def bucket_property(name, doc=None):
         return self.set_property(name, value)
 
     return property(_prop_getter, _prop_setter, doc=doc)
+
 
 @deprecateBucketQuorumAccessors
 class RiakBucket(object):

@@ -198,6 +198,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
         stored_object = bucket.get("lots_of_links")
         self.assertEqual(len(stored_object.links), 400)
 
+
 class FilterTests(unittest.TestCase):
     def test_simple(self):
         f1 = RiakKeyFilter("tokenize", "-", 1)

@@ -299,8 +299,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req = riak_pb.RpbResetBucketReq()
         req.bucket = bucket.name
-        msg_code = self._request(MSG_CODE_RESET_BUCKET_REQ, req,
-                                 MSG_CODE_RESET_BUCKET_RESP)
+        self._request(MSG_CODE_RESET_BUCKET_REQ, req,
+                      MSG_CODE_RESET_BUCKET_RESP)
         return True
 
     def mapred(self, inputs, query, timeout=None):
