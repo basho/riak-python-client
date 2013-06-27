@@ -179,7 +179,7 @@ class RiakBucket(object):
 
     def get(self, key, r=None, pr=None):
         """
-        Retrieve a JSON-encoded object from Riak.
+        Retrieve an object from Riak.
 
         :param key: Name of the key.
         :type key: string
@@ -194,7 +194,7 @@ class RiakBucket(object):
 
     def get_binary(self, key, r=None, pr=None):
         """
-        Retrieve a binary/string object from Riak.
+        Retrieve a binary/string object from Riak. DEPRECATED
 
         :param key: Name of the key.
         :type key: string
