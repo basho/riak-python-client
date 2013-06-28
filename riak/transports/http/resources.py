@@ -108,6 +108,13 @@ class RiakHttpResources(object):
             key = quote_plus(key)
         return mkpath(self.luwak_wm_file, key)
 
+    def counters_path(self, bucket, key, **options):
+        if not self.riak_kv_wm_counter:
+            raise RiakError("Counters are unsupported by this Riak node")
+
+        return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket), "counters",
+                      quote_plus(key), **options)
+
     @lazy_property
     def riak_kv_wm_buckets(self):
         return self.resources.get('riak_kv_wm_index')
@@ -143,6 +150,10 @@ class RiakHttpResources(object):
     @lazy_property
     def luwak_wm_file(self):
         return self.resources.get('luwak_wm_file')
+
+    @lazy_property
+    def riak_kv_wm_counter(self):
+        return self.resources.get('riak_kv_wm_counter')
 
     @lazy_property
     def resources(self):

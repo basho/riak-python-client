@@ -55,7 +55,11 @@ from messages import (
     MSG_CODE_SEARCH_QUERY_REQ,
     MSG_CODE_SEARCH_QUERY_RESP,
     MSG_CODE_RESET_BUCKET_REQ,
-    MSG_CODE_RESET_BUCKET_RESP
+    MSG_CODE_RESET_BUCKET_RESP,
+    MSG_CODE_COUNTER_UPDATE_REQ,
+    MSG_CODE_COUNTER_UPDATE_RESP,
+    MSG_CODE_COUNTER_GET_REQ,
+    MSG_CODE_COUNTER_GET_RESP
 )
 
 
@@ -396,3 +400,50 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             docs.append(resultdoc)
         result['docs'] = docs
         return result
+
+    def get_counter(self, bucket, key, **params):
+        if not self.counters():
+            raise NotImplementedError("Counters are not supported")
+
+        req = riak_pb.RpbCounterGetReq()
+        req.bucket = bucket.name
+        req.key = key
+        if params.get('r') is not None:
+            req.r = self._encode_quorum(params['r'])
+        if params.get('pr') is not None:
+            req.pr = self._encode_quorum(params['pr'])
+        if params.get('basic_quorum') is not None:
+            req.basic_quorum = params['basic_quorum']
+        if params.get('notfound_ok') is not None:
+            req.notfound_ok = params['notfound_ok']
+
+        msg_code, resp = self._request(MSG_CODE_COUNTER_GET_REQ, req,
+                                       MSG_CODE_COUNTER_GET_RESP)
+        if resp.HasField('value'):
+            return resp.value
+        else:
+            return None
+
+    def update_counter(self, bucket, key, value, **params):
+        if not self.counters():
+            raise NotImplementedError("Counters are not supported")
+
+        req = riak_pb.RpbCounterUpdateReq()
+        req.bucket = bucket.name
+        req.key = key
+        req.amount = value
+        if params.get('w') is not None:
+            req.w = self._encode_quorum(params['w'])
+        if params.get('dw') is not None:
+            req.dw = self._encode_quorum(params['dw'])
+        if params.get('pw') is not None:
+            req.pw = self._encode_quorum(params['pw'])
+        if params.get('returnvalue') is not None:
+            req.returnvalue = params['returnvalue']
+
+        msg_code, resp = self._request(MSG_CODE_COUNTER_UPDATE_REQ, req,
+                                       MSG_CODE_COUNTER_UPDATE_RESP)
+        if resp.HasField('value'):
+            return resp.value
+        else:
+            return True
