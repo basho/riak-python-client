@@ -42,9 +42,8 @@ class FeatureDetectionTest(unittest.TestCase):
     def test_implements_server_version(self):
         t = IncompleteTransport()
 
-        def get_server_version():
+        with self.assertRaises(NotImplementedError):
             t.server_version
-        self.assertRaises(NotImplementedError, get_server_version)
 
     def test_pre_10(self):
         t = DummyTransport("0.14.2")
@@ -55,6 +54,8 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.quorum_controls())
         self.assertFalse(t.tombstone_vclocks())
         self.assertFalse(t.pb_head())
+        self.assertFalse(t.pb_clear_bucket_props())
+        self.assertFalse(t.pb_all_bucket_props())
 
     def test_10(self):
         t = DummyTransport("1.0.3")
@@ -65,6 +66,8 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.quorum_controls())
         self.assertTrue(t.tombstone_vclocks())
         self.assertTrue(t.pb_head())
+        self.assertFalse(t.pb_clear_bucket_props())
+        self.assertFalse(t.pb_all_bucket_props())
 
     def test_11(self):
         t = DummyTransport("1.1.4")
@@ -75,6 +78,8 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.quorum_controls())
         self.assertTrue(t.tombstone_vclocks())
         self.assertTrue(t.pb_head())
+        self.assertFalse(t.pb_clear_bucket_props())
+        self.assertFalse(t.pb_all_bucket_props())
 
     def test_12(self):
         t = DummyTransport("1.2.0")
@@ -85,6 +90,8 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.quorum_controls())
         self.assertTrue(t.tombstone_vclocks())
         self.assertTrue(t.pb_head())
+        self.assertFalse(t.pb_clear_bucket_props())
+        self.assertFalse(t.pb_all_bucket_props())
 
     def test_12_loose(self):
         t = DummyTransport("1.2.1p3")
@@ -95,7 +102,20 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.quorum_controls())
         self.assertTrue(t.tombstone_vclocks())
         self.assertTrue(t.pb_head())
+        self.assertFalse(t.pb_clear_bucket_props())
+        self.assertFalse(t.pb_all_bucket_props())
 
+    def test_14(self):
+        t = DummyTransport("1.4.0rc1")
+        self.assertTrue(t.phaseless_mapred())
+        self.assertTrue(t.pb_indexes())
+        self.assertTrue(t.pb_search())
+        self.assertTrue(t.pb_conditionals())
+        self.assertTrue(t.quorum_controls())
+        self.assertTrue(t.tombstone_vclocks())
+        self.assertTrue(t.pb_head())
+        self.assertTrue(t.pb_clear_bucket_props())
+        self.assertTrue(t.pb_all_bucket_props())
 
 if __name__ == '__main__':
     unittest.main()
