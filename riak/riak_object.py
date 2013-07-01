@@ -39,6 +39,8 @@ def content_property(name, doc=None):
         setattr(self.siblings[0], name, value)
 
     def _getter(self):
+        if len(self.siblings) == 0:
+            return
         if len(self.siblings) != 1:
             raise ConflictError()
         return getattr(self.siblings[0], name)

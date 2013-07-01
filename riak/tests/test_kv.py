@@ -220,6 +220,8 @@ class BasicKVTests(object):
         bucket = self.client.bucket(self.bucket_name)
         obj = bucket.get(self.key_name)
         self.assertFalse(obj.exists)
+        # Object with no siblings should not raise the ConflictError
+        self.assertIsNone(obj.data)
 
     def test_delete(self):
         bucket = self.client.bucket(self.bucket_name)
