@@ -316,7 +316,7 @@ class RiakClientOperations(RiakClientTransport):
         :param returnvalue: whether to return the updated value of the counter
         :type returnvalue: bool
         """
-        if type(value) is not int:
+        if type(value) not in (int, long):
             raise TypeError("Counter update amount must be an integer")
         if value == 0:
             raise ValueError("Cannot increment counter by 0")
