@@ -35,8 +35,29 @@ class RiakClientOperations(RiakClientTransport):
         Get the list of buckets as RiakBucket instances.
         NOTE: Do not use this in production, as it requires traversing through
         all keys stored in a cluster.
+
+        :rtype list of RiakBucket instances
         """
         return [self.bucket(name) for name in transport.get_buckets()]
+
+    def stream_buckets(self):
+        """
+        Streams the list of buckets. This is a generator method that
+        should be iterated over. NOTE: Do not use this in production,
+        as it requires traversing through all keys stored in a
+        cluster.
+
+        :rtype iterator
+        """
+        with self._transport() as transport:
+            stream = transport.stream_buckets()
+            try:
+                for bucket_list in stream:
+                    bucket_list = [self.bucket(name) for name in bucket_list]
+                    if len(bucket_list) > 0:
+                        yield bucket_list
+            finally:
+                stream.close()
 
     @retryable
     def ping(self, transport):

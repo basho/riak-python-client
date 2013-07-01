@@ -90,7 +90,12 @@ class RiakTransport(FeatureDetection):
     def get_buckets(self):
         """
         Serialize get buckets request and deserialize response
-        @return dict()
+        """
+        raise NotImplementedError
+
+    def stream_buckets(self):
+        """
+        Streams the list of buckets through an iterator
         """
         raise NotImplementedError
 
