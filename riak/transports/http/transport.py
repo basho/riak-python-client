@@ -356,6 +356,35 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                       {'Content-Type': 'text/xml'},
                       xml.toxml().encode('utf-8'))
 
+    def get_counter(self, bucket, key, **options):
+        if not self.counters():
+            raise NotImplementedError("Counters are not supported")
+
+        url = self.counters_path(bucket.name, key, **options)
+        status, headers, body = self._request('GET', url)
+
+        self.check_http_code(status, [200, 404])
+        if status == 200:
+            return long(body.strip())
+        elif status == 404:
+            return None
+
+    def update_counter(self, bucket, key, amount, **options):
+        if not self.counters():
+            raise NotImplementedError("Counters are not supported")
+
+        return_value = 'returnvalue' in options and options['returnvalue']
+        headers = {'Content-Type': 'text/plain'}
+        url = self.counters_path(bucket.name, key, **options)
+        status, headers, body = self._request('POST', url, headers,
+                                              str(amount))
+        if return_value and status == 200:
+            return long(body.strip())
+        elif status == 204:
+            return True
+        else:
+            self.check_http_code(status, [200, 204])
+
     def check_http_code(self, status, expected_statuses):
         if not status in expected_statuses:
             raise Exception('Expected status %s, received %s' %

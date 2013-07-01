@@ -179,6 +179,20 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def get_counter(self, bucket, key, r=None, pr=None, basic_quorum=None,
+                    notfound_ok=None):
+        """
+        Gets the value of a counter.
+        """
+        raise NotImplementedError
+
+    def update_counter(self, bucket, key, value, w=None, dw=None, pw=None,
+                       returnvalue=False):
+        """
+        Updates a counter by the given value.
+        """
+        raise NotImplementedError
+
     def _search_mapred_emu(self, index, query):
         """
         Emulates a search request via MapReduce. Used in the case

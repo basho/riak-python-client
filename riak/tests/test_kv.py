@@ -521,3 +521,31 @@ class KVFileTests(object):
         obj = bucket.get(self.key_name)
         # self.assertEqual(obj.encoded_data, None)
         self.assertFalse(obj.exists)
+
+
+class CounterTests(object):
+    def test_counter_requires_allow_mult(self):
+        bucket = self.client.bucket(self.bucket_name)
+        self.assertFalse(bucket.allow_mult)
+
+        with self.assertRaises(Exception):
+            bucket.update_counter(self.key_name, 10)
+
+    def test_counter_ops(self):
+        bucket = self.client.bucket(self.sibs_bucket)
+        self.assertTrue(bucket.allow_mult)
+
+        # Non-existent counter has no value
+        self.assertEqual(None, bucket.get_counter(self.key_name))
+
+        # Update the counter
+        bucket.update_counter(self.key_name, 10)
+        self.assertEqual(10, bucket.get_counter(self.key_name))
+
+        # Update with returning the value
+        self.assertEqual(15, bucket.update_counter(self.key_name, 5,
+                                                   returnvalue=True))
+
+        # Now try decrementing
+        self.assertEqual(10, bucket.update_counter(self.key_name, -5,
+                                                   returnvalue=True))
