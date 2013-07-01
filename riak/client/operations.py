@@ -24,33 +24,37 @@ class RiakClientOperations(RiakClientTransport):
     Methods for RiakClient that result in requests sent to the Riak
     cluster.
 
-    Note that all of these methods have an implicit 'transport'
+    Note that many of these methods have an implicit 'transport'
     argument that will be prepended automatically as part of the retry
     logic, and does not need to be supplied by the user.
     """
 
     @retryable
-    def get_buckets(self, transport):
+    def get_buckets(self, transport, timeout=None):
         """
         Get the list of buckets as RiakBucket instances.
         NOTE: Do not use this in production, as it requires traversing through
         all keys stored in a cluster.
 
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype list of RiakBucket instances
         """
-        return [self.bucket(name) for name in transport.get_buckets()]
+        return [self.bucket(name) for name in transport.get_buckets(timeout=timeout)]
 
-    def stream_buckets(self):
+    def stream_buckets(self, timeout=None):
         """
         Streams the list of buckets. This is a generator method that
         should be iterated over. NOTE: Do not use this in production,
         as it requires traversing through all keys stored in a
         cluster.
 
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype iterator
         """
         with self._transport() as transport:
-            stream = transport.stream_buckets()
+            stream = transport.stream_buckets(timeout=timeout)
             try:
                 for bucket_list in stream:
                     bucket_list = [self.bucket(name) for name in bucket_list]
@@ -121,17 +125,19 @@ class RiakClientOperations(RiakClientTransport):
         return transport.clear_bucket_props(bucket)
 
     @retryable
-    def get_keys(self, transport, bucket):
+    def get_keys(self, transport, bucket, timeout=None):
         """
         Lists all keys in a bucket.
 
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype: list
         """
-        return transport.get_keys(bucket)
+        return transport.get_keys(bucket, timeout=timeout)
 
-    def stream_keys(self, bucket):
+    def stream_keys(self, bucket, timeout=None):
         """
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
@@ -139,10 +145,12 @@ class RiakClientOperations(RiakClientTransport):
 
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype: iterator
         """
         with self._transport() as transport:
-            stream = transport.stream_keys(bucket)
+            stream = transport.stream_keys(bucket, timeout=timeout)
             try:
                 for keylist in stream:
                     if len(keylist) > 0:
@@ -152,7 +160,7 @@ class RiakClientOperations(RiakClientTransport):
 
     @retryable
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
-            if_none_match=None):
+            if_none_match=None, timeout=None):
         """
         Stores an object in the Riak cluster.
 
@@ -170,13 +178,16 @@ class RiakClientOperations(RiakClientTransport):
         :param if_none_match: whether to fail the write if the object
           exists
         :type if_none_match: boolean
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         """
         return transport.put(robj, w=w, dw=dw, pw=pw,
                              return_body=return_body,
-                             if_none_match=if_none_match)
+                             if_none_match=if_none_match,
+                             timeout=timeout)
 
     @retryable
-    def get(self, transport, robj, r=None, pr=None):
+    def get(self, transport, robj, r=None, pr=None, timeout=None):
         """
         Fetches the contents of a Riak object.
 
@@ -186,16 +197,18 @@ class RiakClientOperations(RiakClientTransport):
         :type r: integer, string, None
         :param pr: the primary read quorum
         :type pr: integer, string, None
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         """
         if not isinstance(robj.key, basestring):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
-        return transport.get(robj, r=r, pr=pr)
+        return transport.get(robj, r=r, pr=pr, timeout=timeout)
 
     @retryable
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,
-               pr=None, pw=None):
+               pr=None, pw=None, timeout=None):
         """
         Deletes an object from Riak.
 
@@ -213,9 +226,11 @@ class RiakClientOperations(RiakClientTransport):
         :type dw: integer, string, None
         :param pw: the primary write quorum
         :type pw: integer, string, None
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         """
         return transport.delete(robj, rw=rw, r=r, w=w, dw=dw, pr=pr,
-                                pw=pw)
+                                pw=pw, timeout=timeout)
 
     @retryable
     def mapred(self, transport, inputs, query, timeout):

@@ -242,7 +242,7 @@ class RiakObject(object):
         return self.siblings[index]
 
     def store(self, w=None, dw=None, pw=None, return_body=True,
-              if_none_match=False):
+              if_none_match=False, timeout=None):
         """
         Store the object in Riak. When this operation completes, the
         object could contain new metadata and possibly new data if Riak
@@ -265,6 +265,8 @@ class RiakObject(object):
         :param if_none_match: Should the object be stored only if
                               there is no key previously defined
         :type if_none_match: bool
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype: RiakObject """
         if len(self.siblings) != 1:
             raise ConflictError("Attempting to store an invalid object, "
@@ -272,11 +274,12 @@ class RiakObject(object):
 
         self.client.put(self, w=w, dw=dw, pw=pw,
                         return_body=return_body,
-                        if_none_match=if_none_match)
+                        if_none_match=if_none_match,
+                        timeout=timeout)
 
         return self
 
-    def reload(self, r=None, pr=None):
+    def reload(self, r=None, pr=None, timeout=None):
         """
         Reload the object from Riak. When this operation completes, the
         object could contain new metadata and a new value, if the object
@@ -289,13 +292,16 @@ class RiakObject(object):
                    be available before performing the read that
                    precedes the put
         :type pr: integer
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype: RiakObject
         """
 
-        self.client.get(self, r=r, pr=pr)
+        self.client.get(self, r=r, pr=pr, timeout=timeout)
         return self
 
-    def delete(self, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
+    def delete(self, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
+               timeout=None):
         """
         Delete this object from Riak.
 
@@ -319,10 +325,13 @@ class RiakObject(object):
         :param pw: PW-value, require this many primary partitions to
                    be available before performing the put
         :type pw: integer
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype: RiakObject
         """
 
-        self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw)
+        self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw,
+                           timeout=timeout)
         self.clear()
         return self
 
