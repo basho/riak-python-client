@@ -33,7 +33,8 @@ from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.codec import RiakHttpCodec
 from riak.transports.http.stream import (
     RiakHttpKeyStream,
-    RiakHttpMapReduceStream)
+    RiakHttpMapReduceStream,
+    RiakHttpBucketStream)
 from riak import RiakError
 
 
@@ -191,6 +192,22 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             return props['buckets']
         else:
             raise Exception('Error getting buckets.')
+
+    def stream_buckets(self):
+        """
+        Stream list of buckets through an iterator
+        """
+        if not self.bucket_stream():
+            raise NotImplementedError('Streaming list-buckets is not '
+                                      'supported')
+
+        url = self.bucket_list_path(buckets="stream")
+        status, headers, response = self._request('GET', url, stream=True)
+
+        if status == 200:
+            return RiakHttpBucketStream(response)
+        else:
+            raise Exception('Error listing buckets.')
 
     def get_bucket_props(self, bucket):
         """

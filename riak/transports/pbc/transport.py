@@ -24,7 +24,7 @@ from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
 from connection import RiakPbcConnection
-from stream import RiakPbcKeyStream, RiakPbcMapredStream
+from stream import RiakPbcKeyStream, RiakPbcMapredStream, RiakPbcBucketStream
 from codec import RiakPbcCodec
 
 from messages import (
@@ -258,6 +258,22 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         msg_code, resp = self._request(MSG_CODE_LIST_BUCKETS_REQ,
                                        expect=MSG_CODE_LIST_BUCKETS_RESP)
         return resp.buckets
+
+    def stream_buckets(self):
+        """
+        Stream list of buckets through an iterator
+        """
+
+        if not self.bucket_stream():
+            raise NotImplementedError('Streaming list-buckets is not '
+                                      'supported')
+
+        req = riak_pb.RpbListBucketsReq()
+        req.stream = True
+
+        self._send_msg(MSG_CODE_LIST_BUCKETS_REQ, req)
+
+        return RiakPbcBucketStream(self)
 
     def get_bucket_props(self, bucket):
         """

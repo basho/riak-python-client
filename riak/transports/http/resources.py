@@ -38,8 +38,8 @@ class RiakHttpResources(object):
         return mkpath(self.riak_kv_wm_mapred, **options)
 
     def bucket_list_path(self, **options):
-        query = options.copy()
-        query.update(buckets=True)
+        query = {'buckets': True}
+        query.update(options)
         if self.riak_kv_wm_buckets:
             return mkpath(self.riak_kv_wm_buckets, **query)
         else:
