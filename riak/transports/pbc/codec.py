@@ -18,6 +18,7 @@ under the License.
 import riak_pb
 from riak import RiakError
 from riak.content import RiakContent
+from riak.util import decode_index_value
 
 
 def _invert(d):
@@ -147,8 +148,7 @@ class RiakPbcCodec(object):
         sibling.usermeta = dict([(usermd.key, usermd.value)
                                  for usermd in rpb_content.usermeta])
         sibling.indexes = set([(index.key,
-                                self._decode_index_value(index.key,
-                                                         index.value))
+                                decode_index_value(index.key, index.value))
                                for index in rpb_content.indexes])
 
         sibling.encoded_data = rpb_content.value
@@ -374,7 +374,8 @@ class RiakPbcCodec(object):
             self._encode_modfun(hook, msg.modfun)
         return msg
 
-    def _encode_index_req(self, bucket, index, startkey, endkey=None):
+    def _encode_index_req(self, bucket, index, startkey, endkey=None,
+                          return_terms=None):
         """
         Encodes a secondary index request into the protobuf message.
 
@@ -386,6 +387,9 @@ class RiakPbcCodec(object):
         :type startkey: integer, string
         :param endkey: the end of the range
         :type endkey: integer, string
+        :param return_terms: whether to return the index term with the key
+        :type return_terms: bool
+        :rtype riak_pb.RpbIndexReq
         """
         req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
         if endkey:
@@ -395,4 +399,6 @@ class RiakPbcCodec(object):
         else:
             req.qtype = riak_pb.RpbIndexReq.eq
             req.key = str(startkey)
+        if return_terms is not None:
+            req.return_terms = return_terms
         return req

@@ -50,7 +50,8 @@ class RiakClientOperations(RiakClientTransport):
     is_alive = ping
 
     @retryable
-    def get_index(self, transport, bucket, index, startkey, endkey=None):
+    def get_index(self, transport, bucket, index, startkey, endkey=None,
+                  return_terms=None):
         """
         Queries a secondary index, returning matching keys.
 
@@ -62,11 +63,15 @@ class RiakClientOperations(RiakClientTransport):
         :type startkey: string, integer
         :param endkey: the end of the query range (optional if equality)
         :type endkey: string, integer
+        :param return_terms: whether to include the secondary index value
+        :type return_terms: boolean
         :rtype: list
         """
-        return transport.get_index(bucket, index, startkey, endkey)
+        return transport.get_index(bucket, index, startkey, endkey,
+                                   return_terms=return_terms)
 
-    def stream_index(self, bucket, index, startkey, endkey=None):
+    def stream_index(self, bucket, index, startkey, endkey=None,
+                     return_terms=None):
         """
         Queries a secondary index, streaming matching keys through an
         iterator.
@@ -79,10 +84,13 @@ class RiakClientOperations(RiakClientTransport):
         :type startkey: string, integer
         :param endkey: the end of the query range (optional if equality)
         :type endkey: string, integer
+        :param return_terms: whether to include the secondary index value
+        :type return_terms: boolean
         :rtype: iterable
         """
         with self._transport() as transport:
-            stream = transport.stream_index(bucket, index, startkey, endkey)
+            stream = transport.stream_index(bucket, index, startkey, endkey,
+                                            return_terms=return_terms)
             try:
                 for item in stream:
                     yield item

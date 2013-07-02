@@ -107,16 +107,24 @@ class RiakPbcIndexStream(RiakPbcStream):
 
     _expect = MSG_CODE_INDEX_RESP
 
+    def __init__(self, transport, index, return_terms=False):
+        super(RiakPbcIndexStream, self).__init__(transport)
+        self.index = index
+        self.return_terms = return_terms
+
     def next(self):
         response = super(RiakPbcIndexStream, self).next()
 
         if response.done and not (response.keys or response.results):
             raise StopIteration
 
-        if response.keys:
+        if self.return_terms and response.results:
+            return [(self._coerce(r.key), r.value) for r in response.results]
+        elif response.keys:
             return response.keys
-        elif response.results:
-            return [(r.key, r.value) for r in response.results]
+
+    def _coerce(self, index_value):
+        if "_int" in self.index:
+            return long(index_value)
         else:
-            # WAT
-            return self.next()
+            return str(index_value)

@@ -36,6 +36,7 @@ from riak.transports.http.stream import (
     RiakHttpMapReduceStream,
     RiakHttpIndexStream)
 from riak import RiakError
+from riak.util import decode_index_value
 
 
 class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
@@ -276,17 +277,27 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                 'Error running MapReduce operation. Headers: %s Body: %s' %
                 (repr(headers), repr(response.read())))
 
-    def get_index(self, bucket, index, startkey, endkey=None):
+    def get_index(self, bucket, index, startkey, endkey=None,
+                  return_terms=None):
         """
         Performs a secondary index query.
         """
-        url = self.index_path(bucket, index, startkey, endkey)
+        params = {'return_terms': return_terms}
+        url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
         json_data = json.loads(body)
-        return json_data[u'keys'][:]
+        if return_terms:
+            results = []
+            for result in json_data[u'results'][:]:
+                term, key = result.items()[0]
+                results.append((decode_index_value(index, term), key),)
+            return results
+        else:
+            return json_data[u'keys'][:]
 
-    def stream_index(self, bucket, index, startkey, endkey=None):
+    def stream_index(self, bucket, index, startkey, endkey=None,
+                     return_terms=None):
         """
         Streams a secondary index query.
         """
@@ -294,11 +305,12 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise NotImplementedError("Secondary index streaming is not "
                                       "supported")
 
-        url = self.index_path(bucket, index, startkey, endkey, stream=True)
+        params = {'return_terms': return_terms, 'stream': True}
+        url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
-            return RiakHttpIndexStream(response)
+            return RiakHttpIndexStream(response, index, return_terms)
         else:
             raise Exception('Error streaming secondary index.')
 

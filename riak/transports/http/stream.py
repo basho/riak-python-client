@@ -21,6 +21,7 @@ import string
 import re
 from cgi import parse_header
 from email import message_from_string
+from riak.util import decode_index_value
 
 
 class RiakHttpStream(object):
@@ -130,6 +131,11 @@ class RiakHttpIndexStream(RiakHttpMultipartStream):
     Streaming iterator for secondary indexes over HTTP
     """
 
+    def __init__(self, response, index, return_terms):
+        super(RiakHttpIndexStream, self).__init__(response)
+        self.index = index
+        self.return_terms = return_terms
+
     def next(self):
         message = super(RiakHttpIndexStream, self).next()
         payload = json.loads(message.get_payload())
@@ -138,8 +144,10 @@ class RiakHttpIndexStream(RiakHttpMultipartStream):
         elif u'results' in payload:
             structs = payload[u'results']
             # Format is {"results":[{"2ikey":"primarykey"}, ...]}
-            munged = [ d.items()[0] for d in structs ]
-            return munged
+            return [self._decode_pair(d.items()[0]) for d in structs]
         else:
             # WAT
             self.next()
+
+    def _decode_pair(self, pair):
+        return (decode_index_value(self.index, pair[0]), pair[1])

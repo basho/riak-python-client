@@ -186,56 +186,29 @@ class TwoITests(object):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
 
-        bucket = self.client.bucket(self.bucket_name)
-
-        bucket.\
-            new('mykey1', 'data1').\
-            add_index('field1_bin', 'val1').\
-            add_index('field2_int', 1001).\
-            store()
-        bucket.\
-            new('mykey2', 'data1').\
-            add_index('field1_bin', 'val2').\
-            add_index('field2_int', 1002).\
-            store()
-        bucket.\
-            new('mykey3', 'data1').\
-            add_index('field1_bin', 'val3').\
-            add_index('field2_int', 1003).\
-            store()
-        bucket.\
-            new('mykey4', 'data1').\
-            add_index('field1_bin', 'val4').\
-            add_index('field2_int', 1004).\
-            store()
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
 
         # Test an equality query...
         results = bucket.get_index('field1_bin', 'val2')
         self.assertEquals(1, len(results))
-        self.assertEquals('mykey2', str(results[0]))
+        self.assertEquals(o2.key, str(results[0]))
 
         # Test a range query...
         results = bucket.get_index('field1_bin', 'val2', 'val4')
         vals = set([str(key) for key in results])
         self.assertEquals(3, len(results))
-        self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
+        self.assertEquals(set([o2.key, o3.key, o4.key]), vals)
 
         # Test an equality query...
         results = bucket.get_index('field2_int', 1002)
         self.assertEquals(1, len(results))
-        self.assertEquals('mykey2', str(results[0]))
+        self.assertEquals(o2.key, str(results[0]))
 
         # Test a range query...
         results = bucket.get_index('field2_int', 1002, 1004)
         vals = set([str(key) for key in results])
         self.assertEquals(3, len(results))
-        self.assertEquals(set(['mykey2', 'mykey3', 'mykey4']), vals)
-
-        # Clean up...
-        bucket.get('mykey1').delete()
-        bucket.get('mykey2').delete()
-        bucket.get('mykey3').delete()
-        bucket.get('mykey4').delete()
+        self.assertEquals(set([o2.key, o3.key, o4.key]), vals)
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_invalid_name(self):
@@ -270,6 +243,43 @@ class TwoITests(object):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
 
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        keys = []
+        for entries in bucket.stream_index('field1_bin', 'val1', 'val3'):
+            keys.extend(entries)
+
+        # Riak 1.4 ensures that entries come back in-order
+        self.assertEqual([o1.key, o2.key, o3.key], keys)
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_return_terms(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        # Test synchronous index query
+        pairs = bucket.get_index('field1_bin', 'val2', 'val4',
+                                 return_terms=True)
+
+        self.assertEqual([('val2', o2.key),
+                          ('val3', o3.key),
+                          ('val4', o4.key)], pairs)
+
+        # Test streaming index query
+        spairs = []
+        for chunk in bucket.stream_index('field2_int', 1002, 1004,
+                                         return_terms=True):
+            spairs.extend(chunk)
+
+        self.assertEqual([(1002, o2.key), (1003, o3.key), (1004, o4.key)],
+                         spairs)
+
+    def _create_index_objects(self):
+        """
+        Creates a number of index objects to be used in 2i test
+        """
         bucket = self.client.bucket(self.bucket_name)
 
         o1 = bucket.\
@@ -293,9 +303,4 @@ class TwoITests(object):
             add_index('field2_int', 1004).\
             store()
 
-        keys = []
-        for entries in bucket.stream_index('field1_bin', 'val1', 'val3'):
-            keys.extend(entries)
-
-        # Riak 1.4 ensures that entries come back in-order
-        self.assertEqual([o1.key, o2.key, o3.key], keys)
+        return bucket, o1, o2, o3, o4
