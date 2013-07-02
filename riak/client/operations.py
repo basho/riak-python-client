@@ -40,7 +40,9 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :rtype list of RiakBucket instances
         """
-        return [self.bucket(name) for name in transport.get_buckets(timeout=timeout)]
+        _validate_timeout(timeout)
+        return [self.bucket(name) for name in
+                transport.get_buckets(timeout=timeout)]
 
     def stream_buckets(self, timeout=None):
         """
@@ -53,6 +55,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :rtype iterator
         """
+        _validate_timeout(timeout)
         with self._transport() as transport:
             stream = transport.stream_buckets(timeout=timeout)
             try:
@@ -135,6 +138,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :rtype: list
         """
+        _validate_timeout(timeout)
         return transport.get_keys(bucket, timeout=timeout)
 
     def stream_keys(self, bucket, timeout=None):
@@ -149,6 +153,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :rtype: iterator
         """
+        _validate_timeout(timeout)
         with self._transport() as transport:
             stream = transport.stream_keys(bucket, timeout=timeout)
             try:
@@ -181,6 +186,7 @@ class RiakClientOperations(RiakClientTransport):
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         """
+        _validate_timeout(timeout)
         return transport.put(robj, w=w, dw=dw, pw=pw,
                              return_body=return_body,
                              if_none_match=if_none_match,
@@ -200,6 +206,7 @@ class RiakClientOperations(RiakClientTransport):
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         """
+        _validate_timeout(timeout)
         if not isinstance(robj.key, basestring):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
@@ -229,6 +236,7 @@ class RiakClientOperations(RiakClientTransport):
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         """
+        _validate_timeout(timeout)
         return transport.delete(robj, rw=rw, r=r, w=w, dw=dw, pr=pr,
                                 pw=pw, timeout=timeout)
 
@@ -245,6 +253,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: integer, None
         :rtype: mixed
         """
+        _validate_timeout(timeout)
         return transport.mapred(inputs, query, timeout)
 
     def stream_mapred(self, inputs, query, timeout):
@@ -260,6 +269,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: integer, None
         :rtype: iterator
         """
+        _validate_timeout(timeout)
         with self._transport() as transport:
             stream = transport.stream_mapred(inputs, query, timeout)
             try:
@@ -307,3 +317,13 @@ class RiakClientOperations(RiakClientTransport):
         :type queries: list
         """
         transport.fulltext_delete(index, docs, queries)
+
+
+def _validate_timeout(timeout):
+    """
+    Raises an exception if the given timeout is an invalid value.
+    """
+    if not (timeout is None or
+            (type(timeout) in (int, long) and
+             timeout > 0)):
+        raise ValueError("timeout must be a positive integer")
