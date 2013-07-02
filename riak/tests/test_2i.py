@@ -294,9 +294,8 @@ class TwoITests(object):
             store()
 
         keys = []
-        for entries in self.client.stream_index(bucket, 'field1_bin',
-                                                'val1', 'val3'):
-            keys.append(entries)
+        for entries in bucket.stream_index('field1_bin', 'val1', 'val3'):
+            keys.extend(entries)
 
         # Riak 1.4 ensures that entries come back in-order
         self.assertEqual([o1.key, o2.key, o3.key], keys)
