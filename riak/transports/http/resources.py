@@ -51,7 +51,7 @@ class RiakHttpResources(object):
                           "props", **options)
         else:
             query = options.copy()
-            query.update(props=True, keys=True)
+            query.update(props=True, keys=False)
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), **query)
 
     def key_list_path(self, bucket, **options):

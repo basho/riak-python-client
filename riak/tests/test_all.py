@@ -163,6 +163,7 @@ class ClientTests(object):
                 for i in self.client.stream_mapred([], [], bad):
                     pass
 
+
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
                                BucketPropsTest,
