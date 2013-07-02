@@ -33,7 +33,8 @@ from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.codec import RiakHttpCodec
 from riak.transports.http.stream import (
     RiakHttpKeyStream,
-    RiakHttpMapReduceStream)
+    RiakHttpMapReduceStream,
+    RiakHttpBucketStream)
 from riak import RiakError
 
 
@@ -105,25 +106,26 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             return {}
 
-    def get(self, robj, r=None, pr=None):
+    def get(self, robj, r=None, pr=None, timeout=None):
         """
         Get a bucket/key from the server
         """
         # We could detect quorum_controls here but HTTP ignores
         # unknown flags/params.
-        params = {'r': r, 'pr': pr}
+        params = {'r': r, 'pr': pr, 'timeout': timeout}
         url = self.object_path(robj.bucket.name, robj.key, **params)
         response = self._request('GET', url)
         return self._parse_body(robj, response, [200, 300, 404])
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=True,
-            if_none_match=False):
+            if_none_match=False, timeout=None):
         """
         Puts a (possibly new) object.
         """
         # We could detect quorum_controls here but HTTP ignores
         # unknown flags/params.
-        params = {'returnbody': return_body, 'w': w, 'dw': dw, 'pw': pw}
+        params = {'returnbody': return_body, 'w': w, 'dw': dw, 'pw': pw,
+                  'timeout': timeout}
         url = self.object_path(robj.bucket.name, robj.key, **params)
         headers = self._build_put_headers(robj, if_none_match=if_none_match)
         content = bytearray(robj.encoded_data)
@@ -142,13 +144,15 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             self.check_http_code(response[0], expect)
             return None
 
-    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
+    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
+               timeout=None):
         """
         Delete an object.
         """
         # We could detect quorum_controls here but HTTP ignores
         # unknown flags/params.
-        params = {'rw': rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw}
+        params = {'rw': rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw,
+                  'timeout': timeout}
         headers = {}
         url = self.object_path(robj.bucket.name, robj.key, **params)
         if self.tombstone_vclocks() and robj.vclock is not None:
@@ -157,11 +161,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         self.check_http_code(response[0], [204, 404])
         return self
 
-    def get_keys(self, bucket):
+    def get_keys(self, bucket, timeout=None):
         """
         Fetch a list of keys for the bucket
         """
-        url = self.key_list_path(bucket.name)
+        url = self.key_list_path(bucket.name, timeout=timeout)
         status, _, body = self._request('GET', url)
 
         if status == 200:
@@ -170,8 +174,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise Exception('Error listing keys.')
 
-    def stream_keys(self, bucket):
-        url = self.key_list_path(bucket.name, keys='stream')
+    def stream_keys(self, bucket, timeout=None):
+        url = self.key_list_path(bucket.name, keys='stream', timeout=timeout)
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
@@ -179,11 +183,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise Exception('Error listing keys.')
 
-    def get_buckets(self):
+    def get_buckets(self, timeout=None):
         """
         Fetch a list of all buckets
         """
-        url = self.bucket_list_path()
+        url = self.bucket_list_path(timeout=timeout)
         status, headers, body = self._request('GET', url)
 
         if status == 200:
@@ -191,6 +195,22 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             return props['buckets']
         else:
             raise Exception('Error getting buckets.')
+
+    def stream_buckets(self, timeout=None):
+        """
+        Stream list of buckets through an iterator
+        """
+        if not self.bucket_stream():
+            raise NotImplementedError('Streaming list-buckets is not '
+                                      'supported')
+
+        url = self.bucket_list_path(buckets="stream", timeout=timeout)
+        status, headers, response = self._request('GET', url, stream=True)
+
+        if status == 200:
+            return RiakHttpBucketStream(response)
+        else:
+            raise Exception('Error listing buckets.')
 
     def get_bucket_props(self, bucket):
         """

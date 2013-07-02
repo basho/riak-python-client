@@ -24,7 +24,7 @@ from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
 from connection import RiakPbcConnection
-from stream import RiakPbcKeyStream, RiakPbcMapredStream
+from stream import RiakPbcKeyStream, RiakPbcMapredStream, RiakPbcBucketStream
 from codec import RiakPbcCodec
 
 from messages import (
@@ -117,7 +117,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     client_id = property(_get_client_id, _set_client_id,
                          doc="""the client ID for this connection""")
 
-    def get(self, robj, r=None, pr=None):
+    def get(self, robj, r=None, pr=None, timeout=None):
         """
         Serialize get request and deserialize response
         """
@@ -128,7 +128,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.r = self._encode_quorum(r)
         if self.quorum_controls() and pr:
             req.pr = self._encode_quorum(pr)
-
+        if self.client_timeouts() and timeout:
+            req.timeout = timeout
         if self.tombstone_vclocks():
             req.deletedvclock = 1
 
@@ -154,7 +155,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         return robj
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=True,
-            if_none_match=False):
+            if_none_match=False, timeout=None):
         """
         Serialize get request and deserialize response
         """
@@ -172,6 +173,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.return_body = 1
         if if_none_match:
             req.if_none_match = 1
+        if self.client_timeouts() and timeout:
+            req.timeout = timeout
 
         req.bucket = bucket.name
         if robj.key:
@@ -196,7 +199,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return robj
 
-    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None):
+    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
+               timeout=None):
         """
         Serialize get request and deserialize response
         """
@@ -218,6 +222,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             if pw:
                 req.pw = self._encode_quorum(pw)
 
+        if self.client_timeouts() and timeout:
+            req.timeout = timeout
+
         if self.tombstone_vclocks() and robj.vclock:
             req.vclock = robj.vclock.encode('binary')
 
@@ -228,36 +235,63 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                                        MSG_CODE_DEL_RESP)
         return self
 
-    def get_keys(self, bucket):
+    def get_keys(self, bucket, timeout=None):
         """
         Lists all keys within a bucket.
         """
         keys = []
-        for keylist in self.stream_keys(bucket):
+        for keylist in self.stream_keys(bucket, timeout=timeout):
             for key in keylist:
                 keys.append(key)
 
         return keys
 
-    def stream_keys(self, bucket):
+    def stream_keys(self, bucket, timeout=None):
         """
         Streams keys from a bucket, returning an iterator that yields
         lists of keys.
         """
         req = riak_pb.RpbListKeysReq()
         req.bucket = bucket.name
+        if self.client_timeouts() and timeout:
+            req.timeout = timeout
 
         self._send_msg(MSG_CODE_LIST_KEYS_REQ, req)
 
         return RiakPbcKeyStream(self)
 
-    def get_buckets(self):
+    def get_buckets(self, timeout=None):
         """
         Serialize bucket listing request and deserialize response
         """
-        msg_code, resp = self._request(MSG_CODE_LIST_BUCKETS_REQ,
-                                       expect=MSG_CODE_LIST_BUCKETS_RESP)
+        req = None
+        if self.client_timeouts() and timeout:
+            req = riak_pb.RpbListBucketsReq()
+            req.timeout = timeout
+
+        msg_code, resp = self._request(MSG_CODE_LIST_BUCKETS_REQ, req,
+                                       MSG_CODE_LIST_BUCKETS_RESP)
         return resp.buckets
+
+    def stream_buckets(self, timeout=None):
+        """
+        Stream list of buckets through an iterator
+        """
+
+        if not self.bucket_stream():
+            raise NotImplementedError('Streaming list-buckets is not '
+                                      'supported')
+
+        req = riak_pb.RpbListBucketsReq()
+        req.stream = True
+        # Bucket streaming landed in the same release as timeouts, so
+        # we don't need to check the capability.
+        if timeout:
+            req.timeout = timeout
+
+        self._send_msg(MSG_CODE_LIST_BUCKETS_REQ, req)
+
+        return RiakPbcBucketStream(self)
 
     def get_bucket_props(self, bucket):
         """

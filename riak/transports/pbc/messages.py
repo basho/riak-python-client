@@ -78,7 +78,7 @@ MESSAGE_CLASSES = {
     MSG_CODE_PUT_RESP: riak_pb.RpbPutResp,
     MSG_CODE_DEL_REQ: riak_pb.RpbDelReq,
     MSG_CODE_DEL_RESP: None,
-    MSG_CODE_LIST_BUCKETS_REQ: None,
+    MSG_CODE_LIST_BUCKETS_REQ: riak_pb.RpbListBucketsReq,
     MSG_CODE_LIST_BUCKETS_RESP: riak_pb.RpbListBucketsResp,
     MSG_CODE_LIST_KEYS_REQ: riak_pb.RpbListKeysReq,
     MSG_CODE_LIST_KEYS_RESP: riak_pb.RpbListKeysResp,

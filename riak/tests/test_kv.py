@@ -423,6 +423,30 @@ class BasicKVTests(object):
         buckets = self.client.get_buckets()
         self.assertTrue(self.bucket_name in [x.name for x in buckets])
 
+    def test_stream_buckets(self):
+        bucket = self.client.bucket(self.bucket_name)
+        bucket.new(self.key_name, data={"foo": "one",
+                                        "bar": "baz"}).store()
+        buckets = []
+        for bucket_list in self.client.stream_buckets():
+            buckets.extend(bucket_list)
+
+        self.assertTrue(self.bucket_name in [x.name for x in buckets])
+
+    def test_stream_buckets_abort(self):
+        bucket = self.client.bucket(self.bucket_name)
+        bucket.new(self.key_name, data={"foo": "one",
+                                        "bar": "baz"}).store()
+        try:
+            for bucket_list in self.client.stream_buckets():
+                raise RuntimeError("abort")
+        except RuntimeError:
+            pass
+
+        robj = bucket.get(self.key_name)
+        self.assertTrue(robj.exists)
+        self.assertEqual(len(robj.siblings), 1)
+
     def generate_siblings(self, original, count=5, delay=None):
         vals = []
         for i in range(count):
