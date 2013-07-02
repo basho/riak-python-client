@@ -15,7 +15,7 @@ class TwoITests(object):
     def is_2i_supported(self):
         # Immediate test to see if 2i is even supported w/ the backend
         try:
-            self.client.index('foo', 'bar_bin', 'baz').run()
+            self.client.get_index('foo', 'bar_bin', 'baz')
             return True
         except Exception as e:
             if "indexes_not_supported" in str(e):
@@ -25,7 +25,7 @@ class TwoITests(object):
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_store(self):
         if not self.is_2i_supported():
-            return True
+            raise unittest.SkipTest("2I not supported")
 
         # Create a new object with indexes...
         bucket = self.client.bucket(self.bucket_name)
@@ -106,7 +106,7 @@ class TwoITests(object):
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_set_indexes(self):
         if not self.is_2i_supported():
-            return True
+            raise unittest.SkipTest("2I not supported")
 
         bucket = self.client.bucket(self.bucket_name)
         foo = bucket.new('foo', 1)
@@ -124,7 +124,7 @@ class TwoITests(object):
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_remove_indexes(self):
         if not self.is_2i_supported():
-            return True
+            raise unittest.SkipTest("2I not supported")
 
         bucket = self.client.bucket(self.bucket_name)
         bar = bucket.new('bar', 1).add_index('bar_int', 1)\
@@ -184,7 +184,7 @@ class TwoITests(object):
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_query(self):
         if not self.is_2i_supported():
-            return True
+            raise unittest.SkipTest("2I not supported")
 
         bucket = self.client.bucket(self.bucket_name)
 
@@ -240,7 +240,7 @@ class TwoITests(object):
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_invalid_name(self):
         if not self.is_2i_supported():
-            return True
+            raise unittest.SkipTest("2I not supported")
 
         bucket = self.client.bucket(self.bucket_name)
 
@@ -250,7 +250,7 @@ class TwoITests(object):
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
     def test_set_index(self):
         if not self.is_2i_supported():
-            return True
+            raise unittest.SkipTest("2I not supported")
 
         bucket = self.client.bucket(self.bucket_name)
         obj = bucket.new('bar', 1)
@@ -264,3 +264,39 @@ class TwoITests(object):
         self.assertEqual(set((('bar_int', 3), ('bar2_int', 1))), obj.indexes)
         obj.set_index('bar2_int', 10)
         self.assertEqual(set((('bar_int', 3), ('bar2_int', 10))), obj.indexes)
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_stream_index(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I not supported")
+
+        bucket = self.client.bucket(self.bucket_name)
+
+        o1 = bucket.\
+            new(self.key_name, 'data1').\
+            add_index('field1_bin', 'val1').\
+            add_index('field2_int', 1001).\
+            store()
+        o2 = bucket.\
+            new(self.randname(), 'data1').\
+            add_index('field1_bin', 'val2').\
+            add_index('field2_int', 1002).\
+            store()
+        o3 = bucket.\
+            new(self.randname(), 'data1').\
+            add_index('field1_bin', 'val3').\
+            add_index('field2_int', 1003).\
+            store()
+        o4 = bucket.\
+            new(self.randname(), 'data1').\
+            add_index('field1_bin', 'val4').\
+            add_index('field2_int', 1004).\
+            store()
+
+        keys = []
+        for entries in self.client.stream_index(bucket, 'field1_bin',
+                                                'val1', 'val3'):
+            keys.append(entries)
+
+        # Riak 1.4 ensures that entries come back in-order
+        self.assertEqual([o1.key, o2.key, o3.key], keys)
