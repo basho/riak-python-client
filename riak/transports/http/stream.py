@@ -123,3 +123,23 @@ class RiakHttpMapReduceStream(RiakHttpMultipartStream):
         message = super(RiakHttpMapReduceStream, self).next()
         payload = json.loads(message.get_payload())
         return payload['phase'], payload['data']
+
+
+class RiakHttpIndexStream(RiakHttpMultipartStream):
+    """
+    Streaming iterator for secondary indexes over HTTP
+    """
+
+    def next(self):
+        message = super(RiakHttpIndexStream, self).next()
+        payload = json.loads(message.get_payload())
+        if u'keys' in payload:
+            return payload[u'keys']
+        elif u'results' in payload:
+            structs = payload[u'results']
+            # Format is {"results":[{"2ikey":"primarykey"}, ...]}
+            munged = [ d.items()[0] for d in structs ]
+            return munged
+        else:
+            # WAT
+            self.next()

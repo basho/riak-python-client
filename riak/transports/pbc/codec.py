@@ -373,3 +373,26 @@ class RiakPbcCodec(object):
         else:
             self._encode_modfun(hook, msg.modfun)
         return msg
+
+    def _encode_index_req(self, bucket, index, startkey, endkey=None):
+        """
+        Encodes a secondary index request into the protobuf message.
+
+        :param bucket: the bucket whose index to query
+        :type bucket: string
+        :param index: the index to query
+        :type index: string
+        :param startkey: the value or beginning of the range
+        :type startkey: integer, string
+        :param endkey: the end of the range
+        :type endkey: integer, string
+        """
+        req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
+        if endkey:
+            req.qtype = riak_pb.RpbIndexReq.range
+            req.range_min = str(startkey)
+            req.range_max = str(endkey)
+        else:
+            req.qtype = riak_pb.RpbIndexReq.eq
+            req.key = str(startkey)
+        return req

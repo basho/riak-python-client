@@ -24,7 +24,7 @@ from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
 from connection import RiakPbcConnection
-from stream import RiakPbcKeyStream, RiakPbcMapredStream
+from stream import RiakPbcKeyStream, RiakPbcMapredStream, RiakPbcIndexStream
 from codec import RiakPbcCodec
 
 from messages import (
@@ -338,18 +338,22 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_indexes():
             return self._get_index_mapred_emu(bucket, index, startkey, endkey)
 
-        req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
-        if endkey:
-            req.qtype = riak_pb.RpbIndexReq.range
-            req.range_min = str(startkey)
-            req.range_max = str(endkey)
-        else:
-            req.qtype = riak_pb.RpbIndexReq.eq
-            req.key = str(startkey)
+        req = self._encode_index_req(bucket, index, startkey, endkey)
 
         msg_code, resp = self._request(MSG_CODE_INDEX_REQ, req,
                                        MSG_CODE_INDEX_RESP)
         return resp.keys
+
+    def stream_index(self, bucket, index, startkey, endkey=None):
+        if not self.stream_indexes():
+            raise NotImplementedError("Secondary index streaming is not "
+                                      "supported")
+        req = self._encode_index_req(bucket, index, startkey, endkey)
+        req.stream = True
+
+        self._send_msg(MSG_CODE_INDEX_REQ, req)
+
+        return RiakPbcIndexStream(self)
 
     def search(self, index, query, **params):
         if not self.pb_search():

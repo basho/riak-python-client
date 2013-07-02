@@ -20,7 +20,8 @@ under the License.
 import json
 from riak.transports.pbc.messages import (
     MSG_CODE_LIST_KEYS_RESP,
-    MSG_CODE_MAPRED_RESP
+    MSG_CODE_MAPRED_RESP,
+    MSG_CODE_INDEX_RESP
 )
 
 
@@ -96,3 +97,26 @@ class RiakPbcMapredStream(RiakPbcStream):
             raise StopIteration
 
         return response.phase, json.loads(response.response)
+
+
+class RiakPbcIndexStream(RiakPbcStream):
+    """
+    Used internally by RiakPbcTransport to implement Secondary Index
+    streams.
+    """
+
+    _expect = MSG_CODE_INDEX_RESP
+
+    def next(self):
+        response = super(RiakPbcIndexStream, self).next()
+
+        if response.done and not (response.keys or response.results):
+            raise StopIteration
+
+        if response.keys:
+            return response.keys
+        elif response.results:
+            return [(r.key, r.value) for r in response.results]
+        else:
+            # WAT
+            return self.next()

@@ -33,7 +33,8 @@ from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.codec import RiakHttpCodec
 from riak.transports.http.stream import (
     RiakHttpKeyStream,
-    RiakHttpMapReduceStream)
+    RiakHttpMapReduceStream,
+    RiakHttpIndexStream)
 from riak import RiakError
 
 
@@ -284,6 +285,22 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         self.check_http_code(status, [200])
         json_data = json.loads(body)
         return json_data[u'keys'][:]
+
+    def stream_index(self, bucket, index, startkey, endkey=None):
+        """
+        Streams a secondary index query.
+        """
+        if not self.stream_indexes():
+            raise NotImplementedError("Secondary index streaming is not "
+                                      "supported")
+
+        url = self.index_path(bucket, index, startkey, endkey, stream=True)
+        status, headers, response = self._request('GET', url, stream=True)
+
+        if status == 200:
+            return RiakHttpIndexStream(response)
+        else:
+            raise Exception('Error streaming secondary index.')
 
     def search(self, index, query, **params):
         """
