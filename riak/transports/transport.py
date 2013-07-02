@@ -167,6 +167,12 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def stream_index(self, bucket, index, startkey, endkey=None):
+        """
+        Streams a secondary index query.
+        """
+        raise NotImplementedError
+
     def fulltext_add(self, index, *docs):
         """
         Adds documents to the full-text index.

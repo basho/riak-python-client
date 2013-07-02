@@ -66,6 +66,29 @@ class RiakClientOperations(RiakClientTransport):
         """
         return transport.get_index(bucket, index, startkey, endkey)
 
+    def stream_index(self, bucket, index, startkey, endkey=None):
+        """
+        Queries a secondary index, streaming matching keys through an
+        iterator.
+
+        :param bucket: the bucket whose index will be queried
+        :type bucket: RiakBucket
+        :param index: the index to query
+        :type index: string
+        :param startkey: the sole key to query, or beginning of the query range
+        :type startkey: string, integer
+        :param endkey: the end of the query range (optional if equality)
+        :type endkey: string, integer
+        :rtype: iterable
+        """
+        with self._transport() as transport:
+            stream = transport.stream_index(bucket, index, startkey, endkey)
+            try:
+                for item in stream:
+                    yield item
+            finally:
+                stream.close()
+
     @retryable
     def get_bucket_props(self, transport, bucket):
         """

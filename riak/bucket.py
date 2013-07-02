@@ -411,6 +411,13 @@ class RiakBucket(object):
         """
         return self._client.get_index(self.name, index, startkey, endkey)
 
+    def stream_index(self, index, startkey, endkey=None):
+        """
+        Queries a secondary index over objects in this bucket,
+        streaming keys via an iterator.
+        """
+        return self._client.stream_index(self.name, index, startkey, endkey)
+
     def delete(self, key, **kwargs):
         """Deletes an object from riak.
 
