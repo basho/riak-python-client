@@ -276,6 +276,128 @@ class TwoITests(object):
         self.assertEqual([(1002, o2.key), (1003, o3.key), (1004, o4.key)],
                          spairs)
 
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_pagination(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        results = bucket.get_index('field1_bin', 'val0', 'val5',
+                                   max_results=2)
+        # Number of results =< page size
+        self.assertLessEqual(2, len(results))
+        # Results are in-order
+        self.assertEqual([o1.key, o2.key], results)
+
+        # Continuation/next page present when page size smaller than
+        # total results size
+        self.assertIsNotNone(results.continuation)
+        self.assertTrue(results.has_next_page())
+
+        # Retrieving next page gets more results
+        page2 = results.next_page()
+        self.assertLessEqual(2, len(page2))
+        self.assertEqual([o3.key, o4.key], page2)
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_pagination_return_terms(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        # ========= Above steps work for return-terms ==========
+        results = bucket.get_index('field1_bin', 'val0', 'val5',
+                                   max_results=2, return_terms=True)
+        # Number of results =< page size
+        self.assertLessEqual(2, len(results))
+        # Results are in-order
+        self.assertEqual([('val1', o1.key), ('val2', o2.key)], results)
+
+        # Continuation/next page present when page size smaller than
+        # total results size
+        self.assertIsNotNone(results.continuation)
+        self.assertTrue(results.has_next_page())
+
+        # Retrieving next page gets more results
+        page2 = results.next_page()
+        self.assertLessEqual(2, len(results))
+        self.assertEqual([('val3', o3.key), ('val4', o4.key)], page2)
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_pagination_stream(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        # ========= Above steps work for streaming ==========
+        stream = bucket.stream_index('field1_bin', 'val0', 'val5',
+                                     max_results=2)
+        results = []
+        for result in stream:
+            results.extend(result)
+
+        # Number of results =< page size
+        self.assertLessEqual(2, len(results))
+        # Results are in-order
+        self.assertEqual([o1.key, o2.key], results)
+
+        # Continuation/next page present when page size smaller than
+        # total results size
+        self.assertIsNotNone(stream.continuation)
+        self.assertTrue(stream.has_next_page())
+
+        # Retrieving next page gets more results
+        results = []
+        for result in stream.next_page():
+            results.extend(result)
+        self.assertLessEqual(2, len(results))
+        self.assertEqual([o3.key, o4.key], results)
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_pagination_stream_return_terms(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        # ========= Above steps work for streaming with return-terms ==========
+
+        stream = bucket.stream_index('field1_bin', 'val0', 'val5',
+                                     max_results=2, return_terms=True)
+        results = []
+        for result in stream:
+            results.extend(result)
+
+        # Number of results =< page size
+        self.assertLessEqual(2, len(results))
+        # Results are in-order
+        self.assertEqual([('val1', o1.key), ('val2', o2.key)], results)
+
+        # Continuation/next page present when page size smaller than
+        # total results size
+        self.assertIsNotNone(stream.continuation)
+        self.assertTrue(stream.has_next_page())
+
+        # Retrieving next page gets more results
+        results = []
+        for result in stream.next_page():
+            results.extend(result)
+        self.assertLessEqual(2, len(results))
+        self.assertEqual([('val3', o3.key), ('val4', o4.key)], results)
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_eq_query_return_terms(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        results = bucket.get_index('field2_int', 1001, return_terms=True)
+        self.assertEqual([(1001, o1.key)], results)
+
     def _create_index_objects(self):
         """
         Creates a number of index objects to be used in 2i test

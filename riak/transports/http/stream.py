@@ -22,6 +22,7 @@ import re
 from cgi import parse_header
 from email import message_from_string
 from riak.util import decode_index_value
+from riak.client.index_page import CONTINUATION
 
 
 class RiakHttpStream(object):
@@ -145,9 +146,8 @@ class RiakHttpIndexStream(RiakHttpMultipartStream):
             structs = payload[u'results']
             # Format is {"results":[{"2ikey":"primarykey"}, ...]}
             return [self._decode_pair(d.items()[0]) for d in structs]
-        else:
-            # WAT
-            self.next()
+        elif u'continuation' in payload:
+            return CONTINUATION(payload[u'continuation'])
 
     def _decode_pair(self, pair):
         return (decode_index_value(self.index, pair[0]), pair[1])

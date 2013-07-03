@@ -23,6 +23,8 @@ from riak.transports.pbc.messages import (
     MSG_CODE_MAPRED_RESP,
     MSG_CODE_INDEX_RESP
 )
+from riak.util import decode_index_value
+from riak.client.index_page import CONTINUATION
 
 
 class RiakPbcStream(object):
@@ -115,16 +117,15 @@ class RiakPbcIndexStream(RiakPbcStream):
     def next(self):
         response = super(RiakPbcIndexStream, self).next()
 
-        if response.done and not (response.keys or response.results):
+        if response.done and not (response.keys or
+                                  response.results or
+                                  response.continuation):
             raise StopIteration
 
         if self.return_terms and response.results:
-            return [(self._coerce(r.key), r.value) for r in response.results]
+            return [(decode_index_value(self.index, r.key), r.value)
+                    for r in response.results]
         elif response.keys:
             return response.keys
-
-    def _coerce(self, index_value):
-        if "_int" in self.index:
-            return long(index_value)
-        else:
-            return str(index_value)
+        elif response.continuation:
+            return CONTINUATION(response.continuation)

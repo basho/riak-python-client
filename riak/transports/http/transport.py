@@ -278,26 +278,31 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                 (repr(headers), repr(response.read())))
 
     def get_index(self, bucket, index, startkey, endkey=None,
-                  return_terms=None):
+                  return_terms=None, max_results=None, continuation=None):
         """
         Performs a secondary index query.
         """
-        params = {'return_terms': return_terms}
+        params = {'return_terms': return_terms, 'max_results': max_results,
+                  'continuation': continuation}
         url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
         json_data = json.loads(body)
-        if return_terms:
+        if return_terms and u'results' in json_data:
             results = []
             for result in json_data[u'results'][:]:
                 term, key = result.items()[0]
                 results.append((decode_index_value(index, term), key),)
-            return results
         else:
-            return json_data[u'keys'][:]
+            results = json_data[u'keys'][:]
+
+        if max_results and u'continuation' in json_data:
+            return (results, json_data[u'continuation'])
+        else:
+            return (results, None)
 
     def stream_index(self, bucket, index, startkey, endkey=None,
-                     return_terms=None):
+                     return_terms=None, max_results=None, continuation=None):
         """
         Streams a secondary index query.
         """
@@ -305,7 +310,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise NotImplementedError("Secondary index streaming is not "
                                       "supported")
 
-        params = {'return_terms': return_terms, 'stream': True}
+        params = {'return_terms': return_terms, 'stream': True,
+                  'max_results': max_results, 'continuation': continuation}
         url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, response = self._request('GET', url, stream=True)
 

@@ -375,7 +375,8 @@ class RiakPbcCodec(object):
         return msg
 
     def _encode_index_req(self, bucket, index, startkey, endkey=None,
-                          return_terms=None):
+                          return_terms=None, max_results=None,
+                          continuation=None):
         """
         Encodes a secondary index request into the protobuf message.
 
@@ -389,6 +390,11 @@ class RiakPbcCodec(object):
         :type endkey: integer, string
         :param return_terms: whether to return the index term with the key
         :type return_terms: bool
+        :param max_results: the maximum number of results to return (page size)
+        :type max_results: integer
+        :param continuation: the opaque continuation returned from a
+            previous paginated request
+        :type continuation: string
         :rtype riak_pb.RpbIndexReq
         """
         req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
@@ -401,4 +407,8 @@ class RiakPbcCodec(object):
             req.key = str(startkey)
         if return_terms is not None:
             req.return_terms = return_terms
+        if max_results:
+            req.max_results = max_results
+        if continuation:
+            req.continuation = continuation
         return req
