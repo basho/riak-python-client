@@ -33,8 +33,10 @@ from riak.transports.http.connection import RiakHttpConnection
 from riak.transports.http.codec import RiakHttpCodec
 from riak.transports.http.stream import (
     RiakHttpKeyStream,
-    RiakHttpMapReduceStream)
+    RiakHttpMapReduceStream,
+    RiakHttpIndexStream)
 from riak import RiakError
+from riak.util import decode_index_value
 
 
 class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
@@ -275,15 +277,48 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                 'Error running MapReduce operation. Headers: %s Body: %s' %
                 (repr(headers), repr(response.read())))
 
-    def get_index(self, bucket, index, startkey, endkey=None):
+    def get_index(self, bucket, index, startkey, endkey=None,
+                  return_terms=None, max_results=None, continuation=None):
         """
         Performs a secondary index query.
         """
-        url = self.index_path(bucket, index, startkey, endkey)
+        params = {'return_terms': return_terms, 'max_results': max_results,
+                  'continuation': continuation}
+        url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
         json_data = json.loads(body)
-        return json_data[u'keys'][:]
+        if return_terms and u'results' in json_data:
+            results = []
+            for result in json_data[u'results'][:]:
+                term, key = result.items()[0]
+                results.append((decode_index_value(index, term), key),)
+        else:
+            results = json_data[u'keys'][:]
+
+        if max_results and u'continuation' in json_data:
+            return (results, json_data[u'continuation'])
+        else:
+            return (results, None)
+
+    def stream_index(self, bucket, index, startkey, endkey=None,
+                     return_terms=None, max_results=None, continuation=None):
+        """
+        Streams a secondary index query.
+        """
+        if not self.stream_indexes():
+            raise NotImplementedError("Secondary index streaming is not "
+                                      "supported")
+
+        params = {'return_terms': return_terms, 'stream': True,
+                  'max_results': max_results, 'continuation': continuation}
+        url = self.index_path(bucket, index, startkey, endkey, **params)
+        status, headers, response = self._request('GET', url, stream=True)
+
+        if status == 200:
+            return RiakHttpIndexStream(response, index, return_terms)
+        else:
+            raise Exception('Error streaming secondary index.')
 
     def search(self, index, query, **params):
         """

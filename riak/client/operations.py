@@ -17,6 +17,7 @@ under the License.
 """
 
 from transport import RiakClientTransport, retryable, retryableHttpOnly
+from index_page import IndexPage
 
 
 class RiakClientOperations(RiakClientTransport):
@@ -50,7 +51,8 @@ class RiakClientOperations(RiakClientTransport):
     is_alive = ping
 
     @retryable
-    def get_index(self, transport, bucket, index, startkey, endkey=None):
+    def get_index(self, transport, bucket, index, startkey, endkey=None,
+                  return_terms=None, max_results=None, continuation=None):
         """
         Queries a secondary index, returning matching keys.
 
@@ -62,9 +64,57 @@ class RiakClientOperations(RiakClientTransport):
         :type startkey: string, integer
         :param endkey: the end of the query range (optional if equality)
         :type endkey: string, integer
-        :rtype: list
+        :param return_terms: whether to include the secondary index value
+        :type return_terms: boolean
+        :param max_results: the maximum number of results to return (page size)
+        :type max_results: integer
+        :param continuation: the opaque continuation returned from a
+            previous paginated request
+        :type continuation: string
+        :rtype: :class:`riak.client.index_page.IndexPage`
         """
-        return transport.get_index(bucket, index, startkey, endkey)
+        page = IndexPage(self, bucket, index, startkey, endkey,
+                         return_terms, max_results)
+
+        results, continuation = transport.get_index(
+            bucket, index, startkey, endkey, return_terms=return_terms,
+            max_results=max_results, continuation=continuation)
+
+        page.results = results
+        page.continuation = continuation
+        return page
+
+    def stream_index(self, bucket, index, startkey, endkey=None,
+                     return_terms=None, max_results=None, continuation=None):
+        """
+        Queries a secondary index, streaming matching keys through an
+        iterator.
+
+        :param bucket: the bucket whose index will be queried
+        :type bucket: RiakBucket
+        :param index: the index to query
+        :type index: string
+        :param startkey: the sole key to query, or beginning of the query range
+        :type startkey: string, integer
+        :param endkey: the end of the query range (optional if equality)
+        :type endkey: string, integer
+        :param return_terms: whether to include the secondary index value
+        :type return_terms: boolean
+        :param max_results: the maximum number of results to return (page size)
+        :type max_results: integer
+        :param continuation: the opaque continuation returned from a
+            previous paginated request
+        :type continuation: string
+        :rtype: :class:`riak.client.index_page.IndexPage`
+        """
+        page = IndexPage(self, bucket, index, startkey, endkey,
+                         return_terms, max_results)
+        with self._transport() as transport:
+            page.stream = True
+            page.results = transport.stream_index(
+                bucket, index, startkey, endkey, return_terms=return_terms,
+                max_results=max_results, continuation=continuation)
+            return page
 
     @retryable
     def get_bucket_props(self, transport, bucket):

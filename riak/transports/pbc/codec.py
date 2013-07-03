@@ -18,6 +18,7 @@ under the License.
 import riak_pb
 from riak import RiakError
 from riak.content import RiakContent
+from riak.util import decode_index_value
 
 
 def _invert(d):
@@ -147,8 +148,7 @@ class RiakPbcCodec(object):
         sibling.usermeta = dict([(usermd.key, usermd.value)
                                  for usermd in rpb_content.usermeta])
         sibling.indexes = set([(index.key,
-                                self._decode_index_value(index.key,
-                                                         index.value))
+                                decode_index_value(index.key, index.value))
                                for index in rpb_content.indexes])
 
         sibling.encoded_data = rpb_content.value
@@ -373,3 +373,42 @@ class RiakPbcCodec(object):
         else:
             self._encode_modfun(hook, msg.modfun)
         return msg
+
+    def _encode_index_req(self, bucket, index, startkey, endkey=None,
+                          return_terms=None, max_results=None,
+                          continuation=None):
+        """
+        Encodes a secondary index request into the protobuf message.
+
+        :param bucket: the bucket whose index to query
+        :type bucket: string
+        :param index: the index to query
+        :type index: string
+        :param startkey: the value or beginning of the range
+        :type startkey: integer, string
+        :param endkey: the end of the range
+        :type endkey: integer, string
+        :param return_terms: whether to return the index term with the key
+        :type return_terms: bool
+        :param max_results: the maximum number of results to return (page size)
+        :type max_results: integer
+        :param continuation: the opaque continuation returned from a
+            previous paginated request
+        :type continuation: string
+        :rtype riak_pb.RpbIndexReq
+        """
+        req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
+        if endkey:
+            req.qtype = riak_pb.RpbIndexReq.range
+            req.range_min = str(startkey)
+            req.range_max = str(endkey)
+        else:
+            req.qtype = riak_pb.RpbIndexReq.eq
+            req.key = str(startkey)
+        if return_terms is not None:
+            req.return_terms = return_terms
+        if max_results:
+            req.max_results = max_results
+        if continuation:
+            req.continuation = continuation
+        return req
