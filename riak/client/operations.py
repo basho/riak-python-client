@@ -73,9 +73,6 @@ class RiakClientOperations(RiakClientTransport):
         :type continuation: string
         :rtype: :class:`riak.client.index_page.IndexPage`
         """
-        if return_terms and endkey is None:
-            raise ValueError("Cannot use return_terms with an equality query")
-
         page = IndexPage(self, bucket, index, startkey, endkey,
                          return_terms, max_results)
 
@@ -110,9 +107,6 @@ class RiakClientOperations(RiakClientTransport):
         :type continuation: string
         :rtype: :class:`riak.client.index_page.IndexPage`
         """
-        if return_terms and endkey is None:
-            raise ValueError("Cannot use return_terms with an equality query")
-
         page = IndexPage(self, bucket, index, startkey, endkey,
                          return_terms, max_results)
         with self._transport() as transport:

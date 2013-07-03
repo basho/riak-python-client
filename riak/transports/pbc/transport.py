@@ -350,7 +350,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             results = [(decode_index_value(index, pair.key), pair.value)
                        for pair in resp.results]
         else:
-            results = resp.keys
+            results = resp.keys[:]
 
         if max_results:
             return (results, resp.continuation)

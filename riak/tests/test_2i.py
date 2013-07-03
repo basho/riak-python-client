@@ -398,6 +398,19 @@ class TwoITests(object):
         results = bucket.get_index('field2_int', 1001, return_terms=True)
         self.assertEqual([(1001, o1.key)], results)
 
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_eq_query_stream_return_terms(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        results = []
+        for item in bucket.stream_index('field2_int', 1001, return_terms=True):
+            results.extend(item)
+
+        self.assertEqual([(1001, o1.key)], results)
+
     def _create_index_objects(self):
         """
         Creates a number of index objects to be used in 2i test

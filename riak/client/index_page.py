@@ -47,41 +47,60 @@ class IndexPage(Sequence, object):
         self.stream = False
 
     def __iter__(self):
-        if self.results:
-            try:
-                for result in self.results:
-                    if self.stream and isinstance(result, CONTINUATION):
-                        self.continuation = result.c
-                    else:
-                        yield result
-            finally:
-                if self.stream:
-                    self.results.close()
-        else:
+        """
+        Emulates the iterator interface. When streaming, this means
+        delegating to the stream, otherwise iterating over the
+        existing result set.
+        """
+        if self.results is None:
             raise ValueError("No index results to iterate")
 
+        try:
+            for result in self.results:
+                if self.stream and isinstance(result, CONTINUATION):
+                    self.continuation = result.c
+                else:
+                    yield self._inject_term(result)
+        finally:
+            if self.stream:
+                self.results.close()
+
     def __len__(self):
-        if not self.stream and self.results is not None:
+        """
+        Returns the length of the captured results.
+        """
+        if self._has_results():
             return len(self.results)
         else:
             raise ValueError("Streamed index page has no length")
 
     def __getitem__(self, index):
-        if not self.stream and self.results is not None:
+        """
+        Fetches an item by index from the captured results.
+        """
+        if self._has_results():
             return self.results[index]
         else:
             raise ValueError("Streamed index page has no entries")
 
     def __eq__(self, other):
-        if isinstance(other, list) and not (self.stream or
-                                            self.results is None):
-            return self.results == other
+        """
+        An IndexPage can pretend to be equal to a list when it has
+        captured results by simply comparing the internal results to
+        the passed list. Otherwise the other object needs to be an
+        equivalent IndexPage.
+        """
+        if isinstance(other, list) and self._has_results():
+            return self._inject_term(self.results) == other
         elif isinstance(other, IndexPage):
             return other.__dict__ == self.__dict__
         else:
             return False
 
     def __ne__(self, other):
+        """
+        Converse of __eq__.
+        """
         return not self.__eq__(other)
 
     def has_next_page(self):
@@ -120,3 +139,33 @@ class IndexPage(Sequence, object):
             return self.client.stream_index(**args)
         else:
             return self.client.get_index(**args)
+
+    def _has_results(self):
+        """
+        When not streaming, have results been assigned?
+        """
+        return not (self.stream or self.results is None)
+
+    def _should_inject_term(self, term):
+        """
+        The index term should be injected when using an equality query
+        and the return terms option. If the term is already a tuple,
+        it can be skipped.
+        """
+        return self.return_terms and not self.endkey
+
+    def _inject_term(self, result):
+        """
+        Upgrades a result (streamed or not) to include the index term
+        when an equality query is used with return_terms.
+        """
+        if self._should_inject_term(result):
+            if type(result) is list:
+                return [ (self.startkey, r) for r in result ]
+            else:
+                return (self.startkey, result)
+        else:
+            return result
+
+    def __repr__(self):
+        return "<{!s} {!r}>".format(self.__class__.__name__, self.__dict__)

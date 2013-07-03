@@ -126,6 +126,6 @@ class RiakPbcIndexStream(RiakPbcStream):
             return [(decode_index_value(self.index, r.key), r.value)
                     for r in response.results]
         elif response.keys:
-            return response.keys
+            return response.keys[:]
         elif response.continuation:
             return CONTINUATION(response.continuation)
