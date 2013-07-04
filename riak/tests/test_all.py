@@ -13,6 +13,7 @@ else:
 from riak.client import RiakClient
 from riak.mapreduce import RiakKeyFilter
 from riak import key_filter
+from riak.riak_object import RiakObject
 
 from riak.test_server import TestServer
 
@@ -128,6 +129,45 @@ class ClientTests(object):
         # error.
         self.assertRaises(IOError, client.ping)
 
+    def test_multiget_bucket(self):
+        """
+        Multiget operations can be invoked on buckets.
+        """
+        keys = [self.key_name, self.randname(), self.randname()]
+        for key in keys:
+            self.client.bucket(self.bucket_name)\
+                .new(key, encoded_data=key, content_type="text/plain")\
+                .store()
+        results = self.client.bucket(self.bucket_name).multiget(keys)
+        for obj in results:
+            self.assertIsInstance(obj, RiakObject)
+            self.assertTrue(obj.exists)
+            self.assertEqual(obj.key, obj.encoded_data)
+
+    def test_multiget_errors(self):
+        """
+        Unrecoverable errors are captured along with the bucket/key
+        and not propagated.
+        """
+        keys = [self.key_name, self.randname(), self.randname()]
+        client = self.create_client(http_port=1023, pb_port=1024)
+        results = client.bucket(self.bucket_name).multiget(keys)
+        for failure in results:
+            self.assertIsInstance(failure, tuple)
+            self.assertEqual(failure[0], self.bucket_name)
+            self.assertIn(failure[1], keys)
+            self.assertIsInstance(failure[2], StandardError)
+
+    def test_multiget_notfounds(self):
+        """
+        Not founds work in multiget just the same as get.
+        """
+        keys = [(self.bucket_name, self.key_name),
+                (self.bucket_name, self.randname())]
+        results = self.client.multiget(keys)
+        for obj in results:
+            self.assertIsInstance(obj, RiakObject)
+            self.assertFalse(obj.exists)
 
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
