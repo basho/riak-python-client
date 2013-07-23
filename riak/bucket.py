@@ -179,7 +179,7 @@ class RiakBucket(object):
                    'param instead of data')
         return self.new(key, encoded_data=data, content_type=content_type)
 
-    def get(self, key, r=None, pr=None):
+    def get(self, key, r=None, pr=None, timeout=None):
         """
         Retrieve an object from Riak.
 
@@ -189,12 +189,14 @@ class RiakBucket(object):
         :type r: integer
         :param pr: PR-Value of the request (defaults to bucket's PR)
         :type pr: integer
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         obj = RiakObject(self._client, self, key)
-        return obj.reload(r=r, pr=pr)
+        return obj.reload(r=r, pr=pr, timeout=timeout)
 
-    def get_binary(self, key, r=None, pr=None):
+    def get_binary(self, key, r=None, pr=None, timeout=None):
         """
         Retrieve a binary/string object from Riak. DEPRECATED
 
@@ -204,11 +206,13 @@ class RiakBucket(object):
         :type r: integer
         :param pr: PR-Value of the request (defaults to bucket's PR)
         :type pr: integer
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         deprecated('RiakBucket.get_binary is deprecated, '
                    'use RiakBucket.get')
-        return self.get(key, r=r, pr=pr)
+        return self.get(key, r=r, pr=pr, timeout=timeout)
 
     def multiget(self, keys, r=None, pr=None):
         """

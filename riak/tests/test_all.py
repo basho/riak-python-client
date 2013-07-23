@@ -129,6 +129,13 @@ class ClientTests(object):
         # error.
         self.assertRaises(IOError, client.ping)
 
+    def test_timeout_validation(self):
+        bucket = self.client.bucket(self.bucket_name)
+        key = self.key_name
+        obj = bucket.new(key)
+        for bad in [0, -1, False, "foo"]:
+            with self.assertRaises(ValueError):
+                self.client.get_buckets(timeout=bad)
     def test_multiget_bucket(self):
         """
         Multiget operations can be invoked on buckets.
@@ -143,6 +150,34 @@ class ClientTests(object):
             self.assertIsInstance(obj, RiakObject)
             self.assertTrue(obj.exists)
             self.assertEqual(obj.key, obj.encoded_data)
+
+            with self.assertRaises(ValueError):
+                for i in self.client.stream_buckets(timeout=bad):
+                    pass
+
+            with self.assertRaises(ValueError):
+                self.client.get_keys(bucket, timeout=bad)
+
+            with self.assertRaises(ValueError):
+                for i in self.client.stream_keys(bucket, timeout=bad):
+                    pass
+
+            with self.assertRaises(ValueError):
+                self.client.put(obj, timeout=bad)
+
+            with self.assertRaises(ValueError):
+                self.client.get(obj, timeout=bad)
+
+            with self.assertRaises(ValueError):
+                self.client.delete(obj, timeout=bad)
+
+            with self.assertRaises(ValueError):
+                self.client.mapred([], [], bad)
+
+            with self.assertRaises(ValueError):
+                for i in self.client.stream_mapred([], [], bad):
+                    pass
+
 
     def test_multiget_errors(self):
         """

@@ -51,10 +51,8 @@ class RiakHttpStream(object):
         pass
 
 
-class RiakHttpKeyStream(RiakHttpStream):
-    """
-    Streaming iterator for list-keys over HTTP
-    """
+class RiakHttpJsonStream(RiakHttpStream):
+    _json_field = None
 
     def next(self):
         while '}' not in self.buffer and not self.response_done:
@@ -64,10 +62,24 @@ class RiakHttpKeyStream(RiakHttpStream):
             idx = string.index(self.buffer, '}') + 1
             chunk = self.buffer[:idx]
             self.buffer = self.buffer[idx:]
-            keys = json.loads(chunk)[u'keys']
-            return keys
+            field = json.loads(chunk)[self._json_field]
+            return field
         else:
             raise StopIteration
+
+
+class RiakHttpKeyStream(RiakHttpJsonStream):
+    """
+    Streaming iterator for list-keys over HTTP
+    """
+    _json_field = u'keys'
+
+
+class RiakHttpBucketStream(RiakHttpJsonStream):
+    """
+    Streaming iterator for list-buckets over HTTP
+    """
+    _json_field = u'buckets'
 
 
 class RiakHttpMultipartStream(RiakHttpStream):

@@ -61,69 +61,67 @@ class RiakTransport(FeatureDetection):
     def ping(self):
         """
         Ping the remote server
-        @return boolean
         """
         raise NotImplementedError
 
-    def get(self, robj, r=None):
+    def get(self, robj, r=None, pr=None, timeout=None):
         """
-        Serialize get request and deserialize response
-        @return (vclock=None, [(metadata, value)]=None)
-        """
-        raise NotImplementedError
-
-    def put(self, robj, w=None, dw=None, return_body=True):
-        """
-        Serialize put request and deserialize response - if 'content'
-        is true, retrieve the updated metadata/content
-        @return (vclock=None, [(metadata, value)]=None)
+        Fetches an object.
         """
         raise NotImplementedError
 
-    def delete(self, robj, rw=None):
+    def put(self, robj, w=None, dw=None, pw=None, return_body=None,
+            if_none_match=None, timeout=None):
         """
-        Serialize delete request and deserialize response
+        Stores an object.
+        """
+        raise NotImplementedError
+
+    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None,
+               pw=None, timeout=None):
+        """
+        Deletes an object.
         @return true
         """
         raise NotImplementedError
 
-    def get_buckets(self):
+    def get_buckets(self, timeout=None):
         """
-        Serialize get buckets request and deserialize response
-        @return dict()
+        Gets the list of buckets as strings.
+        """
+        raise NotImplementedError
+
+    def stream_buckets(self, timeout=None):
+        """
+        Streams the list of buckets through an iterator
         """
         raise NotImplementedError
 
     def get_bucket_props(self, bucket):
         """
-        Serialize get bucket property request and deserialize response
-        @return dict()
+        Fetches properties for the given bucket.
         """
         raise NotImplementedError
 
     def set_bucket_props(self, bucket, props):
         """
-        Serialize set bucket property request and deserialize response
-        bucket = bucket object
-        props = dictionary of properties
-        @return boolean
+        Sets properties on the given bucket.
         """
         raise NotImplementedError
 
     def clear_bucket_props(self, bucket):
         """
         Reset bucket properties to their defaults
-        bucket = bucket object
         """
         raise NotImplementedError
 
-    def get_keys(self, bucket):
+    def get_keys(self, bucket, timeout=None):
         """
         Lists all keys within the given bucket.
         """
         raise NotImplementedError
 
-    def stream_keys(self, bucket):
+    def stream_keys(self, bucket, timeout=None):
         """
         Streams the list of keys for the bucket through an iterator.
         """
