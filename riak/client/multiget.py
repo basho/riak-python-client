@@ -158,7 +158,7 @@ def multiget(client, keys, **options):
     for _ in range(len(keys)):
         if RIAK_MULTIGET_POOL.stopped():
             raise RuntimeError("Multi-get operation interrupted by pool "
-                                   "stopping!")
+                               "stopping!")
         results.append(outq.get())
         outq.task_done()
 
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     from riak import RiakClient
     import riak.benchmark as benchmark
     client = RiakClient(protocol='pbc')
-    bkeys = [ ('multiget', str(key)) for key in xrange(10000) ]
+    bkeys = [('multiget', str(key)) for key in xrange(10000)]
 
     data = open(__file__).read()
 

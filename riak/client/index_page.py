@@ -161,7 +161,7 @@ class IndexPage(Sequence, object):
         """
         if self._should_inject_term(result):
             if type(result) is list:
-                return [ (self.startkey, r) for r in result ]
+                return [(self.startkey, r) for r in result]
             else:
                 return (self.startkey, result)
         else:

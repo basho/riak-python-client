@@ -25,7 +25,8 @@ from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
 from riak.util import decode_index_value
 from connection import RiakPbcConnection
-from stream import RiakPbcKeyStream, RiakPbcMapredStream, RiakPbcBucketStream, RiakPbcIndexStream
+from stream import (RiakPbcKeyStream, RiakPbcMapredStream, RiakPbcBucketStream,
+                    RiakPbcIndexStream)
 from codec import RiakPbcCodec
 
 from messages import (

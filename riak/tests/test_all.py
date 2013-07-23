@@ -136,20 +136,6 @@ class ClientTests(object):
         for bad in [0, -1, False, "foo"]:
             with self.assertRaises(ValueError):
                 self.client.get_buckets(timeout=bad)
-    def test_multiget_bucket(self):
-        """
-        Multiget operations can be invoked on buckets.
-        """
-        keys = [self.key_name, self.randname(), self.randname()]
-        for key in keys:
-            self.client.bucket(self.bucket_name)\
-                .new(key, encoded_data=key, content_type="text/plain")\
-                .store()
-        results = self.client.bucket(self.bucket_name).multiget(keys)
-        for obj in results:
-            self.assertIsInstance(obj, RiakObject)
-            self.assertTrue(obj.exists)
-            self.assertEqual(obj.key, obj.encoded_data)
 
             with self.assertRaises(ValueError):
                 for i in self.client.stream_buckets(timeout=bad):
@@ -178,6 +164,20 @@ class ClientTests(object):
                 for i in self.client.stream_mapred([], [], bad):
                     pass
 
+    def test_multiget_bucket(self):
+        """
+        Multiget operations can be invoked on buckets.
+        """
+        keys = [self.key_name, self.randname(), self.randname()]
+        for key in keys:
+            self.client.bucket(self.bucket_name)\
+                .new(key, encoded_data=key, content_type="text/plain")\
+                .store()
+        results = self.client.bucket(self.bucket_name).multiget(keys)
+        for obj in results:
+            self.assertIsInstance(obj, RiakObject)
+            self.assertTrue(obj.exists)
+            self.assertEqual(obj.key, obj.encoded_data)
 
     def test_multiget_errors(self):
         """
@@ -203,6 +203,7 @@ class ClientTests(object):
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
             self.assertFalse(obj.exists)
+
 
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
