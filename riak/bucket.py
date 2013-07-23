@@ -436,6 +436,28 @@ class RiakBucket(object):
         """
         return self.new(key).delete(**kwargs)
 
+    def get_counter(self, key, **kwargs):
+        """
+        Gets the value of a counter stored in this bucket.
+
+        :param key: the key of the counter
+        :type key: string
+        :rtype int
+        """
+        return self._client.get_counter(self, key, **kwargs)
+
+    def update_counter(self, key, value, **kwargs):
+        """
+        Updates the value of a counter stored in this bucket. Positive
+        values increment the counter, negative values decrement.
+
+        :param key: the key of the counter
+        :type key: string
+        :param value: the amount to increment or decrement
+        :type value: integer
+        """
+        return self._client.update_counter(self, key, value, **kwargs)
+
     def __str__(self):
         return '<RiakBucket "{0}">'.format(self.name)
 

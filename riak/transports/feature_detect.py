@@ -107,6 +107,13 @@ class FeatureDetection(object):
         """
         return self.server_version >= versions[1.4]
 
+    def counters(self):
+        """
+        Whether CRDT counters are supported.
+        :rtype bool
+        """
+        return self.server_version >= versions[1.4]
+
     @lazy_property
     def server_version(self):
         return LooseVersion(self._server_version())

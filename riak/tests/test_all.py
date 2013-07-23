@@ -22,7 +22,7 @@ from riak.tests.test_search import SearchTests, \
 from riak.tests.test_mapreduce import MapReduceAliasTests, \
     ErlangMapReduceTests, JSMapReduceTests, LinkTests, MapReduceStreamTests
 from riak.tests.test_kv import BasicKVTests, KVFileTests, \
-    BucketPropsTest
+    BucketPropsTest, CounterTests
 from riak.tests.test_2i import TwoITests
 
 try:
@@ -181,6 +181,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                EnableSearchTests,
                                SearchTests,
                                ClientTests,
+                               CounterTests,
                                BaseTestCase,
                                unittest.TestCase):
 
@@ -213,6 +214,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 SolrSearchTests,
                                 SearchTests,
                                 ClientTests,
+                                CounterTests,
                                 BaseTestCase,
                                 unittest.TestCase):
 
