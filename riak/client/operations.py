@@ -17,7 +17,7 @@ under the License.
 """
 
 from transport import RiakClientTransport, retryable, retryableHttpOnly
-
+from multiget import multiget
 
 class RiakClientOperations(RiakClientTransport):
     """
@@ -271,3 +271,15 @@ class RiakClientOperations(RiakClientTransport):
         :type queries: list
         """
         transport.fulltext_delete(index, docs, queries)
+
+    def multiget(self, pairs, **params):
+        """
+        Fetches many keys in parallel via threads.
+
+        :param pairs: list of bucket/key tuple pairs
+        :type pairs: list
+        :param params: additional request flags, e.g. r, pr
+        :type params: dict
+        :rtype list
+        """
+        return multiget(self, pairs, **params)
