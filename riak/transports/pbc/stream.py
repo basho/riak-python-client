@@ -21,8 +21,11 @@ import json
 from riak.transports.pbc.messages import (
     MSG_CODE_LIST_KEYS_RESP,
     MSG_CODE_MAPRED_RESP,
-    MSG_CODE_LIST_BUCKETS_RESP
+    MSG_CODE_LIST_BUCKETS_RESP,
+    MSG_CODE_INDEX_RESP
 )
+from riak.util import decode_index_value
+from riak.client.index_page import CONTINUATION
 
 
 class RiakPbcStream(object):
@@ -113,3 +116,33 @@ class RiakPbcBucketStream(RiakPbcStream):
             raise StopIteration
 
         return response.buckets
+
+
+class RiakPbcIndexStream(RiakPbcStream):
+    """
+    Used internally by RiakPbcTransport to implement Secondary Index
+    streams.
+    """
+
+    _expect = MSG_CODE_INDEX_RESP
+
+    def __init__(self, transport, index, return_terms=False):
+        super(RiakPbcIndexStream, self).__init__(transport)
+        self.index = index
+        self.return_terms = return_terms
+
+    def next(self):
+        response = super(RiakPbcIndexStream, self).next()
+
+        if response.done and not (response.keys or
+                                  response.results or
+                                  response.continuation):
+            raise StopIteration
+
+        if self.return_terms and response.results:
+            return [(decode_index_value(self.index, r.key), r.value)
+                    for r in response.results]
+        elif response.keys:
+            return response.keys[:]
+        elif response.continuation:
+            return CONTINUATION(response.continuation)

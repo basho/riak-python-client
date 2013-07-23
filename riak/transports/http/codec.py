@@ -35,6 +35,7 @@ from riak.content import RiakContent
 from riak.riak_object import VClock
 from riak.multidict import MultiDict
 from riak.transports.http.search import XMLSearchResult
+from riak.util import decode_index_value
 
 
 class RiakHttpCodec(object):
@@ -127,8 +128,7 @@ class RiakHttpCodec(object):
                 reader = csv.reader([value], skipinitialspace=True)
                 for line in reader:
                     for token in line:
-                        if field.endswith("_int"):
-                            token = int(token)
+                        token = decode_index_value(field, token)
                         sibling.add_index(field, token)
             elif header == 'x-riak-deleted':
                 sibling.exists = False

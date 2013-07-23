@@ -123,3 +123,10 @@ class lazy_property(object):
         value = self.fget(obj)
         setattr(obj, self.func_name, value)
         return value
+
+
+def decode_index_value(index, value):
+    if "_int" in index:
+        return long(value)
+    else:
+        return str(value)
