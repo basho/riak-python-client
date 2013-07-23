@@ -224,7 +224,7 @@ class RiakBucket(object):
         :type r: integer
         :param pr: PR-Value for the requests (defaults to bucket's PR)
         :type pr: integer
-        :rtype list of :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         bkeys = [(self.name, key) for key in keys]
         return self._client.multiget(bkeys, r=r, pr=pr)
@@ -253,13 +253,10 @@ class RiakBucket(object):
     N-value for this bucket, which is the number of replicas
     that will be written of each object in the bucket.
 
-    .. warning::
-
-    Set this once before you write any data to the bucket, and never
-    change it again, otherwise unpredictable things could happen.
-    This should only be used if you know what you are doing.
-
-    :type nval: integer
+    .. warning:: Set this once before you write any data to the
+        bucket, and never change it again, otherwise unpredictable
+        things could happen. This should only be used if you know what
+        you are doing.
     """)
 
     allow_mult = bucket_property('allow_mult', doc="""
@@ -461,7 +458,7 @@ class RiakBucket(object):
 
         :param key: the key of the counter
         :type key: string
-        :rtype int
+        :rtype: int
         """
         return self._client.get_counter(self, key, **kwargs)
 

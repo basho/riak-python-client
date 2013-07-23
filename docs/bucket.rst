@@ -1,9 +1,9 @@
 .. ref-bucket:
 
-==========
-RiakBucket
-==========
+===========================
+Bucket Objects (RiakBucket)
+===========================
 
 .. currentmodule:: riak.bucket
 
-.. autoclass:: riak.bucket.RiakBucket
+.. autoclass:: RiakBucket
