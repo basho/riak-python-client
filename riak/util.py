@@ -80,7 +80,7 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
     getter_name = "get_%s" % quorum
     setter_name = "set_%s" % quorum
     if not parent:
-        def direct_getter(self, val=None):
+        def direct_getter(self, value=None):
             deprecated(QDEPMESSAGE % klass.__name__)
             if val:
                 return val
@@ -88,7 +88,7 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
 
         getter = direct_getter
     else:
-        def parent_getter(self, val=None):
+        def parent_getter(self, value=None):
             deprecated(QDEPMESSAGE % klass.__name__)
             if val:
                 return val
@@ -102,6 +102,22 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
         deprecated(QDEPMESSAGE % klass.__name__)
         setattr(self, propname, value)
         return self
+
+    getter.__doc__ = """
+       Gets the value used in requests for the {!r} quorum.
+       If not set, returns the passed value. **DEPRECATED**
+
+       :param value: the value to use if not set
+       :type value: mixed
+       :rtype: mixed""".format(quorum)
+
+    setter.__doc__ = """
+       Sets the value used in requests for the {!r} quorum.
+       **DEPRECATED**
+
+       :param value: the value to use if not set
+       :type value: mixed
+       """
 
     setattr(klass, getter_name, getter)
     setattr(klass, setter_name, setter)

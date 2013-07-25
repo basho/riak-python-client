@@ -37,6 +37,11 @@ RiakClient API
    .. autoattribute:: PROTOCOLS
    .. autoattribute:: protocol
    .. autoattribute:: client_id
+   .. attribute:: resolver
+
+      The sibling-resolution function for this client. Defaults
+      to :func:`riak.resolver.default_resolver`.
+
    .. attribute:: nodes
 
       The list of :class:`nodes <riak.node.RiakNode>` that this
@@ -136,8 +141,9 @@ media-types. Supported by default are ``application/json`` and
 Deprecated Methods and Properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. warning:: These methods exist solely for backwards-compatibility and should not
-   be used unless code is being ported from an older version.
+.. warning:: These methods and attributes exist solely for
+   backwards-compatibility and should not be used unless code is being
+   ported from an older version.
 
 .. automethod:: RiakClient.get_transport
 .. automethod:: RiakClient.get_client_id
@@ -145,4 +151,17 @@ Deprecated Methods and Properties
 .. attribute:: RiakClient.solr
 
    Returns a RiakSearch object which can access search indexes.
-   DEPRECATED
+   **DEPRECATED**
+
+.. automethod:: RiakClient.get_r
+.. automethod:: RiakClient.set_r
+.. automethod:: RiakClient.get_pr
+.. automethod:: RiakClient.set_pr
+.. automethod:: RiakClient.get_w
+.. automethod:: RiakClient.set_w
+.. automethod:: RiakClient.get_dw
+.. automethod:: RiakClient.set_dw
+.. automethod:: RiakClient.get_pw
+.. automethod:: RiakClient.set_pw
+.. automethod:: RiakClient.get_rw
+.. automethod:: RiakClient.set_rw
