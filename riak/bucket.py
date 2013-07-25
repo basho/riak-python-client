@@ -43,8 +43,6 @@ class RiakBucket(object):
     objects within the bucket.
     """
 
-    SEARCH_PRECOMMIT_HOOK = {"mod": "riak_search_kv_hook", "fun": "precommit"}
-
     def __init__(self, client, name):
         """
         Returns a new ``RiakBucket`` instance.
@@ -86,6 +84,8 @@ class RiakBucket(object):
         Get the encoding function for the provided content type for
         this bucket.
 
+        :param content_type: the requested media type
+        :type content_type: str
         :param content_type: Content type requested
         """
         if content_type in self._encoders:
@@ -98,9 +98,11 @@ class RiakBucket(object):
         Set the encoding function for the provided content type for
         this bucket.
 
-        :param content_type: Content type for encoder
-        :param encoder: Function to encode with - will be called with
-                        data as single argument.
+        :param content_type: the requested media type
+        :type content_type: str
+        :param encoder: an encoding function, takes a single object
+            argument and returns a string data as single argument.
+        :type encoder: function
         """
         self._encoders[content_type] = encoder
         return self
@@ -110,7 +112,9 @@ class RiakBucket(object):
         Get the decoding function for the provided content type for
         this bucket.
 
-        :param content_type: Content type for decoder
+        :param content_type: the requested media type
+        :type content_type: str
+        :rtype: function
         """
         if content_type in self._decoders:
             return self._decoders[content_type]
@@ -122,9 +126,11 @@ class RiakBucket(object):
         Set the decoding function for the provided content type for
         this bucket.
 
-        :param content_type: Content type for decoder
-        :param decoder: Function to decode with - will be called with
-                        string
+        :param content_type: the requested media type
+        :type content_type: str
+        :param decoder: a decoding function, takes a string and
+            returns a Python type
+        :type decoder: function
         """
         self._decoders[content_type] = decoder
         return self
@@ -164,7 +170,7 @@ class RiakBucket(object):
         Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
         that will be stored as plain text/binary. A shortcut for
         manually instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>`.
+        <riak.riak_object.RiakObject>`. **DEPRECATED**
 
         :param key: Name of the key.
         :type key: string
@@ -198,7 +204,7 @@ class RiakBucket(object):
 
     def get_binary(self, key, r=None, pr=None, timeout=None):
         """
-        Retrieve a binary/string object from Riak. DEPRECATED
+        Retrieve a binary/string object from Riak. **DEPRECATED**
 
         :param key: Name of the key.
         :type key: string
@@ -246,8 +252,7 @@ class RiakBucket(object):
     resolver = property(_get_resolver, _set_resolver, doc=
                         """The sibling-resolution function for this
                            bucket. If the resolver is not set, the
-                           client's resolver will be used. :type
-                           callable""")
+                           client's resolver will be used.""")
 
     n_val = bucket_property('n_val', doc="""
     N-value for this bucket, which is the number of replicas
@@ -261,8 +266,7 @@ class RiakBucket(object):
 
     allow_mult = bucket_property('allow_mult', doc="""
     If set to True, then writes with conflicting data will be stored
-    and returned to the client. This situation can be detected by
-    calling has_siblings() and get_siblings().
+    and returned to the client.
 
     :type bool: boolean
     """)
@@ -344,7 +348,6 @@ class RiakBucket(object):
     def clear_properties(self):
         """
         Reset all bucket properties to their defaults.
-
         """
         return self._client.clear_bucket_props(self)
 
@@ -352,9 +355,7 @@ class RiakBucket(object):
         """
         Return all keys within the bucket.
 
-        .. warning::
-
-           At current, this is a very expensive operation. Use with caution.
+        :rtype: list of keys
         """
         return self._client.get_keys(self)
 
@@ -362,18 +363,21 @@ class RiakBucket(object):
         """
         Streams all keys within the bucket through an iterator.
 
-        .. warning::
-
-           At current, this is a very expensive operation. Use with caution.
-
         :rtype: iterator
         """
         return self._client.stream_keys(self)
 
     def new_from_file(self, key, filename):
         """
-        Create a new Riak object in the bucket, using the content of
-        the specified file.
+        Create a new Riak object in the bucket, using the contents of
+        the specified file. This is a shortcut for :meth:`new`, where the
+        ``encoded_data`` and ``content_type`` are set for you.
+
+        :param key: the key of the new object
+        :type key: string
+        :param filename: the file to read the contents from
+        :type filename: string
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         binary_data = open(filename, "rb").read()
         mimetype, encoding = mimetypes.guess_type(filename)
@@ -386,21 +390,31 @@ class RiakBucket(object):
         return self.new(key, encoded_data=binary_data, content_type=mimetype)
 
     def new_binary_from_file(self, key, filename):
+        """
+        Create a new Riak object in the bucket, using the contents of
+        the specified file. This is a shortcut for :meth:`new`, where the
+        ``encoded_data`` and ``content_type`` are set for you. **DEPRECATED**
+
+        :param key: the key of the new object
+        :type key: string
+        :param filename: the file to read the contents from
+        :type filename: string
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        """
         deprecated('RiakBucket.new_binary_from_file is deprecated, use '
                    'RiakBucket.new_from_file')
         return self.new_from_file(key, filename)
 
     def search_enabled(self):
         """
-        Returns True if the search precommit hook is enabled for this
+        Returns True if search indexing is enabled for this
         bucket.
         """
         return self.get_properties().get('search', False)
 
     def enable_search(self):
         """
-        Enable search for this bucket by installing the precommit hook to
-        index objects in it.
+        Enable search indexing for this bucket.
         """
         if not self.search_enabled():
             self.set_property('search', True)
@@ -408,8 +422,7 @@ class RiakBucket(object):
 
     def disable_search(self):
         """
-        Disable search for this bucket by removing the precommit hook to
-        index objects in it.
+        Disable search indexing for this bucket.
         """
         if self.search_enabled():
             self.set_property('search', False)
@@ -417,14 +430,19 @@ class RiakBucket(object):
 
     def search(self, query, **params):
         """
-        Queries a search index over objects in this bucket/index.
+        Queries a search index over objects in this bucket/index. See
+        :meth:`RiakClient.fulltext_search()
+        <riak.client.RiakClient.fulltext_search>` for more details.
         """
         return self._client.solr.search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None, return_terms=None,
                   max_results=None, continuation=None):
         """
-        Queries a secondary index over objects in this bucket, returning keys.
+        Queries a secondary index over objects in this bucket,
+        returning keys or index/key pairs. See
+        :meth:`RiakClient.get_index()
+        <riak.client.RiakClient.get_index>` for more details.
         """
         return self._client.get_index(self.name, index, startkey, endkey,
                                       return_terms=return_terms,
@@ -435,7 +453,9 @@ class RiakBucket(object):
                      max_results=None, continuation=None):
         """
         Queries a secondary index over objects in this bucket,
-        streaming keys via an iterator.
+        streaming keys or index/key pairs via an iterator. See
+        :meth:`RiakClient.stream_index()
+        <riak.client.RiakClient.stream_index>` for more details.
         """
         return self._client.stream_index(self.name, index, startkey, endkey,
                                          return_terms=return_terms,
@@ -443,9 +463,10 @@ class RiakBucket(object):
                                          continuation=continuation)
 
     def delete(self, key, **kwargs):
-        """Deletes an object from riak.
+        """Deletes an object from riak. Short hand for
+        bucket.new(key).delete(). See :meth:`RiakClient.delete()
+        <riak.client.RiakClient.delete>` for options.
 
-        Short hand for bucket.new(key).delete()
         :param key: The key for the object
         :type key: string
         :rtype: RiakObject
@@ -454,7 +475,9 @@ class RiakBucket(object):
 
     def get_counter(self, key, **kwargs):
         """
-        Gets the value of a counter stored in this bucket.
+        Gets the value of a counter stored in this bucket. See
+        :meth:`RiakClient.get_counter()
+        <riak.client.RiakClient.get_counter>` for options.
 
         :param key: the key of the counter
         :type key: string
@@ -465,7 +488,10 @@ class RiakBucket(object):
     def update_counter(self, key, value, **kwargs):
         """
         Updates the value of a counter stored in this bucket. Positive
-        values increment the counter, negative values decrement.
+        values increment the counter, negative values decrement. See
+        :meth:`RiakClient.update_counter()
+        <riak.client.RiakClient.update_counter>` for options.
+
 
         :param key: the key of the counter
         :type key: string
