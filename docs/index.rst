@@ -1,5 +1,18 @@
 Riak Python Client
-=====================
+==================
+
+.. cssclass:: well pull-right
+.. compound::
+
+   **Contents** 
+
+   .. toctree::
+      :maxdepth: 2
+    
+      client
+      bucket
+      object
+      mapreduce
 
 Installation
 ------------
@@ -16,16 +29,15 @@ Installation
 .. _easy_install: http://pypi.python.org/pypi/setuptools
 .. _PyPI: http://pypi.python.org/pypi/riak/
 
-Contents:
+Development
+-----------
 
-.. toctree::
-   :maxdepth: 2
+All development is done on Github_. Use Issues_ to report
+problems or submit contributions.
 
-   client
-   bucket
-   riak_object
-   content
-   mapreduce
+.. _Github: https://github.com/basho/riak-python-client/
+.. _Issues: https://github.com/basho/riak-python-client/issues
+
 
 Indices and tables
 ------------------
