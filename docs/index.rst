@@ -21,8 +21,6 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   tutorial
-
    client
    bucket
    riak_object
