@@ -34,13 +34,20 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def get_buckets(self, transport, timeout=None):
         """
-        Get the list of buckets as RiakBucket instances.
-        NOTE: Do not use this in production, as it requires traversing through
-        all keys stored in a cluster.
+        get_buckets(timeout=None)
+
+        Get the list of buckets as :class:`RiakBucket
+        <riak.bucket.RiakBucket>` instances.
+
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype list of RiakBucket instances
+        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
         """
         _validate_timeout(timeout)
         return [self.bucket(name) for name in
@@ -49,13 +56,15 @@ class RiakClientOperations(RiakClientTransport):
     def stream_buckets(self, timeout=None):
         """
         Streams the list of buckets. This is a generator method that
-        should be iterated over. NOTE: Do not use this in production,
-        as it requires traversing through all keys stored in a
-        cluster.
+        should be iterated over.
+
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
 
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype iterator
+        :rtype: iterator that yields lists of :class:`RiakBucket
+             <riak.bucket.RiakBucket>` instances
         """
         _validate_timeout(timeout)
         with self._transport() as transport:
@@ -71,7 +80,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def ping(self, transport):
         """
+        ping()
+
         Check if the Riak server for this ``RiakClient`` instance is alive.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :rtype: boolean
         """
@@ -83,7 +97,13 @@ class RiakClientOperations(RiakClientTransport):
     def get_index(self, transport, bucket, index, startkey, endkey=None,
                   return_terms=None, max_results=None, continuation=None):
         """
+        get_index(bucket, index, startkey, endkey=None, return_terms=None,\
+                  max_results=None, continuation=None)
+
         Queries a secondary index, returning matching keys.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param bucket: the bucket whose index will be queried
         :type bucket: RiakBucket
@@ -148,7 +168,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def get_bucket_props(self, transport, bucket):
         """
+        get_bucket_props(bucket)
+
         Fetches bucket properties for the given bucket.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param bucket: the bucket whose properties will be fetched
         :type bucket: RiakBucket
@@ -159,7 +184,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def set_bucket_props(self, transport, bucket, props):
         """
+        set_bucket_props(bucket, props)
+
         Sets bucket properties for the given bucket.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
@@ -171,7 +201,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def clear_bucket_props(self, transport, bucket):
         """
+        clear_bucket_props(bucket)
+
         Resets bucket properties for the given bucket.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
@@ -181,7 +216,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def get_keys(self, transport, bucket, timeout=None):
         """
+        get_keys(bucket, timeout=None)
+
         Lists all keys in a bucket.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
@@ -196,7 +236,6 @@ class RiakClientOperations(RiakClientTransport):
         """
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
-
 
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
@@ -218,7 +257,13 @@ class RiakClientOperations(RiakClientTransport):
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
             if_none_match=None, timeout=None):
         """
+        put(robj, w=None, dw=None, pw=None, return_body=None,\
+            if_none_match=None, timeout=None)
+
         Stores an object in the Riak cluster.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param robj: the object to store
         :type robj: RiakObject
@@ -246,7 +291,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None):
         """
+        get(robj, r=None, pr=None, timeout=None)
+
         Fetches the contents of a Riak object.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param robj: the object to fetch
         :type robj: RiakObject
@@ -268,7 +318,13 @@ class RiakClientOperations(RiakClientTransport):
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,
                pr=None, pw=None, timeout=None):
         """
+        delete(robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,\
+               timeout=None)
+
         Deletes an object from Riak.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param robj: the object to store
         :type robj: RiakObject
@@ -294,7 +350,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def mapred(self, transport, inputs, query, timeout):
         """
+        mapred(inputs, query, timeout)
+
         Executes a MapReduce query.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param inputs: the input list/structure
         :type inputs: list, dict
@@ -332,7 +393,12 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def fulltext_search(self, transport, index, query, **params):
         """
+        fulltext_search(index, query, **params)
+
         Performs a full-text search query.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param index: the bucket/index to search over
         :type index: string
@@ -346,7 +412,13 @@ class RiakClientOperations(RiakClientTransport):
     @retryableHttpOnly
     def fulltext_add(self, transport, index, docs):
         """
+        fulltext_add(index, docs)
+
         Adds documents to the full-text index.
+
+        .. note:: This request is automatically retried
+           :attr:`RETRY_COUNT` times if it fails due to network error.
+           Only HTTP will be used for this request.
 
         :param index: the bucket/index in which to index these docs
         :type index: string
@@ -358,7 +430,13 @@ class RiakClientOperations(RiakClientTransport):
     @retryableHttpOnly
     def fulltext_delete(self, transport, index, docs=None, queries=None):
         """
+        fulltext_delete(index, docs=None, queries=None)
+
         Removes documents from the full-text index.
+
+        .. note:: This request is automatically retried
+           :attr:`RETRY_COUNT` times if it fails due to network error.
+           Only HTTP will be used for this request.
 
         :param index: the bucket/index from which to delete
         :type index: string
@@ -377,7 +455,8 @@ class RiakClientOperations(RiakClientTransport):
         :type pairs: list
         :param params: additional request flags, e.g. r, pr
         :type params: dict
-        :rtype list
+        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>`
+            instances
         """
         return multiget(self, pairs, **params)
 
@@ -385,7 +464,13 @@ class RiakClientOperations(RiakClientTransport):
     def get_counter(self, transport, bucket, key, r=None, pr=None,
                     basic_quorum=None, notfound_ok=None):
         """
+        get_counter(bucket, key, r=None, pr=None, basic_quorum=None,\
+                    notfound_ok=None)
+
         Gets the value of a counter.
+
+        .. note:: This request is automatically retried :attr:`RETRY_COUNT`
+           times if it fails due to network error.
 
         :param bucket: the bucket of the counter
         :type bucket: RiakBucket
@@ -400,13 +485,16 @@ class RiakClientOperations(RiakClientTransport):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
-        :rtype integer
+        :rtype: integer
         """
         return transport.get_counter(bucket, key, r=r, pr=pr)
 
     def update_counter(self, bucket, key, value, w=None, dw=None, pw=None,
                        returnvalue=False):
         """
+        update_counter(bucket, key, value, w=None, dw=None, pw=None,\
+                       returnvalue=False)
+
         Updates a counter by the given value. This operation is not
         idempotent and so should not be retried automatically.
 

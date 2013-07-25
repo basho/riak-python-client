@@ -14,7 +14,7 @@ Installation
 
 .. _Pip: http://pip.openplans.org/
 .. _easy_install: http://pypi.python.org/pypi/setuptools
-.. _PyPI: http://pypi.python.org/pypi/riak/1.4.0
+.. _PyPI: http://pypi.python.org/pypi/riak/
 
 Contents:
 

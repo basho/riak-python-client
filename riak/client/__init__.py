@@ -55,6 +55,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     or by using the methods on related objects.
     """
 
+    #: The supported protocols
     PROTOCOLS = ['http', 'https', 'pbc']
 
     def __init__(self, protocol='http', transport_options={},
@@ -120,16 +121,18 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     protocol = property(_get_protocol, _set_protocol,
                         doc=
                         """
-                        Which protocol to prefer, one of PROTOCOLS.
-                        Please note that when one protocol is
-                        selected, the other protocols MAY NOT attempt
-                        to connect. Changing to another protocol will
-                        cause a connection on the next request.
+                        Which protocol to prefer, one of
+                        :attr:`PROTOCOLS
+                        <riak.client.RiakClient.PROTOCOLS>`. Please
+                        note that when one protocol is selected, the
+                        other protocols MAY NOT attempt to connect.
+                        Changing to another protocol will cause a
+                        connection on the next request.
 
-                        Some requests are only valid over 'http' or
-                        'https', and will always be sent via those
-                        transports, regardless of which protocol is
-                        preferred.
+                        Some requests are only valid over ``'http'``
+                        or ``'https'``, and will always be sent via
+                        those transports, regardless of which protocol
+                        is preferred.
                          """)
 
     def get_transport(self):
@@ -181,6 +184,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def get_encoder(self, content_type):
         """
         Get the encoding function for the provided content type.
+
+        :param content_type: the requested media type
+        :type content_type: str
+        :rtype: function
         """
         return self._encoders.get(content_type)
 
@@ -188,7 +195,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         Set the encoding function for the provided content type.
 
-        :param encoder:
+        :param content_type: the requested media type
+        :type content_type: str
+        :param encoder: an encoding function, takes a single object
+            argument and returns a string
         :type encoder: function
         """
         self._encoders[content_type] = encoder
@@ -196,6 +206,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def get_decoder(self, content_type):
         """
         Get the decoding function for the provided content type.
+
+        :param content_type: the requested media type
+        :type content_type: str
+        :rtype: function
         """
         return self._decoders.get(content_type)
 
@@ -203,7 +217,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         Set the decoding function for the provided content type.
 
-        :param decoder:
+        :param content_type: the requested media type
+        :type content_type: str
+        :param decoder: a decoding function, takes a string and
+            returns a Python type
         :type decoder: function
         """
         self._decoders[content_type] = decoder
@@ -226,7 +243,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def solr(self):
         """
         Returns a RiakSearch object which can access search indexes.
+        DEPRECATED
         """
+        deprecated("``solr`` is deprecated, use ``fulltext_search``,"
+                   " ``fulltext_add`` and ``fulltext_delete`` directly")
         return RiakSearch(self)
 
     def _create_node(self, n):

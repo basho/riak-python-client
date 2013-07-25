@@ -124,6 +124,9 @@ def retryable(fn, protocol=None):
 
         return self._with_retries(pool, thunk)
 
+    wrapper.__doc__ = fn.__doc__
+    wrapper.__repr__ = fn.__repr__
+
     return wrapper
 
 
