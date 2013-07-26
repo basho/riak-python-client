@@ -117,7 +117,7 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
 
        :param value: the value to use if not set
        :type value: mixed
-       """
+       """.format(quorum)
 
     setattr(klass, getter_name, getter)
     setattr(klass, setter_name, setter)

@@ -2,10 +2,6 @@
 Client & Connections
 ====================
 
---------
-Overview
---------
-
 To connect to a Riak cluster, you must create a
 :py:class:`~riak.client.RiakClient` object. The default configuration
 connects to a single Riak node on ``localhost`` with the default
@@ -28,7 +24,7 @@ protocol. Connections are opened as-needed; a random node is selected
 when a new connection is requested.
 
 --------------
-RiakClient API
+Client objects
 --------------
 
 .. currentmodule:: riak.client
@@ -66,9 +62,9 @@ the ``RiakClient`` constructor, they will be turned into this type.
 .. autoclass:: riak.node.RiakNode
    :members:
 
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 Client-level Operations
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 Some operations are not scoped by buckets and can be performed on the
 client directly:
@@ -77,9 +73,9 @@ client directly:
 .. automethod:: RiakClient.get_buckets
 .. automethod:: RiakClient.stream_buckets
 
-^^^^^^^^^^^^^^^^^
+-----------------
 Accessing Buckets
-^^^^^^^^^^^^^^^^^
+-----------------
 
 Most client operations are on :py:class:`bucket objects
 <riak.bucket.RiakBucket>` or keys within those buckets. Use the
@@ -88,9 +84,9 @@ the called client.
 
 .. automethod:: RiakClient.bucket
 
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 Bucket-level Operations
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 .. automethod:: RiakClient.get_bucket_props
 .. automethod:: RiakClient.set_bucket_props
@@ -98,9 +94,9 @@ Bucket-level Operations
 .. automethod:: RiakClient.get_keys
 .. automethod:: RiakClient.stream_keys
 
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 Key-level Operations
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 .. automethod:: RiakClient.get
 .. automethod:: RiakClient.put
@@ -109,9 +105,9 @@ Key-level Operations
 .. automethod:: RiakClient.get_counter
 .. automethod:: RiakClient.update_counter
 
-^^^^^^^^^^^^^^^^
+----------------
 Query Operations
-^^^^^^^^^^^^^^^^
+----------------
 
 .. automethod:: RiakClient.mapred
 .. automethod:: RiakClient.stream_mapred
@@ -121,9 +117,9 @@ Query Operations
 .. automethod:: RiakClient.fulltext_add
 .. automethod:: RiakClient.fulltext_delete
 
-^^^^^^^^^^^^^
+-------------
 Serialization
-^^^^^^^^^^^^^
+-------------
 
 The client supports automatic transformation of Riak responses into
 Python types if encoders and decoders are registered for the
@@ -137,9 +133,9 @@ media-types. Supported by default are ``application/json`` and
 .. automethod:: RiakClient.set_decoder
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Deprecated Methods and Properties
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------
+Deprecated Methods
+------------------
 
 .. warning:: These methods and attributes exist solely for
    backwards-compatibility and should not be used unless code is being

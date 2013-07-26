@@ -4,10 +4,6 @@ Buckets
 
 .. currentmodule:: riak.bucket
 
---------
-Overview
---------
-
 Buckets are both namespaces for the key-value pairs you store in Riak,
 and containers for properties that apply to that namespace. Buckets
 should be created via the :meth:`bucket()
@@ -19,7 +15,7 @@ should be created via the :meth:`bucket()
     mybucket = client.bucket('mybucket')
 
 --------------
-RiakBucket API
+Bucket objects
 --------------
 
 .. autoclass:: RiakBucket
@@ -30,9 +26,9 @@ RiakBucket API
 
    .. autoattribute:: resolver
 
-^^^^^^^^^^^^^^^^^
+-----------------
 Bucket properties
-^^^^^^^^^^^^^^^^^
+-----------------
 
 Bucket properties are flags and defaults that apply to all keys in the
 bucket.
@@ -43,9 +39,9 @@ bucket.
 .. automethod:: RiakBucket.get_property
 .. automethod:: RiakBucket.set_property
 
-"""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Shortcuts for common properties
-"""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some of the most commonly-used bucket properties are exposed as object
 properties as well. The getters and setters simply call
@@ -61,9 +57,9 @@ respectively.
 .. autoattribute:: RiakBucket.pw
 .. autoattribute:: RiakBucket.rw
 
-""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^
 Shortcuts for search
-""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^
 
 When Riak Search is enabled on the server, you can toggle which
 buckets have automatic indexing turned on using the ``search`` bucket
@@ -74,9 +70,9 @@ methods simplify interacting with that configuration.
 .. automethod:: RiakBucket.enable_search
 .. automethod:: RiakBucket.disable_search
 
-^^^^^^^^^^^^^^^^^
+-----------------
 Working with keys
-^^^^^^^^^^^^^^^^^
+-----------------
 
 The primary purpose of buckets is to act as namespaces for keys. As
 such, you can use the bucket object to create, fetch and delete
@@ -88,9 +84,11 @@ such, you can use the bucket object to create, fetch and delete
 .. automethod:: RiakBucket.multiget
 .. automethod:: RiakBucket.delete
 
-""""""""
+.. _counters:
+
+^^^^^^^^
 Counters
-""""""""
+^^^^^^^^
 
 Rather than returning objects, the counter operations new to Riak 1.4
 act directly on the value of the counter.
@@ -98,18 +96,18 @@ act directly on the value of the counter.
 .. automethod:: RiakBucket.get_counter
 .. automethod:: RiakBucket.update_counter
 
-^^^^^^^^^^^^^^^^
+----------------
 Query operations
-^^^^^^^^^^^^^^^^
+----------------
 
 .. automethod:: RiakBucket.search
 .. automethod:: RiakBucket.get_index
 .. automethod:: RiakBucket.stream_index
 
 
-^^^^^^^^^^^^^
+-------------
 Serialization
-^^^^^^^^^^^^^
+-------------
 
 Similar to :class:`RiakClient <riak.client.RiakClient>`, buckets can
 register custom transformation functions for media-types. When
@@ -123,9 +121,9 @@ with the bucket.
 .. automethod:: RiakBucket.set_decoder
 
 
-^^^^^^^^^^^^
+------------
 Listing keys
-^^^^^^^^^^^^
+------------
 
 Shortcuts for :meth:`RiakClient.get_keys()
 <riak.client.RiakClient.get_keys>` and
@@ -136,9 +134,9 @@ object. The same admonitions for these operations apply.
 .. automethod:: RiakBucket.get_keys
 .. automethod:: RiakBucket.stream_keys
 
-^^^^^^^^^^^^^^^^^^
+------------------
 Deprecated methods
-^^^^^^^^^^^^^^^^^^
+------------------
 
 .. warning:: These methods exist solely for backwards-compatibility and should not
    be used unless code is being ported from an older version.
