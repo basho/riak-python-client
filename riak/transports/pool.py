@@ -23,29 +23,33 @@ import threading
 # This file is a rough port of the Innertube Ruby library
 class BadResource(StandardError):
     """
-    Users of a Pool should raise this error when the pool element
-    currently in-use is bad and should be removed from the pool.
+    Users of a :class:`Pool` should raise this error when the pool
+    element currently in-use is bad and should be removed from the
+    pool.
     """
     pass
 
 
 class Element(object):
     """
-    A member of the Pool, a container for the actual resource being
-    pooled and a marker for whether the resource is currently claimed.
+    A member of the :class:`Pool`, a container for the actual resource
+    being pooled and a marker for whether the resource is currently
+    claimed.
     """
     def __init__(self, obj):
         """
         Creates a new Element, wrapping the passed object as the
         pooled resource.
+
         :param obj: the resource to wrap
         :type obj: object
         """
 
-        """The wrapped pool resource."""
         self.object = obj
-        """Whether the resource is currently in use."""
+        """The wrapped pool resource."""
+
         self.claimed = False
+        """Whether the resource is currently in use."""
 
 
 class Pool(object):
@@ -59,7 +63,7 @@ class Pool(object):
     method also allows filtering of the pool and supplying a default
     value to be used as the resource if no elements are free.
 
-    Example:
+    Example::
 
         from riak.Pool import Pool, BadResource
         class ListPool(Pool):
@@ -80,7 +84,7 @@ class Pool(object):
     def __init__(self):
         """
         Creates a new Pool. This should be called manually if you
-        override the __init__ method in a subclass.
+        override the :meth:`__init__` method in a subclass.
         """
         self.lock = threading.RLock()
         self.releaser = threading.Condition(self.lock)
@@ -89,6 +93,8 @@ class Pool(object):
     @contextmanager
     def take(self, _filter=None, default=None):
         """
+        take(_filter=None, default=None)
+
         Claims a resource from the pool for use in a thread-safe,
         reentrant manner (as part of a with statement). Resources are
         created as needed when all members of the pool are claimed or
@@ -98,7 +104,7 @@ class Pool(object):
             of the pool
         :type _filter: callable
         :param default: a value that will be used instead of calling
-            create_resource if a new resource needs to be created
+            :meth:`create_resource` if a new resource needs to be created
         """
         if not _filter:
             def _filter(obj):
@@ -151,7 +157,7 @@ class Pool(object):
 
     def clear(self):
         """
-        Removes all resources from the pool, calling delete_element
+        Removes all resources from the pool, calling :meth:`delete_element`
         with each one so that the resources are cleaned up.
         """
         for element in self:

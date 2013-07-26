@@ -55,6 +55,9 @@ def deep_merge(a, b):
 
 
 def deprecated(message, stacklevel=3):
+    """
+    Prints a deprecation warning to the console.
+    """
     warnings.warn(message, UserWarning, stacklevel=stacklevel)
 
 QUORUMS = ['r', 'pr', 'w', 'dw', 'pw', 'rw']
@@ -125,8 +128,9 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
 
 class lazy_property(object):
     '''
-    meant to be used for lazy evaluation of an object attribute.
-    property should represent non-mutable data, as it replaces itself.
+    A method decorator meant to be used for lazy evaluation and
+    memoization of an object attribute. The property should represent
+    immutable data, as it replaces itself on first access.
     '''
 
     def __init__(self, fget):

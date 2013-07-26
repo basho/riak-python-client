@@ -28,7 +28,8 @@ from feature_detect import FeatureDetection
 
 class RiakTransport(FeatureDetection):
     """
-    Class to encapsulate transport details
+    Class to encapsulate transport details and methods. All protocol
+    transports are subclasses of this class.
     """
 
     def _get_client_id(self):

@@ -13,6 +13,7 @@ Riak Python Client
       bucket
       object
       mapreduce
+      advanced
 
 Installation
 ------------

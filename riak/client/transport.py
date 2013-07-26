@@ -37,6 +37,8 @@ class RiakClientTransport(object):
     @contextmanager
     def _transport(self):
         """
+        _transport()
+
         Yields a single transport to the caller from the default pool,
         without retries.
         """
