@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 from Queue import Queue
-from threading import Thread #, currentThread
+from threading import Thread
 import sys
 sys.path.append("../transports/")
-from pool import Pool #, BadResource
+from pool import Pool
 from random import SystemRandom
 from time import sleep
 
