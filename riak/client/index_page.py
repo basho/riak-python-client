@@ -43,8 +43,15 @@ class IndexPage(Sequence, object):
         self.return_terms = return_terms
         self.max_results = max_results
         self.results = None
-        self.continuation = None
         self.stream = False
+
+    continuation = None
+    """
+    The opaque page marker that is used when fetching the next chunk
+    of results. The user can simply call :meth:`next_page` to do so,
+    or pass this to the :meth:`~riak.client.RiakClient.get_index`
+    method using the ``continuation`` option.
+    """
 
     def __iter__(self):
         """

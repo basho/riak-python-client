@@ -98,6 +98,12 @@ Protocol Buffers Transport
 Utilities
 ---------
 
+^^^^^^^^^^^^^^^^^^
+Link wrapper class
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: riak.mapreduce.RiakLink
+
 ^^^^^^^^^^^^^^^^^
 Multi-valued Dict
 ^^^^^^^^^^^^^^^^^
