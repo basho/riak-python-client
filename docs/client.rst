@@ -147,7 +147,9 @@ Deprecated Methods
 .. attribute:: RiakClient.solr
 
    Returns a RiakSearch object which can access search indexes.
-   **DEPRECATED**
+
+   .. deprecated:: 2.0.0
+      Use the ``fulltext_*`` methods instead.
 
 .. automethod:: RiakClient.get_r
 .. automethod:: RiakClient.set_r

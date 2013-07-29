@@ -1,6 +1,6 @@
-==============
-Keys & Objects
-==============
+================
+Values & Objects
+================
 
 .. currentmodule:: riak.riak_object
 

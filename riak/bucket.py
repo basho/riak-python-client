@@ -170,7 +170,10 @@ class RiakBucket(object):
         Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
         that will be stored as plain text/binary. A shortcut for
         manually instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>`. **DEPRECATED**
+        <riak.riak_object.RiakObject>`.
+
+        .. deprecated:: 2.0.0
+           Use :meth:`new` instead.
 
         :param key: Name of the key.
         :type key: string
@@ -204,7 +207,10 @@ class RiakBucket(object):
 
     def get_binary(self, key, r=None, pr=None, timeout=None):
         """
-        Retrieve a binary/string object from Riak. **DEPRECATED**
+        Retrieve a binary/string object from Riak.
+
+        .. deprecated:: 2.0.0
+           Use :meth:`get` instead.
 
         :param key: Name of the key.
         :type key: string
@@ -393,7 +399,10 @@ class RiakBucket(object):
         """
         Create a new Riak object in the bucket, using the contents of
         the specified file. This is a shortcut for :meth:`new`, where the
-        ``encoded_data`` and ``content_type`` are set for you. **DEPRECATED**
+        ``encoded_data`` and ``content_type`` are set for you.
+
+        .. deprecated:: 2.0.0
+           Use :meth:`new_from_file` instead.
 
         :param key: the key of the new object
         :type key: string

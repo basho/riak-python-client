@@ -82,7 +82,6 @@ class RiakTransport(FeatureDetection):
                pw=None, timeout=None):
         """
         Deletes an object.
-        @return true
         """
         raise NotImplementedError
 

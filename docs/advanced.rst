@@ -19,8 +19,6 @@ Connection pool
    :members:
 
 .. autoclass:: PoolIterator
-   :members:
-   :special-members:
 
 -----------
 Retry logic

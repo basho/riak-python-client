@@ -605,7 +605,25 @@ class RiakLinkPhase(object):
 
 
 class RiakKeyFilter(object):
+    """
+    A helper class for building up lists of key filters. Unknown
+    methods are treated as filters to be added; ``&`` and ``|`` create
+    conjunctions and disjunctions, respectively. ``+`` concatenates filters.
+
+    Example::
+
+        f1 = RiakKeyFilter().starts_with('2005')
+        f2 = RiakKeyFilter().ends_with('-01')
+        f3 = f1 & f2
+        print f3
+        # => [['and', [['starts_with', '2005']], [['ends_with', '-01']]]]
+    """
+
     def __init__(self, *args):
+        """
+        :param args: a list of arguments to be treated as a filter.
+        :type args: list
+        """
         if args:
             self._filters = [list(args)]
         else:

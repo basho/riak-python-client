@@ -107,16 +107,21 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
         return self
 
     getter.__doc__ = """
-       Gets the value used in requests for the {!r} quorum.
-       If not set, returns the passed value. **DEPRECATED**
+       Gets the value used in requests for the {0!r} quorum.
+       If not set, returns the passed value.
+
+       .. deprecated:: 2.0.0
+          Use the {0!r} bucket property or request option instead.
 
        :param value: the value to use if not set
        :type value: mixed
        :rtype: mixed""".format(quorum)
 
     setter.__doc__ = """
-       Sets the value used in requests for the {!r} quorum.
-       **DEPRECATED**
+       Sets the value used in requests for the {0!r} quorum.
+
+       .. deprecated:: 2.0.0
+          Use the {0!r} bucket property or request option instead.
 
        :param value: the value to use if not set
        :type value: mixed

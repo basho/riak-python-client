@@ -138,7 +138,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def get_transport(self):
         """
         Get the transport instance the client is using for it's
-        connection. DEPRECATED
+        connection.
+
+        .. deprecated:: 2.0.0
+           There is no equivalent to this method, it will return ``None``.
         """
         deprecated("get_transport is deprecated, use client, " +
                    "bucket, or object methods instead")
@@ -146,8 +149,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
     def get_client_id(self):
         """
-        Get the ``client_id`` for this ``RiakClient`` instance.
-        DEPRECATED
+        Get the client identifier.
+
+        .. deprecated:: 2.0.0
+           Use the :attr:`client_id` attribute instead.
 
         :rtype: string
         """
@@ -157,8 +162,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
     def set_client_id(self, client_id):
         """
-        Set the client_id for this ``RiakClient`` instance.
-        DEPRECATED
+        Set the client identifier.
+
+        .. deprecated:: 2.0.0
+           Use the :attr:`client_id` attribute instead.
 
         :param client_id: The new client_id.
         :type client_id: string
@@ -243,7 +250,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def solr(self):
         """
         Returns a RiakSearch object which can access search indexes.
-        DEPRECATED
+
+        .. deprecated:: 2.0.0
+           Use the ``fulltext_*`` methods instead.
         """
         deprecated("``solr`` is deprecated, use ``fulltext_search``,"
                    " ``fulltext_add`` and ``fulltext_delete`` directly")

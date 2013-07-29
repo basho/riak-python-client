@@ -26,12 +26,12 @@ for equality or across ranges.::
 
     # Performs an equality query
     seans = bucket.get_index("fname_bin", "Sean")
-    
+
     # Performs a range query
     eighties = bucket.get_index("byear_int", 1980, 1989)
 
 Secondary indexes are also available via :meth:`MapReduce
-<riak.mapreduce.MapReduce.index>`.
+<riak.mapreduce.RiakMapReduce.index>`.
 
 ^^^^^^^^^^^^^^^^^^
 Riak 1.4+ Features
@@ -112,7 +112,7 @@ MapReduce
 
 .. currentmodule:: riak.mapreduce
 
-:class:`MapReduce` allows you to construct query-processing jobs that
+:class:`RiakMapReduce` allows you to construct query-processing jobs that
 are performed mostly in-parallel around the Riak cluster. You can
 think of it as a pipeline, where inputs are fed in one end, they pass
 through a number of ``map`` and ``reduce`` phases, and then are
@@ -163,7 +163,7 @@ results, while ``reduce`` phases operate over collections of results
 from previous phases. ``link`` phases are a special type of ``map``
 phase that extract matching :attr:`~riak.riak_object.RiakObject.links`
 from the object, usually so they can be used in a subsequent ``map``
-phase. 
+phase.
 
 Any number of phases can return results directly to the client by
 passing ``keep=True``.

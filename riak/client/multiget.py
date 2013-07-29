@@ -142,7 +142,8 @@ class MultiGetPool(object):
         input queue is empty. Once the stop flag is set, new enqueues
         are disallowed, meaning that the workers can safely drain the
         queue before exiting.
-        :rtype: boolean
+
+        :rtype: bool
         """
         return self.stopped() and self._inq.empty()
 
