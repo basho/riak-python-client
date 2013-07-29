@@ -55,6 +55,9 @@ def deep_merge(a, b):
 
 
 def deprecated(message, stacklevel=3):
+    """
+    Prints a deprecation warning to the console.
+    """
     warnings.warn(message, UserWarning, stacklevel=stacklevel)
 
 QUORUMS = ['r', 'pr', 'w', 'dw', 'pw', 'rw']
@@ -80,18 +83,18 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
     getter_name = "get_%s" % quorum
     setter_name = "set_%s" % quorum
     if not parent:
-        def direct_getter(self, val=None):
+        def direct_getter(self, value=None):
             deprecated(QDEPMESSAGE % klass.__name__)
-            if val:
-                return val
+            if value:
+                return value
             return getattr(self, propname, "default")
 
         getter = direct_getter
     else:
-        def parent_getter(self, val=None):
+        def parent_getter(self, value=None):
             deprecated(QDEPMESSAGE % klass.__name__)
-            if val:
-                return val
+            if value:
+                return value
             parentInstance = getattr(self, parent)
             return getattr(self, propname,
                            getattr(parentInstance, propname, "default"))
@@ -103,14 +106,36 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
         setattr(self, propname, value)
         return self
 
+    getter.__doc__ = """
+       Gets the value used in requests for the {0!r} quorum.
+       If not set, returns the passed value.
+
+       .. deprecated:: 2.0.0
+          Use the {0!r} bucket property or request option instead.
+
+       :param value: the value to use if not set
+       :type value: mixed
+       :rtype: mixed""".format(quorum)
+
+    setter.__doc__ = """
+       Sets the value used in requests for the {0!r} quorum.
+
+       .. deprecated:: 2.0.0
+          Use the {0!r} bucket property or request option instead.
+
+       :param value: the value to use if not set
+       :type value: mixed
+       """.format(quorum)
+
     setattr(klass, getter_name, getter)
     setattr(klass, setter_name, setter)
 
 
 class lazy_property(object):
     '''
-    meant to be used for lazy evaluation of an object attribute.
-    property should represent non-mutable data, as it replaces itself.
+    A method decorator meant to be used for lazy evaluation and
+    memoization of an object attribute. The property should represent
+    immutable data, as it replaces itself on first access.
     '''
 
     def __init__(self, fget):

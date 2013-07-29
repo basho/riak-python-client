@@ -37,6 +37,8 @@ class RiakClientTransport(object):
     @contextmanager
     def _transport(self):
         """
+        _transport()
+
         Yields a single transport to the caller from the default pool,
         without retries.
         """
@@ -123,6 +125,9 @@ def retryable(fn, protocol=None):
             return fn(self, transport, *args, **kwargs)
 
         return self._with_retries(pool, thunk)
+
+    wrapper.__doc__ = fn.__doc__
+    wrapper.__repr__ = fn.__repr__
 
     return wrapper
 

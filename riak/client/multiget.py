@@ -25,12 +25,15 @@ __all__ = ['multiget']
 
 
 try:
+    #: The default size of the worker pool, either based on the number
+    #: of CPUS or defaulting to 6
     POOL_SIZE = cpu_count()
 except NotImplementedError:
     # Make an educated guess
     POOL_SIZE = 6
 
-
+#: A :class:`namedtuple` for tasks that are fed to workers in the
+#: multiget pool.
 Task = namedtuple('Task', ['client', 'outq', 'bucket', 'key', 'options'])
 
 
@@ -41,6 +44,11 @@ class MultiGetPool(object):
     """
 
     def __init__(self, size=POOL_SIZE):
+        """
+        :param size: the desired size of the worker pool
+        :type size: int
+        """
+
         self._inq = Queue()
         self._size = size
         self._started = Event()
@@ -110,7 +118,10 @@ class MultiGetPool(object):
 
     def _fetcher(self):
         """
-        The body of the multi-get worker.
+        The body of the multi-get worker. Loops until
+        :meth:`_should_quit` returns ``True``, taking tasks off the
+        input queue, fetching the object, and putting them on the
+        output queue.
         """
         while not self._should_quit():
             task = self._inq.get()
@@ -131,21 +142,27 @@ class MultiGetPool(object):
         input queue is empty. Once the stop flag is set, new enqueues
         are disallowed, meaning that the workers can safely drain the
         queue before exiting.
-        :rtype boolean
+
+        :rtype: bool
         """
         return self.stopped() and self._inq.empty()
 
 
+#: The default pool is automatically created and stored in this constant.
 RIAK_MULTIGET_POOL = MultiGetPool()
 
 
 def multiget(client, keys, **options):
     """
     Executes a parallel-fetch across multiple threads. Returns a list
-    containing RiakObject instances, or 3-tuples of bucket, key, and
-    the exception raised.
+    containing :class:`~riak.riak_object.RiakObject` instances, or
+    3-tuples of bucket, key, and the exception raised.
 
-    :rtype list
+    :param client: the client to use
+    :type client: :class:`~riak.client.RiakClient`
+    :param keys: the bucket/key pairs to fetch in parallel
+    :type keys: list of two-tuples -- bucket/key pairs
+    :rtype: list
     """
     outq = Queue()
 

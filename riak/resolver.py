@@ -20,12 +20,14 @@ under the License.
 def default_resolver(riak_object):
     """
     The default conflict-resolution function, which does nothing. To
-    implement a resolver, define a function that sets the ``siblings``
-    property on the passed ``RiakObject`` instance to a list
-    containing a single ``RiakContent`` object.
+    implement a resolver, define a function that sets the
+    :attr:`siblings <riak.riak_object.RiakObject.siblings>` property
+    on the passed :class:`RiakObject <riak.riak_object.RiakObject>`
+    instance to a list containing a single :class:`RiakContent
+    <riak.content.RiakContent>` object.
 
     :param riak_object: an object-in-conflict that will be resolved
-    :type riak_object: RiakObject
+    :type riak_object: :class:`RiakObject <riak.riak_object.RiakObject>`
     """
     pass
 
@@ -36,7 +38,7 @@ def last_written_resolver(riak_object):
     recently-modified sibling by timestamp.
 
     :param riak_object: an object-in-conflict that will be resolved
-    :type riak_object: RiakObject
+    :type riak_object: :class:`RiakObject <riak.riak_object.RiakObject>`
     """
     lm = lambda x: x.last_modified
     riak_object.siblings = [max(riak_object.siblings, key=lm), ]
