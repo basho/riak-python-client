@@ -4,6 +4,7 @@ import os
 import subprocess
 import platform
 from setuptools import setup, find_packages
+from version import get_version
 
 def make_docs():
     if not os.path.exists('docs'):
@@ -20,7 +21,7 @@ if platform.python_version() < '2.7':
 
 setup(
     name='riak',
-    version='2.0.0a',
+    version=get_version(),
     packages = find_packages(),
     requires = requires,
     install_requires = install_requires,
