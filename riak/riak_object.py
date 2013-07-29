@@ -354,9 +354,9 @@ class RiakObject(object):
     def add(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.add`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.add`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
@@ -365,9 +365,9 @@ class RiakObject(object):
     def link(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.link`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.link`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
@@ -376,9 +376,9 @@ class RiakObject(object):
     def map(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.map`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.map`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
@@ -387,9 +387,9 @@ class RiakObject(object):
     def reduce(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.reduce`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.reduce`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)

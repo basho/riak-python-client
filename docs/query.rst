@@ -151,6 +151,8 @@ can chain the construction of the query job.
 .. automethod:: RiakMapReduce.search
 .. automethod:: RiakMapReduce.index
 
+.. autoclass:: RiakKeyFilter
+
 ^^^^^^
 Phases
 ^^^^^^
@@ -174,6 +176,24 @@ passing ``keep=True``.
 
 .. autoclass:: RiakLinkPhase
 
+"""""""""""""""
+Phase shortcuts
+"""""""""""""""
+
+A number of commonly-used phases are also available as shortcut
+methods:
+
+.. automethod:: RiakMapReduce.map_values
+.. automethod:: RiakMapReduce.map_values_json
+.. automethod:: RiakMapReduce.reduce_sum
+.. automethod:: RiakMapReduce.reduce_min
+.. automethod:: RiakMapReduce.reduce_max
+.. automethod:: RiakMapReduce.reduce_sort
+.. automethod:: RiakMapReduce.reduce_numeric_sort
+.. automethod:: RiakMapReduce.reduce_limit
+.. automethod:: RiakMapReduce.reduce_slice
+.. automethod:: RiakMapReduce.filter_not_found
+
 ^^^^^^^^^
 Execution
 ^^^^^^^^^
@@ -184,3 +204,18 @@ of the ``map`` and ``reduce`` phases the query contains.
 
 .. automethod:: RiakMapReduce.run
 .. automethod:: RiakMapReduce.stream
+
+^^^^^^^^^^^^^^^^^^^^^
+Shortcut constructors
+^^^^^^^^^^^^^^^^^^^^^
+
+:class:`~riak.riak_object.RiakObject` contains some shortcut methods
+that make it more convenient to begin constructing
+:class:`RiakMapReduce` queries.
+
+.. currentmodule:: riak.riak_object
+
+.. automethod:: RiakObject.add
+.. automethod:: RiakObject.link
+.. automethod:: RiakObject.map
+.. automethod:: RiakObject.reduce
