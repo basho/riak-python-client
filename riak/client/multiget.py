@@ -36,6 +36,7 @@ except NotImplementedError:
 #: multiget pool.
 Task = namedtuple('Task', ['client', 'outq', 'bucket', 'key', 'options'])
 
+
 class MultiGetPool(object):
     """
     Encapsulates a pool of fetcher threads. These threads can be used

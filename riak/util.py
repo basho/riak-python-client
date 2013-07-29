@@ -85,16 +85,16 @@ def __deprecateQuorumAccessor(klass, parent, quorum):
     if not parent:
         def direct_getter(self, value=None):
             deprecated(QDEPMESSAGE % klass.__name__)
-            if val:
-                return val
+            if value:
+                return value
             return getattr(self, propname, "default")
 
         getter = direct_getter
     else:
         def parent_getter(self, value=None):
             deprecated(QDEPMESSAGE % klass.__name__)
-            if val:
-                return val
+            if value:
+                return value
             parentInstance = getattr(self, parent)
             return getattr(self, propname,
                            getattr(parentInstance, propname, "default"))
