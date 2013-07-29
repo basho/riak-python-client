@@ -15,6 +15,20 @@ Riak Python Client
       query
       advanced
 
+Tutorial
+--------
+
+The tutorial documentation has been converted to the `Basho Docs`_ as
+the `Taste of Riak: Python`_. The old tutorial_ that used to live here
+has been moved to the `Github Wiki`_ and is likely out-of-date.
+
+.. _`Basho Docs`: http://docs.basho.com/
+.. _`Taste of Riak: Python`:
+   http://docs.basho.com/riak/latest/dev/taste-of-riak/python/
+.. _tutorial:
+   https://github.com/basho/riak-python-client/wiki/Tutorial-%28old%29
+.. _`Github Wiki`: https://github.com/basho/riak-python-client/wiki
+
 Installation
 ------------
 
