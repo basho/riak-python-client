@@ -1,0 +1,37 @@
+{% extends "!layout.html" %}
+
+{% block sidebarrel %}{% endblock %}
+
+{%- block content %}
+{{ navBar() }}
+<div class="container">
+  <ul class="pager">
+    {%- if prev %}
+    <li class="previous">
+      <a href="{{ prev.link|e }}" 
+         title="{{ _('previous chapter') }}">{{"&larr;"|safe}}{{ prev.title }}</a></li>
+    {%- endif %}
+    {%- if next %}
+    <li class="next">
+      <a href="{{ next.link|e }}" 
+         title="{{ _('next chapter') }}">{{ next.title }}{{"&rarr;"|safe}}</a></li>
+    {%- endif %}
+  </ul>
+  {% block body %}{% endblock %}
+  <div class="clearfix">&nbsp;</div>
+  <ul class="pager">
+    {%- if prev %}
+    <li class="previous">
+      <a href="{{ prev.link|e }}" 
+         title="{{ _('previous chapter') }}">{{"&larr;"|safe}}{{ prev.title }}</a></li>
+    {%- endif %}
+    {%- if next %}
+    <li class="next">
+      <a href="{{ next.link|e }}" 
+         title="{{ _('next chapter') }}">{{ next.title }}{{"&rarr;"|safe}}</a></li>
+    {%- endif %}
+  </ul>
+</div>
+{%- endblock %}
+
+{% set css_files = css_files + ['_static/custom.css'] %}

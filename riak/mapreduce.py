@@ -21,6 +21,8 @@ under the License.
 from collections import Iterable, namedtuple
 from riak import RiakError
 
+#: Links are just bucket/key/tag tuples, this class provides a
+#: backwards-compatible format: ``RiakLink(bucket, key, tag)``
 RiakLink = namedtuple("RiakLink", ("bucket", "key", "tag"))
 
 
@@ -34,8 +36,9 @@ class RiakMapReduce(object):
     def __init__(self, client):
         """
         Construct a Map/Reduce object.
-        :param client: A RiakClient object.
-        :type client: RiakClient
+
+        :param client: the client that will perform the query
+        :type client: :class:`~riak.client.RiakClient`
         """
         self._client = client
         self._phases = []
@@ -57,7 +60,7 @@ class RiakMapReduce(object):
         :type arg2: string, list, None
         :param arg3: key data for this input (must be convertible to JSON)
         :type arg3: string, list, dict, None
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         if (arg2 is None) and (arg3 is None):
             if isinstance(arg1, RiakObject):
@@ -73,7 +76,7 @@ class RiakMapReduce(object):
 
         :param obj: the object to add
         :type obj: RiakObject
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         return self.add_bucket_key_data(obj._bucket._name, obj._key, None)
 
@@ -87,7 +90,7 @@ class RiakMapReduce(object):
         :type key: string
         :param data: the key-specific data
         :type data: string, list, dict, None
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         if self._input_mode == 'bucket':
             raise ValueError('Already added a bucket, can\'t add an object.')
@@ -108,7 +111,7 @@ class RiakMapReduce(object):
 
         :param bucket: the bucket
         :type bucket: string
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         self._input_mode = 'bucket'
         self._inputs = bucket
@@ -120,7 +123,7 @@ class RiakMapReduce(object):
 
         :param key_filters: a list of filters
         :type key_filters: list
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         if self._input_mode == 'query':
             raise ValueError('Key filters are not supported in a query.')
@@ -134,7 +137,7 @@ class RiakMapReduce(object):
 
         :param args: a filter
         :type args: list
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         if self._input_mode == 'query':
             raise ValueError('Key filters are not supported in a query.')
@@ -151,7 +154,7 @@ class RiakMapReduce(object):
         :type bucket: string
         :param query: The search query
         :type query: string
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         self._input_mode = 'query'
         self._inputs = {'module': 'riak_search',
@@ -173,6 +176,7 @@ class RiakMapReduce(object):
         :type startkey: string, integer
         :param endkey: The end key of index range (if doing a range query)
         :type endkey: string, integer, None
+        :rtype: :class:`RiakMapReduce`
         """
         self._input_mode = 'query'
 
@@ -192,7 +196,7 @@ class RiakMapReduce(object):
         Add a link phase to the map/reduce operation.
 
         :param bucket: Bucket name (default '_', which means all
-        buckets)
+            buckets)
         :type bucket: string
         :param tag:  Tag (default '_', which means any tag)
         :type tag: string
@@ -200,7 +204,7 @@ class RiakMapReduce(object):
           the map/reduce. (default False, unless this is the last step
           in the phase)
         :type keep: boolean
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         self._phases.append(RiakLinkPhase(bucket, tag, keep))
         return self
@@ -217,7 +221,7 @@ class RiakMapReduce(object):
         :param options: phase options, containing 'language', 'keep'
           flag, and/or 'arg'.
         :type options: dict
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         if options is None:
             options = dict()
@@ -245,7 +249,7 @@ class RiakMapReduce(object):
         :type function: string, list
         :param options: phase options, containing 'language', 'keep'
           flag, and/or 'arg'.
-        :rtype: RiakMapReduce
+        :rtype: :class:`RiakMapReduce`
         """
         if options is None:
             options = dict()
@@ -265,8 +269,8 @@ class RiakMapReduce(object):
     def run(self, timeout=None):
         """
         Run the map/reduce operation synchronously. Returns a list of
-        results, or a list of links if the last phase is a
-        link phase.
+        results, or a list of links if the last phase is a link phase.
+        Shortcut for :meth:`riak.client.RiakClient.mapred`.
 
         :param timeout: Timeout in milliseconds
         :type timeout: integer, None
@@ -309,11 +313,12 @@ class RiakMapReduce(object):
 
     def stream(self, timeout=None):
         """
-        Streams the MapReduce query (returns an iterator).
+        Streams the MapReduce query (returns an iterator). Shortcut
+        for :meth:`riak.client.RiakClient.stream_mapred`.
 
         :param timeout: Timeout in milliseconds
         :type timeout: integer
-        :rtype: iterator
+        :rtype: iterator that yields (phase_num, data) tuples
         """
         query, lrf = self._normalize_query()
         return self._client.stream_mapred(self._inputs, query, timeout)
@@ -569,13 +574,14 @@ class RiakLinkPhase(object):
     map/reduce operation.
 
     Normally you won't need to use this object directly, but instead
-    call ``link`` on RiakMapReduce objects to add instances to the
-    query.
+    call :meth:`RiakMapReduce.link` on RiakMapReduce objects to add
+    instances to the query.
     """
 
     def __init__(self, bucket, tag, keep):
         """
         Construct a RiakLinkPhase object.
+
         :param bucket: - The bucket name
         :type bucket: string
         :param tag: The tag
@@ -599,7 +605,25 @@ class RiakLinkPhase(object):
 
 
 class RiakKeyFilter(object):
+    """
+    A helper class for building up lists of key filters. Unknown
+    methods are treated as filters to be added; ``&`` and ``|`` create
+    conjunctions and disjunctions, respectively. ``+`` concatenates filters.
+
+    Example::
+
+        f1 = RiakKeyFilter().starts_with('2005')
+        f2 = RiakKeyFilter().ends_with('-01')
+        f3 = f1 & f2
+        print f3
+        # => [['and', [['starts_with', '2005']], [['ends_with', '-01']]]]
+    """
+
     def __init__(self, *args):
+        """
+        :param args: a list of arguments to be treated as a filter.
+        :type args: list
+        """
         if args:
             self._filters = [list(args)]
         else:

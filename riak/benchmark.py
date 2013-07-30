@@ -25,9 +25,9 @@ __all__ = ['measure', 'measure_with_rehearsal']
 def measure_with_rehearsal():
     """
     Runs a benchmark when used as an iterator, injecting a garbage
-    collection between iterations. Example:
+    collection between iterations. Example::
 
-        for b in benchmark.measure_with_rehearsal():
+        for b in riak.benchmark.measure_with_rehearsal():
             with b.report("pow"):
                 for _ in range(10000):
                     math.pow(2,10000)
@@ -40,9 +40,9 @@ def measure_with_rehearsal():
 
 def measure():
     """
-    Runs a benchmark once when used as a context manager. Example:
+    Runs a benchmark once when used as a context manager. Example::
 
-        with benchmark.measure() as b:
+        with riak.benchmark.measure() as b:
             with b.report("pow"):
                 for _ in range(10000):
                     math.pow(2,10000)

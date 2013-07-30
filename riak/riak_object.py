@@ -58,6 +58,8 @@ def content_method(name):
             raise ConflictError()
         return getattr(self.siblings[0], name).__call__(*args, **kwargs)
 
+    _delegate.__doc__ = getattr(RiakContent, name).__doc__
+
     return _delegate
 
 
@@ -125,6 +127,9 @@ class RiakObject(object):
         self.vclock = None
         self.siblings = [RiakContent(self)]
 
+    #: The list of sibling values contained in this object
+    siblings = []
+
     def __hash__(self):
         return hash((self.key, self.bucket, self.vclock))
 
@@ -146,7 +151,7 @@ class RiakObject(object):
         this property will result in decoding the `encoded_data`
         property into Python values. The decoding is dependent on the
         `content_type` property and the bucket's registered decoders.
-        :type mixed """)
+        """)
 
     encoded_data = content_property('encoded_data', doc="""
         The raw data stored in this object, essentially the encoded
@@ -154,42 +159,42 @@ class RiakObject(object):
         will result in encoding the `data` property into a string. The
         encoding is dependent on the `content_type` property and the
         bucket's registered encoders.
-        :type basestring""")
+        """)
 
     charset = content_property('charset', doc="""
-        The character set of the encoded data
-        :type string""")
+        The character set of the encoded data as a string
+        """)
 
     content_type = content_property('content_type', doc="""
-        The MIME media type of the encoded data
-        :type string""")
+        The MIME media type of the encoded data as a string
+        """)
 
     content_encoding = content_property('content_encoding', doc="""
         The encoding (compression) of the encoded data. Valid values
         are identity, deflate, gzip
-        :type string""")
+        """)
 
     last_modified = content_property('last_modified', """
         The UNIX timestamp of the modification time of this value.
-        :type float""")
+        """)
 
     etag = content_property('etag', """
         A unique entity-tag for the value.
-        :type string""")
+        """)
 
     usermeta = content_property('usermeta', doc="""
-        Arbitrary user-defined metadata, mapping strings to strings.
-        :type dict""")
+        Arbitrary user-defined metadata dict, mapping strings to strings.
+        """)
 
     links = content_property('links', doc="""
-        A collection of bucket/key/tag 3-tuples representing links to
-        other keys.
-        :type set""")
+        A set of bucket/key/tag 3-tuples representing links to other
+        keys.
+        """)
 
     indexes = content_property('indexes', doc="""
         The set of secondary index entries, consisting of
         index-name/value tuples
-        :type set""")
+        """)
 
     get_encoded_data = content_method('get_encoded_data')
     set_encoded_data = content_method('set_encoded_data')
@@ -210,10 +215,9 @@ class RiakObject(object):
             return self.siblings[0].exists
 
     exists = property(_exists, None, doc="""
-       Whether the object exists. This is only False when there are no
-       siblings (the object was not found), or the solitary sibling is
-       a tombstone.
-       :type bool
+       Whether the object exists. This is only ``False`` when there
+       are no siblings (the object was not found), or the solitary
+       sibling is a tombstone.
        """)
 
     def _get_resolver(self):
@@ -233,8 +237,7 @@ class RiakObject(object):
     resolver = property(_get_resolver, _set_resolver, doc=
                         """The sibling-resolution function for this
                            object. If the resolver is not set, the
-                           bucket's resolver will be used. :type
-                           callable""")
+                           bucket's resolver will be used.""")
 
     def get_sibling(self, index):
         deprecated("RiakObject.get_sibling is deprecated, use the "
@@ -267,7 +270,7 @@ class RiakObject(object):
         :type if_none_match: bool
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: RiakObject """
+        :rtype: :class:`RiakObject` """
         if len(self.siblings) != 1:
             raise ConflictError("Attempting to store an invalid object, "
                                 "resolve the siblings first")
@@ -285,6 +288,10 @@ class RiakObject(object):
         object could contain new metadata and a new value, if the object
         was updated in Riak since it was last retrieved.
 
+        .. note:: Even if the key is not found in Riak, this will
+           return a :class:`RiakObject`. Check the :attr:`exists`
+           property to see if the key was found.
+
         :param r: R-Value, wait for this many partitions to respond
          before returning to client.
         :type r: integer
@@ -294,7 +301,7 @@ class RiakObject(object):
         :type pr: integer
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: RiakObject
+        :rtype: :class:`RiakObject`
         """
 
         self.client.get(self, r=r, pr=pr, timeout=timeout)
@@ -327,7 +334,7 @@ class RiakObject(object):
         :type pw: integer
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: RiakObject
+        :rtype: :class:`RiakObject`
         """
 
         self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw,
@@ -347,9 +354,9 @@ class RiakObject(object):
     def add(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.add`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.add`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
@@ -358,9 +365,9 @@ class RiakObject(object):
     def link(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.link`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.link`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
@@ -369,9 +376,9 @@ class RiakObject(object):
     def map(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.map`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.map`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
@@ -380,9 +387,9 @@ class RiakObject(object):
     def reduce(self, *args):
         """
         Start assembling a Map/Reduce operation.
-        A shortcut for :func:`RiakMapReduce.reduce`.
+        A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.reduce`.
 
-        :rtype: RiakMapReduce
+        :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
