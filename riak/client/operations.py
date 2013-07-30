@@ -435,6 +435,7 @@ class RiakClientOperations(RiakClientTransport):
                                             w=w, dw=dw, pw=pw,
                                             returnvalue=returnvalue)
 
+    increment_counter = update_counter
 
 def _validate_timeout(timeout):
     """

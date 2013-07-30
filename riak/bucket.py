@@ -477,6 +477,8 @@ class RiakBucket(object):
         """
         return self._client.update_counter(self, key, value, **kwargs)
 
+    increment_counter = update_counter
+
     def __str__(self):
         return '<RiakBucket "{0}">'.format(self.name)
 
