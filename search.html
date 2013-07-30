@@ -1,22 +1,24 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Search &mdash; Riak Python Client 1.5.2 documentation</title>
+    <title>Search &mdash; Riak Python Client 2.0.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap-responsive.min.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.5.2',
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,29 +28,113 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/searchtools.js"></script>
-    <link rel="top" title="Riak Python Client 1.5.2 documentation" href="index.html" />
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-2.3.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="Riak Python Client 2.0.0 documentation" href="index.html" />
   <script type="text/javascript">
     jQuery(function() { Search.loadIndex("searchindex.js"); });
   </script>
-   
+  
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
 
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="index.html">Riak Python Client 1.5.2 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  <div id="navbar" class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a class="brand" href="index.html">Riak Python Client</a>
+        <span class="navbar-text pull-left"><b>2.0.0</b></span>
+
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="divider-vertical"></li>
             
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Docs <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-buckets">Accessing Buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-level-operations">Bucket-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-methods">Deprecated Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-methods">Deprecated methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="object.html#riakobject">RiakObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#persistence">Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#value-and-metadata">Value and Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#siblings">Siblings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#fulltext-search">Fulltext Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"></ul>
+</li>
+            
+            
+            
+          </ul>
+
+          
+            
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+  <ul class="pager">
+  </ul>
+  
   <h1 id="search-documentation">Search</h1>
   <div id="fallback" class="admonition warning">
   <script type="text/javascript">$('#fallback').hide();</script>
@@ -63,37 +149,36 @@
     function will automatically search for all of the words. Pages
     containing fewer words won't appear in the result list.
   </p>
-  <form action="" method="get">
-    <input type="text" name="q" value="" />
-    <input type="submit" value="search" />
+
+  <form class="form-search" action="" method="get">
+    <input type="text" name="q" class="input-medium search-query">
+    <button type="submit" class="btn">search</button>
     <span id="search-progress" style="padding-left: 10px"></span>
   </form>
+
   
   <div id="search-results">
   
   </div>
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="index.html">Riak Python Client 1.5.2 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2010-2012, Basho Technologies.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
-    </div>
+  <div class="clearfix">&nbsp;</div>
+  <ul class="pager">
+  </ul>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2010-2013, Basho Technologies.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2b1.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>

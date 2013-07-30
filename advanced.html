@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced Usage &amp; Internals &mdash; Riak Python Client 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap-responsive.min.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-2.3.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="Riak Python Client 2.0.0 documentation" href="index.html" />
+    <link rel="prev" title="Query Methods" href="query.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a class="brand" href="index.html">Riak Python Client</a>
+        <span class="navbar-text pull-left"><b>2.0.0</b></span>
+
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="divider-vertical"></li>
+            
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Docs <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-buckets">Accessing Buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-level-operations">Bucket-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-methods">Deprecated Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-methods">Deprecated methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="object.html#riakobject">RiakObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#persistence">Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#value-and-metadata">Value and Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#siblings">Siblings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#fulltext-search">Fulltext Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Advanced Usage &amp; Internals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#connection-pool">Connection pool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#retry-logic">Retry logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multiget">Multiget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transports">Transports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"><ul>
+<li><a class="reference internal" href="#">Advanced Usage &amp; Internals</a><ul>
+<li><a class="reference internal" href="#connection-pool">Connection pool</a></li>
+<li><a class="reference internal" href="#retry-logic">Retry logic</a></li>
+<li><a class="reference internal" href="#multiget">Multiget</a></li>
+<li><a class="reference internal" href="#transports">Transports</a><ul>
+<li><a class="reference internal" href="#http-transport">HTTP Transport</a></li>
+<li><a class="reference internal" href="#protocol-buffers-transport">Protocol Buffers Transport</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li><a class="reference internal" href="#link-wrapper-class">Link wrapper class</a></li>
+<li><a class="reference internal" href="#multi-valued-dict">Multi-valued Dict</a></li>
+<li><a class="reference internal" href="#micro-benchmarking">Micro-benchmarking</a></li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-search pull-right" action="search.html" method="get">
+  <input type="text" name="q" class="search-query" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+  <ul class="pager">
+    <li class="previous">
+      <a href="query.html" 
+         title="previous chapter">&larr;Query Methods</a></li>
+  </ul>
+  
+  <div class="section" id="advanced-usage-internals">
+<h1>Advanced Usage &amp; Internals<a class="headerlink" href="#advanced-usage-internals" title="Permalink to this headline">¶</a></h1>
+<p>This page contains documentation for aspects of library internals that
+you will rarely need to interact with, but are important for
+understanding how it works and development purposes.</p>
+<div class="section" id="connection-pool">
+<h2>Connection pool<a class="headerlink" href="#connection-pool" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="riak.transports.pool.BadResource">
+<em class="property">exception </em><tt class="descclassname">riak.transports.pool.</tt><tt class="descname">BadResource</tt><a class="headerlink" href="#riak.transports.pool.BadResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Users of a <a class="reference internal" href="#riak.transports.pool.Pool" title="riak.transports.pool.Pool"><tt class="xref py py-class docutils literal"><span class="pre">Pool</span></tt></a> should raise this error when the pool
+element currently in-use is bad and should be removed from the
+pool.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.transports.pool.Element">
+<em class="property">class </em><tt class="descclassname">riak.transports.pool.</tt><tt class="descname">Element</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#riak.transports.pool.Element" title="Permalink to this definition">¶</a></dt>
+<dd><p>A member of the <a class="reference internal" href="#riak.transports.pool.Pool" title="riak.transports.pool.Pool"><tt class="xref py py-class docutils literal"><span class="pre">Pool</span></tt></a>, a container for the actual resource
+being pooled and a marker for whether the resource is currently
+claimed.</p>
+<p>Creates a new Element, wrapping the passed object as the
+pooled resource.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<em>object</em>) &#8211; the resource to wrap</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="riak.transports.pool.Element.claimed">
+<tt class="descname">claimed</tt><em class="property"> = None</em><a class="headerlink" href="#riak.transports.pool.Element.claimed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the resource is currently in use.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="riak.transports.pool.Element.object">
+<tt class="descname">object</tt><em class="property"> = None</em><a class="headerlink" href="#riak.transports.pool.Element.object" title="Permalink to this definition">¶</a></dt>
+<dd><p>The wrapped pool resource.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.transports.pool.Pool">
+<em class="property">class </em><tt class="descclassname">riak.transports.pool.</tt><tt class="descname">Pool</tt><a class="headerlink" href="#riak.transports.pool.Pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>A thread-safe, reentrant resource pool, ported from the
+&#8220;Innertube&#8221; Ruby library. Pool should be subclassed to implement
+the create_resource and destroy_resource functions that are
+responsible for creating and cleaning up the resources in the
+pool, respectively. Claiming a resource of the pool for a block of
+code is done using a with statement on the take method. The take
+method also allows filtering of the pool and supplying a default
+value to be used as the resource if no elements are free.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">riak.Pool</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">BadResource</span>
+<span class="k">class</span> <span class="nc">ListPool</span><span class="p">(</span><span class="n">Pool</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">destroy_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Lists don&#39;t need to be cleaned up</span>
+        <span class="k">pass</span>
+
+<span class="n">pool</span> <span class="o">=</span> <span class="n">ListPool</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">take</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource</span><span class="p">:</span>
+    <span class="n">resource</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">take</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource2</span><span class="p">:</span>
+    <span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">resource2</span><span class="p">)</span> <span class="c"># should be [1]</span>
+</pre></div>
+</div>
+<p>Creates a new Pool. This should be called manually if you
+override the <tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt> method in a subclass.</p>
+<dl class="method">
+<dt id="riak.transports.pool.Pool.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.pool.Pool.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all resources from the pool, calling <a class="reference internal" href="#riak.transports.pool.Pool.delete_element" title="riak.transports.pool.Pool.delete_element"><tt class="xref py py-meth docutils literal"><span class="pre">delete_element()</span></tt></a>
+with each one so that the resources are cleaned up.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pool.Pool.create_resource">
+<tt class="descname">create_resource</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.pool.Pool.create_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses to allocate a new resource for use
+in the pool.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pool.Pool.delete_element">
+<tt class="descname">delete_element</tt><big>(</big><em>element</em><big>)</big><a class="headerlink" href="#riak.transports.pool.Pool.delete_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the element from the pool and destroys the associated
+resource. Not usually needed by users of the pool, but called
+internally when BadResource is raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>element</strong> (<em>Element</em>) &#8211; the element to remove</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pool.Pool.destroy_resource">
+<tt class="descname">destroy_resource</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#riak.transports.pool.Pool.destroy_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when removing a resource from the pool so that it can
+be cleanly deallocated. Subclasses should implement this
+method if additional cleanup is needed beyond normal GC. The
+default implementation is a no-op.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> &#8211; the resource being removed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pool.Pool.take">
+<tt class="descname">take</tt><big>(</big><em>_filter=None</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#riak.transports.pool.Pool.take" title="Permalink to this definition">¶</a></dt>
+<dd><p>Claims a resource from the pool for use in a thread-safe,
+reentrant manner (as part of a with statement). Resources are
+created as needed when all members of the pool are claimed or
+the pool is empty.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>_filter</strong> (<em>callable</em>) &#8211; a filter that can be used to select a member
+of the pool</li>
+<li><strong>default</strong> &#8211; a value that will be used instead of calling
+<a class="reference internal" href="#riak.transports.pool.Pool.create_resource" title="riak.transports.pool.Pool.create_resource"><tt class="xref py py-meth docutils literal"><span class="pre">create_resource()</span></tt></a> if a new resource needs to be created</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.transports.pool.PoolIterator">
+<em class="property">class </em><tt class="descclassname">riak.transports.pool.</tt><tt class="descname">PoolIterator</tt><big>(</big><em>pool</em><big>)</big><a class="headerlink" href="#riak.transports.pool.PoolIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterates over a snapshot of the pool in a thread-safe manner,
+eventually touching all resources that were known when the
+iteration started.</p>
+<p>Note that if claimed resources are not released for long periods,
+the iterator may hang, waiting for those last resources to be
+released. The iteration and pool functionality is only meant to be
+used internally within the client, and resources will be claimed
+per client operation, making this an unlikely event (although
+still possible).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="retry-logic">
+<h2>Retry logic<a class="headerlink" href="#retry-logic" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="riak.client.transport.RiakClientTransport">
+<em class="property">class </em><tt class="descclassname">riak.client.transport.</tt><tt class="descname">RiakClientTransport</tt><a class="headerlink" href="#riak.client.transport.RiakClientTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Methods for RiakClient related to transport selection and retries.</p>
+<dl class="method">
+<dt id="riak.client.transport.RiakClientTransport._choose_pool">
+<tt class="descname">_choose_pool</tt><big>(</big><em>protocol=None</em><big>)</big><a class="headerlink" href="#riak.client.transport.RiakClientTransport._choose_pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selects a connection pool according to the default protocol
+and the passed one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>protocol</strong> (<em>string</em>) &#8211; the protocol to use</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Pool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.transport.RiakClientTransport._transport">
+<tt class="descname">_transport</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.transport.RiakClientTransport._transport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields a single transport to the caller from the default pool,
+without retries.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.transport.RiakClientTransport._with_retries">
+<tt class="descname">_with_retries</tt><big>(</big><em>pool</em>, <em>fn</em><big>)</big><a class="headerlink" href="#riak.client.transport.RiakClientTransport._with_retries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the passed function with retries against the given pool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pool</strong> (<em>Pool</em>) &#8211; the connection pool to use</li>
+<li><strong>fn</strong> (<em>function</em>) &#8211; the function to pass a transport</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.client.transport._is_retryable">
+<tt class="descclassname">riak.client.transport.</tt><tt class="descname">_is_retryable</tt><big>(</big><em>error</em><big>)</big><a class="headerlink" href="#riak.client.transport._is_retryable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a given error is retryable according to the
+exceptions allowed to be retried by each transport.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>error</strong> (<em>Exception</em>) &#8211; the error to check</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.client.transport.retryable">
+<tt class="descclassname">riak.client.transport.</tt><tt class="descname">retryable</tt><big>(</big><em>fn</em>, <em>protocol=None</em><big>)</big><a class="headerlink" href="#riak.client.transport.retryable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a client operation that can be retried according to the set
+RETRY_COUNT. Used internally.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.client.transport.retryableHttpOnly">
+<tt class="descclassname">riak.client.transport.</tt><tt class="descname">retryableHttpOnly</tt><big>(</big><em>fn</em><big>)</big><a class="headerlink" href="#riak.client.transport.retryableHttpOnly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a retryable client operation that is only valid over HTTP.
+Used internally.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="multiget">
+<h2>Multiget<a class="headerlink" href="#multiget" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="riak.client.multiget.POOL_SIZE">
+<tt class="descclassname">riak.client.multiget.</tt><tt class="descname">POOL_SIZE</tt><em class="property"> = 8</em><a class="headerlink" href="#riak.client.multiget.POOL_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default size of the worker pool, either based on the number
+of CPUS or defaulting to 6</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.client.multiget.Task">
+<em class="property">class </em><tt class="descclassname">riak.client.multiget.</tt><tt class="descname">Task</tt><a class="headerlink" href="#riak.client.multiget.Task" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <tt class="xref py py-class docutils literal"><span class="pre">namedtuple</span></tt> for tasks that are fed to workers in the
+multiget pool.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.client.multiget.MultiGetPool">
+<em class="property">class </em><tt class="descclassname">riak.client.multiget.</tt><tt class="descname">MultiGetPool</tt><big>(</big><em>size=8</em><big>)</big><a class="headerlink" href="#riak.client.multiget.MultiGetPool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encapsulates a pool of fetcher threads. These threads can be used
+across many multi-get requests.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>size</strong> (<em>int</em>) &#8211; the desired size of the worker pool</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="riak.client.multiget.MultiGetPool._fetcher">
+<tt class="descname">_fetcher</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.multiget.MultiGetPool._fetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>The body of the multi-get worker. Loops until
+<a class="reference internal" href="#riak.client.multiget.MultiGetPool._should_quit" title="riak.client.multiget.MultiGetPool._should_quit"><tt class="xref py py-meth docutils literal"><span class="pre">_should_quit()</span></tt></a> returns <tt class="docutils literal"><span class="pre">True</span></tt>, taking tasks off the
+input queue, fetching the object, and putting them on the
+output queue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.multiget.MultiGetPool._should_quit">
+<tt class="descname">_should_quit</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.multiget.MultiGetPool._should_quit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Worker threads should exit when the stop flag is set and the
+input queue is empty. Once the stop flag is set, new enqueues
+are disallowed, meaning that the workers can safely drain the
+queue before exiting.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.multiget.MultiGetPool.enq">
+<tt class="descname">enq</tt><big>(</big><em>task</em><big>)</big><a class="headerlink" href="#riak.client.multiget.MultiGetPool.enq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enqueues a fetch task to the pool of workers. This will raise
+a RuntimeError if the pool is stopped or in the process of
+stopping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>task</strong> (<em>Task</em>) &#8211; the Task object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.multiget.MultiGetPool.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.multiget.MultiGetPool.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the worker threads if they are not already started.
+This method is thread-safe and will be called automatically
+when executing a MultiGet operation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.multiget.MultiGetPool.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.multiget.MultiGetPool.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signals the worker threads to exit and waits on them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.multiget.MultiGetPool.stopped">
+<tt class="descname">stopped</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.client.multiget.MultiGetPool.stopped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detects whether this pool has been stopped.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="riak.client.multiget.RIAK_MULTIGET_POOL">
+<tt class="descclassname">riak.client.multiget.</tt><tt class="descname">RIAK_MULTIGET_POOL</tt><em class="property"> = &lt;riak.client.multiget.MultiGetPool object at 0x1017c7110&gt;</em><a class="headerlink" href="#riak.client.multiget.RIAK_MULTIGET_POOL" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default pool is automatically created and stored in this constant.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.client.multiget.multiget">
+<tt class="descclassname">riak.client.multiget.</tt><tt class="descname">multiget</tt><big>(</big><em>client</em>, <em>keys</em>, <em>**options</em><big>)</big><a class="headerlink" href="#riak.client.multiget.multiget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a parallel-fetch across multiple threads. Returns a list
+containing <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> instances, or
+3-tuples of bucket, key, and the exception raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>) &#8211; the client to use</li>
+<li><strong>keys</strong> (<em>list of two-tuples &#8211; bucket/key pairs</em>) &#8211; the bucket/key pairs to fetch in parallel</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="transports">
+<h2>Transports<a class="headerlink" href="#transports" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="riak.transports.transport.RiakTransport">
+<em class="property">class </em><tt class="descclassname">riak.transports.transport.</tt><tt class="descname">RiakTransport</tt><a class="headerlink" href="#riak.transports.transport.RiakTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to encapsulate transport details and methods. All protocol
+transports are subclasses of this class.</p>
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport._get_index_mapred_emu">
+<tt class="descname">_get_index_mapred_emu</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport._get_index_mapred_emu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emulates a secondary index request via MapReduce. Used in the
+case where the transport supports MapReduce but has no native
+secondary index query capability.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport._search_mapred_emu">
+<tt class="descname">_search_mapred_emu</tt><big>(</big><em>index</em>, <em>query</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport._search_mapred_emu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emulates a search request via MapReduce. Used in the case
+where the transport supports MapReduce but has no native
+search capability.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.clear_bucket_props">
+<tt class="descname">clear_bucket_props</tt><big>(</big><em>bucket</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset bucket properties to their defaults</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.delete">
+<tt class="descname">delete</tt><big>(</big><em>robj</em>, <em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.fulltext_add">
+<tt class="descname">fulltext_add</tt><big>(</big><em>index</em>, <em>*docs</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.fulltext_add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds documents to the full-text index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.fulltext_delete">
+<tt class="descname">fulltext_delete</tt><big>(</big><em>index</em>, <em>docs=None</em>, <em>queries=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.fulltext_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes documents from the full-text index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.get">
+<tt class="descname">get</tt><big>(</big><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.get_bucket_props">
+<tt class="descname">get_bucket_props</tt><big>(</big><em>bucket</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches properties for the given bucket.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.get_buckets">
+<tt class="descname">get_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the list of buckets as strings.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.get_client_id">
+<tt class="descname">get_client_id</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_client_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch the client id for the transport.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.get_counter">
+<tt class="descname">get_counter</tt><big>(</big><em>bucket</em>, <em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the value of a counter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.get_index">
+<tt class="descname">get_index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a secondary index query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.get_keys">
+<tt class="descname">get_keys</tt><big>(</big><em>bucket</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all keys within the given bucket.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="riak.transports.transport.RiakTransport.make_fixed_client_id">
+<em class="property">classmethod </em><tt class="descname">make_fixed_client_id</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.make_fixed_client_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unique identifier for the current machine/process/thread.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="riak.transports.transport.RiakTransport.make_random_client_id">
+<em class="property">classmethod </em><tt class="descname">make_random_client_id</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.make_random_client_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a random client identifier</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.mapred">
+<tt class="descname">mapred</tt><big>(</big><em>inputs</em>, <em>query</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.mapred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a MapReduce request synchronously.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.ping">
+<tt class="descname">ping</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ping the remote server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.put">
+<tt class="descname">put</tt><big>(</big><em>robj</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=None</em>, <em>if_none_match=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.search">
+<tt class="descname">search</tt><big>(</big><em>index</em>, <em>query</em>, <em>**params</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a search query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.set_bucket_props">
+<tt class="descname">set_bucket_props</tt><big>(</big><em>bucket</em>, <em>props</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets properties on the given bucket.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.set_client_id">
+<tt class="descname">set_client_id</tt><big>(</big><em>client_id</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.set_client_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the client id. This overrides the default, random client
+id, which is automatically generated when none is specified in
+when creating the transport object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.stream_buckets">
+<tt class="descname">stream_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams the list of buckets through an iterator</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.stream_index">
+<tt class="descname">stream_index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams a secondary index query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.stream_keys">
+<tt class="descname">stream_keys</tt><big>(</big><em>bucket</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams the list of keys for the bucket through an iterator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.stream_mapred">
+<tt class="descname">stream_mapred</tt><big>(</big><em>inputs</em>, <em>query</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_mapred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams the results of a MapReduce request through an iterator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.update_counter">
+<tt class="descname">update_counter</tt><big>(</big><em>bucket</em>, <em>key</em>, <em>value</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>returnvalue=False</em><big>)</big><a class="headerlink" href="#riak.transports.transport.RiakTransport.update_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates a counter by the given value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="riak.transports.transport.RiakTransport.client_id">
+<tt class="descname">client_id</tt><a class="headerlink" href="#riak.transports.transport.RiakTransport.client_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>the client ID for this connection</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.transports.feature_detect.FeatureDetection">
+<em class="property">class </em><tt class="descclassname">riak.transports.feature_detect.</tt><tt class="descname">FeatureDetection</tt><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements boolean methods that can be checked for the presence of
+specific server-side features. Subclasses must implement the
+<a class="reference internal" href="#riak.transports.feature_detect.FeatureDetection._server_version" title="riak.transports.feature_detect.FeatureDetection._server_version"><tt class="xref py py-meth docutils literal"><span class="pre">_server_version()</span></tt></a> method to use this functionality, which
+should return the server&#8217;s version as a string.</p>
+<p><a class="reference internal" href="#riak.transports.feature_detect.FeatureDetection" title="riak.transports.feature_detect.FeatureDetection"><tt class="xref py py-class docutils literal"><span class="pre">FeatureDetection</span></tt></a> is a parent class of
+<a class="reference internal" href="#riak.transports.transport.RiakTransport" title="riak.transports.transport.RiakTransport"><tt class="xref py py-class docutils literal"><span class="pre">RiakTransport</span></tt></a>.</p>
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection._server_version">
+<tt class="descname">_server_version</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection._server_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the server version from the server. To be implemented by
+the individual transport class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.bucket_stream">
+<tt class="descname">bucket_stream</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.bucket_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether streaming bucket lists are supported.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.client_timeouts">
+<tt class="descname">client_timeouts</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.client_timeouts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether client-supplied timeouts are supported.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.counters">
+<tt class="descname">counters</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.counters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether CRDT counters are supported.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.pb_all_bucket_props">
+<tt class="descname">pb_all_bucket_props</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.pb_all_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether all normal bucket properties are supported over
+Protocol Buffers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.pb_clear_bucket_props">
+<tt class="descname">pb_clear_bucket_props</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.pb_clear_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether bucket properties can be cleared over Protocol
+Buffers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.pb_conditionals">
+<tt class="descname">pb_conditionals</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.pb_conditionals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether conditional fetch/store semantics are supported over
+Protocol Buffers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.pb_head">
+<tt class="descname">pb_head</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.pb_head" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether partial-fetches (vclock and metadata only) are
+supported over Protocol Buffers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.pb_indexes">
+<tt class="descname">pb_indexes</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.pb_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether secondary index queries are supported over Protocol
+Buffers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.pb_search">
+<tt class="descname">pb_search</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.pb_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether search queries are supported over Protocol Buffers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.phaseless_mapred">
+<tt class="descname">phaseless_mapred</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.phaseless_mapred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether MapReduce requests can be submitted without phases.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.quorum_controls">
+<tt class="descname">quorum_controls</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.quorum_controls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether additional quorums and FSM controls are available,
+e.g. primary quorums, basic_quorum, notfound_ok</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.stream_indexes">
+<tt class="descname">stream_indexes</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.stream_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether secondary indexes support streaming responses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.feature_detect.FeatureDetection.tombstone_vclocks">
+<tt class="descname">tombstone_vclocks</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection.tombstone_vclocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether &#8216;not found&#8217; responses might include vclocks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="http-transport">
+<h3>HTTP Transport<a class="headerlink" href="#http-transport" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="riak.transports.http.RiakHttpPool">
+<em class="property">class </em><tt class="descclassname">riak.transports.http.</tt><tt class="descname">RiakHttpPool</tt><big>(</big><em>client</em>, <em>**options</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpPool" title="Permalink to this definition">¶</a></dt>
+<dd><p>A pool of HTTP(S) transport connections.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.transports.http.is_retryable">
+<tt class="descclassname">riak.transports.http.</tt><tt class="descname">is_retryable</tt><big>(</big><em>err</em><big>)</big><a class="headerlink" href="#riak.transports.http.is_retryable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if the given exception is something that is
+network/socket-related and should thus cause the HTTP connection
+to close and the operation retried on another node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.transports.http.RiakHttpTransport">
+<em class="property">class </em><tt class="descclassname">riak.transports.http.</tt><tt class="descname">RiakHttpTransport</tt><big>(</big><em>node=None</em>, <em>client=None</em>, <em>connection_class=&lt;class httplib.HTTPConnection at 0x101789328&gt;</em>, <em>client_id=None</em>, <em>**unused_options</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>The RiakHttpTransport object holds information necessary to
+connect to Riak via HTTP.</p>
+<p>Construct a new HTTP connection to Riak.</p>
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.clear_bucket_props">
+<tt class="descname">clear_bucket_props</tt><big>(</big><em>bucket</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>reset the properties on the bucket object given</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.delete">
+<tt class="descname">delete</tt><big>(</big><em>robj</em>, <em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.fulltext_add">
+<tt class="descname">fulltext_add</tt><big>(</big><em>index</em>, <em>docs</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.fulltext_add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds documents to the search index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.fulltext_delete">
+<tt class="descname">fulltext_delete</tt><big>(</big><em>index</em>, <em>docs=None</em>, <em>queries=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.fulltext_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes documents from the full-text index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.get">
+<tt class="descname">get</tt><big>(</big><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a bucket/key from the server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.get_bucket_props">
+<tt class="descname">get_bucket_props</tt><big>(</big><em>bucket</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get properties for a bucket</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.get_buckets">
+<tt class="descname">get_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch a list of all buckets</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.get_index">
+<tt class="descname">get_index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a secondary index query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.get_keys">
+<tt class="descname">get_keys</tt><big>(</big><em>bucket</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch a list of keys for the bucket</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.get_resources">
+<tt class="descname">get_resources</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_resources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a JSON mapping of server-side resource names to paths
+:rtype dict</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.mapred">
+<tt class="descname">mapred</tt><big>(</big><em>inputs</em>, <em>query</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.mapred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a MapReduce query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.ping">
+<tt class="descname">ping</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check server is alive over HTTP</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.put">
+<tt class="descname">put</tt><big>(</big><em>robj</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=True</em>, <em>if_none_match=False</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Puts a (possibly new) object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.search">
+<tt class="descname">search</tt><big>(</big><em>index</em>, <em>query</em>, <em>**params</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a search query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.set_bucket_props">
+<tt class="descname">set_bucket_props</tt><big>(</big><em>bucket</em>, <em>props</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the properties on the bucket object given</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.stats">
+<tt class="descname">stats</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets performance statistics and server information</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.stream_buckets">
+<tt class="descname">stream_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream list of buckets through an iterator</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.http.RiakHttpTransport.stream_index">
+<tt class="descname">stream_index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em><big>)</big><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.stream_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams a secondary index query.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="protocol-buffers-transport">
+<h3>Protocol Buffers Transport<a class="headerlink" href="#protocol-buffers-transport" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="riak.transports.pbc.RiakPbcTransport">
+<em class="property">class </em><tt class="descclassname">riak.transports.pbc.</tt><tt class="descname">RiakPbcTransport</tt><big>(</big><em>node=None</em>, <em>client=None</em>, <em>timeout=None</em>, <em>*unused_options</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>The RiakPbcTransport object holds a connection to the protocol
+buffers interface on the riak server.</p>
+<p>Construct a new RiakPbcTransport object.</p>
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.clear_bucket_props">
+<tt class="descname">clear_bucket_props</tt><big>(</big><em>bucket</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear bucket properties, resetting them to their defaults</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.delete">
+<tt class="descname">delete</tt><big>(</big><em>robj</em>, <em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize get request and deserialize response</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.get">
+<tt class="descname">get</tt><big>(</big><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize get request and deserialize response</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.get_bucket_props">
+<tt class="descname">get_bucket_props</tt><big>(</big><em>bucket</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize bucket property request and deserialize response</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.get_buckets">
+<tt class="descname">get_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize bucket listing request and deserialize response</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.get_keys">
+<tt class="descname">get_keys</tt><big>(</big><em>bucket</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all keys within a bucket.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.get_server_info">
+<tt class="descname">get_server_info</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_server_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.ping">
+<tt class="descname">ping</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ping the remote server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.put">
+<tt class="descname">put</tt><big>(</big><em>robj</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=True</em>, <em>if_none_match=False</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize get request and deserialize response</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.set_bucket_props">
+<tt class="descname">set_bucket_props</tt><big>(</big><em>bucket</em>, <em>props</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize set bucket property request and deserialize response</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.stream_buckets">
+<tt class="descname">stream_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream list of buckets through an iterator</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.pbc.RiakPbcTransport.stream_keys">
+<tt class="descname">stream_keys</tt><big>(</big><em>bucket</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.stream_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams keys from a bucket, returning an iterator that yields
+lists of keys.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="riak.transports.pbc.RiakPbcTransport.client_id">
+<tt class="descname">client_id</tt><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.client_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>the client ID for this connection</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="link-wrapper-class">
+<h3>Link wrapper class<a class="headerlink" href="#link-wrapper-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="riak.mapreduce.RiakLink">
+<em class="property">class </em><tt class="descclassname">riak.mapreduce.</tt><tt class="descname">RiakLink</tt><a class="headerlink" href="#riak.mapreduce.RiakLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Links are just bucket/key/tag tuples, this class provides a
+backwards-compatible format: <tt class="docutils literal"><span class="pre">RiakLink(bucket,</span> <span class="pre">key,</span> <span class="pre">tag)</span></tt></p>
+</dd></dl>
+
+</div>
+<div class="section" id="multi-valued-dict">
+<h3>Multi-valued Dict<a class="headerlink" href="#multi-valued-dict" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="riak.multidict.MultiDict">
+<em class="property">class </em><tt class="descclassname">riak.multidict.</tt><tt class="descname">MultiDict</tt><big>(</big><em>*args</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#riak.multidict.MultiDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>An ordered dictionary that can have multiple values for each key.
+Adds the methods getall, getone, mixed, and add to the normal
+dictionary interface.</p>
+<dl class="method">
+<dt id="riak.multidict.MultiDict.add">
+<tt class="descname">add</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#riak.multidict.MultiDict.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the key and value, not overwriting any previous value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.multidict.MultiDict.getall">
+<tt class="descname">getall</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#riak.multidict.MultiDict.getall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all values matching the key (may be an empty list)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.multidict.MultiDict.getone">
+<tt class="descname">getone</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#riak.multidict.MultiDict.getone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one value matching the key, raising a KeyError if multiple
+values were found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.multidict.MultiDict.mixed">
+<tt class="descname">mixed</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.multidict.MultiDict.mixed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary where the values are either single
+values, or a list of values when a key/value appears more than
+once in this dictionary.  This is similar to the kind of
+dictionary often used to represent the variables in a web
+request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.multidict.MultiDict.dict_of_lists">
+<tt class="descname">dict_of_lists</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.multidict.MultiDict.dict_of_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary where each key is associated with a
+list of values.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="micro-benchmarking">
+<h3>Micro-benchmarking<a class="headerlink" href="#micro-benchmarking" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="riak.benchmark.measure">
+<tt class="descclassname">riak.benchmark.</tt><tt class="descname">measure</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.benchmark.measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a benchmark once when used as a context manager. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">riak</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span> <span class="k">as</span> <span class="n">b</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;pow&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+            <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10000</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;factorial&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+            <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.benchmark.measure_with_rehearsal">
+<tt class="descclassname">riak.benchmark.</tt><tt class="descname">measure_with_rehearsal</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.benchmark.measure_with_rehearsal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a benchmark when used as an iterator, injecting a garbage
+collection between iterations. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">riak</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">measure_with_rehearsal</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;pow&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+            <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10000</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;factorial&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+            <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.benchmark.Benchmark">
+<em class="property">class </em><tt class="descclassname">riak.benchmark.</tt><tt class="descname">Benchmark</tt><big>(</big><em>rehearse=False</em><big>)</big><a class="headerlink" href="#riak.benchmark.Benchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>A benchmarking run, which may consist of multiple steps. See
+measure_with_rehearsal() and measure() for examples.</p>
+<p>Creates a new benchmark reporter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rehearse</strong> (<em>boolean</em>) &#8211; whether to run twice to take counter the effects
+of garbage collection</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="riak.benchmark.Benchmark.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.benchmark.Benchmark.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the next iteration of the benchmark.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.benchmark.Benchmark.report">
+<tt class="descname">report</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#riak.benchmark.Benchmark.report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a report for the current step of the benchmark.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="miscellaneous">
+<h3>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="riak.util.quacks_like_dict">
+<tt class="descclassname">riak.util.</tt><tt class="descname">quacks_like_dict</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#riak.util.quacks_like_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if object is dict-like</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.util.deep_merge">
+<tt class="descclassname">riak.util.</tt><tt class="descname">deep_merge</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="headerlink" href="#riak.util.deep_merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge two deep dicts non-destructively</p>
+<p>Uses a stack to avoid maximum recursion depth exceptions</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="s">&#39;d&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">2</span><span class="p">:</span> <span class="mi">7</span><span class="p">},</span> <span class="s">&#39;d&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;z&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">merge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span><span class="p">;</span> <span class="n">pprint</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 1, &#39;b&#39;: {1: 1, 2: 7}, &#39;c&#39;: 3, &#39;d&#39;: {&#39;z&#39;: [1, 2, 3]}}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.util.deprecated">
+<tt class="descclassname">riak.util.</tt><tt class="descname">deprecated</tt><big>(</big><em>message</em>, <em>stacklevel=3</em><big>)</big><a class="headerlink" href="#riak.util.deprecated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints a deprecation warning to the console.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.util.deprecateQuorumAccessors">
+<tt class="descclassname">riak.util.</tt><tt class="descname">deprecateQuorumAccessors</tt><big>(</big><em>klass</em>, <em>parent=None</em><big>)</big><a class="headerlink" href="#riak.util.deprecateQuorumAccessors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds deprecation warnings for the quorum get_* and set_*
+accessors, informing the user to switch to the appropriate bucket
+properties or requests parameters.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.util.lazy_property">
+<em class="property">class </em><tt class="descclassname">riak.util.</tt><tt class="descname">lazy_property</tt><big>(</big><em>fget</em><big>)</big><a class="headerlink" href="#riak.util.lazy_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>A method decorator meant to be used for lazy evaluation and
+memoization of an object attribute. The property should represent
+immutable data, as it replaces itself on first access.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+  <div class="clearfix">&nbsp;</div>
+  <ul class="pager">
+    <li class="previous">
+      <a href="query.html" 
+         title="previous chapter">&larr;Query Methods</a></li>
+  </ul>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+  <a href="_sources/advanced.txt"
+     rel="nofollow">Source</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2010-2013, Basho Technologies.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2b1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

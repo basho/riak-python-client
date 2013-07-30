@@ -1,24 +1,25 @@
 
-
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; Riak Python Client 1.5.2 documentation</title>
+    <title>Index &mdash; Riak Python Client 2.0.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap-responsive.min.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '1.5.2',
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,29 +28,122 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Riak Python Client 1.5.2 documentation" href="index.html" /> 
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-2.3.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="Riak Python Client 2.0.0 documentation" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
   </head>
   <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
-             accesskey="I">index</a></li>
-        <li><a href="index.html">Riak Python Client 1.5.2 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  <div id="navbar" class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a class="brand" href="index.html">Riak Python Client</a>
+        <span class="navbar-text pull-left"><b>2.0.0</b></span>
+
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="divider-vertical"></li>
             
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Docs <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-buckets">Accessing Buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-level-operations">Bucket-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-methods">Deprecated Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-methods">Deprecated methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="object.html#riakobject">RiakObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#persistence">Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#value-and-metadata">Value and Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object.html#siblings">Siblings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#fulltext-search">Fulltext Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"></ul>
+</li>
+            
+            
+
+   
+
+            
+          </ul>
+
+          
+            
+<form class="navbar-search pull-right" action="search.html" method="get">
+  <input type="text" name="q" class="search-query" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+  <ul class="pager">
+  </ul>
+  
 
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#A"><strong>A</strong></a>
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
@@ -58,60 +152,126 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
-<h2 id="A">A</h2>
+<h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="client.html#riak.client.RiakClient.add">add() (riak.client.RiakClient method)</a>
-  </dt>
-
-      <dd><dl>
-        
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.add">(riak.mapreduce.RiakMapReduce method)</a>
-  </dt>
-
-        
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.add">(riak.riak_object.RiakObject method)</a>
-  </dt>
-
-      </dl></dd>
-      
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.add_bucket">add_bucket() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.client.index_page.IndexPage.__eq__">__eq__() (riak.client.index_page.IndexPage method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.add_bucket_key_data">add_bucket_key_data() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.client.index_page.IndexPage.__getitem__">__getitem__() (riak.client.index_page.IndexPage method)</a>
   </dt>
 
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.add_index">add_index() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="query.html#riak.client.index_page.IndexPage.__iter__">__iter__() (riak.client.index_page.IndexPage method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.transport.RiakClientTransport._choose_pool">_choose_pool() (riak.client.transport.RiakClientTransport method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.multiget.MultiGetPool._fetcher">_fetcher() (riak.client.multiget.MultiGetPool method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport._get_index_mapred_emu">_get_index_mapred_emu() (riak.transports.transport.RiakTransport method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.add_key_filter">add_key_filter() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="advanced.html#riak.client.transport._is_retryable">_is_retryable() (in module riak.client.transport)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.add_key_filters">add_key_filters() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport._search_mapred_emu">_search_mapred_emu() (riak.transports.transport.RiakTransport method)</a>
   </dt>
 
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.add_link">add_link() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection._server_version">_server_version() (riak.transports.feature_detect.FeatureDetection method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.add_object">add_object() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="advanced.html#riak.client.multiget.MultiGetPool._should_quit">_should_quit() (riak.client.multiget.MultiGetPool method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.transport.RiakClientTransport._transport">_transport() (riak.client.transport.RiakClientTransport method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.transport.RiakClientTransport._with_retries">_with_retries() (riak.client.transport.RiakClientTransport method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.add">add() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.multidict.MultiDict.add">(riak.multidict.MultiDict method)</a>
+  </dt>
+
+        
+  <dt><a href="query.html#riak.riak_object.RiakObject.add">(riak.riak_object.RiakObject method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.add_bucket">add_bucket() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.add_bucket_key_data">add_bucket_key_data() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.add_index">add_index() (riak.riak_object.RiakObject method)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.add_key_filter">add_key_filter() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.add_key_filters">add_key_filters() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.add_link">add_link() (riak.riak_object.RiakObject method)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.add_object">add_object() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.allow_mult">allow_mult (riak.bucket.RiakBucket attribute)</a>
   </dt>
 
   </dl></td>
@@ -121,7 +281,25 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="advanced.html#riak.transports.pool.BadResource">BadResource</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.benchmark.Benchmark">Benchmark (class in riak.benchmark)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.bucket">bucket (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
   <dt><a href="client.html#riak.client.RiakClient.bucket">bucket() (riak.client.RiakClient method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.bucket_stream">bucket_stream() (riak.transports.feature_detect.FeatureDetection method)</a>
   </dt>
 
   </dl></td>
@@ -131,7 +309,81 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.clear">clear() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.charset">charset (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.pool.Element.claimed">claimed (riak.transports.pool.Element attribute)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.pool.Pool.clear">clear() (riak.transports.pool.Pool method)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.clear_bucket_props">clear_bucket_props() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.clear_bucket_props">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.clear_bucket_props">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.clear_bucket_props">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.clear_properties">clear_properties() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.client_id">client_id (riak.client.RiakClient attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.client_id">(riak.transports.pbc.RiakPbcTransport attribute)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.client_id">(riak.transports.transport.RiakTransport attribute)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.client_timeouts">client_timeouts() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="object.html#riak.ConflictError">ConflictError</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.content_encoding">content_encoding (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.content_type">content_type (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.client.index_page.IndexPage.continuation">continuation (riak.client.index_page.IndexPage attribute)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.counters">counters() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.pool.Pool.create_resource">create_resource() (riak.transports.pool.Pool method)</a>
   </dt>
 
   </dl></td>
@@ -141,17 +393,75 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.delete">delete() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.data">data (riak.riak_object.RiakObject attribute)</a>
   </dt>
 
       
-  <dt><a href="client.html#riak.client.RiakClient.delete_file">delete_file() (riak.client.RiakClient method)</a>
+  <dt><a href="advanced.html#riak.util.deep_merge">deep_merge() (in module riak.util)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.default_encoder">default_encoder() (in module riak.client)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.resolver.default_resolver">default_resolver() (in module riak.resolver)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.delete">delete() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="client.html#riak.client.RiakClient.delete">(riak.client.RiakClient method)</a>
+  </dt>
+
+        
+  <dt><a href="object.html#riak.riak_object.RiakObject.delete">(riak.riak_object.RiakObject method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.delete">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.delete">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.delete">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="advanced.html#riak.transports.pool.Pool.delete_element">delete_element() (riak.transports.pool.Pool method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="advanced.html#riak.util.deprecated">deprecated() (in module riak.util)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.util.deprecateQuorumAccessors">deprecateQuorumAccessors() (in module riak.util)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.pool.Pool.destroy_resource">destroy_resource() (riak.transports.pool.Pool method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.multidict.MultiDict.dict_of_lists">dict_of_lists() (riak.multidict.MultiDict method)</a>
+  </dt>
+
+      
   <dt><a href="bucket.html#riak.bucket.RiakBucket.disable_search">disable_search() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.dw">dw (riak.bucket.RiakBucket attribute)</a>
   </dt>
 
   </dl></td>
@@ -161,13 +471,29 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="advanced.html#riak.transports.pool.Element">Element (class in riak.transports.pool)</a>
+  </dt>
+
+      
   <dt><a href="bucket.html#riak.bucket.RiakBucket.enable_search">enable_search() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.encoded_data">encoded_data (riak.riak_object.RiakObject attribute)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.exists">exists() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="advanced.html#riak.client.multiget.MultiGetPool.enq">enq() (riak.client.multiget.MultiGetPool method)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.etag">etag (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.exists">exists (riak.riak_object.RiakObject attribute)</a>
   </dt>
 
   </dl></td>
@@ -177,7 +503,45 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.filter_not_found">filter_not_found() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection">FeatureDetection (class in riak.transports.feature_detect)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.filter_not_found">filter_not_found() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.fulltext_add">fulltext_add() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.fulltext_add">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.fulltext_add">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="client.html#riak.client.RiakClient.fulltext_delete">fulltext_delete() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.fulltext_delete">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.fulltext_delete">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="client.html#riak.client.RiakClient.fulltext_search">fulltext_search() (riak.client.RiakClient method)</a>
   </dt>
 
   </dl></td>
@@ -192,35 +556,41 @@
 
       <dd><dl>
         
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.get">(riak.mapreduce.RiakLink method)</a>
+  <dt><a href="client.html#riak.client.RiakClient.get">(riak.client.RiakClient method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.get">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.get">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.get">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
       </dl></dd>
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_allow_multiples">get_allow_multiples() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_binary">get_binary() (riak.bucket.RiakBucket method)</a>
   </dt>
 
-      <dd><dl>
-        
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.get_binary">(riak.mapreduce.RiakLink method)</a>
-  </dt>
-
-      </dl></dd>
       
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_bool_property">get_bool_property() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.get_bucket">get_bucket() (riak.mapreduce.RiakLink method)</a>
+  <dt><a href="client.html#riak.client.RiakClient.get_bucket_props">get_bucket_props() (riak.client.RiakClient method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_bucket">(riak.riak_object.RiakObject method)</a>
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.get_bucket_props">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.get_bucket_props">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.get_bucket_props">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
       </dl></dd>
@@ -228,18 +598,44 @@
   <dt><a href="client.html#riak.client.RiakClient.get_buckets">get_buckets() (riak.client.RiakClient method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.get_buckets">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.get_buckets">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.get_buckets">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="client.html#riak.client.RiakClient.get_client_id">get_client_id() (riak.client.RiakClient method)</a>
   </dt>
 
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_content_type">get_content_type() (riak.riak_object.RiakObject method)</a>
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.get_client_id">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
+      </dl></dd>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_data">get_data() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_counter">get_counter() (riak.bucket.RiakBucket method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="client.html#riak.client.RiakClient.get_counter">(riak.client.RiakClient method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.get_counter">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_decoder">get_decoder() (riak.bucket.RiakBucket method)</a>
   </dt>
@@ -251,22 +647,6 @@
 
       </dl></dd>
       
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_default_dw_val">get_default_dw_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_default_r_val">get_default_r_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_default_rw_val">get_default_rw_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_default_w_val">get_default_w_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_dw">get_dw() (riak.bucket.RiakBucket method)</a>
   </dt>
 
@@ -276,10 +656,6 @@
   </dt>
 
       </dl></dd>
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_encoded_data">get_encoded_data() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_encoder">get_encoder() (riak.bucket.RiakBucket method)</a>
   </dt>
@@ -291,10 +667,6 @@
 
       </dl></dd>
       
-  <dt><a href="client.html#riak.client.RiakClient.get_file">get_file() (riak.client.RiakClient method)</a>
-  </dt>
-
-      
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_index">get_index() (riak.bucket.RiakBucket method)</a>
   </dt>
 
@@ -303,20 +675,12 @@
   <dt><a href="client.html#riak.client.RiakClient.get_index">(riak.client.RiakClient method)</a>
   </dt>
 
-      </dl></dd>
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_indexes">get_indexes() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.get_key">get_key() (riak.mapreduce.RiakLink method)</a>
-  </dt>
-
-      <dd><dl>
         
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_key">(riak.riak_object.RiakObject method)</a>
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.get_index">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.get_index">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
       </dl></dd>
@@ -324,22 +688,24 @@
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_keys">get_keys() (riak.bucket.RiakBucket method)</a>
   </dt>
 
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_links">get_links() (riak.riak_object.RiakObject method)</a>
+      <dd><dl>
+        
+  <dt><a href="client.html#riak.client.RiakClient.get_keys">(riak.client.RiakClient method)</a>
   </dt>
 
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_metadata">get_metadata() (riak.riak_object.RiakObject method)</a>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.get_keys">(riak.transports.http.RiakHttpTransport method)</a>
   </dt>
 
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_n_val">get_n_val() (riak.bucket.RiakBucket method)</a>
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.get_keys">(riak.transports.pbc.RiakPbcTransport method)</a>
   </dt>
 
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.get_name">get_name() (riak.bucket.RiakBucket method)</a>
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.get_keys">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
+      </dl></dd>
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_pr">get_pr() (riak.bucket.RiakBucket method)</a>
   </dt>
@@ -350,6 +716,8 @@
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_properties">get_properties() (riak.bucket.RiakBucket method)</a>
   </dt>
@@ -379,6 +747,10 @@
 
       </dl></dd>
       
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.get_resources">get_resources() (riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+      
   <dt><a href="bucket.html#riak.bucket.RiakBucket.get_rw">get_rw() (riak.bucket.RiakBucket method)</a>
   </dt>
 
@@ -389,27 +761,11 @@
 
       </dl></dd>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_sibling">get_sibling() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_sibling_count">get_sibling_count() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_siblings">get_siblings() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-      
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.get_tag">get_tag() (riak.mapreduce.RiakLink method)</a>
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.get_server_info">get_server_info() (riak.transports.pbc.RiakPbcTransport method)</a>
   </dt>
 
       
   <dt><a href="client.html#riak.client.RiakClient.get_transport">get_transport() (riak.client.RiakClient method)</a>
-  </dt>
-
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.get_usermeta">get_usermeta() (riak.riak_object.RiakObject method)</a>
   </dt>
 
       
@@ -422,6 +778,14 @@
   </dt>
 
       </dl></dd>
+      
+  <dt><a href="advanced.html#riak.multidict.MultiDict.getall">getall() (riak.multidict.MultiDict method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.multidict.MultiDict.getone">getone() (riak.multidict.MultiDict method)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
@@ -429,7 +793,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.has_siblings">has_siblings() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="query.html#riak.client.index_page.IndexPage.has_next_page">has_next_page() (riak.client.index_page.IndexPage method)</a>
   </dt>
 
   </dl></td>
@@ -439,23 +803,31 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="client.html#riak.client.RiakClient.index">index() (riak.client.RiakClient method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.index">index() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
-      <dd><dl>
-        
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.index">(riak.mapreduce.RiakMapReduce method)</a>
-  </dt>
-
-      </dl></dd>
       
-  <dt><a href="client.html#riak.client.RiakClient.is_alive">is_alive() (riak.client.RiakClient method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.indexes">indexes (riak.riak_object.RiakObject attribute)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.isEqual">isEqual() (riak.mapreduce.RiakLink method)</a>
+  <dt><a href="query.html#riak.client.index_page.IndexPage">IndexPage (class in riak.client.index_page)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.http.is_retryable">is_retryable() (in module riak.transports.http)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.key">key (riak.riak_object.RiakObject attribute)</a>
   </dt>
 
   </dl></td>
@@ -465,19 +837,33 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="client.html#riak.client.RiakClient.link">link() (riak.client.RiakClient method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.last_modified">last_modified (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.resolver.last_written_resolver">last_written_resolver() (in module riak.resolver)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.util.lazy_property">lazy_property (class in riak.util)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.link">link() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.link">(riak.mapreduce.RiakMapReduce method)</a>
-  </dt>
-
-        
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.link">(riak.riak_object.RiakObject method)</a>
+  <dt><a href="query.html#riak.riak_object.RiakObject.link">(riak.riak_object.RiakObject method)</a>
   </dt>
 
       </dl></dd>
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.links">links (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
@@ -485,27 +871,79 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="client.html#riak.client.RiakClient.map">map() (riak.client.RiakClient method)</a>
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.make_fixed_client_id">make_fixed_client_id() (riak.transports.transport.RiakTransport class method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.make_random_client_id">make_random_client_id() (riak.transports.transport.RiakTransport class method)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.map">map() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.map">(riak.mapreduce.RiakMapReduce method)</a>
-  </dt>
-
-        
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.map">(riak.riak_object.RiakObject method)</a>
+  <dt><a href="query.html#riak.riak_object.RiakObject.map">(riak.riak_object.RiakObject method)</a>
   </dt>
 
       </dl></dd>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.map_values">map_values() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.map_values">map_values() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.map_values_json">map_values_json() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.mapred">mapred() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.mapred">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.mapred">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.map_values_json">map_values_json() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="advanced.html#riak.benchmark.measure">measure() (in module riak.benchmark)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.benchmark.measure_with_rehearsal">measure_with_rehearsal() (in module riak.benchmark)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.multidict.MultiDict.mixed">mixed() (riak.multidict.MultiDict method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.multidict.MultiDict">MultiDict (class in riak.multidict)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.multiget.multiget">multiget() (in module riak.client.multiget)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.multiget">(riak.bucket.RiakBucket method)</a>
+  </dt>
+
+        
+  <dt><a href="client.html#riak.client.RiakClient.multiget">(riak.client.RiakClient method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="advanced.html#riak.client.multiget.MultiGetPool">MultiGetPool (class in riak.client.multiget)</a>
   </dt>
 
   </dl></td>
@@ -515,6 +953,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.n_val">n_val (riak.bucket.RiakBucket attribute)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.name">name (riak.bucket.RiakBucket attribute)</a>
+  </dt>
+
+      
   <dt><a href="bucket.html#riak.bucket.RiakBucket.new">new() (riak.bucket.RiakBucket method)</a>
   </dt>
 
@@ -522,10 +968,152 @@
   <dt><a href="bucket.html#riak.bucket.RiakBucket.new_binary">new_binary() (riak.bucket.RiakBucket method)</a>
   </dt>
 
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.new_binary_from_file">new_binary_from_file() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.new_binary_from_file">new_binary_from_file() (riak.bucket.RiakBucket method)</a>
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.new_from_file">new_from_file() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.benchmark.Benchmark.next">next() (riak.benchmark.Benchmark method)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.client.index_page.IndexPage.next_page">next_page() (riak.client.index_page.IndexPage method)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.nodes">nodes (riak.client.RiakClient attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="advanced.html#riak.transports.pool.Element.object">object (riak.transports.pool.Element attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.pb_all_bucket_props">pb_all_bucket_props() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.pb_clear_bucket_props">pb_clear_bucket_props() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.pb_conditionals">pb_conditionals() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.pb_head">pb_head() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.pb_indexes">pb_indexes() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.pb_search">pb_search() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.phaseless_mapred">phaseless_mapred() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.ping">ping() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.ping">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.ping">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.ping">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="advanced.html#riak.transports.pool.Pool">Pool (class in riak.transports.pool)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.multiget.POOL_SIZE">POOL_SIZE (in module riak.client.multiget)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.pool.PoolIterator">PoolIterator (class in riak.transports.pool)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.pr">pr (riak.bucket.RiakBucket attribute)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.protocol">protocol (riak.client.RiakClient attribute)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.PROTOCOLS">PROTOCOLS (riak.client.RiakClient attribute)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.put">put() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.put">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.put">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.put">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.pw">pw (riak.bucket.RiakBucket attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="advanced.html#riak.util.quacks_like_dict">quacks_like_dict() (in module riak.util)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.quorum_controls">quorum_controls() (riak.transports.feature_detect.FeatureDetection method)</a>
   </dt>
 
   </dl></td>
@@ -535,65 +1123,91 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="client.html#riak.client.RiakClient.reduce">reduce() (riak.client.RiakClient method)</a>
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.r">r (riak.bucket.RiakBucket attribute)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce">reduce() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce">(riak.mapreduce.RiakMapReduce method)</a>
-  </dt>
-
-        
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.reduce">(riak.riak_object.RiakObject method)</a>
+  <dt><a href="query.html#riak.riak_object.RiakObject.reduce">(riak.riak_object.RiakObject method)</a>
   </dt>
 
       </dl></dd>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce_limit">reduce_limit() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce_limit">reduce_limit() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce_max">reduce_max() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce_max">reduce_max() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce_min">reduce_min() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce_min">reduce_min() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce_numeric_sort">reduce_numeric_sort() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce_numeric_sort">reduce_numeric_sort() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce_slice">reduce_slice() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce_slice">reduce_slice() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce_sort">reduce_sort() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce_sort">reduce_sort() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.reduce_sum">reduce_sum() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.reduce_sum">reduce_sum() (riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.reload">reload() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.reload">reload() (riak.riak_object.RiakObject method)</a>
   </dt>
 
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.remove_index">remove_index() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.remove_index">remove_index() (riak.riak_object.RiakObject method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.benchmark.Benchmark.report">report() (riak.benchmark.Benchmark method)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.resolver">resolver (riak.bucket.RiakBucket attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="client.html#riak.client.RiakClient.resolver">(riak.client.RiakClient attribute)</a>
+  </dt>
+
+        
+  <dt><a href="object.html#riak.riak_object.RiakObject.resolver">(riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="client.html#riak.client.RiakClient.RETRY_COUNT">RETRY_COUNT (riak.client.RiakClient attribute)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.transport.retryable">retryable() (in module riak.client.transport)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.transport.retryableHttpOnly">retryableHttpOnly() (in module riak.client.transport)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.multiget.RIAK_MULTIGET_POOL">RIAK_MULTIGET_POOL (in module riak.client.multiget)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.remove_indexes">remove_indexes() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.remove_link">remove_link() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket">RiakBucket (class in riak.bucket)</a>
   </dt>
@@ -603,27 +1217,63 @@
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink">RiakLink (class in riak.mapreduce)</a>
+  <dt><a href="advanced.html#riak.client.transport.RiakClientTransport">RiakClientTransport (class in riak.client.transport)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLinkPhase">RiakLinkPhase (class in riak.mapreduce)</a>
+  <dt><a href="object.html#riak.content.RiakContent">RiakContent (class in riak.content)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce">RiakMapReduce (class in riak.mapreduce)</a>
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpPool">RiakHttpPool (class in riak.transports.http)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReducePhase">RiakMapReducePhase (class in riak.mapreduce)</a>
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport">RiakHttpTransport (class in riak.transports.http)</a>
   </dt>
 
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject">RiakObject (class in riak.riak_object)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakKeyFilter">RiakKeyFilter (class in riak.mapreduce)</a>
   </dt>
 
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.run">run() (riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="advanced.html#riak.mapreduce.RiakLink">RiakLink (class in riak.mapreduce)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakLinkPhase">RiakLinkPhase (class in riak.mapreduce)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce">RiakMapReduce (class in riak.mapreduce)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReducePhase">RiakMapReducePhase (class in riak.mapreduce)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.node.RiakNode">RiakNode (class in riak.node)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject">RiakObject (class in riak.riak_object)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport">RiakPbcTransport (class in riak.transports.pbc)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport">RiakTransport (class in riak.transports.transport)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.run">run() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.rw">rw (riak.bucket.RiakBucket attribute)</a>
   </dt>
 
   </dl></td>
@@ -638,11 +1288,15 @@
 
       <dd><dl>
         
-  <dt><a href="client.html#riak.client.RiakClient.search">(riak.client.RiakClient method)</a>
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.search">(riak.mapreduce.RiakMapReduce method)</a>
   </dt>
 
         
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReduce.search">(riak.mapreduce.RiakMapReduce method)</a>
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.search">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.search">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
       </dl></dd>
@@ -651,29 +1305,33 @@
   </dt>
 
       
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.SEARCH_PRECOMMIT_HOOK">SEARCH_PRECOMMIT_HOOK (riak.bucket.RiakBucket attribute)</a>
+  <dt><a href="client.html#riak.client.RiakClient.set_bucket_props">set_bucket_props() (riak.client.RiakClient method)</a>
   </dt>
 
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.set_allow_multiples">set_allow_multiples() (riak.bucket.RiakBucket method)</a>
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.set_bucket_props">(riak.transports.http.RiakHttpTransport method)</a>
   </dt>
 
-      
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.set_bucket">set_bucket() (riak.mapreduce.RiakLink method)</a>
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.set_bucket_props">(riak.transports.pbc.RiakPbcTransport method)</a>
   </dt>
 
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.set_bucket_props">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="client.html#riak.client.RiakClient.set_client_id">set_client_id() (riak.client.RiakClient method)</a>
   </dt>
 
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.set_content_type">set_content_type() (riak.riak_object.RiakObject method)</a>
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.set_client_id">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.set_data">set_data() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
+      </dl></dd>
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.set_decoder">set_decoder() (riak.bucket.RiakBucket method)</a>
   </dt>
@@ -685,22 +1343,6 @@
 
       </dl></dd>
       
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.set_default_dw_val">set_default_dw_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.set_default_r_val">set_default_r_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.set_default_rw_val">set_default_rw_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.set_default_w_val">set_default_w_val() (riak.bucket.RiakBucket method)</a>
-  </dt>
-
-      
   <dt><a href="bucket.html#riak.bucket.RiakBucket.set_dw">set_dw() (riak.bucket.RiakBucket method)</a>
   </dt>
 
@@ -710,10 +1352,6 @@
   </dt>
 
       </dl></dd>
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.set_encoded_data">set_encoded_data() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.set_encoder">set_encoder() (riak.bucket.RiakBucket method)</a>
   </dt>
@@ -725,25 +1363,7 @@
 
       </dl></dd>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.set_indexes">set_indexes() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.set_key">set_key() (riak.mapreduce.RiakLink method)</a>
-  </dt>
-
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.set_links">set_links() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.set_metadata">set_metadata() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
-      
-  <dt><a href="bucket.html#riak.bucket.RiakBucket.set_n_val">set_n_val() (riak.bucket.RiakBucket method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.set_index">set_index() (riak.riak_object.RiakObject method)</a>
   </dt>
 
       
@@ -794,14 +1414,8 @@
   </dt>
 
       </dl></dd>
-      
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.set_tag">set_tag() (riak.mapreduce.RiakLink method)</a>
-  </dt>
-
-      
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.set_usermeta">set_usermeta() (riak.riak_object.RiakObject method)</a>
-  </dt>
-
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="bucket.html#riak.bucket.RiakBucket.set_w">set_w() (riak.bucket.RiakBucket method)</a>
   </dt>
@@ -813,17 +1427,105 @@
 
       </dl></dd>
       
-  <dt><a href="client.html#riak.client.RiakClient.solr">solr() (riak.client.RiakClient method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.siblings">siblings (riak.riak_object.RiakObject attribute)</a>
   </dt>
 
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.store">store() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="client.html#riak.client.RiakClient.solr">solr (riak.client.RiakClient attribute)</a>
   </dt>
 
       
-  <dt><a href="client.html#riak.client.RiakClient.store_file">store_file() (riak.client.RiakClient method)</a>
+  <dt><a href="advanced.html#riak.client.multiget.MultiGetPool.start">start() (riak.client.multiget.MultiGetPool method)</a>
   </dt>
 
+      
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.stats">stats() (riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.multiget.MultiGetPool.stop">stop() (riak.client.multiget.MultiGetPool method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.multiget.MultiGetPool.stopped">stopped() (riak.client.multiget.MultiGetPool method)</a>
+  </dt>
+
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.store">store() (riak.riak_object.RiakObject method)</a>
+  </dt>
+
+      
+  <dt><a href="query.html#riak.mapreduce.RiakMapReduce.stream">stream() (riak.mapreduce.RiakMapReduce method)</a>
+  </dt>
+
+      
+  <dt><a href="client.html#riak.client.RiakClient.stream_buckets">stream_buckets() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.stream_buckets">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.stream_buckets">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.stream_buckets">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.stream_index">stream_index() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="client.html#riak.client.RiakClient.stream_index">(riak.client.RiakClient method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.http.RiakHttpTransport.stream_index">(riak.transports.http.RiakHttpTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.stream_index">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.stream_indexes">stream_indexes() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.stream_keys">stream_keys() (riak.bucket.RiakBucket method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="client.html#riak.client.RiakClient.stream_keys">(riak.client.RiakClient method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.pbc.RiakPbcTransport.stream_keys">(riak.transports.pbc.RiakPbcTransport method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.stream_keys">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="client.html#riak.client.RiakClient.stream_mapred">stream_mapred() (riak.client.RiakClient method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.stream_mapred">(riak.transports.transport.RiakTransport method)</a>
+  </dt>
+
+      </dl></dd>
   </dl></td>
 </tr></table>
 
@@ -831,19 +1533,43 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLinkPhase.to_array">to_array() (riak.mapreduce.RiakLinkPhase method)</a>
+  <dt><a href="advanced.html#riak.transports.pool.Pool.take">take() (riak.transports.pool.Pool method)</a>
+  </dt>
+
+      
+  <dt><a href="advanced.html#riak.client.multiget.Task">Task (class in riak.client.multiget)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="advanced.html#riak.transports.feature_detect.FeatureDetection.tombstone_vclocks">tombstone_vclocks() (riak.transports.feature_detect.FeatureDetection method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.update_counter">update_counter() (riak.bucket.RiakBucket method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakMapReducePhase.to_array">(riak.mapreduce.RiakMapReducePhase method)</a>
+  <dt><a href="client.html#riak.client.RiakClient.update_counter">(riak.client.RiakClient method)</a>
+  </dt>
+
+        
+  <dt><a href="advanced.html#riak.transports.transport.RiakTransport.update_counter">(riak.transports.transport.RiakTransport method)</a>
   </dt>
 
       </dl></dd>
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="mapreduce.html#riak.mapreduce.RiakLink.to_link_header">to_link_header() (riak.mapreduce.RiakLink method)</a>
+  <dt><a href="object.html#riak.riak_object.RiakObject.usermeta">usermeta (riak.riak_object.RiakObject attribute)</a>
   </dt>
 
   </dl></td>
@@ -853,7 +1579,23 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="riak_object.html#riak.riak_object.RiakObject.vclock">vclock() (riak.riak_object.RiakObject method)</a>
+  <dt><a href="object.html#riak.riak_object.VClock">VClock (class in riak.riak_object)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="object.html#riak.riak_object.RiakObject.vclock">vclock (riak.riak_object.RiakObject attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="bucket.html#riak.bucket.RiakBucket.w">w (riak.bucket.RiakBucket attribute)</a>
   </dt>
 
   </dl></td>
@@ -861,43 +1603,24 @@
 
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-
-   
-
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
+  <div class="clearfix">&nbsp;</div>
+  <ul class="pager">
+  </ul>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
-             >index</a></li>
-        <li><a href="index.html">Riak Python Client 1.5.2 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2010-2012, Basho Technologies.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
-    </div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2010-2013, Basho Technologies.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2b1.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>
