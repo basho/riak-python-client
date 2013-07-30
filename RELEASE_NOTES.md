@@ -1,9 +1,60 @@
 # Riak Python Client Release Notes
 
-## 1.5.2 Patch Release
+## 2.0.0 Feature Release - 2013-07-30
 
-* Added optional `timeout` parameter to `transport_options` dictionary
-  when creating a RiakClient object with Protocol Buffers.
+Release 2.0 is the culmination of many months of rearchitecting the
+client. Highlights:
+
+* Automatic connection to multiple nodes, with request retries,
+  through a thread-safe connection pool.
+* All Riak 1.3 and 1.4 features, including bucket properties,
+  paginating and streaming secondary indexes, CRDT counters,
+  client-specified timeouts, and more.
+* Cleaner, more Pythonic access to RiakObject and RiakBucket
+  attributes, favoring properties over methods where possible.
+* Simpler representations of links (3-tuples) and index entries
+  (2-tuples).
+* Streaming requests (keys, buckets, MapReduce, 2i) are now exposed as
+  iterators.
+* Feature detection prevents sending requests to hosts that can't
+  handle them.
+* Better handling of siblings -- you don't have to request them
+  individually anymore -- and registrable resolver functions.
+* A new `multiget` operation that fetches a collection of keys using
+  a pool background threads.
+* A more resilient, repeatable test suite that generates buckets and
+  key names that are essentially random.
+* Last but not least, a brand new, more detailed documentation site!
+
+Other features:
+
+* Added an encoder/decoder pair to support `text/plain`.
+* The Travis CI build will now install the latest Riak to run the
+  suite against.
+
+Other bugfixes:
+
+* The `charset` metadata can now be received via the `Content-Type`
+  header on HTTP.
+* Objects with empty keys and buckets with empty names cannot be
+  created or accessed, as they are unaddressable over HTTP.
+* Performance and compatibility of `TestServer` was improved.
+* Non-ASCII request bodies are better supported on HTTP.
+* Enabling and disabling search indexing on a bucket now uses the
+  `search` bucket property.
+
+## 1.5.2 Patch Release - 2013-01-31
+
+Release 1.5.2 fixes some bugs and adds HTTPS/SSL support.
+
+* Added support for HTTPS.
+* Fixed writing of the `app.config` for the `TestServer`.
+* Reorganized the tests into multiple files and cases.
+* Some methods on `RiakObject` were made private where appropriate.
+* The version comparison used in feature detection was loosened to
+  support pre-release versions of Riak.
+* Prevent fetching the `protobuf` package from Google Code.
+* Prefer `simplejson` over `json` when present.
 
 ## 1.5.1 Patch Release - 2012-10-24
 
