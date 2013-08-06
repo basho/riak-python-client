@@ -411,6 +411,24 @@ class TwoITests(object):
 
         self.assertEqual([(1001, o1.key)], results)
 
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_timeout(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        with self.assertRaises(RiakError):
+            bucket.get_index('field1_bin', 'val1', timeout=1)
+
+        with self.assertRaises(RiakError):
+            for i in bucket.stream_index('field1_bin', 'val1', timeout=1):
+                pass
+
+        # This should not raise
+        self.assertEqual([o1.key], bucket.get_index('field1_bin', 'val1',
+                                                    timeout='infinity'))
+
     def _create_index_objects(self):
         """
         Creates a number of index objects to be used in 2i test
@@ -418,7 +436,7 @@ class TwoITests(object):
         bucket = self.client.bucket(self.bucket_name)
 
         o1 = bucket.\
-            new(self.key_name, 'data1').\
+            new(self.randname(), 'data1').\
             add_index('field1_bin', 'val1').\
             add_index('field2_int', 1001).\
             store()
