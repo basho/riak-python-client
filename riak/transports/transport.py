@@ -160,14 +160,16 @@ class RiakTransport(FeatureDetection):
         raise NotImplementedError
 
     def get_index(self, bucket, index, startkey, endkey=None,
-                  return_terms=None, max_results=None, continuation=None):
+                  return_terms=None, max_results=None, continuation=None,
+                  timeout=None):
         """
         Performs a secondary index query.
         """
         raise NotImplementedError
 
     def stream_index(self, bucket, index, startkey, endkey=None,
-                     return_terms=None, max_results=None, continuation=None):
+                     return_terms=None, max_results=None, continuation=None,
+                     timeout=None):
         """
         Streams a secondary index query.
         """

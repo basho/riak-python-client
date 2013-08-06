@@ -298,12 +298,16 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                 (repr(headers), repr(response.read())))
 
     def get_index(self, bucket, index, startkey, endkey=None,
-                  return_terms=None, max_results=None, continuation=None):
+                  return_terms=None, max_results=None, continuation=None,
+                  timeout=None):
         """
         Performs a secondary index query.
         """
+        if timeout == 'infinity':
+            timeout = 0
+
         params = {'return_terms': return_terms, 'max_results': max_results,
-                  'continuation': continuation}
+                  'continuation': continuation, 'timeout': timeout}
         url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
@@ -322,7 +326,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             return (results, None)
 
     def stream_index(self, bucket, index, startkey, endkey=None,
-                     return_terms=None, max_results=None, continuation=None):
+                     return_terms=None, max_results=None, continuation=None,
+                     timeout=None):
         """
         Streams a secondary index query.
         """
@@ -330,8 +335,12 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise NotImplementedError("Secondary index streaming is not "
                                       "supported")
 
+        if timeout == 'infinity':
+            timeout = 0
+
         params = {'return_terms': return_terms, 'stream': True,
-                  'max_results': max_results, 'continuation': continuation}
+                  'max_results': max_results, 'continuation': continuation,
+                  'timeout': timeout}
         url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, response = self._request('GET', url, stream=True)
 
