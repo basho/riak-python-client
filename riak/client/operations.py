@@ -133,7 +133,8 @@ class RiakClientOperations(RiakClientTransport):
 
         results, continuation = transport.get_index(
             bucket, index, startkey, endkey, return_terms=return_terms,
-            max_results=max_results, continuation=continuation)
+            max_results=max_results, continuation=continuation,
+            timeout=timeout)
 
         page.results = results
         page.continuation = continuation
@@ -168,13 +169,14 @@ class RiakClientOperations(RiakClientTransport):
         if timeout != 'infinity':
             _validate_timeout(timeout)
 
-        page = IndexPage(self, bucket, index, startkey, endkey,
-                         return_terms, max_results)
         with self._transport() as transport:
+            page = IndexPage(self, bucket, index, startkey, endkey,
+                             return_terms, max_results)
             page.stream = True
             page.results = transport.stream_index(
                 bucket, index, startkey, endkey, return_terms=return_terms,
-                max_results=max_results, continuation=continuation)
+                max_results=max_results, continuation=continuation,
+                timeout=timeout)
             return page
 
     @retryable
