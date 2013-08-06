@@ -174,7 +174,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             props = json.loads(body)
             return props['keys']
         else:
-            raise Exception('Error listing keys.')
+            raise RiakError('Error listing keys.')
 
     def stream_keys(self, bucket, timeout=None):
         url = self.key_list_path(bucket.name, keys='stream', timeout=timeout)
@@ -183,7 +183,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if status == 200:
             return RiakHttpKeyStream(response)
         else:
-            raise Exception('Error listing keys.')
+            raise RiakError('Error listing keys.')
 
     def get_buckets(self, timeout=None):
         """
@@ -196,7 +196,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             props = json.loads(body)
             return props['buckets']
         else:
-            raise Exception('Error getting buckets.')
+            raise RiakError('Error getting buckets.')
 
     def stream_buckets(self, timeout=None):
         """
@@ -212,7 +212,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if status == 200:
             return RiakHttpBucketStream(response)
         else:
-            raise Exception('Error listing buckets.')
+            raise RiakError('Error listing buckets.')
 
     def get_bucket_props(self, bucket):
         """
@@ -226,7 +226,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             props = json.loads(body)
             return props['props']
         else:
-            raise Exception('Error getting bucket properties.')
+            raise RiakError('Error getting bucket properties.')
 
     def set_bucket_props(self, bucket, props):
         """
@@ -240,7 +240,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, _ = self._request('PUT', url, headers, content)
 
         if status != 204:
-            raise Exception('Error setting bucket properties.')
+            raise RiakError('Error setting bucket properties.')
         return True
 
     def clear_bucket_props(self, bucket):
@@ -258,7 +258,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         elif status == 405:
             return False
         else:
-            raise Exception('Error %s clearing bucket properties.'
+            raise RiakError('Error %s clearing bucket properties.'
                             % status)
 
     def mapred(self, inputs, query, timeout=None):
@@ -293,7 +293,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if status == 200:
             return RiakHttpMapReduceStream(response)
         else:
-            raise Exception(
+            raise RiakError(
                 'Error running MapReduce operation. Headers: %s Body: %s' %
                 (repr(headers), repr(response.read())))
 
@@ -333,7 +333,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         if not self.stream_indexes():
             raise NotImplementedError("Secondary index streaming is not "
-                                      "supported")
+                                      "supported on %s" % self.server_version.vstring)
 
         if timeout == 'infinity':
             timeout = 0
@@ -347,7 +347,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if status == 200:
             return RiakHttpIndexStream(response, index, return_terms)
         else:
-            raise Exception('Error streaming secondary index.')
+            raise RiakError('Error streaming secondary index.')
 
     def search(self, index, query, **params):
         """
@@ -451,5 +451,5 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
     def check_http_code(self, status, expected_statuses):
         if not status in expected_statuses:
-            raise Exception('Expected status %s, received %s' %
+            raise RiakError('Expected status %s, received %s' %
                             (expected_statuses, status))
