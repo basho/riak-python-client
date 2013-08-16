@@ -152,7 +152,9 @@ class RiakHttpIndexStream(RiakHttpMultipartStream):
     def next(self):
         message = super(RiakHttpIndexStream, self).next()
         payload = json.loads(message.get_payload())
-        if u'keys' in payload:
+        if u'error' in payload:
+            raise RiakError(payload[u'error'])
+        elif u'keys' in payload:
             return payload[u'keys']
         elif u'results' in payload:
             structs = payload[u'results']
