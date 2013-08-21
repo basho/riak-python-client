@@ -55,6 +55,8 @@ class RiakBucket(object):
         try:
             if isinstance(name, basestring):
                 name = name.encode('ascii')
+            else:
+                raise TypeError('Bucket name must be a string')
         except UnicodeError:
             raise TypeError('Unicode bucket names are not supported.')
 
