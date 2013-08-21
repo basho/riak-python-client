@@ -4,7 +4,7 @@ import cPickle
 import copy
 import platform
 from time import sleep
-from riak import ConflictError
+from riak import ConflictError, RiakBucket
 from riak.resolver import default_resolver, last_written_resolver
 try:
     import simplejson as json
@@ -94,6 +94,25 @@ class BasicKVTests(object):
         obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.encoded_data.decode('utf-8'))
+
+    def test_string_bucket_name(self):
+        # Things that are not strings cannot be bucket names
+        for bad in (12345, True, None, {}, []):
+            with self.assertRaisesRegexp(TypeError, 'must be a string'):
+                self.client.bucket(bad)
+
+            with self.assertRaisesRegexp(TypeError, 'must be a string'):
+                RiakBucket(self.client, bad)
+
+        # Unicode bucket names are not supported, if they can't be
+        # encoded to ASCII. This should be changed in a future
+        # release.
+        with self.assertRaisesRegexp(TypeError,
+                                     'Unicode bucket names are not supported'):
+            self.client.bucket(u'føø')
+
+        # This is fine, since it's already ASCII
+        self.client.bucket('ASCII')
 
     def test_generate_key(self):
         # Ensure that Riak generates a random key when
