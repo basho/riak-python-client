@@ -239,6 +239,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
         """
+        if not isinstance(name, basestring):
+            raise TypeError('Bucket name must be a string')
+
         if name in self._buckets:
             return self._buckets[name]
         else:
