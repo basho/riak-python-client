@@ -47,7 +47,12 @@ class RiakPbcStream(object):
         if self.finished:
             raise StopIteration
 
-        msg_code, resp = self.transport._recv_msg(self._expect)
+        try:
+            msg_code, resp = self.transport._recv_msg(expect=self._expect)
+        except:
+            self.finished = True
+            raise
+
         if(self._is_done(resp)):
             self.finished = True
 

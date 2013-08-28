@@ -117,7 +117,7 @@ class IndexPage(Sequence, object):
         """
         return self.continuation is not None
 
-    def next_page(self, stream=None):
+    def next_page(self, timeout=None, stream=None):
         """
         Fetches the next page using the same parameters as the
         original query.
@@ -128,6 +128,8 @@ class IndexPage(Sequence, object):
         :param stream: whether to enable streaming. `True` enables,
             `False` disables, `None` uses previous value.
         :type stream: boolean
+        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :type timeout: int
         """
         if not self.continuation:
             raise ValueError("Cannot get next index page, no continuation")
@@ -141,7 +143,8 @@ class IndexPage(Sequence, object):
                 'endkey': self.endkey,
                 'return_terms': self.return_terms,
                 'max_results': self.max_results,
-                'continuation': self.continuation}
+                'continuation': self.continuation,
+                'timeout': timeout}
         if self.stream:
             return self.client.stream_index(**args)
         else:
