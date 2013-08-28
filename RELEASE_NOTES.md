@@ -1,5 +1,10 @@
 # Riak Python Client Release Notes
 
+## 2.0.1 Patch release - 2013-08-28
+
+Release 2.0.1 includes a minor compatibility fix for Python 2.6 and an
+updated README.
+
 ## 2.0.0 Feature Release - 2013-07-30
 
 Release 2.0 is the culmination of many months of rearchitecting the
