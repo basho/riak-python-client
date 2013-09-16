@@ -49,7 +49,7 @@ QUORUM_TO_PY = _invert(QUORUM_TO_PB)
 
 NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
                 'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
-                'notfound_ok', 'search', 'backend']
+                'notfound_ok', 'search', 'backend', 'yz_index']
 COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
 MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
@@ -412,3 +412,17 @@ class RiakPbcCodec(object):
         if continuation:
             req.continuation = continuation
         return req
+
+    def _decode_yz_index(self, index):
+        """
+        Fills an RpbYokozunaIndex message with the appropriate data.
+
+        :param index: a yz index message
+        :type index: riak_pb.RpbYokozunaIndex
+        :rtype dict
+        """
+        result = {}
+        result['name'] = index.name
+        if index.HasField('schema'):
+            result['schema'] = index.schema
+        return result

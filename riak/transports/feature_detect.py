@@ -65,6 +65,14 @@ class FeatureDetection(object):
         """
         return self.server_version >= versions[1.2]
 
+    def pb_search_admin(self):
+        """
+        Whether search administration is supported over Protocol Buffers
+
+        :rtype: bool
+        """
+        return self.server_version >= versions[1.4]
+
     def pb_search(self):
         """
         Whether search queries are supported over Protocol Buffers
