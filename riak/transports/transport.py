@@ -153,6 +153,42 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def create_search_index(self, index, schema=None):
+        """
+        Creates a yokozuna search index.
+        """
+        raise NotImplementedError
+
+    def get_search_index(self, index):
+        """
+        Returns a yokozuna search index or None.
+        """
+        raise NotImplementedError
+
+    def list_search_indexes(self):
+        """
+        Lists all yokozuna search indexes.
+        """
+        raise NotImplementedError
+
+    def delete_search_index(self, index):
+        """
+        Deletes a yokozuna search index.
+        """
+        raise NotImplementedError
+
+    def create_search_schema(self, schema, content):
+        """
+        Creates a yokozuna search schema.
+        """
+        raise NotImplementedError
+
+    def get_search_schema(self, schema):
+        """
+        Returns a yokozuna search schema.
+        """
+        raise NotImplementedError
+
     def search(self, index, query, **params):
         """
         Performs a search query.

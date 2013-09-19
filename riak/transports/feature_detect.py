@@ -24,7 +24,8 @@ versions = {
     1: LooseVersion("1.0.0"),
     1.1: LooseVersion("1.1.0"),
     1.2: LooseVersion("1.2.0"),
-    1.4: LooseVersion("1.4.0")
+    1.4: LooseVersion("1.4.0"),
+    2.0: LooseVersion("2.0.0")
 }
 
 
@@ -64,6 +65,14 @@ class FeatureDetection(object):
         :rtype: bool
         """
         return self.server_version >= versions[1.2]
+
+    def pb_search_admin(self):
+        """
+        Whether search administration is supported over Protocol Buffers
+
+        :rtype: bool
+        """
+        return self.server_version >= versions[2.0]
 
     def pb_search(self):
         """

@@ -391,6 +391,85 @@ class RiakClientOperations(RiakClientTransport):
                 stream.close()
 
     @retryable
+    def create_search_index(self, transport, index, schema=None):
+        """
+        create_search_index(index, schema)
+
+        Create a search index of the given name, and optionally set
+        a schema. If no schema is set, the default will be used.
+
+        :param index: the name of the index to create
+        :type index: string
+        :param schema: the schema that this index will follow
+        :type schema: string, None
+        """
+        return transport.create_search_index(index, schema)
+
+    @retryable
+    def get_search_index(self, transport, index):
+        """
+        get_search_index(index)
+
+        Gets a search index of the given name if it exists,
+        which will also return the schema. Raises a RiakError
+        if no such schema exists.
+
+        :param index: the name of the index to create
+        :type index: string
+        """
+        return transport.get_search_index(index)
+
+    @retryable
+    def list_search_indexes(self, transport):
+        """
+        list_search_indexes(bucket)
+
+        Gets all search indexes and their schemas. Returns
+        a blank list if none exist
+        """
+        return transport.list_search_indexes()
+
+    @retryable
+    def delete_search_index(self, transport, index):
+        """
+        delete_search_index(index)
+
+        Delete the search index that matches the given name.
+
+        :param index: the name of the index to delete
+        :type index: string
+        """
+        return transport.delete_search_index(index)
+
+    @retryable
+    def create_search_schema(self, transport, schema, content):
+        """
+        create_search_schema(schema, content)
+
+        Creates a solr schema of the given name and content.
+        Content must be valid solr schema xml.
+
+        :param schema: the name of the schema to create
+        :type schema: string
+        :param schema: the solr schema xml content
+        :type schema: string
+        """
+        return transport.create_search_schema(schema, content)
+
+    @retryable
+    def get_search_schema(self, transport, schema):
+        """
+        get_search_schema(schema)
+
+        Gets a search schema of the given name if it exists.
+        Raises a RiakError if no such schema exists.
+
+        :param schema: the name of the schema to get
+        :type schema: string
+        """
+        return transport.get_search_schema(schema)
+
+    @retryable
     def fulltext_search(self, transport, index, query, **params):
         """
         fulltext_search(index, query, **params)
