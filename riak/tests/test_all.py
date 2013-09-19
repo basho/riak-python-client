@@ -17,6 +17,7 @@ from riak.riak_object import RiakObject
 
 from riak.test_server import TestServer
 
+from riak.tests.test_yokozuna import YZSearchTests
 from riak.tests.test_search import SearchTests, \
     EnableSearchTests, SolrSearchTests
 from riak.tests.test_mapreduce import MapReduceAliasTests, \
@@ -64,15 +65,14 @@ def setUpModule():
     testrun_sibs_bucket = 'sibsbucket'
     c.bucket(testrun_sibs_bucket).allow_mult = True
 
-    if not int(os.environ.get('SKIP_SEARCH', '0')):
+    if not int(os.environ.get('SKIP_SEARCH', '0')) and not int(os.environ.get('RUN_YZ', '1')):
         testrun_search_bucket = 'searchbucket'
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
 
-
 def tearDownModule():
     c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
-    if not int(os.environ.get('SKIP_SEARCH', '0')):
+    if not int(os.environ.get('SKIP_SEARCH', '0')) and not int(os.environ.get('RUN_YZ', '1')):
         b = c.bucket(testrun_search_bucket)
         b.clear_properties()
     b = c.bucket(testrun_sibs_bucket)
@@ -216,6 +216,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                MapReduceStreamTests,
                                EnableSearchTests,
                                SearchTests,
+                               YZSearchTests,
                                ClientTests,
                                CounterTests,
                                BaseTestCase,
@@ -229,6 +230,13 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.protocol = 'pbc'
         self.http_client = self.create_client(HTTP_HOST,
                                               http_port=HTTP_PORT)
+        # Only supporting yokozuna via PBC
+        if int(os.environ.get('RUN_YZ', '0')):
+            testrun_yz_bucket = 'yztest'
+            self.http_client.create_search_index(testrun_yz_bucket)
+            b = self.http_client.bucket(testrun_yz_bucket)
+            b.set_property('yz_index', testrun_yz_bucket)
+
         super(RiakPbcTransportTestCase, self).setUp()
 
     def test_uses_client_id_if_given(self):

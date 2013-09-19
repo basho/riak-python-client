@@ -61,7 +61,15 @@ from messages import (
     MSG_CODE_COUNTER_UPDATE_REQ,
     MSG_CODE_COUNTER_UPDATE_RESP,
     MSG_CODE_COUNTER_GET_REQ,
-    MSG_CODE_COUNTER_GET_RESP
+    MSG_CODE_COUNTER_GET_RESP,
+    MSG_CODE_YOKOZUNA_INDEX_GET_REQ,
+    MSG_CODE_YOKOZUNA_INDEX_GET_RESP,
+    MSG_CODE_YOKOZUNA_INDEX_PUT_REQ,
+    MSG_CODE_YOKOZUNA_INDEX_DELETE_REQ,
+    MSG_CODE_YOKOZUNA_SCHEMA_GET_REQ,
+    MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP,
+    MSG_CODE_YOKOZUNA_SCHEMA_PUT_REQ
+
 )
 
 
@@ -409,6 +417,80 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._send_msg(MSG_CODE_INDEX_REQ, req)
 
         return RiakPbcIndexStream(self, index, return_terms)
+
+    def create_search_index(self, index, schema=None):
+        if not self.pb_search_admin():
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+        idx = riak_pb.RpbYokozunaIndex(name=index)
+        if schema:
+            idx.schema = schema
+        req = riak_pb.RpbYokozunaIndexPutReq(index=idx)
+
+        self._request(MSG_CODE_YOKOZUNA_INDEX_PUT_REQ, req,
+                      MSG_CODE_PUT_RESP)
+        return True
+
+    def get_search_index(self, index):
+        if not self.pb_search_admin():
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+        req = riak_pb.RpbYokozunaIndexGetReq(name=index)
+
+        msg_code, resp = self._request(MSG_CODE_YOKOZUNA_INDEX_GET_REQ, req,
+                               MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
+        if len(resp.index) > 0:
+            return self._decode_yz_index( resp.index[0] )
+        else:
+            raise RiakError('notfound')
+
+    def list_search_indexes(self):
+        if not self.pb_search_admin():
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+        req = riak_pb.RpbYokozunaIndexGetReq()
+
+        msg_code, resp = self._request(MSG_CODE_YOKOZUNA_INDEX_GET_REQ, req,
+                               MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
+
+        return [self._decode_yz_index(index) for index in resp.index]
+            
+
+    def delete_search_index(self, index):
+        if not self.pb_search_admin():
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+        req = riak_pb.RpbYokozunaIndexDeleteReq(name=index)
+
+        self._request(MSG_CODE_YOKOZUNA_INDEX_DELETE_REQ, req,
+                      MSG_CODE_DEL_RESP)
+
+        return True
+
+
+    def create_search_schema(self, schema, content):
+        if not self.pb_search_admin():
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+        scma = riak_pb.RpbYokozunaSchema(name=schema, content=content)
+        req = riak_pb.RpbYokozunaSchemaPutReq(schema=scma)
+
+        self._request(MSG_CODE_YOKOZUNA_SCHEMA_PUT_REQ, req,
+                      MSG_CODE_PUT_RESP)
+        return True
+
+    def get_search_schema(self, schema):
+        if not self.pb_search_admin():
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+        req = riak_pb.RpbYokozunaSchemaGetReq(name=schema)
+
+        msg_code, resp = self._request(MSG_CODE_YOKOZUNA_SCHEMA_GET_REQ, req,
+                               MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP)
+        result = {}
+        result['name'] = resp.schema.name
+        result['content'] = resp.schema.content
+        return result
 
     def search(self, index, query, **params):
         if not self.pb_search():
