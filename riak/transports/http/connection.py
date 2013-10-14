@@ -35,7 +35,7 @@ class RiakHttpConnection(object):
                            'multipart/mixed, application/json, */*;q=0.5')
         try:
             self._connection.request(method, uri, body, headers)
-            response = self._connection.getresponse()
+            response = self._connection.getresponse(buffering=True)
 
             if stream:
                 # The caller is responsible for fully reading the
