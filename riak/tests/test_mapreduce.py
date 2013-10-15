@@ -44,6 +44,22 @@ class LinkTests(object):
         self.assertEqual(links[2][1], "foo2")
         self.assertEqual(links[2][2], "tag2")
 
+    def test_set_link(self):
+        # Create the object
+        bucket = self.client.bucket(self.bucket_name)
+        o = bucket.new(self.key_name, 2)
+        other_o = bucket.new(self.key_name, 2)
+        o.links = [(self.bucket_name, "foo1", None),
+                   (self.bucket_name, "foo2", "tag")]
+        o.store()
+        o.set_link(other_o, "foo2")
+        obj = bucket.get(self.key_name)
+        links = sorted(obj.links, key=lambda x: x[1])
+        self.assertEqual(len(links), 2)
+        self.assertEqual(links[0][1], "foo1")
+        self.assertEqual(links[1][1], "foo2")
+        self.assertEqual(links[1][2], "tag")
+
     def test_link_walking(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)

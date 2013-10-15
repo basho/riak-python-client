@@ -195,3 +195,29 @@ class RiakContent(object):
 
         self.links.append(newlink)
         return self._robject
+
+    def set_link(self, obj, tag=None):
+        """
+        add_link(obj, tag=None)
+
+        Add a link to a RiakObject.
+
+        :param obj: Either a RiakObject or 3 item link tuple consisting
+            of (bucket, key, tag).
+        :type obj: mixed
+        :param tag: Optional link tag. Defaults to bucket name. It is ignored
+            if ``obj`` is a 3 item link tuple.
+        :type tag: string
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        """
+        if isinstance(obj, tuple):
+            newlink = obj
+        else:
+            newlink = (obj.bucket.name, obj.key, tag)
+
+        multi = [x for x in self.links if x[0:1] == newlink[0:1]]
+        for item in multi:
+            self.links.remove(item)
+
+        self.links.append(newlink)
+        return self._robject

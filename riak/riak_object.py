@@ -203,6 +203,7 @@ class RiakObject(object):
     remove_indexes = remove_index
     set_index = content_method('set_index')
     add_link = content_method('add_link')
+    set_link = content_method('set_link')
 
     def _exists(self):
         if len(self.siblings) == 0:
