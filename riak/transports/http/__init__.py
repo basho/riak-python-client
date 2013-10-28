@@ -19,9 +19,21 @@ under the License.
 """
 
 import httplib
+import socket
 from riak.transports.pool import Pool
 from riak.transports.http.transport import RiakHttpTransport
 
+class NoNagleHTTPConnection(httplib.HTTPConnection):
+    """
+    Setup a connection class which does not use Nagle - deal with latency on PUT 
+    requests lower than MTU
+    """
+    def connect(self):
+        """
+        Set TCP_NODELAY on socket
+        """
+        httplib.HTTPConnection.connect(self)
+        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
 class RiakHttpPool(Pool):
     """
@@ -33,7 +45,7 @@ class RiakHttpPool(Pool):
         if client.protocol == 'https':
             self.connection_class = httplib.HTTPSConnection
         else:
-            self.connection_class = httplib.HTTPConnection
+            self.connection_class = NoNagleHTTPConnection
         super(RiakHttpPool, self).__init__()
 
     def create_resource(self):
