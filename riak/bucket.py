@@ -446,7 +446,7 @@ class RiakBucket(object):
         return self._client.solr.search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None, return_terms=None,
-                  max_results=None, continuation=None):
+                  max_results=None, continuation=None, timeout=None):
         """
         Queries a secondary index over objects in this bucket,
         returning keys or index/key pairs. See
@@ -456,10 +456,11 @@ class RiakBucket(object):
         return self._client.get_index(self.name, index, startkey, endkey,
                                       return_terms=return_terms,
                                       max_results=max_results,
-                                      continuation=continuation)
+                                      continuation=continuation,
+                                      timeout=timeout)
 
     def stream_index(self, index, startkey, endkey=None, return_terms=None,
-                     max_results=None, continuation=None):
+                     max_results=None, continuation=None, timeout=None):
         """
         Queries a secondary index over objects in this bucket,
         streaming keys or index/key pairs via an iterator. See
@@ -469,7 +470,8 @@ class RiakBucket(object):
         return self._client.stream_index(self.name, index, startkey, endkey,
                                          return_terms=return_terms,
                                          max_results=max_results,
-                                         continuation=continuation)
+                                         continuation=continuation,
+                                         timeout=timeout)
 
     def delete(self, key, **kwargs):
         """Deletes an object from riak. Short hand for

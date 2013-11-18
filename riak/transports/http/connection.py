@@ -52,6 +52,9 @@ class RiakHttpConnection(object):
     def _connect(self):
         self._connection = self._connection_class(self._node.host,
                                                   self._node.http_port)
+        # Forces the population of stats and resources before any
+        # other requests are made.
+        self.server_version
 
     def close(self):
         """
