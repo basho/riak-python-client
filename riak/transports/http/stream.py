@@ -23,6 +23,7 @@ from cgi import parse_header
 from email import message_from_string
 from riak.util import decode_index_value
 from riak.client.index_page import CONTINUATION
+from riak import RiakError
 
 
 class RiakHttpStream(object):
@@ -152,7 +153,9 @@ class RiakHttpIndexStream(RiakHttpMultipartStream):
     def next(self):
         message = super(RiakHttpIndexStream, self).next()
         payload = json.loads(message.get_payload())
-        if u'keys' in payload:
+        if u'error' in payload:
+            raise RiakError(payload[u'error'])
+        elif u'keys' in payload:
             return payload[u'keys']
         elif u'results' in payload:
             structs = payload[u'results']

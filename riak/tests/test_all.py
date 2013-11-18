@@ -164,6 +164,15 @@ class ClientTests(object):
                 for i in self.client.stream_mapred([], [], bad):
                     pass
 
+            with self.assertRaises(ValueError):
+                self.client.get_index(bucket, 'field1_bin', 'val1', 'val4',
+                                      timeout=bad)
+
+            with self.assertRaises(ValueError):
+                for i in self.client.stream_index(bucket, 'field1_bin', 'val1',
+                                                  'val4', timeout=bad):
+                    pass
+
     def test_multiget_bucket(self):
         """
         Multiget operations can be invoked on buckets.

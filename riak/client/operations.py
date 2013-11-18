@@ -95,7 +95,8 @@ class RiakClientOperations(RiakClientTransport):
 
     @retryable
     def get_index(self, transport, bucket, index, startkey, endkey=None,
-                  return_terms=None, max_results=None, continuation=None):
+                  return_terms=None, max_results=None, continuation=None,
+                  timeout=None):
         """
         get_index(bucket, index, startkey, endkey=None, return_terms=None,\
                   max_results=None, continuation=None)
@@ -120,21 +121,28 @@ class RiakClientOperations(RiakClientTransport):
         :param continuation: the opaque continuation returned from a
             previous paginated request
         :type continuation: string
+        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :type timeout: int
         :rtype: :class:`riak.client.index_page.IndexPage`
         """
+        if timeout != 'infinity':
+            _validate_timeout(timeout)
+
         page = IndexPage(self, bucket, index, startkey, endkey,
                          return_terms, max_results)
 
         results, continuation = transport.get_index(
             bucket, index, startkey, endkey, return_terms=return_terms,
-            max_results=max_results, continuation=continuation)
+            max_results=max_results, continuation=continuation,
+            timeout=timeout)
 
         page.results = results
         page.continuation = continuation
         return page
 
     def stream_index(self, bucket, index, startkey, endkey=None,
-                     return_terms=None, max_results=None, continuation=None):
+                     return_terms=None, max_results=None, continuation=None,
+                     timeout=None):
         """
         Queries a secondary index, streaming matching keys through an
         iterator.
@@ -154,15 +162,21 @@ class RiakClientOperations(RiakClientTransport):
         :param continuation: the opaque continuation returned from a
             previous paginated request
         :type continuation: string
+        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :type timeout: int
         :rtype: :class:`riak.client.index_page.IndexPage`
         """
-        page = IndexPage(self, bucket, index, startkey, endkey,
-                         return_terms, max_results)
+        if timeout != 'infinity':
+            _validate_timeout(timeout)
+
         with self._transport() as transport:
+            page = IndexPage(self, bucket, index, startkey, endkey,
+                             return_terms, max_results)
             page.stream = True
             page.results = transport.stream_index(
                 bucket, index, startkey, endkey, return_terms=return_terms,
-                max_results=max_results, continuation=continuation)
+                max_results=max_results, continuation=continuation,
+                timeout=timeout)
             return page
 
     @retryable
@@ -603,6 +617,7 @@ class RiakClientOperations(RiakClientTransport):
                                             returnvalue=returnvalue)
 
     increment_counter = update_counter
+
 
 def _validate_timeout(timeout):
     """

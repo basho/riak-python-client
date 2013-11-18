@@ -376,7 +376,7 @@ class RiakPbcCodec(object):
 
     def _encode_index_req(self, bucket, index, startkey, endkey=None,
                           return_terms=None, max_results=None,
-                          continuation=None):
+                          continuation=None, timeout=None):
         """
         Encodes a secondary index request into the protobuf message.
 
@@ -395,6 +395,8 @@ class RiakPbcCodec(object):
         :param continuation: the opaque continuation returned from a
             previous paginated request
         :type continuation: string
+        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :type timeout: int
         :rtype riak_pb.RpbIndexReq
         """
         req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
@@ -411,6 +413,11 @@ class RiakPbcCodec(object):
             req.max_results = max_results
         if continuation:
             req.continuation = continuation
+        if timeout:
+            if timeout == 'infinity':
+                req.timeout = 0
+            else:
+                req.timeout = timeout
         return req
 
     def _decode_yz_index(self, index):
