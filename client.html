@@ -733,6 +733,7 @@ times if it fails due to network error.</p>
 <li><strong>max_results</strong> (<em>integer</em>) &#8211; the maximum number of results to return (page size)</li>
 <li><strong>continuation</strong> (<em>string</em>) &#8211; the opaque continuation returned from a
 previous paginated request</li>
+<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds, or &#8216;infinity&#8217;</li>
 </ul>
 </td>
 </tr>
@@ -745,7 +746,7 @@ previous paginated request</li>
 
 <dl class="method">
 <dt id="riak.client.RiakClient.stream_index">
-<tt class="descclassname">RiakClient.</tt><tt class="descname">stream_index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.stream_index" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakClient.</tt><tt class="descname">stream_index</tt><big>(</big><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.client.RiakClient.stream_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queries a secondary index, streaming matching keys through an
 iterator.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -761,6 +762,7 @@ iterator.</p>
 <li><strong>max_results</strong> (<em>integer</em>) &#8211; the maximum number of results to return (page size)</li>
 <li><strong>continuation</strong> (<em>string</em>) &#8211; the opaque continuation returned from a
 previous paginated request</li>
+<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds, or &#8216;infinity&#8217;</li>
 </ul>
 </td>
 </tr>

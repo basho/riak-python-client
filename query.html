@@ -261,7 +261,7 @@ included a continuation.</p>
 
 <dl class="method">
 <dt id="riak.client.index_page.IndexPage.next_page">
-<tt class="descname">next_page</tt><big>(</big><em>stream=None</em><big>)</big><a class="headerlink" href="#riak.client.index_page.IndexPage.next_page" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">next_page</tt><big>(</big><em>timeout=None</em>, <em>stream=None</em><big>)</big><a class="headerlink" href="#riak.client.index_page.IndexPage.next_page" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches the next page using the same parameters as the
 original query.</p>
 <p>Note that if streaming was used before, it will be used again
@@ -270,8 +270,12 @@ unless overridden.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream</strong> (<em>boolean</em>) &#8211; whether to enable streaming. <cite>True</cite> enables,
-<cite>False</cite> disables, <cite>None</cite> uses previous value.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>stream</strong> (<em>boolean</em>) &#8211; whether to enable streaming. <cite>True</cite> enables,
+<cite>False</cite> disables, <cite>None</cite> uses previous value.</li>
+<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds, or &#8216;infinity&#8217;</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
