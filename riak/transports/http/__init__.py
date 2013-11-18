@@ -23,10 +23,11 @@ import socket
 from riak.transports.pool import Pool
 from riak.transports.http.transport import RiakHttpTransport
 
+
 class NoNagleHTTPConnection(httplib.HTTPConnection):
     """
-    Setup a connection class which does not use Nagle - deal with latency on PUT 
-    requests lower than MTU
+    Setup a connection class which does not use Nagle - deal with
+    latency on PUT requests lower than MTU
     """
     def connect(self):
         """
@@ -34,6 +35,7 @@ class NoNagleHTTPConnection(httplib.HTTPConnection):
         """
         httplib.HTTPConnection.connect(self)
         self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+
 
 class RiakHttpPool(Pool):
     """
