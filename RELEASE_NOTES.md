@@ -1,5 +1,10 @@
 # Riak Python Client Release Notes
 
+## 2.0.2 Patch release - 2013-11-18
+
+Release 2.0.2 includes support for the 1.4.1+ "timeout" option on
+secondary index queries.
+
 ## 2.0.1 Patch release - 2013-08-28
 
 Release 2.0.1 includes a minor compatibility fix for Python 2.6 and an
