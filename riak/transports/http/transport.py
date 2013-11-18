@@ -333,7 +333,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         if not self.stream_indexes():
             raise NotImplementedError("Secondary index streaming is not "
-                                      "supported on %s" % self.server_version.vstring)
+                                      "supported on %s" %
+                                      self.server_version.vstring)
 
         if timeout == 'infinity':
             timeout = 0
