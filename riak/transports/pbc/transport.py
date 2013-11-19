@@ -442,9 +442,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req = riak_pb.RpbYokozunaIndexGetReq(name=index)
 
         msg_code, resp = self._request(MSG_CODE_YOKOZUNA_INDEX_GET_REQ, req,
-                               MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
+                                       MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
         if len(resp.index) > 0:
-            return self._decode_yz_index( resp.index[0] )
+            return self._decode_yz_index(resp.index[0])
         else:
             raise RiakError('notfound')
 
@@ -455,10 +455,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req = riak_pb.RpbYokozunaIndexGetReq()
 
         msg_code, resp = self._request(MSG_CODE_YOKOZUNA_INDEX_GET_REQ, req,
-                               MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
+                                       MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
 
         return [self._decode_yz_index(index) for index in resp.index]
-            
 
     def delete_search_index(self, index):
         if not self.pb_search_admin():
@@ -470,7 +469,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                       MSG_CODE_DEL_RESP)
 
         return True
-
 
     def create_search_schema(self, schema, content):
         if not self.pb_search_admin():
@@ -490,7 +488,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req = riak_pb.RpbYokozunaSchemaGetReq(name=schema)
 
         msg_code, resp = self._request(MSG_CODE_YOKOZUNA_SCHEMA_GET_REQ, req,
-                               MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP)
+                                       MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP)
         result = {}
         result['name'] = resp.schema.name
         result['content'] = resp.schema.content

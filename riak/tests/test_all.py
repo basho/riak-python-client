@@ -42,6 +42,9 @@ HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 
 USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
 
+SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
+RUN_YZ = int(os.environ.get('RUN_YZ', '1'))
+
 if USE_TEST_SERVER:
     HTTP_PORT = 9000
     PB_PORT = 9002
@@ -65,14 +68,15 @@ def setUpModule():
     testrun_sibs_bucket = 'sibsbucket'
     c.bucket(testrun_sibs_bucket).allow_mult = True
 
-    if not int(os.environ.get('SKIP_SEARCH', '0')) and not int(os.environ.get('RUN_YZ', '1')):
+    if (not SKIP_SEARCH and not RUN_YZ):
         testrun_search_bucket = 'searchbucket'
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
 
+
 def tearDownModule():
     c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
-    if not int(os.environ.get('SKIP_SEARCH', '0')) and not int(os.environ.get('RUN_YZ', '1')):
+    if not SKIP_SEARCH and not RUN_YZ:
         b = c.bucket(testrun_search_bucket)
         b.clear_properties()
     b = c.bucket(testrun_sibs_bucket)
