@@ -45,7 +45,7 @@ class YZSearchTests(object):
         # detatch bucket from index then delete
         b = self.client.bucket(testrun_yz_bucket)
         b.set_property('yz_index', '')
-        self.assert(self.client.delete_search_index(testrun_yz_bucket))
+        self.assertTrue(self.client.delete_search_index(testrun_yz_bucket))
         # create it again
         self.client.create_search_index(testrun_yz_bucket)
         b = self.client.bucket(testrun_yz_bucket)
@@ -79,7 +79,7 @@ class YZSearchTests(object):
         </types>
         </schema>"""
         schema_name = 'yzgoodschema'
-        self.assert(self.client.create_search_schema(schema_name, content))
+        self.assertTrue(self.client.create_search_schema(schema_name, content))
         schema = self.client.get_search_schema(schema_name)
         self.assertEquals(schema_name, schema['name'])
         self.assertEquals(content, schema['content'])
