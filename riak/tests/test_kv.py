@@ -85,6 +85,17 @@ class BasicKVTests(object):
         obj = bucket.get('foo')
         self.assertEqual(obj.data, data)
 
+    def test_store_obj_set_key_to_unicode(self):
+        bucket = self.client.bucket(self.bucket_name)
+        data = {'hello': 'world'}
+        obj = bucket.new()
+        obj.key = u'foo'
+        obj.data = data
+        obj.store()
+
+        obj = bucket.get(u'foo')
+        self.assertEquals(obj.data, data)
+
     def test_store_unicode_string(self):
         bucket = self.client.bucket(self.bucket_name)
         data = u"some unicode data: \u00c6"
