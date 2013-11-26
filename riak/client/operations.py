@@ -340,7 +340,7 @@ class RiakClientOperations(RiakClientTransport):
         .. note:: This request is automatically retried :attr:`RETRY_COUNT`
            times if it fails due to network error.
 
-        :param robj: the object to store
+        :param robj: the object to delete
         :type robj: RiakObject
         :param rw: the read/write (delete) quorum
         :type rw: integer, string, None
