@@ -1,7 +1,0 @@
-#!/usr/bin/make -f
-%:
-	dh $@
-
-override_dh_clean:
-	dh_clean
-	rm -rf *.egg-info
