@@ -443,7 +443,7 @@ class RiakBucket(object):
         :meth:`RiakClient.fulltext_search()
         <riak.client.RiakClient.fulltext_search>` for more details.
         """
-        return self._client.solr.search(self.name, query, **params)
+        return self._client.fulltext_search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None, return_terms=None,
                   max_results=None, continuation=None, timeout=None,
