@@ -249,8 +249,7 @@ class TwoITests(object):
         for entries in bucket.stream_index('field1_bin', 'val1', 'val3'):
             keys.extend(entries)
 
-        # Riak 1.4 ensures that entries come back in-order
-        self.assertEqual([o1.key, o2.key, o3.key], keys)
+        self.assertEqual(sorted([o1.key, o2.key, o3.key]), sorted(keys))
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
     def test_index_return_terms(self):
@@ -265,7 +264,7 @@ class TwoITests(object):
 
         self.assertEqual([('val2', o2.key),
                           ('val3', o3.key),
-                          ('val4', o4.key)], pairs)
+                          ('val4', o4.key)], sorted(pairs))
 
         # Test streaming index query
         spairs = []
@@ -274,7 +273,7 @@ class TwoITests(object):
             spairs.extend(chunk)
 
         self.assertEqual([(1002, o2.key), (1003, o3.key), (1004, o4.key)],
-                         spairs)
+                         sorted(spairs))
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
     def test_index_pagination(self):
@@ -428,6 +427,21 @@ class TwoITests(object):
         # This should not raise
         self.assertEqual([o1.key], bucket.get_index('field1_bin', 'val1',
                                                     timeout='infinity'))
+
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_regex(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects()
+
+        results = []
+        for item in bucket.stream_index('field1_bin', 'val0',
+                                        'val5', term_regex='.*l2',
+                                        return_terms=True):
+            results.extend(item)
+
+        self.assertEqual([('val2', o2.key)], results)
 
     def _create_index_objects(self):
         """

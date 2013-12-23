@@ -34,7 +34,7 @@ class IndexPage(Sequence, object):
     elsewhere.
     """
     def __init__(self, client, bucket, index, startkey, endkey, return_terms,
-                 max_results):
+                 max_results, term_regex):
         self.client = client
         self.bucket = bucket
         self.index = index
@@ -44,6 +44,7 @@ class IndexPage(Sequence, object):
         self.max_results = max_results
         self.results = None
         self.stream = False
+        self.term_regex = term_regex
 
     continuation = None
     """
@@ -144,7 +145,9 @@ class IndexPage(Sequence, object):
                 'return_terms': self.return_terms,
                 'max_results': self.max_results,
                 'continuation': self.continuation,
-                'timeout': timeout}
+                'timeout': timeout,
+                'term_regex': self.term_regex}
+
         if self.stream:
             return self.client.stream_index(**args)
         else:

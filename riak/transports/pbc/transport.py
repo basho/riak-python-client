@@ -376,13 +376,17 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def get_index(self, bucket, index, startkey, endkey=None,
                   return_terms=None, max_results=None, continuation=None,
-                  timeout=None):
+                  timeout=None, term_regex=None):
         if not self.pb_indexes():
             return self._get_index_mapred_emu(bucket, index, startkey, endkey)
 
+        if term_regex and not self.index_term_regex():
+            raise NotImplementedError("Secondary index term_regex is not "
+                                      "supported")
+
         req = self._encode_index_req(bucket, index, startkey, endkey,
                                      return_terms, max_results, continuation,
-                                     timeout)
+                                     timeout, term_regex)
 
         msg_code, resp = self._request(MSG_CODE_INDEX_REQ, req,
                                        MSG_CODE_INDEX_RESP)
@@ -400,14 +404,18 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def stream_index(self, bucket, index, startkey, endkey=None,
                      return_terms=None, max_results=None, continuation=None,
-                     timeout=None):
+                     timeout=None, term_regex=None):
         if not self.stream_indexes():
             raise NotImplementedError("Secondary index streaming is not "
                                       "supported")
 
+        if term_regex and not self.index_term_regex():
+            raise NotImplementedError("Secondary index term_regex is not "
+                                      "supported")
+
         req = self._encode_index_req(bucket, index, startkey, endkey,
                                      return_terms, max_results, continuation,
-                                     timeout)
+                                     timeout, term_regex)
         req.stream = True
 
         self._send_msg(MSG_CODE_INDEX_REQ, req)

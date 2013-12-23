@@ -161,7 +161,7 @@ class RiakTransport(FeatureDetection):
 
     def get_index(self, bucket, index, startkey, endkey=None,
                   return_terms=None, max_results=None, continuation=None,
-                  timeout=None):
+                  timeout=None, term_regex=None):
         """
         Performs a secondary index query.
         """
