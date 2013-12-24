@@ -4,6 +4,8 @@ from __future__ import with_statement
 import os
 import random
 import platform
+from threading import Thread
+from Queue import Queue
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -132,6 +134,33 @@ class ClientTests(object):
         # If retries are exhausted, the final result should also be an
         # error.
         self.assertRaises(IOError, client.ping)
+
+    def test_request_retries_configurable(self):
+        # We guess at some ports that will be unused by Riak or
+        # anything else.
+        client = self.create_client(http_port=1023, pb_port=1022)
+
+        # Change the retry count
+        client.retries = 10
+        self.assertEqual(10, client.retries)
+
+        # The retry count should be a thread local
+        retries = Queue()
+
+        def _target():
+            retries.put(client.retries)
+            retries.join()
+
+        th = Thread(target=_target)
+        th.start()
+        self.assertEqual(3, retries.get(block=True))
+        retries.task_done()
+        th.join()
+
+        # Modify the retries in a with statement
+        with client.retry_count(5):
+            self.assertEqual(5, client.retries)
+            self.assertRaises(IOError, client.ping)
 
     def test_timeout_validation(self):
         bucket = self.client.bucket(self.bucket_name)
