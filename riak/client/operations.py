@@ -96,7 +96,7 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def get_index(self, transport, bucket, index, startkey, endkey=None,
                   return_terms=None, max_results=None, continuation=None,
-                  timeout=None):
+                  timeout=None, term_regex=None):
         """
         get_index(bucket, index, startkey, endkey=None, return_terms=None,\
                   max_results=None, continuation=None)
@@ -123,18 +123,20 @@ class RiakClientOperations(RiakClientTransport):
         :type continuation: string
         :param timeout: a timeout value in milliseconds, or 'infinity'
         :type timeout: int
+        :param term_regex: a regular expression used to filter index terms
+        :type term_regex: string
         :rtype: :class:`riak.client.index_page.IndexPage`
         """
         if timeout != 'infinity':
             _validate_timeout(timeout)
 
         page = IndexPage(self, bucket, index, startkey, endkey,
-                         return_terms, max_results)
+                         return_terms, max_results, term_regex)
 
         results, continuation = transport.get_index(
             bucket, index, startkey, endkey, return_terms=return_terms,
             max_results=max_results, continuation=continuation,
-            timeout=timeout)
+            timeout=timeout, term_regex=term_regex)
 
         page.results = results
         page.continuation = continuation
@@ -142,7 +144,7 @@ class RiakClientOperations(RiakClientTransport):
 
     def stream_index(self, bucket, index, startkey, endkey=None,
                      return_terms=None, max_results=None, continuation=None,
-                     timeout=None):
+                     timeout=None, term_regex=None):
         """
         Queries a secondary index, streaming matching keys through an
         iterator.
@@ -164,6 +166,8 @@ class RiakClientOperations(RiakClientTransport):
         :type continuation: string
         :param timeout: a timeout value in milliseconds, or 'infinity'
         :type timeout: int
+        :param term_regex: a regular expression used to filter index terms
+        :type term_regex: string
         :rtype: :class:`riak.client.index_page.IndexPage`
         """
         if timeout != 'infinity':
@@ -171,12 +175,12 @@ class RiakClientOperations(RiakClientTransport):
 
         with self._transport() as transport:
             page = IndexPage(self, bucket, index, startkey, endkey,
-                             return_terms, max_results)
+                             return_terms, max_results, term_regex)
             page.stream = True
             page.results = transport.stream_index(
                 bucket, index, startkey, endkey, return_terms=return_terms,
                 max_results=max_results, continuation=continuation,
-                timeout=timeout)
+                timeout=timeout, term_regex=term_regex)
             return page
 
     @retryable

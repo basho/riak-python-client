@@ -376,7 +376,7 @@ class RiakPbcCodec(object):
 
     def _encode_index_req(self, bucket, index, startkey, endkey=None,
                           return_terms=None, max_results=None,
-                          continuation=None, timeout=None):
+                          continuation=None, timeout=None, term_regex=None):
         """
         Encodes a secondary index request into the protobuf message.
 
@@ -418,6 +418,8 @@ class RiakPbcCodec(object):
                 req.timeout = 0
             else:
                 req.timeout = timeout
+        if term_regex:
+            req.term_regex = term_regex
         return req
 
     def _decode_yz_index(self, index):

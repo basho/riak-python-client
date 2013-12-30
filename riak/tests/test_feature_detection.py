@@ -58,6 +58,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.pb_all_bucket_props())
         self.assertFalse(t.counters())
         self.assertFalse(t.stream_indexes())
+        self.assertFalse(t.index_term_regex())
 
     def test_10(self):
         t = DummyTransport("1.0.3")
@@ -72,6 +73,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.pb_all_bucket_props())
         self.assertFalse(t.counters())
         self.assertFalse(t.stream_indexes())
+        self.assertFalse(t.index_term_regex())
 
     def test_11(self):
         t = DummyTransport("1.1.4")
@@ -86,6 +88,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.pb_all_bucket_props())
         self.assertFalse(t.counters())
         self.assertFalse(t.stream_indexes())
+        self.assertFalse(t.index_term_regex())
 
     def test_12(self):
         t = DummyTransport("1.2.0")
@@ -100,6 +103,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.pb_all_bucket_props())
         self.assertFalse(t.counters())
         self.assertFalse(t.stream_indexes())
+        self.assertFalse(t.index_term_regex())
 
     def test_12_loose(self):
         t = DummyTransport("1.2.1p3")
@@ -114,6 +118,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.pb_all_bucket_props())
         self.assertFalse(t.counters())
         self.assertFalse(t.stream_indexes())
+        self.assertFalse(t.index_term_regex())
 
     def test_14(self):
         t = DummyTransport("1.4.0rc1")
@@ -128,6 +133,22 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.pb_all_bucket_props())
         self.assertTrue(t.counters())
         self.assertTrue(t.stream_indexes())
+        self.assertFalse(t.index_term_regex())
+
+    def test_144(self):
+        t = DummyTransport("1.4.6")
+        self.assertTrue(t.phaseless_mapred())
+        self.assertTrue(t.pb_indexes())
+        self.assertTrue(t.pb_search())
+        self.assertTrue(t.pb_conditionals())
+        self.assertTrue(t.quorum_controls())
+        self.assertTrue(t.tombstone_vclocks())
+        self.assertTrue(t.pb_head())
+        self.assertTrue(t.pb_clear_bucket_props())
+        self.assertTrue(t.pb_all_bucket_props())
+        self.assertTrue(t.counters())
+        self.assertTrue(t.stream_indexes())
+        self.assertTrue(t.index_term_regex())
 
 if __name__ == '__main__':
     unittest.main()

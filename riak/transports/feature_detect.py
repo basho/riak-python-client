@@ -25,6 +25,7 @@ versions = {
     1.1: LooseVersion("1.1.0"),
     1.2: LooseVersion("1.2.0"),
     1.4: LooseVersion("1.4.0"),
+    1.44: LooseVersion("1.4.4"),
     2.0: LooseVersion("2.0.0")
 }
 
@@ -166,6 +167,14 @@ class FeatureDetection(object):
         :rtype: bool
         """
         return self.server_version >= versions[1.4]
+
+    def index_term_regex(self):
+        """
+        Whether secondary indexes supports a regexp term filter.
+
+        :rtype: bool
+        """
+        return self.server_version >= versions[1.44]
 
     @lazy_property
     def server_version(self):

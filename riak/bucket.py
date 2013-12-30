@@ -448,7 +448,8 @@ class RiakBucket(object):
         return self._client.fulltext_search(self.name, query, **params)
 
     def get_index(self, index, startkey, endkey=None, return_terms=None,
-                  max_results=None, continuation=None, timeout=None):
+                  max_results=None, continuation=None, timeout=None,
+                  term_regex=None):
         """
         Queries a secondary index over objects in this bucket,
         returning keys or index/key pairs. See
@@ -459,10 +460,11 @@ class RiakBucket(object):
                                       return_terms=return_terms,
                                       max_results=max_results,
                                       continuation=continuation,
-                                      timeout=timeout)
+                                      timeout=timeout, term_regex=term_regex)
 
     def stream_index(self, index, startkey, endkey=None, return_terms=None,
-                     max_results=None, continuation=None, timeout=None):
+                     max_results=None, continuation=None, timeout=None,
+                     term_regex=None):
         """
         Queries a secondary index over objects in this bucket,
         streaming keys or index/key pairs via an iterator. See
@@ -473,7 +475,8 @@ class RiakBucket(object):
                                          return_terms=return_terms,
                                          max_results=max_results,
                                          continuation=continuation,
-                                         timeout=timeout)
+                                         timeout=timeout,
+                                         term_regex=term_regex)
 
     def delete(self, key, **kwargs):
         """Deletes an object from riak. Short hand for
