@@ -299,15 +299,21 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
     def get_index(self, bucket, index, startkey, endkey=None,
                   return_terms=None, max_results=None, continuation=None,
-                  timeout=None):
+                  timeout=None, term_regex=None):
         """
         Performs a secondary index query.
         """
+        if term_regex and not self.index_term_regex():
+            raise NotImplementedError("Secondary index term_regex is not "
+                                      "supported")
+
         if timeout == 'infinity':
             timeout = 0
 
         params = {'return_terms': return_terms, 'max_results': max_results,
-                  'continuation': continuation, 'timeout': timeout}
+                  'continuation': continuation, 'timeout': timeout,
+                  'term_regex': term_regex}
+
         url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
@@ -327,7 +333,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
     def stream_index(self, bucket, index, startkey, endkey=None,
                      return_terms=None, max_results=None, continuation=None,
-                     timeout=None):
+                     timeout=None, term_regex=None):
         """
         Streams a secondary index query.
         """
@@ -336,12 +342,16 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                                       "supported on %s" %
                                       self.server_version.vstring)
 
+        if term_regex and not self.index_term_regex():
+            raise NotImplementedError("Secondary index term_regex is not "
+                                      "supported")
+
         if timeout == 'infinity':
             timeout = 0
 
         params = {'return_terms': return_terms, 'stream': True,
                   'max_results': max_results, 'continuation': continuation,
-                  'timeout': timeout}
+                  'timeout': timeout, 'term_regex': term_regex}
         url = self.index_path(bucket, index, startkey, endkey, **params)
         status, headers, response = self._request('GET', url, stream=True)
 

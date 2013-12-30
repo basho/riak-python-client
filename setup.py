@@ -13,8 +13,8 @@ def make_docs():
     for name in glob.glob('*.html'):
         os.rename(name, 'docs/%s' % name)
 
-install_requires = ["riak_pb >=1.4.1, < 1.5.0"]
-requires = ["riak_pb(>=1.4.1,<1.5.0)"]
+install_requires = ["riak_pb >=1.4.4, < 1.5.0"]
+requires = ["riak_pb(>=1.4.4,<1.5.0)"]
 tests_require = []
 if platform.python_version() < '2.7':
     tests_require.append("unittest2")
