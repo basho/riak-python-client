@@ -19,7 +19,7 @@ under the License.
 import socket
 import struct
 from riak import RiakError
-from messages import (
+from riak_pb.messages import (
     MESSAGE_CLASSES,
     MSG_CODE_ERROR_RESP
 )

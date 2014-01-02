@@ -29,7 +29,7 @@ from stream import (RiakPbcKeyStream, RiakPbcMapredStream, RiakPbcBucketStream,
                     RiakPbcIndexStream)
 from codec import RiakPbcCodec
 
-from messages import (
+from riak_pb.messages import (
     MSG_CODE_PING_REQ,
     MSG_CODE_PING_RESP,
     MSG_CODE_GET_CLIENT_ID_REQ,
@@ -51,7 +51,7 @@ from messages import (
     MSG_CODE_GET_BUCKET_RESP,
     MSG_CODE_SET_BUCKET_REQ,
     MSG_CODE_SET_BUCKET_RESP,
-    MSG_CODE_MAPRED_REQ,
+    MSG_CODE_MAP_RED_REQ,
     MSG_CODE_INDEX_REQ,
     MSG_CODE_INDEX_RESP,
     MSG_CODE_SEARCH_QUERY_REQ,
@@ -378,7 +378,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req.request = content
         req.content_type = "application/json"
 
-        self._send_msg(MSG_CODE_MAPRED_REQ, req)
+        self._send_msg(MSG_CODE_MAP_RED_REQ, req)
 
         return RiakPbcMapredStream(self)
 
