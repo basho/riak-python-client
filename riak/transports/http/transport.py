@@ -55,7 +55,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         Construct a new HTTP connection to Riak.
         """
-        super(RiakHttpTransport, self).__init__()
+        super(RiakHttpTransport, self).__init__(**unused_options)
 
         self._client = client
         self._node = node
