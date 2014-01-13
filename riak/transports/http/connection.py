@@ -23,6 +23,8 @@ class RiakHttpConnection(object):
     """
     Connection and low-level request methods for RiakHttpTransport.
     """
+    def __init__(self, default_headers=None):
+        self.default_headers = default_headers or {}
 
     def _request(self, method, uri, headers={}, body='', stream=False):
         """
@@ -33,6 +35,7 @@ class RiakHttpConnection(object):
         response = None
         headers.setdefault('Accept',
                            'multipart/mixed, application/json, */*;q=0.5')
+        headers.update(self.default_headers)
         try:
             self._connection.request(method, uri, body, headers)
             response = self._connection.getresponse()
