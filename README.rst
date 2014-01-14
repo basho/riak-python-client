@@ -2,9 +2,6 @@
 Python Client for Riak
 ========================
 
-.. image:: https://secure.travis-ci.org/basho/riak-python-client.png?branch=master
-   :target: http://travis-ci.org/basho/riak-python-client
-
 Documentation
 =============
 
