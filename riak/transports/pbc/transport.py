@@ -452,7 +452,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         msg_code, resp = self._request(MSG_CODE_YOKOZUNA_INDEX_GET_REQ, req,
                                        MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
         if len(resp.index) > 0:
-            return self._decode_yz_index(resp.index[0])
+            return self._decode_search_index(resp.index[0])
         else:
             raise RiakError('notfound')
 
@@ -465,7 +465,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         msg_code, resp = self._request(MSG_CODE_YOKOZUNA_INDEX_GET_REQ, req,
                                        MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
 
-        return [self._decode_yz_index(index) for index in resp.index]
+        return [self._decode_search_index(index) for index in resp.index]
 
     def delete_search_index(self, index):
         if not self.pb_search_admin():

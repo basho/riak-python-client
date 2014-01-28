@@ -248,7 +248,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
             testrun_yz_bucket = 'yztest'
             self.http_client.create_search_index(testrun_yz_bucket)
             b = self.http_client.bucket(testrun_yz_bucket)
-            b.set_property('yz_index', testrun_yz_bucket)
+            b.set_property('search_index', testrun_yz_bucket)
 
         super(RiakPbcTransportTestCase, self).setUp()
 

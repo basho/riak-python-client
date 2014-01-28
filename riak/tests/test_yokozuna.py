@@ -44,12 +44,12 @@ class YZSearchTests(object):
             self.client.delete_search_index(testrun_yz_bucket)
         # detatch bucket from index then delete
         b = self.client.bucket(testrun_yz_bucket)
-        b.set_property('yz_index', '')
+        b.set_property('search_index', '')
         self.assertTrue(self.client.delete_search_index(testrun_yz_bucket))
         # create it again
         self.client.create_search_index(testrun_yz_bucket)
         b = self.client.bucket(testrun_yz_bucket)
-        b.set_property('yz_index', testrun_yz_bucket)
+        b.set_property('search_index', testrun_yz_bucket)
         time.sleep(1)  # wait for index to apply
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
