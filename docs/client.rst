@@ -44,23 +44,32 @@ Client objects
       client will connect to. It is best not to modify this property
       directly, as it is not thread-safe.
 
-   .. attribute:: RETRY_COUNT
-
-      The maximum number of times to retry requests where it is
-      permitted, default is 3. Retries will attempt to select nodes
-      with better error rates, excluding nodes where the request
-      failed.
-
 ^^^^^
 Nodes
 ^^^^^
 
-The ``nodes`` attribute of ``RiakClient`` objects is a list of
-``RiakNode`` objects. If you include multiple host specifications in
-the ``RiakClient`` constructor, they will be turned into this type.
+The :attr:`nodes <RiakClient.nodes>` attribute of ``RiakClient`` objects is
+a list of ``RiakNode`` objects. If you include multiple host
+specifications in the ``RiakClient`` constructor, they will be turned
+into this type.
 
 .. autoclass:: riak.node.RiakNode
    :members:
+
+^^^^^^^^^^^
+Retry logic
+^^^^^^^^^^^
+
+Some operations that fail because of network errors or Riak node
+failure may be safely retried on another node, and the client will do
+so automatically. The items below can be used to configure this
+behavior.
+
+.. autoattribute:: RiakClient.retries
+
+.. automethod:: RiakClient.retry_count
+
+.. autodata:: riak.client.transport.DEFAULT_RETRY_COUNT
 
 -----------------------
 Client-level Operations

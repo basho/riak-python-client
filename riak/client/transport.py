@@ -19,7 +19,22 @@ from contextlib import contextmanager
 from riak.transports.pool import BadResource
 from riak.transports.pbc import is_retryable as is_pbc_retryable
 from riak.transports.http import is_retryable as is_http_retryable
+import threading
 import httplib
+
+#: The default (global) number of times to retry requests that are
+#: retryable. This can be modified locally, per-thread, via the
+#: :attr:`RiakClient.retries` property, or using the
+#: :attr:`RiakClient.retry_count` method in a ``with`` statement.
+DEFAULT_RETRY_COUNT = 3
+
+
+class _client_locals(threading.local):
+    """
+    A thread-locals object used by the client.
+    """
+    def __init__(self):
+        self.riak_retries_count = DEFAULT_RETRY_COUNT
 
 
 class RiakClientTransport(object):
@@ -27,12 +42,54 @@ class RiakClientTransport(object):
     Methods for RiakClient related to transport selection and retries.
     """
 
-    RETRY_COUNT = 3
-
     # These will be set or redefined by the RiakClient initializer
     protocol = 'http'
     _http_pool = None
     _pb_pool = None
+    _locals = _client_locals()
+
+    def _get_retry_count(self):
+        return self._locals.riak_retries_count or DEFAULT_RETRY_COUNT
+
+    def _set_retry_count(self, value):
+        if not isinstance(value, int):
+            raise TypeError("retries must be an integer")
+        self._locals.riak_retries_count = value
+
+    __retries_doc = """
+          The number of times retryable operations will be attempted
+          before raising an exception to the caller. Defaults to
+          ``3``.
+
+          :note: This is a thread-local for safety and
+                 operation-specific modification. To change the
+                 default globally, modify
+                 :data:`riak.client.transport.DEFAULT_RETRY_COUNT`.
+          """
+
+    retries = property(_get_retry_count, _set_retry_count, doc=__retries_doc)
+
+    @contextmanager
+    def retry_count(self, retries):
+        """
+        retry_count(retries)
+
+        Modifies the number of retries for the scope of the ``with``
+        statement (in the current thread).
+
+        Example::
+
+            with client.retry_count(10):
+                client.ping()
+        """
+        if not isinstance(retries, int):
+            raise TypeError("retries must be an integer")
+
+        old_retries, self.retries = self.retries, retries
+        try:
+            yield
+        finally:
+            self.retries = old_retries
 
     @contextmanager
     def _transport(self):
@@ -60,7 +117,7 @@ class RiakClientTransport(object):
         def _skip_bad_nodes(transport):
             return transport._node not in skip_nodes
 
-        retry_count = self.RETRY_COUNT
+        retry_count = self.retries
 
         for retry in range(retry_count):
             try:
@@ -116,7 +173,7 @@ def _is_retryable(error):
 def retryable(fn, protocol=None):
     """
     Wraps a client operation that can be retried according to the set
-    RETRY_COUNT. Used internally.
+    :attr:`RiakClient.retries`. Used internally.
     """
     def wrapper(self, *args, **kwargs):
         pool = self._choose_pool(protocol)
