@@ -32,7 +32,7 @@ def deep_merge(a, b):
 
     >>> a = {'a': 1, 'b': {1: 1, 2: 2}, 'd': 6}
     >>> b = {'c': 3, 'b': {2: 7}, 'd': {'z': [1, 2, 3]}}
-    >>> c = merge(a, b)
+    >>> c = deep_merge(a, b)
     >>> from pprint import pprint; pprint(c)
     {'a': 1, 'b': {1: 1, 2: 7}, 'c': 3, 'd': {'z': [1, 2, 3]}}
     """

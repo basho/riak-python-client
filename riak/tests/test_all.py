@@ -58,13 +58,15 @@ if USE_TEST_SERVER:
 testrun_search_bucket = None
 testrun_props_bucket = None
 testrun_sibs_bucket = None
+testrun_yz_bucket = None
 
 
 def setUpModule():
     global testrun_search_bucket, testrun_props_bucket, \
-        testrun_sibs_bucket
+        testrun_sibs_bucket, testrun_yz_bucket
 
-    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
+    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
+                   pb_port=PB_PORT)
 
     testrun_props_bucket = 'propsbucket'
     testrun_sibs_bucket = 'sibsbucket'
@@ -75,16 +77,36 @@ def setUpModule():
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
 
+    if RUN_YZ:
+        c.protocol = 'pbc'
+        testrun_yz_bucket = 'yzbucket'
+        c.create_search_index(testrun_yz_bucket)
+        b = c.bucket(testrun_yz_bucket)
+        b.set_property('search_index', testrun_yz_bucket)
+
 
 def tearDownModule():
-    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
+    global testrun_search_bucket, testrun_props_bucket, \
+        testrun_sibs_bucket, testrun_yz_bucket
+
+    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
+                   pb_port=PB_PORT)
+
+    c.bucket(testrun_sibs_bucket).clear_properties()
+    c.bucket(testrun_props_bucket).clear_properties()
+
     if not SKIP_SEARCH and not RUN_YZ:
         b = c.bucket(testrun_search_bucket)
         b.clear_properties()
-    b = c.bucket(testrun_sibs_bucket)
-    b.clear_properties()
-    b = c.bucket(testrun_props_bucket)
-    b.clear_properties()
+
+    if RUN_YZ:
+        c.protocol = 'pbc'
+        yzbucket = c.bucket(testrun_yz_bucket)
+        yzbucket.set_property('search_index', '')
+        c.delete_search_index(testrun_yz_bucket)
+        for keys in yzbucket.stream_keys():
+            for key in keys:
+                yzbucket.delete(key)
 
 
 class BaseTestCase(object):
@@ -121,6 +143,7 @@ class BaseTestCase(object):
         self.search_bucket = testrun_search_bucket
         self.sibs_bucket = testrun_sibs_bucket
         self.props_bucket = testrun_props_bucket
+        self.yz_bucket = testrun_yz_bucket
 
         self.client = self.create_client()
 
@@ -270,15 +293,6 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.host = PB_HOST
         self.pb_port = PB_PORT
         self.protocol = 'pbc'
-        self.http_client = self.create_client(HTTP_HOST,
-                                              http_port=HTTP_PORT)
-        # Only supporting yokozuna via PBC
-        if int(os.environ.get('RUN_YZ', '0')):
-            testrun_yz_bucket = 'yztest'
-            self.http_client.create_search_index(testrun_yz_bucket)
-            b = self.http_client.bucket(testrun_yz_bucket)
-            b.set_property('search_index', testrun_yz_bucket)
-
         super(RiakPbcTransportTestCase, self).setUp()
 
     def test_uses_client_id_if_given(self):

@@ -13,7 +13,7 @@ RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 class YZSearchTests(object):
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_from_bucket(self):
-        bucket = self.client.bucket('yztest')
+        bucket = self.client.bucket(self.yz_bucket)
         bucket.new("user", {"user_s": "Z"}).store()
         time.sleep(1)
         results = bucket.search("user_s:Z")
@@ -23,39 +23,40 @@ class YZSearchTests(object):
         self.assertIn('_yz_rk', result)
         self.assertEquals(u'user', result['_yz_rk'])
         self.assertIn('_yz_rb', result)
-        self.assertEquals(u'yztest', result['_yz_rb'])
+        self.assertEquals(self.yz_bucket, result['_yz_rb'])
         self.assertIn('score', result)
         self.assertIn('user_s', result)
         self.assertEquals(u'Z', result['user_s'])
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_get_search_index(self):
-        index = self.client.get_search_index('yztest')
-        self.assertEquals('yztest', index['name'])
+        index = self.client.get_search_index(self.yz_bucket)
+        self.assertEquals(self.yz_bucket, index['name'])
         self.assertEquals('_yz_default', index['schema'])
         with self.assertRaises(Exception):
-            self.client.get_search_index('NOTyztest')
+            self.client.get_search_index('NOT' + self.yz_bucket)
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_delete_search_index(self):
-        testrun_yz_bucket = 'yztest'
+
         # expected to fail, since there's an attached bucket
         with self.assertRaises(Exception):
-            self.client.delete_search_index(testrun_yz_bucket)
+            self.client.delete_search_index(self.yz_bucket)
         # detatch bucket from index then delete
-        b = self.client.bucket(testrun_yz_bucket)
+        b = self.client.bucket(self.yz_bucket)
         b.set_property('search_index', '')
-        self.assertTrue(self.client.delete_search_index(testrun_yz_bucket))
+        self.assertTrue(self.client.delete_search_index(self.yz_bucket))
         # create it again
-        self.client.create_search_index(testrun_yz_bucket)
-        b = self.client.bucket(testrun_yz_bucket)
-        b.set_property('search_index', testrun_yz_bucket)
+        self.client.create_search_index(self.yz_bucket)
+        b = self.client.bucket(self.yz_bucket)
+        b.set_property('search_index', self.yz_bucket)
         time.sleep(1)  # wait for index to apply
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_list_search_indexes(self):
         indexes = self.client.list_search_indexes()
-        self.assertEquals(1, len(indexes))
+        self.assertIn(self.yz_bucket, [item['name'] for item in indexes])
+        self.assertEqual(1, len(indexes))
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_create_schema(self):
@@ -71,6 +72,8 @@ class YZSearchTests(object):
            <field name="_yz_node" type="_yz_str" indexed="true" stored="true"/>
            <field name="_yz_rk" type="_yz_str" indexed="true" stored="true"/>
            <field name="_yz_rb" type="_yz_str" indexed="true" stored="true"/>
+           <field name="_yz_rt" type="_yz_str" indexed="true" stored="true"/>
+           <field name="_yz_err" type="_yz_str" indexed="true"/>
         </fields>
         <uniqueKey>_yz_id</uniqueKey>
         <types>
@@ -78,7 +81,7 @@ class YZSearchTests(object):
              sortMissingLast="true" />
         </types>
         </schema>"""
-        schema_name = 'yzgoodschema'
+        schema_name = self.randname()
         self.assertTrue(self.client.create_search_schema(schema_name, content))
         schema = self.client.get_search_schema(schema_name)
         self.assertEquals(schema_name, schema['name'])
@@ -90,11 +93,11 @@ class YZSearchTests(object):
         <derp nope nope, how do i computer?
         """
         with self.assertRaises(Exception):
-            self.client.create_search_schema('yzbadschema', bad_content)
+            self.client.create_search_schema(self.randname(), bad_content)
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_queries(self):
-        bucket = self.client.bucket('yztest')
+        bucket = self.client.bucket(self.yz_bucket)
         bucket.new("Z", {"username_s": "Z", "name_s": "ryan",
                          "age_i": 30}).store()
         bucket.new("R", {"username_s": "R", "name_s": "eric",
@@ -132,7 +135,7 @@ class YZSearchTests(object):
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_utf8(self):
-        bucket = self.client.bucket('yztest')
+        bucket = self.client.bucket(self.yz_bucket)
         body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
         bucket.new("shift_jis", body).store()
         # TODO: fails due to lack of direct PB unicode support

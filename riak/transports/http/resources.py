@@ -37,37 +37,49 @@ class RiakHttpResources(object):
     def mapred_path(self, **options):
         return mkpath(self.riak_kv_wm_mapred, **options)
 
-    def bucket_list_path(self, **options):
+    def bucket_list_path(self, bucket_type=None, **options):
         query = {'buckets': True}
         query.update(options)
-        if self.riak_kv_wm_buckets:
-            return mkpath(self.riak_kv_wm_buckets, **query)
+        if self.riak_kv_wm_bucket_type and bucket_type:
+            return mkpath("/types", quote_plus(bucket_type),
+                          "buckets", **query)
+        elif self.riak_kv_wm_buckets:
+            return mkpath("/buckets", **query)
         else:
             return mkpath(self.riak_kv_wm_raw, **query)
 
-    def bucket_properties_path(self, bucket, **options):
-        if self.riak_kv_wm_buckets:
-            return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket),
+    def bucket_properties_path(self, bucket, bucket_type=None, **options):
+        if self.riak_kv_wm_bucket_type and bucket_type:
+            return mkpath("/types", quote_plus(bucket_type), "buckets",
+                          quote_plus(bucket), "props", **options)
+        elif self.riak_kv_wm_buckets:
+            return mkpath("/buckets", quote_plus(bucket),
                           "props", **options)
         else:
             query = options.copy()
             query.update(props=True, keys=False)
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), **query)
 
-    def key_list_path(self, bucket, **options):
+    def key_list_path(self, bucket, bucket_type=None, **options):
         query = {'keys': True, 'props': False}
         query.update(options)
+        if self.riak_kv_wm_bucket_type and bucket_type:
+            return mkpath("/types", quote_plus(bucket_type), "buckets",
+                          quote_plus(bucket), "keys", **options)
         if self.riak_kv_wm_buckets:
-            return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket), "keys",
+            return mkpath("/buckets", quote_plus(bucket), "keys",
                           **query)
         else:
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), **query)
 
-    def object_path(self, bucket, key=None, **options):
+    def object_path(self, bucket, key=None, bucket_type=None, **options):
         if key:
             key = quote_plus(key)
-        if self.riak_kv_wm_buckets:
-            return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket), "keys",
+        if self.riak_kv_wm_bucket_type and bucket_type:
+            return mkpath("/types", quote_plus(bucket_type), "buckets",
+                          quote_plus(bucket), "keys", key, **options)
+        elif self.riak_kv_wm_buckets:
+            return mkpath("/buckets", quote_plus(bucket), "keys",
                           key, **options)
         else:
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), key,
@@ -76,37 +88,37 @@ class RiakHttpResources(object):
     # TODO: link_walk_path is undefined here because there is no path
     # to it in the client without using MapReduce.
 
-    def index_path(self, bucket, index, start, finish=None, **options):
+    def index_path(self, bucket, index, start, finish=None, bucket_type=None,
+                   **options):
         if not self.riak_kv_wm_buckets:
             raise RiakError("Indexes are unsupported by this Riak node")
         if finish:
             finish = quote_plus(str(finish))
-        return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket),
-                      "index", quote_plus(index), quote_plus(str(start)),
-                      finish, **options)
+        if self.riak_kv_wm_bucket_type and bucket_type:
+            return mkpath("/types", quote_plus(bucket_type),
+                          "buckets", quote_plus(bucket),
+                          "index", quote_plus(index), quote_plus(str(start)),
+                          finish, **options)
+        else:
+            return mkpath("/buckets", quote_plus(bucket),
+                          "index", quote_plus(index), quote_plus(str(start)),
+                          finish, **options)
 
     def solr_select_path(self, index, query, **options):
-        if not self.riak_solr_searcher_wm:
-            raise RiakError("Riak Search is unsupported by this Riak node")
+        if not self.riak_solr_searcher_wm or self.yz_wm_search:
+            raise RiakError("Search is unsupported by this Riak node")
         qs = {'q': query, 'wt': 'json'}
         qs.update(options)
         if index:
             index = quote_plus(index)
-        return mkpath(self.riak_solr_searcher_wm, index, "select", **qs)
+        return mkpath("/solr", index, "select", **qs)
 
     def solr_update_path(self, index):
         if not self.riak_solr_searcher_wm:
-            raise RiakError("Riak Search is unsupported by this Riak node")
+            raise RiakError("Riak Search 1 is unsupported by this Riak node")
         if index:
             index = quote_plus(index)
         return mkpath(self.riak_solr_indexer_wm, index, "update")
-
-    def luwak_path(self, key=None):
-        if not self.luwak_wm_file:
-            raise RiakError("Luwak is unsupported by this Riak node")
-        if key:
-            key = quote_plus(key)
-        return mkpath(self.luwak_wm_file, key)
 
     def counters_path(self, bucket, key, **options):
         if not self.riak_kv_wm_counter:
@@ -116,8 +128,14 @@ class RiakHttpResources(object):
                       quote_plus(key), **options)
 
     @lazy_property
+    def riak_kv_wm_bucket_type(self):
+        if 'riak_kv_wm_bucket_type' in self.resources:
+            return "/types"
+
+    @lazy_property
     def riak_kv_wm_buckets(self):
-        return self.resources.get('riak_kv_wm_index')
+        if 'riak_kv_wm_buckets' in self.resources:
+            return "/buckets"
 
     @lazy_property
     def riak_kv_wm_raw(self):
@@ -146,10 +164,6 @@ class RiakHttpResources(object):
     @lazy_property
     def riak_solr_indexer_wm(self):
         return self.resources.get('riak_solr_indexer_wm')
-
-    @lazy_property
-    def luwak_wm_file(self):
-        return self.resources.get('luwak_wm_file')
 
     @lazy_property
     def riak_kv_wm_counter(self):

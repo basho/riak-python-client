@@ -204,7 +204,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         if not self.bucket_stream():
             raise NotImplementedError('Streaming list-buckets is not '
-                                      'supported')
+                                      "supported on %s" %
+                                      self.server_version.vstring)
 
         url = self.bucket_list_path(buckets="stream", timeout=timeout)
         status, headers, response = self._request('GET', url, stream=True)
@@ -305,7 +306,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         if term_regex and not self.index_term_regex():
             raise NotImplementedError("Secondary index term_regex is not "
-                                      "supported")
+                                      "supported on %s" %
+                                      self.server_version.vstring)
 
         if timeout == 'infinity':
             timeout = 0
@@ -344,7 +346,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
         if term_regex and not self.index_term_regex():
             raise NotImplementedError("Secondary index term_regex is not "
-                                      "supported")
+                                      "supported on %s" %
+                                      self.server_version.vstring)
 
         if timeout == 'infinity':
             timeout = 0
@@ -433,7 +436,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
     def get_counter(self, bucket, key, **options):
         if not self.counters():
-            raise NotImplementedError("Counters are not supported")
+            raise NotImplementedError("Counters are not "
+                                      "supported on %s" %
+                                      self.server_version.vstring)
 
         url = self.counters_path(bucket.name, key, **options)
         status, headers, body = self._request('GET', url)
@@ -446,7 +451,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
     def update_counter(self, bucket, key, amount, **options):
         if not self.counters():
-            raise NotImplementedError("Counters are not supported")
+            raise NotImplementedError("Counters are not "
+                                      "supported on %s" %
+                                      self.server_version.vstring)
 
         return_value = 'returnvalue' in options and options['returnvalue']
         headers = {'Content-Type': 'text/plain'}

@@ -527,14 +527,14 @@ class BucketPropsTest(object):
 
     def test_clear_bucket_properties(self):
         bucket = self.client.bucket(self.props_bucket)
-        bucket.allow_mult = True
-        self.assertTrue(bucket.allow_mult)
+        bucket.allow_mult = False
+        self.assertFalse(bucket.allow_mult)
         bucket.n_val = 1
         self.assertEqual(bucket.n_val, 1)
         # Test setting clearing properties...
 
         self.assertTrue(bucket.clear_properties())
-        self.assertFalse(bucket.allow_mult)
+        self.assertTrue(bucket.allow_mult)
         self.assertEqual(bucket.n_val, 3)
 
 
@@ -569,6 +569,8 @@ class KVFileTests(object):
 class CounterTests(object):
     def test_counter_requires_allow_mult(self):
         bucket = self.client.bucket(self.bucket_name)
+        if bucket.allow_mult:
+            bucket.allow_mult = False
         self.assertFalse(bucket.allow_mult)
 
         with self.assertRaises(Exception):
