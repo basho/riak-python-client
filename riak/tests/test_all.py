@@ -88,7 +88,8 @@ def tearDownModule():
     global testrun_search_bucket, testrun_props_bucket, \
         testrun_sibs_bucket, testrun_yz_bucket
 
-    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT)
+    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
+                   pb_port=PB_PORT)
 
     c.bucket(testrun_sibs_bucket).clear_properties()
     c.bucket(testrun_props_bucket).clear_properties()
