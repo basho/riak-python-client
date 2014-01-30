@@ -47,7 +47,8 @@ except ImportError:
         'ls: non_existent_file: No such file or directory\n'
         """
         if 'stdout' in kwargs:
-            raise ValueError('stdout argument not allowed, it will be overridden.')
+            raise ValueError('stdout argument not allowed, it will be '
+                             'overridden.')
         process = Popen(stdout=PIPE, *popenargs, **kwargs)
         output, unused_err = process.communicate()
         retcode = process.poll()
