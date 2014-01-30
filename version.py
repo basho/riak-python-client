@@ -41,9 +41,10 @@ except ImportError:
         The stdout argument is not allowed as it is used internally.
         To capture standard error in the result, use stderr=STDOUT.
 
+        >>> import sys
         >>> check_output(["/bin/sh", "-c",
         ...               "ls -l non_existent_file ; exit 0"],
-        ...              stderr=STDOUT)
+        ...              stderr=sys.stdout)
         'ls: non_existent_file: No such file or directory\n'
         """
         if 'stdout' in kwargs:
