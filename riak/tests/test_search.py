@@ -45,9 +45,9 @@ class SolrSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_document_to_index(self):
         self.client.fulltext_add(self.search_bucket,
-                             [{"id": "doc", "username": "tony"}])
+                                 [{"id": "doc", "username": "tony"}])
         results = self.client.fulltext_search(self.search_bucket,
-                                          "username:tony")
+                                              "username:tony")
         self.assertEquals("tony", results['docs'][0]['username'])
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')

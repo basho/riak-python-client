@@ -41,7 +41,8 @@ class RiakHttpResources(object):
         query = {'buckets': True}
         query.update(options)
         if self.riak_kv_wm_bucket_type and bucket_type:
-            return mkpath("/types", quote_plus(bucket_type), "buckets", **query)
+            return mkpath("/types", quote_plus(bucket_type),
+                          "buckets", **query)
         elif self.riak_kv_wm_buckets:
             return mkpath("/buckets", **query)
         else:
