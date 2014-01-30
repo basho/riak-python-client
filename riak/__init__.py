@@ -35,7 +35,7 @@ __all__ = ['RiakBucket', 'RiakNode', 'RiakObject', 'RiakClient',
            'ConflictError', 'ONE', 'ALL', 'QUORUM', 'key_filter']
 
 
-class RiakError(Exception):
+class RiakError(StandardError):
     """
     Base class for exceptions generated in the Riak API.
     """
