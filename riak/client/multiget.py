@@ -131,7 +131,7 @@ class MultiGetPool(object):
                 task.outq.put(obj)
             except KeyboardInterrupt:
                 raise
-            except StandardError as err:
+            except Exception as err:
                 task.outq.put((task.bucket, task.key, err), )
             finally:
                 self._inq.task_done()
