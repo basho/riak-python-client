@@ -18,9 +18,9 @@ under the License.
 
 
 import json
-from riak.transports.pbc.messages import (
+from riak_pb.messages import (
     MSG_CODE_LIST_KEYS_RESP,
-    MSG_CODE_MAPRED_RESP,
+    MSG_CODE_MAP_RED_RESP,
     MSG_CODE_LIST_BUCKETS_RESP,
     MSG_CODE_INDEX_RESP
 )
@@ -96,7 +96,7 @@ class RiakPbcMapredStream(RiakPbcStream):
     streams.
     """
 
-    _expect = MSG_CODE_MAPRED_RESP
+    _expect = MSG_CODE_MAP_RED_RESP
 
     def next(self):
         response = super(RiakPbcMapredStream, self).next()
