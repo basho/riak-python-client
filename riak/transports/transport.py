@@ -153,7 +153,7 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def create_search_index(self, index, schema=None):
+    def create_search_index(self, index, schema=None, n_val=None):
         """
         Creates a yokozuna search index.
         """
