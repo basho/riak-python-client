@@ -249,6 +249,20 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def fetch_datatype(self, bucket, key, r=None, pr=None, basic_quorum=None,
+                       notfound_ok=None, timeout=None, include_context=None):
+        """
+        Fetches a Riak Datatype.
+        """
+        raise NotImplementedError
+
+    def update_datatype(self, datatype, w=None, dw=None, pw=None,
+                        return_body=None, timeout=None, include_context=None):
+        """
+        Updates a Riak Datatype by sending local operations to the server.
+        """
+        raise NotImplementedError
+
     def _search_mapred_emu(self, index, query):
         """
         Emulates a search request via MapReduce. Used in the case

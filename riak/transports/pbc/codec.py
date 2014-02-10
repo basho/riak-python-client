@@ -55,6 +55,25 @@ COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
 MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
 
+MAP_FIELD_TYPES = {
+    riak_pb.MapField.COUNTER: 'counter',
+    riak_pb.MapField.SET: 'set',
+    riak_pb.MapField.REGISTER: 'register',
+    riak_pb.MapField.FLAG: 'flag',
+    riak_pb.MapField.MAP: 'map',
+    'counter': riak_pb.MapField.COUNTER,
+    'set': riak_pb.MapField.SET,
+    'register': riak_pb.MapField.REGISTER,
+    'flag': riak_pb.MapField.FLAG,
+    'map': riak_pb.MapField.MAP
+}
+
+DT_FETCH_TYPES = {
+    riak_pb.DtFetchResp.COUNTER: 'counter',
+    riak_pb.DtFetchResp.SET: 'set',
+    riak_pb.DtFetchResp.MAP: 'map'
+}
+
 
 class RiakPbcCodec(object):
     """
@@ -477,3 +496,108 @@ class RiakPbcCodec(object):
             uval = unicode(pair.value, 'utf-8')
             resultdoc.add(ukey, uval)
         return resultdoc.mixed()
+
+    def _decode_dt_fetch(self, resp):
+        dtype = DT_FETCH_TYPES.get(resp.type)
+        if dtype is None:
+            raise ValueError("Unknown datatype on wire: {}".format(resp.type))
+
+        value = self._decode_dt_value(dtype, resp.value)
+
+        if resp.HasField('context'):
+            context = resp.context[:]
+        else:
+            context = None
+
+        return dtype, value, context
+
+    def _decode_dt_value(self, dtype, msg):
+        if dtype == 'counter':
+            return msg.counter_value
+        elif dtype == 'set':
+            return self._decode_set_value(msg.set_value)
+        elif dtype == 'map':
+            return self._decode_map_value(msg.map_value)
+
+    def _encode_dt_options(self, req, params):
+        for q in ['r', 'pr', 'w', 'dw', 'pw']:
+            if q in params and params[q] is not None:
+                setattr(req, q, self._encode_quorum(params[q]))
+
+        for o in ['basic_quorum', 'notfound_ok', 'timeout', 'return_body',
+                  'include_context']:
+            if o in params and params[o] is not None:
+                setattr(req, o, params[o])
+
+    def _decode_map_value(self, entries):
+        out = {}
+        for entry in entries:
+            name = entry.field.name[:]
+            dtype = MAP_FIELD_TYPES[entry.field.type]
+            if dtype == 'counter':
+                value = entry.counter_value
+            elif dtype == 'set':
+                value = self._decode_set_value(entry.set_value)
+            elif dtype == 'register':
+                value = entry.register_value[:]
+            elif dtype == 'flag':
+                value = entry.flag_value
+            elif dtype == 'map':
+                value = self._decode_map_value(entry.map_value)
+            out[(name, dtype)] = value
+        return out
+
+    def _decode_set_value(self, set_value):
+        return [string[:] for string in set_value]
+
+    def _encode_dt_op(self, dtype, req, op):
+        if dtype == 'counter':
+            req.op.counter_op.increment = op[1]
+        elif dtype == 'set':
+            self._encode_set_op(req.op, op)
+        elif dtype == 'map':
+            self._encode_map_op(req.op.map_op, op)
+        else:
+            raise TypeError("Cannot send operation on datatype {!r}".
+                            format(dtype))
+
+    def _encode_set_op(self, msg, op):
+        if 'adds' in op:
+            msg.set_op.adds.extend(op['adds'])
+        if 'removes' in op:
+            msg.set_op.removes.extend(op['removes'])
+
+    def _encode_map_op(self, msg, ops):
+        for op in ops:
+            name, dtype = op[1]
+            ftype = MAP_FIELD_TYPES[dtype]
+            if op[0] == 'add':
+                add = msg.adds.add()
+                add.name = name
+                add.type = ftype
+            elif op[0] == 'remove':
+                remove = msg.removes.add()
+                remove.name = name
+                remove.type = ftype
+            elif op[0] == 'update':
+                update = msg.updates.add()
+                update.field.name = name
+                update.field.type = ftype
+                self._encode_map_update(dtype, update, op[2])
+
+    def _encode_map_update(self, dtype, msg, op):
+        if dtype == 'counter':
+            # ('increment', some_int)
+            msg.counter_op.increment = op[1]
+        elif dtype == 'set':
+            self._encode_set_op(msg, op)
+        elif dtype == 'map':
+            self._encode_map_op(msg.map_op, op)
+        elif dtype == 'register':
+            # ('assign', some_str)
+            msg.register_op = op[1]
+        elif dtype == 'flag':
+            if op == 'enable':
+                msg.flag_op = riak_pb.MapUpdate.ENABLE
+            else:
+                msg.flag_op = riak_pb.MapUpdate.DISABLE

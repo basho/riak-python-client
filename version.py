@@ -57,7 +57,7 @@ except ImportError:
             cmd = kwargs.get("args")
             if cmd is None:
                 cmd = popenargs[0]
-            raise CalledProcessError(retcode, cmd, output=output)
+            raise CalledProcessError(retcode, cmd)
         return output
 
 version_re = re.compile('^Version: (.+)$', re.M)

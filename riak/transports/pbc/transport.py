@@ -70,7 +70,11 @@ from riak_pb.messages import (
     MSG_CODE_YOKOZUNA_INDEX_DELETE_REQ,
     MSG_CODE_YOKOZUNA_SCHEMA_GET_REQ,
     MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP,
-    MSG_CODE_YOKOZUNA_SCHEMA_PUT_REQ
+    MSG_CODE_YOKOZUNA_SCHEMA_PUT_REQ,
+    MSG_CODE_DT_FETCH_REQ,
+    MSG_CODE_DT_FETCH_RESP,
+    MSG_CODE_DT_UPDATE_REQ,
+    MSG_CODE_DT_UPDATE_RESP
 )
 
 
@@ -619,3 +623,63 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             return resp.value
         else:
             return True
+
+    def fetch_datatype(self, bucket, key, **options):
+
+        if bucket.bucket_type.is_default():
+            raise NotImplementedError("Datatypes cannot be used in the default"
+                                      " bucket-type.")
+
+        if not self.datatypes():
+            raise NotImplementedError("Datatypes are not supported.")
+
+        req = riak_pb.DtFetchReq()
+        req.type = bucket.bucket_type.name
+        req.bucket = bucket.name
+        req.key = key
+        self._encode_dt_options(req, options)
+
+        msg_code, resp = self._request(MSG_CODE_DT_FETCH_REQ, req,
+                                       MSG_CODE_DT_FETCH_RESP)
+
+        return self._decode_dt_fetch(resp)
+
+    def update_datatype(self, datatype, **options):
+
+        if datatype.bucket.bucket_type.is_default():
+            raise NotImplementedError("Datatypes cannot be used in the default"
+                                      " bucket-type.")
+
+        if not self.datatypes():
+            raise NotImplementedError("Datatypes are not supported.")
+
+        op = datatype.to_op()
+        type_name = datatype.type_name
+        if not op:
+            raise ValueError("No operation to send on datatype {!r}".
+                             format(datatype))
+
+        req = riak_pb.DtUpdateReq()
+        req.bucket = datatype.bucket.name
+        req.type = datatype.bucket.bucket_type.name
+
+        if datatype.key:
+            req.key = datatype.key
+        if datatype._context:
+            req.context = datatype._context
+
+        self._encode_dt_options(req, options)
+
+        self._encode_dt_op(type_name, req, op)
+
+        msg_code, resp = self._request(MSG_CODE_DT_UPDATE_REQ, req,
+                                       MSG_CODE_DT_UPDATE_RESP)
+        if resp.HasField('key'):
+            datatype.key = resp.key[:]
+        if resp.HasField('context'):
+            datatype._context = resp.context[:]
+
+        if options.get('return_body'):
+            datatype._set_value(self._decode_dt_value(type_name, resp))
+
+        return True

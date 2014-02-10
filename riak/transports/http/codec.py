@@ -267,3 +267,47 @@ class RiakHttpCodec(object):
         else:
             charset = None
         return content_type, charset
+
+    def _decode_datatype(self, dtype, value):
+        if not dtype == 'map':
+            return value
+
+        map = {}
+        for key in value:
+            field = self._map_key_to_pair(key)
+            map[field] = self._decode_datatype(field[1], value[key])
+        return map
+
+    def _map_key_to_pair(self, key):
+        name, _, type = key.rpartition('_')
+        return (name, type)
+
+    def _map_pair_to_key(self, pair):
+        return "_".join(pair)
+
+    def _encode_dt_op(self, dtype, op):
+        if dtype in ('counter', 'register'):
+            # ('increment', some_int)
+            # ('assign', some_str)
+            return dict([op])
+        elif dtype == 'flag':
+            return op
+        elif dtype == 'set':
+            # self._encode_set_op(msg, op)
+            set_op = {}
+            if 'adds' in op:
+                set_op['add_all'] = op['adds']
+            if 'removes' in op:
+                set_op['remove_all'] = op['removes']
+            return set_op
+        elif dtype == 'map':
+            map_op = {}
+            for fop in op:
+                fopname = fop[0]
+                fopkey = self._map_pair_to_key(fop[1])
+                if fopname in ('add', 'remove'):
+                    map_op.setdefault(fopname, []).append(fopkey)
+                elif fopname == 'update':
+                    updates = map_op.setdefault(fopname, {})
+                    updates[fopkey] = self._encode_dt_op(fop[1][1], fop[2])
+            return map_op

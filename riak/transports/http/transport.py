@@ -692,6 +692,70 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             self.check_http_code(status, [200, 204])
 
+    def fetch_datatype(self, bucket, key, **options):
+        if bucket.bucket_type.is_default():
+            raise NotImplementedError("Datatypes cannot be used in the default"
+                                      " bucket-type.")
+
+        if not self.datatypes():
+            raise NotImplementedError("Datatypes are not supported.")
+
+        url = self.datatypes_path(bucket.bucket_type.name, bucket.name, key,
+                                  **options)
+        status, headers, body = self._request('GET', url)
+
+        self.check_http_code(status, [200, 404])
+        response = json.loads(body)
+        dtype = response['type']
+        if status == 404:
+            return (dtype, None, None)
+        else:
+            return (dtype, self._decode_datatype(dtype, response['value']),
+                    response.get('context'))
+
+    def update_datatype(self, datatype, **options):
+        if datatype.bucket.bucket_type.is_default():
+            raise NotImplementedError("Datatypes cannot be used in the default"
+                                      " bucket-type.")
+
+        if not self.datatypes():
+            raise NotImplementedError("Datatypes are not supported.")
+
+        op = datatype.to_op()
+        context = datatype.context
+        type_name = datatype.type_name
+        if not op:
+            raise ValueError("No operation to send on datatype {!r}".
+                             format(datatype))
+
+        if type_name not in ('counter', 'set', 'map'):
+            raise TypeError("Cannot send operation on datatype {!r}".
+                            format(type_name))
+
+        url = self.datatypes_path(datatype.bucket.bucket_type.name,
+                                  datatype.bucket.name,
+                                  datatype.key, **options)
+        headers = {'Content-Type': 'application/json'}
+        opdict = self._encode_dt_op(type_name, op)
+        if context:
+            opdict['context'] = context
+        payload = json.dumps(opdict)
+
+        status, headers, body = self._request('POST', url, headers, payload)
+
+        self.check_http_code(status, [200, 201, 204])
+
+        if status == 201:
+            datatype.key = headers['location'].strip().split('/')[-1]
+
+        if options.get('return_body') and status is not 204:
+            response = json.loads(body)
+            datatype._set_value(self._decode_datatype(type_name,
+                                                      response['value']))
+            datatype._context = response.get('context')
+
+        return True
+
     def check_http_code(self, status, expected_statuses):
         if status not in expected_statuses:
             raise RiakError('Expected status %s, received %s' %
