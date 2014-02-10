@@ -26,7 +26,7 @@ class YZSearchTests(object):
         self.assertEquals(self.yz_bucket, result['_yz_rb'])
         self.assertIn('score', result)
         self.assertIn('user_s', result)
-        self.assertEquals(u'Z', result['user_s'])
+        self.assertEqual(u'Z', result['user_s'])
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_get_search_index(self):
@@ -56,7 +56,7 @@ class YZSearchTests(object):
     def test_yz_list_search_indexes(self):
         indexes = self.client.list_search_indexes()
         self.assertIn(self.yz_bucket, [item['name'] for item in indexes])
-        self.assertEqual(1, len(indexes))
+        self.assertLessEqual(1, len(indexes))
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_create_schema(self):
