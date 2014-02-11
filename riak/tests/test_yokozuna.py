@@ -26,13 +26,14 @@ class YZSearchTests(object):
         self.assertEquals(self.yz_bucket, result['_yz_rb'])
         self.assertIn('score', result)
         self.assertIn('user_s', result)
-        self.assertEqual(u'Z', result['user_s'])
+        self.assertEquals(u'Z', result['user_s'])
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_get_search_index(self):
         index = self.client.get_search_index(self.yz_bucket)
         self.assertEquals(self.yz_bucket, index['name'])
         self.assertEquals('_yz_default', index['schema'])
+        self.assertEquals(3, index['n_val'])
         with self.assertRaises(Exception):
             self.client.get_search_index('NOT' + self.yz_bucket)
 
@@ -47,7 +48,7 @@ class YZSearchTests(object):
         b.set_property('search_index', '')
         self.assertTrue(self.client.delete_search_index(self.yz_bucket))
         # create it again
-        self.client.create_search_index(self.yz_bucket)
+        self.client.create_search_index(self.yz_bucket, '_yz_default', 3)
         b = self.client.bucket(self.yz_bucket)
         b.set_property('search_index', self.yz_bucket)
         time.sleep(1)  # wait for index to apply
