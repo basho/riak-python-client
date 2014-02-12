@@ -430,13 +430,15 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return RiakPbcIndexStream(self, index, return_terms)
 
-    def create_search_index(self, index, schema=None):
+    def create_search_index(self, index, schema=None, n_val=None):
         if not self.pb_search_admin():
             raise NotImplementedError("Yokozuna administration is not "
                                       "supported for this version")
         idx = riak_pb.RpbYokozunaIndex(name=index)
         if schema:
             idx.schema = schema
+        if n_val:
+            idx.n_val = n_val
         req = riak_pb.RpbYokozunaIndexPutReq(index=idx)
 
         self._request(MSG_CODE_YOKOZUNA_INDEX_PUT_REQ, req,

@@ -434,4 +434,6 @@ class RiakPbcCodec(object):
         result['name'] = index.name
         if index.HasField('schema'):
             result['schema'] = index.schema
+        if index.HasField('n_val'):
+            result['n_val'] = index.n_val
         return result

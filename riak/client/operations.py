@@ -409,9 +409,9 @@ class RiakClientOperations(RiakClientTransport):
                 stream.close()
 
     @retryable
-    def create_search_index(self, transport, index, schema=None):
+    def create_search_index(self, transport, index, schema=None, n_val=None):
         """
-        create_search_index(index, schema)
+        create_search_index(index, schema, n_val)
 
         Create a search index of the given name, and optionally set
         a schema. If no schema is set, the default will be used.
@@ -420,8 +420,10 @@ class RiakClientOperations(RiakClientTransport):
         :type index: string
         :param schema: the schema that this index will follow
         :type schema: string, None
+        :param n_val: this indexes N value
+        :type n_val: integer, None
         """
-        return transport.create_search_index(index, schema)
+        return transport.create_search_index(index, schema, n_val)
 
     @retryable
     def get_search_index(self, transport, index):
