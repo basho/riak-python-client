@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Buckets &mdash; Riak Python Client 2.0.2 documentation</title>
+    <title>Buckets &mdash; Riak Python Client 2.0.3 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.0.2',
+        VERSION:     '2.0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-2.3.2/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="Riak Python Client 2.0.2 documentation" href="index.html" />
+    <link rel="top" title="Riak Python Client 2.0.3 documentation" href="index.html" />
     <link rel="next" title="Values &amp; Objects" href="object.html" />
     <link rel="prev" title="Client &amp; Connections" href="client.html" />
 <meta charset='utf-8'>
@@ -53,7 +53,7 @@
         </button>
 
         <a class="brand" href="index.html">Riak Python Client</a>
-        <span class="navbar-text pull-left"><b>2.0.2</b></span>
+        <span class="navbar-text pull-left"><b>2.0.3</b></span>
 
         <div class="nav-collapse">
           <ul class="nav">
@@ -565,7 +565,7 @@ values increment the counter, negative values decrement. See
 
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.get_index">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_index</tt><big>(</big><em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_index" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_index</tt><big>(</big><em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queries a secondary index over objects in this bucket,
 returning keys or index/key pairs. See
 <a class="reference internal" href="client.html#riak.client.RiakClient.get_index" title="riak.client.RiakClient.get_index"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.get_index()</span></tt></a> for more details.</p>
@@ -573,7 +573,7 @@ returning keys or index/key pairs. See
 
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.stream_index">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">stream_index</tt><big>(</big><em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.stream_index" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">stream_index</tt><big>(</big><em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.stream_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queries a secondary index over objects in this bucket,
 streaming keys or index/key pairs via an iterator. See
 <a class="reference internal" href="client.html#riak.client.RiakClient.stream_index" title="riak.client.RiakClient.stream_index"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.stream_index()</span></tt></a> for more details.</p>
@@ -712,7 +712,7 @@ be used unless code is being ported from an older version.</p>
 that will be stored as plain text/binary. A shortcut for
 manually instantiating a <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.new" title="riak.bucket.RiakBucket.new"><tt class="xref py py-meth docutils literal"><span class="pre">new()</span></tt></a> instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.new" title="riak.bucket.RiakBucket.new"><tt class="xref py py-meth docutils literal"><span class="pre">new()</span></tt></a> instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -739,7 +739,7 @@ manually instantiating a <a class="reference internal" href="object.html#riak.ri
 the specified file. This is a shortcut for <a class="reference internal" href="#riak.bucket.RiakBucket.new" title="riak.bucket.RiakBucket.new"><tt class="xref py py-meth docutils literal"><span class="pre">new()</span></tt></a>, where the
 <tt class="docutils literal"><span class="pre">encoded_data</span></tt> and <tt class="docutils literal"><span class="pre">content_type</span></tt> are set for you.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.new_from_file" title="riak.bucket.RiakBucket.new_from_file"><tt class="xref py py-meth docutils literal"><span class="pre">new_from_file()</span></tt></a> instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.new_from_file" title="riak.bucket.RiakBucket.new_from_file"><tt class="xref py py-meth docutils literal"><span class="pre">new_from_file()</span></tt></a> instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -763,7 +763,7 @@ the specified file. This is a shortcut for <a class="reference internal" href="#
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">get_binary</tt><big>(</big><em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_binary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a binary/string object from Riak.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -790,7 +790,7 @@ the specified file. This is a shortcut for <a class="reference internal" href="#
 <dd><p>Gets the value used in requests for the &#8216;r&#8217; quorum.
 If not set, returns the passed value.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;r&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;r&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -809,7 +809,7 @@ If not set, returns the passed value.</p>
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">set_r</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_r" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the value used in requests for the &#8216;r&#8217; quorum.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;r&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;r&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -827,7 +827,7 @@ If not set, returns the passed value.</p>
 <dd><p>Gets the value used in requests for the &#8216;pr&#8217; quorum.
 If not set, returns the passed value.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;pr&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pr&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -846,7 +846,7 @@ If not set, returns the passed value.</p>
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">set_pr</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_pr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the value used in requests for the &#8216;pr&#8217; quorum.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;pr&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pr&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -864,7 +864,7 @@ If not set, returns the passed value.</p>
 <dd><p>Gets the value used in requests for the &#8216;w&#8217; quorum.
 If not set, returns the passed value.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;w&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;w&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -883,7 +883,7 @@ If not set, returns the passed value.</p>
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">set_w</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the value used in requests for the &#8216;w&#8217; quorum.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;w&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;w&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -901,7 +901,7 @@ If not set, returns the passed value.</p>
 <dd><p>Gets the value used in requests for the &#8216;dw&#8217; quorum.
 If not set, returns the passed value.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;dw&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;dw&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -920,7 +920,7 @@ If not set, returns the passed value.</p>
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">set_dw</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_dw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the value used in requests for the &#8216;dw&#8217; quorum.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;dw&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;dw&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -938,7 +938,7 @@ If not set, returns the passed value.</p>
 <dd><p>Gets the value used in requests for the &#8216;pw&#8217; quorum.
 If not set, returns the passed value.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;pw&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pw&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -957,7 +957,7 @@ If not set, returns the passed value.</p>
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">set_pw</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_pw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the value used in requests for the &#8216;pw&#8217; quorum.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;pw&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pw&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -975,7 +975,7 @@ If not set, returns the passed value.</p>
 <dd><p>Gets the value used in requests for the &#8216;rw&#8217; quorum.
 If not set, returns the passed value.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;rw&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;rw&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -994,7 +994,7 @@ If not set, returns the passed value.</p>
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">set_rw</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_rw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the value used in requests for the &#8216;rw&#8217; quorum.</p>
 <div class="deprecated">
-<p><span>Deprecated since version 2.0.0: </span>Use the &#8216;rw&#8217; bucket property or request option instead.</p>
+<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;rw&#8217; bucket property or request option instead.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1033,7 +1033,7 @@ If not set, returns the passed value.</p>
     </p>
     <p>
         &copy; Copyright 2010-2013, Basho Technologies.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2b1.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.2.<br/>
     </p>
   </div>
 </footer>
