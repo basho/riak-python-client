@@ -1,5 +1,15 @@
 # Riak Python Client Release Notes
 
+## 2.0.3 Patch Release - 2014-03-06
+
+Release 2.0.3 includes support for 1.4.4's 2I regexp feature and fixes
+a few bugs:
+
+* Docs generation now uses the version from the top-level package.
+* Some internal uses of the deprecated RiakClient.solr were removed.
+* More errors will be caught and propagated properly from multiget
+  requests, preventing deadlocks on the caller side.
+
 ## 2.0.2 Patch release - 2013-11-18
 
 Release 2.0.2 includes support for the 1.4.1+ "timeout" option on
