@@ -1,6 +1,7 @@
 Riak Python Client
 ==================
 
+{% if not READTHEDOCS %}
 .. cssclass:: well pull-right
 .. compound::
 
@@ -14,6 +15,7 @@ Riak Python Client
       object
       query
       advanced
+{% endif %}
 
 Tutorial
 --------
