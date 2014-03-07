@@ -109,6 +109,18 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def get_bucket_type_props(self, bucket_type):
+        """
+        Fetches properties for the given bucket-type.
+        """
+        raise NotImplementedError
+
+    def set_bucket_type_props(self, bucket_type, props):
+        """
+        Sets properties on the given bucket-type.
+        """
+        raise NotImplementedError
+
     def clear_bucket_props(self, bucket):
         """
         Reset bucket properties to their defaults
