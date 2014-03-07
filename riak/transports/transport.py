@@ -310,3 +310,10 @@ class RiakTransport(FeatureDetection):
 
         content = json.dumps(job)
         return content
+
+    def _check_bucket_types(self, bucket_type):
+        if not self.bucket_types():
+            raise NotImplementedError('Server does not support bucket-types')
+
+        if bucket_type.name == 'default':
+            raise ValueError('Cannot manipulate the default bucket-type')

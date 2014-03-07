@@ -262,6 +262,36 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise RiakError('Error %s clearing bucket properties.'
                             % status)
 
+    def get_bucket_type_props(self, bucket_type):
+        """
+        Get properties for a bucket-type
+        """
+        self._check_bucket_types(bucket_type)
+        url = self.bucket_type_properties_path(bucket_type.name)
+        status, headers, body = self._request('GET', url)
+
+        if status == 200:
+            props = json.loads(body)
+            return props['props']
+        else:
+            raise RiakError('Error getting bucket-type properties.')
+
+    def set_bucket_type_props(self, bucket_type, props):
+        """
+        Set the properties on the bucket-type
+        """
+        self._check_bucket_types(bucket_type)
+        url = self.bucket_type_properties_path(bucket_type.name)
+        headers = {'Content-Type': 'application/json'}
+        content = json.dumps({'props': props})
+
+        # Run the request...
+        status, _, _ = self._request('PUT', url, headers, content)
+
+        if status != 204:
+            raise RiakError('Error setting bucket properties.')
+        return True
+
     def mapred(self, inputs, query, timeout=None):
         """
         Run a MapReduce query.

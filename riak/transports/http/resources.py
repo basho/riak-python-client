@@ -60,6 +60,10 @@ class RiakHttpResources(object):
             query.update(props=True, keys=False)
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), **query)
 
+    def bucket_type_properties_path(self, bucket_type, **options):
+        return mkpath("/types", quote_plus(bucket_type), "props",
+                      **options)
+
     def key_list_path(self, bucket, bucket_type=None, **options):
         query = {'keys': True, 'props': False}
         query.update(options)
@@ -84,9 +88,6 @@ class RiakHttpResources(object):
         else:
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), key,
                           **options)
-
-    # TODO: link_walk_path is undefined here because there is no path
-    # to it in the client without using MapReduce.
 
     def index_path(self, bucket, index, start, finish=None, bucket_type=None,
                    **options):

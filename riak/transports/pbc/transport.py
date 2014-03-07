@@ -351,6 +351,35 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                       MSG_CODE_RESET_BUCKET_RESP)
         return True
 
+    def get_bucket_type_props(self, bucket_type):
+        """
+        Fetch bucket-type properties
+        """
+        self._check_bucket_types(bucket_type)
+
+        req = riak_pb.RpbGetBucketTypeReq()
+        req.type = bucket_type.name
+
+        msg_code, resp = self._request(MSG_CODE_GET_BUCKET_TYPE_REQ, req,
+                                       MSG_CODE_GET_BUCKET_RESP)
+
+        return self._decode_bucket_props(resp.props)
+
+    def set_bucket_props(self, bucket_type, props):
+        """
+        Set bucket-type properties
+        """
+        self._check_bucket_types(bucket_type)
+
+        req = riak_pb.RpbSetBucketTypeReq()
+        req.bucket = bucket.name
+
+        self._encode_bucket_props(props, req)
+
+        msg_code, resp = self._request(MSG_CODE_SET_BUCKET_TYPE_REQ, req,
+                                       MSG_CODE_SET_BUCKET_RESP)
+        return True
+
     def mapred(self, inputs, query, timeout=None):
         # dictionary of phase results - each content should be an encoded array
         # which is appended to the result for that phase.
