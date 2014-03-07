@@ -43,7 +43,7 @@ class RiakBucket(object):
     objects within the bucket.
     """
 
-    def __init__(self, client, name):
+    def __init__(self, client, name, bucket_type):
         """
         Returns a new ``RiakBucket`` instance.
 
@@ -51,6 +51,8 @@ class RiakBucket(object):
         :type client: :class:`RiakClient <riak.client.RiakClient>`
         :param name: The bucket name
         :type name: string
+        :param bucket_type: The parent bucket type of this bucket
+        :type bucket_type: :class:`BucketType`
         """
         try:
             if isinstance(name, basestring):
@@ -62,12 +64,13 @@ class RiakBucket(object):
 
         self._client = client
         self.name = name
+        self.bucket_type = bucket_type
         self._encoders = {}
         self._decoders = {}
         self._resolver = None
 
     def __hash__(self):
-        return hash((self.name, self._client))
+        return hash((self.bucket_type.name, self.name, self._client))
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -519,6 +522,76 @@ class RiakBucket(object):
     increment_counter = update_counter
 
     def __str__(self):
-        return '<RiakBucket "{0}">'.format(self.name)
+        return '<RiakBucket {0!r}>'.format(self.name)
+
+
+class BucketType(object):
+    """
+    The ``BucketType`` object allows you to access and change
+    properties on a Riak bucket type and access buckets within its
+    namespace.
+    """
+    def __init__(self, client, name):
+        """
+        Returns a new ``RiakBucket`` instance.
+
+        :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
+        :type client: :class:`RiakClient <riak.client.RiakClient>`
+        :param name: The bucket-type name
+        :type name: string
+        """
+        self._client = client
+        self.name = name
+
+    def get_property(self, key, value):
+        """
+        Retrieve a bucket-type property.
+
+        :param key: The property to retrieve.
+        :type key: string
+        :rtype: mixed
+        """
+        return self.get_properties()[key]
+
+    def set_property(self, key, value):
+        """
+        Set a bucket-type property.
+
+        :param key: Property to set.
+        :type key: string
+        :param value: Property value.
+        :type value: mixed
+        """
+        return self.set_properties({key: value})
+
+    def get_properties(self):
+        """
+        Retrieve a dict of all bucket-type properties.
+
+        :rtype: dict
+        """
+        return self._client.get_bucket_type_props(self)
+
+    def set_properties(self, props):
+        """
+        Set multiple bucket-type properties in one call.
+
+        :param props: A dictionary of properties
+        :type props: dict
+        """
+        self._client.set_bucket_type_props(self, props)
+
+    def bucket(self, name):
+        """
+        Gets a bucket that belongs to this bucket-type.
+
+        :param name: the bucket name
+        :type name: str
+        :rtype: :class:`RiakBucket`
+        """
+        return self._client.bucket(name, self)
+
+    def __str__(self):
+        return "<BucketType {0!r}>".format(self.name)
 
 from riak_object import RiakObject
