@@ -232,6 +232,39 @@ class RiakClientOperations(RiakClientTransport):
         return transport.clear_bucket_props(bucket)
 
     @retryable
+    def get_bucket_type_props(self, transport, bucket_type):
+        """
+        get_bucket_type_props(bucket_type)
+
+        Fetches properties for the given bucket-type.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param bucket_type: the bucket-type whose properties will be fetched
+        :type bucket_type: BucketType
+        :rtype: dict
+        """
+        return transport.get_bucket_type_props(bucket_type)
+
+    @retryable
+    def set_bucket_type_props(self, transport, bucket_type, props):
+        """
+        set_bucket_type_props(bucket_type, props)
+
+        Sets properties for the given bucket-type.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param bucket_type: the bucket-type whose properties will be set
+        :type bucket_type: BucketType
+        :param props: the properties to set
+        :type props: dict
+        """
+        return transport.set_bucket_type_props(bucket, props)
+
+    @retryable
     def get_keys(self, transport, bucket, timeout=None):
         """
         get_keys(bucket, timeout=None)
@@ -624,6 +657,7 @@ class RiakClientOperations(RiakClientTransport):
 
     increment_counter = update_counter
 
+    
 
 def _validate_timeout(timeout):
     """
