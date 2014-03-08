@@ -12,9 +12,12 @@
 # serve to show the default.
 
 import sys, os
+
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if not on_rtd:
-    import sphinx_bootstrap_theme
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -96,29 +99,14 @@ pygments_style = 'tango'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-if on_rtd:
-    html_theme = 'default'
-else:
-    html_theme = 'bootstrap'
 # html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-if on_rtd:
-    html_theme_options = {}
-else:
-    html_theme_options = {
-        'bootswatch_theme': 'cerulean',
-        'navbar_site_name':"Docs",
-        'globaltoc_depth': 2,
-        'source_link_position':'footer'
-        }
 
 # Add any paths that contain custom themes here, relative to this
 # directory.
-if not on_rtd:
-    html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -139,7 +127,7 @@ if not on_rtd:
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
