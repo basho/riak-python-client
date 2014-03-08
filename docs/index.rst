@@ -1,20 +1,6 @@
 Riak Python Client
 ==================
 
-.. cssclass:: well pull-right
-.. compound::
-
-   **Contents** 
-
-   .. toctree::
-      :maxdepth: 2
-    
-      client
-      bucket
-      object
-      query
-      advanced
-
 Tutorial
 --------
 
@@ -60,3 +46,14 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`search`
 
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 1
+
+   client
+   bucket
+   object
+   query
+   advanced
