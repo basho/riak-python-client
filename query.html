@@ -1,70 +1,77 @@
+
+
 <!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Query Methods &mdash; Riak Python Client 2.0.3.post5 documentation</title>
+  
 
+  
+  
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Query Methods &mdash; Riak Python Client 2.0.3 documentation</title>
-    
-    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-2.3.2/css/bootstrap-responsive.min.css" type="text/css" />
-    
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2.0.3',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
+        URL_ROOT:'./',
+        VERSION:'2.0.3.post5',
+        COLLAPSE_INDEX:false,
+        FILE_SUFFIX:'.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-2.3.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="Riak Python Client 2.0.3 documentation" href="index.html" />
-    <link rel="next" title="Advanced Usage &amp; Internals" href="advanced.html" />
-    <link rel="prev" title="Values &amp; Objects" href="object.html" />
-<meta charset='utf-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
 
-  </head>
-  <body>
+    
 
-  <div id="navbar" class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-        <button class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
+  
 
-        <a class="brand" href="index.html">Riak Python Client</a>
-        <span class="navbar-text pull-left"><b>2.0.3</b></span>
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
-        <div class="nav-collapse">
-          <ul class="nav">
-            <li class="divider-vertical"></li>
-            
-              <li class="dropdown globaltoc-container">
-  <a href="index.html"
-     class="dropdown-toggle"
-     data-toggle="dropdown">Docs <b class="caret"></b></a>
-  <ul class="dropdown-menu globaltoc"
-    ><ul class="current">
+  
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+    <link rel="top" title="Riak Python Client 2.0.3.post5 documentation" href="index.html"/>
+        <link rel="next" title="Advanced Usage &amp; Internals" href="advanced.html"/>
+        <link rel="prev" title="Values &amp; Objects" href="object.html"/> 
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> Riak Python Client</a>
+        <form class="wy-form" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search docs" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix">
+        
+        
+            <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
@@ -108,61 +115,32 @@
 </ul>
 </li>
 </ul>
-</ul>
-</li>
-              <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"><ul>
-<li><a class="reference internal" href="#">Query Methods</a><ul>
-<li><a class="reference internal" href="#secondary-indexes">Secondary Indexes</a><ul>
-<li><a class="reference internal" href="#riak-1-4-features">Riak 1.4+ Features</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#fulltext-search">Fulltext Search</a></li>
-<li><a class="reference internal" href="#mapreduce">MapReduce</a><ul>
-<li><a class="reference internal" href="#constructing-the-query">Constructing the query</a></li>
-<li><a class="reference internal" href="#inputs">Inputs</a></li>
-<li><a class="reference internal" href="#phases">Phases</a><ul>
-<li><a class="reference internal" href="#phase-shortcuts">Phase shortcuts</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#execution">Execution</a></li>
-<li><a class="reference internal" href="#shortcut-constructors">Shortcut constructors</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</ul>
-</li>
-            
-            
-            
-          </ul>
 
-          
-            
-<form class="navbar-search pull-right" action="search.html" method="get">
-  <input type="text" name="q" class="search-query" placeholder="Search" />
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
-          
-        </div>
+        
       </div>
-    </div>
-  </div>
+      &nbsp;
+    </nav>
 
-<div class="container">
-  <ul class="pager">
-    <li class="previous">
-      <a href="object.html" 
-         title="previous chapter">&larr;Values &amp; Objects</a></li>
-    <li class="next">
-      <a href="advanced.html" 
-         title="next chapter">Advanced Usage &amp; Internals&rarr;</a></li>
-  </ul>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href="/">Riak Python Client</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <ul class="wy-breadcrumbs">
+  <li><a href="index.html">Docs</a> &raquo;</li>
+  <li><a href="">Query Methods</a></li>
   
+</ul>
+<hr/>
+
+          
   <div class="section" id="query-methods">
 <h1>Query Methods<a class="headerlink" href="#query-methods" title="Permalink to this headline">¶</a></h1>
 <p>Although most operations you will do involve directly interacting with
@@ -980,32 +958,33 @@ A shortcut for <a class="reference internal" href="#riak.mapreduce.RiakMapReduce
 </div>
 
 
-  <div class="clearfix">&nbsp;</div>
-  <ul class="pager">
-    <li class="previous">
-      <a href="object.html" 
-         title="previous chapter">&larr;Values &amp; Objects</a></li>
-    <li class="next">
-      <a href="advanced.html" 
-         title="next chapter">Advanced Usage &amp; Internals&rarr;</a></li>
-  </ul>
-</div>
-<footer class="footer">
-  <div class="container">
-    <p class="pull-right">
-      <a href="#">Back to top</a>
+          <footer>
+  
+    <div class="rst-footer-buttons">
       
-        <br/>
-        
-  <a href="_sources/query.txt"
-     rel="nofollow">Source</a>
+        <a href="advanced.html" class="btn btn-neutral float-right" title="Advanced Usage &amp; Internals"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
-    </p>
-    <p>
-        &copy; Copyright 2010-2013, Basho Technologies.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.2.<br/>
-    </p>
-  </div>
+      
+        <a href="object.html" class="btn btn-neutral" title="Values &amp; Objects"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <p>
+      &copy; Copyright 2010-2013, Basho Technologies.
+  </p>
+
+  <a href="https://www.github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="http://readthedocs.org">Read the Docs</a>
 </footer>
-  </body>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+</body>
 </html>
