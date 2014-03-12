@@ -664,7 +664,6 @@ class RiakClientOperations(RiakClientTransport):
     increment_counter = update_counter
 
 
-
 def _validate_timeout(timeout):
     """
     Raises an exception if the given timeout is an invalid value.

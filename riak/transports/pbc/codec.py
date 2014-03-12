@@ -442,5 +442,6 @@ class RiakPbcCodec(object):
     def _add_bucket_type(self, req, bucket_type):
         if bucket_type and not bucket_type.is_default():
             if not self.bucket_types():
-                raise NotImplementedError('Server does not support bucket-types')
+                raise NotImplementedError(
+                    'Server does not support bucket-types')
             req.type = bucket_type.name
