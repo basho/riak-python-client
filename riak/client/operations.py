@@ -268,7 +268,7 @@ class RiakClientOperations(RiakClientTransport):
         :param props: the properties to set
         :type props: dict
         """
-        return transport.set_bucket_type_props(bucket, props)
+        return transport.set_bucket_type_props(bucket_type, props)
 
     @retryable
     def get_keys(self, transport, bucket, timeout=None):
