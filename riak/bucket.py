@@ -533,7 +533,7 @@ class BucketType(object):
     """
     def __init__(self, client, name):
         """
-        Returns a new ``RiakBucket`` instance.
+        Returns a new ``BucketType`` instance.
 
         :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
