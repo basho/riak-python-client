@@ -51,6 +51,8 @@ from riak_pb.messages import (
     MSG_CODE_GET_BUCKET_RESP,
     MSG_CODE_SET_BUCKET_REQ,
     MSG_CODE_SET_BUCKET_RESP,
+    MSG_CODE_GET_BUCKET_TYPE_REQ,
+    MSG_CODE_SET_BUCKET_TYPE_REQ,
     MSG_CODE_MAP_RED_REQ,
     MSG_CODE_INDEX_REQ,
     MSG_CODE_INDEX_RESP,
@@ -369,14 +371,14 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return self._decode_bucket_props(resp.props)
 
-    def set_bucket_props(self, bucket_type, props):
+    def set_bucket_type_props(self, bucket_type, props):
         """
         Set bucket-type properties
         """
         self._check_bucket_types(bucket_type)
 
         req = riak_pb.RpbSetBucketTypeReq()
-        req.bucket = bucket.name
+        req.type = bucket_type.name
 
         self._encode_bucket_props(props, req)
 
