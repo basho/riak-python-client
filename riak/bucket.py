@@ -459,7 +459,7 @@ class RiakBucket(object):
         :meth:`RiakClient.get_index()
         <riak.client.RiakClient.get_index>` for more details.
         """
-        return self._client.get_index(self.name, index, startkey, endkey,
+        return self._client.get_index(self, index, startkey, endkey,
                                       return_terms=return_terms,
                                       max_results=max_results,
                                       continuation=continuation,
@@ -474,7 +474,7 @@ class RiakBucket(object):
         :meth:`RiakClient.stream_index()
         <riak.client.RiakClient.stream_index>` for more details.
         """
-        return self._client.stream_index(self.name, index, startkey, endkey,
+        return self._client.stream_index(self, index, startkey, endkey,
                                          return_terms=return_terms,
                                          max_results=max_results,
                                          continuation=continuation,
@@ -543,6 +543,15 @@ class BucketType(object):
         self._client = client
         self.name = name
 
+    def is_default(self):
+        """
+        Whether this bucket type is the default type, or a
+        user-defined type.
+
+        :rtype: bool
+        """
+        return self.name == 'default'
+
     def get_property(self, key, value):
         """
         Retrieve a bucket-type property.
@@ -591,7 +600,40 @@ class BucketType(object):
         """
         return self._client.bucket(name, self)
 
+    def get_buckets(self, timeout=None):
+        """
+        Get the list of buckets under this bucket-type as
+        :class:`RiakBucket <riak.bucket.RiakBucket>` instances.
+
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
+        """
+        return self._client.get_buckets(bucket_type=self, timeout=timeout)
+
+    def stream_buckets(self, timeout=None):
+        """
+        Streams the list of buckets under this bucket-type. This is a
+        generator method that should be iterated over.
+
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
+
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        :rtype: iterator that yields lists of :class:`RiakBucket
+             <riak.bucket.RiakBucket>` instances
+        """
+        return self._client.stream_buckets(bucket_type=self, timeout=timeout)
+
     def __str__(self):
         return "<BucketType {0!r}>".format(self.name)
+
 
 from riak_object import RiakObject

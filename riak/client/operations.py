@@ -32,9 +32,9 @@ class RiakClientOperations(RiakClientTransport):
     """
 
     @retryable
-    def get_buckets(self, transport, timeout=None):
+    def get_buckets(self, transport, bucket_type=None, timeout=None):
         """
-        get_buckets(timeout=None)
+        get_buckets(bucket_type=None, timeout=None)
 
         Get the list of buckets as :class:`RiakBucket
         <riak.bucket.RiakBucket>` instances.
@@ -45,15 +45,18 @@ class RiakClientOperations(RiakClientTransport):
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
 
+        :param bucket_type: the optional containing bucket type
+        :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
         """
         _validate_timeout(timeout)
         return [self.bucket(name) for name in
-                transport.get_buckets(timeout=timeout)]
+                transport.get_buckets(bucket_type=bucket_type,
+                                      timeout=timeout)]
 
-    def stream_buckets(self, timeout=None):
+    def stream_buckets(self, bucket_type=None, timeout=None):
         """
         Streams the list of buckets. This is a generator method that
         should be iterated over.
@@ -61,6 +64,8 @@ class RiakClientOperations(RiakClientTransport):
         .. warning:: Do not use this in production, as it requires
            traversing through all keys stored in a cluster.
 
+        :param bucket_type: the optional containing bucket type
+        :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         :rtype: iterator that yields lists of :class:`RiakBucket
@@ -68,7 +73,8 @@ class RiakClientOperations(RiakClientTransport):
         """
         _validate_timeout(timeout)
         with self._transport() as transport:
-            stream = transport.stream_buckets(timeout=timeout)
+            stream = transport.stream_buckets(bucket_type=bucket_type,
+                                              timeout=timeout)
             try:
                 for bucket_list in stream:
                     bucket_list = [self.bucket(name) for name in bucket_list]
@@ -657,7 +663,7 @@ class RiakClientOperations(RiakClientTransport):
 
     increment_counter = update_counter
 
-    
+
 
 def _validate_timeout(timeout):
     """

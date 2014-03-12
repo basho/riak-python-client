@@ -85,13 +85,13 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def get_buckets(self, timeout=None):
+    def get_buckets(self, bucket_type=None, timeout=None):
         """
         Gets the list of buckets as strings.
         """
         raise NotImplementedError
 
-    def stream_buckets(self, timeout=None):
+    def stream_buckets(self, bucket_type=None, timeout=None):
         """
         Streams the list of buckets through an iterator
         """
@@ -315,5 +315,5 @@ class RiakTransport(FeatureDetection):
         if not self.bucket_types():
             raise NotImplementedError('Server does not support bucket-types')
 
-        if bucket_type.name == 'default':
+        if bucket_type.is_default():
             raise ValueError('Cannot manipulate the default bucket-type')
