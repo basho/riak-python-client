@@ -522,7 +522,13 @@ class RiakBucket(object):
     increment_counter = update_counter
 
     def __str__(self):
-        return '<RiakBucket {0!r}>'.format(self.name)
+        if self.bucket_type.is_default():
+            return '<RiakBucket {0!r}>'.format(self.name)
+        else:
+            return '<RiakBucket {0!r}/{1!r}>'.format(self.bucket_type.name,
+                                                     self.name)
+
+    __repr__ = __str__
 
 
 class BucketType(object):
@@ -634,6 +640,8 @@ class BucketType(object):
 
     def __str__(self):
         return "<BucketType {0!r}>".format(self.name)
+
+    __repr__ = __str__
 
 
 from riak_object import RiakObject
