@@ -42,6 +42,11 @@ PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
 HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 
+# these ports are used to simulate errors, there shouldn't
+# be anything listening on either port.
+DUMMY_HTTP_PORT = int(os.environ.get('DUMMY_HTTP_PORT', '1023'))
+DUMMY_PB_PORT = int(os.environ.get('DUMMY_PB_PORT', '1022'))
+
 USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
 
 SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
@@ -152,7 +157,7 @@ class ClientTests(object):
     def test_request_retries(self):
         # We guess at some ports that will be unused by Riak or
         # anything else.
-        client = self.create_client(http_port=1023, pb_port=1022)
+        client = self.create_client(http_port=DUMMY_HTTP_PORT, pb_port=DUMMY_PB_PORT)
 
         # If retries are exhausted, the final result should also be an
         # error.
@@ -161,7 +166,7 @@ class ClientTests(object):
     def test_request_retries_configurable(self):
         # We guess at some ports that will be unused by Riak or
         # anything else.
-        client = self.create_client(http_port=1023, pb_port=1022)
+        client = self.create_client(http_port=DUMMY_HTTP_PORT, pb_port=DUMMY_PB_PORT)
 
         # Change the retry count
         client.retries = 10
@@ -250,7 +255,7 @@ class ClientTests(object):
         and not propagated.
         """
         keys = [self.key_name, self.randname(), self.randname()]
-        client = self.create_client(http_port=1023, pb_port=1024)
+        client = self.create_client(http_port=DUMMY_HTTP_PORT, pb_port=DUMMY_PB_PORT)
         results = client.bucket(self.bucket_name).multiget(keys)
         for failure in results:
             self.assertIsInstance(failure, tuple)
