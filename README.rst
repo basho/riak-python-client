@@ -29,7 +29,7 @@ To run the unit tests against a Riak server (with default TCP port configuration
 
     python setup.py test
 
-If you don't have `Riak Search <http://wiki.basho.com/Riak-Search.html>`_ enabled, you can set the ``SKIP_SEARCH`` environment variable to 1 skip those tests.
+If you don't have `Riak Search <http://docs.basho.com/riak/latest/dev/using/search/>`_ enabled, you can set the ``SKIP_SEARCH`` environment variable to 1 skip those tests.
 
 If you don't have `Yokozuna <https://github.com/basho/yokozuna>`_  enabled, you can set the ``RUN_YZ`` environment variable to 0 to skip those tests.
 
