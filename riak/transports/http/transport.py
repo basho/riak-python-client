@@ -542,6 +542,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                             (expected_statuses, status))
 
     def _get_bucket_type(self, bucket_type):
+        if bucket_type is None:
+            return None
         if bucket_type.is_default():
             return None
         elif not self.bucket_types():

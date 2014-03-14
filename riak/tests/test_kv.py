@@ -104,7 +104,7 @@ class BasicKVTests(object):
                 self.client.bucket(bad)
 
             with self.assertRaisesRegexp(TypeError, 'must be a string'):
-                RiakBucket(self.client, bad)
+                RiakBucket(self.client, bad, None)
 
         # Unicode bucket names are not supported, if they can't be
         # encoded to ASCII. This should be changed in a future
