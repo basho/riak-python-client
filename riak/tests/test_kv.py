@@ -16,6 +16,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
+from . import SKIP_RESOLVE
 
 class NotJsonSerializable(object):
 
@@ -334,7 +335,7 @@ class BasicKVTests(object):
         self.assertEqual(len(obj.siblings), 1)
         self.assertEqual(obj.encoded_data, resolved_sibling.encoded_data)
 
-    @unittest.skipIf(os.environ.get('SKIP_RESOLVE', '0') == '1',
+    @unittest.skipIf(SKIP_RESOLVE == '1',
                      "skip requested for resolvers test")
     def test_resolution(self):
         bucket = self.client.bucket(self.sibs_bucket)

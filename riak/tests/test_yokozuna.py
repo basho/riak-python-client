@@ -7,8 +7,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
-
+from . import RUN_YZ
 
 class YZSearchTests(object):
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')

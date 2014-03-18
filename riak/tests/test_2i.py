@@ -7,9 +7,7 @@ else:
     import unittest
 
 from riak import RiakError
-
-SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
-
+from . import SKIP_INDEXES
 
 class TwoITests(object):
     def is_2i_supported(self):

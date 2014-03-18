@@ -6,9 +6,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-SKIP_SEARCH = (int(os.environ.get('SKIP_SEARCH', '0'))
-               or int(os.environ.get('RUN_YZ', '1')))
-
+from . import SKIP_SEARCH
 
 class EnableSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
