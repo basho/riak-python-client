@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import platform
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -7,6 +6,7 @@ else:
     import unittest
 
 from . import SKIP_SEARCH
+
 
 class EnableSearchTests(object):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')

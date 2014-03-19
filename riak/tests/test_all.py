@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-import os
 import random
 import platform
 from threading import Thread
@@ -17,8 +16,6 @@ from riak.mapreduce import RiakKeyFilter
 from riak import key_filter
 from riak.riak_object import RiakObject
 
-from riak.test_server import TestServer
-
 from riak.tests.test_yokozuna import YZSearchTests
 from riak.tests.test_search import SearchTests, \
     EnableSearchTests, SolrSearchTests
@@ -28,7 +25,9 @@ from riak.tests.test_kv import BasicKVTests, KVFileTests, \
     BucketPropsTest, CounterTests
 from riak.tests.test_2i import TwoITests
 
-from . import *
+from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
+    HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
+    SKIP_SEARCH, RUN_YZ
 
 testrun_search_bucket = None
 testrun_props_bucket = None
@@ -127,7 +126,8 @@ class ClientTests(object):
     def test_request_retries(self):
         # We guess at some ports that will be unused by Riak or
         # anything else.
-        client = self.create_client(http_port=DUMMY_HTTP_PORT, pb_port=DUMMY_PB_PORT)
+        client = self.create_client(http_port=DUMMY_HTTP_PORT,
+                                    pb_port=DUMMY_PB_PORT)
 
         # If retries are exhausted, the final result should also be an
         # error.
@@ -136,7 +136,8 @@ class ClientTests(object):
     def test_request_retries_configurable(self):
         # We guess at some ports that will be unused by Riak or
         # anything else.
-        client = self.create_client(http_port=DUMMY_HTTP_PORT, pb_port=DUMMY_PB_PORT)
+        client = self.create_client(http_port=DUMMY_HTTP_PORT,
+                                    pb_port=DUMMY_PB_PORT)
 
         # Change the retry count
         client.retries = 10
@@ -225,7 +226,8 @@ class ClientTests(object):
         and not propagated.
         """
         keys = [self.key_name, self.randname(), self.randname()]
-        client = self.create_client(http_port=DUMMY_HTTP_PORT, pb_port=DUMMY_PB_PORT)
+        client = self.create_client(http_port=DUMMY_HTTP_PORT,
+                                    pb_port=DUMMY_PB_PORT)
         results = client.bucket(self.bucket_name).multiget(keys)
         for failure in results:
             self.assertIsInstance(failure, tuple)

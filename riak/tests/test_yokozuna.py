@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import platform
 import time
 if platform.python_version() < '2.7':
@@ -8,6 +7,7 @@ else:
     import unittest
 
 from . import RUN_YZ
+
 
 class YZSearchTests(object):
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')

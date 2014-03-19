@@ -1,4 +1,6 @@
 import os
+from riak.test_server import TestServer
+
 USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
 if USE_TEST_SERVER:
     HTTP_PORT = 9000

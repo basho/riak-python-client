@@ -18,6 +18,7 @@ else:
 
 from . import SKIP_RESOLVE
 
+
 class NotJsonSerializable(object):
 
     def __init__(self, *args, **kwargs):
