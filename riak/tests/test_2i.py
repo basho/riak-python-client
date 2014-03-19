@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import platform
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -7,8 +6,7 @@ else:
     import unittest
 
 from riak import RiakError
-
-SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
+from . import SKIP_INDEXES
 
 
 class TwoITests(object):

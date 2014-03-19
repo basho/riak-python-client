@@ -29,6 +29,12 @@ To run the unit tests against a Riak server (with default TCP port configuration
 
     python setup.py test
 
-If you don't have `Riak Search <http://wiki.basho.com/Riak-Search.html>`_ enabled you can set the ``SKIP_SEARCH`` environment variable to skip that tests.
+If you don't have `Riak Search <http://docs.basho.com/riak/latest/dev/using/search/>`_ enabled, you can set the ``SKIP_SEARCH`` environment variable to 1 skip those tests.
 
-If your Riak server isn't running on localhost, use the environment variables ``RIAK_TEST_HOST`` and  ``RIAK_TEST_HTTP_PORT`` and  ``RIAK_TEST_PB_PORT=8087`` to specify where to find the Riak server.
+If you don't have `Yokozuna <https://github.com/basho/yokozuna>`_  enabled, you can set the ``RUN_YZ`` environment variable to 0 to skip those tests.
+
+If your Riak server isn't running on localhost or you have built a Riak devrel from source, use the environment variables ``RIAK_TEST_HOST``, ``RIAK_TEST_HTTP_PORT`` and  ``RIAK_TEST_PB_PORT=8087`` to specify where to find the Riak server.
+
+Some of the connection tests need port numbers that are NOT in use.
+If ports 1023 and 1022 are in use on your test system, set the environment variables ``DUMMY_HTTP_PORT`` and ``DUMMY_PB_PORT`` to unused port numbers.
+

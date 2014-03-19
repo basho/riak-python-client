@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import platform
 import time
 if platform.python_version() < '2.7':
@@ -7,7 +6,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
+from . import RUN_YZ
 
 
 class YZSearchTests(object):
