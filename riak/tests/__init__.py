@@ -28,10 +28,10 @@ DUMMY_HTTP_PORT = int(os.environ.get('DUMMY_HTTP_PORT', '1023'))
 DUMMY_PB_PORT = int(os.environ.get('DUMMY_PB_PORT', '1022'))
 
 
-SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '0'))
-RUN_YZ = int(os.environ.get('RUN_YZ', '1'))
+SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '1'))
+RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 
-SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '0'))
+SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '1'))
 
 SKIP_POOL = os.environ.get('SKIP_POOL')
 SKIP_RESOLVE = os.environ.get('SKIP_RESOLVE', '0')
