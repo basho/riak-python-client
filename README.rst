@@ -1,5 +1,5 @@
 ========================
-Python Client for Riak
+ Python Client for Riak
 ========================
 
 Documentation
@@ -28,22 +28,16 @@ There is an additional dependency on the Python package `setuptools`.
 Please install `setuptools` first, e.g. ``port install
 py27-setuptools`` for OS X and MacPorts.
 
-Unit Test
-=========
+Testing
+=======
 
-To run the unit tests against a Riak server (with default TCP port
+To run the tests against a Riak server (with default TCP port
 configuration) on localhost, execute::
 
     python setup.py test
 
-If you don't have `Riak Search
-<http://docs.basho.com/riak/latest/dev/using/search/>`_ enabled, you
-can set the ``SKIP_SEARCH`` environment variable to 1 skip those
-tests.
-
-If you don't have `Yokozuna <https://github.com/basho/yokozuna>`_
-enabled, you can set the ``RUN_YZ`` environment variable to 0 to skip
-those tests.
+Connections to Riak in Tests
+----------------------------
 
 If your Riak server isn't running on localhost or you have built a
 Riak devrel from source, use the environment variables
@@ -54,4 +48,26 @@ Some of the connection tests need port numbers that are NOT in use. If
 ports 1023 and 1022 are in use on your test system, set the
 environment variables ``DUMMY_HTTP_PORT`` and ``DUMMY_PB_PORT`` to
 unused port numbers.
+
+Testing Search
+--------------
+
+If you don't have `Riak Search
+<http://docs.basho.com/riak/latest/dev/using/search/>`_ enabled, you
+can set the ``SKIP_SEARCH`` environment variable to 1 skip those
+tests.
+
+If you don't have `Search 2.0 <https://github.com/basho/yokozuna>`_
+enabled, you can set the ``RUN_YZ`` environment variable to 0 to skip
+those tests.
+
+Testing Bucket Types (Riak 2+)
+------------------------------
+
+To test bucket-types, you must run the ``create_bucket_types`` setup
+command, which will create the bucket-types used in testing, or create
+them manually yourself. It can be run like so (substituting ``$RIAK``
+with the root of your Riak install)::
+
+    ./setup.py create_bucket_types --riak-admin=$RIAK/bin/riak-admin
 
