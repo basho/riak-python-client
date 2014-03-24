@@ -37,3 +37,4 @@ SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '1'))
 
 SKIP_POOL = os.environ.get('SKIP_POOL')
 SKIP_RESOLVE = os.environ.get('SKIP_RESOLVE', '0')
+SKIP_BTYPES = os.environ.get('SKIP_BTYPES', '0')
