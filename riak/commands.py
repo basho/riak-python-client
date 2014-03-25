@@ -6,7 +6,7 @@ __all__ = ['create_bucket_types']
 
 from distutils import log
 from distutils.core import Command
-from distutils.errors import DistutilsExecError, DistutilsOptionError
+from distutils.errors import DistutilsOptionError
 from subprocess import CalledProcessError, Popen, PIPE
 
 try:
@@ -51,6 +51,7 @@ try:
 except ImportError:
     import json
 
+
 class create_bucket_types(Command):
     """
     Creates bucket-types appropriate for testing. By default this will create:
@@ -69,11 +70,11 @@ class create_bucket_types(Command):
     ]
 
     _props = {
-        'maps': {'datatype': 'map'},
-        'sets': {'datatype': 'set'},
-        'counters': {'datatype': 'counter'},
-        'consistent': {'consistent': True},
-        'testing': {'allow_mult': False}
+        'pytest-maps': {'datatype': 'map'},
+        'pytest-sets': {'datatype': 'set'},
+        'pytest-counters': {'datatype': 'counter'},
+        'pytest-consistent': {'consistent': True},
+        'pytest': {'allow_mult': False}
     }
 
     def initialize_options(self):
@@ -97,8 +98,8 @@ class create_bucket_types(Command):
 
     def _check_available(self):
         try:
-             self.check_btype_command("list")
-             return True
+            self.check_btype_command("list")
+            return True
         except CalledProcessError:
             log.error("Bucket types are not supported on this Riak node!")
             return False
@@ -119,14 +120,14 @@ class create_bucket_types(Command):
             log.info("Updating {!r} bucket-type with props {!r}".format(name,
                                                                         props))
             self.check_btype_command("update", name,
-                                json.dumps({'props': props},
-                                           separators=(',',':')))
+                                     json.dumps({'props': props},
+                                                separators=(',', ':')))
         else:
             log.info("Creating {!r} bucket-type with props {!r}".format(name,
                                                                         props))
             self.check_btype_command("create", name,
-                                json.dumps({'props': props},
-                                           separators=(',',':')))
+                                     json.dumps({'props': props},
+                                                separators=(',', ':')))
 
         if not active:
             log.info('Activating {!r} bucket-type'.format(name))
