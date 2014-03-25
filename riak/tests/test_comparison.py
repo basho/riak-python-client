@@ -86,7 +86,7 @@ class RiakObjectComparisonTest(unittest.TestCase):
         bucket_b = RiakBucket('client', 'a', default_bt)
         c = RiakObject(None, bucket_a, 'key')
         d = RiakObject(None, bucket_b, 'key')
-        self.assertEqual(a, b)
+        self.assertEqual(c, d)
 
     def test_object_nq(self):
         a = RiakObject(None, 'bucket', 'key')
@@ -100,7 +100,7 @@ class RiakObjectComparisonTest(unittest.TestCase):
         bucket_b = RiakBucket('client', 'a', foo_bt)
         c = RiakObject(None, bucket_a, 'key')
         d = RiakObject(None, bucket_b, 'key')
-        self.assertNotEqual(a, b)
+        self.assertNotEqual(c, d)
 
     def test_object_hash(self):
         a = RiakObject(None, 'bucket', 'key')
@@ -113,10 +113,10 @@ class RiakObjectComparisonTest(unittest.TestCase):
         foo_bt = BucketType(None, "foo")
         bucket_a = RiakBucket('client', 'a', default_bt)
         bucket_b = RiakBucket('client', 'a', foo_bt)
-        d = RiakObject(None, default_bt, 'key')
-        e = RiakObject(None, default_bt, 'key')
-        f = RiakObject(None, foo_bt, 'key')
-        g = RiakObject(None, foo_bt, 'not key')
+        d = RiakObject(None, bucket_a, 'key')
+        e = RiakObject(None, bucket_a, 'key')
+        f = RiakObject(None, bucket_b, 'key')
+        g = RiakObject(None, bucket_b, 'not key')
         self.assertEqual(hash(d), hash(e),
                          'same object, same bucket_type has different hashes')
         self.assertNotEqual(hash(e), hash(f),

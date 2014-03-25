@@ -25,6 +25,7 @@ from riak.tests.test_mapreduce import MapReduceAliasTests, \
 from riak.tests.test_kv import BasicKVTests, KVFileTests, \
     BucketPropsTest, CounterTests
 from riak.tests.test_2i import TwoITests
+from riak.tests.test_btypes import BucketTypeTests
 
 from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
     HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
@@ -58,7 +59,7 @@ def setUpModule():
         c.create_search_index(testrun_yz_bucket)
         b = c.bucket(testrun_yz_bucket)
         error = None
-        for i in xrange(50):
+        for i in xrange(100):
             try:
                 b.set_property('search_index', testrun_yz_bucket)
                 return
@@ -269,6 +270,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                YZSearchTests,
                                ClientTests,
                                CounterTests,
+                               BucketTypeTests,
                                BaseTestCase,
                                unittest.TestCase):
 
@@ -300,6 +302,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 SearchTests,
                                 ClientTests,
                                 CounterTests,
+                                BucketTypeTests,
                                 BaseTestCase,
                                 unittest.TestCase):
 
