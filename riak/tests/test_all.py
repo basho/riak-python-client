@@ -56,7 +56,14 @@ def setUpModule():
         testrun_yz_bucket = 'yzbucket'
         c.create_search_index(testrun_yz_bucket)
         b = c.bucket(testrun_yz_bucket)
-        b.set_property('search_index', testrun_yz_bucket)
+        error = None
+        for i in xrange(10):
+            try:
+                b.set_property('search_index', testrun_yz_bucket)
+                return
+            except RiakError as e:
+                error = e
+        raise error
 
 
 def tearDownModule():
@@ -76,7 +83,7 @@ def tearDownModule():
     if RUN_YZ:
         c.protocol = 'pbc'
         yzbucket = c.bucket(testrun_yz_bucket)
-        yzbucket.set_property('search_index', '')
+        yzbucket.set_property('search_index', '_dont_index_')
         c.delete_search_index(testrun_yz_bucket)
         for keys in yzbucket.stream_keys():
             for key in keys:
