@@ -11,6 +11,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
+from riak import RiakError
 from riak.client import RiakClient
 from riak.mapreduce import RiakKeyFilter
 from riak import key_filter
