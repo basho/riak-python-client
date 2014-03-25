@@ -58,7 +58,7 @@ def setUpModule():
         c.create_search_index(testrun_yz_bucket)
         b = c.bucket(testrun_yz_bucket)
         error = None
-        for i in xrange(10):
+        for i in xrange(50):
             try:
                 b.set_property('search_index', testrun_yz_bucket)
                 return
