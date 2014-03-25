@@ -10,6 +10,37 @@ from riak.bucket import RiakBucket, BucketType
 from riak.tests.test_all import BaseTestCase
 
 
+class BucketTypeRichComparisonTest(unittest.TestCase):
+    def test_btype_eq(self):
+        a = BucketType('client', 'a')
+        b = BucketType('client', 'a')
+        c = BucketType(None, 'a')
+        d = BucketType(None, 'a')
+        self.assertEqual(a, b)
+        self.assertEqual(c, d)
+
+    def test_btype_nq(self):
+        a = BucketType('client', 'a')
+        b = BucketType('client', 'b')
+        c = BucketType(None, 'a')
+        d = BucketType(None, 'a')
+        self.assertNotEqual(a, b, "matched with different name, same client")
+        self.assertNotEqual(a, c, "matched with different client, same name")
+        self.assertNotEqual(b, d, "matched with nothing in common")
+
+    def test_btype_hash(self):
+        a = BucketType('client', 'a')
+        b = BucketType('client', 'a')
+        c = BucketType('client', 'c')
+        d = BucketType('client2', 'a')
+        self.assertEqual(hash(a), hash(b),
+                         'same bucket type has different hashes')
+        self.assertNotEqual(hash(a), hash(c),
+                            'different bucket has same hash')
+        self.assertNotEqual(hash(a), hash(d),
+                            'same bucket type, different client has same hash')
+
+
 class RiakBucketRichComparisonTest(unittest.TestCase):
     def test_bucket_eq(self):
         default_bt = BucketType(None, "default")
@@ -37,9 +68,13 @@ class RiakBucketRichComparisonTest(unittest.TestCase):
         b = RiakBucket('client', 'a', default_bt)
         c = RiakBucket('client', 'c', default_bt)
         d = RiakBucket('client', 'a', foo_bt)
-        self.assertEqual(hash(a), hash(b), 'same bucket has different hashes')
-        self.assertNotEqual(hash(a), hash(c), 'different bucket has same hash')
-        self.assertNotEqual(hash(a), hash(d), 'same bucket, different bucket type has same hash')
+        self.assertEqual(hash(a), hash(b),
+                         'same bucket has different hashes')
+        self.assertNotEqual(hash(a), hash(c),
+                            'different bucket has same hash')
+        self.assertNotEqual(hash(a), hash(d),
+                            'same bucket, different bucket type has same hash')
+
 
 class RiakObjectComparisonTest(unittest.TestCase):
     def test_object_eq(self):
@@ -82,9 +117,14 @@ class RiakObjectComparisonTest(unittest.TestCase):
         e = RiakObject(None, default_bt, 'key')
         f = RiakObject(None, foo_bt, 'key')
         g = RiakObject(None, foo_bt, 'not key')
-        self.assertEqual(hash(d), hash(e), 'same object, same bucket_type has different hashes')
-        self.assertNotEqual(hash(e), hash(f), 'same object, different bucket type has the same hash')
-        self.assertNotEqual(hash(d), hash(g), 'different object, different bucket type has same hash')
+        self.assertEqual(hash(d), hash(e),
+                         'same object, same bucket_type has different hashes')
+        self.assertNotEqual(hash(e), hash(f),
+                            'same object, different bucket type has the '
+                            'same hash')
+        self.assertNotEqual(hash(d), hash(g),
+                            'different object, different bucket '
+                            'type has same hash')
 
     def test_object_valid_key(self):
         a = RiakObject(None, 'bucket', 'key')

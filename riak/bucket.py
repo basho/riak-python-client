@@ -643,5 +643,20 @@ class BucketType(object):
 
     __repr__ = __str__
 
+    def __hash__(self):
+        return hash((self.name, self._client))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+        else:
+            return False
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) != hash(other)
+        else:
+            return True
+
 
 from riak_object import RiakObject
