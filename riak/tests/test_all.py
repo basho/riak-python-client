@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 import random
 import platform
 from threading import Thread
@@ -58,15 +56,13 @@ def setUpModule():
         testrun_yz_bucket = 'yzbucket'
         c.create_search_index(testrun_yz_bucket)
         b = c.bucket(testrun_yz_bucket)
-        error = None
-        for i in xrange(100):
+        index_set = False
+        while not index_set:
             try:
                 b.set_property('search_index', testrun_yz_bucket)
-                return
-            except RiakError as e:
-                error = e
-        raise error
-
+                index_set = True
+            except RiakError:
+                pass
 
 def tearDownModule():
     global testrun_search_bucket, testrun_props_bucket, \
