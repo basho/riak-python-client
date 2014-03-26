@@ -64,6 +64,8 @@ class BucketTypeTests(object):
         self.assertIsInstance(newprops, dict)
         self.assertIn('allow_mult', newprops)
         self.assertTrue(newprops['allow_mult'])
+        if 'claimant' in oldprops: # HTTP hack
+            del oldprops['claimant']
         btype.set_properties(oldprops)
 
     @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")

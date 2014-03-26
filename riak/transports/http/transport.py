@@ -315,7 +315,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, _ = self._request('PUT', url, headers, content)
 
         if status != 204:
-            raise RiakError('Error setting bucket properties.')
+            raise RiakError('Error setting bucket-type properties.')
         return True
 
     def mapred(self, inputs, query, timeout=None):
