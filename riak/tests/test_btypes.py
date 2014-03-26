@@ -7,7 +7,7 @@ else:
 
 from . import SKIP_BTYPES
 from riak.bucket import RiakBucket, BucketType
-
+from riak import RiakError
 
 class BucketTypeTests(object):
     def test_btype_init(self):
@@ -25,14 +25,49 @@ class BucketTypeTests(object):
                       self.client.bucket_type('foo').bucket(self.bucket_name))
         self.assertIsNot(bucket, self.client.bucket(self.bucket_name))
 
+    def test_btype_default(self):
+        defbtype = self.client.bucket_type('default')
+        othertype = self.client.bucket_type('foo')
+        self.assertTrue(defbtype.is_default())
+        self.assertFalse(othertype.is_default())
+
+    def test_btype_repr(self):
+        defbtype = self.client.bucket_type("default")
+        othertype = self.client.bucket_type("foo")
+        self.assertEqual("<BucketType 'default'>", str(defbtype))
+        self.assertEqual("<BucketType 'foo'>", str(othertype))
+        self.assertEqual("<BucketType 'default'>", repr(defbtype))
+        self.assertEqual("<BucketType 'foo'>", repr(othertype))
+
     @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
     def test_btype_get_props(self):
-        raise NotImplementedError('pending')
+        defbtype = self.client.bucket_type("default")
+        btype = self.client.bucket_type("pytest")
+        with self.assertRaises(ValueError):
+            defbtype.get_properties()
+
+        props = btype.get_properties()
+        self.assertIsInstance(props, dict)
+        self.assertIn('n_val', props)
+        self.assertEqual(3, props['n_val'])
 
     @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
     def test_btype_set_props(self):
-        raise NotImplementedError('pending')
+        defbtype = self.client.bucket_type("default")
+        btype = self.client.bucket_type("pytest")
+        with self.assertRaises(ValueError):
+            defbtype.set_properties({'allow_mult': True})
+
+        oldprops = btype.get_properties()
+        btype.set_properties({'allow_mult': True})
+        newprops = btype.get_properties()
+        self.assertIsInstance(newprops, dict)
+        self.assertIn('allow_mult', newprops)
+        self.assertTrue(newprops['allow_mult'])
+        btype.set_properties(oldprops)
 
     @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
     def test_btype_set_props_immutable(self):
-        raise NotImplementedError('pending')
+        btype = self.client.bucket_type("pytest-maps")
+        with self.assertRaises(RiakError):
+            btype.set_property('datatype', 'counter')
