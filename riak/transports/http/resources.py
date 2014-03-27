@@ -69,7 +69,7 @@ class RiakHttpResources(object):
         query.update(options)
         if self.riak_kv_wm_bucket_type and bucket_type:
             return mkpath("/types", quote_plus(bucket_type), "buckets",
-                          quote_plus(bucket), "keys", **options)
+                          quote_plus(bucket), "keys", **query)
         if self.riak_kv_wm_buckets:
             return mkpath("/buckets", quote_plus(bucket), "keys",
                           **query)

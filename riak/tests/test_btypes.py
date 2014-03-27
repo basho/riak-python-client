@@ -88,3 +88,19 @@ class BucketTypeTests(object):
             buckets.extend(nested_buckets)
 
         self.assertIn(bucket, buckets)
+
+    @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
+    def test_btype_list_keys(self):
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+
+        obj = bucket.new(self.key_name)
+        obj.data = [1,2,3]
+        obj.store()
+
+        self.assertIn(self.key_name, bucket.get_keys())
+        keys = []
+        for keylist in bucket.stream_keys():
+            keys.extend(keylist)
+
+        self.assertIn(self.key_name, keys)
