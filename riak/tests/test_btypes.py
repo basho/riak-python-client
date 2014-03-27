@@ -9,6 +9,7 @@ from . import SKIP_BTYPES
 from riak.bucket import RiakBucket, BucketType
 from riak import RiakError
 
+
 class BucketTypeTests(object):
     def test_btype_init(self):
         btype = self.client.bucket_type('foo')
@@ -64,7 +65,7 @@ class BucketTypeTests(object):
         self.assertIsInstance(newprops, dict)
         self.assertIn('allow_mult', newprops)
         self.assertTrue(newprops['allow_mult'])
-        if 'claimant' in oldprops: # HTTP hack
+        if 'claimant' in oldprops:  # HTTP hack
             del oldprops['claimant']
         btype.set_properties(oldprops)
 
@@ -79,7 +80,7 @@ class BucketTypeTests(object):
         btype = self.client.bucket_type("pytest")
         bucket = btype.bucket(self.bucket_name)
         obj = bucket.new(self.key_name)
-        obj.data = [1,2,3]
+        obj.data = [1, 2, 3]
         obj.store()
 
         self.assertIn(bucket, btype.get_buckets())
@@ -95,7 +96,7 @@ class BucketTypeTests(object):
         bucket = btype.bucket(self.bucket_name)
 
         obj = bucket.new(self.key_name)
-        obj.data = [1,2,3]
+        obj.data = [1, 2, 3]
         obj.store()
 
         self.assertIn(self.key_name, bucket.get_keys())

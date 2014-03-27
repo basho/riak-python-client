@@ -64,6 +64,7 @@ def setUpModule():
             except RiakError:
                 pass
 
+
 def tearDownModule():
     global testrun_search_bucket, testrun_props_bucket, \
         testrun_sibs_bucket, testrun_yz_bucket
