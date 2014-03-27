@@ -71,5 +71,10 @@ with the root of your Riak install)::
 
     ./setup.py create_bucket_types --riak-admin=$RIAK/bin/riak-admin
 
+You may alternately add these lines to `setup.cfg`::
+
+    [create_bucket_types]
+    riak-admin=/Users/sean/dev/riak/rel/riak/bin/riak-admin
+
 To skip the bucket-type tests, set the ``SKIP_BTYPES`` environment
 variable to ``1``.
