@@ -60,14 +60,16 @@ class BucketTypeTests(object):
             defbtype.set_properties({'allow_mult': True})
 
         oldprops = btype.get_properties()
-        btype.set_properties({'allow_mult': True})
-        newprops = btype.get_properties()
-        self.assertIsInstance(newprops, dict)
-        self.assertIn('allow_mult', newprops)
-        self.assertTrue(newprops['allow_mult'])
-        if 'claimant' in oldprops:  # HTTP hack
-            del oldprops['claimant']
-        btype.set_properties(oldprops)
+        try:
+            btype.set_properties({'allow_mult': True})
+            newprops = btype.get_properties()
+            self.assertIsInstance(newprops, dict)
+            self.assertIn('allow_mult', newprops)
+            self.assertTrue(newprops['allow_mult'])
+            if 'claimant' in oldprops:  # HTTP hack
+                del oldprops['claimant']
+        finally:
+            btype.set_properties(oldprops)
 
     @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
     def test_btype_set_props_immutable(self):
