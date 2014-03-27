@@ -73,3 +73,18 @@ class BucketTypeTests(object):
         btype = self.client.bucket_type("pytest-maps")
         with self.assertRaises(RiakError):
             btype.set_property('datatype', 'counter')
+
+    @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
+    def test_btype_list_buckets(self):
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+        obj = bucket.new(self.key_name)
+        obj.data = [1,2,3]
+        obj.store()
+
+        self.assertIn(bucket, btype.get_buckets())
+        buckets = []
+        for nested_buckets in btype.stream_buckets():
+            buckets.extend(nested_buckets)
+
+        self.assertIn(bucket, buckets)

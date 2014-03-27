@@ -52,7 +52,12 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
         """
         _validate_timeout(timeout)
-        return [self.bucket(name) for name in
+        if bucket_type:
+            bucketfn = lambda name: bucket_type.bucket(name)
+        else:
+            bucketfn = lambda name: self.bucket(name)
+
+        return [bucketfn(name) for name in
                 transport.get_buckets(bucket_type=bucket_type,
                                       timeout=timeout)]
 
@@ -72,12 +77,17 @@ class RiakClientOperations(RiakClientTransport):
              <riak.bucket.RiakBucket>` instances
         """
         _validate_timeout(timeout)
+        if bucket_type:
+            bucketfn = lambda name: bucket_type.bucket(name)
+        else:
+            bucketfn = lambda name: self.bucket(name)
+
         with self._transport() as transport:
             stream = transport.stream_buckets(bucket_type=bucket_type,
                                               timeout=timeout)
             try:
                 for bucket_list in stream:
-                    bucket_list = [self.bucket(name) for name in bucket_list]
+                    bucket_list = [bucketfn(name) for name in bucket_list]
                     if len(bucket_list) > 0:
                         yield bucket_list
             finally:
