@@ -546,7 +546,7 @@ class BucketType(object):
 
         :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
-        :param name: The bucket-type name
+        :param name: The bucket-type's name
         :type name: string
         """
         self._client = client
