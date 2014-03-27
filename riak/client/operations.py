@@ -290,7 +290,7 @@ class RiakClientOperations(RiakClientTransport):
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
 
-        :param bucket: the bucket whose properties will be set
+        :param bucket: the bucket whose keys are fetched
         :type bucket: RiakBucket
         :param timeout: a timeout value in milliseconds
         :type timeout: int

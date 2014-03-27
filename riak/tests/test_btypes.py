@@ -107,3 +107,39 @@ class BucketTypeTests(object):
             keys.extend(keylist)
 
         self.assertIn(self.key_name, keys)
+
+    @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
+    def test_default_btype_list_buckets(self):
+        default_btype = self.client.bucket_type("default")
+        bucket = default_btype.bucket(self.bucket_name)
+        obj = bucket.new(self.key_name)
+        obj.data = [1, 2, 3]
+        obj.store()
+
+        self.assertIn(bucket, default_btype.get_buckets())
+        buckets = []
+        for nested_buckets in default_btype.stream_buckets():
+            buckets.extend(nested_buckets)
+
+        self.assertIn(bucket, buckets)
+
+        self.assertItemsEqual(buckets, self.client.get_buckets())
+
+    @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
+    def test_default_btype_list_keys(self):
+        btype = self.client.bucket_type("default")
+        bucket = btype.bucket(self.bucket_name)
+
+        obj = bucket.new(self.key_name)
+        obj.data = [1, 2, 3]
+        obj.store()
+
+        self.assertIn(self.key_name, bucket.get_keys())
+        keys = []
+        for keylist in bucket.stream_keys():
+            keys.extend(keylist)
+
+        self.assertIn(self.key_name, keys)
+
+        oldapikeys = self.client.get_keys(self.client.bucket(self.bucket_name))
+        self.assertItemsEqual(keys, oldapikeys)
