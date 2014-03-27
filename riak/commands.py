@@ -56,11 +56,11 @@ class create_bucket_types(Command):
     """
     Creates bucket-types appropriate for testing. By default this will create:
 
-    * `maps` with ``{"datatype":"map"}``
-    * `sets` with ``{"datatype":"set"}``
-    * `counters` with ``{"datatype":"counter"}``
-    * `consistent` with ``{"consistent":true}``
-    * `testing` with ``{"allow_mult":false}``
+    * `pytest-maps` with ``{"datatype":"map"}``
+    * `pytest-sets` with ``{"datatype":"set"}``
+    * `pytest-counters` with ``{"datatype":"counter"}``
+    * `pytest-consistent` with ``{"consistent":true}``
+    * `pytest` with ``{"allow_mult":false}``
     """
 
     description = "create bucket-types used in integration tests"
