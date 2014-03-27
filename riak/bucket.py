@@ -62,6 +62,9 @@ class RiakBucket(object):
         except UnicodeError:
             raise TypeError('Unicode bucket names are not supported.')
 
+        if not isinstance(bucket_type, BucketType):
+            raise TypeError('Parent bucket type must be a BucketType instance')
+
         self._client = client
         self.name = name
         self.bucket_type = bucket_type
