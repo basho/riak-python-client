@@ -176,6 +176,14 @@ class FeatureDetection(object):
         """
         return self.server_version >= versions[1.44]
 
+    def bucket_types(self):
+        """
+        Whether bucket-types are supported.
+
+        :rtype: bool
+        """
+        return self.server_version >= versions[2.0]
+
     @lazy_property
     def server_version(self):
         return LooseVersion(self._server_version())

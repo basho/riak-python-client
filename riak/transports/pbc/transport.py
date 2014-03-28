@@ -51,6 +51,8 @@ from riak_pb.messages import (
     MSG_CODE_GET_BUCKET_RESP,
     MSG_CODE_SET_BUCKET_REQ,
     MSG_CODE_SET_BUCKET_RESP,
+    MSG_CODE_GET_BUCKET_TYPE_REQ,
+    MSG_CODE_SET_BUCKET_TYPE_REQ,
     MSG_CODE_MAP_RED_REQ,
     MSG_CODE_INDEX_REQ,
     MSG_CODE_INDEX_RESP,
@@ -148,6 +150,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.deletedvclock = 1
 
         req.bucket = bucket.name
+        self._add_bucket_type(req, bucket.bucket_type)
+
         req.key = robj.key
 
         msg_code, resp = self._request(MSG_CODE_GET_REQ, req,
@@ -170,9 +174,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def put(self, robj, w=None, dw=None, pw=None, return_body=True,
             if_none_match=False, timeout=None):
-        """
-        Serialize get request and deserialize response
-        """
         bucket = robj.bucket
 
         req = riak_pb.RpbPutReq()
@@ -191,6 +192,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.timeout = timeout
 
         req.bucket = bucket.name
+        self._add_bucket_type(req, bucket.bucket_type)
+
         if robj.key:
             req.key = robj.key
         if robj.vclock:
@@ -215,11 +218,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):
-        """
-        Serialize get request and deserialize response
-        """
-        bucket = robj.bucket
-
         req = riak_pb.RpbDelReq()
         if rw:
             req.rw = self._encode_quorum(rw)
@@ -242,7 +240,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if self.tombstone_vclocks() and robj.vclock:
             req.vclock = robj.vclock.encode('binary')
 
+        bucket = robj.bucket
         req.bucket = bucket.name
+        self._add_bucket_type(req, bucket.bucket_type)
         req.key = robj.key
 
         msg_code, resp = self._request(MSG_CODE_DEL_REQ, req,
@@ -267,6 +267,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         req = riak_pb.RpbListKeysReq()
         req.bucket = bucket.name
+        self._add_bucket_type(req, bucket.bucket_type)
         if self.client_timeouts() and timeout:
             req.timeout = timeout
 
@@ -274,20 +275,21 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return RiakPbcKeyStream(self)
 
-    def get_buckets(self, timeout=None):
+    def get_buckets(self, bucket_type=None, timeout=None):
         """
         Serialize bucket listing request and deserialize response
         """
-        req = None
+        req = riak_pb.RpbListBucketsReq()
+        self._add_bucket_type(req, bucket_type)
+
         if self.client_timeouts() and timeout:
-            req = riak_pb.RpbListBucketsReq()
             req.timeout = timeout
 
         msg_code, resp = self._request(MSG_CODE_LIST_BUCKETS_REQ, req,
                                        MSG_CODE_LIST_BUCKETS_RESP)
         return resp.buckets
 
-    def stream_buckets(self, timeout=None):
+    def stream_buckets(self, bucket_type=None, timeout=None):
         """
         Stream list of buckets through an iterator
         """
@@ -298,6 +300,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req = riak_pb.RpbListBucketsReq()
         req.stream = True
+        self._add_bucket_type(req, bucket_type)
         # Bucket streaming landed in the same release as timeouts, so
         # we don't need to check the capability.
         if timeout:
@@ -313,6 +316,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         req = riak_pb.RpbGetBucketReq()
         req.bucket = bucket.name
+        self._add_bucket_type(req, bucket.bucket_type)
 
         msg_code, resp = self._request(MSG_CODE_GET_BUCKET_REQ, req,
                                        MSG_CODE_GET_BUCKET_RESP)
@@ -325,6 +329,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         req = riak_pb.RpbSetBucketReq()
         req.bucket = bucket.name
+        self._add_bucket_type(req, bucket.bucket_type)
 
         if not self.pb_all_bucket_props():
             for key in props:
@@ -347,8 +352,38 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         req = riak_pb.RpbResetBucketReq()
         req.bucket = bucket.name
+        self._add_bucket_type(req, bucket.bucket_type)
         self._request(MSG_CODE_RESET_BUCKET_REQ, req,
                       MSG_CODE_RESET_BUCKET_RESP)
+        return True
+
+    def get_bucket_type_props(self, bucket_type):
+        """
+        Fetch bucket-type properties
+        """
+        self._check_bucket_types(bucket_type)
+
+        req = riak_pb.RpbGetBucketTypeReq()
+        req.type = bucket_type.name
+
+        msg_code, resp = self._request(MSG_CODE_GET_BUCKET_TYPE_REQ, req,
+                                       MSG_CODE_GET_BUCKET_RESP)
+
+        return self._decode_bucket_props(resp.props)
+
+    def set_bucket_type_props(self, bucket_type, props):
+        """
+        Set bucket-type properties
+        """
+        self._check_bucket_types(bucket_type)
+
+        req = riak_pb.RpbSetBucketTypeReq()
+        req.type = bucket_type.name
+
+        self._encode_bucket_props(props, req)
+
+        msg_code, resp = self._request(MSG_CODE_SET_BUCKET_TYPE_REQ, req,
+                                       MSG_CODE_SET_BUCKET_RESP)
         return True
 
     def mapred(self, inputs, query, timeout=None):
@@ -551,6 +586,11 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         return result
 
     def get_counter(self, bucket, key, **params):
+        if not bucket.bucket_type.is_default():
+            raise NotImplementedError("Counters are not "
+                                      "supported with bucket-types, "
+                                      "use datatypes instead.")
+
         if not self.counters():
             raise NotImplementedError("Counters are not supported")
 
@@ -574,6 +614,11 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             return None
 
     def update_counter(self, bucket, key, value, **params):
+        if not bucket.bucket_type.is_default():
+            raise NotImplementedError("Counters are not "
+                                      "supported with bucket-types, "
+                                      "use datatypes instead.")
+
         if not self.counters():
             raise NotImplementedError("Counters are not supported")
 

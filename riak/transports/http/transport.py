@@ -115,7 +115,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         # We could detect quorum_controls here but HTTP ignores
         # unknown flags/params.
         params = {'r': r, 'pr': pr, 'timeout': timeout}
-        url = self.object_path(robj.bucket.name, robj.key, **params)
+
+        bucket_type = self._get_bucket_type(robj.bucket.bucket_type)
+
+        url = self.object_path(robj.bucket.name, robj.key,
+                               bucket_type=bucket_type, **params)
         response = self._request('GET', url)
         return self._parse_body(robj, response, [200, 300, 404])
 
@@ -128,7 +132,12 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         # unknown flags/params.
         params = {'returnbody': return_body, 'w': w, 'dw': dw, 'pw': pw,
                   'timeout': timeout}
-        url = self.object_path(robj.bucket.name, robj.key, **params)
+
+        bucket_type = self._get_bucket_type(robj.bucket.bucket_type)
+
+        url = self.object_path(robj.bucket.name, robj.key,
+                               bucket_type=bucket_type,
+                               **params)
         headers = self._build_put_headers(robj, if_none_match=if_none_match)
         content = bytearray(robj.encoded_data)
 
@@ -156,7 +165,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         params = {'rw': rw, 'r': r, 'w': w, 'dw': dw, 'pr': pr, 'pw': pw,
                   'timeout': timeout}
         headers = {}
-        url = self.object_path(robj.bucket.name, robj.key, **params)
+
+        bucket_type = self._get_bucket_type(robj.bucket.bucket_type)
+
+        url = self.object_path(robj.bucket.name, robj.key,
+                               bucket_type=bucket_type, **params)
         if self.tombstone_vclocks() and robj.vclock is not None:
             headers['X-Riak-Vclock'] = robj.vclock.encode('base64')
         response = self._request('DELETE', url, headers)
@@ -167,7 +180,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         Fetch a list of keys for the bucket
         """
-        url = self.key_list_path(bucket.name, timeout=timeout)
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.key_list_path(bucket.name, bucket_type=bucket_type,
+                                 timeout=timeout)
         status, _, body = self._request('GET', url)
 
         if status == 200:
@@ -177,7 +192,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise RiakError('Error listing keys.')
 
     def stream_keys(self, bucket, timeout=None):
-        url = self.key_list_path(bucket.name, keys='stream', timeout=timeout)
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.key_list_path(bucket.name, bucket_type=bucket_type,
+                                 keys='stream', timeout=timeout)
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
@@ -185,11 +202,13 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise RiakError('Error listing keys.')
 
-    def get_buckets(self, timeout=None):
+    def get_buckets(self, bucket_type=None, timeout=None):
         """
         Fetch a list of all buckets
         """
-        url = self.bucket_list_path(timeout=timeout)
+        bucket_type = self._get_bucket_type(bucket_type)
+        url = self.bucket_list_path(bucket_type=bucket_type,
+                                    timeout=timeout)
         status, headers, body = self._request('GET', url)
 
         if status == 200:
@@ -198,7 +217,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise RiakError('Error getting buckets.')
 
-    def stream_buckets(self, timeout=None):
+    def stream_buckets(self, bucket_type=None, timeout=None):
         """
         Stream list of buckets through an iterator
         """
@@ -206,8 +225,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise NotImplementedError('Streaming list-buckets is not '
                                       "supported on %s" %
                                       self.server_version.vstring)
-
-        url = self.bucket_list_path(buckets="stream", timeout=timeout)
+        bucket_type = self._get_bucket_type(bucket_type)
+        url = self.bucket_list_path(bucket_type=bucket_type,
+                                    buckets="stream", timeout=timeout)
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
@@ -219,8 +239,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         Get properties for a bucket
         """
-        # Run the request...
-        url = self.bucket_properties_path(bucket.name)
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.bucket_properties_path(bucket.name,
+                                          bucket_type=bucket_type)
         status, headers, body = self._request('GET', url)
 
         if status == 200:
@@ -233,7 +254,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         Set the properties on the bucket object given
         """
-        url = self.bucket_properties_path(bucket.name)
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.bucket_properties_path(bucket.name,
+                                          bucket_type=bucket_type)
         headers = {'Content-Type': 'application/json'}
         content = json.dumps({'props': props})
 
@@ -248,6 +271,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         reset the properties on the bucket object given
         """
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.bucket_properties_path(bucket.name,
+                                          bucket_type=bucket_type)
         url = self.bucket_properties_path(bucket.name)
         headers = {'Content-Type': 'application/json'}
 
@@ -261,6 +287,36 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise RiakError('Error %s clearing bucket properties.'
                             % status)
+
+    def get_bucket_type_props(self, bucket_type):
+        """
+        Get properties for a bucket-type
+        """
+        self._check_bucket_types(bucket_type)
+        url = self.bucket_type_properties_path(bucket_type.name)
+        status, headers, body = self._request('GET', url)
+
+        if status == 200:
+            props = json.loads(body)
+            return props['props']
+        else:
+            raise RiakError('Error getting bucket-type properties.')
+
+    def set_bucket_type_props(self, bucket_type, props):
+        """
+        Set the properties on the bucket-type
+        """
+        self._check_bucket_types(bucket_type)
+        url = self.bucket_type_properties_path(bucket_type.name)
+        headers = {'Content-Type': 'application/json'}
+        content = json.dumps({'props': props})
+
+        # Run the request...
+        status, _, _ = self._request('PUT', url, headers, content)
+
+        if status != 204:
+            raise RiakError('Error setting bucket-type properties.')
+        return True
 
     def mapred(self, inputs, query, timeout=None):
         """
@@ -315,8 +371,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         params = {'return_terms': return_terms, 'max_results': max_results,
                   'continuation': continuation, 'timeout': timeout,
                   'term_regex': term_regex}
-
-        url = self.index_path(bucket, index, startkey, endkey, **params)
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.index_path(bucket.name, index, startkey, endkey,
+                              bucket_type=bucket_type, **params)
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
         json_data = json.loads(body)
@@ -355,7 +412,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         params = {'return_terms': return_terms, 'stream': True,
                   'max_results': max_results, 'continuation': continuation,
                   'timeout': timeout, 'term_regex': term_regex}
-        url = self.index_path(bucket, index, startkey, endkey, **params)
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.index_path(bucket.name, index, startkey, endkey,
+                              bucket_type=bucket_type, **params)
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
@@ -435,6 +494,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                       xml.toxml().encode('utf-8'))
 
     def get_counter(self, bucket, key, **options):
+        if not bucket.bucket_type.is_default():
+            raise NotImplementedError("Counters are not "
+                                      "supported with bucket-types, "
+                                      "use datatypes instead.")
+
         if not self.counters():
             raise NotImplementedError("Counters are not "
                                       "supported on %s" %
@@ -450,6 +514,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             return None
 
     def update_counter(self, bucket, key, amount, **options):
+        if not bucket.bucket_type.is_default():
+            raise NotImplementedError("Counters are not "
+                                      "supported with bucket-types, "
+                                      "use datatypes instead.")
+
         if not self.counters():
             raise NotImplementedError("Counters are not "
                                       "supported on %s" %
@@ -471,3 +540,13 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if not status in expected_statuses:
             raise RiakError('Expected status %s, received %s' %
                             (expected_statuses, status))
+
+    def _get_bucket_type(self, bucket_type):
+        if bucket_type is None:
+            return None
+        if bucket_type.is_default():
+            return None
+        elif not self.bucket_types():
+            raise NotImplementedError('Server does not support bucket-types')
+        else:
+            return bucket_type.name

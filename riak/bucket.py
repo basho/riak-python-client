@@ -43,7 +43,7 @@ class RiakBucket(object):
     objects within the bucket.
     """
 
-    def __init__(self, client, name):
+    def __init__(self, client, name, bucket_type):
         """
         Returns a new ``RiakBucket`` instance.
 
@@ -51,6 +51,8 @@ class RiakBucket(object):
         :type client: :class:`RiakClient <riak.client.RiakClient>`
         :param name: The bucket name
         :type name: string
+        :param bucket_type: The parent bucket type of this bucket
+        :type bucket_type: :class:`BucketType`
         """
         try:
             if isinstance(name, basestring):
@@ -60,14 +62,18 @@ class RiakBucket(object):
         except UnicodeError:
             raise TypeError('Unicode bucket names are not supported.')
 
+        if not isinstance(bucket_type, BucketType):
+            raise TypeError('Parent bucket type must be a BucketType instance')
+
         self._client = client
         self.name = name
+        self.bucket_type = bucket_type
         self._encoders = {}
         self._decoders = {}
         self._resolver = None
 
     def __hash__(self):
-        return hash((self.name, self._client))
+        return hash((self.bucket_type.name, self.name, self._client))
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -456,7 +462,7 @@ class RiakBucket(object):
         :meth:`RiakClient.get_index()
         <riak.client.RiakClient.get_index>` for more details.
         """
-        return self._client.get_index(self.name, index, startkey, endkey,
+        return self._client.get_index(self, index, startkey, endkey,
                                       return_terms=return_terms,
                                       max_results=max_results,
                                       continuation=continuation,
@@ -471,7 +477,7 @@ class RiakBucket(object):
         :meth:`RiakClient.stream_index()
         <riak.client.RiakClient.stream_index>` for more details.
         """
-        return self._client.stream_index(self.name, index, startkey, endkey,
+        return self._client.stream_index(self, index, startkey, endkey,
                                          return_terms=return_terms,
                                          max_results=max_results,
                                          continuation=continuation,
@@ -519,6 +525,141 @@ class RiakBucket(object):
     increment_counter = update_counter
 
     def __str__(self):
-        return '<RiakBucket "{0}">'.format(self.name)
+        if self.bucket_type.is_default():
+            return '<RiakBucket {0!r}>'.format(self.name)
+        else:
+            return '<RiakBucket {0!r}/{1!r}>'.format(self.bucket_type.name,
+                                                     self.name)
+
+    __repr__ = __str__
+
+
+class BucketType(object):
+    """
+    The ``BucketType`` object allows you to access and change
+    properties on a Riak bucket type and access buckets within its
+    namespace.
+    """
+    def __init__(self, client, name):
+        """
+        Returns a new ``BucketType`` instance.
+
+        :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
+        :type client: :class:`RiakClient <riak.client.RiakClient>`
+        :param name: The bucket-type's name
+        :type name: string
+        """
+        self._client = client
+        self.name = name
+
+    def is_default(self):
+        """
+        Whether this bucket type is the default type, or a
+        user-defined type.
+
+        :rtype: bool
+        """
+        return self.name == 'default'
+
+    def get_property(self, key, value):
+        """
+        Retrieve a bucket-type property.
+
+        :param key: The property to retrieve.
+        :type key: string
+        :rtype: mixed
+        """
+        return self.get_properties()[key]
+
+    def set_property(self, key, value):
+        """
+        Set a bucket-type property.
+
+        :param key: Property to set.
+        :type key: string
+        :param value: Property value.
+        :type value: mixed
+        """
+        return self.set_properties({key: value})
+
+    def get_properties(self):
+        """
+        Retrieve a dict of all bucket-type properties.
+
+        :rtype: dict
+        """
+        return self._client.get_bucket_type_props(self)
+
+    def set_properties(self, props):
+        """
+        Set multiple bucket-type properties in one call.
+
+        :param props: A dictionary of properties
+        :type props: dict
+        """
+        self._client.set_bucket_type_props(self, props)
+
+    def bucket(self, name):
+        """
+        Gets a bucket that belongs to this bucket-type.
+
+        :param name: the bucket name
+        :type name: str
+        :rtype: :class:`RiakBucket`
+        """
+        return self._client.bucket(name, self)
+
+    def get_buckets(self, timeout=None):
+        """
+        Get the list of buckets under this bucket-type as
+        :class:`RiakBucket <riak.bucket.RiakBucket>` instances.
+
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
+        """
+        return self._client.get_buckets(bucket_type=self, timeout=timeout)
+
+    def stream_buckets(self, timeout=None):
+        """
+        Streams the list of buckets under this bucket-type. This is a
+        generator method that should be iterated over.
+
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
+
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        :rtype: iterator that yields lists of :class:`RiakBucket
+             <riak.bucket.RiakBucket>` instances
+        """
+        return self._client.stream_buckets(bucket_type=self, timeout=timeout)
+
+    def __str__(self):
+        return "<BucketType {0!r}>".format(self.name)
+
+    __repr__ = __str__
+
+    def __hash__(self):
+        return hash((self.name, self._client))
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) == hash(other)
+        else:
+            return False
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return hash(self) != hash(other)
+        else:
+            return True
+
 
 from riak_object import RiakObject

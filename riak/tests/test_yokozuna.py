@@ -38,13 +38,12 @@ class YZSearchTests(object):
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_delete_search_index(self):
-
         # expected to fail, since there's an attached bucket
         with self.assertRaises(Exception):
             self.client.delete_search_index(self.yz_bucket)
         # detatch bucket from index then delete
         b = self.client.bucket(self.yz_bucket)
-        b.set_property('search_index', '')
+        b.set_property('search_index', '_dont_index_')
         self.assertTrue(self.client.delete_search_index(self.yz_bucket))
         # create it again
         self.client.create_search_index(self.yz_bucket, '_yz_default', 3)

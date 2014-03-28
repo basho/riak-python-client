@@ -49,7 +49,7 @@ QUORUM_TO_PY = _invert(QUORUM_TO_PB)
 
 NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
                 'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
-                'notfound_ok', 'search', 'backend', 'search_index']
+                'notfound_ok', 'search', 'backend', 'search_index', 'datatype']
 COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
 MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
@@ -399,7 +399,8 @@ class RiakPbcCodec(object):
         :type timeout: int
         :rtype riak_pb.RpbIndexReq
         """
-        req = riak_pb.RpbIndexReq(bucket=bucket, index=index)
+        req = riak_pb.RpbIndexReq(bucket=bucket.name, index=index)
+        self._add_bucket_type(req, bucket.bucket_type)
         if endkey:
             req.qtype = riak_pb.RpbIndexReq.range
             req.range_min = str(startkey)
@@ -437,3 +438,10 @@ class RiakPbcCodec(object):
         if index.HasField('n_val'):
             result['n_val'] = index.n_val
         return result
+
+    def _add_bucket_type(self, req, bucket_type):
+        if bucket_type and not bucket_type.is_default():
+            if not self.bucket_types():
+                raise NotImplementedError(
+                    'Server does not support bucket-types')
+            req.type = bucket_type.name

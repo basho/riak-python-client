@@ -28,7 +28,7 @@ import random
 from weakref import WeakValueDictionary
 from riak.client.operations import RiakClientOperations
 from riak.node import RiakNode
-from riak.bucket import RiakBucket
+from riak.bucket import RiakBucket, BucketType
 from riak.mapreduce import RiakMapReduceChain
 from riak.resolver import default_resolver
 from riak.search import RiakSearch
@@ -108,6 +108,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                           'text/json': json.loads,
                           'text/plain': str}
         self._buckets = WeakValueDictionary()
+        self._bucket_types = WeakValueDictionary()
 
     def _get_protocol(self):
         return self._protocol
@@ -232,22 +233,52 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         self._decoders[content_type] = decoder
 
-    def bucket(self, name):
+    def bucket(self, name, bucket_type='default'):
         """
         Get the bucket by the specified name. Since buckets always exist,
         this will always return a :class:`RiakBucket <riak.bucket.RiakBucket>`.
 
+        :param name: the bucket name
+        :type name: str
+        :param bucket_type: the parent bucket-type
+        :type bucket_type: :class:`BucketType <riak.bucket.BucketType>` or str
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
         """
         if not isinstance(name, basestring):
             raise TypeError('Bucket name must be a string')
 
-        if name in self._buckets:
-            return self._buckets[name]
+        if isinstance(bucket_type, basestring):
+            bucket_type = self.bucket_type(bucket_type)
+        elif not isinstance(bucket_type, BucketType):
+            raise TypeError('bucket_type must be a string '
+                            'or riak.bucket.BucketType')
+
+        if (bucket_type, name) in self._buckets:
+            return self._buckets[(bucket_type, name)]
         else:
-            bucket = RiakBucket(self, name)
-            self._buckets[name] = bucket
+            bucket = RiakBucket(self, name, bucket_type)
+            self._buckets[(bucket_type, name)] = bucket
             return bucket
+
+    def bucket_type(self, name):
+        """
+        Gets the bucket-type by the specified name. Bucket-types do
+        not always exist (unlike buckets), but this will always return
+        a :class:`BucketType <riak.bucket.BucketType>` object.
+
+        :param name: the bucket name
+        :type name: str
+        :rtype: :class:`BucketType <riak.bucket.BucketType>`
+        """
+        if not isinstance(name, basestring):
+            raise TypeError('Bucket name must be a string')
+
+        if name in self._bucket_types:
+            return self._bucket_types[name]
+        else:
+            btype = BucketType(self, name)
+            self._bucket_types[name] = btype
+            return btype
 
     @lazy_property
     def solr(self):

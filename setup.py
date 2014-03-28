@@ -5,15 +5,7 @@ import subprocess
 import platform
 from setuptools import setup, find_packages
 from version import get_version
-
-
-def make_docs():
-    if not os.path.exists('docs'):
-        os.mkdir('docs')
-    subprocess.call(['pydoc', '-w', 'riak'])
-    for name in glob.glob('*.html'):
-        os.rename(name, 'docs/%s' % name)
-
+from riak.commands import create_bucket_types
 
 install_requires = ["riak_pb >=2.0.0"]
 requires = ["riak_pb(>=2.0.0)"]
@@ -39,6 +31,7 @@ setup(
     author_email='clients@basho.com',
     test_suite='riak.tests.suite',
     url='https://github.com/basho/riak-python-client',
+    cmdclass={'create_bucket_types': create_bucket_types},
     classifiers=['License :: OSI Approved :: Apache Software License',
                  'Intended Audience :: Developers',
                  'Operating System :: OS Independent',

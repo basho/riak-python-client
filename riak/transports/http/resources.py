@@ -60,12 +60,16 @@ class RiakHttpResources(object):
             query.update(props=True, keys=False)
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), **query)
 
+    def bucket_type_properties_path(self, bucket_type, **options):
+        return mkpath("/types", quote_plus(bucket_type), "props",
+                      **options)
+
     def key_list_path(self, bucket, bucket_type=None, **options):
         query = {'keys': True, 'props': False}
         query.update(options)
         if self.riak_kv_wm_bucket_type and bucket_type:
             return mkpath("/types", quote_plus(bucket_type), "buckets",
-                          quote_plus(bucket), "keys", **options)
+                          quote_plus(bucket), "keys", **query)
         if self.riak_kv_wm_buckets:
             return mkpath("/buckets", quote_plus(bucket), "keys",
                           **query)
@@ -84,9 +88,6 @@ class RiakHttpResources(object):
         else:
             return mkpath(self.riak_kv_wm_raw, quote_plus(bucket), key,
                           **options)
-
-    # TODO: link_walk_path is undefined here because there is no path
-    # to it in the client without using MapReduce.
 
     def index_path(self, bucket, index, start, finish=None, bucket_type=None,
                    **options):
@@ -127,6 +128,17 @@ class RiakHttpResources(object):
         return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket), "counters",
                       quote_plus(key), **options)
 
+    # Feature detection overrides
+    def bucket_types(self):
+        return self.riak_kv_wm_bucket_type is not None
+
+    def index_term_regex(self):
+        if self.riak_kv_wm_bucket_type is not None:
+            return True
+        else:
+            return super(RiakHttpResources, self).index_term_regex()
+
+    # Resource root paths
     @lazy_property
     def riak_kv_wm_bucket_type(self):
         if 'riak_kv_wm_bucket_type' in self.resources:

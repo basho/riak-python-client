@@ -32,9 +32,9 @@ class RiakClientOperations(RiakClientTransport):
     """
 
     @retryable
-    def get_buckets(self, transport, timeout=None):
+    def get_buckets(self, transport, bucket_type=None, timeout=None):
         """
-        get_buckets(timeout=None)
+        get_buckets(bucket_type=None, timeout=None)
 
         Get the list of buckets as :class:`RiakBucket
         <riak.bucket.RiakBucket>` instances.
@@ -45,15 +45,23 @@ class RiakClientOperations(RiakClientTransport):
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
 
+        :param bucket_type: the optional containing bucket type
+        :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
         """
         _validate_timeout(timeout)
-        return [self.bucket(name) for name in
-                transport.get_buckets(timeout=timeout)]
+        if bucket_type:
+            bucketfn = lambda name: bucket_type.bucket(name)
+        else:
+            bucketfn = lambda name: self.bucket(name)
 
-    def stream_buckets(self, timeout=None):
+        return [bucketfn(name) for name in
+                transport.get_buckets(bucket_type=bucket_type,
+                                      timeout=timeout)]
+
+    def stream_buckets(self, bucket_type=None, timeout=None):
         """
         Streams the list of buckets. This is a generator method that
         should be iterated over.
@@ -61,17 +69,25 @@ class RiakClientOperations(RiakClientTransport):
         .. warning:: Do not use this in production, as it requires
            traversing through all keys stored in a cluster.
 
+        :param bucket_type: the optional containing bucket type
+        :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         :rtype: iterator that yields lists of :class:`RiakBucket
              <riak.bucket.RiakBucket>` instances
         """
         _validate_timeout(timeout)
+        if bucket_type:
+            bucketfn = lambda name: bucket_type.bucket(name)
+        else:
+            bucketfn = lambda name: self.bucket(name)
+
         with self._transport() as transport:
-            stream = transport.stream_buckets(timeout=timeout)
+            stream = transport.stream_buckets(bucket_type=bucket_type,
+                                              timeout=timeout)
             try:
                 for bucket_list in stream:
-                    bucket_list = [self.bucket(name) for name in bucket_list]
+                    bucket_list = [bucketfn(name) for name in bucket_list]
                     if len(bucket_list) > 0:
                         yield bucket_list
             finally:
@@ -232,6 +248,39 @@ class RiakClientOperations(RiakClientTransport):
         return transport.clear_bucket_props(bucket)
 
     @retryable
+    def get_bucket_type_props(self, transport, bucket_type):
+        """
+        get_bucket_type_props(bucket_type)
+
+        Fetches properties for the given bucket-type.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param bucket_type: the bucket-type whose properties will be fetched
+        :type bucket_type: BucketType
+        :rtype: dict
+        """
+        return transport.get_bucket_type_props(bucket_type)
+
+    @retryable
+    def set_bucket_type_props(self, transport, bucket_type, props):
+        """
+        set_bucket_type_props(bucket_type, props)
+
+        Sets properties for the given bucket-type.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param bucket_type: the bucket-type whose properties will be set
+        :type bucket_type: BucketType
+        :param props: the properties to set
+        :type props: dict
+        """
+        return transport.set_bucket_type_props(bucket_type, props)
+
+    @retryable
     def get_keys(self, transport, bucket, timeout=None):
         """
         get_keys(bucket, timeout=None)
@@ -241,7 +290,7 @@ class RiakClientOperations(RiakClientTransport):
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
 
-        :param bucket: the bucket whose properties will be set
+        :param bucket: the bucket whose keys are fetched
         :type bucket: RiakBucket
         :param timeout: a timeout value in milliseconds
         :type timeout: int

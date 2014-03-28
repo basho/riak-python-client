@@ -104,7 +104,7 @@ class BasicKVTests(object):
                 self.client.bucket(bad)
 
             with self.assertRaisesRegexp(TypeError, 'must be a string'):
-                RiakBucket(self.client, bad)
+                RiakBucket(self.client, bad, None)
 
         # Unicode bucket names are not supported, if they can't be
         # encoded to ASCII. This should be changed in a future
@@ -529,14 +529,14 @@ class BucketPropsTest(object):
 
     def test_clear_bucket_properties(self):
         bucket = self.client.bucket(self.props_bucket)
-        bucket.allow_mult = False
-        self.assertFalse(bucket.allow_mult)
+        bucket.allow_mult = True
+        self.assertTrue(bucket.allow_mult)
         bucket.n_val = 1
         self.assertEqual(bucket.n_val, 1)
         # Test setting clearing properties...
 
         self.assertTrue(bucket.clear_properties())
-        self.assertTrue(bucket.allow_mult)
+        self.assertFalse(bucket.allow_mult)
         self.assertEqual(bucket.n_val, 3)
 
 

@@ -27,7 +27,7 @@ try:
     from subprocess import check_output
 except ImportError:
     def check_output(*popenargs, **kwargs):
-        r"""Run command with arguments and return its output as a byte string.
+        """Run command with arguments and return its output as a byte string.
 
         If the exit code was non-zero it raises a CalledProcessError.  The
         CalledProcessError object will have the return code in the returncode
