@@ -128,10 +128,17 @@ class RiakHttpResources(object):
         return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket), "counters",
                       quote_plus(key), **options)
 
-    # Feature detection override
+    # Feature detection overrides
     def bucket_types(self):
         return self.riak_kv_wm_bucket_type is not None
 
+    def index_term_regex(self):
+        if self.riak_kv_wm_bucket_type is not None:
+            return True
+        else:
+            return super(RiakHttpResources, self).index_term_regex()
+
+    # Resource root paths
     @lazy_property
     def riak_kv_wm_bucket_type(self):
         if 'riak_kv_wm_bucket_type' in self.resources:
