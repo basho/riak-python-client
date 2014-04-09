@@ -422,6 +422,151 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise RiakError('Error streaming secondary index.')
 
+    def create_search_index(self, index, schema=None, n_val=None):
+        """
+        Create a Solr search index for Yokozuna.
+
+        :param index: a name of a yz index
+        :type index: string
+        :param schema: XML of Solr schema
+        :type schema: string
+        :param n_val: N value of the write
+        :type n_val: int
+        :rtype boolean
+        """
+        if not self.yz_wm_index:
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+
+        url = self.search_index_path(index)
+        headers = {'Content-Type': 'application/json'}
+        content_dict = dict()
+        if schema:
+            content_dict['schema'] = schema
+        if n_val:
+            content_dict['n_val'] = n_val
+        content = json.dumps(content_dict)
+
+        # Run the request...
+        status, _, _ = self._request('PUT', url, headers, content)
+
+        if status != 204:
+            raise RiakError('Error setting Yokozuna search index.')
+        return True
+
+    def get_search_index(self, index):
+        """
+        Fetch the specified Solr search index for Yokozuna.
+
+        :param index: a name of a yz index
+        :type index: string
+        :rtype string
+        """
+        if not self.yz_wm_index:
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+
+        url = self.search_index_path(index)
+
+        # Run the request...
+        status, headers, body = self._request('GET', url)
+
+        if status == 200:
+            return json.loads(body)
+        else:
+            raise RiakError('Error getting Yokozuna search index.')
+
+    def list_search_indexes(self):
+        """
+        Return a list of Solr search indexes from Yokozuna.
+
+        :rtype list of dicts
+        """
+        if not self.yz_wm_index:
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+
+        url = self.search_index_path()
+
+        # Run the request...
+        status, headers, body = self._request('GET', url)
+
+        if status == 200:
+            json_data = json.loads(body)
+            # Return a list of dictionaries
+            return json_data
+        else:
+            raise RiakError('Error getting Yokozuna search index.')
+
+    def delete_search_index(self, index):
+        """
+        Fetch the specified Solr search index for Yokozuna.
+
+        :param index: a name of a yz index
+        :type index: string
+        :rtype boolean
+        """
+        if not self.yz_wm_index:
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+
+        url = self.search_index_path(index)
+
+        # Run the request...
+        status, _, _ = self._request('DELETE', url)
+
+        if status != 204:
+            raise RiakError('Error setting Yokozuna search index.')
+        return True
+
+    def create_search_schema(self, schema, content):
+        """
+        Create a new Solr schema for Yokozuna.
+
+        :param schema: name of Solr schema
+        :type schema: string
+        :param content: actual defintion of schema (XML)
+        :type content: string
+        :rtype boolean
+        """
+        if not self.yz_wm_schema:
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+
+        url = self.search_schema_path(schema)
+        headers = {'Content-Type': 'application/xml'}
+
+        # Run the request...
+        status, header, body = self._request('PUT', url, headers, content)
+
+        if status != 204:
+            raise RiakError('Error creating Yokozuna search schema.')
+        return True
+
+    def get_search_schema(self, schema):
+        """
+        Fetch a Solr schema from Yokozuna.
+
+        :param schema: name of Solr schema
+        :type schema: string
+        :rtype dict
+        """
+        if not self.yz_wm_schema:
+            raise NotImplementedError("Yokozuna administration is not "
+                                      "supported for this version")
+        url = self.search_schema_path(schema)
+
+        # Run the request...
+        status, _, body = self._request('GET', url)
+
+        if status == 200:
+            result = {}
+            result['name'] = schema
+            result['content'] = body
+            return result
+        else:
+            raise RiakError('Error getting Yokozuna search schema.')
+
     def search(self, index, query, **params):
         """
         Performs a search query.
