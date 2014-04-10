@@ -118,7 +118,8 @@ class RiakHttpResources(object):
         if not self.yz_wm_index:
             raise RiakError("Yokozuna search is unsupported by this Riak node")
         if index:
-            return mkpath(self.yz_wm_index, "index", quote_plus(index), **options)
+            return mkpath(self.yz_wm_index, "index", quote_plus(index),
+                          **options)
         else:
             # Use this flavor for listsing all of the indexes
             return mkpath(self.yz_wm_index, "index", **options)
@@ -135,12 +136,13 @@ class RiakHttpResources(object):
         """
         if not self.yz_wm_schema:
             raise RiakError("Yokozuna search is unsupported by this Riak node")
-        return mkpath(self.yz_wm_schema, "schema", quote_plus(index), **options)
+        return mkpath(self.yz_wm_schema, "schema", quote_plus(index),
+                      **options)
 
     def solr_select_path(self, index, query, **options):
         if not self.riak_solr_searcher_wm and not self.yz_wm_search:
             raise RiakError("Search is unsupported by this Riak node")
-        qs = {'q': query, 'wt': 'json', 'fl' : '*,score'}
+        qs = {'q': query, 'wt': 'json', 'fl': '*,score'}
         qs.update(options)
         if index:
             index = quote_plus(index)
