@@ -105,10 +105,41 @@ class RiakHttpResources(object):
                           "index", quote_plus(index), quote_plus(str(start)),
                           finish, **options)
 
+    def search_index_path(self, index=None, **options):
+        """
+        Builds a Yokozuna search index URL.
+
+        :param index: optional name of a yz index
+        :type index: string
+        :param options: optional list of additional arguments
+        :type index: dict
+        :rtype URL string
+        """
+        if not self.yz_wm_index:
+            raise RiakError("Yokozuna search is unsupported by this Riak node")
+        if index:
+            quote_plus(index)
+        return mkpath(self.yz_wm_index, "index", index, **options)
+
+    def search_schema_path(self, index, **options):
+        """
+        Builds a Yokozuna search Solr schema URL.
+
+        :param index: a name of a yz solr schema
+        :type index: string
+        :param options: optional list of additional arguments
+        :type index: dict
+        :rtype URL string
+        """
+        if not self.yz_wm_schema:
+            raise RiakError("Yokozuna search is unsupported by this Riak node")
+        return mkpath(self.yz_wm_schema, "schema", quote_plus(index),
+                      **options)
+
     def solr_select_path(self, index, query, **options):
-        if not self.riak_solr_searcher_wm or self.yz_wm_search:
+        if not self.riak_solr_searcher_wm and not self.yz_wm_search:
             raise RiakError("Search is unsupported by this Riak node")
-        qs = {'q': query, 'wt': 'json'}
+        qs = {'q': query, 'wt': 'json', 'fl': '*,score'}
         qs.update(options)
         if index:
             index = quote_plus(index)
@@ -180,6 +211,22 @@ class RiakHttpResources(object):
     @lazy_property
     def riak_kv_wm_counter(self):
         return self.resources.get('riak_kv_wm_counter')
+
+    @lazy_property
+    def yz_wm_search(self):
+        return self.resources.get('yz_wm_search')
+
+    @lazy_property
+    def yz_wm_extract(self):
+        return self.resources.get('yz_wm_extract')
+
+    @lazy_property
+    def yz_wm_schema(self):
+        return self.resources.get('yz_wm_schema')
+
+    @lazy_property
+    def yz_wm_index(self):
+        return self.resources.get('yz_wm_index')
 
     @lazy_property
     def resources(self):

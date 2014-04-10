@@ -229,10 +229,16 @@ class RiakHttpCodec(object):
             result['max_score'] = float(json[u'response'][u'maxScore'])
             docs = []
             for doc in json[u'response'][u'docs']:
-                resdoc = {u'id': doc[u'id']}
-                if u'fields' in doc:
-                    for k, v in doc[u'fields'].iteritems():
-                        resdoc[k] = v
+                resdoc = {}
+                if u'_yz_rk' in doc:
+                    # Is this a Riak 2.0 result?
+                    resdoc = doc
+                else:
+                    # Riak Search 1.0 Legacy assumptions about format
+                    resdoc[u'id'] = doc[u'id']
+                    if u'fields' in doc:
+                        for k, v in doc[u'fields'].iteritems():
+                            resdoc[k] = v
                 docs.append(resdoc)
             result['docs'] = docs
         return result

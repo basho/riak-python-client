@@ -467,7 +467,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def create_search_index(self, index, schema=None, n_val=None):
         if not self.pb_search_admin():
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
         idx = riak_pb.RpbYokozunaIndex(name=index)
         if schema:
@@ -482,7 +482,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def get_search_index(self, index):
         if not self.pb_search_admin():
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
         req = riak_pb.RpbYokozunaIndexGetReq(name=index)
 
@@ -495,7 +495,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def list_search_indexes(self):
         if not self.pb_search_admin():
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
         req = riak_pb.RpbYokozunaIndexGetReq()
 
@@ -506,7 +506,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def delete_search_index(self, index):
         if not self.pb_search_admin():
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
         req = riak_pb.RpbYokozunaIndexDeleteReq(name=index)
 
@@ -517,7 +517,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def create_search_schema(self, schema, content):
         if not self.pb_search_admin():
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
         scma = riak_pb.RpbYokozunaSchema(name=schema, content=content)
         req = riak_pb.RpbYokozunaSchemaPutReq(schema=scma)
@@ -528,7 +528,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def get_search_schema(self, schema):
         if not self.pb_search_admin():
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
         req = riak_pb.RpbYokozunaSchemaGetReq(name=schema)
 
