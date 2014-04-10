@@ -435,7 +435,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :rtype boolean
         """
         if not self.yz_wm_index:
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
 
         url = self.search_index_path(index)
@@ -451,7 +451,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, _ = self._request('PUT', url, headers, content)
 
         if status != 204:
-            raise RiakError('Error setting Yokozuna search index.')
+            raise RiakError('Error setting Search 2.0 index.')
         return True
 
     def get_search_index(self, index):
@@ -463,7 +463,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :rtype string
         """
         if not self.yz_wm_index:
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
 
         url = self.search_index_path(index)
@@ -474,7 +474,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if status == 200:
             return json.loads(body)
         else:
-            raise RiakError('Error getting Yokozuna search index.')
+            raise RiakError('Error getting Search 2.0 index.')
 
     def list_search_indexes(self):
         """
@@ -483,7 +483,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :rtype list of dicts
         """
         if not self.yz_wm_index:
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
 
         url = self.search_index_path()
@@ -496,7 +496,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             # Return a list of dictionaries
             return json_data
         else:
-            raise RiakError('Error getting Yokozuna search index.')
+            raise RiakError('Error getting Search 2.0 index.')
 
     def delete_search_index(self, index):
         """
@@ -507,7 +507,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :rtype boolean
         """
         if not self.yz_wm_index:
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
 
         url = self.search_index_path(index)
@@ -516,7 +516,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, _ = self._request('DELETE', url)
 
         if status != 204:
-            raise RiakError('Error setting Yokozuna search index.')
+            raise RiakError('Error setting Search 2.0 index.')
         return True
 
     def create_search_schema(self, schema, content):
@@ -530,7 +530,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :rtype boolean
         """
         if not self.yz_wm_schema:
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
 
         url = self.search_schema_path(schema)
@@ -540,7 +540,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, header, body = self._request('PUT', url, headers, content)
 
         if status != 204:
-            raise RiakError('Error creating Yokozuna search schema.')
+            raise RiakError('Error creating Search 2.0 schema.')
         return True
 
     def get_search_schema(self, schema):
@@ -552,7 +552,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :rtype dict
         """
         if not self.yz_wm_schema:
-            raise NotImplementedError("Yokozuna administration is not "
+            raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
         url = self.search_schema_path(schema)
 
@@ -565,7 +565,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             result['content'] = body
             return result
         else:
-            raise RiakError('Error getting Yokozuna search schema.')
+            raise RiakError('Error getting Search 2.0 schema.')
 
     def search(self, index, query, **params):
         """

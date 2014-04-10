@@ -118,11 +118,8 @@ class RiakHttpResources(object):
         if not self.yz_wm_index:
             raise RiakError("Yokozuna search is unsupported by this Riak node")
         if index:
-            return mkpath(self.yz_wm_index, "index", quote_plus(index),
-                          **options)
-        else:
-            # Use this flavor for listsing all of the indexes
-            return mkpath(self.yz_wm_index, "index", **options)
+            quote_plus(index)
+        return mkpath(self.yz_wm_index, "index", index, **options)
 
     def search_schema_path(self, index, **options):
         """
