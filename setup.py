@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-import glob
-import os
-import subprocess
 import platform
 from setuptools import setup, find_packages
 from version import get_version
