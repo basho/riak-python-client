@@ -14,12 +14,13 @@ configure:
 	@../setup.py create_bucket_types --riak-admin=${RIAK_ADMIN}
 
 compile:
-	@../setup.py build
+	@yes y | pip uninstall riak-pb protobuf
+	@../setup.py develop
 
 lint:
 	@pip install --upgrade pep8 pyflakes
-	@cd ..; pep8 riak
-	@cd ..; pyflakes riak
+	@cd ..; pep8 riak *.py
+	@cd ..; pyflakes riak *.py
 
 test:
-	@RUN_YZ=1 ../setup.py test
+	@RUN_YZ=1 SKIP_INDEXES=0 ../setup.py test

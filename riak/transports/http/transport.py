@@ -682,7 +682,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             self.check_http_code(status, [200, 204])
 
     def check_http_code(self, status, expected_statuses):
-        if not status in expected_statuses:
+        if status not in expected_statuses:
             raise RiakError('Expected status %s, received %s' %
                             (expected_statuses, status))
 

@@ -234,8 +234,8 @@ class RiakObject(object):
         else:
             raise TypeError("resolver is not a function")
 
-    resolver = property(_get_resolver, _set_resolver, doc=
-                        """The sibling-resolution function for this
+    resolver = property(_get_resolver, _set_resolver,
+                        doc="""The sibling-resolution function for this
                            object. If the resolver is not set, the
                            bucket's resolver will be used.""")
 

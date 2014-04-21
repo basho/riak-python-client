@@ -120,8 +120,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._protocol = value
 
     protocol = property(_get_protocol, _set_protocol,
-                        doc=
-                        """
+                        doc="""
                         Which protocol to prefer, one of
                         :attr:`PROTOCOLS
                         <riak.client.RiakClient.PROTOCOLS>`. Please

@@ -105,17 +105,17 @@ class ErlangMapReduceTests(object):
         bucket.new("bar", 2).store()
         bucket.new("baz", 4).store()
 
-        #adding a b-key pair to a bucket input
+        # adding a b-key pair to a bucket input
         with self.assertRaises(ValueError):
             mr = self.client.add(self.bucket_name)
             mr.add(self.bucket_name, 'bar')
 
-        #adding a b-key pair to a query input
+        # adding a b-key pair to a query input
         with self.assertRaises(ValueError):
             mr = self.client.search(self.bucket_name, 'fleh')
             mr.add(self.bucket_name, 'bar')
 
-        #adding a key filter to a query input
+        # adding a key filter to a query input
         with self.assertRaises(ValueError):
             mr = self.client.search(self.bucket_name, 'fleh')
             mr.add_key_filter("tokenize", "-", 1)
