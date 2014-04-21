@@ -22,4 +22,4 @@ lint:
 	@cd ..; pyflakes riak *.py
 
 test:
-	@RUN_YZ=1 ../setup.py test
+	@RUN_YZ=1 SKIP_INDEX=0 ../setup.py test
