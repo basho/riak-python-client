@@ -18,8 +18,8 @@ compile:
 
 lint:
 	@pip install --upgrade pep8 pyflakes
-	@cd ..; pep8 riak
-	@cd ..; pyflakes riak
+	@cd ..; pep8 riak *.py
+	@cd ..; pyflakes riak *.py
 
 test:
 	@RUN_YZ=1 ../setup.py test
