@@ -14,7 +14,7 @@ configure:
 	@../setup.py create_bucket_types --riak-admin=${RIAK_ADMIN}
 
 compile:
-	@../setup.py develop
+	@../setup.py develop -U
 
 lint:
 	@pip install --upgrade pep8 pyflakes
