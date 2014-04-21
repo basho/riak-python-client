@@ -90,7 +90,7 @@ class RiakNode(object):
         :type pb_port: integer
         """
 
-        if 'port' in unused_args and not 'already_warned_port' in unused_args:
+        if 'port' in unused_args and 'already_warned_port' not in unused_args:
             deprecated("port option is deprecated, use http_port or pb_port")
 
         self.host = host

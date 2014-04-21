@@ -174,9 +174,7 @@ class MultiDict(DictMixin):
     def __len__(self):
         return len(self._items)
 
-    ##
-    ## All the iteration:
-    ##
+    # All the iteration:
 
     def keys(self):
         return [k for k, v in self._items]
