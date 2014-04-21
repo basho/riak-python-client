@@ -5,7 +5,7 @@ import subprocess
 import platform
 from setuptools import setup, find_packages
 from version import get_version
-from riak.commands import create_bucket_types
+from commands import create_bucket_types
 
 install_requires = ["riak_pb >=2.0.0"]
 requires = ["riak_pb(>=2.0.0)"]

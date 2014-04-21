@@ -5,3 +5,4 @@ include README.rst
 include LICENSE
 include RELEASE_NOTES.md
 include version.py
+include commands.py
