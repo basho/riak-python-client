@@ -17,6 +17,7 @@ under the License.
 """
 
 import httplib
+from riak.security import security_auth_headers
 
 
 class RiakHttpConnection(object):
@@ -33,6 +34,12 @@ class RiakHttpConnection(object):
         response = None
         headers.setdefault('Accept',
                            'multipart/mixed, application/json, */*;q=0.5')
+
+        if self.security_creds:
+            security_auth_headers(self.security_creds.username,
+                                  self.security_creds.password,
+                                  headers)
+
         try:
             self._connection.request(method, uri, body, headers)
             response = self._connection.getresponse()
@@ -50,8 +57,16 @@ class RiakHttpConnection(object):
         return response.status, response.msg, response_body
 
     def _connect(self):
-        self._connection = self._connection_class(self._node.host,
-                                                  self._node.http_port)
+        """
+        Use the appropriate connection class; optionally with security.
+        """
+        if self.security_creds:
+            self._connection = self._connection_class(self._node.host,
+                                                      self._node.http_port,
+                                                      self.security_creds)
+        else:
+            self._connection = self._connection_class(self._node.host,
+                                                      self._node.http_port)
         # Forces the population of stats and resources before any
         # other requests are made.
         self.server_version
@@ -68,3 +83,4 @@ class RiakHttpConnection(object):
     # These are set by the RiakHttpTransport initializer
     _connection_class = httplib.HTTPConnection
     _node = None
+    security_creds = None

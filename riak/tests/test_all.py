@@ -22,10 +22,11 @@ from riak.tests.test_kv import BasicKVTests, KVFileTests, \
     BucketPropsTest, CounterTests
 from riak.tests.test_2i import TwoITests
 from riak.tests.test_btypes import BucketTypeTests
+from riak.tests.test_security import SecurityTests
 
 from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
     HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
-    SKIP_SEARCH, RUN_YZ
+    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS
 
 testrun_search_bucket = None
 testrun_props_bucket = None
@@ -41,7 +42,7 @@ def setUpModule():
         testrun_mr_bucket
 
     c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT)
+                   pb_port=PB_PORT, security_creds=SECURITY_CREDS)
 
     testrun_props_bucket = 'propsbucket'
     testrun_sibs_bucket = 'sibsbucket'
@@ -84,7 +85,7 @@ def tearDownModule():
         testrun_sibs_bucket, testrun_yz_bucket
 
     c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT)
+                   pb_port=PB_PORT, security_creds=SECURITY_CREDS)
 
     c.bucket(testrun_sibs_bucket).clear_properties()
     c.bucket(testrun_props_bucket).clear_properties()
@@ -115,6 +116,7 @@ class BaseTestCase(object):
     host = None
     pb_port = None
     http_port = None
+    security_creds = None
 
     @staticmethod
     def randint():
@@ -128,14 +130,17 @@ class BaseTestCase(object):
         return out
 
     def create_client(self, host=None, http_port=None, pb_port=None,
-                      protocol=None, **client_args):
+                      protocol=None, security_creds=None,
+                      **client_args):
         host = host or self.host or HOST
         http_port = http_port or self.http_port or HTTP_PORT
         pb_port = pb_port or self.pb_port or PB_PORT
         protocol = protocol or self.protocol
+        security_creds = security_creds or SECURITY_CREDS
         return RiakClient(protocol=protocol,
                           host=host,
                           http_port=http_port,
+                          security_creds=security_creds,
                           pb_port=pb_port, **client_args)
 
     def setUp(self):
@@ -147,6 +152,7 @@ class BaseTestCase(object):
         self.yz_bucket = testrun_yz_bucket
         self.mr_btype = testrun_mr_btype
         self.mr_bucket = testrun_mr_bucket
+        self.security_creds = SECURITY_CREDS
 
         self.client = self.create_client()
 
@@ -307,6 +313,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                ClientTests,
                                CounterTests,
                                BucketTypeTests,
+                               SecurityTests,
                                BaseTestCase,
                                unittest.TestCase):
 
@@ -340,6 +347,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 ClientTests,
                                 CounterTests,
                                 BucketTypeTests,
+                                SecurityTests,
                                 BaseTestCase,
                                 unittest.TestCase):
 

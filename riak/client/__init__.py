@@ -58,8 +58,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     #: The supported protocols
     PROTOCOLS = ['http', 'https', 'pbc']
 
-    def __init__(self, protocol='http', transport_options={},
-                 nodes=None, **unused_args):
+    def __init__(self, protocol='http', transport_options={}, nodes=None,
+                 security_creds=None, **unused_args):
         """
         Construct a new ``RiakClient`` object.
 
@@ -72,6 +72,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :param transport_options: Optional key-value args to pass to
                                   the transport constructor
         :type transport_options: dict
+        :param security_creditials: optional object of security info
+        :type security_creditials: SecurityCreds
         """
         unused_args = unused_args.copy()
 
@@ -98,8 +100,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
         self.protocol = protocol or 'http'
         self.resolver = default_resolver
-        self._http_pool = RiakHttpPool(self, **transport_options)
-        self._pb_pool = RiakPbcPool(self, **transport_options)
+        self._http_pool = RiakHttpPool(self, security_creds,
+                                       **transport_options)
+        self._pb_pool = RiakPbcPool(self, security_creds, **transport_options)
 
         self._encoders = {'application/json': default_encoder,
                           'text/json': default_encoder,
@@ -109,6 +112,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                           'text/plain': str}
         self._buckets = WeakValueDictionary()
         self._bucket_types = WeakValueDictionary()
+        self.security_creds = security_creds
 
     def _get_protocol(self):
         return self._protocol

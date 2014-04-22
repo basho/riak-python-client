@@ -20,6 +20,8 @@ under the License.
 
 import httplib
 import socket
+from riak.security import RiakHTTPSConnection
+
 from riak.transports.pool import Pool
 from riak.transports.http.transport import RiakHttpTransport
 
@@ -41,13 +43,18 @@ class RiakHttpPool(Pool):
     """
     A pool of HTTP(S) transport connections.
     """
-    def __init__(self, client, **options):
+    def __init__(self, client, security_creds=None, **options):
         self.client = client
+        self.security_creds = security_creds
         self.options = options
         if client.protocol == 'https':
             self.connection_class = httplib.HTTPSConnection
         else:
             self.connection_class = NoNagleHTTPConnection
+        # TODO: Rationalize protocol and security credentials
+        if self.security_creds:
+            self.connection_class = RiakHTTPSConnection
+
         super(RiakHttpPool, self).__init__()
 
     def create_resource(self):
@@ -55,6 +62,7 @@ class RiakHttpPool(Pool):
         return RiakHttpTransport(node=node,
                                  client=self.client,
                                  connection_class=self.connection_class,
+                                 security_creds=self.security_creds,
                                  **self.options)
 
     def destroy_resource(self, transport):

@@ -1,5 +1,6 @@
 import os
 from riak.test_server import TestServer
+from riak.security import SecurityCreds
 
 USE_TEST_SERVER = int(os.environ.get('USE_TEST_SERVER', '0'))
 if USE_TEST_SERVER:
@@ -36,5 +37,17 @@ RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '1'))
 
 SKIP_POOL = os.environ.get('SKIP_POOL')
-SKIP_RESOLVE = os.environ.get('SKIP_RESOLVE', '0')
-SKIP_BTYPES = os.environ.get('SKIP_BTYPES', '0')
+SKIP_RESOLVE = int(os.environ.get('SKIP_RESOLVE', '0'))
+SKIP_BTYPES = int(os.environ.get('SKIP_BTYPES', '0'))
+
+RUN_SECURITY = int(os.environ.get('RUN_SECURITY', '0'))
+SECURITY_USER = os.environ.get('RIAK_TEST_SECURITY_USER', 'testuser')
+SECURITY_PASSWD = os.environ.get('RIAK_TEST_SECURITY_PASSWD', 'testpassword')
+SECURITY_CACERT = os.environ.get('RIAK_TEST_SECURITY_CACERT',
+                                 '/tmp/cacert.pem')
+
+SECURITY_CREDS = None
+if RUN_SECURITY:
+    SECURITY_CREDS = SecurityCreds(username=SECURITY_USER,
+                                   password=SECURITY_PASSWD,
+                                   cacert_file=SECURITY_CACERT)

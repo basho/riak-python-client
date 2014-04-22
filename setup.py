@@ -2,7 +2,8 @@
 import platform
 from setuptools import setup, find_packages
 from version import get_version
-from commands import create_bucket_types
+from commands import create_bucket_types, setup_security, \
+    preconfig_security
 
 install_requires = ["riak_pb >=2.0.0"]
 requires = ["riak_pb(>=2.0.0)"]
@@ -28,7 +29,9 @@ setup(
     author_email='clients@basho.com',
     test_suite='riak.tests.suite',
     url='https://github.com/basho/riak-python-client',
-    cmdclass={'create_bucket_types': create_bucket_types},
+    cmdclass={'create_bucket_types': create_bucket_types,
+              'setup_security': setup_security,
+              'preconfig_security': preconfig_security},
     classifiers=['License :: OSI Approved :: Apache Software License',
                  'Intended Audience :: Developers',
                  'Operating System :: OS Independent',

@@ -71,7 +71,6 @@ from riak_pb.messages import (
     MSG_CODE_YOKOZUNA_SCHEMA_GET_REQ,
     MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP,
     MSG_CODE_YOKOZUNA_SCHEMA_PUT_REQ
-
 )
 
 
@@ -81,7 +80,12 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     buffers interface on the riak server.
     """
 
-    def __init__(self, node=None, client=None, timeout=None, *unused_options):
+    def __init__(self,
+                 node=None,
+                 client=None,
+                 security_creds=None,
+                 timeout=None,
+                 *unused_options):
         """
         Construct a new RiakPbcTransport object.
         """
@@ -92,6 +96,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._address = (node.host, node.pb_port)
         self._timeout = timeout
         self._socket = None
+        self.security_creds = security_creds
 
     # FeatureDetection API
     def _server_version(self):
