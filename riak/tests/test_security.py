@@ -25,19 +25,19 @@ class SecurityTests(object):
     @unittest.expectedFailure
     def test_security_bad_user(self):
         creds = SecurityCreds('foo', SECURITY_PASSWD, SECURITY_CACERT)
-        client = self.create_client(security_creds=creds)
+        client = self.create_client(credentials=creds)
         client.get_buckets()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is undefined')
     @unittest.expectedFailure
     def test_security_bad_password(self):
         creds = SecurityCreds(SECURITY_USER, 'foo', SECURITY_CACERT)
-        client = self.create_client(security_creds=creds)
+        client = self.create_client(credentials=creds)
         client.get_buckets()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is undefined')
     @unittest.expectedFailure
     def test_security_missing_cert(self):
         creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD, '/tmp/foo')
-        client = self.create_client(security_creds=creds)
+        client = self.create_client(credentials=creds)
         client.get_buckets()

@@ -51,19 +51,16 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                  client=None,
                  connection_class=httplib.HTTPConnection,
                  client_id=None,
-                 security_creds=None,
                  **unused_options):
         """
         Construct a new HTTP connection to Riak.
-
-        :param security_creds: Riak security settings
-        :type security_creds: SecurityCreds
         """
         super(RiakHttpTransport, self).__init__()
 
         self._client = client
+        if self._client:
+            self._credentials = self._client.credentials
         self._node = node
-        self.security_creds = security_creds
         self._connection_class = connection_class
         self._client_id = client_id
         if not self._client_id:

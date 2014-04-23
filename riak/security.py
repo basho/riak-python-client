@@ -20,29 +20,27 @@ import OpenSSL.SSL
 import httplib
 import socket
 import select
-import base64
 from riak import RiakError
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 
+OPENSSL_VERSION_101G = 268439679
+sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
+# Be sure to use at least OpenSSL 1.0.1g
+if (sslver < OPENSSL_VERSION_101G):
+    verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
+    raise RuntimeError("Found {0} version, but expected at least "
+                       "OpenSSL 1.0.1g".format(verstring))
 
-def security_auth_headers(username, password, headers):
-    """
-    Add in the requisite HTTP Authentication Headers
 
-    :param username: Riak Security Username
-    :type str
-    :param password: Riak Security Password
-    :type str
-    :param headers: Dictionary of headers
-    :type dict
+class SecurityError(RiakError):
     """
-    userColonPassword = username + ":" + password
-    b64UserColonPassword = base64.b64encode(userColonPassword) \
-        .decode("ascii")
-    headers['Authorization'] = 'Basic %s' % b64UserColonPassword
+    Raised when there is an issue establishing security.
+    """
+    def __init__(self, message="Security error"):
+        super(SecurityError, self).__init__(message)
 
 
 class SecurityCreds(object):
@@ -63,19 +61,10 @@ class SecurityCreds(object):
         :param ssl_version: OpenSSL security version
         :type ssl_version: int
         """
-        self.check_version()
         self.username = username
         self.password = password
         self.cacert_file = cacert_file
         self.ssl_version = ssl_version
-
-    def check_version(self):
-        sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
-        # Be sure to use at least OpenSSL 1.0.1g
-        if (sslver < 268439679):
-            verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
-            raise RuntimeError("Found {0} version, but expected at least "
-                               "OpenSSL 1.0.1g".format(verstring))
 
 
 # Inspired by
@@ -84,7 +73,7 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
     def __init__(self,
                  host,
                  port,
-                 security_creds,
+                 credentials,
                  key_file=None,
                  cert_file=None,
                  timeout=None):
@@ -96,8 +85,8 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         :type host: str
         :param port: Riak host port number
         :type port: int
-        :param security_creds: Security Credential settings
-        :type  security_creds: SecurityCreds
+        :param credentials: Security Credential settings
+        :type  credentials: SecurityCreds
         :param key_file: PEM formatted file that contains your private key
         :type key_file: str
         :param cert_file: PEM formatted certificate chain file
@@ -112,7 +101,7 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
                                          cert_file=cert_file)
         self.key_file = key_file
         self.cert_file = cert_file
-        self.security_creds = security_creds
+        self.credentials = credentials
         self.timeout = timeout
 
     def connect(self):
@@ -120,8 +109,8 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         Connect to a host on a given (SSL) port using PyOpenSSL.
         """
         sock = socket.create_connection((self.host, self.port), self.timeout)
-        ssl_ctx = OpenSSL.SSL.Context(self.security_creds.ssl_version)
-        ssl_ctx.load_verify_locations(self.security_creds.cacert_file)
+        ssl_ctx = OpenSSL.SSL.Context(self.credentials.ssl_version)
+        ssl_ctx.load_verify_locations(self.credentials.cacert_file)
 
         # attempt to upgrade the socket to SSL
         cxn = OpenSSL.SSL.Connection(ssl_ctx, sock)
@@ -133,7 +122,7 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
                 select.select([sock], [], [])
                 continue
             except OpenSSL.SSL.Error as e:
-                raise RiakError('bad handshake', e)
+                raise SecurityError('bad handshake - ' + str(e))
             break
 
         self.sock = RiakWrappedSocket(cxn, sock)

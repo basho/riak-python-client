@@ -67,9 +67,7 @@ class RiakPbcConnection(object):
 
     def _send_msg(self, msg_code, msg):
         self._connect()
-        if self.security_creds and not self._secure_connection:
-            self._check_security()
-        self._socket.send(self._encode_msg(msg_code, msg))
+        self._non_connect_send_msg(msg_code, msg)
 
     def _check_security(self):
         # _ssh_handshake() will throw an exception upon failure,
@@ -98,8 +96,8 @@ class RiakPbcConnection(object):
               auth request/response to prevent denial of service attacks
         """
         req = riak_pb.RpbAuthReq()
-        req.user = self.security_creds.username
-        req.password = self.security_creds.password
+        req.user = self._credentials.username
+        req.password = self._credentials.password
         msg_code, _ = self._non_connect_request(MSG_CODE_AUTH_REQ, req,
                                                 MSG_CODE_AUTH_RESP)
         if msg_code == MSG_CODE_AUTH_RESP:
@@ -114,31 +112,28 @@ class RiakPbcConnection(object):
                      taken place with Riak
         returns True upon success, otherwise an exception is raised
         """
-        if self.security_creds:
-                ssl_ctx = OpenSSL.SSL.Context(self.security_creds.ssl_version)
-                cacert_file = self.security_creds.cacert_file
-                try:
-                    ssl_ctx.load_verify_locations(cacert_file)
-                    # attempt to upgrade the socket to SSL
-                    ssl_socket = OpenSSL.SSL.Connection(ssl_ctx, self._socket)
-                    ssl_socket.set_connect_state()
-                    ssl_socket.do_handshake()
-                    # ssl handshake successful
-                    self._socket = ssl_socket
-                    return True
-                except Exception as e:
-                    # fail if *any* exceptions are thrown during SSL handshake
-                    raise RiakError(e.message)
+        if self._credentials:
+            ssl_ctx = OpenSSL.SSL.Context(self._credentials.ssl_version)
+            cacert_file = self._credentials.cacert_file
+            try:
+                ssl_ctx.load_verify_locations(cacert_file)
+                # attempt to upgrade the socket to SSL
+                ssl_socket = OpenSSL.SSL.Connection(ssl_ctx, self._socket)
+                ssl_socket.set_connect_state()
+                ssl_socket.do_handshake()
+                # ssl handshake successful
+                self._socket = ssl_socket
+                return True
+            except Exception as e:
+                # fail if *any* exceptions are thrown during SSL handshake
+                raise RiakError(e.message)
 
     def _recv_msg(self, expect=None):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code is MSG_CODE_ERROR_RESP:
             err = self._parse_msg(msg_code, self._inbuf[1:])
-            if err:
-                raise RiakError(err.errmsg)
-            else:
-                raise RiakError("Unknown Error")
+            raise RiakError(err.errmsg)
         elif msg_code in MESSAGE_CLASSES:
             msg = self._parse_msg(msg_code, self._inbuf[1:])
         else:
@@ -175,6 +170,8 @@ class RiakPbcConnection(object):
                                                         self._timeout)
             else:
                 self._socket = socket.create_connection(self._address)
+        if self._credentials and not self._secure_connection:
+            self._check_security()
 
     def close(self):
         """

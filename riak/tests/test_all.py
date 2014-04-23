@@ -42,7 +42,7 @@ def setUpModule():
         testrun_mr_bucket
 
     c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT, security_creds=SECURITY_CREDS)
+                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
 
     testrun_props_bucket = 'propsbucket'
     testrun_sibs_bucket = 'sibsbucket'
@@ -85,7 +85,7 @@ def tearDownModule():
         testrun_sibs_bucket, testrun_yz_bucket
 
     c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT, security_creds=SECURITY_CREDS)
+                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
 
     c.bucket(testrun_sibs_bucket).clear_properties()
     c.bucket(testrun_props_bucket).clear_properties()
@@ -116,7 +116,7 @@ class BaseTestCase(object):
     host = None
     pb_port = None
     http_port = None
-    security_creds = None
+    credentials = None
 
     @staticmethod
     def randint():
@@ -130,17 +130,17 @@ class BaseTestCase(object):
         return out
 
     def create_client(self, host=None, http_port=None, pb_port=None,
-                      protocol=None, security_creds=None,
+                      protocol=None, credentials=None,
                       **client_args):
         host = host or self.host or HOST
         http_port = http_port or self.http_port or HTTP_PORT
         pb_port = pb_port or self.pb_port or PB_PORT
         protocol = protocol or self.protocol
-        security_creds = security_creds or SECURITY_CREDS
+        credentials = credentials or SECURITY_CREDS
         return RiakClient(protocol=protocol,
                           host=host,
                           http_port=http_port,
-                          security_creds=security_creds,
+                          credentials=credentials,
                           pb_port=pb_port, **client_args)
 
     def setUp(self):
@@ -152,7 +152,7 @@ class BaseTestCase(object):
         self.yz_bucket = testrun_yz_bucket
         self.mr_btype = testrun_mr_btype
         self.mr_bucket = testrun_mr_bucket
-        self.security_creds = SECURITY_CREDS
+        self.credentials = SECURITY_CREDS
 
         self.client = self.create_client()
 

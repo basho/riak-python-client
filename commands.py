@@ -2,7 +2,7 @@
 distutils commands for riak-python-client
 """
 
-__all__ = ['create_bucket_types']
+__all__ = ['create_bucket_types', 'setup_security', 'preconfig_security']
 
 from distutils import log
 from distutils.core import Command
@@ -293,7 +293,7 @@ class preconfig_security(Command):
         ('advanced-conf=', None, 'path to the advanced.conf file'),
         ('host=', None, 'IP of host running Riak'),
         ('pb-port=', None, 'protocol buffers port number'),
-        ('http-port=', None, 'http port number')
+        ('https-port=', None, 'https port number')
     ]
 
     def initialize_options(self):
@@ -301,7 +301,7 @@ class preconfig_security(Command):
         self.advanced_conf = None
         self.host = "127.0.0.1"
         self.pb_port = "8087"
-        self.http_port = "8098"
+        self.https_port = "8099"
 
     def finalize_options(self):
         if self.riak_conf is None:
@@ -316,15 +316,13 @@ class preconfig_security(Command):
         self._update_advanced_conf()
 
     def _update_riak_conf(self):
-        http_host = self.host + ':' + self.http_port
+        https_host = self.host + ':' + self.https_port
         pb_host = self.host + ':' + self.pb_port
         self._backup_file(self.riak_conf)
         f = open(self.riak_conf, 'r', False)
         conf = f.read()
         f.close()
         conf = re.sub(r'search\s+=\s+off', r'search = on', conf)
-        conf = re.sub(r'storage_backend\s+=\s+\S+',
-                      r'storage_backend = leveldb', conf)
         conf = re.sub(r'^##\s+ssl.', 'ssl.', conf, flags=re.MULTILINE)
         conf = re.sub(r'^ssl.certfile\s+=\s+\S+$',
                       r'ssl.certfile = ' + self.cert_dir + '/cert.pem',
@@ -336,14 +334,11 @@ class preconfig_security(Command):
                       r'ssl.cacertfile = ' + self.cert_dir +
                       '/cacert.pem',
                       conf, flags=re.MULTILINE)
-        conf = re.sub(r'^listener.http.internal',
-                      r'## listener.http.internal',
-                      conf, flags=re.MULTILINE)
         conf = re.sub(r'^##\s+listener.https.internal',
                       'listener.https.internal', conf,
                       flags=re.MULTILINE)
         conf = re.sub(r'^listener.https.internal\s+=\s+\S+',
-                      r'listener.https.internal = ' + http_host,
+                      r'listener.https.internal = ' + https_host,
                       conf, flags=re.MULTILINE)
         conf = re.sub(r'^listener.protobuf.internal\s+=\s+\S+',
                       r'listener.protobuf.internal = ' + pb_host,

@@ -83,7 +83,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     def __init__(self,
                  node=None,
                  client=None,
-                 security_creds=None,
                  timeout=None,
                  *unused_options):
         """
@@ -92,11 +91,12 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         super(RiakPbcTransport, self).__init__()
 
         self._client = client
+        if self._client:
+            self._credentials = self._client.credentials
         self._node = node
         self._address = (node.host, node.pb_port)
         self._timeout = timeout
         self._socket = None
-        self.security_creds = security_creds
 
     # FeatureDetection API
     def _server_version(self):

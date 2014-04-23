@@ -5,8 +5,8 @@ from version import get_version
 from commands import create_bucket_types, setup_security, \
     preconfig_security
 
-install_requires = ["riak_pb >=2.0.0"]
-requires = ["riak_pb(>=2.0.0)"]
+install_requires = ["riak_pb >=2.0.0", "pyOpenSSL >= 0.14"]
+requires = ["riak_pb(>=2.0.0)", "pyOpenSSL(>=0.14)"]
 tests_require = []
 if platform.python_version() < '2.7':
     tests_require.append("unittest2")

@@ -17,7 +17,7 @@ under the License.
 """
 
 import httplib
-from riak.security import security_auth_headers
+import base64
 
 
 class RiakHttpConnection(object):
@@ -35,10 +35,10 @@ class RiakHttpConnection(object):
         headers.setdefault('Accept',
                            'multipart/mixed, application/json, */*;q=0.5')
 
-        if self.security_creds:
-            security_auth_headers(self.security_creds.username,
-                                  self.security_creds.password,
-                                  headers)
+        if self._credentials:
+            self._security_auth_headers(self._credentials.username,
+                                        self._credentials.password,
+                                        headers)
 
         try:
             self._connection.request(method, uri, body, headers)
@@ -60,13 +60,13 @@ class RiakHttpConnection(object):
         """
         Use the appropriate connection class; optionally with security.
         """
-        if self.security_creds:
+        if self._credentials:
             self._connection = self._connection_class(self._node.host,
-                                                      self._node.http_port,
-                                                      self.security_creds)
+                                                      self._node.https_port,
+                                                      self._credentials)
         else:
             self._connection = self._connection_class(self._node.host,
-                                                      self._node.http_port)
+                                                      self._node.https_port)
         # Forces the population of stats and resources before any
         # other requests are made.
         self.server_version
@@ -83,4 +83,20 @@ class RiakHttpConnection(object):
     # These are set by the RiakHttpTransport initializer
     _connection_class = httplib.HTTPConnection
     _node = None
-    security_creds = None
+    credentials = None
+
+    def _security_auth_headers(self, username, password, headers):
+        """
+        Add in the requisite HTTP Authentication Headers
+
+        :param username: Riak Security Username
+        :type str
+        :param password: Riak Security Password
+        :type str
+        :param headers: Dictionary of headers
+        :type dict
+        """
+        userColonPassword = username + ":" + password
+        b64UserColonPassword = base64.b64encode(userColonPassword) \
+            .decode("ascii")
+        headers['Authorization'] = 'Basic %s' % b64UserColonPassword

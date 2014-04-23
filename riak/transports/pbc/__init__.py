@@ -29,17 +29,15 @@ class RiakPbcPool(Pool):
     """
     A resource pool of PBC transports.
     """
-    def __init__(self, client, security_creds=None, **options):
+    def __init__(self, client, **options):
         super(RiakPbcPool, self).__init__()
         self._client = client
-        self.security_creds = security_creds
         self._options = options
 
     def create_resource(self):
         node = self._client._choose_node()
         return RiakPbcTransport(node=node,
                                 client=self._client,
-                                security_creds=self.security_creds,
                                 **self._options)
 
     def destroy_resource(self, pbc):
