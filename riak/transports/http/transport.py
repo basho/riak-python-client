@@ -58,8 +58,6 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         super(RiakHttpTransport, self).__init__()
 
         self._client = client
-        if self._client:
-            self._credentials = self._client.credentials
         self._node = node
         self._connection_class = connection_class
         self._client_id = client_id

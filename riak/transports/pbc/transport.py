@@ -91,8 +91,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         super(RiakPbcTransport, self).__init__()
 
         self._client = client
-        if self._client:
-            self._credentials = self._client.credentials
         self._node = node
         self._address = (node.host, node.pb_port)
         self._timeout = timeout

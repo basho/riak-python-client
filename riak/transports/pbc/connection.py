@@ -96,8 +96,8 @@ class RiakPbcConnection(object):
               auth request/response to prevent denial of service attacks
         """
         req = riak_pb.RpbAuthReq()
-        req.user = self._credentials.username
-        req.password = self._credentials.password
+        req.user = self._client._credentials.username
+        req.password = self._client._credentials.password
         msg_code, _ = self._non_connect_request(MSG_CODE_AUTH_REQ, req,
                                                 MSG_CODE_AUTH_RESP)
         if msg_code == MSG_CODE_AUTH_RESP:
@@ -112,9 +112,9 @@ class RiakPbcConnection(object):
                      taken place with Riak
         returns True upon success, otherwise an exception is raised
         """
-        if self._credentials:
-            ssl_ctx = OpenSSL.SSL.Context(self._credentials.ssl_version)
-            cacert_file = self._credentials.cacert_file
+        if self._client._credentials:
+            ssl_ctx = OpenSSL.SSL.Context(self._client._credentials.ssl_version)
+            cacert_file = self._client._credentials.cacert_file
             try:
                 ssl_ctx.load_verify_locations(cacert_file)
                 # attempt to upgrade the socket to SSL
@@ -170,7 +170,7 @@ class RiakPbcConnection(object):
                                                         self._timeout)
             else:
                 self._socket = socket.create_connection(self._address)
-        if self._credentials and not self._secure_connection:
+        if self._client._credentials and not self._secure_connection:
             self._check_security()
 
     def close(self):

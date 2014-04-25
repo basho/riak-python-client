@@ -2,7 +2,8 @@
 distutils commands for riak-python-client
 """
 
-__all__ = ['create_bucket_types', 'setup_security', 'preconfig_security']
+__all__ = ['create_bucket_types', 'setup_security', 'preconfig_security',
+           'setup_tests']
 
 from distutils import log
 from distutils.core import Command
@@ -206,13 +207,16 @@ class setup_security(Command):
 
     def initialize_options(self):
         self.riak_admin = None
-        # Default values:
-        self.username = 'testuser'
-        self.password = 'testpassword'
+        self.username = None
+        self.password = None
 
     def finalize_options(self):
         if self.riak_admin is None:
             raise DistutilsOptionError("riak-admin option not set")
+        if self.username is None:
+            self.username = 'testuser'
+        if self.password is None:
+            self.password = 'testpassword'
 
     def run(self):
         if self._check_available():
@@ -386,3 +390,39 @@ class preconfig_security(Command):
             shutil.copyfile(name, backup)
         else:
             log.info("Cannot backup missing file {!r}".format(name))
+
+
+class setup_tests(Command):
+    """
+    Sets up security configuration.
+
+    * Run setup_security and create_bucket_types
+    """
+
+    description = "create bucket types and security settings for testing"
+
+    user_options = create_bucket_types.user_options + setup_security.user_options
+
+    def initialize_options(self):
+        self.riak_admin = None
+        self.username = None
+        self.password = None
+        pass
+
+    def finalize_options(self):
+        bucket = self.distribution.get_command_obj('create_bucket_types')
+        bucket.riak_admin = self.riak_admin
+        security = self.distribution.get_command_obj('setup_security')
+        security.riak_admin = self.riak_admin
+        security.username = self.username
+        security.password = self.password
+        pass
+
+    def run(self):
+        # Run all relevant sub-commands.
+        for cmd_name in self.get_sub_commands():
+            self.run_command(cmd_name)
+
+    sub_commands = [('create_bucket_types', None),
+                    ('setup_security', None)
+                    ]

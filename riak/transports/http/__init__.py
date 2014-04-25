@@ -50,8 +50,7 @@ class RiakHttpPool(Pool):
             self.connection_class = httplib.HTTPSConnection
         else:
             self.connection_class = NoNagleHTTPConnection
-        # TODO: Rationalize protocol and security credentials
-        if self.client.credentials:
+        if self.client._credentials:
             self.connection_class = RiakHTTPSConnection
 
         super(RiakHttpPool, self).__init__()

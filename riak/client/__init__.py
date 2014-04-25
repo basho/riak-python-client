@@ -34,6 +34,7 @@ from riak.resolver import default_resolver
 from riak.search import RiakSearch
 from riak.transports.http import RiakHttpPool
 from riak.transports.pbc import RiakPbcPool
+from riak.security import SecurityCreds
 from riak.util import deprecated
 from riak.util import deprecateQuorumAccessors
 from riak.util import lazy_property
@@ -100,7 +101,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
         self.protocol = protocol or 'http'
         self.resolver = default_resolver
-        self.credentials = credentials
+        self._credentials = self._create_credentials(credentials)
         self._http_pool = RiakHttpPool(self, **transport_options)
         self._pb_pool = RiakPbcPool(self, **transport_options)
 
@@ -315,6 +316,20 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return RiakNode(**n)
         else:
             raise TypeError("%s is not a valid node configuration"
+                            % repr(n))
+
+    def _create_credentials(self, n):
+        """
+        Create security credentials, if necessary.
+        """
+        if not n:
+            return n
+        elif isinstance(n, SecurityCreds):
+            return n
+        elif isinstance(n, dict):
+            return SecurityCreds(**n)
+        else:
+            raise TypeError("%s is not a valid security configuration"
                             % repr(n))
 
     def _choose_node(self, nodes=None):
