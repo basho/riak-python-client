@@ -113,7 +113,8 @@ class RiakPbcConnection(object):
         returns True upon success, otherwise an exception is raised
         """
         if self._client._credentials:
-            ssl_ctx = OpenSSL.SSL.Context(self._client._credentials.ssl_version)
+            ssl_ctx = \
+                OpenSSL.SSL.Context(self._client._credentials.ssl_version)
             cacert_file = self._client._credentials.cacert_file
             try:
                 ssl_ctx.load_verify_locations(cacert_file)

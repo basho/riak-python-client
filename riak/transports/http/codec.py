@@ -57,7 +57,7 @@ class RiakHttpCodec(object):
         # Check if the server is down(status==0)
         if not status:
             m = 'Could not contact Riak Server: http://{0}:{1}!'.format(
-                self._node.host, self._node.https_port)
+                self._node.host, self._node.http_port)
             raise RiakError(m)
 
         # Make sure expected code came back

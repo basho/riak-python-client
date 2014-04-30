@@ -61,9 +61,10 @@ class RiakHttpConnection(object):
         Use the appropriate connection class; optionally with security.
         """
         if self._client._credentials:
-            self._connection = self._connection_class(self._node.host,
-                                                      self._node.http_port,
-                                                      self._client._credentials)
+            self._connection = \
+                self._connection_class(self._node.host,
+                                       self._node.http_port,
+                                       self._client._credentials)
         else:
             self._connection = self._connection_class(self._node.host,
                                                       self._node.http_port)

@@ -57,7 +57,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     """
 
     #: The supported protocols
-    PROTOCOLS = ['http', 'https', 'pbc']
+    PROTOCOLS = ['http', 'pbc']
 
     def __init__(self, protocol='http', transport_options={}, nodes=None,
                  credentials=None, **unused_args):
@@ -74,7 +74,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                                   the transport constructor
         :type transport_options: dict
         :param credentials: optional object of security info
-        :type credentials: SecurityCreds
+        :type credentials: SecurityCreds or dict
         """
         unused_args = unused_args.copy()
 
@@ -84,7 +84,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                        "used as the %s port unless already set" %
                        (unused_args['port'], protocol))
             unused_args['already_warned_port'] = True
-            if (protocol in ['http', 'https'] and
+            if (protocol == 'http' and
                     'http_port' not in unused_args):
                 unused_args['http_port'] = unused_args['port']
             elif protocol == 'pbc' and 'pb_port' not in unused_args:
@@ -133,8 +133,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                         Changing to another protocol will cause a
                         connection on the next request.
 
-                        Some requests are only valid over ``'http'``
-                        or ``'https'``, and will always be sent via
+                        Some requests are only valid over ``'http'``,
+                        and will always be sent via
                         those transports, regardless of which protocol
                         is preferred.
                          """)

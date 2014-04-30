@@ -401,7 +401,8 @@ class setup_tests(Command):
 
     description = "create bucket types and security settings for testing"
 
-    user_options = create_bucket_types.user_options + setup_security.user_options
+    user_options = create_bucket_types.user_options + \
+        setup_security.user_options
 
     def initialize_options(self):
         self.riak_admin = None

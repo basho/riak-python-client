@@ -46,10 +46,7 @@ class RiakHttpPool(Pool):
     def __init__(self, client, **options):
         self.client = client
         self.options = options
-        if client.protocol == 'https':
-            self.connection_class = httplib.HTTPSConnection
-        else:
-            self.connection_class = NoNagleHTTPConnection
+        self.connection_class = NoNagleHTTPConnection
         if self.client._credentials:
             self.connection_class = RiakHTTPSConnection
 
