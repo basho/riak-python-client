@@ -14,7 +14,7 @@ configure:
 	@../setup.py create_bucket_types --riak-admin=${RIAK_ADMIN}
 
 compile:
-	@yes y | pip uninstall riak-pb protobuf
+	-@yes y | pip uninstall riak-pb protobuf pyOpenSSL
 	@../setup.py develop
 
 lint:
