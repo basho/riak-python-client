@@ -40,21 +40,21 @@ ssldate = datetime.date(2014, 4, 1)
 sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
 # Be sure to use at least OpenSSL 1.0.1g
 if (sslver < OPENSSL_VERSION_101G):
-    too_old = False
     # Check the build date on older versions
     verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
     verdots = string.split(verstring)[OPENSSL_VERSION_NUM_POS]
     builtstr = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_BUILT_ON)
     timestamp = string.split(builtstr)
-    calmap = {v: k for k,v in enumerate(calendar.month_abbr)}
+    calmap = {v: k for k, v in enumerate(calendar.month_abbr)}
     day = int(timestamp[OPENSSL_VERSION_DAY_POS])
     mon = calmap[timestamp[OPENSSL_VERSION_MON_POS]]
     year = int(timestamp[OPENSSL_VERSION_YEAR_POS])
     build = datetime.date(year, mon, day)
     if LooseVersion(verdots) < LooseVersion(OPENSSL_VERSION_101) or \
-        build < ssldate:
+            build < ssldate:
         raise RuntimeError("Found {0} version, but expected at least "
-                           "OpenSSL 1.0.1g".format(verstring))
+                           "OpenSSL 1.0.1 built after {1}"
+                           .format(verstring, ssldate))
 
 
 class SecurityError(RiakError):
