@@ -393,6 +393,14 @@ class BasicKVTests(object):
         self.assertEqual(obj.resolver, max_value_resolver)
         self.assertEqual(obj.data, max(vals))
 
+    @unittest.skipIf(SKIP_RESOLVE == '1',
+                     "skip requested for resolvers test")
+    def test_resolution_default(self):
+        # If no resolver is setup, be sure to resolve to default_resolver
+        bucket = self.client.bucket(self.sibs_bucket)
+        self.assertEqual(self.client.resolver, default_resolver)
+        self.assertEqual(bucket.resolver, default_resolver)
+
     def test_tombstone_siblings(self):
         # Set up the bucket, clear any existing object...
         bucket = self.client.bucket(self.sibs_bucket)
