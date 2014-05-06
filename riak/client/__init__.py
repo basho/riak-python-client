@@ -291,6 +291,15 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                    " ``fulltext_add`` and ``fulltext_delete`` directly")
         return RiakSearch(self)
 
+    def close(self):
+        """
+        Iterate through all of the connections and close each one.
+        """
+        if self._http_pool is not None:
+            self._http_pool.clear()
+        if self._pb_pool is not None:
+            self._pb_pool.clear()
+
     def _create_node(self, n):
         if isinstance(n, RiakNode):
             return n
