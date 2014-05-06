@@ -250,6 +250,20 @@ class ClientTests(object):
             self.assertIsInstance(obj, RiakObject)
             self.assertFalse(obj.exists)
 
+    def test_pool_close(self):
+        """
+        Iterate over the connection pool and close all connections.
+        """
+        # Do something to add to the connection pool
+        self.test_multiget_bucket()
+        if self.client.protocol == 'pbc':
+            self.assertGreater(len(self.client._pb_pool.elements), 1)
+        else:
+            self.assertGreater(len(self.client._http_pool.elements), 1)
+        # Now close them all up
+        self.client.close()
+        self.assertEqual(len(self.client._http_pool.elements), 0)
+        self.assertEqual(len(self.client._pb_pool.elements), 0)
 
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
