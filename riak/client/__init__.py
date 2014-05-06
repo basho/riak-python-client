@@ -296,11 +296,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         Iterate through all of the connections and close each one.
         """
         if self._http_pool is not None:
-            for item in self._http_pool:
-                self._http_pool.delete_element(item)
+            self._http_pool.clear()
         if self._pb_pool is not None:
-            for item in self._pb_pool:
-                self._pb_pool.delete_element(item)
+            self._pb_pool.clear()
 
     def _create_node(self, n):
         if isinstance(n, RiakNode):
