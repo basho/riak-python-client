@@ -65,7 +65,11 @@ class RiakHttpJsonStream(RiakHttpStream):
             idx = string.index(self.buffer, '}') + 1
             chunk = self.buffer[:idx]
             self.buffer = self.buffer[idx:]
-            field = json.loads(chunk)[self._json_field]
+            jsdict = json.loads(chunk)
+            if 'error' in jsdict:
+                self.close()
+                raise RiakError(jsdict['error'])
+            field = jsdict[self._json_field]
             return field
         else:
             raise StopIteration

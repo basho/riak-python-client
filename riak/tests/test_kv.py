@@ -4,7 +4,7 @@ import cPickle
 import copy
 import platform
 from time import sleep
-from riak import ConflictError, RiakBucket
+from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
 try:
     import simplejson as json
@@ -140,6 +140,16 @@ class BasicKVTests(object):
                 self.assertIsInstance(key, basestring)
             streamed_keys += keylist
         self.assertEqual(sorted(regular_keys), sorted(streamed_keys))
+
+    def test_stream_keys_timeout(self):
+        bucket = self.client.bucket('random_key_bucket')
+        streamed_keys = []
+        with self.assertRaises(RiakError):
+            for keylist in self.client.stream_keys(bucket, timeout=1):
+                self.assertNotEqual([], keylist)
+                for key in keylist:
+                    self.assertIsInstance(key, basestring)
+                streamed_keys += keylist
 
     def test_stream_keys_abort(self):
         bucket = self.client.bucket('random_key_bucket')
