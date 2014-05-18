@@ -34,7 +34,8 @@ except NotImplementedError:
 
 #: A :class:`namedtuple` for tasks that are fed to workers in the
 #: multiget pool.
-Task = namedtuple('Task', ['client', 'outq', 'bucket', 'key', 'options'])
+Task = namedtuple('Task', ['client', 'outq', 'bucket_type', 'bucket', 'key',
+                           'options'])
 
 
 class MultiGetPool(object):
@@ -126,13 +127,13 @@ class MultiGetPool(object):
         while not self._should_quit():
             task = self._inq.get()
             try:
-                obj = task.client.bucket(task.bucket).get(task.key,
-                                                          **task.options)
+                btype = task.client.bucket_type(task.bucket_type)
+                obj = btype.bucket(task.bucket).get(task.key, **task.options)
                 task.outq.put(obj)
             except KeyboardInterrupt:
                 raise
             except Exception as err:
-                task.outq.put((task.bucket, task.key, err), )
+                task.outq.put((task.bucket_type, task.bucket, task.key, err), )
             finally:
                 self._inq.task_done()
 
@@ -167,8 +168,8 @@ def multiget(client, keys, **options):
     outq = Queue()
 
     RIAK_MULTIGET_POOL.start()
-    for bucket, key in keys:
-        task = Task(client, outq, bucket, key, options)
+    for bucket_type, bucket, key in keys:
+        task = Task(client, outq, bucket_type, bucket, key, options)
         RIAK_MULTIGET_POOL.enq(task)
 
     results = []
