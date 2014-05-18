@@ -161,8 +161,8 @@ def multiget(client, keys, **options):
 
     :param client: the client to use
     :type client: :class:`~riak.client.RiakClient`
-    :param keys: the bucket/key pairs to fetch in parallel
-    :type keys: list of two-tuples -- bucket/key pairs
+    :param keys: the keys to fetch in parallel
+    :type keys: list of three-tuples -- bucket_type/bucket/key
     :rtype: list
     """
     outq = Queue()
