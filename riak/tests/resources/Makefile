@@ -44,16 +44,16 @@ SERVER_CSR=${SERVER_DIR}/server.csr
 SERVER_CERT=${SERVER_DIR}/server.crt
 # Certificate Revocation List
 SERVER_CRL=${SERVER_DIR}/server.crl
-# Common Name
-SERVER_CN=localhost
+# Common Name (must match nodename)
+SERVER_CN=riak@127.0.0.1
 SERVER_STRING="${CNTRY}\n${STATE}\n${CITY}\n${ORG}\n${UNIT}\n${SERVER_CN}\n${EMAIL}\n${PASSWD}\n${COMPANY}\n"
 
 CLIENT_DIR=client
 CLIENT_KEY=${CLIENT_DIR}/client.key
 CLIENT_CSR=${CLIENT_DIR}/client.csr
 CLIENT_CERT=${CLIENT_DIR}/client.crt
-# Common Name
-CLIENT_CN=testuser
+# Common Name (must name Riak username)
+CLIENT_CN=certuser
 CLIENT_STRING="${CNTRY}\n${STATE}\n${CITY}\n${ORG}\n${UNIT}\n${CLIENT_CN}\n${EMAIL}\n${PASSWD}\n${COMPANY}\n"
 
 RANDOM=od -vAn -N3 -tu4 < /dev/urandom| awk '{print $1;}'
@@ -65,11 +65,12 @@ INDEX_ATTR=index.txt.attr
 
 all: ${CA_CERT} ${SERVER_CERT} ${CLIENT_CERT} ${SERVER_CRL}
 
-install: all
+install:
 	cp ${CA_CERT} .
 	cp ${SERVER_CERT} .
 	cp ${SERVER_KEY} .
 	cp ${SERVER_CRL} .
+	cp ${CLIENT_KEY} .
 	cp ${CLIENT_CERT} .
 
 # Certificate Serial Number

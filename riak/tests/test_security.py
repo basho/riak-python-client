@@ -1,44 +1,110 @@
 # -*- coding: utf-8 -*-
+"""
+Copyright 2014 Basho Technologies, Inc.
+
+This file is provided to you under the Apache License,
+Version 2.0 (the "License"); you may not use this file
+except in compliance with the License.  You may obtain
+a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+"""
+
 import platform
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
 from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
-    SECURITY_CACERT
+    SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
+    SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT
 from riak.security import SecurityCreds
-from riak import RiakError
 
 
 class SecurityTests(object):
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is undefined')
+    @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is set')
+    def test_security_disabled(self):
+        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+                              cacert_file=SECURITY_CACERT)
+        client = self.create_client(credentials=creds)
+        myBucket = client.bucket('test')
+        val1 = "foobar"
+        key1 = myBucket.new('x', data=val1)
+        with self.assertRaises(Exception):
+            key1.store()
+
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_basic_connection(self):
         myBucket = self.client.bucket('test')
         val1 = "foobar"
         key1 = myBucket.new('x', data=val1)
         key1.store()
-        fetched1 = myBucket.get('x')
-        for sibling in fetched1.siblings:
-            # print sibling.etag + " " +  sibling.data
-            pass
+        myBucket.get('x')
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is undefined')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_user(self):
-        creds = SecurityCreds('foo', SECURITY_PASSWD, SECURITY_CACERT)
+        creds = SecurityCreds('foo', SECURITY_PASSWD,
+                              cacert_file=SECURITY_CACERT)
         client = self.create_client(credentials=creds)
-        with self.assertRaises(RiakError):
+        with self.assertRaises(Exception):
             client.get_buckets()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is undefined')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_password(self):
-        creds = SecurityCreds(SECURITY_USER, 'foo', SECURITY_CACERT)
+        creds = SecurityCreds(SECURITY_USER, 'foo',
+                              cacert_file=SECURITY_CACERT)
         client = self.create_client(credentials=creds)
-        with self.assertRaises(RiakError):
+        with self.assertRaises(Exception):
             client.get_buckets()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is undefined')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_missing_cert(self):
-        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD, '/tmp/foo')
+        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+                              cacert_file='/tmp/foo')
+        client = self.create_client(credentials=creds)
+        with self.assertRaises(Exception):
+            client.get_buckets()
+
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    def test_security_cert_authentication(self):
+        creds = SecurityCreds(SECURITY_CERT_USER,
+                              SECURITY_CERT_PASSWD,
+                              cert_file=SECURITY_CERT,
+                              key_file=SECURITY_KEY)
+        client = self.create_client(credentials=creds)
+        myBucket = client.bucket('test')
+        val1 = "foobar2"
+        key1 = myBucket.new('x', data=val1)
+        # Certificate Authentication is currently only supported
+        # by Protocol Buffers
+        if self.protocol == 'pbc':
+            key1.store()
+            myBucket.get('x')
+        else:
+            with self.assertRaises(Exception):
+                key1.store()
+                myBucket.get('x')                
+        
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    def test_security_revoked_cert(self):
+        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+                              cacert_file=SECURITY_CACERT,
+                              crl_file=SECURITY_REVOKED)
+        client = self.create_client(credentials=creds)
+        with self.assertRaises(Exception):
+            client.get_buckets()
+            
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    def test_security_bad_ca_cert(self):
+        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+                              cacert_file=SECURITY_BAD_CERT)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()

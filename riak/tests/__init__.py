@@ -44,7 +44,21 @@ RUN_SECURITY = int(os.environ.get('RUN_SECURITY', '0'))
 SECURITY_USER = os.environ.get('RIAK_TEST_SECURITY_USER', 'testuser')
 SECURITY_PASSWD = os.environ.get('RIAK_TEST_SECURITY_PASSWD', 'testpassword')
 SECURITY_CACERT = os.environ.get('RIAK_TEST_SECURITY_CACERT',
-                                 '/tmp/cacert.pem')
+                                 'riak/tests/resources/ca.crt')
+SECURITY_REVOKED = os.environ.get('RIAK_TEST_SECURITY_REVOKED',
+                                  'riak/tests/resources/server.crl')
+SECURITY_BAD_CERT = os.environ.get('RIAK_TEST_SECURITY_BAD_CERT',
+                                   'riak/tests/resources/bad_ca.crt')
+# Certificate-based Authentication only supported by PBC
+# N.B., username and password must both still be supplied
+SECURITY_KEY = os.environ.get('RIAK_TEST_SECURITY_KEY',
+                              'riak/tests/resources/client.key')
+SECURITY_CERT = os.environ.get('RIAK_TEST_SECURITY_CERT',
+                               'riak/tests/resources/client.crt')
+SECURITY_CERT_USER = os.environ.get('RIAK_TEST_SECURITY_CERT_USER',
+                                    'certuser')
+SECURITY_CERT_PASSWD = os.environ.get('RIAK_TEST_SECURITY_CERT_PASSWD',
+                                      'certpass')
 
 SECURITY_CREDS = None
 if RUN_SECURITY:

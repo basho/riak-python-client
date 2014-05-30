@@ -41,7 +41,7 @@ def setUpModule():
         testrun_sibs_bucket, testrun_yz_bucket, testrun_mr_btype, \
         testrun_mr_bucket
 
-    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
+    c = RiakClient(protocol='pbc', host=PB_HOST, http_port=HTTP_PORT,
                    pb_port=PB_PORT, credentials=SECURITY_CREDS)
 
     testrun_props_bucket = 'propsbucket'

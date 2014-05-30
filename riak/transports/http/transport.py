@@ -37,6 +37,7 @@ from riak.transports.http.stream import (
     RiakHttpBucketStream,
     RiakHttpIndexStream)
 from riak import RiakError
+from riak.security import SecurityError
 from riak.util import decode_index_value
 
 
@@ -269,9 +270,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         content = json.dumps({'props': props})
 
         # Run the request...
-        status, _, _ = self._request('PUT', url, headers, content)
+        status, _, body = self._request('PUT', url, headers, content)
 
-        if status != 204:
+        if status == 401:
+            raise SecurityError('Not authorized to set bucket properties.')
+        elif status != 204:
             raise RiakError('Error setting bucket properties.')
         return True
 

@@ -158,7 +158,8 @@ class setup_security(Command):
     Sets up security for testing. By default this will create:
 
     * User `testuser` with password `testpassword`
-    * A security resource
+    * User `certuser` with password `certpass`
+    * Two security sources
     * Permissions on
         * riak_kv.get
         * riak_kv.put
@@ -180,13 +181,17 @@ class setup_security(Command):
     user_options = [
         ('riak-admin=', None, 'path to the riak-admin script'),
         ('username=', None, 'test user account'),
-        ('password=', None, 'password for test user account')
+        ('password=', None, 'password for test user account'),
+        ('certuser=', None, 'certificate test user account'),
+        ('certpass=', None, 'password for certificate test user account')
     ]
 
     _commands = [
         "enable",
         "add-user $USERNAME password=$PASSWORD",
-        "add-source all 127.0.0.1/32 password"
+        "add-source $USERNAME 127.0.0.1/32 password",
+        "add-user $CERTUSER password=$CERTPASS",
+        "add-source $CERTUSER 127.0.0.1/32 certificate"
     ]
 
     _grants = {
@@ -209,6 +214,8 @@ class setup_security(Command):
         self.riak_admin = None
         self.username = None
         self.password = None
+        self.certuser = None
+        self.certpass = None
 
     def finalize_options(self):
         if self.riak_admin is None:
@@ -217,6 +224,10 @@ class setup_security(Command):
             self.username = 'testuser'
         if self.password is None:
             self.password = 'testpassword'
+        if self.certuser is None:
+            self.certuser = 'certuser'
+        if self.certpass is None:
+            self.certpass = 'certpass'
 
     def run(self):
         if self._check_available():
@@ -224,7 +235,9 @@ class setup_security(Command):
                 # Replace the username and password if specified
                 s = Template(cmd)
                 newcmd = s.substitute(USERNAME=self.username,
-                                      PASSWORD=self.password)
+                                      PASSWORD=self.password,
+                                      CERTUSER=self.certuser,
+                                      CERTPASS=self.certpass)
                 log.info("Security command: {!r}".format(newcmd))
                 self.run_security_command(tuple(newcmd.split(' ')))
             for perm in self._grants:
@@ -250,6 +263,10 @@ class setup_security(Command):
             cmd = ["grant", perm, "on", target, "to", self.username]
             log.info("Granting permission {!r} on {!r} to {!r}"
                      .format(perm, target, self.username))
+            self.run_security_command(cmd)
+            cmd = ["grant", perm, "on", target, "to", self.certuser]
+            log.info("Granting permission {!r} on {!r} to {!r}"
+                     .format(perm, target, self.certuser))
             self.run_security_command(cmd)
 
     def check_security_command(self, *args):
@@ -279,22 +296,15 @@ class preconfig_security(Command):
         * listener.protobuf.internal = 127.0.0.1:8087
         * listener.https.internal = 127.0.0.1:8098
         * ## listener.http.internal = 127.0.0.1:8098
-        * ssl.certfile = $pwd/tests/resources/cert.pem
-        * ssl.keyfile = $pwd/tests/resources/key.pem
-        * ssl.cacertfile = $pwd/tests/resources/cacert.pem
-    * Update these lines in advanced.conf
-          {riak_api, [
-            {certfile,  "$pwd/tests/resources/cert.pem"},
-            {keyfile,    "$pwd/tests/resources/key.pem"},
-            {cacertfile, "$pwd/tests/resources/cacert.pem"}
-            ]}
+        * ssl.certfile = $pwd/tests/resources/server.crt
+        * ssl.keyfile = $pwd/tests/resources/server.key
+        * ssl.cacertfile = $pwd/tests/resources/ca.crt
     """
 
     description = "preconfigure security settings used in integration tests"
 
     user_options = [
         ('riak-conf=', None, 'path to the riak.conf file'),
-        ('advanced-conf=', None, 'path to the advanced.conf file'),
         ('host=', None, 'IP of host running Riak'),
         ('pb-port=', None, 'protocol buffers port number'),
         ('https-port=', None, 'https port number')
@@ -302,7 +312,6 @@ class preconfig_security(Command):
 
     def initialize_options(self):
         self.riak_conf = None
-        self.advanced_conf = None
         self.host = "127.0.0.1"
         self.pb_port = "8087"
         self.https_port = "8099"
@@ -310,14 +319,11 @@ class preconfig_security(Command):
     def finalize_options(self):
         if self.riak_conf is None:
             raise DistutilsOptionError("riak-conf option not set")
-        if self.advanced_conf is None:
-            raise DistutilsOptionError("advanced-conf option not set")
 
     def run(self):
         self.cert_dir = os.path.dirname(os.path.realpath(__file__)) + \
             "/riak/tests/resources"
         self._update_riak_conf()
-        self._update_advanced_conf()
 
     def _update_riak_conf(self):
         https_host = self.host + ':' + self.https_port
@@ -329,19 +335,19 @@ class preconfig_security(Command):
         conf = re.sub(r'search\s+=\s+off', r'search = on', conf)
         conf = re.sub(r'^##\s+ssl.', 'ssl.', conf, flags=re.MULTILINE)
         conf = re.sub(r'^ssl.certfile\s+=\s+\S+$',
-                      r'ssl.certfile = ' + self.cert_dir + '/cert.pem',
+                      r'ssl.certfile = ' + self.cert_dir + '/server.crt',
+                      conf, flags=re.MULTILINE)
+        conf = re.sub(r'^storage_backend\s+=\s+\S+$',
+                      r'storage_backend = leveldb',
                       conf, flags=re.MULTILINE)
         conf = re.sub(r'^ssl.keyfile\s+=\s+\S+$',
-                      r'ssl.keyfile = ' + self.cert_dir + '/key.pem',
+                      r'ssl.keyfile = ' + self.cert_dir + '/server.key',
                       conf, flags=re.MULTILINE)
         conf = re.sub(r'^ssl.cacertfile\s+=\s+\S+$',
                       r'ssl.cacertfile = ' + self.cert_dir +
-                      '/cacert.pem',
+                      '/ca.crt',
                       conf, flags=re.MULTILINE)
-        conf = re.sub(r'^##\s+listener.https.internal',
-                      'listener.https.internal', conf,
-                      flags=re.MULTILINE)
-        conf = re.sub(r'^listener.https.internal\s+=\s+\S+',
+        conf = re.sub(r'^#*\s*listener.https.internal\s+=\s+\S+',
                       r'listener.https.internal = ' + https_host,
                       conf, flags=re.MULTILINE)
         conf = re.sub(r'^listener.protobuf.internal\s+=\s+\S+',
@@ -351,38 +357,6 @@ class preconfig_security(Command):
         f.write(conf)
         f.close()
 
-    def _update_advanced_conf(self):
-        self._backup_file(self.advanced_conf)
-        conf = ""
-        if os.path.isfile(self.advanced_conf):
-            f = open(self.advanced_conf, 'r', False)
-            conf = f.read()
-            f.close()
-
-        if re.search(r'{riak_api,', conf) and re.search(r'{certfile,', conf):
-            # Already has certificates
-            conf = re.sub(r'{certfile,\s+[^}]+}',
-                          r'{certfile, "' + self.cert_dir + '/cert.pem"}',
-                          conf, flags=re.MULTILINE)
-            conf = re.sub(r'{keyfile,\s+[^}]+}',
-                          r'{keyfile, "' + self.cert_dir + '/key.pem"}',
-                          conf, flags=re.MULTILINE)
-            conf = re.sub(r'{cacertfile,\s+[^}]+}',
-                          r'{cacertfile, "' + self.cert_dir +
-                          '/cacert.pem"}',
-                          conf, flags=re.MULTILINE)
-        else:
-            # Add from scratch
-            conf += '[\n  {riak_api, [\n'
-            conf += '    {{certfile, "{0}/cert.pem"}},\n'.format(self.cert_dir)
-            conf += '    {{keyfile, "{0}/key.pem"}},\n'.format(self.cert_dir)
-            conf += '    {{cacertfile, "{0}/cacert.pem"}}\n' \
-                .format(self.cert_dir)
-            conf += '  ]}\n].\n'
-
-        f = open(self.advanced_conf, 'w', False)
-        f.write(conf)
-        f.close()
 
     def _backup_file(self, name):
         backup = name + ".bak"
@@ -408,7 +382,6 @@ class setup_tests(Command):
         self.riak_admin = None
         self.username = None
         self.password = None
-        pass
 
     def finalize_options(self):
         bucket = self.distribution.get_command_obj('create_bucket_types')
@@ -417,7 +390,6 @@ class setup_tests(Command):
         security.riak_admin = self.riak_admin
         security.username = self.username
         security.password = self.password
-        pass
 
     def run(self):
         # Run all relevant sub-commands.

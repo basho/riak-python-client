@@ -1,35 +1,35 @@
 Certificate:
     Data:
         Version: 3 (0x2)
-        Serial Number: 10876751 (0xa5f74f)
+        Serial Number: 6741516 (0x66de0c)
     Signature Algorithm: sha1WithRSAEncryption
         Issuer: C=US, ST=Washington, L=Seattle, O=Basho, OU=Riak Python Client, CN=CA/emailAddress=clients@basho.com
         Validity
-            Not Before: May 26 21:23:32 2014 GMT
-            Not After : May 23 21:23:32 2024 GMT
-        Subject: C=US, ST=Washington, O=Basho, OU=Riak Python Client, CN=testuser/emailAddress=clients@basho.com
+            Not Before: May 27 19:42:46 2014 GMT
+            Not After : May 24 19:42:46 2024 GMT
+        Subject: C=US, ST=Washington, O=Basho, OU=Riak Python Client, CN=certuser/emailAddress=clients@basho.com
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
                 Public-Key: (2048 bit)
                 Modulus:
-                    00:cf:cd:fc:33:57:75:cd:fe:41:fd:a4:e2:c9:ea:
-                    1e:63:40:2a:13:88:b8:8a:ae:22:64:08:a2:ae:99:
-                    51:eb:63:47:da:cd:2b:44:52:21:8d:4b:85:05:b1:
-                    ea:fe:83:50:cc:ee:ff:4e:1f:64:bb:7e:47:d0:64:
-                    99:cb:4e:1b:ba:29:90:18:cf:7b:e4:77:76:24:53:
-                    e3:23:9d:18:17:0f:c6:27:07:17:80:e6:d0:71:3d:
-                    c1:72:f4:83:13:cc:75:d9:f9:24:b0:e9:a3:b3:a6:
-                    76:b3:29:e2:92:ce:e4:4d:60:21:d0:54:a1:db:21:
-                    0f:60:cc:d2:9e:c4:c9:41:89:64:3f:b6:ea:76:08:
-                    23:66:bb:84:8f:c4:ad:1a:cb:21:33:25:3c:d0:ea:
-                    98:31:34:12:65:94:9f:a3:aa:ca:24:2f:ba:40:cb:
-                    51:3d:ea:83:b0:98:9e:49:47:62:0a:18:66:e6:1f:
-                    4f:73:13:4d:1c:74:87:9d:e7:b3:89:4c:b5:8a:9a:
-                    80:5f:18:0a:4f:85:03:ca:4f:ec:9f:b5:e2:1c:b3:
-                    83:ff:2a:5c:69:8a:76:d8:a8:69:9e:3f:77:c7:4b:
-                    88:ff:2e:aa:ed:f4:61:62:e5:63:43:a9:4e:bb:2a:
-                    76:b2:ee:33:bb:3f:62:34:6f:49:49:02:15:5b:99:
-                    fb:8f
+                    00:b1:89:99:8c:dc:2c:c3:1d:fb:a2:c3:fd:bf:a4:
+                    2c:b2:b7:6c:9b:af:f9:d2:de:42:d9:9b:c5:1c:e8:
+                    3f:54:db:85:68:a7:d0:4a:5e:52:5c:0e:2e:77:24:
+                    76:c8:cd:4a:e7:27:5c:48:00:ff:14:75:ce:c2:a2:
+                    c8:70:e6:2b:d6:9f:d5:e9:04:88:5c:c1:3a:94:f8:
+                    89:48:74:9e:bf:ef:25:d1:99:b1:5f:d3:bc:c5:21:
+                    f4:e9:56:51:08:9f:2d:b0:c1:cf:6b:cc:09:fb:9a:
+                    ea:12:a3:ae:57:70:14:63:c5:8b:ae:92:16:c9:ec:
+                    7e:bc:03:5a:c9:94:b8:d3:1d:32:d8:1f:90:7b:9f:
+                    75:f3:01:30:a7:bd:a7:f9:c4:b1:ad:5d:0e:76:7f:
+                    dd:df:01:a1:b3:18:e7:76:d6:e1:14:6d:5c:7a:86:
+                    6f:56:05:a8:5d:0f:70:b2:68:ca:ac:80:11:2a:71:
+                    cc:4a:17:07:6e:d3:d3:9c:3e:51:a8:83:55:9a:2f:
+                    10:85:e0:2d:81:be:3d:8e:d4:f7:ff:0b:1b:95:f9:
+                    fc:7e:fa:c7:5a:88:ed:ae:55:c6:42:69:80:15:45:
+                    87:31:ab:bb:17:70:d8:d9:c1:48:41:cf:75:3b:ad:
+                    0f:46:20:11:59:fd:b8:96:a4:ea:a0:85:7e:42:a6:
+                    19:81
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
             X509v3 Basic Constraints: 
@@ -41,55 +41,55 @@ Certificate:
             Netscape Comment: 
                 Riak Python Client Testing Certificate
             X509v3 Subject Key Identifier: 
-                29:C0:0B:AF:17:C4:02:9A:66:F4:96:8F:EE:D7:0C:95:B1:B5:4D:EF
+                A6:FF:15:58:E1:37:34:03:E4:1D:46:56:A4:66:60:62:CD:02:9E:85
             X509v3 Authority Key Identifier: 
                 DirName:/C=US/ST=Washington/L=Seattle/O=Basho/OU=Riak Python Client/CN=CA/emailAddress=clients@basho.com
-                serial:D8:9C:6B:A8:96:59:31:8B
+                serial:E1:10:A9:1E:39:1D:6B:C1
 
             X509v3 Extended Key Usage: 
                 TLS Web Server Authentication, TLS Web Client Authentication
     Signature Algorithm: sha1WithRSAEncryption
-         bb:4a:a4:bc:df:4a:86:39:78:bc:8c:5b:2a:96:48:ed:33:9a:
-         5b:01:48:a2:50:18:92:84:93:59:74:d8:7d:c6:6b:7b:60:cb:
-         38:d6:84:af:3c:73:1d:d4:12:88:8d:be:b6:8a:17:87:77:ad:
-         1b:67:c5:6e:3d:9f:2c:00:8b:e4:41:1a:dd:3e:61:2d:d1:a2:
-         12:82:f8:87:21:75:1b:3a:94:ad:3c:9c:bd:1f:50:63:11:da:
-         7f:a6:99:94:d9:06:fa:db:53:db:7c:a1:75:c7:13:04:ee:6f:
-         21:3c:8d:bd:e0:27:1b:92:50:4c:5f:12:86:ef:9c:be:25:0c:
-         95:23:b9:a9:bd:14:2d:d5:dc:6d:56:50:20:c5:29:23:1f:1b:
-         19:f7:fe:a3:eb:1c:04:53:4f:93:c1:7a:ff:78:cd:01:4a:2f:
-         11:fd:45:eb:fe:7c:52:62:34:f2:f6:e7:20:55:fc:24:8a:ba:
-         98:21:52:cc:3d:fa:49:81:55:b3:0b:97:21:f1:f2:bf:5f:e0:
-         0c:8b:89:68:b3:09:b8:a6:9e:57:91:79:7d:14:b4:45:42:45:
-         03:7a:c4:30:a3:a6:a7:2b:9a:1e:6e:c6:07:fb:57:b3:a7:e0:
-         55:82:a6:f1:56:47:c7:22:e5:46:03:e1:76:52:1b:1c:6f:a2:
-         27:25:92:29
+         bf:db:c4:09:e5:d3:51:5f:81:79:fc:04:b4:97:e7:4a:be:86:
+         3e:33:0a:c6:00:24:15:85:9a:d4:5c:dc:7c:d4:88:c6:c8:d3:
+         26:64:1d:0f:97:36:70:2b:04:c2:c3:b1:fb:d7:36:e2:51:80:
+         a9:0c:ab:8a:fd:4f:50:cb:0e:23:e6:b2:e4:6c:59:0b:44:c2:
+         66:2f:6c:60:b5:3f:e0:b8:e0:01:a5:1b:57:83:4e:38:a4:6a:
+         56:10:ec:9b:17:57:7c:4a:0a:8b:13:b5:19:69:e2:9f:47:20:
+         14:83:bf:f1:5e:cd:b8:5c:09:f0:a9:d1:4e:63:a4:2d:73:bb:
+         1d:56:d3:89:d1:ac:ca:f9:c8:4b:8c:e2:a8:65:aa:c6:af:9c:
+         dd:c9:36:2d:ba:16:b1:6d:52:44:f7:ef:86:9b:06:4c:93:f8:
+         07:b4:d3:0e:9c:4b:fc:7c:34:20:37:46:cc:0b:2f:33:5b:d8:
+         7c:eb:af:48:a8:b0:2e:a0:a6:52:d3:84:cd:f7:d5:5d:e9:37:
+         f5:46:af:3c:c9:e5:fa:78:28:39:43:1b:c8:a7:f0:c3:a2:23:
+         18:11:15:18:17:bf:e7:4f:56:8c:64:9f:a4:89:32:e3:42:bb:
+         2f:ab:ca:73:ef:b5:da:5c:6b:45:16:21:54:e7:f3:ba:43:91:
+         25:2b:0c:c3
 -----BEGIN CERTIFICATE-----
-MIIE7DCCA9SgAwIBAgIEAKX3TzANBgkqhkiG9w0BAQUFADCBkDELMAkGA1UEBhMC
-VVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxDjAMBgNV
-BAoMBUJhc2hvMRswGQYDVQQLDBJSaWFrIFB5dGhvbiBDbGllbnQxCzAJBgNVBAMM
-AkNBMSAwHgYJKoZIhvcNAQkBFhFjbGllbnRzQGJhc2hvLmNvbTAeFw0xNDA1MjYy
-MTIzMzJaFw0yNDA1MjMyMTIzMzJaMIGEMQswCQYDVQQGEwJVUzETMBEGA1UECAwK
-V2FzaGluZ3RvbjEOMAwGA1UECgwFQmFzaG8xGzAZBgNVBAsMElJpYWsgUHl0aG9u
-IENsaWVudDERMA8GA1UEAwwIdGVzdHVzZXIxIDAeBgkqhkiG9w0BCQEWEWNsaWVu
-dHNAYmFzaG8uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz838
-M1d1zf5B/aTiyeoeY0AqE4i4iq4iZAiirplR62NH2s0rRFIhjUuFBbHq/oNQzO7/
-Th9ku35H0GSZy04buimQGM975Hd2JFPjI50YFw/GJwcXgObQcT3BcvSDE8x12fkk
-sOmjs6Z2syniks7kTWAh0FSh2yEPYMzSnsTJQYlkP7bqdggjZruEj8StGsshMyU8
-0OqYMTQSZZSfo6rKJC+6QMtRPeqDsJieSUdiChhm5h9PcxNNHHSHneeziUy1ipqA
-XxgKT4UDyk/sn7XiHLOD/ypcaYp22Khpnj93x0uI/y6q7fRhYuVjQ6lOuyp2su4z
-uz9iNG9JSQIVW5n7jwIDAQABo4IBVjCCAVIwCQYDVR0TBAIwADARBglghkgBhvhC
-AQEEBAMCBsAwCwYDVR0PBAQDAgXgMDUGCWCGSAGG+EIBDQQoFiZSaWFrIFB5dGhv
-biBDbGllbnQgVGVzdGluZyBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUKcALrxfEAppm
-9JaP7tcMlbG1Te8wga8GA1UdIwSBpzCBpKGBlqSBkzCBkDELMAkGA1UEBhMCVVMx
-EzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxDjAMBgNVBAoM
-BUJhc2hvMRswGQYDVQQLDBJSaWFrIFB5dGhvbiBDbGllbnQxCzAJBgNVBAMMAkNB
-MSAwHgYJKoZIhvcNAQkBFhFjbGllbnRzQGJhc2hvLmNvbYIJANica6iWWTGLMB0G
-A1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjANBgkqhkiG9w0BAQUFAAOCAQEA
-u0qkvN9Khjl4vIxbKpZI7TOaWwFIolAYkoSTWXTYfcZre2DLONaErzxzHdQSiI2+
-tooXh3etG2fFbj2fLACL5EEa3T5hLdGiEoL4hyF1GzqUrTycvR9QYxHaf6aZlNkG
-+ttT23yhdccTBO5vITyNveAnG5JQTF8Shu+cviUMlSO5qb0ULdXcbVZQIMUpIx8b
-Gff+o+scBFNPk8F6/3jNAUovEf1F6/58UmI08vbnIFX8JIq6mCFSzD36SYFVswuX
-IfHyv1/gDIuJaLMJuKaeV5F5fRS0RUJFA3rEMKOmpyuaHm7GB/tXs6fgVYKm8VZH
-xyLlRgPhdlIbHG+iJyWSKQ==
+MIIE6zCCA9OgAwIBAgIDZt4MMA0GCSqGSIb3DQEBBQUAMIGQMQswCQYDVQQGEwJV
+UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEOMAwGA1UE
+CgwFQmFzaG8xGzAZBgNVBAsMElJpYWsgUHl0aG9uIENsaWVudDELMAkGA1UEAwwC
+Q0ExIDAeBgkqhkiG9w0BCQEWEWNsaWVudHNAYmFzaG8uY29tMB4XDTE0MDUyNzE5
+NDI0NloXDTI0MDUyNDE5NDI0NlowgYQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApX
+YXNoaW5ndG9uMQ4wDAYDVQQKDAVCYXNobzEbMBkGA1UECwwSUmlhayBQeXRob24g
+Q2xpZW50MREwDwYDVQQDDAhjZXJ0dXNlcjEgMB4GCSqGSIb3DQEJARYRY2xpZW50
+c0BiYXNoby5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCxiZmM
+3CzDHfuiw/2/pCyyt2ybr/nS3kLZm8Uc6D9U24Vop9BKXlJcDi53JHbIzUrnJ1xI
+AP8Udc7Coshw5ivWn9XpBIhcwTqU+IlIdJ6/7yXRmbFf07zFIfTpVlEIny2wwc9r
+zAn7muoSo65XcBRjxYuukhbJ7H68A1rJlLjTHTLYH5B7n3XzATCnvaf5xLGtXQ52
+f93fAaGzGOd21uEUbVx6hm9WBahdD3CyaMqsgBEqccxKFwdu09OcPlGog1WaLxCF
+4C2Bvj2O1Pf/CxuV+fx++sdaiO2uVcZCaYAVRYcxq7sXcNjZwUhBz3U7rQ9GIBFZ
+/biWpOqghX5CphmBAgMBAAGjggFWMIIBUjAJBgNVHRMEAjAAMBEGCWCGSAGG+EIB
+AQQEAwIGwDALBgNVHQ8EBAMCBeAwNQYJYIZIAYb4QgENBCgWJlJpYWsgUHl0aG9u
+IENsaWVudCBUZXN0aW5nIENlcnRpZmljYXRlMB0GA1UdDgQWBBSm/xVY4Tc0A+Qd
+RlakZmBizQKehTCBrwYDVR0jBIGnMIGkoYGWpIGTMIGQMQswCQYDVQQGEwJVUzET
+MBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEOMAwGA1UECgwF
+QmFzaG8xGzAZBgNVBAsMElJpYWsgUHl0aG9uIENsaWVudDELMAkGA1UEAwwCQ0Ex
+IDAeBgkqhkiG9w0BCQEWEWNsaWVudHNAYmFzaG8uY29tggkA4RCpHjkda8EwHQYD
+VR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBBQUAA4IBAQC/
+28QJ5dNRX4F5/AS0l+dKvoY+MwrGACQVhZrUXNx81IjGyNMmZB0PlzZwKwTCw7H7
+1zbiUYCpDKuK/U9Qyw4j5rLkbFkLRMJmL2xgtT/guOABpRtXg044pGpWEOybF1d8
+SgqLE7UZaeKfRyAUg7/xXs24XAnwqdFOY6Qtc7sdVtOJ0azK+chLjOKoZarGr5zd
+yTYtuhaxbVJE9++GmwZMk/gHtNMOnEv8fDQgN0bMCy8zW9h8669IqLAuoKZS04TN
+99Vd6Tf1Rq88yeX6eCg5QxvIp/DDoiMYERUYF7/nT1aMZJ+kiTLjQrsvq8pz77Xa
+XGtFFiFU5/O6Q5ElKwzD
 -----END CERTIFICATE-----

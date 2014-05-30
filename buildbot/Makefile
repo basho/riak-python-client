@@ -24,3 +24,12 @@ lint:
 
 test:
 	@RUN_YZ=1 SKIP_INDEXES=0 ../setup.py test
+
+preconfigure_security:
+	@../setup.py preconfig_security --riak-conf=${RIAK_CONF}
+
+configure_security:
+	@../setup.py setup_tests --riak-admin=${RIAK_ADMIN}
+
+test_security:
+	(cd ..; RUN_YZ=1 SKIP_INDEXES=0 RUN_SECURITY=1 RIAK_TEST_HTTP_PORT=8099 ./setup.py test)

@@ -55,7 +55,7 @@ class LinkTests(object):
 
     # "Link walking is deprecated in Riak 2.0 and is not compatible
     #  with security."
-    @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is undefined')
+    @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is set')
     def test_link_walking(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)

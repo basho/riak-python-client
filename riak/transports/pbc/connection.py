@@ -19,6 +19,7 @@ under the License.
 import socket
 import struct
 import riak_pb
+from riak.security import SecurityError, check_revoked_cert
 from riak import RiakError
 from riak_pb.messages import (
     MESSAGE_CLASSES,
@@ -27,16 +28,13 @@ from riak_pb.messages import (
     MSG_CODE_AUTH_REQ,
     MSG_CODE_AUTH_RESP
 )
-import OpenSSL.SSL
+from OpenSSL.SSL import Context, Connection
 
 
 class RiakPbcConnection(object):
     """
     Connection-related methods for RiakPbcTransport.
     """
-
-    def __init__(self):
-        self._secure_connection = None
 
     def _encode_msg(self, msg_code, msg=None):
         if msg is None:
@@ -69,13 +67,16 @@ class RiakPbcConnection(object):
         self._connect()
         self._non_connect_send_msg(msg_code, msg)
 
-    def _check_security(self):
-        # _ssh_handshake() will throw an exception upon failure,
-        # while _starttls() and _auth() return false
-        if self._starttls() and self._ssl_handshake() and self._auth():
-            self._secure_connection = True
-        else:
-            self._secure_connection = False
+    def _init_security(self):
+        """
+        Initialize a secure connection to the server.
+        """
+        if not self._starttls():
+            raise SecurityError("Could not start TLS connection")
+        # _ssh_handshake() will throw an exception upon failure
+        self._ssl_handshake()
+        if not self._auth():
+            raise SecurityError("Could not authorize connection")
 
     def _starttls(self):
         """
@@ -114,16 +115,29 @@ class RiakPbcConnection(object):
         """
         if self._client._credentials:
             ssl_ctx = \
-                OpenSSL.SSL.Context(self._client._credentials.ssl_version)
+                Context(self._client._credentials.ssl_version)
+            key_file = self._client._credentials.key_file
+            cert_file = self._client._credentials.cert_file
             cacert_file = self._client._credentials.cacert_file
+            crl_file = self._client._credentials.crl_file
             try:
-                ssl_ctx.load_verify_locations(cacert_file)
+                if key_file is not None:
+                    ssl_ctx.use_privatekey_file(key_file)
+                if cert_file is not None:
+                    ssl_ctx.use_certificate_chain_file(cert_file)
+                if cacert_file is not None:
+                    ssl_ctx.load_verify_locations(cacert_file)
+
                 # attempt to upgrade the socket to SSL
-                ssl_socket = OpenSSL.SSL.Connection(ssl_ctx, self._socket)
+                ssl_socket = Connection(ssl_ctx, self._socket)
                 ssl_socket.set_connect_state()
                 ssl_socket.do_handshake()
                 # ssl handshake successful
                 self._socket = ssl_socket
+                
+                if crl_file is not None:
+                    check_revoked_cert(ssl_socket, crl_file)
+
                 return True
             except Exception as e:
                 # fail if *any* exceptions are thrown during SSL handshake
@@ -171,8 +185,8 @@ class RiakPbcConnection(object):
                                                         self._timeout)
             else:
                 self._socket = socket.create_connection(self._address)
-        if self._client._credentials and not self._secure_connection:
-            self._check_security()
+            if self._client._credentials:
+                self._init_security()
 
     def close(self):
         """
