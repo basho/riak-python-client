@@ -94,6 +94,7 @@ class SecurityCreds(object):
         self.crl_file = crl_file
         self.ssl_version = ssl_version
 
+
 def check_revoked_cert(ssl_socket, crl_file):
     """
     Determine if the server certificate has been revoked or not.

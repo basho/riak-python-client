@@ -90,8 +90,8 @@ class SecurityTests(object):
         else:
             with self.assertRaises(Exception):
                 key1.store()
-                myBucket.get('x')                
-        
+                myBucket.get('x')
+
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_revoked_cert(self):
         creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
@@ -100,7 +100,7 @@ class SecurityTests(object):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
-            
+
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_ca_cert(self):
         creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,

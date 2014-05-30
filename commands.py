@@ -357,7 +357,6 @@ class preconfig_security(Command):
         f.write(conf)
         f.close()
 
-
     def _backup_file(self, name):
         backup = name + ".bak"
         if os.path.isfile(name):

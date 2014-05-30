@@ -233,4 +233,3 @@ class fileobject(socket._fileobject):
                 buf_len += n
                 # assert buf_len == buf.tell()
             return buf.getvalue()
-

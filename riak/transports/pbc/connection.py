@@ -134,7 +134,7 @@ class RiakPbcConnection(object):
                 ssl_socket.do_handshake()
                 # ssl handshake successful
                 self._socket = ssl_socket
-                
+
                 if crl_file is not None:
                     check_revoked_cert(ssl_socket, crl_file)
 
