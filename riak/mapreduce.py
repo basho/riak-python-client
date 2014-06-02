@@ -145,21 +145,21 @@ class RiakMapReduce(object):
         self._key_filters.append(args)
         return self
 
-    def search(self, bucket, query):
+    def search(self, index, query):
         """
         Begin a map/reduce operation using a Search. This command will
         return an error unless executed against a Riak Search cluster.
 
-        :param bucket: The bucket over which to perform the search
-        :type bucket: string
+        :param index: The Solr index used in the search
+        :type index: string
         :param query: The search query
         :type query: string
         :rtype: :class:`RiakMapReduce`
         """
         self._input_mode = 'query'
-        self._inputs = {'module': 'riak_search',
-                        'function': 'mapred_search',
-                        'arg': [bucket, query]}
+        self._inputs = {'bucket': index,
+                        'index': index,
+                        'query': query}
         return self
 
     def index(self, bucket, index, startkey, endkey=None):
