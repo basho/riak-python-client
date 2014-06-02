@@ -235,16 +235,17 @@ class ClientTests(object):
         results = client.bucket(self.bucket_name).multiget(keys)
         for failure in results:
             self.assertIsInstance(failure, tuple)
-            self.assertEqual(failure[0], self.bucket_name)
-            self.assertIn(failure[1], keys)
-            self.assertIsInstance(failure[2], StandardError)
+            self.assertEqual(failure[0], 'default')
+            self.assertEqual(failure[1], self.bucket_name)
+            self.assertIn(failure[2], keys)
+            self.assertIsInstance(failure[3], StandardError)
 
     def test_multiget_notfounds(self):
         """
         Not founds work in multiget just the same as get.
         """
-        keys = [(self.bucket_name, self.key_name),
-                (self.bucket_name, self.randname())]
+        keys = [("default", self.bucket_name, self.key_name),
+                ("default", self.bucket_name, self.randname())]
         results = self.client.multiget(keys)
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
