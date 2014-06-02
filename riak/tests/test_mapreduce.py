@@ -10,6 +10,7 @@ else:
 
 from . import RUN_YZ
 
+
 class LinkTests(object):
     def test_store_and_get_links(self):
         # Create the object...
@@ -125,6 +126,7 @@ class ErlangMapReduceTests(object):
         with self.assertRaises(ValueError):
             mr = self.client.search(self.bucket_name, 'fleh')
             mr.add_key_filter("tokenize", "-", 1)
+
 
 class JSMapReduceTests(object):
     def test_javascript_source_map(self):
@@ -375,8 +377,8 @@ class JSMapReduceTests(object):
         mr.map("""function(v) {
             var riak_obj = JSON.parse(v.values[0].data);
             return [riak_obj['calories_i']]; }""")
-        result = mr.reduce(
-           'function(values, arg) { return [values.sort()[0]]; }').run()
+        result = mr.reduce('function(values, arg) ' +
+                           '{ return [values.sort()[0]]; }').run()
         self.assertEquals(result, [100])
 
 

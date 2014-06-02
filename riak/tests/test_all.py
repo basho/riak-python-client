@@ -67,7 +67,6 @@ def setUpModule():
         # Add bucket and type for Search -> MapReduce
         testrun_mr_btype = 'pytest-mr'
         testrun_mr_bucket = 'mrbucket'
-        #c.create_search_index(testrun_mr_bucket)
         c.create_search_index(testrun_mr_bucket, '_yz_default')
         t = c.bucket_type(testrun_mr_btype)
         b = t.bucket(testrun_mr_bucket)
@@ -78,6 +77,7 @@ def setUpModule():
                 index_set = True
             except RiakError:
                 pass
+
 
 def tearDownModule():
     global testrun_search_bucket, testrun_props_bucket, \
@@ -108,6 +108,7 @@ def tearDownModule():
         for keys in mrbucket.stream_keys():
             for key in keys:
                 mrbucket.delete(key)
+
 
 class BaseTestCase(object):
 
