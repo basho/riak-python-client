@@ -265,6 +265,7 @@ class ClientTests(object):
         self.assertEqual(len(self.client._http_pool.elements), 0)
         self.assertEqual(len(self.client._pb_pool.elements), 0)
 
+
 class RiakPbcTransportTestCase(BasicKVTests,
                                KVFileTests,
                                BucketPropsTest,
