@@ -104,7 +104,15 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, body = self._request('GET', '/',
                                         {'Accept': 'application/json'})
         if status == 200:
-            return json.loads(body)
+            tmp, resources = json.loads(body), {}
+            for k in tmp:
+                # The keys and values returned by json.loads() are unicode,
+                # which will cause problems when passed into httplib later
+                # (expecting bytes both in Python 2.x and 3.x).
+                # We just encode the resource paths into bytes, with an
+                # encoding consistent with what the resources module expects.
+                resources[k] = tmp[k].encode('utf-8')
+            return resources
         else:
             return {}
 
