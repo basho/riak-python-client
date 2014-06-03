@@ -149,3 +149,18 @@ class YZSearchTests(object):
             pass
         results = bucket.search(u"text_ja:大好き".encode('utf8'))
         self.assertEquals(1, len(results['docs']))
+
+    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
+    def test_yz_multivalued_fields(self):
+        bucket = self.client.bucket(self.yz_bucket)
+        body = {"groups_ss": ['a', 'b', 'c']}
+        bucket.new('multivalued', body).store()
+        while len(bucket.search('*:*')['docs']) == 0:
+            pass
+        results = bucket.search('groups_ss:*')
+        self.assertEquals(1, len(results['docs']))
+        doc = results['docs'][0]
+        self.assertIn('groups_ss', doc)
+        field = doc['groups_ss']
+        self.assertIsInstance(field, list)
+        self.assertItemsEqual(['a', 'b', 'c'], field)
