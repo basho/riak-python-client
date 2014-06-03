@@ -544,27 +544,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             return self._search_mapred_emu(index, query)
 
         req = riak_pb.RpbSearchQueryReq(index=index, q=query)
-        if 'rows' in params:
-            req.rows = params['rows']
-        if 'start' in params:
-            req.start = params['start']
-        if 'sort' in params:
-            req.sort = params['sort']
-        if 'filter' in params:
-            req.filter = params['filter']
-        if 'df' in params:
-            req.df = params['df']
-        if 'op' in params:
-            req.op = params['op']
-        if 'q.op' in params:
-            req.op = params['q.op']
-        if 'fl' in params:
-            if isinstance(params['fl'], list):
-                req.fl.extend(params['fl'])
-            else:
-                req.fl.append(params['fl'])
-        if 'presort' in params:
-            req.presort = params['presort']
+        self._encode_search_query(req, params)
 
         msg_code, resp = self._request(MSG_CODE_SEARCH_QUERY_REQ, req,
                                        MSG_CODE_SEARCH_QUERY_RESP)
@@ -574,21 +554,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             result['max_score'] = resp.max_score
         if resp.HasField('num_found'):
             result['num_found'] = resp.num_found
-        docs = []
-        for doc in resp.docs:
-            resultdoc = {}
-            for pair in doc.fields:
-                ukey = unicode(pair.key, 'utf-8')
-                uval = unicode(pair.value, 'utf-8')
-                # Handle multivalued field
-                if ukey in resultdoc:
-                    if not isinstance(resultdoc[ukey], list):
-                        resultdoc[ukey] = [resultdoc[ukey], ]
-                    resultdoc[ukey].append(uval)
-                else:
-                    resultdoc[ukey] = uval
-            docs.append(resultdoc)
-        result['docs'] = docs
+        result['docs'] = [self._decode_search_doc(doc) for doc in resp.docs]
         return result
 
     def get_counter(self, bucket, key, **params):
