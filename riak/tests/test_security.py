@@ -108,3 +108,22 @@ class SecurityTests(object):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
+
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    def test_security_ciphers(self):
+        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+                              ciphers='DHE-RSA-AES256-SHA')
+        client = self.create_client(credentials=creds)
+        myBucket = client.bucket('test')
+        val1 = "foobar"
+        key1 = myBucket.new('x', data=val1)
+        key1.store()
+        myBucket.get('x')
+
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    def test_security_bad_ciphers(self):
+        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+                              ciphers='ECDHE-RSA-AES256-GCM-SHA384')
+        client = self.create_client(credentials=creds)
+        with self.assertRaises(Exception):
+            client.get_buckets()

@@ -22,7 +22,7 @@ import socket
 import select
 
 from riak.security import SecurityError, check_revoked_cert
-from riak.transports.security import RiakWrappedSocket
+from riak.transports.security import RiakWrappedSocket, configure_context
 from riak.transports.pool import Pool
 from riak.transports.http.transport import RiakHttpTransport
 
@@ -49,6 +49,7 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
                  credentials,
                  key_file=None,
                  cert_file=None,
+                 ciphers=None,
                  timeout=None):
         """
         Class to make a HTTPS connection,
@@ -64,6 +65,8 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         :type key_file: str
         :param cert_file: PEM formatted certificate chain file
         :type key_file: str
+        :param ciphers: List of supported SSL ciphers
+        :type ciphers: str
         :param timeout: Number of seconds before timing out
         :type timeout: int
         """
@@ -83,12 +86,7 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         """
         sock = socket.create_connection((self.host, self.port), self.timeout)
         ssl_ctx = OpenSSL.SSL.Context(self.credentials.ssl_version)
-        if self.credentials.key_file is not None:
-            ssl_ctx.use_privatekey_file(self.credentials.key_file)
-        if self.credentials.cacert_file is not None:
-            ssl_ctx.load_verify_locations(self.credentials.cacert_file)
-        if self.credentials.cert_file is not None:
-            ssl_ctx.use_certificate_chain_file(self.credentials.cert_file)
+        configure_context(ssl_ctx, self.credentials)
 
         # attempt to upgrade the socket to SSL
         cxn = OpenSSL.SSL.Connection(ssl_ctx, sock)

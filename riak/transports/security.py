@@ -24,6 +24,30 @@ except ImportError:
     from StringIO import StringIO
 
 
+def configure_context(ssl_ctx, credentials):
+    """
+    Set various options on the SSL context.
+
+    :param ssl_ctx: OpenSSL context
+    :type ssl_ctx: OpenSSL.SSL.Context
+    :param credentials: Riak Security Credentials
+    :type credentials:
+    """
+    key_file = credentials.key_file
+    cert_file = credentials.cert_file
+    cacert_file = credentials.cacert_file
+    crl_file = credentials.crl_file
+    ciphers = credentials.ciphers
+    if key_file is not None:
+        ssl_ctx.use_privatekey_file(key_file)
+    if cert_file is not None:
+        ssl_ctx.use_certificate_chain_file(cert_file)
+    if cacert_file is not None:
+        ssl_ctx.load_verify_locations(cacert_file)
+    if ciphers is not None:
+        ssl_ctx.set_cipher_list(ciphers)
+
+
 # Inspired by
 # https://github.com/shazow/urllib3/blob/master/urllib3/contrib/pyopenssl.py
 class RiakWrappedSocket(object):

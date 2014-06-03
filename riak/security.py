@@ -67,6 +67,7 @@ class SecurityCreds(object):
                  cert_file=None,
                  cacert_file=None,
                  crl_file=None,
+                 ciphers=None,
                  ssl_version=OpenSSL.SSL.TLSv1_2_METHOD):
         """
         Container class for security-related settings
@@ -83,6 +84,8 @@ class SecurityCreds(object):
         :type cacert_file: str
         :param crl_file: Full path to revoked certificates file
         :type crl_file: str
+        :param ciphers: List of supported SSL ciphers
+        :type ciphers: str
         :param ssl_version: OpenSSL security version
         :type ssl_version: int
         """
@@ -92,6 +95,7 @@ class SecurityCreds(object):
         self.cert_file = cert_file
         self.cacert_file = cacert_file
         self.crl_file = crl_file
+        self.ciphers = ciphers
         self.ssl_version = ssl_version
 
 

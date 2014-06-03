@@ -20,6 +20,7 @@ import socket
 import struct
 import riak_pb
 from riak.security import SecurityError, check_revoked_cert
+from riak.transports.security import configure_context
 from riak import RiakError
 from riak_pb.messages import (
     MESSAGE_CLASSES,
@@ -116,18 +117,9 @@ class RiakPbcConnection(object):
         if self._client._credentials:
             ssl_ctx = \
                 Context(self._client._credentials.ssl_version)
-            key_file = self._client._credentials.key_file
-            cert_file = self._client._credentials.cert_file
-            cacert_file = self._client._credentials.cacert_file
             crl_file = self._client._credentials.crl_file
             try:
-                if key_file is not None:
-                    ssl_ctx.use_privatekey_file(key_file)
-                if cert_file is not None:
-                    ssl_ctx.use_certificate_chain_file(cert_file)
-                if cacert_file is not None:
-                    ssl_ctx.load_verify_locations(cacert_file)
-
+                configure_context(ssl_ctx, self._client._credentials)
                 # attempt to upgrade the socket to SSL
                 ssl_socket = Connection(ssl_ctx, self._socket)
                 ssl_socket.set_connect_state()
