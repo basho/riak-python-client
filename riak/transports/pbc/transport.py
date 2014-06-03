@@ -543,6 +543,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
 
+        if isinstance(query, unicode):
+            query = query.encode('utf8')
+
         req = riak_pb.RpbSearchQueryReq(index=index, q=query)
         self._encode_search_query(req, params)
 
