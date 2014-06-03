@@ -144,6 +144,8 @@ class YZSearchTests(object):
         bucket = self.client.bucket(self.yz_bucket)
         body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
         bucket.new("shift_jis", body).store()
-        # TODO: fails due to lack of direct PB unicode support
-        # results = bucket.search(u"text_ja:大好き")
-        # self.assertEquals(1, len(results['docs']))
+        # TODO: encode the query as UTF8 in the transport as necessary
+        while len(bucket.search('*:*')['docs']) == 0:
+            pass
+        results = bucket.search(u"text_ja:大好き".encode('utf8'))
+        self.assertEquals(1, len(results['docs']))
