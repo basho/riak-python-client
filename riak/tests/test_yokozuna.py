@@ -143,21 +143,23 @@ class YZSearchTests(object):
     def test_yz_search_utf8(self):
         bucket = self.client.bucket(self.yz_bucket)
         body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
-        bucket.new("shift_jis", body).store()
+        bucket.new(self.key_name, body).store()
         # TODO: encode the query as UTF8 in the transport as necessary
-        while len(bucket.search('*:*')['docs']) == 0:
+        while len(bucket.search('_yz_rk:' + self.key_name)['docs']) == 0:
             pass
-        results = bucket.search(u"text_ja:大好き".encode('utf8'))
+        results = bucket.search(u"text_ja:大好き AND  _yz_rk:{}".
+                                format(self.key_name).encode('utf8'))
         self.assertEquals(1, len(results['docs']))
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_multivalued_fields(self):
         bucket = self.client.bucket(self.yz_bucket)
         body = {"groups_ss": ['a', 'b', 'c']}
-        bucket.new('multivalued', body).store()
-        while len(bucket.search('*:*')['docs']) == 0:
+        bucket.new(self.key_name, body).store()
+        while len(bucket.search('_yz_rk:'+self.key_name)['docs']) == 0:
             pass
-        results = bucket.search('groups_ss:*')
+        results = bucket.search('groups_ss:* AND _yz_rk:{}'.
+                                format(self.key_name))
         self.assertEquals(1, len(results['docs']))
         doc = results['docs'][0]
         self.assertIn('groups_ss', doc)

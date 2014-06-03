@@ -583,7 +583,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                 # Handle multivalued field
                 if ukey in resultdoc:
                     if not isinstance(resultdoc[ukey], list):
-                        resultdoc[ukey] = [resultdoc[ukey],]
+                        resultdoc[ukey] = [resultdoc[ukey], ]
                     resultdoc[ukey].append(uval)
                 else:
                     resultdoc[ukey] = uval
