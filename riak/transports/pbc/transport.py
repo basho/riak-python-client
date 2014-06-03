@@ -580,7 +580,13 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             for pair in doc.fields:
                 ukey = unicode(pair.key, 'utf-8')
                 uval = unicode(pair.value, 'utf-8')
-                resultdoc[ukey] = uval
+                # Handle multivalued field
+                if ukey in resultdoc:
+                    if not isinstance(resultdoc[ukey], list):
+                        resultdoc[ukey] = [resultdoc[ukey],]
+                    resultdoc[ukey].append(uval)
+                else:
+                    resultdoc[ukey] = uval
             docs.append(resultdoc)
         result['docs'] = docs
         return result
