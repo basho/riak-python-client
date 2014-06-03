@@ -7,7 +7,7 @@ else:
 
 from . import SKIP_BTYPES
 from riak.bucket import RiakBucket, BucketType
-from riak import RiakError
+from riak import RiakError, RiakObject
 
 
 class BucketTypeTests(object):
@@ -143,3 +143,19 @@ class BucketTypeTests(object):
 
         oldapikeys = self.client.get_keys(self.client.bucket(self.bucket_name))
         self.assertItemsEqual(keys, oldapikeys)
+
+    @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
+    def test_multiget_bucket_types(self):
+        btype = self.client.bucket_type('pytest')
+        bucket = btype.bucket(self.bucket_name)
+
+        for i in range(100):
+            obj = bucket.new(self.key_name + str(i))
+            obj.data = {'id': i}
+            obj.store()
+
+        mget = bucket.multiget([self.key_name + str(i) for i in range(100)])
+        for mobj in mget:
+            self.assertIsInstance(mobj, RiakObject)
+            self.assertEqual(bucket, mobj.bucket)
+            self.assertEqual(btype, mobj.bucket.bucket_type)

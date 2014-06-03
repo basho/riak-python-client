@@ -34,7 +34,8 @@ except NotImplementedError:
 
 #: A :class:`namedtuple` for tasks that are fed to workers in the
 #: multiget pool.
-Task = namedtuple('Task', ['client', 'outq', 'bucket', 'key', 'options'])
+Task = namedtuple('Task', ['client', 'outq', 'bucket_type', 'bucket', 'key',
+                           'options'])
 
 
 class MultiGetPool(object):
@@ -126,13 +127,13 @@ class MultiGetPool(object):
         while not self._should_quit():
             task = self._inq.get()
             try:
-                obj = task.client.bucket(task.bucket).get(task.key,
-                                                          **task.options)
+                btype = task.client.bucket_type(task.bucket_type)
+                obj = btype.bucket(task.bucket).get(task.key, **task.options)
                 task.outq.put(obj)
             except KeyboardInterrupt:
                 raise
             except Exception as err:
-                task.outq.put((task.bucket, task.key, err), )
+                task.outq.put((task.bucket_type, task.bucket, task.key, err), )
             finally:
                 self._inq.task_done()
 
@@ -160,15 +161,15 @@ def multiget(client, keys, **options):
 
     :param client: the client to use
     :type client: :class:`~riak.client.RiakClient`
-    :param keys: the bucket/key pairs to fetch in parallel
-    :type keys: list of two-tuples -- bucket/key pairs
+    :param keys: the keys to fetch in parallel
+    :type keys: list of three-tuples -- bucket_type/bucket/key
     :rtype: list
     """
     outq = Queue()
 
     RIAK_MULTIGET_POOL.start()
-    for bucket, key in keys:
-        task = Task(client, outq, bucket, key, options)
+    for bucket_type, bucket, key in keys:
+        task = Task(client, outq, bucket_type, bucket, key, options)
         RIAK_MULTIGET_POOL.enq(task)
 
     results = []
@@ -186,7 +187,7 @@ if __name__ == '__main__':
     from riak import RiakClient
     import riak.benchmark as benchmark
     client = RiakClient(protocol='pbc')
-    bkeys = [('multiget', str(key)) for key in xrange(10000)]
+    bkeys = [('default', 'multiget', str(key)) for key in xrange(10000)]
 
     data = open(__file__).read()
 
@@ -198,14 +199,14 @@ if __name__ == '__main__':
 
     with benchmark.measure() as b:
         with b.report('populate'):
-            for bucket, key in bkeys:
+            for _, bucket, key in bkeys:
                 client.bucket(bucket).new(key, encoded_data=data,
                                           content_type='text/plain'
                                           ).store()
     for b in benchmark.measure_with_rehearsal():
         client.protocol = 'http'
         with b.report('http seq'):
-            for bucket, key in bkeys:
+            for _, bucket, key in bkeys:
                 client.bucket(bucket).get(key)
 
         with b.report('http multi'):
@@ -213,7 +214,7 @@ if __name__ == '__main__':
 
         client.protocol = 'pbc'
         with b.report('pbc seq'):
-            for bucket, key in bkeys:
+            for _, bucket, key in bkeys:
                 client.bucket(bucket).get(key)
 
         with b.report('pbc multi'):
