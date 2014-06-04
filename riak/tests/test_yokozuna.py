@@ -62,13 +62,9 @@ class YZSearchTests(object):
         b = self.client.bucket(self.yz_bucket)
         b.set_property('search_index', self.yz_bucket)
         # Wait for index to apply
-        while True:
-            for index in self.client.list_search_indexes():
-                if index['name'] == self.yz_bucket:
-                    break
-            else:
-                continue  # executed if the loop ended normally (no break)
-            break  # executed if 'continue' was skipped (break)
+        indexes = []
+        while self.yz_bucket not in indexes:
+            indexes = [i['name'] for i in self.client.list_search_indexes()]
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_list_search_indexes(self):
