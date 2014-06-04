@@ -2,6 +2,7 @@
 
 from riak.mapreduce import RiakMapReduce
 from riak import key_filter, RiakError
+from riak.tests.test_yokozuna import wait_for_yz_index
 import platform
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -374,8 +375,7 @@ class JSMapReduceTests(object):
                               "calories_i": 110,
                               "fruit_b": False}).store()
         # Wait for Solr to catch up
-        while len(bucket.search('_yz_rk:Crunch')['docs']) == 0:
-            pass
+        wait_for_yz_index(bucket, "Crunch")
         mr = RiakMapReduce(self.client).search(self.mr_bucket, 'fruit_b:false')
         mr.map("""function(v) {
             var solr_doc = JSON.parse(v.values[0].data);

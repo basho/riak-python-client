@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import platform
-import time
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
@@ -9,12 +8,25 @@ else:
 from . import RUN_YZ
 
 
+def wait_for_yz_index(bucket, key):
+    """
+    Wait until Solr index has been updated and a value returns from a query.
+
+    :param bucket: Bucket to which indexed value is written
+    :type bucket: RiakBucket
+    :param key: Key to which value was written
+    :type key: str
+    """
+    while len(bucket.search('_yz_rk:' + key)['docs']) == 0:
+        pass
+
+
 class YZSearchTests(object):
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_from_bucket(self):
         bucket = self.client.bucket(self.yz_bucket)
         bucket.new("user", {"user_s": "Z"}).store()
-        time.sleep(1)
+        wait_for_yz_index(bucket, "user")
         results = bucket.search("user_s:Z")
         self.assertEquals(1, len(results['docs']))
         # TODO: check that docs return useful info
@@ -49,7 +61,10 @@ class YZSearchTests(object):
         self.client.create_search_index(self.yz_bucket, '_yz_default', 3)
         b = self.client.bucket(self.yz_bucket)
         b.set_property('search_index', self.yz_bucket)
-        time.sleep(1)  # wait for index to apply
+        # Wait for index to apply
+        indexes = []
+        while self.yz_bucket not in indexes:
+            indexes = [i['name'] for i in self.client.list_search_indexes()]
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_list_search_indexes(self):
@@ -112,7 +127,7 @@ class YZSearchTests(object):
                          "age_i": 32}).store()
         bucket.new("H", {"username_s": "H", "name_s": "brett",
                          "age_i": 14}).store()
-        time.sleep(1)
+        wait_for_yz_index(bucket, "H")
         # multiterm
         results = bucket.search("username_s:(F OR H)")
         self.assertEquals(2, len(results['docs']))
