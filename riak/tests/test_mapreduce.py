@@ -374,7 +374,9 @@ class JSMapReduceTests(object):
                               "sugar_i": 12,
                               "calories_i": 110,
                               "fruit_b": False}).store()
-        time.sleep(1)
+        # Wait for Solr to catch up
+        while len(bucket.search('_yz_rk:Crunch')['docs']) == 0:
+            pass
         mr = self.client.search(self.mr_bucket, 'fruit_b:false')
         mr.map("""function(v) {
             var solr_doc = JSON.parse(v.values[0].data);
