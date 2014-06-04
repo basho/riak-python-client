@@ -375,8 +375,8 @@ class JSMapReduceTests(object):
                               "fruit_b": False}).store()
         mr = self.client.search(self.mr_bucket, 'fruit_b:false')
         mr.map("""function(v) {
-            var riak_obj = JSON.parse(v.values[0].data);
-            return [riak_obj['calories_i']]; }""")
+            var solr_doc = JSON.parse(v.values[0].data);
+            return [solr_doc["calories_i"]]; }""")
         result = mr.reduce('function(values, arg) ' +
                            '{ return [values.sort()[0]]; }').run()
         self.assertEquals(result, [100])
