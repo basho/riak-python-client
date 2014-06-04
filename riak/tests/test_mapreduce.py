@@ -3,6 +3,7 @@
 from riak.mapreduce import RiakMapReduce
 from riak import key_filter, RiakError
 import platform
+import time
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
@@ -373,6 +374,7 @@ class JSMapReduceTests(object):
                               "sugar_i": 12,
                               "calories_i": 110,
                               "fruit_b": False}).store()
+        time.sleep(1)
         mr = self.client.search(self.mr_bucket, 'fruit_b:false')
         mr.map("""function(v) {
             var solr_doc = JSON.parse(v.values[0].data);
