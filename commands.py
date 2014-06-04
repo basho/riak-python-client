@@ -60,6 +60,7 @@ class create_bucket_types(Command):
     * `pytest-sets` with ``{"datatype":"set"}``
     * `pytest-counters` with ``{"datatype":"counter"}``
     * `pytest-consistent` with ``{"consistent":true}``
+    * `pytest-mr`
     * `pytest` with ``{"allow_mult":false}``
     """
 
@@ -74,6 +75,7 @@ class create_bucket_types(Command):
         'pytest-sets': {'datatype': 'set'},
         'pytest-counters': {'datatype': 'counter'},
         'pytest-consistent': {'consistent': True},
+        'pytest-mr': {},
         'pytest': {'allow_mult': False}
     }
 

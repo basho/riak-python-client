@@ -2,6 +2,13 @@
 
 from riak.mapreduce import RiakMapReduce
 from riak import key_filter, RiakError
+import platform
+if platform.python_version() < '2.7':
+    unittest = __import__('unittest2')
+else:
+    import unittest
+
+from . import RUN_YZ
 
 
 class LinkTests(object):
@@ -333,6 +340,49 @@ class JSMapReduceTests(object):
                           u'"barval9"',
                           u'"fooval2"',
                           u'"fooval3"'])
+
+    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
+    def test_mr_search(self):
+        """
+        Try a successful map/reduce from search results.
+        """
+        btype = self.client.bucket_type(self.mr_btype)
+        bucket = btype.bucket(self.mr_bucket)
+        bucket.new("Pebbles", {"name_s": "Fruity Pebbles",
+                               "maker_s": "Post",
+                               "sugar_i": 9,
+                               "calories_i": 110,
+                               "fruit_b": True}).store()
+        bucket.new("Loops", {"name_s": "Froot Loops",
+                             "maker_s": "Kellogg's",
+                             "sugar_i": 12,
+                             "calories_i": 110,
+                             "fruit_b": True}).store()
+        bucket.new("Charms", {"name_s": "Lucky Charms",
+                              "maker_s": "General Mills",
+                              "sugar_i": 10,
+                              "calories_i": 110,
+                              "fruit_b": False}).store()
+        bucket.new("Count", {"name_s": "Count Chocula",
+                             "maker_s": "General Mills",
+                             "sugar_i": 9,
+                             "calories_i": 100,
+                             "fruit_b": False}).store()
+        bucket.new("Crunch", {"name_s": "Cap'n Crunch",
+                              "maker_s": "Quaker Oats",
+                              "sugar_i": 12,
+                              "calories_i": 110,
+                              "fruit_b": False}).store()
+        # Wait for Solr to catch up
+        while len(bucket.search('_yz_rk:Crunch')['docs']) == 0:
+            pass
+        mr = RiakMapReduce(self.client).search(self.mr_bucket, 'fruit_b:false')
+        mr.map("""function(v) {
+            var solr_doc = JSON.parse(v.values[0].data);
+            return [solr_doc["calories_i"]]; }""")
+        result = mr.reduce('function(values, arg) ' +
+                           '{ return [values.sort()[0]]; }').run()
+        self.assertEquals(result, [100])
 
 
 class MapReduceAliasTests(object):
