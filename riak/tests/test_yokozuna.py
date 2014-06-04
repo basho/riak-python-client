@@ -143,7 +143,25 @@ class YZSearchTests(object):
     def test_yz_search_utf8(self):
         bucket = self.client.bucket(self.yz_bucket)
         body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
-        bucket.new("shift_jis", body).store()
-        # TODO: fails due to lack of direct PB unicode support
-        # results = bucket.search(u"text_ja:大好き")
-        # self.assertEquals(1, len(results['docs']))
+        bucket.new(self.key_name, body).store()
+        while len(bucket.search('_yz_rk:' + self.key_name)['docs']) == 0:
+            pass
+        results = bucket.search(u"text_ja:大好き AND  _yz_rk:{}".
+                                format(self.key_name))
+        self.assertEquals(1, len(results['docs']))
+
+    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
+    def test_yz_multivalued_fields(self):
+        bucket = self.client.bucket(self.yz_bucket)
+        body = {"groups_ss": ['a', 'b', 'c']}
+        bucket.new(self.key_name, body).store()
+        while len(bucket.search('_yz_rk:'+self.key_name)['docs']) == 0:
+            pass
+        results = bucket.search('groups_ss:* AND _yz_rk:{}'.
+                                format(self.key_name))
+        self.assertEquals(1, len(results['docs']))
+        doc = results['docs'][0]
+        self.assertIn('groups_ss', doc)
+        field = doc['groups_ss']
+        self.assertIsInstance(field, list)
+        self.assertItemsEqual(['a', 'b', 'c'], field)

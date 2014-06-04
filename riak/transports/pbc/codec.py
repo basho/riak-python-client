@@ -19,6 +19,7 @@ import riak_pb
 from riak import RiakError
 from riak.content import RiakContent
 from riak.util import decode_index_value
+from riak.multidict import MultiDict
 
 
 def _invert(d):
@@ -445,3 +446,34 @@ class RiakPbcCodec(object):
                 raise NotImplementedError(
                     'Server does not support bucket-types')
             req.type = bucket_type.name
+
+    def _encode_search_query(self, req, params):
+        if 'rows' in params:
+            req.rows = params['rows']
+        if 'start' in params:
+            req.start = params['start']
+        if 'sort' in params:
+            req.sort = params['sort']
+        if 'filter' in params:
+            req.filter = params['filter']
+        if 'df' in params:
+            req.df = params['df']
+        if 'op' in params:
+            req.op = params['op']
+        if 'q.op' in params:
+            req.op = params['q.op']
+        if 'fl' in params:
+            if isinstance(params['fl'], list):
+                req.fl.extend(params['fl'])
+            else:
+                req.fl.append(params['fl'])
+        if 'presort' in params:
+            req.presort = params['presort']
+
+    def _decode_search_doc(self, doc):
+        resultdoc = MultiDict()
+        for pair in doc.fields:
+            ukey = unicode(pair.key, 'utf-8')
+            uval = unicode(pair.value, 'utf-8')
+            resultdoc.add(ukey, uval)
+        return resultdoc.mixed()
