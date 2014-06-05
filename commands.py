@@ -2,8 +2,8 @@
 distutils commands for riak-python-client
 """
 
-__all__ = ['create_bucket_types', 'setup_security', 'preconfig_security',
-           'setup_tests']
+__all__ = ['create_bucket_types', 'setup_security', 'enable_security',
+           'disable_security', 'preconfigure', 'configure']
 
 from distutils import log
 from distutils.core import Command
@@ -153,7 +153,32 @@ class create_bucket_types(Command):
         return cmd
 
 
-class setup_security(Command):
+class security_commands:
+    def check_security_command(self, *args):
+        cmd = self._security_command(*args)
+        return self.check_output(cmd)
+
+    def run_security_command(self, *args):
+        self.spawn(self._security_command(*args))
+
+    def _security_command(self, *args):
+        cmd = [self.riak_admin, "security"]
+        if isinstance(args, tuple):
+            for elem in args:
+                cmd.extend(elem)
+        else:
+            cmd.extend(args)
+        return cmd
+
+    def check_output(self, *args, **kwargs):
+        if self.dry_run:
+            log.info(' '.join(args))
+            return bytearray()
+        else:
+            return check_output(*args, **kwargs)
+
+
+class setup_security(Command, security_commands):
     """
     Sets up security for testing. By default this will create:
 
@@ -187,7 +212,6 @@ class setup_security(Command):
     ]
 
     _commands = [
-        "enable",
         "add-user $USERNAME password=$PASSWORD",
         "add-source $USERNAME 127.0.0.1/32 password",
         "add-user $CERTUSER password=$CERTPASS",
@@ -243,12 +267,6 @@ class setup_security(Command):
             for perm in self._grants:
                 self._apply_grant(perm, self._grants[perm])
 
-    def check_output(self, *args, **kwargs):
-        if self.dry_run:
-            log.info(' '.join(args))
-            return bytearray()
-        else:
-            return check_output(*args, **kwargs)
 
     def _check_available(self):
         try:
@@ -269,24 +287,52 @@ class setup_security(Command):
                      .format(perm, target, self.certuser))
             self.run_security_command(cmd)
 
-    def check_security_command(self, *args):
-        cmd = self._security_command(*args)
-        return self.check_output(cmd)
 
-    def run_security_command(self, *args):
-        self.spawn(self._security_command(*args))
+class enable_security(Command,security_commands):
+    """
+    Actually turn on security.
+    """
+    description = "turn on security within Riak"
 
-    def _security_command(self, *args):
-        cmd = [self.riak_admin, "security"]
-        if isinstance(args, tuple):
-            for elem in args:
-                cmd.extend(elem)
-        else:
-            cmd.extend(args)
-        return cmd
+    user_options = [
+        ('riak-admin=', None, 'path to the riak-admin script'),
+    ]
+
+    def initialize_options(self):
+        self.riak_admin = None
+
+    def finalize_options(self):
+        if self.riak_admin is None:
+            raise DistutilsOptionError("riak-admin option not set")
+
+    def run(self):
+        cmd = "enable"
+        self.run_security_command(tuple(cmd.split(' ')))
 
 
-class preconfig_security(Command):
+class disable_security(Command,security_commands):
+    """
+    Actually turn off security.
+    """
+    description = "turn off security within Riak"
+
+    user_options = [
+        ('riak-admin=', None, 'path to the riak-admin script'),
+    ]
+
+    def initialize_options(self):
+        self.riak_admin = None
+
+    def finalize_options(self):
+        if self.riak_admin is None:
+            raise DistutilsOptionError("riak-admin option not set")
+
+    def run(self):
+        cmd = "disable"
+        self.run_security_command(tuple(cmd.split(' ')))
+
+
+class preconfigure(Command):
     """
     Sets up security configuration.
 
@@ -294,8 +340,8 @@ class preconfig_security(Command):
         * storage_backend = leveldb
         * search = on
         * listener.protobuf.internal = 127.0.0.1:8087
-        * listener.https.internal = 127.0.0.1:8098
-        * ## listener.http.internal = 127.0.0.1:8098
+        * listener.http.internal = 127.0.0.1:8098
+        * listener.https.internal = 127.0.0.1:8099
         * ssl.certfile = $pwd/tests/resources/server.crt
         * ssl.keyfile = $pwd/tests/resources/server.key
         * ssl.cacertfile = $pwd/tests/resources/ca.crt
@@ -314,6 +360,7 @@ class preconfig_security(Command):
         self.riak_conf = None
         self.host = "127.0.0.1"
         self.pb_port = "8087"
+        self.http_port = "8098"
         self.https_port = "8099"
 
     def finalize_options(self):
@@ -326,6 +373,7 @@ class preconfig_security(Command):
         self._update_riak_conf()
 
     def _update_riak_conf(self):
+        http_host = self.host + ':' + self.http_port
         https_host = self.host + ':' + self.https_port
         pb_host = self.host + ':' + self.pb_port
         self._backup_file(self.riak_conf)
@@ -347,6 +395,9 @@ class preconfig_security(Command):
                       r'ssl.cacertfile = ' + self.cert_dir +
                       '/ca.crt',
                       conf, flags=re.MULTILINE)
+        conf = re.sub(r'^#*\s*listener.http.internal\s+=\s+\S+',
+                      r'listener.http.internal = ' + http_host,
+                      conf, flags=re.MULTILINE)
         conf = re.sub(r'^#*\s*listener.https.internal\s+=\s+\S+',
                       r'listener.https.internal = ' + https_host,
                       conf, flags=re.MULTILINE)
@@ -365,7 +416,7 @@ class preconfig_security(Command):
             log.info("Cannot backup missing file {!r}".format(name))
 
 
-class setup_tests(Command):
+class configure(Command):
     """
     Sets up security configuration.
 
