@@ -267,7 +267,6 @@ class setup_security(Command, security_commands):
             for perm in self._grants:
                 self._apply_grant(perm, self._grants[perm])
 
-
     def _check_available(self):
         try:
             self.check_security_command("status")
@@ -288,7 +287,7 @@ class setup_security(Command, security_commands):
             self.run_security_command(cmd)
 
 
-class enable_security(Command,security_commands):
+class enable_security(Command, security_commands):
     """
     Actually turn on security.
     """
@@ -310,7 +309,7 @@ class enable_security(Command,security_commands):
         self.run_security_command(tuple(cmd.split(' ')))
 
 
-class disable_security(Command,security_commands):
+class disable_security(Command, security_commands):
     """
     Actually turn off security.
     """
