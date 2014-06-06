@@ -153,7 +153,7 @@ class create_bucket_types(Command):
         return cmd
 
 
-class security_commands:
+class security_commands(object):
     def check_security_command(self, *args):
         cmd = self._security_command(*args)
         return self.check_output(cmd)
