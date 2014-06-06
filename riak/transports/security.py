@@ -36,7 +36,6 @@ def configure_context(ssl_ctx, credentials):
     key_file = credentials.key_file
     cert_file = credentials.cert_file
     cacert_file = credentials.cacert_file
-    crl_file = credentials.crl_file
     ciphers = credentials.ciphers
     if key_file is not None:
         ssl_ctx.use_privatekey_file(key_file)
