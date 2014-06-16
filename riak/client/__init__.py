@@ -34,6 +34,7 @@ from riak.resolver import default_resolver
 from riak.search import RiakSearch
 from riak.transports.http import RiakHttpPool
 from riak.transports.pbc import RiakPbcPool
+from riak.security import SecurityCreds
 from riak.util import deprecated
 from riak.util import deprecateQuorumAccessors
 from riak.util import lazy_property
@@ -56,10 +57,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     """
 
     #: The supported protocols
-    PROTOCOLS = ['http', 'https', 'pbc']
+    PROTOCOLS = ['http', 'pbc']
 
-    def __init__(self, protocol='http', transport_options={},
-                 nodes=None, **unused_args):
+    def __init__(self, protocol='http', transport_options={}, nodes=None,
+                 credentials=None, **unused_args):
         """
         Construct a new ``RiakClient`` object.
 
@@ -72,6 +73,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :param transport_options: Optional key-value args to pass to
                                   the transport constructor
         :type transport_options: dict
+        :param credentials: optional object of security info
+        :type credentials: SecurityCreds or dict
         """
         unused_args = unused_args.copy()
 
@@ -81,7 +84,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                        "used as the %s port unless already set" %
                        (unused_args['port'], protocol))
             unused_args['already_warned_port'] = True
-            if (protocol in ['http', 'https'] and
+            if (protocol == 'http' and
                     'http_port' not in unused_args):
                 unused_args['http_port'] = unused_args['port']
             elif protocol == 'pbc' and 'pb_port' not in unused_args:
@@ -98,6 +101,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
         self.protocol = protocol or 'http'
         self.resolver = default_resolver
+        self._credentials = self._create_credentials(credentials)
         self._http_pool = RiakHttpPool(self, **transport_options)
         self._pb_pool = RiakPbcPool(self, **transport_options)
 
@@ -129,8 +133,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                         Changing to another protocol will cause a
                         connection on the next request.
 
-                        Some requests are only valid over ``'http'``
-                        or ``'https'``, and will always be sent via
+                        Some requests are only valid over ``'http'``,
+                        and will always be sent via
                         those transports, regardless of which protocol
                         is preferred.
                          """)
@@ -312,6 +316,20 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return RiakNode(**n)
         else:
             raise TypeError("%s is not a valid node configuration"
+                            % repr(n))
+
+    def _create_credentials(self, n):
+        """
+        Create security credentials, if necessary.
+        """
+        if not n:
+            return n
+        elif isinstance(n, SecurityCreds):
+            return n
+        elif isinstance(n, dict):
+            return SecurityCreds(**n)
+        else:
+            raise TypeError("%s is not a valid security configuration"
                             % repr(n))
 
     def _choose_node(self, nodes=None):

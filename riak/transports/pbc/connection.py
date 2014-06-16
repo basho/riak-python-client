@@ -18,11 +18,18 @@ under the License.
 
 import socket
 import struct
+import riak_pb
+from riak.security import SecurityError, check_revoked_cert
+from riak.transports.security import configure_context
 from riak import RiakError
 from riak_pb.messages import (
     MESSAGE_CLASSES,
-    MSG_CODE_ERROR_RESP
+    MSG_CODE_ERROR_RESP,
+    MSG_CODE_START_TLS,
+    MSG_CODE_AUTH_REQ,
+    MSG_CODE_AUTH_RESP
 )
+from OpenSSL.SSL import Context, Connection
 
 
 class RiakPbcConnection(object):
@@ -42,14 +49,95 @@ class RiakPbcConnection(object):
         self._send_msg(msg_code, msg)
         return self._recv_msg(expect)
 
+    def _non_connect_request(self, msg_code, msg=None, expect=None):
+        """
+        Similar to self._request, but doesn't try to initiate a connection,
+        thus preventing an infinite loop.
+        """
+        self._non_connect_send_msg(msg_code, msg)
+        return self._recv_msg(expect)
+
+    def _non_connect_send_msg(self, msg_code, msg):
+        """
+        Similar to self._send, but doesn't try to initiate a connection,
+        thus preventing an infinite loop.
+        """
+        self._socket.send(self._encode_msg(msg_code, msg))
+
     def _send_msg(self, msg_code, msg):
         self._connect()
-        self._socket.send(self._encode_msg(msg_code, msg))
+        self._non_connect_send_msg(msg_code, msg)
+
+    def _init_security(self):
+        """
+        Initialize a secure connection to the server.
+        """
+        if not self._starttls():
+            raise SecurityError("Could not start TLS connection")
+        # _ssh_handshake() will throw an exception upon failure
+        self._ssl_handshake()
+        if not self._auth():
+            raise SecurityError("Could not authorize connection")
+
+    def _starttls(self):
+        """
+        Exchange a STARTTLS message with Riak to initiate secure communications
+        return True is Riak responds with a STARTTLS response, False otherwise
+        """
+        msg_code, _ = self._non_connect_request(MSG_CODE_START_TLS)
+        if msg_code == MSG_CODE_START_TLS:
+            return True
+        else:
+            return False
+
+    def _auth(self):
+        """
+        Perform an authorization request against Riak
+        returns True upon success, False otherwise
+        Note: Riak will sleep for a short period of time upon a failed
+              auth request/response to prevent denial of service attacks
+        """
+        req = riak_pb.RpbAuthReq()
+        req.user = self._client._credentials.username
+        req.password = self._client._credentials.password
+        msg_code, _ = self._non_connect_request(MSG_CODE_AUTH_REQ, req,
+                                                MSG_CODE_AUTH_RESP)
+        if msg_code == MSG_CODE_AUTH_RESP:
+            return True
+        else:
+            return False
+
+    def _ssl_handshake(self):
+        """
+        Perform an SSL handshake w/ the server.
+        Precondition: a successful STARTTLS exchange has
+                     taken place with Riak
+        returns True upon success, otherwise an exception is raised
+        """
+        if self._client._credentials:
+            ssl_ctx = \
+                Context(self._client._credentials.ssl_version)
+            crl_file = self._client._credentials.crl_file
+            try:
+                configure_context(ssl_ctx, self._client._credentials)
+                # attempt to upgrade the socket to SSL
+                ssl_socket = Connection(ssl_ctx, self._socket)
+                ssl_socket.set_connect_state()
+                ssl_socket.do_handshake()
+                # ssl handshake successful
+                self._socket = ssl_socket
+
+                if crl_file is not None:
+                    check_revoked_cert(ssl_socket, crl_file)
+
+                return True
+            except Exception as e:
+                # fail if *any* exceptions are thrown during SSL handshake
+                raise RiakError(e.message)
 
     def _recv_msg(self, expect=None):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
-
         if msg_code is MSG_CODE_ERROR_RESP:
             err = self._parse_msg(msg_code, self._inbuf[1:])
             raise RiakError(err.errmsg)
@@ -89,13 +177,18 @@ class RiakPbcConnection(object):
                                                         self._timeout)
             else:
                 self._socket = socket.create_connection(self._address)
+            if self._client._credentials:
+                self._init_security()
 
     def close(self):
         """
         Closes the underlying socket of the PB connection.
         """
         if self._socket:
-            self._socket.shutdown(socket.SHUT_RDWR)
+            if self._client._credentials:
+                self._socket.shutdown()
+            else:
+                self._socket.shutdown(socket.SHUT_RDWR)
 
     def _parse_msg(self, code, packet):
         try:

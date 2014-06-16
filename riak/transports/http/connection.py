@@ -17,6 +17,7 @@ under the License.
 """
 
 import httplib
+import base64
 
 
 class RiakHttpConnection(object):
@@ -33,6 +34,12 @@ class RiakHttpConnection(object):
         response = None
         headers.setdefault('Accept',
                            'multipart/mixed, application/json, */*;q=0.5')
+
+        if self._client._credentials:
+            self._security_auth_headers(self._client._credentials.username,
+                                        self._client._credentials.password,
+                                        headers)
+
         try:
             self._connection.request(method, uri, body, headers)
             response = self._connection.getresponse()
@@ -50,8 +57,17 @@ class RiakHttpConnection(object):
         return response.status, response.msg, response_body
 
     def _connect(self):
-        self._connection = self._connection_class(self._node.host,
-                                                  self._node.http_port)
+        """
+        Use the appropriate connection class; optionally with security.
+        """
+        if self._client._credentials:
+            self._connection = \
+                self._connection_class(self._node.host,
+                                       self._node.http_port,
+                                       self._client._credentials)
+        else:
+            self._connection = self._connection_class(self._node.host,
+                                                      self._node.http_port)
         # Forces the population of stats and resources before any
         # other requests are made.
         self.server_version
@@ -68,3 +84,19 @@ class RiakHttpConnection(object):
     # These are set by the RiakHttpTransport initializer
     _connection_class = httplib.HTTPConnection
     _node = None
+
+    def _security_auth_headers(self, username, password, headers):
+        """
+        Add in the requisite HTTP Authentication Headers
+
+        :param username: Riak Security Username
+        :type str
+        :param password: Riak Security Password
+        :type str
+        :param headers: Dictionary of headers
+        :type dict
+        """
+        userColonPassword = username + ":" + password
+        b64UserColonPassword = base64.b64encode(userColonPassword) \
+            .decode("ascii")
+        headers['Authorization'] = 'Basic %s' % b64UserColonPassword

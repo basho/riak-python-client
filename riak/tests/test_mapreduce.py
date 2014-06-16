@@ -3,6 +3,7 @@
 from riak.mapreduce import RiakMapReduce
 from riak import key_filter, RiakError
 from riak.tests.test_yokozuna import wait_for_yz_index
+from riak.tests import RUN_SECURITY
 import platform
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -52,6 +53,9 @@ class LinkTests(object):
         self.assertEqual(links[2][1], "foo2")
         self.assertEqual(links[2][2], "tag2")
 
+    # "Link walking is deprecated in Riak 2.0 and is not compatible
+    #  with security."
+    @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is set')
     def test_link_walking(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)

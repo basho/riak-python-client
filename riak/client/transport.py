@@ -149,7 +149,7 @@ class RiakClientTransport(object):
         """
         if not protocol:
             protocol = self.protocol
-        if protocol in ['http', 'https']:
+        if protocol == 'http':
             pool = self._http_pool
         elif protocol == 'pbc':
             pool = self._pb_pool
