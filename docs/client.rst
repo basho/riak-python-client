@@ -71,28 +71,32 @@ behavior.
 Client-level Operations
 -----------------------
 
-Some operations are not scoped by buckets and can be performed on the
-client directly:
+Some operations are not scoped by buckets or bucket types and can be
+performed on the client directly:
 
 .. automethod:: RiakClient.ping
 .. automethod:: RiakClient.get_buckets
 .. automethod:: RiakClient.stream_buckets
 
------------------
-Accessing Buckets
------------------
+----------------------------------
+Accessing Bucket Types and Buckets
+----------------------------------
 
-Most client operations are on :py:class:`bucket objects
-<riak.bucket.RiakBucket>` or keys within those buckets. Use the
-``bucket`` method for creating buckets that will proxy operations to
-the called client.
+Most client operations are on :py:class:`bucket type objects
+<riak.bucket.BucketType>`, the :py:class:`bucket objects
+<riak.bucket.RiakBucket>` they contain or keys within those buckets. Use the
+``bucket_type`` or ``bucket`` methods for creating bucket types and buckets
+that will proxy operations to the called client.
 
+.. automethod:: RiakClient.bucket_type
 .. automethod:: RiakClient.bucket
 
 -----------------------
 Bucket-level Operations
 -----------------------
 
+.. automethod:: RiakClient.get_bucket_type_props
+.. automethod:: RiakClient.set_bucket_type_props
 .. automethod:: RiakClient.get_bucket_props
 .. automethod:: RiakClient.set_bucket_props
 .. automethod:: RiakClient.clear_bucket_props

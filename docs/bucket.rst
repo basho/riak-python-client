@@ -5,14 +5,35 @@ Buckets
 .. currentmodule:: riak.bucket
 
 Buckets are both namespaces for the key-value pairs you store in Riak,
-and containers for properties that apply to that namespace. Buckets
-should be created via the :meth:`bucket()
+and containers for properties that apply to that namespace.  In older
+versions of Riak, this was the only logical organization available.
+Now a higher-level collection called a **bucket type** can group buckets
+together.  This also allows for efficiently setting properties on a
+group of buckets at the same time.
+
+If bucket types are not specifed, the *default* bucket
+type is used.  These buckets should be created via the :meth:`bucket()
 <riak.client.RiakClient.bucket>` method on the client object, like so::
 
     import riak
 
     client = riak.RiakClient()
     mybucket = client.bucket('mybucket')
+
+Buckets with a user-specified bucket type can also be created via the same
+:meth:`bucket()<riak.client.RiakClient.bucket>` method with
+an additional parameter or explicitly via
+:meth:`bucket_type()<riak.client.RiakClient.bucket_type>`::
+
+    import riak
+
+    client = riak.RiakClient()
+    mybucket = client.bucket('mybucket','mybuckettype')
+    othertype = client.bucket_type('othertype')
+    otherbucket = othertype.bucket('otherbucket')
+
+For more detailed discussion see `Using Bucket Types
+<http://docs.basho.com/riak/2.0.0/dev/advanced/bucket-types/>`_.
 
 --------------
 Bucket objects
@@ -25,6 +46,12 @@ Bucket objects
       The name of the bucket, a string.
 
    .. autoattribute:: resolver
+
+-------------------
+Bucket type objects
+-------------------
+
+.. autoclass:: BucketType
 
 -----------------
 Bucket properties
@@ -56,6 +83,19 @@ respectively.
 .. autoattribute:: RiakBucket.dw
 .. autoattribute:: RiakBucket.pw
 .. autoattribute:: RiakBucket.rw
+
+----------------------
+Bucket type properties
+----------------------
+
+Bucket type properties are flags and defaults that apply to all buckets in the
+bucket type.
+
+.. automethod:: BucketType.is_default
+.. automethod:: BucketType.get_properties
+.. automethod:: BucketType.set_properties
+.. automethod:: BucketType.get_property
+.. automethod:: BucketType.set_property
 
 ^^^^^^^^^^^^^^^^^^^^
 Shortcuts for search
@@ -120,7 +160,6 @@ with the bucket.
 .. automethod:: RiakBucket.get_decoder
 .. automethod:: RiakBucket.set_decoder
 
-
 ------------
 Listing keys
 ------------
@@ -133,3 +172,40 @@ object. The same admonitions for these operations apply.
 
 .. automethod:: RiakBucket.get_keys
 .. automethod:: RiakBucket.stream_keys
+
+---------------
+Listing buckets
+---------------
+
+Shortcuts for :meth:`RiakClient.get_buckets()
+<riak.client.RiakClient.get_buckets>` and
+:meth:`RiakClient.stream_buckets()
+<riak.client.RiakClient.stream_buckets>` are exposed on the bucket
+type object.  This is similar to `Listing keys`_ on buckets.
+
+.. automethod:: BucketType.bucket
+.. automethod:: BucketType.get_buckets
+.. automethod:: BucketType.stream_buckets
+
+------------------
+Deprecated methods
+------------------
+
+.. warning:: These methods exist solely for backwards-compatibility and should not
+   be used unless code is being ported from an older version.
+
+.. automethod:: RiakBucket.new_binary
+.. automethod:: RiakBucket.new_binary_from_file
+.. automethod:: RiakBucket.get_binary
+.. automethod:: RiakBucket.get_r
+.. automethod:: RiakBucket.set_r
+.. automethod:: RiakBucket.get_pr
+.. automethod:: RiakBucket.set_pr
+.. automethod:: RiakBucket.get_w
+.. automethod:: RiakBucket.set_w
+.. automethod:: RiakBucket.get_dw
+.. automethod:: RiakBucket.set_dw
+.. automethod:: RiakBucket.get_pw
+.. automethod:: RiakBucket.set_pw
+.. automethod:: RiakBucket.get_rw
+.. automethod:: RiakBucket.set_rw
