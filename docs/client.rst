@@ -126,6 +126,17 @@ Query Operations
 .. automethod:: RiakClient.fulltext_add
 .. automethod:: RiakClient.fulltext_delete
 
+----------------------------
+Query Maintenance Operations
+----------------------------
+
+.. automethod:: RiakClient.create_search_schema
+.. automethod:: RiakClient.get_search_schema
+.. automethod:: RiakClient.create_search_index
+.. automethod:: RiakClient.get_search_index
+.. automethod:: RiakClient.delete_search_index
+.. automethod:: RiakClient.list_search_indexes
+
 -------------
 Serialization
 -------------
