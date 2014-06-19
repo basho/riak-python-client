@@ -381,6 +381,7 @@ class preconfigure(Command):
             '',
             '## CONFIGURATION ADDED BY PYTHON CLIENT TESTS',
             'search = on',
+            'strong_consistency = on',
             'listener.http.internal = {}'.format(http_host),
             'listener.https.internal = {}'.format(https_host),
             'listener.protobuf.internal = {}'.format(pb_host),
