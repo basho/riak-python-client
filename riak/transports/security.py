@@ -76,8 +76,13 @@ class RiakWrappedSocket(object):
         return self.connection.sendall(bytes(data))
 
     def close(self):
-        return self.connection.shutdown()
-
+        try:
+            return self.connection.shutdown()
+        except OpenSSL.SSL.Error as err:
+            if err.args == ([],):
+                return False
+            else:
+                raise err
 
 # Blatantly Stolen from
 # https://github.com/shazow/urllib3/blob/master/urllib3/contrib/pyopenssl.py
