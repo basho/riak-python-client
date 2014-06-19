@@ -11,7 +11,6 @@ from distutils.errors import DistutilsOptionError
 from subprocess import CalledProcessError, Popen, PIPE
 from string import Template
 import shutil
-import re
 import os.path
 
 try:
@@ -333,9 +332,9 @@ class disable_security(Command, security_commands):
 
 class preconfigure(Command):
     """
-    Sets up security configuration.
+    Sets up integration test configuration.
 
-    * Update these lines in riak.conf
+    * Appends these lines to riak.conf
         * storage_backend = leveldb
         * search = on
         * listener.protobuf.internal = 127.0.0.1:8087
@@ -351,8 +350,9 @@ class preconfigure(Command):
     user_options = [
         ('riak-conf=', None, 'path to the riak.conf file'),
         ('host=', None, 'IP of host running Riak'),
-        ('pb-port=', None, 'protocol buffers port number'),
-        ('https-port=', None, 'https port number')
+        ('http-port=', None, 'http port number'),
+        ('https-port=', None, 'https port number'),
+        ('pb-port=', None, 'protocol buffers port number')
     ]
 
     def initialize_options(self):
@@ -376,35 +376,19 @@ class preconfigure(Command):
         https_host = self.host + ':' + self.https_port
         pb_host = self.host + ':' + self.pb_port
         self._backup_file(self.riak_conf)
-        f = open(self.riak_conf, 'r', False)
-        conf = f.read()
-        f.close()
-        conf = re.sub(r'search\s+=\s+off', r'search = on', conf)
-        conf = re.sub(r'^##\s+ssl.', 'ssl.', conf, flags=re.MULTILINE)
-        conf = re.sub(r'^ssl.certfile\s+=\s+\S+$',
-                      r'ssl.certfile = ' + self.cert_dir + '/server.crt',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^storage_backend\s+=\s+\S+$',
-                      r'storage_backend = leveldb',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^ssl.keyfile\s+=\s+\S+$',
-                      r'ssl.keyfile = ' + self.cert_dir + '/server.key',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^ssl.cacertfile\s+=\s+\S+$',
-                      r'ssl.cacertfile = ' + self.cert_dir +
-                      '/ca.crt',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^#*\s*listener.http.internal\s+=\s+\S+',
-                      r'listener.http.internal = ' + http_host,
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^#*\s*listener.https.internal\s+=\s+\S+',
-                      r'listener.https.internal = ' + https_host,
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^listener.protobuf.internal\s+=\s+\S+',
-                      r'listener.protobuf.internal = ' + pb_host,
-                      conf, flags=re.MULTILINE)
-        f = open(self.riak_conf, 'w', False)
-        f.write(conf)
+        f = open(self.riak_conf, 'a')
+        lines = [
+            '',
+            '## CONFIGURATION ADDED BY PYTHON CLIENT TESTS',
+            'search = on',
+            'listener.http.internal = {}'.format(http_host),
+            'listener.https.internal = {}'.format(https_host),
+            'listener.protobuf.internal = {}'.format(pb_host),
+            'ssl.certfile = {}/server.crt'.format(self.cert_dir),
+            'ssl.keyfile = {}/server.key'.format(self.cert_dir),
+            'ssl.cacertfile = {}/ca.crt'.format(self.cert_dir)
+        ]
+        f.writelines(lines)
         f.close()
 
     def _backup_file(self, name):
