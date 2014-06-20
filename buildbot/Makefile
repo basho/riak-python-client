@@ -2,9 +2,9 @@ RIAK_CONF  =  ${RIAK_DIR}/etc/riak.conf
 RIAK_ADMIN =  ${RIAK_DIR}/bin/riak-admin
 
 ifneq ($(NODENUM),)
-	HTTP_PORT  = $(shell expr 10000 + $NODENUM)
-	PB_PORT    = $(shell expr 10010 + $NODENUM)
-	HTTPS_PORT = $(shell expr 10020 + $NODENUM)
+	HTTP_PORT  = $(shell expr 10000 + ${NODENUM})
+	PB_PORT    = $(shell expr 10010 + ${NODENUM})
+	HTTPS_PORT = $(shell expr 10020 + ${NODENUM})
 endif
 
 preconfigure:
