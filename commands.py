@@ -387,7 +387,8 @@ class preconfigure(Command):
             'listener.protobuf.internal = {}'.format(pb_host),
             'ssl.certfile = {}/server.crt'.format(self.cert_dir),
             'ssl.keyfile = {}/server.key'.format(self.cert_dir),
-            'ssl.cacertfile = {}/ca.crt'.format(self.cert_dir)
+            'ssl.cacertfile = {}/ca.crt'.format(self.cert_dir),
+            ''
         ]
         f.write('\n'.join(lines))
         f.close()
