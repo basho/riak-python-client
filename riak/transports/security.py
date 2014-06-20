@@ -84,6 +84,7 @@ class RiakWrappedSocket(object):
             else:
                 raise err
 
+
 # Blatantly Stolen from
 # https://github.com/shazow/urllib3/blob/master/urllib3/contrib/pyopenssl.py
 # which is basically a port of the `socket._fileobject` class
