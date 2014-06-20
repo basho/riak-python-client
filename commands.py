@@ -389,7 +389,7 @@ class preconfigure(Command):
             'ssl.keyfile = {}/server.key'.format(self.cert_dir),
             'ssl.cacertfile = {}/ca.crt'.format(self.cert_dir)
         ]
-        f.writelines(lines)
+        f.write('\n'.join(lines))
         f.close()
 
     def _backup_file(self, name):
