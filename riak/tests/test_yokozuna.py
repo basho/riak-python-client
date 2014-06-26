@@ -161,7 +161,7 @@ class YZSearchTests(object):
         bucket.new(self.key_name, body).store()
         while len(bucket.search('_yz_rk:' + self.key_name)['docs']) == 0:
             pass
-        results = bucket.search(u"text_ja:大好き AND  _yz_rk:{}".
+        results = bucket.search(u"text_ja:大好き AND  _yz_rk:{0}".
                                 format(self.key_name))
         self.assertEquals(1, len(results['docs']))
 
@@ -172,7 +172,7 @@ class YZSearchTests(object):
         bucket.new(self.key_name, body).store()
         while len(bucket.search('_yz_rk:'+self.key_name)['docs']) == 0:
             pass
-        results = bucket.search('groups_ss:* AND _yz_rk:{}'.
+        results = bucket.search('groups_ss:* AND _yz_rk:{0}'.
                                 format(self.key_name))
         self.assertEquals(1, len(results['docs']))
         doc = results['docs'][0]
