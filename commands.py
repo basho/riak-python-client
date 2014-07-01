@@ -373,6 +373,7 @@ class preconfigure(Command):
             '## CONFIGURATION ADDED BY PYTHON CLIENT TESTS',
             'search = on',
             'strong_consistency = on',
+            'storage_backend = leveldb',
             'listener.https.internal = {}'.format(https_host),
             'ssl.certfile = {}/server.crt'.format(self.cert_dir),
             'ssl.keyfile = {}/server.key'.format(self.cert_dir),
