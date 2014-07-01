@@ -110,6 +110,7 @@ def tearDownModule():
             for key in keys:
                 mrbucket.delete(key)
 
+CACHED_CLIENTS = {}
 
 class BaseTestCase(object):
 
@@ -137,11 +138,15 @@ class BaseTestCase(object):
         pb_port = pb_port or self.pb_port or PB_PORT
         protocol = protocol or self.protocol
         credentials = credentials or SECURITY_CREDS
-        return RiakClient(protocol=protocol,
-                          host=host,
-                          http_port=http_port,
-                          credentials=credentials,
-                          pb_port=pb_port, **client_args)
+        args = dict(protocol=protocol,
+                    host=host,
+                    http_port=http_port,
+                    credentials=credentials,
+                    pb_port=pb_port).update(client_args)
+        if args in CACHED_CLIENTS:
+            return CACHED_CLIENTS[args]
+        else:
+            return RiakClient(**args)
 
     def setUp(self):
         self.bucket_name = self.randname()
