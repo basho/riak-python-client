@@ -366,9 +366,7 @@ class preconfigure(Command):
         self._update_riak_conf()
 
     def _update_riak_conf(self):
-        http_host = self.host + ':' + self.http_port
         https_host = self.host + ':' + self.https_port
-        pb_host = self.host + ':' + self.pb_port
         self._backup_file(self.riak_conf)
         lines = [
             '',
