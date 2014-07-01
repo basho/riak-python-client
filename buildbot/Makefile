@@ -1,8 +1,8 @@
 RIAK_CONF  =  ${RIAK_DIR}/etc/riak.conf
 RIAK_ADMIN =  ${RIAK_DIR}/bin/riak-admin
-PB_PORT    =  $(shell awk '/listener.protobuf.* =/ { print $NF; }' ${RIAK_CONF} | cut -d: -f2)
-HTTP_PORT  =  $(shell awk '/listener.http[.].* =/ { print $NF; }'  ${RIAK_CONF} | cut -d: -f2)
-HTTPS_PORT =  $(shell awk '/listener.https[.].* =/ { print $NF; }' ${RIAK_CONF} | cut -d: -f2)
+PB_PORT    =  $(shell awk '/listener.protobuf.* =/ { print $3; }' ${RIAK_CONF} | cut -d: -f2)
+HTTP_PORT  =  $(shell awk '/listener.http[.].* =/ { print $3; }'  ${RIAK_CONF} | cut -d: -f2)
+HTTPS_PORT =  $(shell awk '/listener.https[.].* =/ { print $3; }' ${RIAK_CONF} | cut -d: -f2)
 
 ifneq ($(NODENUM),)
 	HTTPS_PORT = $(shell expr 20000 + ${NODENUM})
@@ -28,10 +28,12 @@ test: test_normal test_security
 
 test_normal:
 	@echo "Testing Riak Python Client (without security)"
+	@echo " --- PB_PORT=${PB_PORT} HTTP_PORT=${HTTP_PORT}"
 	@../setup.py disable_security --riak-admin=${RIAK_ADMIN}
 	@RUN_YZ=1 SKIP_INDEXES=0 RIAK_TEST_HTTP_PORT=${HTTP_PORT} RIAK_TEST_PB_PORT=${PB_PORT} ../setup.py test
 
 test_security:
 	@echo "Testing Riak Python Client (with security)"
+	@echo " --- PB_PORT=${PB_PORT} HTTPS_PORT=${HTTPS_PORT}"
 	@../setup.py enable_security --riak-admin=${RIAK_ADMIN}
 	(cd ..; RUN_YZ=1 SKIP_INDEXES=0 RUN_SECURITY=1 SKIP_POOL=1 SKIP_RESOLVE=1 RIAK_TEST_HTTP_PORT=${HTTPS_PORT} RIAK_TEST_PB_PORT=${PB_PORT} ./setup.py test)
