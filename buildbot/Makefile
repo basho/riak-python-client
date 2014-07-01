@@ -1,8 +1,8 @@
 RIAK_CONF  =  ${RIAK_DIR}/etc/riak.conf
 RIAK_ADMIN =  ${RIAK_DIR}/bin/riak-admin
-PB_PORT    =  $(shell awk '/listener.protobuf.* =/ { print $3; }' ${RIAK_CONF} | cut -d: -f2)
-HTTP_PORT  =  $(shell awk '/listener.http[.].* =/ { print $3; }'  ${RIAK_CONF} | cut -d: -f2)
-HTTPS_PORT =  $(shell awk '/listener.https[.].* =/ { print $3; }' ${RIAK_CONF} | cut -d: -f2)
+PB_PORT    =  $(shell awk '/^listener.protobuf.* =/ { print $3; }' ${RIAK_CONF} | cut -d: -f2)
+HTTP_PORT  =  $(shell awk '/^listener.http[.].* =/ { print $3; }'  ${RIAK_CONF} | cut -d: -f2)
+HTTPS_PORT =  $(shell awk '/^listener.https[.].* =/ { print $3; }' ${RIAK_CONF} | cut -d: -f2)
 
 ifneq ($(NODENUM),)
 	HTTPS_PORT = $(shell expr 20000 + ${NODENUM})
