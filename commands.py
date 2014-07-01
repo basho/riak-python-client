@@ -337,9 +337,7 @@ class preconfigure(Command):
     * Appends these lines to riak.conf
         * storage_backend = leveldb
         * search = on
-        * listener.protobuf.internal = 127.0.0.1:8087
-        * listener.http.internal = 127.0.0.1:8098
-        * listener.https.internal = 127.0.0.1:8099
+        * listener.https.internal = 127.0.0.1:18098
         * ssl.certfile = $pwd/tests/resources/server.crt
         * ssl.keyfile = $pwd/tests/resources/server.key
         * ssl.cacertfile = $pwd/tests/resources/ca.crt
@@ -350,17 +348,13 @@ class preconfigure(Command):
     user_options = [
         ('riak-conf=', None, 'path to the riak.conf file'),
         ('host=', None, 'IP of host running Riak'),
-        ('http-port=', None, 'http port number'),
         ('https-port=', None, 'https port number'),
-        ('pb-port=', None, 'protocol buffers port number')
     ]
 
     def initialize_options(self):
         self.riak_conf = None
         self.host = "127.0.0.1"
-        self.pb_port = "8087"
-        self.http_port = "8098"
-        self.https_port = "8099"
+        self.https_port = "18098"
 
     def finalize_options(self):
         if self.riak_conf is None:
@@ -376,22 +370,19 @@ class preconfigure(Command):
         https_host = self.host + ':' + self.https_port
         pb_host = self.host + ':' + self.pb_port
         self._backup_file(self.riak_conf)
-        f = open(self.riak_conf, 'a')
         lines = [
             '',
             '## CONFIGURATION ADDED BY PYTHON CLIENT TESTS',
             'search = on',
             'strong_consistency = on',
-            'listener.http.internal = {}'.format(http_host),
             'listener.https.internal = {}'.format(https_host),
-            'listener.protobuf.internal = {}'.format(pb_host),
             'ssl.certfile = {}/server.crt'.format(self.cert_dir),
             'ssl.keyfile = {}/server.key'.format(self.cert_dir),
             'ssl.cacertfile = {}/ca.crt'.format(self.cert_dir),
             ''
         ]
-        f.write('\n'.join(lines))
-        f.close()
+        with open(self.riak_conf, 'a') as f:
+            f.write('\n'.join(lines))
 
     def _backup_file(self, name):
         backup = name + ".bak"
