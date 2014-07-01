@@ -112,6 +112,10 @@ def tearDownModule():
 
 CACHED_CLIENTS = {}
 
+class hashabledict(dict):
+    def __hash__(self):
+        return hash(tuple(sorted(self.items())))
+
 class BaseTestCase(object):
 
     host = None
@@ -138,15 +142,19 @@ class BaseTestCase(object):
         pb_port = pb_port or self.pb_port or PB_PORT
         protocol = protocol or self.protocol
         credentials = credentials or SECURITY_CREDS
-        args = dict(protocol=protocol,
-                    host=host,
-                    http_port=http_port,
-                    credentials=credentials,
-                    pb_port=pb_port).update(client_args)
-        if args in CACHED_CLIENTS:
-            return CACHED_CLIENTS[args]
+        args = hashabledict(protocol=protocol,
+                            host=host,
+                            http_port=http_port,
+                            credentials=credentials,
+                            pb_port=pb_port)
+        args.update(client_args)
+        h = hash(args)
+        if h in CACHED_CLIENTS:
+            return CACHED_CLIENTS[h]
         else:
-            return RiakClient(**args)
+            client = RiakClient(**args)
+            CACHED_CLIENTS[h] = client
+            return client
 
     def setUp(self):
         self.bucket_name = self.randname()
