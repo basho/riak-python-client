@@ -112,10 +112,6 @@ def tearDownModule():
 
 CACHED_CLIENTS = {}
 
-class hashabledict(dict):
-    def __hash__(self):
-        return hash(tuple(sorted(self.items())))
-
 class BaseTestCase(object):
 
     host = None
@@ -142,13 +138,13 @@ class BaseTestCase(object):
         pb_port = pb_port or self.pb_port or PB_PORT
         protocol = protocol or self.protocol
         credentials = credentials or SECURITY_CREDS
-        args = hashabledict(protocol=protocol,
-                            host=host,
-                            http_port=http_port,
-                            credentials=credentials,
-                            pb_port=pb_port)
+        args = dict(protocol=protocol,
+                    host=host,
+                    http_port=http_port,
+                    credentials=credentials,
+                    pb_port=pb_port)
         args.update(client_args)
-        h = hash(args)
+        h = hash(tuple(sorted(args.items())))
         if h in CACHED_CLIENTS:
             return CACHED_CLIENTS[h]
         else:
