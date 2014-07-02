@@ -32,7 +32,7 @@ py27-setuptools`` for OS X and MacPorts.
 Testing
 =======
 
-To setup the default test configuration build a test Riak cluster (from
+To setup the default test configuration build a test Riak node (from
 a ``riak`` directory)::
 
    make rel
@@ -48,7 +48,7 @@ variable to the root of your Riak installation.  Then from the
    cd buildbot
    make preconfigure
 
-Start your Riak cluster with ``riak start`` from the the Riak directory,
+Start your Riak node with ``riak start`` from the the Riak directory,
 then back in ``buildbot`` type::
 
    make configure
@@ -61,7 +61,7 @@ Testing Options
 ---------------
 
 If you wish to change the default options you can run the setup by hand.
-First configure the test cluster by adjusting the ``riak.conf``
+First configure the test node by adjusting the ``riak.conf``
 settings, where ``RIAK_DIR`` is the path to the top your
 Riak installation::
 
@@ -84,7 +84,7 @@ You may alternately add these lines to ``setup.cfg``::
     http-port=8098
     https-port=8099
 
-Next start the test cluster.  Once it is running, a test configuration is
+Next start the test node.  Once it is running, a test configuration is
 installed which includes security test users and bucket types::
 
     python setup.py configure --riak-admin=$RIAK_DIR/bin/riak-admin
