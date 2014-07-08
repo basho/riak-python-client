@@ -29,4 +29,4 @@ test_normal:
 test_security:
 	@echo "Testing Riak Python Client (with security)"
 	@../setup.py enable_security --riak-admin=${RIAK_ADMIN}
-	(cd ..; RUN_YZ=1 SKIP_INDEXES=0 RUN_SECURITY=1 SKIP_POOL=1 SKIP_RESOLVE=1 RIAK_TEST_HTTP_PORT=8099 ./setup.py test)
+	(cd ..; RUN_YZ=1 SKIP_INDEXES=0 RUN_SECURITY=1 SKIP_POOL=1 SKIP_RESOLVE=1 RIAK_TEST_HTTP_PORT=18098 ./setup.py test)

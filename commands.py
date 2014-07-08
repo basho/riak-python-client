@@ -358,7 +358,7 @@ class preconfigure(Command):
         * search = on
         * listener.protobuf.internal = 127.0.0.1:8087
         * listener.http.internal = 127.0.0.1:8098
-        * listener.https.internal = 127.0.0.1:8099
+        * listener.https.internal = 127.0.0.1:18098
         * ssl.certfile = $pwd/tests/resources/server.crt
         * ssl.keyfile = $pwd/tests/resources/server.key
         * ssl.cacertfile = $pwd/tests/resources/ca.crt
@@ -378,7 +378,7 @@ class preconfigure(Command):
         self.host = "127.0.0.1"
         self.pb_port = "8087"
         self.http_port = "8098"
-        self.https_port = "8099"
+        self.https_port = "18098"
 
     def finalize_options(self):
         if self.riak_conf is None:

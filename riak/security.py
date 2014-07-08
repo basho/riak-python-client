@@ -21,42 +21,19 @@ from OpenSSL import crypto
 import string
 import datetime
 import calendar
+import warnings
 from riak import RiakError
 from distutils.version import LooseVersion
 
 OPENSSL_VERSION_101G = 268439679
-OPENSSL_VERSION_101 = "1.0.1"
-OPENSSL_VERSION_NUM_POS = 1
-ssldate = datetime.date(2014, 4, 1)
 sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
 # Be sure to use at least OpenSSL 1.0.1g
-if (sslver < OPENSSL_VERSION_101G):
-    # Check the build date on older versions
+if (sslver < OPENSSL_VERSION_101G) or \
+        not hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
     verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
-    verdots = string.split(verstring)[OPENSSL_VERSION_NUM_POS]
-    builtstr = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_BUILT_ON)
-    timestamp = string.split(builtstr)
-
-    # Older versions don't have a time, only a date
-    if len(timestamp) < 8:
-        OPENSSL_VERSION_DAY_POS = 3
-        OPENSSL_VERSION_MON_POS = 2
-        OPENSSL_VERSION_YEAR_POS = 4
-    else:
-        OPENSSL_VERSION_DAY_POS = 4
-        OPENSSL_VERSION_MON_POS = 3
-        OPENSSL_VERSION_YEAR_POS = 7
-
-    calmap = dict([(v, k) for k, v in enumerate(calendar.month_abbr)])
-    day = int(timestamp[OPENSSL_VERSION_DAY_POS])
-    mon = calmap[timestamp[OPENSSL_VERSION_MON_POS]]
-    year = int(timestamp[OPENSSL_VERSION_YEAR_POS])
-    build = datetime.date(year, mon, day)
-    if LooseVersion(verdots) < LooseVersion(OPENSSL_VERSION_101) or \
-            build < ssldate or not hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
-        raise RuntimeError("Found {0} version, but expected at least "
-                           "OpenSSL 1.0.1 built after {1} supporting TLS 1.2"
-                           .format(verstring, ssldate))
+    msg = "Found {0} version, but expected at least OpenSSL 1.0.1g.  " \
+          "Security may not support TLS 1.2.".format(verstring)
+    warnings.warn(msg, UserWarning)
 
 
 class SecurityError(RiakError):
