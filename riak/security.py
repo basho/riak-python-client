@@ -18,12 +18,8 @@ under the License.
 
 import OpenSSL.SSL
 from OpenSSL import crypto
-import string
-import datetime
-import calendar
 import warnings
 from riak import RiakError
-from distutils.version import LooseVersion
 
 OPENSSL_VERSION_101G = 268439679
 sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
