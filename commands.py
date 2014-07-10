@@ -8,48 +8,64 @@ __all__ = ['create_bucket_types', 'setup_security', 'enable_security',
 from distutils import log
 from distutils.core import Command
 from distutils.errors import DistutilsOptionError
-from subprocess import CalledProcessError, Popen, PIPE
+from subprocess import Popen, PIPE
 from string import Template
 import shutil
 import re
 import os.path
 
-try:
-    from subprocess import check_output
-except ImportError:
-    def check_output(*popenargs, **kwargs):
-        """Run command with arguments and return its output as a byte string.
 
-        If the exit code was non-zero it raises a CalledProcessError.  The
-        CalledProcessError object will have the return code in the returncode
-        attribute and output in the output attribute.
+# Exception classes used by this module.
+class CalledProcessError(Exception):
+    """This exception is raised when a process run by check_call() or
+    check_output() returns a non-zero exit status.
+    The exit status will be stored in the returncode attribute;
+    check_output() will also store the output in the output attribute.
+    """
+    def __init__(self, returncode, cmd, output=None):
+        self.returncode = returncode
+        self.cmd = cmd
+        self.output = output
 
-        The arguments are the same as for the Popen constructor.  Example:
+    def __str__(self):
+        return "Command '%s' returned non-zero exit status %d" % (self.cmd,
+                                                                  self
+                                                                  .returncode)
 
-        >>> check_output(["ls", "-l", "/dev/null"])
-        'crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\n'
 
-        The stdout argument is not allowed as it is used internally.
-        To capture standard error in the result, use stderr=STDOUT.
+def check_output(*popenargs, **kwargs):
+    """Run command with arguments and return its output as a byte string.
 
-        >>> import sys
-        >>> check_output(["/bin/sh", "-c",
-        ...               "ls -l non_existent_file ; exit 0"],
-        ...              stderr=sys.stdout)
-        'ls: non_existent_file: No such file or directory\n'
-        """
-        if 'stdout' in kwargs:
-            raise ValueError('stdout argument not allowed, it will be '
-                             'overridden.')
-        process = Popen(stdout=PIPE, *popenargs, **kwargs)
-        output, unused_err = process.communicate()
-        retcode = process.poll()
-        if retcode:
-            cmd = kwargs.get("args")
-            if cmd is None:
-                cmd = popenargs[0]
-            raise CalledProcessError(retcode, cmd, output=output)
-        return output
+    If the exit code was non-zero it raises a CalledProcessError.  The
+    CalledProcessError object will have the return code in the returncode
+    attribute and output in the output attribute.
+
+    The arguments are the same as for the Popen constructor.  Example:
+
+    >>> check_output(["ls", "-l", "/dev/null"])
+    'crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\n'
+
+    The stdout argument is not allowed as it is used internally.
+    To capture standard error in the result, use stderr=STDOUT.
+
+    >>> import sys
+    >>> check_output(["/bin/sh", "-c",
+    ...               "ls -l non_existent_file ; exit 0"],
+    ...              stderr=sys.stdout)
+    'ls: non_existent_file: No such file or directory\n'
+    """
+    if 'stdout' in kwargs:
+        raise ValueError('stdout argument not allowed, it will be '
+                         'overridden.')
+    process = Popen(stdout=PIPE, *popenargs, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        raise CalledProcessError(retcode, cmd, output=output)
+    return output
 
 try:
     import simplejson as json
@@ -124,20 +140,22 @@ class create_bucket_types(Command):
         active = ('is active' in status)
 
         if exists or active:
-            log.info("Updating {!r} bucket-type with props {!r}".format(name,
-                                                                        props))
+            log.info("Updating {0} bucket-type with props {1}"
+                     .format(repr(name), repr(props)))
             self.check_btype_command("update", name,
                                      json.dumps({'props': props},
                                                 separators=(',', ':')))
         else:
-            log.info("Creating {!r} bucket-type with props {!r}".format(name,
-                                                                        props))
+            print name
+            print props
+            log.info("Creating {0} bucket-type with props {1}"
+                     .format(repr(name), repr(props)))
             self.check_btype_command("create", name,
                                      json.dumps({'props': props},
                                                 separators=(',', ':')))
 
         if not active:
-            log.info('Activating {!r} bucket-type'.format(name))
+            log.info('Activating {0} bucket-type'.format(repr(name)))
             self.check_btype_command("activate", name)
 
     def check_btype_command(self, *args):
@@ -262,7 +280,7 @@ class setup_security(Command, security_commands):
                                       PASSWORD=self.password,
                                       CERTUSER=self.certuser,
                                       CERTPASS=self.certpass)
-                log.info("Security command: {!r}".format(newcmd))
+                log.info("Security command: {0}".format(repr(newcmd)))
                 self.run_security_command(tuple(newcmd.split(' ')))
             for perm in self._grants:
                 self._apply_grant(perm, self._grants[perm])
@@ -278,12 +296,12 @@ class setup_security(Command, security_commands):
     def _apply_grant(self, perm, targets):
         for target in targets:
             cmd = ["grant", perm, "on", target, "to", self.username]
-            log.info("Granting permission {!r} on {!r} to {!r}"
-                     .format(perm, target, self.username))
+            log.info("Granting permission {0} on {1} to {2}"
+                     .format(repr(perm), repr(target), repr(self.username)))
             self.run_security_command(cmd)
             cmd = ["grant", perm, "on", target, "to", self.certuser]
-            log.info("Granting permission {!r} on {!r} to {!r}"
-                     .format(perm, target, self.certuser))
+            log.info("Granting permission {0} on {1} to {2}"
+                     .format(repr(perm), repr(target), repr(self.certuser)))
             self.run_security_command(cmd)
 
 
@@ -340,7 +358,7 @@ class preconfigure(Command):
         * search = on
         * listener.protobuf.internal = 127.0.0.1:8087
         * listener.http.internal = 127.0.0.1:8098
-        * listener.https.internal = 127.0.0.1:8099
+        * listener.https.internal = 127.0.0.1:18098
         * ssl.certfile = $pwd/tests/resources/server.crt
         * ssl.keyfile = $pwd/tests/resources/server.key
         * ssl.cacertfile = $pwd/tests/resources/ca.crt
@@ -360,7 +378,7 @@ class preconfigure(Command):
         self.host = "127.0.0.1"
         self.pb_port = "8087"
         self.http_port = "8098"
-        self.https_port = "8099"
+        self.https_port = "18098"
 
     def finalize_options(self):
         if self.riak_conf is None:
@@ -380,29 +398,29 @@ class preconfigure(Command):
         conf = f.read()
         f.close()
         conf = re.sub(r'search\s+=\s+off', r'search = on', conf)
-        conf = re.sub(r'^##\s+ssl.', 'ssl.', conf, flags=re.MULTILINE)
-        conf = re.sub(r'^ssl.certfile\s+=\s+\S+$',
+        conf = re.sub(r'##[ ]+ssl\.', r'ssl.', conf)
+        conf = re.sub(r'ssl.certfile\s+=\s+\S+',
                       r'ssl.certfile = ' + self.cert_dir + '/server.crt',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^storage_backend\s+=\s+\S+$',
+                      conf)
+        conf = re.sub(r'storage_backend\s+=\s+\S+',
                       r'storage_backend = leveldb',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^ssl.keyfile\s+=\s+\S+$',
+                      conf)
+        conf = re.sub(r'ssl.keyfile\s+=\s+\S+',
                       r'ssl.keyfile = ' + self.cert_dir + '/server.key',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^ssl.cacertfile\s+=\s+\S+$',
+                      conf)
+        conf = re.sub(r'ssl.cacertfile\s+=\s+\S+',
                       r'ssl.cacertfile = ' + self.cert_dir +
                       '/ca.crt',
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^#*\s*listener.http.internal\s+=\s+\S+',
+                      conf)
+        conf = re.sub(r'#*[ ]*listener.http.internal\s+=\s+\S+',
                       r'listener.http.internal = ' + http_host,
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^#*\s*listener.https.internal\s+=\s+\S+',
+                      conf)
+        conf = re.sub(r'#*[ ]*listener.https.internal\s+=\s+\S+',
                       r'listener.https.internal = ' + https_host,
-                      conf, flags=re.MULTILINE)
-        conf = re.sub(r'^listener.protobuf.internal\s+=\s+\S+',
+                      conf)
+        conf = re.sub(r'listener.protobuf.internal\s+=\s+\S+',
                       r'listener.protobuf.internal = ' + pb_host,
-                      conf, flags=re.MULTILINE)
+                      conf)
         f = open(self.riak_conf, 'w', False)
         f.write(conf)
         f.close()
@@ -412,7 +430,7 @@ class preconfigure(Command):
         if os.path.isfile(name):
             shutil.copyfile(name, backup)
         else:
-            log.info("Cannot backup missing file {!r}".format(name))
+            log.info("Cannot backup missing file {0}".format(repr(name)))
 
 
 class configure(Command):
