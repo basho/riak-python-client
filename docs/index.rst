@@ -56,4 +56,5 @@ Contents
    bucket
    object
    query
+   datatypes
    advanced
