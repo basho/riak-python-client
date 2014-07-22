@@ -149,7 +149,8 @@ class RiakBucket(object):
         Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
         that will be stored as JSON. A shortcut for manually
         instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>` or :class:`~riak.datatypes.Datatype`.
+        <riak.riak_object.RiakObject>` or :class:`Datatype
+        <riak.datatypes.Datatype>`.
 
         :param key: Name of the key. Leaving this to be None (default)
                     will make Riak generate the key on store.
@@ -158,6 +159,7 @@ class RiakBucket(object):
         :type data: object
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
                 :class:`~riak.datatypes.Datatype`
+
         """
         if self.bucket_type.datatype:
             return TYPES[self.bucket_type.datatype](bucket=self, key=key)
