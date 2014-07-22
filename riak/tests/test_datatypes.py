@@ -17,6 +17,9 @@ class DatatypeUnitTests(object):
     def op(self, dtype):
         raise NotImplementedError
 
+    def check_op_output(self, op):
+        raise NotImplementedError
+
     def test_new_type_is_clean(self):
         newtype = self.dtype(self.bucket, 'key')
         self.assertIsNone(newtype.to_op())
