@@ -184,6 +184,14 @@ class FeatureDetection(object):
         """
         return self.server_version >= versions[2.0]
 
+    def datatypes(self):
+        """
+        Whether datatypes are supported.
+
+        :rtype: bool
+        """
+        return self.server_version >= versions[2.0]
+
     @lazy_property
     def server_version(self):
         return LooseVersion(self._server_version())

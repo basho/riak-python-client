@@ -60,6 +60,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.stream_indexes())
         self.assertFalse(t.index_term_regex())
         self.assertFalse(t.bucket_types())
+        self.assertFalse(t.datatypes())
 
     def test_10(self):
         t = DummyTransport("1.0.3")
@@ -76,6 +77,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.stream_indexes())
         self.assertFalse(t.index_term_regex())
         self.assertFalse(t.bucket_types())
+        self.assertFalse(t.datatypes())
 
     def test_11(self):
         t = DummyTransport("1.1.4")
@@ -92,6 +94,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.stream_indexes())
         self.assertFalse(t.index_term_regex())
         self.assertFalse(t.bucket_types())
+        self.assertFalse(t.datatypes())
 
     def test_12(self):
         t = DummyTransport("1.2.0")
@@ -108,6 +111,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.stream_indexes())
         self.assertFalse(t.index_term_regex())
         self.assertFalse(t.bucket_types())
+        self.assertFalse(t.datatypes())
 
     def test_12_loose(self):
         t = DummyTransport("1.2.1p3")
@@ -124,6 +128,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertFalse(t.stream_indexes())
         self.assertFalse(t.index_term_regex())
         self.assertFalse(t.bucket_types())
+        self.assertFalse(t.datatypes())
 
     def test_14(self):
         t = DummyTransport("1.4.0rc1")
@@ -140,6 +145,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.stream_indexes())
         self.assertFalse(t.index_term_regex())
         self.assertFalse(t.bucket_types())
+        self.assertFalse(t.datatypes())
 
     def test_144(self):
         t = DummyTransport("1.4.6")
@@ -156,6 +162,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.stream_indexes())
         self.assertTrue(t.index_term_regex())
         self.assertFalse(t.bucket_types())
+        self.assertFalse(t.datatypes())
 
     def test_20(self):
         t = DummyTransport("2.0.1")
@@ -172,6 +179,7 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.stream_indexes())
         self.assertTrue(t.index_term_regex())
         self.assertTrue(t.bucket_types())
+        self.assertTrue(t.datatypes())
 
 if __name__ == '__main__':
     unittest.main()

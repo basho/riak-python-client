@@ -65,3 +65,4 @@ if RUN_SECURITY:
     SECURITY_CREDS = SecurityCreds(username=SECURITY_USER,
                                    password=SECURITY_PASSWD,
                                    cacert_file=SECURITY_CACERT)
+SKIP_DATATYPES = int(os.environ.get('SKIP_DATATYPES', '0'))

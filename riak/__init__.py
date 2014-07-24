@@ -30,7 +30,7 @@ See the unit_tests.py file for example usage.
 @author Jay Baird (@skatterbean) (jay@mochimedia.com)
 """
 
-__all__ = ['RiakBucket', 'RiakNode', 'RiakObject', 'RiakClient',
+__all__ = ['RiakBucket', 'BucketType', 'RiakNode', 'RiakObject', 'RiakClient',
            'RiakMapReduce', 'RiakKeyFilter', 'RiakLink', 'RiakError',
            'ConflictError', 'ONE', 'ALL', 'QUORUM', 'key_filter']
 
@@ -57,7 +57,7 @@ class ConflictError(RiakError):
 
 
 from client import RiakClient
-from bucket import RiakBucket
+from bucket import RiakBucket, BucketType
 from node import RiakNode
 from riak_object import RiakObject
 from mapreduce import RiakKeyFilter, RiakMapReduce, RiakLink

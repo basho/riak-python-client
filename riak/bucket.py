@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 import mimetypes
-from riak.util import deprecateQuorumAccessors, deprecated
+from riak.util import deprecateQuorumAccessors, deprecated, lazy_property
 
 
 def deprecateBucketQuorumAccessors(klass):
@@ -149,15 +149,21 @@ class RiakBucket(object):
         Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
         that will be stored as JSON. A shortcut for manually
         instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>`.
+        <riak.riak_object.RiakObject>` or :class:`Datatype
+        <riak.datatypes.Datatype>`.
 
         :param key: Name of the key. Leaving this to be None (default)
                     will make Riak generate the key on store.
         :type key: string
         :param data: The data to store.
         :type data: object
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
+                :class:`~riak.datatypes.Datatype`
+
         """
+        if self.bucket_type.datatype:
+            return TYPES[self.bucket_type.datatype](bucket=self, key=key)
+
         try:
             if isinstance(data, basestring):
                 data = data.encode('ascii')
@@ -196,9 +202,9 @@ class RiakBucket(object):
                    'param instead of data')
         return self.new(key, encoded_data=data, content_type=content_type)
 
-    def get(self, key, r=None, pr=None, timeout=None):
+    def get(self, key, r=None, pr=None, timeout=None, include_context=None):
         """
-        Retrieve an object from Riak.
+        Retrieve an object or datatype from Riak.
 
         :param key: Name of the key.
         :type key: string
@@ -208,10 +214,19 @@ class RiakBucket(object):
         :type pr: integer
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :param include_context: if the bucket contains datatypes, include
+           the opaque context in the result
+        :type include_context: bool
+        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
+           :class:`~riak.datatypes.Datatype`
         """
-        obj = RiakObject(self._client, self, key)
-        return obj.reload(r=r, pr=pr, timeout=timeout)
+        if self.bucket_type.datatype:
+            return self._client.fetch_datatype(self, key, r=r, pr=pr,
+                                               timeout=timeout,
+                                               include_context=include_context)
+        else:
+            obj = RiakObject(self._client, self, key)
+            return obj.reload(r=r, pr=pr, timeout=timeout)
 
     def get_binary(self, key, r=None, pr=None, timeout=None):
         """
@@ -561,7 +576,7 @@ class BucketType(object):
         """
         return self.name == 'default'
 
-    def get_property(self, key, value):
+    def get_property(self, key):
         """
         Retrieve a bucket-type property.
 
@@ -641,6 +656,16 @@ class BucketType(object):
         """
         return self._client.stream_buckets(bucket_type=self, timeout=timeout)
 
+    @lazy_property
+    def datatype(self):
+        """
+        The assigned datatype for this bucket type, if present.
+        """
+        if self.is_default():
+            return None
+        else:
+            return self.get_properties().get('datatype')
+
     def __str__(self):
         return "<BucketType {0!r}>".format(self.name)
 
@@ -663,3 +688,4 @@ class BucketType(object):
 
 
 from riak_object import RiakObject
+from riak.datatypes import TYPES

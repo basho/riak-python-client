@@ -23,10 +23,11 @@ from riak.tests.test_kv import BasicKVTests, KVFileTests, \
 from riak.tests.test_2i import TwoITests
 from riak.tests.test_btypes import BucketTypeTests
 from riak.tests.test_security import SecurityTests
+from riak.tests.test_datatypes import DatatypeIntegrationTests
 
 from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
     HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
-    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS
+    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS, SKIP_POOL
 
 testrun_search_bucket = None
 testrun_props_bucket = None
@@ -282,6 +283,7 @@ class ClientTests(object):
             self.assertIsInstance(obj, RiakObject)
             self.assertFalse(obj.exists)
 
+    @unittest.skipIf(SKIP_POOL, 'SKIP_POOL is set')
     def test_pool_close(self):
         """
         Iterate over the connection pool and close all connections.
@@ -314,6 +316,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                CounterTests,
                                BucketTypeTests,
                                SecurityTests,
+                               DatatypeIntegrationTests,
                                BaseTestCase,
                                unittest.TestCase):
 
@@ -348,6 +351,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 CounterTests,
                                 BucketTypeTests,
                                 SecurityTests,
+                                DatatypeIntegrationTests,
                                 BaseTestCase,
                                 unittest.TestCase):
 

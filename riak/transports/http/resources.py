@@ -159,6 +159,15 @@ class RiakHttpResources(object):
         return mkpath(self.riak_kv_wm_buckets, quote_plus(bucket), "counters",
                       quote_plus(key), **options)
 
+    def datatypes_path(self, bucket_type, bucket, key=None, **options):
+        if not self.bucket_types():
+            raise RiakError("Datatypes are unsupported by this Riak node")
+        if key:
+            key = quote_plus(key)
+
+        return mkpath("/types", quote_plus(bucket_type), "buckets",
+                      quote_plus(bucket), "datatypes", key, **options)
+
     # Feature detection overrides
     def bucket_types(self):
         return self.riak_kv_wm_bucket_type is not None
