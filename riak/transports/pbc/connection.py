@@ -19,7 +19,7 @@ under the License.
 import socket
 import struct
 import riak_pb
-from riak.security import SecurityError, check_revoked_cert
+from riak.security import SecurityError
 from riak.transports.security import configure_context
 from riak import RiakError
 from riak_pb.messages import (
@@ -117,7 +117,6 @@ class RiakPbcConnection(object):
         if self._client._credentials:
             ssl_ctx = \
                 Context(self._client._credentials.ssl_version)
-            crl_file = self._client._credentials.crl_file
             try:
                 configure_context(ssl_ctx, self._client._credentials)
                 # attempt to upgrade the socket to SSL
@@ -127,8 +126,8 @@ class RiakPbcConnection(object):
                 # ssl handshake successful
                 self._socket = ssl_socket
 
-                if crl_file is not None:
-                    check_revoked_cert(ssl_socket, crl_file)
+                if self._client._credentials.has_credential('crl'):
+                    self._client._credentials.check_revoked_cert(ssl_socket)
 
                 return True
             except Exception as e:

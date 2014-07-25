@@ -21,7 +21,7 @@ import httplib
 import socket
 import select
 
-from riak.security import SecurityError, check_revoked_cert
+from riak.security import SecurityError
 from riak.transports.security import RiakWrappedSocket, configure_context
 from riak.transports.pool import Pool
 from riak.transports.http.transport import RiakHttpTransport
@@ -47,7 +47,7 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
                  host,
                  port,
                  credentials,
-                 key_file=None,
+                 pkey_file=None,
                  cert_file=None,
                  ciphers=None,
                  timeout=None):
@@ -61,10 +61,10 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         :type port: int
         :param credentials: Security Credential settings
         :type  credentials: SecurityCreds
-        :param key_file: PEM formatted file that contains your private key
-        :type key_file: str
+        :param pkey_file: PEM formatted file that contains your private key
+        :type pkey_file: str
         :param cert_file: PEM formatted certificate chain file
-        :type key_file: str
+        :type cert_file: str
         :param ciphers: List of supported SSL ciphers
         :type ciphers: str
         :param timeout: Number of seconds before timing out
@@ -73,9 +73,9 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         httplib.HTTPSConnection.__init__(self,
                                          host,
                                          port,
-                                         key_file=key_file,
+                                         key_file=pkey_file,
                                          cert_file=cert_file)
-        self.key_file = key_file
+        self.pkey_file = pkey_file
         self.cert_file = cert_file
         self.credentials = credentials
         self.timeout = timeout
@@ -102,8 +102,8 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
             break
 
         self.sock = RiakWrappedSocket(cxn, sock)
-        if self.credentials.crl_file:
-            check_revoked_cert(self.sock, self.credentials.crl_file)
+        if self.credentials.has_credential('crl'):
+            self.credentials.check_revoked_cert(self.sock)
 
 
 class RiakHttpPool(Pool):

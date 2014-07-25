@@ -29,20 +29,18 @@ def configure_context(ssl_ctx, credentials):
     Set various options on the SSL context.
 
     :param ssl_ctx: OpenSSL context
-    :type ssl_ctx: OpenSSL.SSL.Context
+    :type ssl_ctx: :py:class `~OpenSSL.SSL.Context`
     :param credentials: Riak Security Credentials
-    :type credentials:
+    :type credentials: :py:class `~riak.security.SecurityCreds`
     """
-    key_file = credentials.key_file
-    cert_file = credentials.cert_file
-    cacert_file = credentials.cacert_file
+
+    if credentials.has_credential('pkey'):
+        ssl_ctx.use_privatekey(credentials.pkey)
+    if credentials.has_credential('cert'):
+        ssl_ctx.use_certificate(credentials.cert)
+    if credentials.has_credential('cacert'):
+        ssl_ctx.add_extra_chain_cert(credentials.cacert)
     ciphers = credentials.ciphers
-    if key_file is not None:
-        ssl_ctx.use_privatekey_file(key_file)
-    if cert_file is not None:
-        ssl_ctx.use_certificate_chain_file(cert_file)
-    if cacert_file is not None:
-        ssl_ctx.load_verify_locations(cacert_file)
     if ciphers is not None:
         ssl_ctx.set_cipher_list(ciphers)
 
