@@ -259,7 +259,8 @@ class RiakBucket(object):
         :type r: integer
         :param pr: PR-Value for the requests (defaults to bucket's PR)
         :type pr: integer
-        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>` or
+                tuples of bucket_type, bucket, key, and the exception raised
         """
         bkeys = [(self.bucket_type.name, self.name, key) for key in keys]
         return self._client.multiget(bkeys, r=r, pr=pr)

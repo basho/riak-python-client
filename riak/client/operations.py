@@ -600,12 +600,12 @@ class RiakClientOperations(RiakClientTransport):
         """
         Fetches many keys in parallel via threads.
 
-        :param pairs: list of bucket/key tuple pairs
+        :param pairs: list of bucket_type/bucket/key tuple triples
         :type pairs: list
         :param params: additional request flags, e.g. r, pr
         :type params: dict
-        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>`
-            instances
+        :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>` or
+                tuples of bucket_type, bucket, key, and the exception raised
         """
         return multiget(self, pairs, **params)
 
