@@ -100,7 +100,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             self.nodes = [self._create_node(n) for n in nodes]
 
         self.protocol = protocol or 'http'
-        self.resolver = default_resolver
+        self._resolver = None
         self._credentials = self._create_credentials(credentials)
         self._http_pool = RiakHttpPool(self, **transport_options)
         self._pb_pool = RiakPbcPool(self, **transport_options)
@@ -138,6 +138,19 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                         those transports, regardless of which protocol
                         is preferred.
                          """)
+
+    def _get_resolver(self):
+        return self._resolver or default_resolver
+
+    def _set_resolver(self, value):
+        if value is None or callable(value):
+            self._resolver = value
+        else:
+            raise TypeError("resolver is not a function")
+
+    resolver = property(_get_resolver, _set_resolver,
+                        doc=""" The sibling-resolution function for this client.
+                        Defaults to :func:`riak.resolver.default_resolver`.""")
 
     def get_transport(self):
         """
