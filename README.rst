@@ -17,17 +17,15 @@ Install
 =======
 
 The recommended version of Python for use with this client is Python
-2.7.
-
-You must have `Protocol Buffers <https://pypi.python.org/pypi/protobuf>`_
-installed before you can install the
-Riak Client. From the Riak Python Client root directory, execute::
+2.7. From the Riak Python Client root directory, execute::
 
     python setup.py install
 
 There is an additional dependency on the Python package `setuptools`.
-Please install `setuptools` first, e.g. ``port install
-py27-setuptools`` for OS X and MacPorts.
+
+Official packages are signed and published to `PyPI
+<https://pypi.python.org/pypi/riak>`_.
+
 
 Testing
 =======
@@ -109,7 +107,7 @@ Connections to Riak in Tests
 If your Riak server isn't running on localhost or you have built a
 Riak devrel from source, use the environment variables
 ``RIAK_TEST_HOST``, ``RIAK_TEST_HTTP_PORT`` and
-``RIAK_TEST_PB_PORT=8087`` to specify where to find the Riak server.
+``RIAK_TEST_PB_PORT`` to specify where to find the Riak server.
 
 Some of the connection tests need port numbers that are NOT in use. If
 ports 1023 and 1022 are in use on your test system, set the
@@ -172,4 +170,4 @@ Once you are done testing security you can also::
 
 To run the tests, then simply::
 
-    RUN_SECURITY=1 RIAK_TEST_HTTP_PORT=8099 python setup.py test
+    RUN_SECURITY=1 RIAK_TEST_HTTP_PORT=18098 python setup.py test
