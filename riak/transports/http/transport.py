@@ -732,6 +732,9 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise TypeError("Cannot send operation on datatype {!r}".
                             format(type_name))
 
+        if 'return_body' in options:
+            options['returnbody'] = options['return_body']
+
         url = self.datatypes_path(datatype.bucket.bucket_type.name,
                                   datatype.bucket.name,
                                   datatype.key, **options)
@@ -748,11 +751,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if status == 201:
             datatype.key = headers['location'].strip().split('/')[-1]
 
-        if options.get('return_body') and status is not 204:
+        if status != 204:
             response = json.loads(body)
+            datatype._context = response.get('context')
             datatype._set_value(self._decode_datatype(type_name,
                                                       response['value']))
-            datatype._context = response.get('context')
 
         return True
 
