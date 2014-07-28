@@ -59,12 +59,12 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     #: The supported protocols
     PROTOCOLS = ['http', 'pbc']
 
-    def __init__(self, protocol='http', transport_options={}, nodes=None,
+    def __init__(self, protocol='pbc', transport_options={}, nodes=None,
                  credentials=None, **unused_args):
         """
         Construct a new ``RiakClient`` object.
 
-        :param protocol: the preferred protocol, defaults to 'http'
+        :param protocol: the preferred protocol, defaults to 'pbc'
         :type protocol: string
         :param nodes: a list of node configurations,
            where each configuration is a dict containing the keys
