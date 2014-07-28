@@ -497,6 +497,20 @@ class BasicKVTests(object):
         self.assertTrue(robj.exists)
         self.assertEqual(len(robj.siblings), 1)
 
+    def test_get_params(self):
+        bucket = self.client.bucket(self.bucket_name)
+        bucket.new(self.key_name, data={"foo": "one",
+                                        "bar": "baz"}).store()
+
+        bucket.get(self.key_name, basic_quorum=False)
+        bucket.get(self.key_name, basic_quorum=True)
+        bucket.get(self.key_name, notfound_ok=True)
+        bucket.get(self.key_name, notfound_ok=False)
+
+        missing = bucket.get('missing-key', notfound_ok=True,
+                             basic_quorum=True)
+        self.assertFalse(missing.exists)
+
     def generate_siblings(self, original, count=5, delay=None):
         vals = []
         for i in range(count):

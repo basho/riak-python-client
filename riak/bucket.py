@@ -173,7 +173,8 @@ class RiakBucket(object):
             obj.encoded_data = encoded_data
         return obj
 
-    def get(self, key, r=None, pr=None, timeout=None, include_context=None):
+    def get(self, key, r=None, pr=None, timeout=None, include_context=None,
+            basic_quorum=None, notfound_ok=None):
         """
         Retrieve an object or datatype from Riak.
 
@@ -188,18 +189,28 @@ class RiakBucket(object):
         :param include_context: if the bucket contains datatypes, include
            the opaque context in the result
         :type include_context: bool
+        :param basic_quorum: whether to use the "basic quorum" policy
+           for not-founds
+        :type basic_quorum: bool
+        :param notfound_ok: whether to treat not-found responses as successful
+        :type notfound_ok: bool
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
            :class:`~riak.datatypes.Datatype`
         """
         if self.bucket_type.datatype:
             return self._client.fetch_datatype(self, key, r=r, pr=pr,
                                                timeout=timeout,
-                                               include_context=include_context)
+                                               include_context=include_context,
+                                               basic_quorum=basic_quorum,
+                                               notfound_ok=notfound_ok)
         else:
             obj = RiakObject(self._client, self, key)
-            return obj.reload(r=r, pr=pr, timeout=timeout)
+            return obj.reload(r=r, pr=pr, timeout=timeout,
+                              basic_quorum=basic_quorum,
+                              notfound_ok=notfound_ok)
 
-    def multiget(self, keys, r=None, pr=None):
+    def multiget(self, keys, r=None, pr=None, timeout=None,
+                 basic_quorum=None, notfound_ok=None):
         """
         Retrieves a list of keys belonging to this bucket in parallel.
 
@@ -209,11 +220,19 @@ class RiakBucket(object):
         :type r: integer
         :param pr: PR-Value for the requests (defaults to bucket's PR)
         :type pr: integer
-        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>` or
-                tuples of bucket_type, bucket, key, and the exception raised
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        :param basic_quorum: whether to use the "basic quorum" policy
+           for not-founds
+        :type basic_quorum: bool
+        :param notfound_ok: whether to treat not-found responses as successful
+        :type notfound_ok: bool
+        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         bkeys = [(self.bucket_type.name, self.name, key) for key in keys]
-        return self._client.multiget(bkeys, r=r, pr=pr)
+        return self._client.multiget(bkeys, r=r, pr=pr, timeout=timeout,
+                                     basic_quorum=basic_quorum,
+                                     notfound_ok=notfound_ok)
 
     def _get_resolver(self):
         if callable(self._resolver):

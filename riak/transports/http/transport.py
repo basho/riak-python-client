@@ -117,13 +117,16 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             return {}
 
-    def get(self, robj, r=None, pr=None, timeout=None):
+    def get(self, robj, r=None, pr=None, timeout=None, basic_quorum=None,
+            notfound_ok=None):
         """
         Get a bucket/key from the server
         """
         # We could detect quorum_controls here but HTTP ignores
         # unknown flags/params.
-        params = {'r': r, 'pr': pr, 'timeout': timeout}
+        params = {'r': r, 'pr': pr, 'timeout': timeout,
+                  'basic_quorum': basic_quorum,
+                  'notfound_ok': notfound_ok}
 
         bucket_type = self._get_bucket_type(robj.bucket.bucket_type)
 

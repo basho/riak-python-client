@@ -274,7 +274,8 @@ class RiakObject(object):
 
         return self
 
-    def reload(self, r=None, pr=None, timeout=None):
+    def reload(self, r=None, pr=None, timeout=None, basic_quorum=None,
+               notfound_ok=None):
         """
         Reload the object from Riak. When this operation completes, the
         object could contain new metadata and a new value, if the object
@@ -293,6 +294,11 @@ class RiakObject(object):
         :type pr: integer
         :param timeout: a timeout value in milliseconds
         :type timeout: int
+        :param basic_quorum: whether to use the "basic quorum" policy
+           for not-founds
+        :type basic_quorum: bool
+        :param notfound_ok: whether to treat not-found responses as successful
+        :type notfound_ok: bool
         :rtype: :class:`RiakObject`
         """
 
