@@ -31,13 +31,9 @@ from riak.node import RiakNode
 from riak.bucket import RiakBucket, BucketType
 from riak.mapreduce import RiakMapReduceChain
 from riak.resolver import default_resolver
-from riak.search import RiakSearch
 from riak.transports.http import RiakHttpPool
 from riak.transports.pbc import RiakPbcPool
 from riak.security import SecurityCreds
-from riak.util import deprecated
-from riak.util import deprecateQuorumAccessors
-from riak.util import lazy_property
 
 
 def default_encoder(obj):
@@ -48,7 +44,6 @@ def default_encoder(obj):
     return json.dumps(obj, ensure_ascii=False).encode("utf-8")
 
 
-@deprecateQuorumAccessors
 class RiakClient(RiakMapReduceChain, RiakClientOperations):
     """
     The ``RiakClient`` object holds information necessary to connect
@@ -77,22 +72,6 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :type credentials: SecurityCreds or dict
         """
         unused_args = unused_args.copy()
-
-        if 'port' in unused_args:
-            deprecated("port option is deprecated, use http_port or pb_port,"
-                       " or the nodes option. Your given port of %r will be "
-                       "used as the %s port unless already set" %
-                       (unused_args['port'], protocol))
-            unused_args['already_warned_port'] = True
-            if (protocol == 'http' and
-                    'http_port' not in unused_args):
-                unused_args['http_port'] = unused_args['port']
-            elif protocol == 'pbc' and 'pb_port' not in unused_args:
-                unused_args['pb_port'] = unused_args['port']
-
-        if 'transport_class' in unused_args:
-            deprecated(
-                "transport_class is deprecated, use the protocol option")
 
         if nodes is None:
             self.nodes = [self._create_node(unused_args), ]
@@ -151,46 +130,6 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     resolver = property(_get_resolver, _set_resolver,
                         doc=""" The sibling-resolution function for this client.
                         Defaults to :func:`riak.resolver.default_resolver`.""")
-
-    def get_transport(self):
-        """
-        Get the transport instance the client is using for it's
-        connection.
-
-        .. deprecated:: 2.0.0
-           There is no equivalent to this method, it will return ``None``.
-        """
-        deprecated("get_transport is deprecated, use client, " +
-                   "bucket, or object methods instead")
-        return None
-
-    def get_client_id(self):
-        """
-        Get the client identifier.
-
-        .. deprecated:: 2.0.0
-           Use the :attr:`client_id` attribute instead.
-
-        :rtype: string
-        """
-        deprecated(
-            "``get_client_id`` is deprecated, use the ``client_id`` property")
-        return self.client_id
-
-    def set_client_id(self, client_id):
-        """
-        Set the client identifier.
-
-        .. deprecated:: 2.0.0
-           Use the :attr:`client_id` attribute instead.
-
-        :param client_id: The new client_id.
-        :type client_id: string
-        """
-        deprecated(
-            "``set_client_id`` is deprecated, use the ``client_id`` property")
-        self.client_id = client_id
-        return self
 
     def _get_client_id(self):
         with self._transport() as transport:
@@ -295,18 +234,6 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             btype = BucketType(self, name)
             self._bucket_types[name] = btype
             return btype
-
-    @lazy_property
-    def solr(self):
-        """
-        Returns a RiakSearch object which can access search indexes.
-
-        .. deprecated:: 2.0.0
-           Use the ``fulltext_*`` methods instead.
-        """
-        deprecated("``solr`` is deprecated, use ``fulltext_search``,"
-                   " ``fulltext_add`` and ``fulltext_delete`` directly")
-        return RiakSearch(self)
 
     def close(self):
         """

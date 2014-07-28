@@ -141,6 +141,4 @@ Miscellaneous
 
 .. autofunction:: deprecated
 
-.. autofunction:: deprecateQuorumAccessors
-
 .. autoclass:: lazy_property

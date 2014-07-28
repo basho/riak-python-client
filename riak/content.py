@@ -16,7 +16,6 @@ specific language governing permissions and limitations
 under the License.
 """
 from riak import RiakError
-from riak.util import deprecated
 
 
 class RiakContent(object):
@@ -59,16 +58,6 @@ class RiakContent(object):
         property into Python values. The decoding is dependent on the
         `content_type` property and the bucket's registered decoders.
         :type mixed """)
-
-    def get_encoded_data(self):
-        deprecated("`get_encoded_data` is deprecated, use the `encoded_data`"
-                   " property")
-        return self.encoded_data
-
-    def set_encoded_data(self, value):
-        deprecated("`set_encoded_data` is deprecated, use the `encoded_data`"
-                   " property")
-        self.encoded_data = value
 
     def _get_encoded_data(self):
         if self._data is not None and self._encoded_data is None:

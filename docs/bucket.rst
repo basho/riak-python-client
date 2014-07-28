@@ -133,26 +133,3 @@ object. The same admonitions for these operations apply.
 
 .. automethod:: RiakBucket.get_keys
 .. automethod:: RiakBucket.stream_keys
-
-------------------
-Deprecated methods
-------------------
-
-.. warning:: These methods exist solely for backwards-compatibility and should not
-   be used unless code is being ported from an older version.
-
-.. automethod:: RiakBucket.new_binary
-.. automethod:: RiakBucket.new_binary_from_file
-.. automethod:: RiakBucket.get_binary
-.. automethod:: RiakBucket.get_r
-.. automethod:: RiakBucket.set_r
-.. automethod:: RiakBucket.get_pr
-.. automethod:: RiakBucket.set_pr
-.. automethod:: RiakBucket.get_w
-.. automethod:: RiakBucket.set_w
-.. automethod:: RiakBucket.get_dw
-.. automethod:: RiakBucket.set_dw
-.. automethod:: RiakBucket.get_pw
-.. automethod:: RiakBucket.set_pw
-.. automethod:: RiakBucket.get_rw
-.. automethod:: RiakBucket.set_rw

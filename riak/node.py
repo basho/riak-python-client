@@ -18,7 +18,6 @@ under the License.
 import math
 import time
 from threading import RLock
-from riak.util import deprecated
 
 
 class Decaying(object):
@@ -89,10 +88,6 @@ class RiakNode(object):
         :param pb_port: the Protcol Buffers port of the node
         :type pb_port: integer
         """
-
-        if 'port' in unused_args and 'already_warned_port' not in unused_args:
-            deprecated("port option is deprecated, use http_port or pb_port")
-
         self.host = host
         self.http_port = http_port
         self.pb_port = pb_port

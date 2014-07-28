@@ -20,7 +20,6 @@ under the License.
 """
 from riak import ConflictError
 from riak.content import RiakContent
-from riak.util import deprecated
 import base64
 
 
@@ -196,8 +195,6 @@ class RiakObject(object):
         index-name/value tuples
         """)
 
-    get_encoded_data = content_method('get_encoded_data')
-    set_encoded_data = content_method('set_encoded_data')
     add_index = content_method('add_index')
     remove_index = content_method('remove_index')
     remove_indexes = remove_index
@@ -238,11 +235,6 @@ class RiakObject(object):
                         doc="""The sibling-resolution function for this
                            object. If the resolver is not set, the
                            bucket's resolver will be used.""")
-
-    def get_sibling(self, index):
-        deprecated("RiakObject.get_sibling is deprecated, use the "
-                   "siblings property instead")
-        return self.siblings[index]
 
     def store(self, w=None, dw=None, pw=None, return_body=True,
               if_none_match=False, timeout=None):
@@ -307,15 +299,11 @@ class RiakObject(object):
         self.client.get(self, r=r, pr=pr, timeout=timeout)
         return self
 
-    def delete(self, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
+    def delete(self, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):
         """
         Delete this object from Riak.
 
-        :param rw: RW-value. Wait until this many partitions have
-            deleted the object before responding. (deprecated in Riak
-            1.0+, use R/W/DW)
-        :type rw: integer
         :param r: R-value, wait for this many partitions to read object
          before performing the put
         :type r: integer
@@ -337,7 +325,7 @@ class RiakObject(object):
         :rtype: :class:`RiakObject`
         """
 
-        self.client.delete(self, rw=rw, r=r, w=w, dw=dw, pr=pr, pw=pw,
+        self.client.delete(self, r=r, w=w, dw=dw, pr=pr, pw=pw,
                            timeout=timeout)
         self.clear()
         return self
