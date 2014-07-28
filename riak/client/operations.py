@@ -288,6 +288,9 @@ class RiakClientOperations(RiakClientTransport):
 
         Lists all keys in a bucket.
 
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
+
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
 
@@ -304,6 +307,9 @@ class RiakClientOperations(RiakClientTransport):
         """
         Lists all keys in a bucket via a stream. This is a generator
         method which should be iterated over.
+
+        .. warning:: Do not use this in production, as it requires
+           traversing through all keys stored in a cluster.
 
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
