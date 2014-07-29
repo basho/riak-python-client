@@ -18,11 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 import mimetypes
-from riak.util import deprecateQuorumAccessors, deprecated, lazy_property
-
-
-def deprecateBucketQuorumAccessors(klass):
-    return deprecateQuorumAccessors(klass, parent='_client')
+from riak.util import lazy_property
 
 
 def bucket_property(name, doc=None):
@@ -35,7 +31,6 @@ def bucket_property(name, doc=None):
     return property(_prop_getter, _prop_setter, doc=doc)
 
 
-@deprecateBucketQuorumAccessors
 class RiakBucket(object):
     """
     The ``RiakBucket`` object allows you to access and change information
@@ -178,30 +173,6 @@ class RiakBucket(object):
             obj.encoded_data = encoded_data
         return obj
 
-    def new_binary(self, key=None, data=None,
-                   content_type='application/octet-stream'):
-        """
-        Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
-        that will be stored as plain text/binary. A shortcut for
-        manually instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>`.
-
-        .. deprecated:: 2.0.0
-           Use :meth:`new` instead.
-
-        :param key: Name of the key.
-        :type key: string
-        :param data: The data to store.
-        :type data: object
-        :param content_type: The content type of the object.
-        :type content_type: string
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
-        """
-        deprecated('RiakBucket.new_binary is deprecated, '
-                   'use RiakBucket.new with the encoded_data '
-                   'param instead of data')
-        return self.new(key, encoded_data=data, content_type=content_type)
-
     def get(self, key, r=None, pr=None, timeout=None, include_context=None):
         """
         Retrieve an object or datatype from Riak.
@@ -227,27 +198,6 @@ class RiakBucket(object):
         else:
             obj = RiakObject(self._client, self, key)
             return obj.reload(r=r, pr=pr, timeout=timeout)
-
-    def get_binary(self, key, r=None, pr=None, timeout=None):
-        """
-        Retrieve a binary/string object from Riak.
-
-        .. deprecated:: 2.0.0
-           Use :meth:`get` instead.
-
-        :param key: Name of the key.
-        :type key: string
-        :param r: R-Value of the request (defaults to bucket's R)
-        :type r: integer
-        :param pr: PR-Value of the request (defaults to bucket's PR)
-        :type pr: integer
-        :param timeout: a timeout value in milliseconds
-        :type timeout: int
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
-        """
-        deprecated('RiakBucket.get_binary is deprecated, '
-                   'use RiakBucket.get')
-        return self.get(key, r=r, pr=pr, timeout=timeout)
 
     def multiget(self, keys, r=None, pr=None):
         """
@@ -418,25 +368,6 @@ class RiakBucket(object):
         if not mimetype:
             mimetype = 'application/octet-stream'
         return self.new(key, encoded_data=binary_data, content_type=mimetype)
-
-    def new_binary_from_file(self, key, filename):
-        """
-        Create a new Riak object in the bucket, using the contents of
-        the specified file. This is a shortcut for :meth:`new`, where the
-        ``encoded_data`` and ``content_type`` are set for you.
-
-        .. deprecated:: 2.0.0
-           Use :meth:`new_from_file` instead.
-
-        :param key: the key of the new object
-        :type key: string
-        :param filename: the file to read the contents from
-        :type filename: string
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
-        """
-        deprecated('RiakBucket.new_binary_from_file is deprecated, use '
-                   'RiakBucket.new_from_file')
-        return self.new_from_file(key, filename)
 
     def search_enabled(self):
         """
