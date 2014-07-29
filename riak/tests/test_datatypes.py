@@ -405,3 +405,47 @@ class DatatypeIntegrationTests(object):
 
         map2 = bucket.get(self.key_name)
         self.assertItemsEqual(["Z"], map2.maps['map'].sets['set'])
+
+    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
+    def test_dt_set_return_body_true_default(self):
+        btype = self.client.bucket_type('pytest-sets')
+        bucket = btype.bucket(self.bucket_name)
+        myset = bucket.new(self.key_name)
+        myset.add('X')
+        myset.store(return_body=False)
+        with self.assertRaises(datatypes.ContextRequired):
+            myset.discard('X')
+
+        myset.add('Y')
+        myset.store()
+        self.assertItemsEqual(myset.value, ['X', 'Y'])
+
+        myset.discard('X')
+        myset.store()
+        self.assertItemsEqual(myset.value, ['Y'])
+
+    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
+    def test_dt_map_return_body_true_default(self):
+        btype = self.client.bucket_type('pytest-maps')
+        bucket = btype.bucket(self.bucket_name)
+        mymap = bucket.new(self.key_name)
+        mymap.sets['a'].add('X')
+        mymap.store(return_body=False)
+        with self.assertRaises(datatypes.ContextRequired):
+            mymap.sets['a'].discard('X')
+        with self.assertRaises(datatypes.ContextRequired):
+            del mymap.sets['a']
+
+        mymap.sets['a'].add('Y')
+        mymap.store()
+        print mymap
+        self.assertItemsEqual(mymap.sets['a'].value, ['X', 'Y'])
+
+        mymap.sets['a'].discard('X')
+        mymap.store()
+        self.assertItemsEqual(mymap.sets['a'].value, ['Y'])
+
+        del mymap.sets['a']
+        mymap.store()
+
+        self.assertEqual(mymap.value, {})

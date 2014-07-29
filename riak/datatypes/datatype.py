@@ -113,7 +113,7 @@ class Datatype(object):
                    be available before performing the put
         :type pw: integer
         :param return_body: if the newly stored object should be
-                            retrieved
+                            retrieved, defaults to True
         :type return_body: bool
         :param include_context: whether to return the new opaque
           context when `return_body` is `True`
@@ -125,7 +125,9 @@ class Datatype(object):
         if not self.modified:
             raise ValueError("No operation to perform")
 
+        params.setdefault('return_body', True)
         self.bucket._client.update_datatype(self, **params)
+        self.clear()
 
         return self
 
