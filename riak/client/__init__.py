@@ -99,7 +99,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         else:
             self.nodes = [self._create_node(n) for n in nodes]
 
-        self.protocol = protocol or 'http'
+        self.protocol = protocol or 'pbc'
         self._resolver = None
         self._credentials = self._create_credentials(credentials)
         self._http_pool = RiakHttpPool(self, **transport_options)
