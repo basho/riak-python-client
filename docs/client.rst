@@ -33,11 +33,7 @@ Client objects
    .. autoattribute:: PROTOCOLS
    .. autoattribute:: protocol
    .. autoattribute:: client_id
-   .. attribute:: resolver
-
-      The sibling-resolution function for this client. Defaults
-      to :func:`riak.resolver.default_resolver`.
-
+   .. autoattribute:: resolver
    .. attribute:: nodes
 
       The list of :class:`nodes <riak.node.RiakNode>` that this
