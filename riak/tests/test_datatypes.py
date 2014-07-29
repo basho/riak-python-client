@@ -438,7 +438,6 @@ class DatatypeIntegrationTests(object):
 
         mymap.sets['a'].add('Y')
         mymap.store()
-        print mymap
         self.assertItemsEqual(mymap.sets['a'].value, ['X', 'Y'])
 
         mymap.sets['a'].discard('X')
