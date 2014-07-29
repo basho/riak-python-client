@@ -42,7 +42,7 @@ def setUpModule():
         testrun_sibs_bucket, testrun_yz_bucket, testrun_mr_btype, \
         testrun_mr_bucket
 
-    c = RiakClient(protocol='pbc', host=PB_HOST, http_port=HTTP_PORT,
+    c = RiakClient(host=PB_HOST, http_port=HTTP_PORT,
                    pb_port=PB_PORT, credentials=SECURITY_CREDS)
 
     testrun_props_bucket = 'propsbucket'
@@ -55,7 +55,6 @@ def setUpModule():
         b.enable_search()
 
     if RUN_YZ:
-        c.protocol = 'pbc'
         testrun_yz_bucket = 'yzbucket'
         c.create_search_index(testrun_yz_bucket)
         b = c.bucket(testrun_yz_bucket)
@@ -85,7 +84,7 @@ def tearDownModule():
     global testrun_search_bucket, testrun_props_bucket, \
         testrun_sibs_bucket, testrun_yz_bucket
 
-    c = RiakClient(protocol='http', host=HTTP_HOST, http_port=HTTP_PORT,
+    c = RiakClient(host=HTTP_HOST, http_port=HTTP_PORT,
                    pb_port=PB_PORT, credentials=SECURITY_CREDS)
 
     c.bucket(testrun_sibs_bucket).clear_properties()
@@ -96,7 +95,6 @@ def tearDownModule():
         b.clear_properties()
 
     if RUN_YZ:
-        c.protocol = 'pbc'
         yzbucket = c.bucket(testrun_yz_bucket)
         yzbucket.set_property('search_index', '_dont_index_')
         c.delete_search_index(testrun_yz_bucket)

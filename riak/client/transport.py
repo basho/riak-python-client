@@ -43,7 +43,7 @@ class RiakClientTransport(object):
     """
 
     # These will be set or redefined by the RiakClient initializer
-    protocol = 'http'
+    protocol = 'pbc'
     _http_pool = None
     _pb_pool = None
     _locals = _client_locals()
