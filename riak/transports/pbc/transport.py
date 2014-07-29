@@ -140,7 +140,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
     client_id = property(_get_client_id, _set_client_id,
                          doc="""the client ID for this connection""")
 
-    def get(self, robj, r=None, pr=None, timeout=None):
+    def get(self, robj, r=None, pr=None, timeout=None, basic_quorum=None,
+            notfound_ok=None):
         """
         Serialize get request and deserialize response
         """
@@ -149,12 +150,17 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req = riak_pb.RpbGetReq()
         if r:
             req.r = self._encode_quorum(r)
-        if self.quorum_controls() and pr:
-            req.pr = self._encode_quorum(pr)
+        if self.quorum_controls():
+            if pr:
+                req.pr = self._encode_quorum(pr)
+            if basic_quorum is not None:
+                req.basic_quorum = basic_quorum
+            if notfound_ok is not None:
+                req.notfound_ok = notfound_ok
         if self.client_timeouts() and timeout:
             req.timeout = timeout
         if self.tombstone_vclocks():
-            req.deletedvclock = 1
+            req.deletedvclock = True
 
         req.bucket = bucket.name
         self._add_bucket_type(req, bucket.bucket_type)
@@ -163,8 +169,6 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         msg_code, resp = self._request(MSG_CODE_GET_REQ, req,
                                        MSG_CODE_GET_RESP)
-
-        # TODO: support if_modified flag
 
         if resp is not None:
             if resp.HasField('vclock'):

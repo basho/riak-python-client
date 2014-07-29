@@ -363,7 +363,8 @@ class RiakClientOperations(RiakClientTransport):
                              timeout=timeout)
 
     @retryable
-    def get(self, transport, robj, r=None, pr=None, timeout=None):
+    def get(self, transport, robj, r=None, pr=None, timeout=None,
+            basic_quorum=None, notfound_ok=None):
         """
         get(robj, r=None, pr=None, timeout=None)
 
@@ -380,13 +381,20 @@ class RiakClientOperations(RiakClientTransport):
         :type pr: integer, string, None
         :param timeout: a timeout value in milliseconds
         :type timeout: int
+        :param basic_quorum: whether to use the "basic quorum" policy
+           for not-founds
+        :type basic_quorum: bool
+        :param notfound_ok: whether to treat not-found responses as successful
+        :type notfound_ok: bool
         """
         _validate_timeout(timeout)
         if not isinstance(robj.key, basestring):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
-        return transport.get(robj, r=r, pr=pr, timeout=timeout)
+        return transport.get(robj, r=r, pr=pr, timeout=timeout,
+                             basic_quorum=basic_quorum,
+                             notfound_ok=notfound_ok)
 
     @retryable
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,
