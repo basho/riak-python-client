@@ -40,14 +40,18 @@ class SecurityError(RiakError):
         super(SecurityError, self).__init__(message)
 
 
-class SecurityCreds(object):
+class SecurityCreds:
     def __init__(self,
                  username=None,
                  password=None,
-                 key_file=None,
+                 pkey_file=None,
+                 pkey=None,
                  cert_file=None,
+                 cert=None,
                  cacert_file=None,
+                 cacert=None,
                  crl_file=None,
+                 crl=None,
                  ciphers=None,
                  ssl_version=OpenSSL.SSL.TLSv1_2_METHOD):
         """
@@ -57,44 +61,119 @@ class SecurityCreds(object):
         :type username: str
         :param password: Riak Security password
         :type password: str
-        :param key_file: Full path to security key file
-        :type key_file: str
+        :param pkey_file: Full path to security key file
+        :type pkey_file: str
+        :param key: Loaded security key file
+        :type key: :py:class `~OpenSSL.crypto.PKey`
         :param cert_file: Full path to certificate file
         :type cert_file: str
+        :param cert: Loaded client certificate
+        :type cert: :py:class `~OpenSSL.crypto.X509`
         :param cacert_file: Full path to CA certificate file
         :type cacert_file: str
+        :param cacert: Loaded CA certificate
+        :type cacert: :py:class `~OpenSSL.crypto.X509`
         :param crl_file: Full path to revoked certificates file
         :type crl_file: str
+        :param crl: Loaded revoked certificates list
+        :type crl: :py:class `~OpenSSL.crypto.CRL`
         :param ciphers: List of supported SSL ciphers
         :type ciphers: str
         :param ssl_version: OpenSSL security version
         :type ssl_version: int
         """
-        self.username = username
-        self.password = password
-        self.key_file = key_file
-        self.cert_file = cert_file
-        self.cacert_file = cacert_file
-        self.crl_file = crl_file
-        self.ciphers = ciphers
-        self.ssl_version = ssl_version
+        self._username = username
+        self._password = password
+        self._pkey_file = pkey_file
+        self._pkey = pkey
+        self._cert_file = cert_file
+        self._cert = cert
+        self._cacert_file = cacert_file
+        self._cacert = cacert
+        self._crl_file = crl_file
+        self._crl = crl
+        self._ciphers = ciphers
+        self._ssl_version = ssl_version
 
+    @property
+    def username(self):
+        """
+        Riak Username
+        """
+        return self._username
 
-def check_revoked_cert(ssl_socket, crl_file):
-    """
-    Determine if the server certificate has been revoked or not.
+    @property
+    def password(self):
+        """
+        Riak Password
+        """
+        return self._password
 
-    :param ssl_socket: Secure SSL socket
-    :type ssl_socket: socket
-    :param crl_file: Certificate Revocation List file
-    :type crl_file: str
-    """
-    f = open(crl_file, 'r')
-    crl = crypto.load_crl(OpenSSL.SSL.FILETYPE_PEM, f.read())
-    revs = crl.get_revoked()
-    servcert = ssl_socket.get_peer_certificate()
-    servserial = servcert.get_serial_number()
-    for rev in revs:
-        if servserial == long(rev.get_serial(), 16):
-            raise RiakError(
-                "Server certificate has been revoked")
+    @property
+    def pkey(self):
+        """
+        Private key
+        """
+        return self._cached_cert('_pkey', crypto.load_privatekey)
+
+    @property
+    def cert(self):
+        """
+        Client Certificate
+        """
+        return self._cached_cert('_cert', crypto.load_certificate)
+
+    @property
+    def cacert(self):
+        """
+        Certifying Authority Certificate
+        """
+        return self._cached_cert('_cacert', crypto.load_certificate)
+
+    @property
+    def crl(self):
+        """
+        Certificate Revocation List
+        """
+        return self._cached_cert('_crl', crypto.load_crl)
+
+    @property
+    def ciphers(self):
+        """
+        Colon-delimited list of supported ciphers
+        """
+        return self._ciphers
+
+    @property
+    def ssl_version(self):
+        """
+        SSL Encryption Version
+        """
+        return self._ssl_version
+
+    def _cached_cert(self, key, loader):
+        # If the key is associated with a file, then lazily load and cache it
+        key_file = key + "_file"
+        if (getattr(self, key) is None) and \
+           (getattr(self, key_file) is not None):
+            with open(getattr(self, key_file), 'r') as f:
+                setattr(self, key, loader(OpenSSL.SSL.FILETYPE_PEM, f.read()))
+        return getattr(self, key)
+
+    def has_credential(self, key):
+        """
+        True if a credential or filename value has been supplied
+        """
+        internal_key = "_" + key
+        return (getattr(self, internal_key) is not None) or \
+            (getattr(self, internal_key + "_file") is not None)
+
+    def check_revoked_cert(self, ssl_socket):
+        if not self.has_credential('crl'):
+            return True
+
+        servcert = ssl_socket.get_peer_certificate()
+        servserial = servcert.get_serial_number()
+        for rev in self.crl.get_revoked():
+            if servserial == long(rev.get_serial(), 16):
+                raise SecurityError("Server certificate has been revoked")

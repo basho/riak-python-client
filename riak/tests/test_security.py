@@ -31,7 +31,8 @@ from riak.security import SecurityCreds
 class SecurityTests(object):
     @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is set')
     def test_security_disabled(self):
-        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+        creds = SecurityCreds(username=SECURITY_USER,
+                              password=SECURITY_PASSWD,
                               cacert_file=SECURITY_CACERT)
         client = self.create_client(credentials=creds)
         myBucket = client.bucket('test')
@@ -50,7 +51,7 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_user(self):
-        creds = SecurityCreds('foo', SECURITY_PASSWD,
+        creds = SecurityCreds(username='foo', password=SECURITY_PASSWD,
                               cacert_file=SECURITY_CACERT)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
@@ -58,7 +59,7 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_password(self):
-        creds = SecurityCreds(SECURITY_USER, 'foo',
+        creds = SecurityCreds(username=SECURITY_USER, password='foo',
                               cacert_file=SECURITY_CACERT)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
@@ -66,7 +67,7 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_missing_cert(self):
-        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               cacert_file='/tmp/foo')
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
@@ -74,10 +75,10 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_cert_authentication(self):
-        creds = SecurityCreds(SECURITY_CERT_USER,
-                              SECURITY_CERT_PASSWD,
+        creds = SecurityCreds(username=SECURITY_CERT_USER,
+                              password=SECURITY_CERT_PASSWD,
                               cert_file=SECURITY_CERT,
-                              key_file=SECURITY_KEY)
+                              pkey_file=SECURITY_KEY)
         client = self.create_client(credentials=creds)
         myBucket = client.bucket('test')
         val1 = "foobar2"
@@ -94,7 +95,7 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_revoked_cert(self):
-        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               cacert_file=SECURITY_CACERT,
                               crl_file=SECURITY_REVOKED)
         client = self.create_client(credentials=creds)
@@ -103,7 +104,7 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_ca_cert(self):
-        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               cacert_file=SECURITY_BAD_CERT)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
@@ -111,7 +112,7 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_ciphers(self):
-        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               ciphers='DHE-RSA-AES256-SHA')
         client = self.create_client(credentials=creds)
         myBucket = client.bucket('test')
@@ -122,7 +123,7 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_ciphers(self):
-        creds = SecurityCreds(SECURITY_USER, SECURITY_PASSWD,
+        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               ciphers='ECDHE-RSA-AES256-GCM-SHA384')
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
