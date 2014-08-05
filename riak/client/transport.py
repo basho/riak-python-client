@@ -100,7 +100,7 @@ class RiakClientTransport(object):
         without retries.
         """
         pool = self._choose_pool()
-        with pool.take() as transport:
+        with pool.transaction() as transport:
             yield transport
 
     def _with_retries(self, pool, fn):
@@ -121,7 +121,7 @@ class RiakClientTransport(object):
 
         for retry in range(retry_count):
             try:
-                with pool.take(_filter=_skip_bad_nodes) as transport:
+                with pool.transaction(_filter=_skip_bad_nodes) as transport:
                     try:
                         return fn(transport)
                     except (IOError, httplib.HTTPException) as e:
