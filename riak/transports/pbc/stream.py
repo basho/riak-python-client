@@ -39,6 +39,8 @@ class RiakPbcStream(object):
     def __init__(self, transport):
         self.finished = False
         self.transport = transport
+        self.resource = None
+        self.pool = None
 
     def __iter__(self):
         return self
@@ -63,6 +65,10 @@ class RiakPbcStream(object):
         # same thing.
         return response.done
 
+    def attach(self, pool, resource):
+        self.pool = pool
+        self.resource = resource
+
     def close(self):
         # We have to drain the socket to make sure that we don't get
         # weird responses when some other request comes after a
@@ -72,6 +78,7 @@ class RiakPbcStream(object):
                 pass
         except StopIteration:
             pass
+        self.pool.release(self.resource)
 
 
 class RiakPbcKeyStream(RiakPbcStream):

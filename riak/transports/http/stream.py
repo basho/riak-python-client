@@ -37,6 +37,8 @@ class RiakHttpStream(object):
         self.response = response
         self.buffer = ''
         self.response_done = False
+        self.resource = None
+        self.pool = None
 
     def __iter__(self):
         return self
@@ -50,8 +52,12 @@ class RiakHttpStream(object):
     def next(self):
         raise NotImplementedError
 
+    def attach(self, pool, resource):
+        self.pool = pool
+        self.resource = resource
+
     def close(self):
-        pass
+        self.pool.release(self.resource)
 
 
 class RiakHttpJsonStream(RiakHttpStream):
