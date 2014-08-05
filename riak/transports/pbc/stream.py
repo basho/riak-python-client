@@ -40,7 +40,6 @@ class RiakPbcStream(object):
         self.finished = False
         self.transport = transport
         self.resource = None
-        self.pool = None
 
     def __iter__(self):
         return self
@@ -65,8 +64,7 @@ class RiakPbcStream(object):
         # same thing.
         return response.done
 
-    def attach(self, pool, resource):
-        self.pool = pool
+    def attach(self, resource):
         self.resource = resource
 
     def close(self):
@@ -78,7 +76,7 @@ class RiakPbcStream(object):
                 pass
         except StopIteration:
             pass
-        self.pool.release(self.resource)
+        self.resource.release()
 
 
 class RiakPbcKeyStream(RiakPbcStream):

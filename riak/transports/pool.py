@@ -36,7 +36,7 @@ class Resource(object):
     being pooled and a marker for whether the resource is currently
     claimed.
     """
-    def __init__(self, obj):
+    def __init__(self, obj, pool):
         """
         Creates a new Resource, wrapping the passed object as the
         pooled resource.
@@ -51,6 +51,14 @@ class Resource(object):
         self.claimed = False
         """Whether the resource is currently in use."""
 
+        self.pool = pool
+        """The pool that this resource belongs to."""
+
+    def release(self):
+        """
+        Releases this resource back to the pool it came from.
+        """
+        self.pool.release(self)
 
 class Pool(object):
     """
@@ -122,9 +130,9 @@ class Pool(object):
                     break
             if resource is None:
                 if default is not None:
-                    resource = Resource(default)
+                    resource = Resource(default, self)
                 else:
-                    resource = Resource(self.create_resource())
+                    resource = Resource(self.create_resource(), self)
                 self.resources.append(resource)
             resource.claimed = True
         return resource

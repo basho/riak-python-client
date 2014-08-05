@@ -173,6 +173,12 @@ class PoolTest(unittest.TestCase):
         pool.release(a)
         with pool.transaction() as d:
             self.assertEqual([1], d)
+        e = pool.acquire()
+        with pool.transaction() as f:
+            self.assertEqual([2], f)
+        e.release()
+        with pool.transaction() as g:
+            self.assertEqual([1], g)
 
     def test_thread_safety(self):
         """

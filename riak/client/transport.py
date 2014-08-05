@@ -103,6 +103,14 @@ class RiakClientTransport(object):
         with pool.transaction() as transport:
             yield transport
 
+    def _acquire(self):
+        """
+        _acquire()
+
+        Acquires a connection from the default pool.
+        """
+        return self._choose_pool().acquire()
+
     def _with_retries(self, pool, fn):
         """
         Performs the passed function with retries against the given pool.
