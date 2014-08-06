@@ -83,16 +83,18 @@ class RiakClientOperations(RiakClientTransport):
         else:
             bucketfn = lambda name: self.bucket(name)
 
-        with self._transport() as transport:
-            stream = transport.stream_buckets(bucket_type=bucket_type,
-                                              timeout=timeout)
-            try:
-                for bucket_list in stream:
-                    bucket_list = [bucketfn(name) for name in bucket_list]
-                    if len(bucket_list) > 0:
-                        yield bucket_list
-            finally:
-                stream.close()
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.stream_buckets(bucket_type=bucket_type,
+                                          timeout=timeout)
+        stream.attach(resource)
+        try:
+            for bucket_list in stream:
+                bucket_list = [bucketfn(name) for name in bucket_list]
+                if len(bucket_list) > 0:
+                    yield bucket_list
+        finally:
+            stream.close()
 
     @retryable
     def ping(self, transport):
@@ -190,15 +192,17 @@ class RiakClientOperations(RiakClientTransport):
         if timeout != 'infinity':
             _validate_timeout(timeout)
 
-        with self._transport() as transport:
-            page = IndexPage(self, bucket, index, startkey, endkey,
-                             return_terms, max_results, term_regex)
-            page.stream = True
-            page.results = transport.stream_index(
+        page = IndexPage(self, bucket, index, startkey, endkey,
+                         return_terms, max_results, term_regex)
+        page.stream = True
+        resource = self._acquire()
+        transport = resource.object
+        page.results = transport.stream_index(
                 bucket, index, startkey, endkey, return_terms=return_terms,
                 max_results=max_results, continuation=continuation,
                 timeout=timeout, term_regex=term_regex)
-            return page
+        page.results.attach(resource)
+        return page
 
     @retryable
     def get_bucket_props(self, transport, bucket):
@@ -318,14 +322,16 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: iterator
         """
         _validate_timeout(timeout)
-        with self._transport() as transport:
-            stream = transport.stream_keys(bucket, timeout=timeout)
-            try:
-                for keylist in stream:
-                    if len(keylist) > 0:
-                        yield keylist
-            finally:
-                stream.close()
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.stream_keys(bucket, timeout=timeout)
+        stream.attach(resource)
+        try:
+            for keylist in stream:
+                if len(keylist) > 0:
+                    yield keylist
+        finally:
+            stream.close()
 
     @retryable
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
@@ -464,13 +470,15 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: iterator
         """
         _validate_timeout(timeout)
-        with self._transport() as transport:
-            stream = transport.stream_mapred(inputs, query, timeout)
-            try:
-                for phase, data in stream:
-                    yield phase, data
-            finally:
-                stream.close()
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.stream_mapred(inputs, query, timeout)
+        stream.attach(resource)
+        try:
+            for phase, data in stream:
+                yield phase, data
+        finally:
+            stream.close()
 
     @retryable
     def create_search_index(self, transport, index, schema=None, n_val=None):
