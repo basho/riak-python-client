@@ -184,10 +184,8 @@ class RiakPbcConnection(object):
         Closes the underlying socket of the PB connection.
         """
         if self._socket:
-            if self._client._credentials:
-                self._socket.shutdown()
-            else:
-                self._socket.shutdown(socket.SHUT_RDWR)
+            self._socket.close()
+            del self._socket
 
     def _parse_msg(self, code, packet):
         try:
