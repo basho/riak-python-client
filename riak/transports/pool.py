@@ -60,6 +60,7 @@ class Resource(object):
         """
         self.pool.release(self)
 
+
 class Pool(object):
     """
     A thread-safe, reentrant resource pool, ported from the

@@ -198,7 +198,8 @@ class RiakClientOperations(RiakClientTransport):
             from contextlib import closing
 
             # Using contextlib.closing
-            with closing(client.stream_index(mybucket, 'name_bin', 'Smith')) as index:
+            with closing(client.stream_index(mybucket, 'name_bin',
+                                             'Smith')) as index:
                 for key in index:
                     do_something(key)
 
@@ -240,9 +241,9 @@ class RiakClientOperations(RiakClientTransport):
         resource = self._acquire()
         transport = resource.object
         page.results = transport.stream_index(
-                bucket, index, startkey, endkey, return_terms=return_terms,
-                max_results=max_results, continuation=continuation,
-                timeout=timeout, term_regex=term_regex)
+            bucket, index, startkey, endkey, return_terms=return_terms,
+            max_results=max_results, continuation=continuation,
+            timeout=timeout, term_regex=term_regex)
         page.results.attach(resource)
         return page
 
