@@ -70,12 +70,33 @@ class RiakClientOperations(RiakClientTransport):
         .. warning:: Do not use this in production, as it requires
            traversing through all keys stored in a cluster.
 
+        The caller should explicitly close the returned iterator,
+        either using :func:`contextlib.closing` or calling `close`
+        explicitly. Consuming the entire iterator will also close the
+        stream. If it does not, the associated connection might not be
+        returned to the pool. Example::
+
+            from contextlib import closing
+
+            # Using contextlib.closing
+            with closing(client.stream_buckets()) as buckets:
+                for bucket_list in buckets:
+                    do_something(bucket_list)
+
+            # Explicit close()
+            stream = client.stream_buckets()
+            for bucket_list in stream:
+                 do_something(bucket_list)
+
+            stream.close()
+
         :param bucket_type: the optional containing bucket type
         :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         :rtype: iterator that yields lists of :class:`RiakBucket
              <riak.bucket.RiakBucket>` instances
+
         """
         _validate_timeout(timeout)
         if bucket_type:
@@ -83,16 +104,18 @@ class RiakClientOperations(RiakClientTransport):
         else:
             bucketfn = lambda name: self.bucket(name)
 
-        with self._transport() as transport:
-            stream = transport.stream_buckets(bucket_type=bucket_type,
-                                              timeout=timeout)
-            try:
-                for bucket_list in stream:
-                    bucket_list = [bucketfn(name) for name in bucket_list]
-                    if len(bucket_list) > 0:
-                        yield bucket_list
-            finally:
-                stream.close()
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.stream_buckets(bucket_type=bucket_type,
+                                          timeout=timeout)
+        stream.attach(resource)
+        try:
+            for bucket_list in stream:
+                bucket_list = [bucketfn(name) for name in bucket_list]
+                if len(bucket_list) > 0:
+                    yield bucket_list
+        finally:
+            stream.close()
 
     @retryable
     def ping(self, transport):
@@ -166,6 +189,27 @@ class RiakClientOperations(RiakClientTransport):
         Queries a secondary index, streaming matching keys through an
         iterator.
 
+        The caller should explicitly close the returned iterator,
+        either using :func:`contextlib.closing` or calling `close`
+        explicitly. Consuming the entire iterator will also close the
+        stream. If it does not, the associated connection might not be
+        returned to the pool. Example::
+
+            from contextlib import closing
+
+            # Using contextlib.closing
+            with closing(client.stream_index(mybucket, 'name_bin',
+                                             'Smith')) as index:
+                for key in index:
+                    do_something(key)
+
+            # Explicit close()
+            stream = client.stream_index(mybucket, 'name_bin', 'Smith')
+            for key in stream:
+                 do_something(key)
+
+            stream.close()
+
         :param bucket: the bucket whose index will be queried
         :type bucket: RiakBucket
         :param index: the index to query
@@ -186,19 +230,22 @@ class RiakClientOperations(RiakClientTransport):
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
         :rtype: :class:`riak.client.index_page.IndexPage`
+
         """
         if timeout != 'infinity':
             _validate_timeout(timeout)
 
-        with self._transport() as transport:
-            page = IndexPage(self, bucket, index, startkey, endkey,
-                             return_terms, max_results, term_regex)
-            page.stream = True
-            page.results = transport.stream_index(
-                bucket, index, startkey, endkey, return_terms=return_terms,
-                max_results=max_results, continuation=continuation,
-                timeout=timeout, term_regex=term_regex)
-            return page
+        page = IndexPage(self, bucket, index, startkey, endkey,
+                         return_terms, max_results, term_regex)
+        page.stream = True
+        resource = self._acquire()
+        transport = resource.object
+        page.results = transport.stream_index(
+            bucket, index, startkey, endkey, return_terms=return_terms,
+            max_results=max_results, continuation=continuation,
+            timeout=timeout, term_regex=term_regex)
+        page.results.attach(resource)
+        return page
 
     @retryable
     def get_bucket_props(self, transport, bucket):
@@ -311,6 +358,26 @@ class RiakClientOperations(RiakClientTransport):
         .. warning:: Do not use this in production, as it requires
            traversing through all keys stored in a cluster.
 
+        The caller should explicitly close the returned iterator,
+        either using :func:`contextlib.closing` or calling `close`
+        explicitly. Consuming the entire iterator will also close the
+        stream. If it does not, the associated connection might
+        not be returned to the pool. Example::
+
+            from contextlib import closing
+
+            # Using contextlib.closing
+            with closing(client.stream_keys(mybucket)) as keys:
+                for key_list in keys:
+                    do_something(key_list)
+
+            # Explicit close()
+            stream = client.stream_keys(mybucket)
+            for key_list in stream:
+                 do_something(key_list)
+
+            stream.close()
+
         :param bucket: the bucket whose properties will be set
         :type bucket: RiakBucket
         :param timeout: a timeout value in milliseconds
@@ -318,14 +385,16 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: iterator
         """
         _validate_timeout(timeout)
-        with self._transport() as transport:
-            stream = transport.stream_keys(bucket, timeout=timeout)
-            try:
-                for keylist in stream:
-                    if len(keylist) > 0:
-                        yield keylist
-            finally:
-                stream.close()
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.stream_keys(bucket, timeout=timeout)
+        stream.attach(resource)
+        try:
+            for keylist in stream:
+                if len(keylist) > 0:
+                    yield keylist
+        finally:
+            stream.close()
 
     @retryable
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
@@ -455,6 +524,26 @@ class RiakClientOperations(RiakClientTransport):
         Streams a MapReduce query as (phase, data) pairs. This is a
         generator method which should be iterated over.
 
+        The caller should explicitly close the returned iterator,
+        either using :func:`contextlib.closing` or calling `close`
+        explicitly. Consuming the entire iterator will also close the
+        stream. If it does not, the associated connection might
+        not be returned to the pool. Example::
+
+            from contextlib import closing
+
+            # Using contextlib.closing
+            with closing(mymapred.stream()) as results:
+                for phase, result in results:
+                    do_something(phase, result)
+
+            # Explicit close()
+            stream = mymapred.stream()
+            for phase, result in stream:
+                 do_something(phase, result)
+
+            stream.close()
+
         :param inputs: the input list/structure
         :type inputs: list, dict
         :param query: the list of query phases
@@ -464,13 +553,15 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: iterator
         """
         _validate_timeout(timeout)
-        with self._transport() as transport:
-            stream = transport.stream_mapred(inputs, query, timeout)
-            try:
-                for phase, data in stream:
-                    yield phase, data
-            finally:
-                stream.close()
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.stream_mapred(inputs, query, timeout)
+        stream.attach(resource)
+        try:
+            for phase, data in stream:
+                yield phase, data
+        finally:
+            stream.close()
 
     @retryable
     def create_search_index(self, transport, index, schema=None, n_val=None):

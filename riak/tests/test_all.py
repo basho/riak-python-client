@@ -289,13 +289,13 @@ class ClientTests(object):
         # Do something to add to the connection pool
         self.test_multiget_bucket()
         if self.client.protocol == 'pbc':
-            self.assertGreater(len(self.client._pb_pool.elements), 1)
+            self.assertGreater(len(self.client._pb_pool.resources), 1)
         else:
-            self.assertGreater(len(self.client._http_pool.elements), 1)
+            self.assertGreater(len(self.client._http_pool.resources), 1)
         # Now close them all up
         self.client.close()
-        self.assertEqual(len(self.client._http_pool.elements), 0)
-        self.assertEqual(len(self.client._pb_pool.elements), 0)
+        self.assertEqual(len(self.client._http_pool.resources), 0)
+        self.assertEqual(len(self.client._pb_pool.resources), 0)
 
 
 class RiakPbcTransportTestCase(BasicKVTests,

@@ -24,21 +24,21 @@ import threading
 class BadResource(StandardError):
     """
     Users of a :class:`Pool` should raise this error when the pool
-    element currently in-use is bad and should be removed from the
+    resource currently in-use is bad and should be removed from the
     pool.
     """
     pass
 
 
-class Element(object):
+class Resource(object):
     """
     A member of the :class:`Pool`, a container for the actual resource
     being pooled and a marker for whether the resource is currently
     claimed.
     """
-    def __init__(self, obj):
+    def __init__(self, obj, pool):
         """
-        Creates a new Element, wrapping the passed object as the
+        Creates a new Resource, wrapping the passed object as the
         pooled resource.
 
         :param obj: the resource to wrap
@@ -51,6 +51,15 @@ class Element(object):
         self.claimed = False
         """Whether the resource is currently in use."""
 
+        self.pool = pool
+        """The pool that this resource belongs to."""
+
+    def release(self):
+        """
+        Releases this resource back to the pool it came from.
+        """
+        self.pool.release(self)
+
 
 class Pool(object):
     """
@@ -59,9 +68,10 @@ class Pool(object):
     the create_resource and destroy_resource functions that are
     responsible for creating and cleaning up the resources in the
     pool, respectively. Claiming a resource of the pool for a block of
-    code is done using a with statement on the take method. The take
-    method also allows filtering of the pool and supplying a default
-    value to be used as the resource if no elements are free.
+    code is done using a with statement on the transaction method. The
+    transaction method also allows filtering of the pool and supplying
+    a default value to be used as the resource if no resources are
+    free.
 
     Example::
 
@@ -75,10 +85,11 @@ class Pool(object):
                 pass
 
         pool = ListPool()
-        with pool.take() as resource:
+        with pool.transaction() as resource:
             resource.append(1)
-        with pool.take() as resource2:
+        with pool.transaction() as resource2:
             print repr(resource2) # should be [1]
+
     """
 
     def __init__(self):
@@ -88,12 +99,63 @@ class Pool(object):
         """
         self.lock = threading.RLock()
         self.releaser = threading.Condition(self.lock)
-        self.elements = list()
+        self.resources = list()
+
+    def acquire(self, _filter=None, default=None):
+        """
+        acquire(_filter=None, default=None)
+
+        Claims a resource from the pool for manual use. Resources are
+        created as needed when all members of the pool are claimed or
+        the pool is empty. Most of the time you will want to use
+        :meth:`transaction`.
+
+        :param _filter: a filter that can be used to select a member
+            of the pool
+        :type _filter: callable
+        :param default: a value that will be used instead of calling
+            :meth:`create_resource` if a new resource needs to be created
+        :rtype: Resource
+        """
+        if not _filter:
+            def _filter(obj):
+                return True
+        elif not callable(_filter):
+            raise TypeError("_filter is not a callable")
+
+        resource = None
+        with self.lock:
+            for e in self.resources:
+                if not e.claimed and _filter(e.object):
+                    resource = e
+                    break
+            if resource is None:
+                if default is not None:
+                    resource = Resource(default, self)
+                else:
+                    resource = Resource(self.create_resource(), self)
+                self.resources.append(resource)
+            resource.claimed = True
+        return resource
+
+    def release(self, resource):
+        """release(resource)
+
+        Returns a resource to the pool. Most of the time you will want
+        to use :meth:`transaction`, but if you use :meth:`acquire`,
+        you must release the acquired resource back to the pool when
+        finished. Failure to do so could result in deadlock.
+
+        :param resource: Resource
+        """
+        with self.releaser:
+            resource.claimed = False
+            self.releaser.notify_all()
 
     @contextmanager
-    def take(self, _filter=None, default=None):
+    def transaction(self, _filter=None, default=None):
         """
-        take(_filter=None, default=None)
+        transaction(_filter=None, default=None)
 
         Claims a resource from the pool for use in a thread-safe,
         reentrant manner (as part of a with statement). Resources are
@@ -106,62 +168,42 @@ class Pool(object):
         :param default: a value that will be used instead of calling
             :meth:`create_resource` if a new resource needs to be created
         """
-        if not _filter:
-            def _filter(obj):
-                return True
-        elif not callable(_filter):
-            raise TypeError("_filter is not a callable")
-
-        element = None
-        with self.lock:
-            for e in self.elements:
-                if not e.claimed and _filter(e.object):
-                    element = e
-                    break
-            if element is None:
-                if default is not None:
-                    element = Element(default)
-                else:
-                    element = Element(self.create_resource())
-                self.elements.append(element)
-            element.claimed = True
+        resource = self.acquire(_filter=_filter, default=default)
         try:
-            yield element.object
+            yield resource.object
         except BadResource:
-            self.delete_element(element)
+            self.delete_resource(resource)
             raise
         finally:
-            with self.releaser:
-                element.claimed = False
-                self.releaser.notify_all()
+            self.release(resource)
 
-    def delete_element(self, element):
+    def delete_resource(self, resource):
         """
-        Deletes the element from the pool and destroys the associated
+        Deletes the resource from the pool and destroys the associated
         resource. Not usually needed by users of the pool, but called
         internally when BadResource is raised.
 
-        :param element: the element to remove
-        :type element: Element
+        :param resource: the resource to remove
+        :type resource: Resource
         """
         with self.lock:
-            self.elements.remove(element)
-        self.destroy_resource(element.object)
-        del element
+            self.resources.remove(resource)
+        self.destroy_resource(resource.object)
+        del resource
 
     def __iter__(self):
         """
-        Iterator callback to iterate over the elements of the pool.
+        Iterator callback to iterate over the resources of the pool.
         """
         return PoolIterator(self)
 
     def clear(self):
         """
-        Removes all resources from the pool, calling :meth:`delete_element`
+        Removes all resources from the pool, calling :meth:`delete_resource`
         with each one so that the resources are cleaned up.
         """
-        for element in self:
-            self.delete_element(element)
+        for resource in self:
+            self.delete_resource(resource)
 
     def create_resource(self):
         """
@@ -198,7 +240,7 @@ class PoolIterator(object):
 
     def __init__(self, pool):
         with pool.lock:
-            self.targets = pool.elements[:]
+            self.targets = pool.resources[:]
         self.unlocked = []
         self.lock = pool.lock
         self.releaser = pool.releaser
@@ -210,22 +252,22 @@ class PoolIterator(object):
         if len(self.targets) == 0:
             raise StopIteration
         if len(self.unlocked) == 0:
-            self.__claim_elements()
+            self.__claim_resources()
         return self.unlocked.pop(0)
 
-    def __claim_elements(self):
+    def __claim_resources(self):
         with self.lock:
             with self.releaser:
                 if self.__all_claimed():
                     self.releaser.wait()
-            for element in self.targets:
-                if not element.claimed:
-                    self.targets.remove(element)
-                    self.unlocked.append(element)
-                    element.claimed = True
+            for resource in self.targets:
+                if not resource.claimed:
+                    self.targets.remove(resource)
+                    self.unlocked.append(resource)
+                    resource.claimed = True
 
     def __all_claimed(self):
-        for element in self.targets:
-            if not element.claimed:
+        for resource in self.targets:
+            if not resource.claimed:
                 return False
         return True

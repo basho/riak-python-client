@@ -37,7 +37,7 @@ def test():
 
     def _run():
         psleep = rand.uniform(0.05, 0.1)
-        with pool.take() as a:
+        with pool.transaction() as a:
             started.put(1)
             started.join()
             a.append(rand.uniform(0, 1))

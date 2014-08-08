@@ -182,3 +182,7 @@ class IndexPage(Sequence, object):
 
     def __repr__(self):
         return "<{!s} {!r}>".format(self.__class__.__name__, self.__dict__)
+
+    def close(self):
+        if self.stream:
+            self.results.close()
