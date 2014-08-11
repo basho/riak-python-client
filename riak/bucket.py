@@ -522,7 +522,6 @@ class RiakBucket(object):
         :meth:`RiakClient.update_counter()
         <riak.client.RiakClient.update_counter>` for options.
 
-
         :param key: the key of the counter
         :type key: string
         :param value: the amount to increment or decrement
@@ -653,6 +652,8 @@ class BucketType(object):
     def datatype(self):
         """
         The assigned datatype for this bucket type, if present.
+
+        :rtype: None or string
         """
         if self.is_default():
             return None

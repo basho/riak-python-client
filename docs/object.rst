@@ -94,7 +94,7 @@ Because Riak's consistency model is "eventual" (and not linearizable),
 there is no way for it to disambiguate writes that happen
 concurrently. The :ref:`vclock` helps establish a
 "happens after" relationships so that concurrent writes can be
-detected, but with the exception of :ref:`counters`, Riak has no way
+detected, but with the exception of :ref:`datatypes`, Riak has no way
 to determine which write has the correct value. 
 
 Instead, when :attr:`allow_mult <riak.bucket.RiakBucket.allow_mult>`

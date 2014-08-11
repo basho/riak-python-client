@@ -31,6 +31,10 @@ Client objects
 .. autoclass:: RiakClient
 
    .. autoattribute:: PROTOCOLS
+
+      Prior to Riak 2.0 the ``'https'`` protocol was also an option, but now
+      secure connections are handled by the :ref:`security-label` feature.
+
    .. autoattribute:: protocol
    .. autoattribute:: client_id
    .. autoattribute:: resolver
@@ -152,6 +156,8 @@ media-types. Supported by default are ``application/json`` and
 .. automethod:: RiakClient.get_decoder
 .. automethod:: RiakClient.set_decoder
 
+.. _security-label:
+
 --------
 Security
 --------
@@ -228,33 +234,3 @@ SecurityCreds object
 
 .. autoclass:: riak.security.SecurityCreds
 
-------------------
-Deprecated Methods
-------------------
-
-.. warning:: These methods and attributes exist solely for
-   backwards-compatibility and should not be used unless code is being
-   ported from an older version.
-
-.. automethod:: RiakClient.get_transport
-.. automethod:: RiakClient.get_client_id
-.. automethod:: RiakClient.set_client_id
-.. attribute:: RiakClient.solr
-
-   Returns a RiakSearch object which can access search indexes.
-
-   .. deprecated:: 2.0.0
-      Use the ``fulltext_*`` methods instead.
-
-.. automethod:: RiakClient.get_r
-.. automethod:: RiakClient.set_r
-.. automethod:: RiakClient.get_pr
-.. automethod:: RiakClient.set_pr
-.. automethod:: RiakClient.get_w
-.. automethod:: RiakClient.set_w
-.. automethod:: RiakClient.get_dw
-.. automethod:: RiakClient.set_dw
-.. automethod:: RiakClient.get_pw
-.. automethod:: RiakClient.set_pw
-.. automethod:: RiakClient.get_rw
-.. automethod:: RiakClient.set_rw

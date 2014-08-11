@@ -1,6 +1,6 @@
-============================
- Advanced Usage & Internals
-============================
+==========================
+Advanced Usage & Internals
+==========================
 
 This page contains documentation for aspects of library internals that
 you will rarely need to interact with, but are important for
@@ -13,7 +13,7 @@ Connection pool
 .. currentmodule:: riak.transports.pool
 
 .. autoexception:: BadResource
-.. autoclass:: Element
+.. autoclass:: Resource
    :members:
 .. autoclass:: Pool
    :members:
