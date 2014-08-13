@@ -712,6 +712,8 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>` or
                 tuples of bucket_type, bucket, key, and the exception raised
         """
+        if self._multiget_pool:
+            params['pool'] = self._multiget_pool
         return multiget(self, pairs, **params)
 
     @retryable

@@ -34,6 +34,7 @@ from riak.resolver import default_resolver
 from riak.transports.http import RiakHttpPool
 from riak.transports.pbc import RiakPbcPool
 from riak.security import SecurityCreds
+from riak.util import lazy_property
 
 
 def default_encoder(obj):
@@ -55,7 +56,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     PROTOCOLS = ['http', 'pbc']
 
     def __init__(self, protocol='pbc', transport_options={}, nodes=None,
-                 credentials=None, **unused_args):
+                 credentials=None, multiget_pool_size=None, **unused_args):
         """
         Construct a new ``RiakClient`` object.
 
@@ -70,6 +71,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :type transport_options: dict
         :param credentials: optional object of security info
         :type credentials: SecurityCreds or dict
+        :param multiget_pool_size: the number of threads to use in
+           multiget operations. Defaults to a factor of the number of
+           CPUs in the system
+        :type multiget_pool_size: int
         """
         unused_args = unused_args.copy()
 
@@ -78,6 +83,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         else:
             self.nodes = [self._create_node(n) for n in nodes]
 
+        self._multiget_pool_size = multiget_pool_size
         self.protocol = protocol or 'pbc'
         self._resolver = None
         self._credentials = self._create_credentials(credentials)
@@ -294,6 +300,13 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         else:
             return random.choice(good)
 
+    @lazy_property
+    def _multiget_pool(self):
+        if self._multiget_pool_size:
+            return MultiGetPool(self._multiget_pool_size)
+        else:
+            return None
+
     def __hash__(self):
         return hash(frozenset([(n.host, n.http_port, n.pb_port)
                                for n in self.nodes]))
@@ -309,3 +322,5 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return hash(self) != hash(other)
         else:
             return True
+
+from riak.client.multiget import MultiGetPool
