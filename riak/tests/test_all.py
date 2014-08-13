@@ -281,6 +281,26 @@ class ClientTests(object):
             self.assertIsInstance(obj, RiakObject)
             self.assertFalse(obj.exists)
 
+    def test_multiget_pool_size(self):
+        """
+        The pool size for multigets can be configured at client initiation
+        time. Multiget still works as expected.
+        """
+        client = self.create_client(multiget_pool_size=2)
+        self.assertEqual(2, client._multiget_pool._size)
+
+        keys = [self.key_name, self.randname(), self.randname()]
+        for key in keys:
+            client.bucket(self.bucket_name)\
+                .new(key, encoded_data=key, content_type="text/plain")\
+                .store()
+
+        results = client.bucket(self.bucket_name).multiget(keys)
+        for obj in results:
+            self.assertIsInstance(obj, RiakObject)
+            self.assertTrue(obj.exists)
+            self.assertEqual(obj.key, obj.encoded_data)
+
     @unittest.skipIf(SKIP_POOL, 'SKIP_POOL is set')
     def test_pool_close(self):
         """
