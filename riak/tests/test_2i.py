@@ -297,6 +297,18 @@ class TwoITests(object):
         self.assertLessEqual(2, len(page2))
         self.assertEqual([o3.key, o4.key], page2)
 
+        # iterate over the entire query
+        presults = []
+        pagecount = 0
+        for page in bucket.paginate_index('field1_bin', 'val0', 'val5',
+                                           max_results=2):
+            pagecount += 1
+            presults.extend(page.results)
+
+        self.assertEqual(3, pagecount)
+        self.assertEqual([o1.key, o2.key, o3.key, o4.key], presults)
+
+
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
     def test_index_pagination_return_terms(self):
         if not self.is_2i_supported():
@@ -352,6 +364,18 @@ class TwoITests(object):
             results.extend(result)
         self.assertLessEqual(2, len(results))
         self.assertEqual([o3.key, o4.key], results)
+
+        # iterate over the entire query, streaming each page
+        presults = []
+        pagecount = 0
+        for page in bucket.paginate_stream_index('field1_bin', 'val0', 'val5',
+                                                 max_results=2):
+            pagecount += 1
+            for result in page:
+                presults.extend(result)
+
+        self.assertEqual(3, pagecount)
+        self.assertEqual([o1.key, o2.key, o3.key, o4.key], presults)
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
     def test_index_pagination_stream_return_terms(self):
