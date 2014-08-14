@@ -301,13 +301,12 @@ class TwoITests(object):
         presults = []
         pagecount = 0
         for page in bucket.paginate_index('field1_bin', 'val0', 'val5',
-                                           max_results=2):
+                                          max_results=2):
             pagecount += 1
             presults.extend(page.results)
 
         self.assertEqual(3, pagecount)
         self.assertEqual([o1.key, o2.key, o3.key, o4.key], presults)
-
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
     def test_index_pagination_return_terms(self):
