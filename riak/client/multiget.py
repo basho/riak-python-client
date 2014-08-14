@@ -21,7 +21,7 @@ from Queue import Queue
 from threading import Thread, Lock, Event
 from multiprocessing import cpu_count
 
-__all__ = ['multiget']
+__all__ = ['multiget', 'MultiGetPool']
 
 
 try:
@@ -167,14 +167,20 @@ def multiget(client, keys, **options):
     """
     outq = Queue()
 
-    RIAK_MULTIGET_POOL.start()
+    if 'pool' in options:
+        pool = options['pool']
+        del options['pool']
+    else:
+        pool = RIAK_MULTIGET_POOL
+
+    pool.start()
     for bucket_type, bucket, key in keys:
         task = Task(client, outq, bucket_type, bucket, key, options)
-        RIAK_MULTIGET_POOL.enq(task)
+        pool.enq(task)
 
     results = []
     for _ in range(len(keys)):
-        if RIAK_MULTIGET_POOL.stopped():
+        if pool.stopped():
             raise RuntimeError("Multi-get operation interrupted by pool "
                                "stopping!")
         results.append(outq.get())
