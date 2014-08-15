@@ -23,7 +23,7 @@ import threading
 # This file is a rough port of the Innertube Ruby library
 class BadResource(StandardError):
     """
-    Users of a :class:`Pool` should raise this error when the pool
+    Users of a :py:class:`Pool` should raise this error when the pool
     resource currently in-use is bad and should be removed from the
     pool.
     """
@@ -32,7 +32,7 @@ class BadResource(StandardError):
 
 class Resource(object):
     """
-    A member of the :class:`Pool`, a container for the actual resource
+    A member of the :py:class:`Pool`, a container for the actual resource
     being pooled and a marker for whether the resource is currently
     claimed.
     """

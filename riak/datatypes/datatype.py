@@ -78,7 +78,7 @@ class Datatype(object):
           as well as the value, which is useful for removal operations
           on sets and maps
         :type include_context: bool
-        :rtype: :class:`Datatype`
+        :rtype: :py:class:`Datatype`
         """
         if not self.bucket:
             raise ValueError('bucket property not assigned')
@@ -120,7 +120,7 @@ class Datatype(object):
         :type include_context: bool
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: a subclass of :class:`~riak.datatypes.Datatype`
+        :rtype: a subclass of :py:class:`~riak.datatypes.Datatype`
         """
         if not self.modified:
             raise ValueError("No operation to perform")

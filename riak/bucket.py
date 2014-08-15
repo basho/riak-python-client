@@ -42,12 +42,13 @@ class RiakBucket(object):
         """
         Returns a new ``RiakBucket`` instance.
 
-        :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
-        :type client: :class:`RiakClient <riak.client.RiakClient>`
+        :param client: A :py:class:`RiakClient <riak.client.RiakClient>`
+               instance
+        :type client: :py:class:`RiakClient <riak.client.RiakClient>`
         :param name: The bucket name
         :type name: string
         :param bucket_type: The parent bucket type of this bucket
-        :type bucket_type: :class:`BucketType`
+        :type bucket_type: :py:class:`BucketType`
         """
         try:
             if isinstance(name, basestring):
@@ -141,10 +142,10 @@ class RiakBucket(object):
     def new(self, key=None, data=None, content_type='application/json',
             encoded_data=None):
         """
-        Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
+        Create a new :py:class:`RiakObject <riak.riak_object.RiakObject>`
         that will be stored as JSON. A shortcut for manually
-        instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>` or :class:`Datatype
+        instantiating a :py:class:`RiakObject
+        <riak.riak_object.RiakObject>` or :py:class:`Datatype
         <riak.datatypes.Datatype>`.
 
         :param key: Name of the key. Leaving this to be None (default)
@@ -152,8 +153,8 @@ class RiakBucket(object):
         :type key: string
         :param data: The data to store.
         :type data: object
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
-                :class:`~riak.datatypes.Datatype`
+        :rtype: :py:class:`RiakObject <riak.riak_object.RiakObject>` or
+                :py:class:`~riak.datatypes.Datatype`
 
         """
         if self.bucket_type.datatype:
@@ -194,8 +195,8 @@ class RiakBucket(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
-           :class:`~riak.datatypes.Datatype`
+        :rtype: :py:class:`RiakObject <riak.riak_object.RiakObject>` or
+           :py:class:`~riak.datatypes.Datatype`
         """
         if self.bucket_type.datatype:
             return self._client.fetch_datatype(self, key, r=r, pr=pr,
@@ -227,7 +228,7 @@ class RiakBucket(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
-        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: list of :py:class:`RiakObject <riak.riak_object.RiakObject>`
         """
         bkeys = [(self.bucket_type.name, self.name, key) for key in keys]
         return self._client.multiget(bkeys, r=r, pr=pr, timeout=timeout,
@@ -376,7 +377,7 @@ class RiakBucket(object):
         :type key: string
         :param filename: the file to read the contents from
         :type filename: string
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: :py:class:`RiakObject <riak.riak_object.RiakObject>`
         """
         binary_data = open(filename, "rb").read()
         mimetype, encoding = mimetypes.guess_type(filename)
@@ -551,8 +552,9 @@ class BucketType(object):
         """
         Returns a new ``BucketType`` instance.
 
-        :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
-        :type client: :class:`RiakClient <riak.client.RiakClient>`
+        :param client: A :py:class:`RiakClient <riak.client.RiakClient>`
+               instance
+        :type client: :py:class:`RiakClient <riak.client.RiakClient>`
         :param name: The bucket-type's name
         :type name: string
         """
@@ -612,14 +614,14 @@ class BucketType(object):
 
         :param name: the bucket name
         :type name: str
-        :rtype: :class:`RiakBucket`
+        :rtype: :py:class:`RiakBucket`
         """
         return self._client.bucket(name, self)
 
     def get_buckets(self, timeout=None):
         """
         Get the list of buckets under this bucket-type as
-        :class:`RiakBucket <riak.bucket.RiakBucket>` instances.
+        :py:class:`RiakBucket <riak.bucket.RiakBucket>` instances.
 
         .. warning:: Do not use this in production, as it requires
            traversing through all keys stored in a cluster.
@@ -629,7 +631,8 @@ class BucketType(object):
 
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
+        :rtype: list of :py:class:`RiakBucket <riak.bucket.RiakBucket>`
+                instances
         """
         return self._client.get_buckets(bucket_type=self, timeout=timeout)
 
@@ -643,7 +646,7 @@ class BucketType(object):
 
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: iterator that yields lists of :class:`RiakBucket
+        :rtype: iterator that yields lists of :py:class:`RiakBucket
              <riak.bucket.RiakBucket>` instances
         """
         return self._client.stream_buckets(bucket_type=self, timeout=timeout)

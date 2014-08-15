@@ -32,7 +32,7 @@ except NotImplementedError:
     # Make an educated guess
     POOL_SIZE = 6
 
-#: A :class:`namedtuple` for tasks that are fed to workers in the
+#: A :py:class:`namedtuple` for tasks that are fed to workers in the
 #: multiget pool.
 Task = namedtuple('Task', ['client', 'outq', 'bucket_type', 'bucket', 'key',
                            'options'])
@@ -156,11 +156,11 @@ RIAK_MULTIGET_POOL = MultiGetPool()
 def multiget(client, keys, **options):
     """
     Executes a parallel-fetch across multiple threads. Returns a list
-    containing :class:`~riak.riak_object.RiakObject` instances, or
+    containing :py:class:`~riak.riak_object.RiakObject` instances, or
     3-tuples of bucket, key, and the exception raised.
 
     :param client: the client to use
-    :type client: :class:`~riak.client.RiakClient`
+    :type client: :py:class:`~riak.client.RiakClient`
     :param keys: the keys to fetch in parallel
     :type keys: list of three-tuples -- bucket_type/bucket/key
     :rtype: list

@@ -55,7 +55,7 @@ class Map(Mapping, Datatype):
         del map[('emails', 'set')]
 
     Convenience accessors exist that partition the map's keys by
-    datatype and implement the :class:`~collections.Mapping`
+    datatype and implement the :py:class:`~collections.Mapping`
     behavior as well as supporting deletion::
 
         map.sets['emails']
@@ -144,7 +144,7 @@ class Map(Mapping, Datatype):
 
         :param key: the key of the value to fetch
         :type key: tuple
-        :rtype: :class:`Datatype` matching the datatype in the key
+        :rtype: :py:class:`Datatype` matching the datatype in the key
         """
         self._check_key(key)
         if key in self._value:

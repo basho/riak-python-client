@@ -63,6 +63,5 @@ SECURITY_CERT_PASSWD = os.environ.get('RIAK_TEST_SECURITY_CERT_PASSWD',
 SECURITY_CREDS = None
 if RUN_SECURITY:
     SECURITY_CREDS = SecurityCreds(username=SECURITY_USER,
-                                   password=SECURITY_PASSWD,
-                                   cacert_file=SECURITY_CACERT)
+                                   password=SECURITY_PASSWD)
 SKIP_DATATYPES = int(os.environ.get('SKIP_DATATYPES', '0'))

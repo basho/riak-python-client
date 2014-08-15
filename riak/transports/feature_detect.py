@@ -37,8 +37,8 @@ class FeatureDetection(object):
     :meth:`_server_version` method to use this functionality, which
     should return the server's version as a string.
 
-    :class:`FeatureDetection` is a parent class of
-    :class:`RiakTransport <riak.transports.transport.RiakTransport>`.
+    :py:class:`FeatureDetection` is a parent class of
+    :py:class:`RiakTransport <riak.transports.transport.RiakTransport>`.
     """
 
     def _server_version(self):

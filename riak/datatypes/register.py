@@ -6,7 +6,7 @@ class Register(Sized, Datatype):
     """
     A convergent datatype that represents an opaque string that is set
     with last-write-wins semantics, and may only be embedded in
-    :class:`~riak.datatypes.Map` instances.
+    :py:class:`~riak.datatypes.Map` instances.
     """
 
     type_name = 'register'

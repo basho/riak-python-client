@@ -57,4 +57,5 @@ Contents
    object
    query
    datatypes
+   security
    advanced

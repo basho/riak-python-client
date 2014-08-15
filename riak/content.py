@@ -107,7 +107,7 @@ class RiakContent(object):
         :type field: string
         :param value: The index value.
         :type value: string or integer
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: :py:class:`RiakObject <riak.riak_object.RiakObject>`
         """
         if field[-4:] not in ("_bin", "_int"):
             raise RiakError("Riak 2i fields must end with either '_bin'"
@@ -128,7 +128,7 @@ class RiakContent(object):
         :type field: string
         :param value: The index value.
         :type value: string or integer
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: :py:class:`RiakObject <riak.riak_object.RiakObject>`
         """
         if not field and not value:
             self.indexes.clear()
@@ -157,7 +157,7 @@ class RiakContent(object):
         :type field: string
         :param value: The index value.
         :type value: string or integer
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: :py:class:`RiakObject <riak.riak_object.RiakObject>`
         """
         to_rem = set((x for x in self.indexes if x[0] == field))
         self.indexes.difference_update(to_rem)
@@ -175,7 +175,7 @@ class RiakContent(object):
         :param tag: Optional link tag. Defaults to bucket name. It is ignored
             if ``obj`` is a 3 item link tuple.
         :type tag: string
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: :py:class:`RiakObject <riak.riak_object.RiakObject>`
         """
         if isinstance(obj, tuple):
             newlink = obj

@@ -5,7 +5,7 @@ class Counter(Datatype):
     """
     A convergent datatype that represents a counter which can be
     incremented or decremented. This type can stand on its own or be
-    embedded within a :class:`~riak.datatypes.Map`.
+    embedded within a :py:class:`~riak.datatypes.Map`.
     """
 
     type_name = 'counter'

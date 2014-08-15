@@ -197,13 +197,15 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def bucket(self, name, bucket_type='default'):
         """
         Get the bucket by the specified name. Since buckets always exist,
-        this will always return a :class:`RiakBucket <riak.bucket.RiakBucket>`.
+        this will always return a
+        :py:class:`RiakBucket <riak.bucket.RiakBucket>`.
 
         :param name: the bucket name
         :type name: str
         :param bucket_type: the parent bucket-type
-        :type bucket_type: :class:`BucketType <riak.bucket.BucketType>` or str
-        :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
+        :type bucket_type: :py:class:`BucketType <riak.bucket.BucketType>`
+              or str
+        :rtype: :py:class:`RiakBucket <riak.bucket.RiakBucket>`
         """
         if not isinstance(name, basestring):
             raise TypeError('Bucket name must be a string')
@@ -225,11 +227,11 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         Gets the bucket-type by the specified name. Bucket-types do
         not always exist (unlike buckets), but this will always return
-        a :class:`BucketType <riak.bucket.BucketType>` object.
+        a :py:class:`BucketType <riak.bucket.BucketType>` object.
 
         :param name: the bucket name
         :type name: str
-        :rtype: :class:`BucketType <riak.bucket.BucketType>`
+        :rtype: :py:class:`BucketType <riak.bucket.BucketType>`
         """
         if not isinstance(name, basestring):
             raise TypeError('Bucket name must be a string')

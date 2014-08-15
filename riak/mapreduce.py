@@ -38,7 +38,7 @@ class RiakMapReduce(object):
         Construct a Map/Reduce object.
 
         :param client: the client that will perform the query
-        :type client: :class:`~riak.client.RiakClient`
+        :type client: :py:class:`~riak.client.RiakClient`
         """
         self._client = client
         self._phases = []
@@ -60,7 +60,7 @@ class RiakMapReduce(object):
         :type arg2: string, list, None
         :param arg3: key data for this input (must be convertible to JSON)
         :type arg3: string, list, dict, None
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         if (arg2 is None) and (arg3 is None):
             if isinstance(arg1, RiakObject):
@@ -76,7 +76,7 @@ class RiakMapReduce(object):
 
         :param obj: the object to add
         :type obj: RiakObject
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         return self.add_bucket_key_data(obj._bucket._name, obj._key, None)
 
@@ -90,7 +90,7 @@ class RiakMapReduce(object):
         :type key: string
         :param data: the key-specific data
         :type data: string, list, dict, None
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         if self._input_mode == 'bucket':
             raise ValueError('Already added a bucket, can\'t add an object.')
@@ -111,7 +111,7 @@ class RiakMapReduce(object):
 
         :param bucket: the bucket
         :type bucket: string
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         self._input_mode = 'bucket'
         self._inputs = bucket
@@ -123,7 +123,7 @@ class RiakMapReduce(object):
 
         :param key_filters: a list of filters
         :type key_filters: list
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         if self._input_mode == 'query':
             raise ValueError('Key filters are not supported in a query.')
@@ -137,7 +137,7 @@ class RiakMapReduce(object):
 
         :param args: a filter
         :type args: list
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         if self._input_mode == 'query':
             raise ValueError('Key filters are not supported in a query.')
@@ -154,7 +154,7 @@ class RiakMapReduce(object):
         :type index: string
         :param query: The search query
         :type query: string
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         self._input_mode = 'query'
         self._inputs = {'bucket': index,
@@ -176,7 +176,7 @@ class RiakMapReduce(object):
         :type startkey: string, integer
         :param endkey: The end key of index range (if doing a range query)
         :type endkey: string, integer, None
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         self._input_mode = 'query'
 
@@ -204,7 +204,7 @@ class RiakMapReduce(object):
           the map/reduce. (default False, unless this is the last step
           in the phase)
         :type keep: boolean
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         self._phases.append(RiakLinkPhase(bucket, tag, keep))
         return self
@@ -221,7 +221,7 @@ class RiakMapReduce(object):
         :param options: phase options, containing 'language', 'keep'
           flag, and/or 'arg'.
         :type options: dict
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         if options is None:
             options = dict()
@@ -249,7 +249,7 @@ class RiakMapReduce(object):
         :type function: string, list
         :param options: phase options, containing 'language', 'keep'
           flag, and/or 'arg'.
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         if options is None:
             options = dict()
@@ -675,7 +675,7 @@ class RiakMapReduceChain(object):
         Start assembling a Map/Reduce operation. A shortcut for
         :func:`RiakMapReduce.add`.
 
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return mr.add(*args)
@@ -687,7 +687,7 @@ class RiakMapReduceChain(object):
         against a Riak Search cluster. A shortcut for
         :func:`RiakMapReduce.search`.
 
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return mr.search(*args)
@@ -697,7 +697,7 @@ class RiakMapReduceChain(object):
         Start assembling a Map/Reduce operation based on secondary
         index query results.
 
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return mr.index(*args)
@@ -707,7 +707,7 @@ class RiakMapReduceChain(object):
         Start assembling a Map/Reduce operation. A shortcut for
         :func:`RiakMapReduce.link`.
 
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return mr.link(*args)
@@ -717,7 +717,7 @@ class RiakMapReduceChain(object):
         Start assembling a Map/Reduce operation. A shortcut for
         :func:`RiakMapReduce.map`.
 
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return mr.map(*args)
@@ -727,7 +727,7 @@ class RiakMapReduceChain(object):
         Start assembling a Map/Reduce operation. A shortcut for
         :func:`RiakMapReduce.reduce`.
 
-        :rtype: :class:`RiakMapReduce`
+        :rtype: :py:class:`RiakMapReduce`
         """
         mr = RiakMapReduce(self)
         return mr.reduce(*args)

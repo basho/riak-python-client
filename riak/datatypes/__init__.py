@@ -1,5 +1,5 @@
 #: A dict from type names as strings to the class that implements
-#: them. This is used inside :class:`Map` to initialize new values.
+#: them. This is used inside :py:class:`Map` to initialize new values.
 TYPES = {}
 
 from .datatype import Datatype

@@ -4,7 +4,7 @@ from riak.datatypes.datatype import Datatype
 class Flag(Datatype):
     """
     A convergent datatype that represents a boolean value that can be
-    enabled or disabled, and may only be embedded in :class:`Map`
+    enabled or disabled, and may only be embedded in :py:class:`Map`
     instances.
     """
 
