@@ -351,8 +351,8 @@ class JSMapReduceTests(object):
         """
         Try a successful map/reduce from search results.
         """
-        btype = self.client.bucket_type(self.mr_btype)
-        bucket = btype.bucket(self.mr_bucket)
+        btype = self.client.bucket_type(self.yz_mr['btype'])
+        bucket = btype.bucket(self.yz_mr['bucket'])
         bucket.new("Pebbles", {"name_s": "Fruity Pebbles",
                                "maker_s": "Post",
                                "sugar_i": 9,
@@ -380,7 +380,8 @@ class JSMapReduceTests(object):
                               "fruit_b": False}).store()
         # Wait for Solr to catch up
         wait_for_yz_index(bucket, "Crunch")
-        mr = RiakMapReduce(self.client).search(self.mr_bucket, 'fruit_b:false')
+        mr = RiakMapReduce(self.client).search(self.yz_mr['bucket'],
+                                               'fruit_b:false')
         mr.map("""function(v) {
             var solr_doc = JSON.parse(v.values[0].data);
             return [solr_doc["calories_i"]]; }""")
