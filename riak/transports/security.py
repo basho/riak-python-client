@@ -37,9 +37,9 @@ def configure_context(ssl_ctx, credentials):
     Set various options on the SSL context.
 
     :param ssl_ctx: OpenSSL context
-    :type ssl_ctx: :py:class `~OpenSSL.SSL.Context`
+    :type ssl_ctx: :class:`~OpenSSL.SSL.Context`
     :param credentials: Riak Security Credentials
-    :type credentials: :py:class `~riak.security.SecurityCreds`
+    :type credentials: :class:`~riak.security.SecurityCreds`
     """
 
     if credentials.has_credential('pkey'):
