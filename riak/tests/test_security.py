@@ -66,7 +66,7 @@ class SecurityTests(object):
             client.get_buckets()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
-    def test_security_missing_cert(self):
+    def test_security_invalid_cert(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               cacert_file='/tmp/foo')
         client = self.create_client(credentials=creds)
@@ -74,11 +74,22 @@ class SecurityTests(object):
             client.get_buckets()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    def test_security_password_without_cacert(self):
+        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD)
+        client = self.create_client(credentials=creds)
+        with self.assertRaises(Exception):
+            myBucket = client.bucket('test')
+            val1 = "foobar"
+            key1 = myBucket.new('x', data=val1)
+            key1.store()
+
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_cert_authentication(self):
         creds = SecurityCreds(username=SECURITY_CERT_USER,
                               password=SECURITY_CERT_PASSWD,
                               cert_file=SECURITY_CERT,
-                              pkey_file=SECURITY_KEY)
+                              pkey_file=SECURITY_KEY,
+                              cacert_file=SECURITY_CACERT)
         client = self.create_client(credentials=creds)
         myBucket = client.bucket('test')
         val1 = "foobar2"
@@ -113,6 +124,7 @@ class SecurityTests(object):
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_ciphers(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
+                              cacert_file=SECURITY_CACERT,
                               ciphers='DHE-RSA-AES256-SHA')
         client = self.create_client(credentials=creds)
         myBucket = client.bucket('test')
@@ -124,6 +136,7 @@ class SecurityTests(object):
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_ciphers(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
+                              cacert_file=SECURITY_CACERT,
                               ciphers='ECDHE-RSA-AES256-GCM-SHA384')
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
