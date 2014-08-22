@@ -22,6 +22,14 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+from riak.security import SecurityError
+
+
+def verify_cb(conn, cert, errnum, depth, ok):
+        if not ok:
+            raise SecurityError("Could not verify CA certificate {0}"
+                                .format(cert.get_subject()))
+        return ok
 
 
 def configure_context(ssl_ctx, credentials):
@@ -29,9 +37,9 @@ def configure_context(ssl_ctx, credentials):
     Set various options on the SSL context.
 
     :param ssl_ctx: OpenSSL context
-    :type ssl_ctx: :py:class `~OpenSSL.SSL.Context`
+    :type ssl_ctx: :class:`~OpenSSL.SSL.Context`
     :param credentials: Riak Security Credentials
-    :type credentials: :py:class `~riak.security.SecurityCreds`
+    :type credentials: :class:`~riak.security.SecurityCreds`
     """
 
     if credentials.has_credential('pkey'):
@@ -39,10 +47,21 @@ def configure_context(ssl_ctx, credentials):
     if credentials.has_credential('cert'):
         ssl_ctx.use_certificate(credentials.cert)
     if credentials.has_credential('cacert'):
-        ssl_ctx.add_extra_chain_cert(credentials.cacert)
+        store = ssl_ctx.get_cert_store()
+        cacerts = credentials.cacert
+        if not isinstance(cacerts, list):
+            cacerts = [cacerts]
+        for cacert in cacerts:
+            store.add_cert(cacert)
+    else:
+        raise SecurityError("cacert_file is required in SecurityCreds")
     ciphers = credentials.ciphers
     if ciphers is not None:
         ssl_ctx.set_cipher_list(ciphers)
+    # Demand a certificate
+    ssl_ctx.set_verify(OpenSSL.SSL.VERIFY_PEER |
+                       OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
+                       verify_cb)
 
 
 # Inspired by

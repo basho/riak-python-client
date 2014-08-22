@@ -64,19 +64,19 @@ class SecurityCreds:
         :param pkey_file: Full path to security key file
         :type pkey_file: str
         :param key: Loaded security key file
-        :type key: :py:class `~OpenSSL.crypto.PKey`
+        :type key: :class:`~OpenSSL.crypto.PKey`
         :param cert_file: Full path to certificate file
         :type cert_file: str
         :param cert: Loaded client certificate
-        :type cert: :py:class `~OpenSSL.crypto.X509`
-        :param cacert_file: Full path to CA certificate file
+        :type cert: :class:`~OpenSSL.crypto.X509`
+        :param cacert_file: List of full paths to CA certificate files
         :type cacert_file: str
-        :param cacert: Loaded CA certificate
-        :type cacert: :py:class `~OpenSSL.crypto.X509`
+        :param cacert: Loaded CA certificates
+        :type cacert: list of :class:`~OpenSSL.crypto.X509`
         :param crl_file: Full path to revoked certificates file
         :type crl_file: str
         :param crl: Loaded revoked certificates list
-        :type crl: :py:class `~OpenSSL.crypto.CRL`
+        :type crl: :class:`~OpenSSL.crypto.CRL`
         :param ciphers: List of supported SSL ciphers
         :type ciphers: str
         :param ssl_version: OpenSSL security version
@@ -153,11 +153,20 @@ class SecurityCreds:
 
     def _cached_cert(self, key, loader):
         # If the key is associated with a file, then lazily load and cache it
-        key_file = key + "_file"
-        if (getattr(self, key) is None) and \
-           (getattr(self, key_file) is not None):
-            with open(getattr(self, key_file), 'r') as f:
-                setattr(self, key, loader(OpenSSL.SSL.FILETYPE_PEM, f.read()))
+        key_file = getattr(self, key + "_file")
+        if (getattr(self, key) is None) and (key_file is not None):
+            cert_list = []
+            # The _file may be a list of files
+            if not isinstance(key_file, list):
+                key_file = [key_file]
+            for filename in key_file:
+                with open(filename, 'r') as f:
+                    cert_list.append(loader(OpenSSL.SSL.FILETYPE_PEM,
+                                            f.read()))
+            # If it is not a list, just store the first element
+            if len(cert_list) == 1:
+                cert_list = cert_list[0]
+            setattr(self, key, cert_list)
         return getattr(self, key)
 
     def has_credential(self, key):

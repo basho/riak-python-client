@@ -132,7 +132,7 @@ class RiakPbcConnection(object):
                 return True
             except Exception as e:
                 # fail if *any* exceptions are thrown during SSL handshake
-                raise RiakError(e.message)
+                raise SecurityError(e.message)
 
     def _recv_msg(self, expect=None):
         self._recv_pkt()
