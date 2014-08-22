@@ -152,6 +152,11 @@ class RiakPbcConnection(object):
 
     def _recv_pkt(self):
         nmsglen = self._socket.recv(4)
+        while len(nmsglen) < 4:
+            x = self._socket.recv(4 - len(nmsglen))
+            if not x:
+                break
+            nmsglen += x
         if len(nmsglen) != 4:
             raise RiakError(
                 "Socket returned short packet length %d - expected 4"
