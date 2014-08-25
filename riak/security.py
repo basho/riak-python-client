@@ -64,19 +64,19 @@ class SecurityCreds:
         :param pkey_file: Full path to security key file
         :type pkey_file: str
         :param key: Loaded security key file
-        :type key: :py:class:`OpenSSL.crypto.PKey`
+        :type key: :class:`OpenSSL.crypto.PKey`
         :param cert_file: Full path to certificate file
         :type cert_file: str
         :param cert: Loaded client certificate
-        :type cert: :py:class:`OpenSSL.crypto.X509`
+        :type cert: :class:`OpenSSL.crypto.X509`
         :param cacert_file: Full path to CA certificate file
         :type cacert_file: str
         :param cacert: Loaded CA certificate
-        :type cacert: :py:class:`OpenSSL.crypto.X509`
+        :type cacert: :class:`OpenSSL.crypto.X509`
         :param crl_file: Full path to revoked certificates file
         :type crl_file: str
         :param crl: Loaded revoked certificates list
-        :type crl: :py:class:`OpenSSL.crypto.CRL`
+        :type crl: :class:`OpenSSL.crypto.CRL`
         :param ciphers: List of supported SSL ciphers
         :type ciphers: str
         :param ssl_version: OpenSSL security version

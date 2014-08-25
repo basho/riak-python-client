@@ -271,3 +271,4 @@ htmlhelp_basename = 'RiakPythonbindingdoc'
 autodoc_default_flags = ['no-undoc-members']
 autodoc_member_order = 'groupwise'
 autoclass_content = 'both'
+primary_domain = 'py'

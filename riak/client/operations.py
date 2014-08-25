@@ -37,7 +37,7 @@ class RiakClientOperations(RiakClientTransport):
         """
         get_buckets(bucket_type=None, timeout=None)
 
-        Get the list of buckets as :py:class:`RiakBucket
+        Get the list of buckets as :class:`RiakBucket
         <riak.bucket.RiakBucket>` instances.
 
         .. warning:: Do not use this in production, as it requires
@@ -47,10 +47,10 @@ class RiakClientOperations(RiakClientTransport):
            times if it fails due to network error.
 
         :param bucket_type: the optional containing bucket type
-        :type bucket_type: :py:class:`~riak.bucket.BucketType`
+        :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: list of :py:class:`RiakBucket <riak.bucket.RiakBucket>`
+        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>`
                 instances
         """
         _validate_timeout(timeout)
@@ -92,10 +92,10 @@ class RiakClientOperations(RiakClientTransport):
             stream.close()
 
         :param bucket_type: the optional containing bucket type
-        :type bucket_type: :py:class:`~riak.bucket.BucketType`
+        :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: iterator that yields lists of :py:class:`RiakBucket
+        :rtype: iterator that yields lists of :class:`RiakBucket
              <riak.bucket.RiakBucket>` instances
 
         """
@@ -167,7 +167,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
-        :rtype: :py:class:`riak.client.index_page.IndexPage`
+        :rtype: :class:`riak.client.index_page.IndexPage`
         """
         if timeout != 'infinity':
             _validate_timeout(timeout)
@@ -276,7 +276,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
-        :rtype: :py:class:`riak.client.index_page.IndexPage`
+        :rtype: :class:`riak.client.index_page.IndexPage`
 
         """
         if timeout != 'infinity':
@@ -705,20 +705,29 @@ class RiakClientOperations(RiakClientTransport):
 
         Gets a search index of the given name if it exists,
         which will also return the schema. Raises a RiakError
-        if no such schema exists.
+        if no such schema exists.  The resulting dict has
+        the following keys:
+
+        * n_val
+        * yzbucket
+        * schema
 
         :param index: the name of the index to create
         :type index: string
+
+        :return: dict
         """
         return transport.get_search_index(index)
 
     @retryable
     def list_search_indexes(self, transport):
         """
-        list_search_indexes(bucket)
+        list_search_indexes()
 
         Gets all search indexes and their schemas. Returns
         a blank list if none exist
+
+        :return: list of dicts
         """
         return transport.list_search_indexes()
 
@@ -755,10 +764,13 @@ class RiakClientOperations(RiakClientTransport):
         get_search_schema(schema)
 
         Gets a search schema of the given name if it exists.
-        Raises a RiakError if no such schema exists.
+        Raises a RiakError if no such schema exists.  The schema is
+        returned as a dict of values: schema and content
 
         :param schema: the name of the schema to get
         :type schema: string
+
+        :return: dict
         """
         return transport.get_search_schema(schema)
 
@@ -827,7 +839,7 @@ class RiakClientOperations(RiakClientTransport):
         :type pairs: list
         :param params: additional request flags, e.g. r, pr
         :type params: dict
-        :rtype: list of :py:class:`RiakObjects <riak.riak_object.RiakObject>`
+        :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>`
                 or tuples of bucket_type, bucket, key, and the exception
                 raised
         """
@@ -913,7 +925,7 @@ class RiakClientOperations(RiakClientTransport):
            times if it fails due to network error.
 
         :param bucket: the bucket of the datatype, which must belong to a
-          :py:class:`~riak.BucketType`
+          :class:`~riak.BucketType`
         :type bucket: RiakBucket
         :param key: the key of the datatype
         :type key: string
@@ -932,7 +944,7 @@ class RiakClientOperations(RiakClientTransport):
           as well as the value, which is useful for removal operations
           on sets and maps
         :type include_context: bool, None
-        :rtype: :py:class:`~riak.datatypes.Datatype`
+        :rtype: :class:`~riak.datatypes.Datatype`
         """
         dtype, value, context = self._fetch_datatype(
             bucket, key, r=r, pr=pr, basic_quorum=basic_quorum,
@@ -950,7 +962,7 @@ class RiakClientOperations(RiakClientTransport):
         so will not be retried automatically.
 
         :param datatype: the datatype with pending updates
-        :type datatype: :py:class:`~riak.datatypes.Datatype`
+        :type datatype: :class:`~riak.datatypes.Datatype`
         :param w: the write quorum
         :type w: integer, string, None
         :param dw: the durable write quorum
@@ -990,7 +1002,7 @@ class RiakClientOperations(RiakClientTransport):
            times if it fails due to network error.
 
         :param bucket: the bucket of the datatype, which must belong to a
-          :py:class:`~riak.BucketType`
+          :class:`~riak.BucketType`
         :type bucket: RiakBucket
         :param key: the key of the datatype
         :type key: string, None

@@ -49,7 +49,7 @@ class RiakError(Exception):
 class ConflictError(RiakError):
     """
     Raised when an operation is attempted on a
-    :py:class:`~riak.riak_object.RiakObject` that has more than one
+    :class:`~riak.riak_object.RiakObject` that has more than one
     sibling.
     """
     def __init__(self, message="Object in conflict"):

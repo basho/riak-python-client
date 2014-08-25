@@ -59,3 +59,4 @@ Contents
    datatypes
    security
    advanced
+   deprecated
