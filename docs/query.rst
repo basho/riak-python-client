@@ -218,7 +218,8 @@ After connecting a bucket (or bucket type) to a
 values (such as JSON, XML, plain text, Data Types, etc.) into Riak as
 normal, and then query those indexed values using the Solr API.
 Unlike traditional Riak data, however, Solr needs to know the format
-of the stored data so it can index it.
+of the stored data so it can index it.  Solr is a document-based
+search engine so it treats each value stored in Riak as a document.
 
 ^^^^^^^^^^^^^^^^^
 Creating a schema
@@ -371,4 +372,12 @@ Here is a brief example of loading and querying data:::
     # Yields all documents, sorted in descending order. We take the top one
     print "The hottest pepper is {0}".format(results['docs'][0]['name_s'])
 
+The results returned by :meth:`~riak.bucket.RiakBucket.search` is a dictionary
+with lots of search metadata like the number of results, the maxium
+`Lucene Score
+<https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/search/package-summary.html#scoring>`_
+as well as the matching documents.
+
+Details on querying Riak Search 2.0 can be found at `Querying
+<http://docs.basho.com/riak/2.0.0/dev/using/search/#Querying>`_.
                             
