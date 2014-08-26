@@ -204,7 +204,8 @@ class RiakClientOperations(RiakClientTransport):
         :type endkey: string, integer
         :param return_terms: whether to include the secondary index value
         :type return_terms: boolean
-        :param max_results: the maximum number of results to return (page size)
+        :param max_results: the maximum number of results to return (page
+            size), defaults to 1000
         :type max_results: integer
         :param continuation: the opaque continuation returned from a
             previous paginated request
@@ -337,7 +338,8 @@ class RiakClientOperations(RiakClientTransport):
         :type endkey: string, integer
         :param return_terms: whether to include the secondary index value
         :type return_terms: boolean
-        :param max_results: the maximum number of results to return (page size)
+        :param max_results: the maximum number of results to return (page
+            size), defaults to 1000
         :type max_results: integer
         :param continuation: the opaque continuation returned from a
             previous paginated request
