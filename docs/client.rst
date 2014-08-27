@@ -129,6 +129,8 @@ Query Operations
 .. automethod:: RiakClient.fulltext_search
 .. automethod:: RiakClient.fulltext_add
 .. automethod:: RiakClient.fulltext_delete
+%.. automethod:: RiakClient.paginate_index
+%.. automethod:: RiakClient.paginate_stream_index
 
 ----------------------------
 Query Maintenance Operations

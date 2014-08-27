@@ -47,21 +47,30 @@ Client-side Authentication
 --------------------------
 
 One the client, simply create a
-:py:class:`~riak.security.SecurityCreds` object with just a username and
-password.  That would then need to be passed into the
+:py:class:`~riak.security.SecurityCreds` object with just a username,
+password and CA Certificate file.  That would then need to be passed into the
 :py:class:`~riak.client.RiakClient` initializer::
 
      creds = SecurityCreds('testuser',
                            'testpass',
                            cacert_file='/path/to/ca.crt')
      client = RiakClient(credentials=creds)
-     myBucket = client.bucket('test')
-     val1 = "#SeanCribbsHoldingThings"
-     key1 = myBucket.new('hashtag', data=val1)
-     key1.store()
+
+The ``credentials`` argument of a :class:`~riak.client.RiakClient` constructor
+is a :class:`~riak.security.SecurityCreds` object. If you specify a dictionary
+instead, it will be turned into this type::
+
+    creds = {'username': 'testuser',
+             'password': 'testpass',
+             'cacert_file': '/path/to/ca.crt'}
+    client = RiakClient(credentials=creds)
 
 .. note:: A Certifying Authority (CA) Certificate must always be supplied
-          to `SecurityCreds`
+          to `SecurityCreds` by specifying the path to a CA certificate
+          file via the ``cacert_file`` argument or by setting the ``cacert``
+          argument to an
+          `OpenSSL.crypto.X509 <http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects>`_
+          object.
 
 --------------------
 Authentication Types
@@ -106,9 +115,9 @@ One the client, simply create a
 password.  That would then need to be passed into the
 :py:class:`~riak.client.RiakClient` initializer::
 
-     creds = SecurityCreds('testuser',
-                           'testpass',
-                           cacert_file='/path/to/ca.crt')
+     creds = {'username': 'testuser',
+              'password': 'testpass',
+              'cacert_file': '/path/to/ca.crt'}
      client = RiakClient(credentials=creds)
      myBucket = client.bucket('test')
      val1 = "#SeanCribbsHoldingThings"
@@ -136,14 +145,14 @@ certificate.  You can add a ``certificate`` source to any number of clients.
 The :py:class:`~riak.security.SecurityCreds` must then include the include a client
 certificate file and a private key file, too::
 
-    creds = SecurityCreds('testuser',
-                          'testpass',
-                          cacert_file='/path/to/ca.crt',
-                          cert_file='/path/to/client.crt',
-                          pkey_file='/path/to/client.key')
+    creds = {'username': 'testuser',
+             'password': 'testpass',
+             'cacert_file': '/path/to/ca.crt',
+             'cert_file': '/path/to/client.crt',
+             'pkey_file': '/path/to/client.key'}
 
 .. note:: Username and password are still required for certificate-based
-          authentication.
+          authentication, although the password is ignored.
 
 Optionally, the certificate or private key may be supplied as a string::
 
@@ -151,10 +160,10 @@ Optionally, the certificate or private key may be supplied as a string::
         preloaded_pkey = f.read()
     with open('/path/to/client.crt, 'r') as f:
         preloaded_cert = f.read()
-    creds = SecurityCreds('testuser',
-                          'testpass',
-                          cert=preloaded_cert,
-                          pkey=prelocated_pkey)
+    creds = {'username': 'testuser',
+             'password': 'testpass',
+             'cert': 'preloaded_cert',
+             'pkey': 'prelocated_pkey'}
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Certificate revocation lists
@@ -168,10 +177,10 @@ have been compromised.  The most common reason for revocation is the user
 no longer being in sole possession of the private key (e.g., the token
 containing the private key has been lost or stolen)::
 
-     creds = SecurityCreds('testuser',
-                           'testpass',
-                           cacert_file='/path/to/ca.crt',
-                           crl_file='/path/to/server.crl')
+     creds = {'username': 'testuser',
+              'password': 'testpass',
+              'cacert_file': '/path/to/ca.crt',
+              'crl_file': '/path/to/server.crl'}
 
 ^^^^^^^^^^^^^^
 Cipher options
@@ -182,9 +191,9 @@ The last interesting setting on
 is a colon-delimited list of supported ciphers for encryption::
 
 
-    creds = SecurityCreds('testuser',
-                          'testpass',
-                           ciphers='ECDHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA')
+    creds = {'username': 'testuser',
+             'password': 'testpass',
+             'ciphers': 'ECDHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA'}
 
 A more detailed discussion can be found at `Security Ciphers
 <http://docs.basho.com/riak/2.0.0/ops/running/authz/#Security-Ciphers>`_.

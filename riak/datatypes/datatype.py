@@ -135,8 +135,7 @@ class Datatype(object):
 
     def clear(self):
         """
-        Removes all locally staged mutations. If not overridden, this
-        simply calls `_post_init()`.
+        Removes all locally staged mutations.
         """
         self._post_init()
 

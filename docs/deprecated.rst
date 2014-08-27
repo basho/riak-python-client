@@ -24,6 +24,24 @@ associated key), use the :class:`~riak.client.RiakClient`
 :meth:`~riak.client.RiakClient.fulltext_add` and
 :meth:`~riak.client.RiakClient.fulltext_delete` methods directly.
 
+
+.. _legacy_counters:
+
+---------------
+Legacy Counters
+---------------
+
+The first Data Type introduced in Riak 1.4 were `counters`.  These pre-date
+:ref:`Bucket Types <bucket_types>` and the current implementation.
+Rather than returning objects, the counter operations
+act directly on the value of the counter.  Legacy counters are deprecated
+as of Riak 2.0.  Please use :py:class:`~riak.datatypes.Counter` instead.  
+
+.. warning:: Legacy counters are incompatible with Bucket Types.
+
+.. automethod:: riak.bucket.RiakBucket.get_counter
+.. automethod:: riak.bucket.RiakBucket.update_counter
+
 ----------
 RiakBucket
 ----------

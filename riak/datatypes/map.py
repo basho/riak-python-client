@@ -215,7 +215,7 @@ class Map(Mapping, Datatype):
     @Datatype.modified.getter
     def modified(self):
         """
-        Whether the
+        Whether the map has staged local modifications.
         """
         is_modified = lambda x: x.modified
         values_modified = [is_modified(self._value[v]) for v in self._value]

@@ -87,6 +87,10 @@ Data Type abstract class
 .. autoattribute:: Datatype.modified
 .. automethod:: Datatype.reload
 .. automethod:: Datatype.update
+.. function:: Datatype.store(**params)
+
+    This is an alias for :meth:`~riak.datatypes.Datatype.update`.
+
 .. automethod:: Datatype.clear
 .. automethod:: Datatype.to_op
 
@@ -100,8 +104,12 @@ Counter class
 
 .. autoclass:: Counter
 
-.. autoattribute:: Counter.modified
-.. automethod:: Counter.to_op
+.. attribute:: Counter.value
+
+   The current value of the counter.
+
+   :rtype: int
+
 .. automethod:: Counter.increment
 .. automethod:: Counter.decrement
 
@@ -112,16 +120,49 @@ Map class
 .. autoclass:: Map
 
 .. autoattribute:: Map.value
-.. autoattribute:: Map.modified
 .. automethod:: Map.reload
 .. automethod:: Map.update
 .. automethod:: Map.clear
-.. automethod:: Map.to_op
-.. autoattribute:: Map.counters
-.. autoattribute:: Map.flags
-.. autoattribute:: Map.maps
-.. autoattribute:: Map.registers
-.. autoattribute:: Map.sets
+
+.. attribute:: Map.counters
+
+   Filters keys in the map to only those of counter types. Example::
+
+        map.counters['views'].increment()
+        del map.counters['points']
+
+
+.. attribute:: Map.flags
+
+   Filters keys in the map to only those of flag types. Example::
+
+        map.flags['confirmed'].enable()
+        del map.flags['attending']
+
+
+.. attribute:: Map.maps
+
+   Filters keys in the map to only those of map types. Example::
+
+        map.maps['emails'].registers['home'].set("user@example.com")
+        del map.maps['spam']
+
+
+.. attribute:: Map.registers
+
+   Filters keys in the map to only those of register types. Example::
+
+        map.registers['username'].set_value("riak-user")
+        del map.registers['access_key']
+
+        return TypedMapView(self, 'register')
+
+.. attribute:: Map.sets
+
+   Filters keys in the map to only those of set types. Example::
+
+        map.sets['friends'].add("brett")
+        del map.sets['favorites']
 
 ^^^^^^^^^
 Set class
@@ -129,8 +170,12 @@ Set class
 
 .. autoclass:: Set
 
-.. autoattribute:: Set.modified
-.. automethod:: Set.to_op
+.. attribute:: Set.value
+
+   The an immutable copy of the current value of the set.
+
+   :rtype: frozenset
+
 .. automethod:: Set.add
 .. automethod:: Set.discard
 
@@ -149,8 +194,6 @@ Register class
 .. autoclass:: Register
 
 .. autoattribute:: Register.value
-.. autoattribute:: Register.modified
-.. automethod:: Register.to_op
 .. automethod:: Register.assign
 
 ++++++++++
@@ -159,25 +202,11 @@ Flag class
 
 .. autoclass:: Flag
 
-.. autoattribute:: Flag.modified
-.. automethod:: Flag.to_op
+.. attribute:: Flag.value
+
+   The current value of the flag.
+
+   :rtype: bool, None
+
 .. automethod:: Flag.enable
 .. automethod:: Flag.disable
-
-.. _legacy_counters:
-
----------------
-Legacy Counters
----------------
-
-The first Data Type introduced in Riak 1.4 were `counters`.  These pre-date
-:ref:`Bucket Types <bucket_types>` and the current implementation.
-Rather than returning objects, the counter operations
-act directly on the value of the counter.
-
-.. warning:: Legacy counters are deprecated as of Riak 2.0.  Please use
-             :py:class:`~riak.datatypes.Counter` instead.  They are also
-             incompatible with Bucket Types.
-
-.. automethod:: riak.bucket.RiakBucket.get_counter
-.. automethod:: riak.bucket.RiakBucket.update_counter

@@ -6,7 +6,30 @@ __all__ = ['Set']
 
 class Set(collections.Set, Datatype):
     """
-    Riak Datatype representing a Set with observed-remove semantics.
+    A convergent datatype representing a Set with observed-remove
+    semantics. Currently strings are the only supported value type.
+    Example::
+
+        myset.add('barista')
+        myset.add('roaster')
+        myset.add('brewer')
+
+    Likewise they can simply be removed::
+
+        myset.discard('barista')
+
+    The ``__len__`` interface works to determine the size of the set.
+    And ``__contains__`` has been implemented to determine membership::
+
+        if 'barista' in myset:
+            print "Make my next one a double"
+
+    Finally the datatype is also iterable::
+
+        import sets
+        pyset = sets.Set()
+        for value in myset:
+            pyset.add(value)
     """
 
     type_name = 'set'
