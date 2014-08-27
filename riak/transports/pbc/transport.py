@@ -451,7 +451,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         else:
             results = resp.keys[:]
 
-        if max_results:
+        if max_results is not None and resp.HasField('continuation'):
             return (results, resp.continuation)
         else:
             return (results, None)

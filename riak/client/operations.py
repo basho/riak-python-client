@@ -139,7 +139,8 @@ class RiakClientOperations(RiakClientTransport):
                   timeout=None, term_regex=None):
         """
         get_index(bucket, index, startkey, endkey=None, return_terms=None,\
-                  max_results=None, continuation=None)
+                  max_results=None, continuation=None, timeout=None,\
+                  term_regex=None)
 
         Queries a secondary index, returning matching keys.
 
@@ -181,6 +182,51 @@ class RiakClientOperations(RiakClientTransport):
         page.results = results
         page.continuation = continuation
         return page
+
+    def paginate_index(self, bucket, index, startkey, endkey=None,
+                       max_results=1000, return_terms=None,
+                       continuation=None, timeout=None, term_regex=None):
+        """
+        Iterates over a paginated index query. This is equivalent to calling
+        :meth:`get_index` and then successively calling :meth:`next_page
+        <riak.client.IndexPage.next_page>` until all results are exhausted.
+
+        Because limiting the result set is necessary to invoke pagination,
+        the `max_results` option has a default of `1000`.
+
+        :param bucket: the bucket whose index will be queried
+        :type bucket: RiakBucket
+        :param index: the index to query
+        :type index: string
+        :param startkey: the sole key to query, or beginning of the query range
+        :type startkey: string, integer
+        :param endkey: the end of the query range (optional if equality)
+        :type endkey: string, integer
+        :param return_terms: whether to include the secondary index value
+        :type return_terms: boolean
+        :param max_results: the maximum number of results to return (page
+            size), defaults to 1000
+        :type max_results: integer
+        :param continuation: the opaque continuation returned from a
+            previous paginated request
+        :type continuation: string
+        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :type timeout: int
+        :param term_regex: a regular expression used to filter index terms
+        :type term_regex: string
+        :rtype: generator over instances of
+          :class:`riak.client.index_page.IndexPage`
+
+        """
+        page = self.get_index(bucket, index, startkey,
+                              endkey=endkey, max_results=max_results,
+                              return_terms=return_terms,
+                              continuation=continuation,
+                              timeout=timeout, term_regex=term_regex)
+        yield page
+        while page.has_next_page():
+            page = page.next_page()
+            yield page
 
     def stream_index(self, bucket, index, startkey, endkey=None,
                      return_terms=None, max_results=None, continuation=None,
@@ -246,6 +292,77 @@ class RiakClientOperations(RiakClientTransport):
             timeout=timeout, term_regex=term_regex)
         page.results.attach(resource)
         return page
+
+    def paginate_stream_index(self, bucket, index, startkey, endkey=None,
+                              max_results=1000, return_terms=None,
+                              continuation=None, timeout=None,
+                              term_regex=None):
+        """
+        Iterates over a streaming paginated index query. This is
+        equivalent to calling :meth:`stream_index` and then successively
+        calling :meth:`next_page <riak.client.IndexPage.next_page>`
+        until all results are exhausted.
+
+        Because limiting the result set is necessary to invoke
+        pagination, the `max_results` option has a default of `1000`.
+
+        The caller should explicitly close each yielded page, either using
+        :func:`contextlib.closing` or calling `close` explicitly. Consuming
+        the entire page will also close the stream. If it does not, the
+        associated connection might not be returned to the pool. Example::
+
+            from contextlib import closing
+
+            # Using contextlib.closing
+            for page in client.paginate_stream_index(mybucket, 'name_bin',
+                                                     'Smith')):
+                with closing(page):
+                    for key in page:
+                        do_something(key)
+
+            # Explicit close()
+            for page in client.paginate_stream_index(mybucket, 'name_bin',
+                                                     'Smith'):
+                for key in page:
+                    do_something(key)
+
+                page.close()
+
+        :param bucket: the bucket whose index will be queried
+        :type bucket: RiakBucket
+        :param index: the index to query
+        :type index: string
+        :param startkey: the sole key to query, or beginning of the query range
+        :type startkey: string, integer
+        :param endkey: the end of the query range (optional if equality)
+        :type endkey: string, integer
+        :param return_terms: whether to include the secondary index value
+        :type return_terms: boolean
+        :param max_results: the maximum number of results to return (page
+            size), defaults to 1000
+        :type max_results: integer
+        :param continuation: the opaque continuation returned from a
+            previous paginated request
+        :type continuation: string
+        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :type timeout: int
+        :param term_regex: a regular expression used to filter index terms
+        :type term_regex: string
+        :rtype: generator over instances of
+          :class:`riak.client.index_page.IndexPage`
+
+        """
+        page = self.stream_index(bucket, index, startkey,
+                                 endkey=endkey,
+                                 max_results=max_results,
+                                 return_terms=return_terms,
+                                 continuation=continuation,
+                                 timeout=timeout,
+                                 term_regex=term_regex)
+        yield page
+        while page.has_next_page():
+            page = page.next_page()
+            yield page
 
     @retryable
     def get_bucket_props(self, transport, bucket):
