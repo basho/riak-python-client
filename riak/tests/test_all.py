@@ -32,15 +32,14 @@ from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
 testrun_search_bucket = None
 testrun_props_bucket = None
 testrun_sibs_bucket = None
-testrun_yz_bucket = None
-testrun_mr_btype = None
-testrun_mr_bucket = None
+testrun_yz = {'btype': None, 'bucket': None, 'index': None}
+testrun_yz_index = {'btype': None, 'bucket': None, 'index': None}
+testrun_yz_mr = {'btype': None, 'bucket': None, 'index': None}
 
 
 def setUpModule():
     global testrun_search_bucket, testrun_props_bucket, \
-        testrun_sibs_bucket, testrun_yz_bucket, testrun_mr_btype, \
-        testrun_mr_bucket
+        testrun_sibs_bucket, testrun_yz, testrun_yz_index, testrun_yz_mr
 
     c = RiakClient(host=PB_HOST, http_port=HTTP_PORT,
                    pb_port=PB_PORT, credentials=SECURITY_CREDS)
@@ -55,29 +54,31 @@ def setUpModule():
         b.enable_search()
 
     if RUN_YZ:
-        testrun_yz_bucket = 'yzbucket'
-        c.create_search_index(testrun_yz_bucket)
-        b = c.bucket(testrun_yz_bucket)
-        index_set = False
-        while not index_set:
-            try:
-                b.set_property('search_index', testrun_yz_bucket)
-                index_set = True
-            except RiakError:
-                pass
-        # Add bucket and type for Search -> MapReduce
-        testrun_mr_btype = 'pytest-mr'
-        testrun_mr_bucket = 'mrbucket'
-        c.create_search_index(testrun_mr_bucket, '_yz_default')
-        t = c.bucket_type(testrun_mr_btype)
-        b = t.bucket(testrun_mr_bucket)
-        index_set = False
-        while not index_set:
-            try:
-                b.set_property('search_index', testrun_mr_bucket)
-                index_set = True
-            except RiakError:
-                pass
+        # YZ index on bucket of the same name
+        testrun_yz = {'btype': None, 'bucket': 'yzbucket',
+                      'index': 'yzbucket'}
+        # YZ index on bucket of a different name
+        testrun_yz_index = {'btype': None, 'bucket': 'yzindexbucket',
+                            'index': 'yzindex'}
+        # Add bucket and type for Search 2.0 -> MapReduce
+        testrun_yz_mr = {'btype': 'pytest-mr', 'bucket': 'mrbucket',
+                         'index': 'mrbucket'}
+
+        for yz in (testrun_yz, testrun_yz_index, testrun_yz_mr):
+            c.create_search_index(yz['index'])
+            if yz['btype'] is not None:
+                t = c.bucket_type(yz['btype'])
+                b = t.bucket(yz['bucket'])
+            else:
+                b = c.bucket(yz['bucket'])
+            # Keep trying to set search bucket property until it succeeds
+            index_set = False
+            while not index_set:
+                try:
+                    b.set_property('search_index', yz['index'])
+                    index_set = True
+                except RiakError:
+                    pass
 
 
 def tearDownModule():
@@ -95,19 +96,17 @@ def tearDownModule():
         b.clear_properties()
 
     if RUN_YZ:
-        yzbucket = c.bucket(testrun_yz_bucket)
-        yzbucket.set_property('search_index', '_dont_index_')
-        c.delete_search_index(testrun_yz_bucket)
-        for keys in yzbucket.stream_keys():
-            for key in keys:
-                yzbucket.delete(key)
-        mrtype = c.bucket_type(testrun_mr_btype)
-        mrbucket = mrtype.bucket(testrun_mr_bucket)
-        mrbucket.set_property('search_index', '_dont_index_')
-        c.delete_search_index(testrun_mr_bucket)
-        for keys in mrbucket.stream_keys():
-            for key in keys:
-                mrbucket.delete(key)
+        for yz in (testrun_yz, testrun_yz_index, testrun_yz_mr):
+            if yz['btype'] is not None:
+                t = c.bucket_type(yz['btype'])
+                b = t.bucket(yz['bucket'])
+            else:
+                b = c.bucket(yz['bucket'])
+            b.set_property('search_index', '_dont_index_')
+            c.delete_search_index(yz['index'])
+            for keys in b.stream_keys():
+                for key in keys:
+                    b.delete(key)
 
 
 class BaseTestCase(object):
@@ -148,9 +147,9 @@ class BaseTestCase(object):
         self.search_bucket = testrun_search_bucket
         self.sibs_bucket = testrun_sibs_bucket
         self.props_bucket = testrun_props_bucket
-        self.yz_bucket = testrun_yz_bucket
-        self.mr_btype = testrun_mr_btype
-        self.mr_bucket = testrun_mr_bucket
+        self.yz = testrun_yz
+        self.yz_index = testrun_yz_index
+        self.yz_mr = testrun_yz_mr
         self.credentials = SECURITY_CREDS
 
         self.client = self.create_client()

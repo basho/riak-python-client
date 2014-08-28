@@ -411,13 +411,21 @@ class RiakBucket(object):
             self.set_property('search', False)
         return True
 
-    def search(self, query, **params):
+    def search(self, query, index=None, **params):
         """
         Queries a search index over objects in this bucket/index. See
         :meth:`RiakClient.fulltext_search()
         <riak.client.RiakClient.fulltext_search>` for more details.
+
+        :param query: the search query
+        :type query: string
+        :param index: the index to search over
+        :type index: string or None
+        :param params: additional query flags
+        :type params: dict
         """
-        return self._client.fulltext_search(self.name, query, **params)
+        search_index = self.name if index is None else index
+        return self._client.fulltext_search(search_index, query, **params)
 
     def get_index(self, index, startkey, endkey=None, return_terms=None,
                   max_results=None, continuation=None, timeout=None,
