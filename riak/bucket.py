@@ -395,8 +395,8 @@ class RiakBucket(object):
         Returns True if search indexing is enabled for this
         bucket.
 
-        Note: This is deprecated as of Riak 2.0.  Use :ref:`Riak Search 2.0
-        <yz-label>` instead.
+        .. deprecated:: 2.0.0
+           Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         return self.get_properties().get('search', False)
 
@@ -404,8 +404,8 @@ class RiakBucket(object):
         """
         Enable search indexing for this bucket.
 
-        Note: This is deprecated as of Riak 2.0.  Use :ref:`Riak Search 2.0
-        <yz-label>` instead.
+        .. deprecated:: 2.0.0
+           Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         if not self.search_enabled():
             self.set_property('search', True)
@@ -415,8 +415,8 @@ class RiakBucket(object):
         """
         Disable search indexing for this bucket.
 
-        Note: This is deprecated as of Riak 2.0.  Use :ref:`Riak Search 2.0
-        <yz-label>` instead.
+        .. deprecated:: 2.0.0
+           Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         if self.search_enabled():
             self.set_property('search', False)
