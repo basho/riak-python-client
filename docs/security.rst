@@ -156,7 +156,7 @@ certificate file and a private key file, too::
 
 Optionally, the certificate or private key may be supplied as a string::
 
-    with open('/path/to/client.key, 'r') as f:
+    with open('/path/to/client.key', 'r') as f:
         preloaded_pkey = f.read()
     with open('/path/to/client.crt, 'r') as f:
         preloaded_cert = f.read()

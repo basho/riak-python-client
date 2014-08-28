@@ -133,8 +133,8 @@ Query operations
 .. automethod:: RiakBucket.search
 .. automethod:: RiakBucket.get_index
 .. automethod:: RiakBucket.stream_index
-%.. automethod:: RiakBucket.paginate_index
-%.. automethod:: RiakBucket.paginate_stream_index
+.. automethod:: RiakBucket.paginate_index
+.. automethod:: RiakBucket.paginate_stream_index
 
 
 -------------

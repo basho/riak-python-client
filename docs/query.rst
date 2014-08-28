@@ -269,7 +269,7 @@ Here is a brief example of creating a custom schema with
     </types>
     </schema>"""
     schema_name = 'jalapeno'
-    client.create_search_schema(schema_name, content))
+    client.create_search_schema(schema_name, content)
 
 If you would like to retrieve the current XML Solr schema,
 :meth:`~riak.client.RiakClient.get_search_schema` is available::

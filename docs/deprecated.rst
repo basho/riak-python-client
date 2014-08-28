@@ -112,7 +112,7 @@ RiakObject
 The method ``get_sibling`` was replaced by the
 :attr:`~riak.RiakObject.siblings` attribute in Riak 2.0.
 
-The siblings in `:class:`riak.RiakObjects` are modeled in the
+The siblings in :class:`riak.RiakObject` are modeled in the
 :class:`riak.RiakContent` content which had two methods deprecated in the
 Riak 2.0 release:
 
