@@ -364,6 +364,10 @@ class RiakBucket(object):
         """
         Streams all keys within the bucket through an iterator.
 
+        The caller must close the stream when finished.  See
+        :meth:`RiakClient.stream_keys()
+        <riak.client.RiakClient.stream_keys>` for more details.
+
         :rtype: iterator
         """
         return self._client.stream_keys(self)
@@ -474,7 +478,8 @@ class RiakBucket(object):
                      term_regex=None):
         """
         Queries a secondary index over objects in this bucket,
-        streaming keys or index/key pairs via an iterator. See
+        streaming keys or index/key pairs via an iterator.
+        The caller must close the stream when finished.  See
         :meth:`RiakClient.stream_index()
         <riak.client.RiakClient.stream_index>` for more details.
         """
@@ -491,8 +496,8 @@ class RiakBucket(object):
                               term_regex=None):
         """
         Paginates through a secondary index over objects in this bucket,
-        streaming keys or index/key pairs. See
-        :meth:`RiakClient.paginate_stream_index()
+        streaming keys or index/key pairs. The caller must close the stream
+        when finished.  See :meth:`RiakClient.paginate_stream_index()
         <riak.client.RiakClient.paginate_stream_index>` for more details.
         """
         return self._client.paginate_stream_index(self, index, startkey,
@@ -650,6 +655,10 @@ class BucketType(object):
         """
         Streams the list of buckets under this bucket-type. This is a
         generator method that should be iterated over.
+
+        The caller must close the stream when finished.  See
+        :meth:`RiakClient.stream_buckets()
+        <riak.client.RiakClient.stream_buckets>` for more details.
 
         .. warning:: Do not use this in production, as it requires
            traversing through all keys stored in a cluster.
