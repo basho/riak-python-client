@@ -51,8 +51,8 @@ One the client, simply create a
 password and CA Certificate file.  That would then need to be passed into the
 :py:class:`~riak.client.RiakClient` initializer::
 
-     creds = SecurityCreds('testuser',
-                           'testpass',
+     creds = SecurityCreds('riakuser',
+                           'riakpass',
                            cacert_file='/path/to/ca.crt')
      client = RiakClient(credentials=creds)
 
@@ -60,8 +60,8 @@ The ``credentials`` argument of a :class:`~riak.client.RiakClient` constructor
 is a :class:`~riak.security.SecurityCreds` object. If you specify a dictionary
 instead, it will be turned into this type::
 
-    creds = {'username': 'testuser',
-             'password': 'testpass',
+    creds = {'username': 'riakuser',
+             'password': 'riakpass',
              'cacert_file': '/path/to/ca.crt'}
     client = RiakClient(credentials=creds)
 
@@ -115,8 +115,8 @@ One the client, simply create a
 password.  That would then need to be passed into the
 :py:class:`~riak.client.RiakClient` initializer::
 
-     creds = {'username': 'testuser',
-              'password': 'testpass',
+     creds = {'username': 'riakuser',
+              'password': 'riakpass',
               'cacert_file': '/path/to/ca.crt'}
      client = RiakClient(credentials=creds)
      myBucket = client.bucket('test')
@@ -145,8 +145,8 @@ certificate.  You can add a ``certificate`` source to any number of clients.
 The :py:class:`~riak.security.SecurityCreds` must then include the include a client
 certificate file and a private key file, too::
 
-    creds = {'username': 'testuser',
-             'password': 'testpass',
+    creds = {'username': 'riakuser',
+             'password': 'riakpass',
              'cacert_file': '/path/to/ca.crt',
              'cert_file': '/path/to/client.crt',
              'pkey_file': '/path/to/client.key'}
@@ -158,10 +158,10 @@ Optionally, the certificate or private key may be supplied as a string::
 
     with open('/path/to/client.key', 'r') as f:
         preloaded_pkey = f.read()
-    with open('/path/to/client.crt, 'r') as f:
+    with open('/path/to/client.crt', 'r') as f:
         preloaded_cert = f.read()
-    creds = {'username': 'testuser',
-             'password': 'testpass',
+    creds = {'username': 'riakuser',
+             'password': 'riakpass',
              'cert': 'preloaded_cert',
              'pkey': 'prelocated_pkey'}
 
@@ -177,8 +177,8 @@ have been compromised.  The most common reason for revocation is the user
 no longer being in sole possession of the private key (e.g., the token
 containing the private key has been lost or stolen)::
 
-     creds = {'username': 'testuser',
-              'password': 'testpass',
+     creds = {'username': 'riakuser',
+              'password': 'riakpass',
               'cacert_file': '/path/to/ca.crt',
               'crl_file': '/path/to/server.crl'}
 
@@ -191,8 +191,8 @@ The last interesting setting on
 is a colon-delimited list of supported ciphers for encryption::
 
 
-    creds = {'username': 'testuser',
-             'password': 'testpass',
+    creds = {'username': 'riakuser',
+             'password': 'riakpass',
              'ciphers': 'ECDHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA'}
 
 A more detailed discussion can be found at `Security Ciphers
