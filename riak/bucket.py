@@ -142,18 +142,19 @@ class RiakBucket(object):
     def new(self, key=None, data=None, content_type='application/json',
             encoded_data=None):
         """
-        Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
-        that will be stored as JSON. A shortcut for manually
-        instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>` or :class:`Datatype
-        <riak.datatypes.Datatype>`.
+        A shortcut for manually instantiating a new
+        :class:`~riak.riak_object.RiakObject`
+        or a new :class:`~riak.datatypes.Datatype`.  A ``RiakObject``
+        will be stored as JSON.  A ``Datatype`` can be one of
+        :class:`~riak.datatypes.Map`, :class:`~riak.datatypes.Set` or
+        :class:`~riak.datatypes.Counter`.
 
         :param key: Name of the key. Leaving this to be None (default)
                     will make Riak generate the key on store.
         :type key: string
         :param data: The data to store.
         :type data: object
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
+        :rtype: :class:`~riak.riak_object.RiakObject` or
                 :class:`~riak.datatypes.Datatype`
 
         """
@@ -393,12 +394,18 @@ class RiakBucket(object):
         """
         Returns True if search indexing is enabled for this
         bucket.
+
+        Note: This is deprecated as of Riak 2.0.  Use :ref:`Riak Search 2.0
+        <yz-label>` instead.
         """
         return self.get_properties().get('search', False)
 
     def enable_search(self):
         """
         Enable search indexing for this bucket.
+
+        Note: This is deprecated as of Riak 2.0.  Use :ref:`Riak Search 2.0
+        <yz-label>` instead.
         """
         if not self.search_enabled():
             self.set_property('search', True)
@@ -407,6 +414,9 @@ class RiakBucket(object):
     def disable_search(self):
         """
         Disable search indexing for this bucket.
+
+        Note: This is deprecated as of Riak 2.0.  Use :ref:`Riak Search 2.0
+        <yz-label>` instead.
         """
         if self.search_enabled():
             self.set_property('search', False)

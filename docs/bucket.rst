@@ -98,19 +98,6 @@ respectively.
 .. autoattribute:: RiakBucket.pw
 .. autoattribute:: RiakBucket.rw
 
-^^^^^^^^^^^^^^^^^^^^
-Shortcuts for search
-^^^^^^^^^^^^^^^^^^^^
-
-When Riak Search is enabled on the server, you can toggle which
-buckets have automatic indexing turned on using the ``search`` bucket
-property (and on older versions, the ``precommit`` property). These
-methods simplify interacting with that configuration.
-
-.. automethod:: RiakBucket.search_enabled
-.. automethod:: RiakBucket.enable_search
-.. automethod:: RiakBucket.disable_search
-
 -----------------
 Working with keys
 -----------------
@@ -207,4 +194,19 @@ type object.  This is similar to `Listing keys`_ on buckets.
 .. automethod:: BucketType.get_buckets
 .. automethod:: BucketType.stream_buckets
 
+-------------------
+Deprecated Features
+-------------------
 
+^^^^^^^^^^^^^^^^^^^^
+Shortcuts for search
+^^^^^^^^^^^^^^^^^^^^
+
+When Legacy Riak Search is enabled on the server, you can toggle which
+buckets have automatic indexing turned on using the ``search`` bucket
+property (and on older versions, the ``precommit`` property). These
+methods simplify interacting with that configuration.
+
+.. automethod:: RiakBucket.search_enabled
+.. automethod:: RiakBucket.enable_search
+.. automethod:: RiakBucket.disable_search

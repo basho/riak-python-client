@@ -132,9 +132,9 @@ Query Operations
 .. automethod:: RiakClient.paginate_index
 .. automethod:: RiakClient.paginate_stream_index
 
-----------------------------
-Query Maintenance Operations
-----------------------------
+-----------------------------
+Search Maintenance Operations
+-----------------------------
 
 .. automethod:: RiakClient.create_search_schema
 .. automethod:: RiakClient.get_search_schema
