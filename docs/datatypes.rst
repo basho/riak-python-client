@@ -31,8 +31,8 @@ Here is the list of current Data Types:
 
 All Data Types must be stored in buckets bearing a :py:class:`Bucket Type
 <riak.bucket.BucketType>` that sets
-the datatype property to one of ``counter``, ``set``, or ``map``. Note that
-the bucket must have the ``allow_mult`` property set to ``true``.
+the ``datatype`` property to one of ``counter``, ``set``, or ``map``. Note
+that the bucket must have the ``allow_mult`` property set to ``true``.
 
 These Data Types are wrapped in a regular `riak_object`, so size constraints
 that apply to normal Riak values apply to Riak Data Types too.

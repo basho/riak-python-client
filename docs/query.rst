@@ -33,9 +33,9 @@ for equality or across ranges.::
 Secondary indexes are also available via :meth:`MapReduce
 <riak.mapreduce.RiakMapReduce.index>`.
 
-^^^^^^^^^^^^^^^^^^
-Riak 1.4+ Features
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Streaming and Paginating Indexes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note:: The features below will raise ``NotImplementedError`` if
    requested against a server that does not support them.
@@ -60,6 +60,15 @@ You can also limit the number of results using the ``max_results``
 option, which enables pagination::
 
    results = bucket.get_index("fname_bin", "S", "T", max_results=20)
+
+Optionally you can use :meth:`~riak.bucket.RiakBucket.paginate_index`
+or :meth:`~riak.bucket.RiakBucket.paginate_stream_index` to create a
+generator of paged results::
+
+   for page in bucket.paginate_stream_index("maestro_bin", "Cribbs"):
+       for key in page:
+           do_something(key)
+       page.close()
 
 All of these features are implemented using the
 :class:`~riak.client.index_page.IndexPage` class, which emulates a
@@ -377,6 +386,32 @@ with lots of search metadata like the number of results, the maxium
 `Lucene Score
 <https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/search/package-summary.html#scoring>`_
 as well as the matching documents.
+
+When querying on :ref:`datatypes` the datatype is the name of the field
+used in Solr since they do not fit into the default schema, e.g.:
+
+.. code::
+
+   riak-admin bucket-type create visitors '{"props":{"datatype": "counter}}'
+   riak-admin bucket-type activate visitors
+
+.. code:: python
+
+   client.create_search_index('website')
+   bucket = client.bucket('hits', 'visitors')
+   bucket.set_property('search_index', 'website')
+
+   site = bucket.new('bbc.co.uk')
+   site.increment(80)
+   site.store()
+   site = bucket.new('cnn.com')
+   site.increment(150)
+   site.store()
+   site = bucket.new('abc.net.au')
+   site.increment(24)
+   site.store()
+
+   results = bucket.search("counter:[10 TO *]", sort="counter desc", rows=5)
 
 Details on querying Riak Search 2.0 can be found at `Querying
 <http://docs.basho.com/riak/2.0.0/dev/using/search/#Querying>`_.
