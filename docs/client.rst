@@ -157,3 +157,45 @@ media-types. Supported by default are ``application/json`` and
 .. automethod:: RiakClient.set_encoder
 .. automethod:: RiakClient.get_decoder
 .. automethod:: RiakClient.set_decoder
+
+-------------------
+Deprecated Features
+-------------------
+
+^^^^^^^^^^^^^^^^
+Full-text search
+^^^^^^^^^^^^^^^^
+
+The original version of Riak Search has been replaced by :ref:`yz-label`,
+which is full-blown Solr integration with Riak.
+
+If Riak Search 1.0 is enabled, you can query an index via the bucket's
+:meth:`~riak.bucket.RiakBucket.search` method::
+
+    bucket.enable_search()
+    bucket.new("one", data={'value':'one'},
+               content_type="application/json").store()
+
+    bucket.search('value=one')
+
+To manually add and remove documents from an index (without an
+associated key), use the :class:`~riak.client.RiakClient`
+:meth:`~riak.client.RiakClient.fulltext_add` and
+:meth:`~riak.client.RiakClient.fulltext_delete` methods directly.
+
+.. _legacy_counters:
+
+^^^^^^^^^^^^^^^
+Legacy Counters
+^^^^^^^^^^^^^^^
+
+The first Data Type introduced in Riak 1.4 were `counters`.  These pre-date
+:ref:`Bucket Types <bucket_types>` and the current implementation.
+Rather than returning objects, the counter operations
+act directly on the value of the counter.  Legacy counters are deprecated
+as of Riak 2.0.  Please use :py:class:`~riak.datatypes.Counter` instead.
+
+.. warning:: Legacy counters are incompatible with Bucket Types.
+
+.. automethod:: riak.bucket.RiakBucket.get_counter
+.. automethod:: riak.bucket.RiakBucket.update_counter

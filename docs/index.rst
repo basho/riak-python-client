@@ -55,8 +55,7 @@ Contents
    client
    bucket
    object
-   query
    datatypes
+   query
    security
    advanced
-   deprecated
