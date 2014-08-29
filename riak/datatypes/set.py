@@ -18,7 +18,7 @@ class Set(collections.Set, Datatype):
         myset.discard('barista')
 
     This datatype also implements the :class:`~collections.Set` ABC,
-    meaning it supports `len()`, `in`, and iteration.
+    meaning it supports ``len()``, ``in``, and iteration.
     """
 
     type_name = 'set'
