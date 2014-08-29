@@ -35,17 +35,16 @@ class TypedMapView(Mapping):
 
 
 class Map(Mapping, Datatype):
-    """
-    A convergent datatype that acts as a key-value datastructure. Keys
-    are pairs of `(name, datatype)` where `name` is a string and
-    `datatype` is the datatype name. Values are other convergent
+    """A convergent datatype that acts as a key-value datastructure. Keys
+    are pairs of ``(name, datatype)`` where ``name`` is a string and
+    ``datatype`` is the datatype name. Values are other convergent
     datatypes, represented by any concrete type in this module.
 
     You cannot set values in the map directly (it does not implement
-    `__setitem__`), but you may add new empty values or access
-    non-existing values directly via bracket syntax. If a key is not
-    in the original value of the map when accessed, fetching the key
-    will cause its associated value to be created.::
+    ``__setitem__``), but you may add new empty values or access
+    non-existing values directly via bracket syntax. If a key is not in the
+    original value of the map when accessed, fetching the key will cause
+    its associated value to be created.::
 
         map[('name', 'register')]
 
