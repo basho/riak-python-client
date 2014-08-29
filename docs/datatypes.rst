@@ -1,4 +1,5 @@
 .. _datatypes:
+.. currentmodule:: riak.datatypes
 
 ==========
 Data Types
@@ -60,26 +61,51 @@ operations:
    * remove the Set field called 'friends' from the Map
    * set the prepay flag to true in the Map
 
+Datatypes can be fetched and created just like
+:class:`~riak.riak_object.RiakObject` instances, using
+:meth:`RiakBucket.get <riak.bucket.RiakBucket.get>` and
+:meth:`RiakBucket.new <riak.bucket.RiakBucket.new>`, except that the
+bucket must belong to a bucket-type that has a valid datatype
+property. If we have a bucket-type named "social-graph" that has the
+datatype `"set"`, we would fetch a :class:`Set` like so::
+
+    graph = client.bucket_type('social-graph')
+    graph.datatype  # => 'set'
+    myfollowers = graph.bucket('followers').get('seancribbs')
+    # => a Set datatype
+
+Once we have a datatype, we can stage operations against it and then
+send those operations to Riak::
+
+   myfollowers.add('javajolt')
+   myfollowers.discard('roach')
+   myfollowers.update()
+
+While this looks in code very similar to manipulating
+:class:`~riak.riak_object.RiakObject` instances, only mutations are
+enqueued locally, not the new value.
+
 ---------------------------
 Context and Observed-Remove
 ---------------------------
 
-In order for Riak Data Types to behave well, you must return the opaque context
-received from a read when you:
+In order for Riak Data Types to behave well, you must have an opaque
+context received from a read when you:
 
-   * Set a :py:class:`~riak.datatypes.Flag` to ``false``
-   * Remove a field from a :py:class:`~riak.datatypes.Map`
-   * Remove an element from a :py:class:`~riak.datatypes.Set`
+   * :meth:`Disable <Flag.disable>` a :class:`Flag`
+     (set it to ``false``)
+   * Remove a field from a :class:`Map`
+   * :meth:`Remove <Set.discard>` an element from a :py:class:`Set`
 
 The basic rule is "you cannot remove something you haven't seen", and the
 context tells Riak what you've actually seen. The Python client handles
-opaque contexts for you.
+opaque contexts for you transparently as long as you fetch before
+performing one of these actions.
 
 ------------------------
 Datatype abstract class
 ------------------------
 
-.. currentmodule:: riak.datatypes
 .. autoclass:: Datatype
 
 .. autoattribute:: Datatype.value
