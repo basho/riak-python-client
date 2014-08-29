@@ -54,6 +54,18 @@ Multiget
 
 .. autofunction:: multiget
 
+---------
+Datatypes
+---------
+
+.. currentmodule:: riak.datatypes
+
+.. autoclass:: riak.datatypes.map.TypedMapView
+   :members:
+   :special-members:
+
+.. autodata:: TYPES
+
 ----------
 Transports
 ----------

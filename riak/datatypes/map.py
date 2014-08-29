@@ -5,7 +5,7 @@ from .datatype import Datatype
 
 class TypedMapView(Mapping):
     """
-    Implements a sort of view over a Map, filtered by the embedded
+    Implements a sort of view over a :class:`Map`, filtered by the embedded
     datatype.
     """
 
@@ -15,22 +15,44 @@ class TypedMapView(Mapping):
 
     # Mapping API
     def __getitem__(self, key):
+        """
+        Fetches an item from the parent :class:`Map` scoped by this view's
+        datatype.
+
+        :param key: the key of the item
+        :type key: str
+        :rtype: :class:`~riak.datatypes.Datatype`
+        """
         return self.map[(key, self.datatype)]
 
     def __iter__(self):
+        """
+        Iterates over all keys in the :class:`Map` scoped by this view's
+        datatype.
+        """
         for key in self.map.value:
             name, datatype = key
             if datatype == self.datatype:
                 yield self.map[key]
 
     def __len__(self):
+        """
+        Returns the number of keys in this map scoped by this view's datatype.
+        """
         return len(iter(self))
 
     def __contains__(self, key):
+        """
+        Determines whether the given key with this view's datatype is in the
+        parent :class:`Map`.
+        """
         return (key, self.datatype) in self.map
 
     # From the MutableMapping API
     def __delitem__(self, key):
+        """
+        Removes the key with this view's datatype from the parent :class:`Map`.
+        """
         del self.map[(key, self.datatype)]
 
 
