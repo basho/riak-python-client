@@ -5,8 +5,7 @@ __all__ = ['Set']
 
 
 class Set(collections.Set, Datatype):
-    """
-    A convergent datatype representing a Set with observed-remove
+    """A convergent datatype representing a Set with observed-remove
     semantics. Currently strings are the only supported value type.
     Example::
 
@@ -18,18 +17,8 @@ class Set(collections.Set, Datatype):
 
         myset.discard('barista')
 
-    The ``__len__`` interface works to determine the size of the set.
-    And ``__contains__`` has been implemented to determine membership::
-
-        if 'barista' in myset:
-            print "Make my next one a double"
-
-    Finally the datatype is also iterable::
-
-        import sets
-        pyset = sets.Set()
-        for value in myset:
-            pyset.add(value)
+    This datatype also implements the :class:`~collections.Set` ABC,
+    meaning it supports `len()`, `in`, and iteration.
     """
 
     type_name = 'set'
