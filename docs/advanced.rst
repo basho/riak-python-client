@@ -166,3 +166,11 @@ Miscellaneous
 .. autofunction:: deprecated
 
 .. autoclass:: lazy_property
+
+------------------
+distutils commands
+------------------
+
+.. automodule:: commands
+   :members:
+   :undoc-members:
