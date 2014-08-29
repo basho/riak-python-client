@@ -45,9 +45,9 @@ Examples of using Data Types can be found at
 `Using Data Types
 <http://docs.basho.com/riak/2.0.0/dev/using/data-types/>`_.
 
---------------------
-Data Type operations
---------------------
+------------------
+Sending Operations
+------------------
 
 Riak Data Types provide a further departure from Riak's usual operation,
 in that the API is operation-based. Rather than fetching the data structure,
@@ -60,9 +60,9 @@ operations:
    * remove the Set field called 'friends' from the Map
    * set the prepay flag to true in the Map
 
------------------
-Data Type context
------------------
+---------------------------
+Context and Observed-Remove
+---------------------------
 
 In order for Riak Data Types to behave well, you must return the opaque context
 received from a read when you:
@@ -76,7 +76,7 @@ context tells Riak what you've actually seen. The Python client handles
 opaque contexts for you.
 
 ------------------------
-Data Type abstract class
+Datatype abstract class
 ------------------------
 
 .. currentmodule:: riak.datatypes
@@ -94,13 +94,13 @@ Data Type abstract class
 .. automethod:: Datatype.clear
 .. automethod:: Datatype.to_op
 
------------------
-Data Type classes
------------------
+--------------------
+Available Data Types
+--------------------
 
-^^^^^^^^^^^^^
-Counter class
-^^^^^^^^^^^^^
+^^^^^^^
+Counter
+^^^^^^^
 
 .. autoclass:: Counter
 
@@ -113,16 +113,28 @@ Counter class
 .. automethod:: Counter.increment
 .. automethod:: Counter.decrement
 
-^^^^^^^^^
-Map class
-^^^^^^^^^
+^^^
+Set
+^^^
+
+.. autoclass:: Set
+
+.. attribute:: Set.value
+
+   The an immutable copy of the current value of the set.
+
+   :rtype: frozenset
+
+.. automethod:: Set.add
+.. automethod:: Set.discard
+
+^^^
+Map
+^^^
 
 .. autoclass:: Map
 
 .. autoattribute:: Map.value
-.. automethod:: Map.reload
-.. automethod:: Map.update
-.. automethod:: Map.clear
 
 .. attribute:: Map.counters
 
@@ -155,8 +167,6 @@ Map class
         map.registers['username'].set_value("riak-user")
         del map.registers['access_key']
 
-        return TypedMapView(self, 'register')
-
 .. attribute:: Map.sets
 
    Filters keys in the map to only those of set types. Example::
@@ -164,41 +174,26 @@ Map class
         map.sets['friends'].add("brett")
         del map.sets['favorites']
 
-^^^^^^^^^
-Set class
-^^^^^^^^^
-
-.. autoclass:: Set
-
-.. attribute:: Set.value
-
-   The an immutable copy of the current value of the set.
-
-   :rtype: frozenset
-
-.. automethod:: Set.add
-.. automethod:: Set.discard
-
-^^^^^^^^^^^^^^^^
-Map-only objects
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
+Map-only datatypes
+^^^^^^^^^^^^^^^^^^
 
 Two of the new Data Types may only be embedded in
-:py:class:`Maps <riak.datatypes.Map>` objects (in addition to
+:py:class:`Map <riak.datatypes.Map>` objects (in addition to
 :py:class:`Map <riak.datatypes.Map>` itself):
 
-++++++++++++++
-Register class
-++++++++++++++
+++++++++
+Register
+++++++++
 
 .. autoclass:: Register
 
 .. autoattribute:: Register.value
 .. automethod:: Register.assign
 
-++++++++++
-Flag class
-++++++++++
+++++
+Flag
+++++
 
 .. autoclass:: Flag
 
