@@ -174,3 +174,9 @@ distutils commands
 .. automodule:: commands
    :members:
    :undoc-members:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Version extraction (``version`` module)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: version
