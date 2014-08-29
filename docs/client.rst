@@ -95,12 +95,17 @@ that will proxy operations to the called client.
 .. automethod:: RiakClient.bucket_type
 .. automethod:: RiakClient.bucket
 
------------------------
-Bucket-level Operations
------------------------
+----------------------
+Bucket Type Operations
+----------------------
 
 .. automethod:: RiakClient.get_bucket_type_props
 .. automethod:: RiakClient.set_bucket_type_props
+
+-----------------
+Bucket Operations
+-----------------
+
 .. automethod:: RiakClient.get_bucket_props
 .. automethod:: RiakClient.set_bucket_props
 .. automethod:: RiakClient.clear_bucket_props
@@ -117,6 +122,8 @@ Key-level Operations
 .. automethod:: RiakClient.multiget
 .. automethod:: RiakClient.get_counter
 .. automethod:: RiakClient.update_counter
+.. automethod:: RiakClient.fetch_datatype
+.. automethod:: RiakClient.update_datatype
 
 ----------------
 Query Operations
@@ -127,8 +134,6 @@ Query Operations
 .. automethod:: RiakClient.get_index
 .. automethod:: RiakClient.stream_index
 .. automethod:: RiakClient.fulltext_search
-.. automethod:: RiakClient.fulltext_add
-.. automethod:: RiakClient.fulltext_delete
 .. automethod:: RiakClient.paginate_index
 .. automethod:: RiakClient.paginate_stream_index
 
@@ -182,6 +187,9 @@ To manually add and remove documents from an index (without an
 associated key), use the :class:`~riak.client.RiakClient`
 :meth:`~riak.client.RiakClient.fulltext_add` and
 :meth:`~riak.client.RiakClient.fulltext_delete` methods directly.
+
+.. automethod:: RiakClient.fulltext_add
+.. automethod:: RiakClient.fulltext_delete
 
 .. _legacy_counters:
 

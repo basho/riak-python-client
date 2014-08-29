@@ -70,9 +70,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                                   the transport constructor
         :type transport_options: dict
         :param credentials: optional object of security info
-        :type credentials: SecurityCreds or dict
+        :type credentials: :class:`~riak.security.SecurityCreds` or dict
         :param multiget_pool_size: the number of threads to use in
-           multiget operations. Defaults to a factor of the number of
+           :meth:`multiget` operations. Defaults to a factor of the number of
            CPUs in the system
         :type multiget_pool_size: int
         """
@@ -200,12 +200,22 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         this will always return a
         :class:`RiakBucket <riak.bucket.RiakBucket>`.
 
+        If you are using a bucket that is contained in a bucket type, it is
+        preferable to access it from the bucket type object::
+
+            # Preferred:
+            client.bucket_type("foo").bucket("bar")
+
+            # Equivalent, but not preferred:
+            client.bucket("bar", bucket_type="foo")
+
         :param name: the bucket name
         :type name: str
         :param bucket_type: the parent bucket-type
         :type bucket_type: :class:`BucketType <riak.bucket.BucketType>`
               or str
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
+
         """
         if not isinstance(name, basestring):
             raise TypeError('Bucket name must be a string')
