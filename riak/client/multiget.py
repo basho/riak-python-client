@@ -154,16 +154,25 @@ RIAK_MULTIGET_POOL = MultiGetPool()
 
 
 def multiget(client, keys, **options):
-    """
-    Executes a parallel-fetch across multiple threads. Returns a list
-    containing :class:`~riak.riak_object.RiakObject` instances, or
-    3-tuples of bucket, key, and the exception raised.
+    """Executes a parallel-fetch across multiple threads. Returns a list
+    containing :class:`~riak.riak_object.RiakObject` or
+    :class:`~riak.datatypes.Datatype` instances, or 4-tuples of
+    bucket-type, bucket, key, and the exception raised.
+
+    If a ``pool`` option is included, the request will use the given worker
+    pool and not the default :data:`RIAK_MULTIGET_POOL`. This option will
+    be passed by the client if the ``multiget_pool_size`` option was set on
+    client initialization.
 
     :param client: the client to use
     :type client: :class:`~riak.client.RiakClient`
     :param keys: the keys to fetch in parallel
     :type keys: list of three-tuples -- bucket_type/bucket/key
+    :param options: request options to
+        :meth:`RiakBucket.get <riak.bucket.RiakBucket.get>`
+    :type options: dict
     :rtype: list
+
     """
     outq = Queue()
 
