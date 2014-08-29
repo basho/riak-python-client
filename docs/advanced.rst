@@ -82,6 +82,18 @@ Transports
    :members:
    :private-members:
 
+^^^^^^^^^^^^^^^^
+Security helpers
+^^^^^^^^^^^^^^^^
+
+.. currentmodule:: riak.transports.security
+
+.. autofunction:: verify_cb
+.. autofunction:: configure_context
+
+.. autoclass:: RiakWrappedSocket
+.. autoclass:: fileobject
+
 ^^^^^^^^^^^^^^
 HTTP Transport
 ^^^^^^^^^^^^^^

@@ -26,10 +26,13 @@ from riak.security import SecurityError
 
 
 def verify_cb(conn, cert, errnum, depth, ok):
-        if not ok:
-            raise SecurityError("Could not verify CA certificate {0}"
-                                .format(cert.get_subject()))
-        return ok
+    """
+    The default OpenSSL certificate verification callback.
+    """
+    if not ok:
+        raise SecurityError("Could not verify CA certificate {0}"
+                            .format(cert.get_subject()))
+    return ok
 
 
 def configure_context(ssl_ctx, credentials):
