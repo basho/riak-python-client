@@ -120,8 +120,6 @@ Key-level Operations
 .. automethod:: RiakClient.put
 .. automethod:: RiakClient.delete
 .. automethod:: RiakClient.multiget
-.. automethod:: RiakClient.get_counter
-.. automethod:: RiakClient.update_counter
 .. automethod:: RiakClient.fetch_datatype
 .. automethod:: RiakClient.update_datatype
 
@@ -205,5 +203,5 @@ as of Riak 2.0.  Please use :py:class:`~riak.datatypes.Counter` instead.
 
 .. warning:: Legacy counters are incompatible with Bucket Types.
 
-.. automethod:: riak.bucket.RiakBucket.get_counter
-.. automethod:: riak.bucket.RiakBucket.update_counter
+.. automethod:: RiakClient.get_counter
+.. automethod:: RiakClient.update_counter

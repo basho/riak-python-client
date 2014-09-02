@@ -849,11 +849,14 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def get_counter(self, transport, bucket, key, r=None, pr=None,
                     basic_quorum=None, notfound_ok=None):
-        """
-        get_counter(bucket, key, r=None, pr=None, basic_quorum=None,\
-                    notfound_ok=None)
+        """get_counter(bucket, key, r=None, pr=None, basic_quorum=None,\
+                       notfound_ok=None)
 
         Gets the value of a counter.
+
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
 
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
@@ -872,6 +875,7 @@ class RiakClientOperations(RiakClientTransport):
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
         :rtype: integer
+
         """
         return transport.get_counter(bucket, key, r=r, pr=pr)
 
@@ -880,6 +884,10 @@ class RiakClientOperations(RiakClientTransport):
         """
         update_counter(bucket, key, value, w=None, dw=None, pw=None,\
                        returnvalue=False)
+
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
 
         Updates a counter by the given value. This operation is not
         idempotent and so should not be retried automatically.
