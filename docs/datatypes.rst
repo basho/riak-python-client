@@ -5,13 +5,13 @@
 Data Types
 ==========
 
-Traditionally all data stored in Riak was an opaque binary type.  Then
-in version 1.4 came the introduction of a :ref:`counter <legacy_counters>`,
-the first Convergent Data Type supported
-in Riak.  In Riak 2.0, several additional Data Types were introduced.  Riak
-"knows" about these data types, and conflicting
-writes to them will converge automatically without presenting sibling values
-to the user.
+Traditionally all data stored in Riak was an opaque binary type. Then
+in version 1.4 came the introduction of a :ref:`counter
+<legacy_counters>`, the first Convergent Data Type supported in Riak.
+In Riak 2.0, several additional Data Types were introduced. Riak
+"knows" about these data types, and conflicting writes to them will
+converge automatically without presenting :ref:`sibling values
+<siblings>` to the user.
 
 Here is the list of current Data Types:
 
@@ -30,13 +30,15 @@ Here is the list of current Data Types:
     * :py:class:`~riak.datatypes.Flag` is similar to a boolean
       and also must be within :py:class:`~riak.datatypes.Map`
 
-All Data Types must be stored in buckets bearing a :py:class:`Bucket Type
-<riak.bucket.BucketType>` that sets
-the ``datatype`` property to one of ``counter``, ``set``, or ``map``. Note
-that the bucket must have the ``allow_mult`` property set to ``true``.
+All Data Types must be stored in buckets bearing a
+:class:`~riak.bucket.BucketType` that sets the
+:attr:`~riak.bucket.BucketType.datatype` property to one of
+``"counter"``, ``"set"``, or ``"map"``. Note that the bucket must have
+the ``allow_mult`` property set to ``true``.
 
-These Data Types are wrapped in a regular `riak_object`, so size constraints
-that apply to normal Riak values apply to Riak Data Types too.
+These Data Types are stored just like :class:`RiakObjects
+<riak.riak_object.RiakObject>`, so size constraints that apply to
+normal Riak values apply to Riak Data Types too.
 
 An in-depth discussion of Data Types, also known as CRDTs,
 can be found at `Data Types
@@ -56,10 +58,10 @@ reconciling conflicts, mutating the result, and writing it back, you instead
 tell Riak what operations to perform on the Data Type. Here are some example
 operations:
 
-   * increment counter by 10
-   * add 'joe' to set
-   * remove the Set field called 'friends' from the Map
-   * set the prepay flag to true in the Map
+   * increment a :class:`Counter` by ``10``
+   * add ``'joe'`` to a :class:`Set`
+   * remove the :class:`Set` field called ``'friends'`` from a :class:`Map`
+   * enable the prepay :class:`Flag` in a :class:`Map`
 
 Datatypes can be fetched and created just like
 :class:`~riak.riak_object.RiakObject` instances, using
@@ -92,15 +94,16 @@ Context and Observed-Remove
 In order for Riak Data Types to behave well, you must have an opaque
 context received from a read when you:
 
-   * :meth:`Disable <Flag.disable>` a :class:`Flag`
+   * :meth:`disable <Flag.disable>` a :class:`Flag`
      (set it to ``false``)
-   * Remove a field from a :class:`Map`
-   * :meth:`Remove <Set.discard>` an element from a :py:class:`Set`
+   * remove a field from a :class:`Map`
+   * :meth:`remove <Set.discard>` an element from a :py:class:`Set`
 
-The basic rule is "you cannot remove something you haven't seen", and the
-context tells Riak what you've actually seen. The Python client handles
-opaque contexts for you transparently as long as you fetch before
-performing one of these actions.
+The basic rule is "you cannot remove something you haven't seen", and
+the context tells Riak what you've actually seen, similar to the
+:ref:`vclock` on :class:`~riak.riak_object.RiakObject`. The Python
+client handles opaque contexts for you transparently as long as you
+fetch before performing one of these actions.
 
 ------------------------
 Datatype abstract class
@@ -108,9 +111,14 @@ Datatype abstract class
 
 .. autoclass:: Datatype
 
-.. autoattribute:: Datatype.value
-.. autoattribute:: Datatype.context
-.. autoattribute:: Datatype.modified
+   .. autoattribute:: value
+   .. autoattribute:: context
+   .. autoattribute:: modified
+
+^^^^^^^^^^^^^^^^^^^
+Persistence methods
+^^^^^^^^^^^^^^^^^^^
+
 .. automethod:: Datatype.reload
 .. automethod:: Datatype.update
 .. function:: Datatype.store(**params)
@@ -118,15 +126,10 @@ Datatype abstract class
     This is an alias for :meth:`~riak.datatypes.Datatype.update`.
 
 .. automethod:: Datatype.clear
-.. automethod:: Datatype.to_op
 
---------------------
-Available Data Types
---------------------
-
-^^^^^^^
+-------
 Counter
-^^^^^^^
+-------
 
 .. autoclass:: Counter
 
@@ -139,24 +142,24 @@ Counter
 .. automethod:: Counter.increment
 .. automethod:: Counter.decrement
 
-^^^
+---
 Set
-^^^
+---
 
 .. autoclass:: Set
 
 .. attribute:: Set.value
 
-   The an immutable copy of the current value of the set.
+   An immutable copy of the current value of the set.
 
    :rtype: frozenset
 
 .. automethod:: Set.add
 .. automethod:: Set.discard
 
-^^^
+---
 Map
-^^^
+---
 
 .. autoclass:: Map
 
@@ -200,26 +203,26 @@ Map
         map.sets['friends'].add("brett")
         del map.sets['favorites']
 
-^^^^^^^^^^^^^^^^^^
+------------------
 Map-only datatypes
-^^^^^^^^^^^^^^^^^^
+------------------
 
 Two of the new Data Types may only be embedded in
 :py:class:`Map <riak.datatypes.Map>` objects (in addition to
 :py:class:`Map <riak.datatypes.Map>` itself):
 
-++++++++
+--------
 Register
-++++++++
+--------
 
 .. autoclass:: Register
 
 .. autoattribute:: Register.value
 .. automethod:: Register.assign
 
-++++
+----
 Flag
-++++
+----
 
 .. autoclass:: Flag
 

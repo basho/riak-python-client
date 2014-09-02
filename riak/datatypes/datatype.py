@@ -8,7 +8,11 @@ class Datatype(object):
     all datatype wrappers.
     """
 
+    #: The string "name" of this datatype. Each datatype should set this.
     type_name = None
+
+    #: The message included in the exception raised when the value is of
+    #: incorrect type. See also :meth:`_check_type`.
     _type_error_msg = "Invalid value type"
 
     def __init__(self, bucket=None, key=None, value=None, context=None):
@@ -29,10 +33,10 @@ class Datatype(object):
         The pure, immutable value of this datatype, as a Python value,
         which is unique for each datatype.
 
-        .. note: Do not use this property to mutate data, as it will
-           not have any effect. Use the methods of the individual type
-           to effect changes. This value is guaranteed to be
-           independent of any internal data representation.
+        **NB**: Do not use this property to mutate data, as it will not
+        have any effect. Use the methods of the individual type to effect
+        changes. This value is guaranteed to be independent of any internal
+        data representation.
         """
         return self._value
 
@@ -49,8 +53,9 @@ class Datatype(object):
     @property
     def modified(self):
         """
-        Whether this datatype has staged local modifications. Each type
-        must implement the getter for this property.
+        Whether this datatype has staged local modifications.
+
+        :rtype: bool
         """
         raise NotImplementedError
 
@@ -185,7 +190,7 @@ class Datatype(object):
 
     def _post_init(self):
         """
-        Called at the end of __init__ so that subclasses can tweak
+        Called at the end of :meth:`__init__` so that subclasses can tweak
         their own setup without overriding the constructor.
         """
         pass

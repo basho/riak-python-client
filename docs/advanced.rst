@@ -60,9 +60,30 @@ Datatypes
 
 .. currentmodule:: riak.datatypes
 
+^^^^^^^^^^^^^^^^^^
+Datatype internals
+^^^^^^^^^^^^^^^^^^
+
+.. automethod:: Datatype.to_op
+.. automethod:: Datatype._check_type
+.. automethod:: Datatype._coerce_value
+.. automethod:: Datatype._default_value
+.. automethod:: Datatype._post_init
+.. automethod:: Datatype._require_context
+.. autoattribute:: Datatype.type_name
+.. autoattribute:: Datatype._type_error_msg
+
+^^^^^^^^^^^^
+TypedMapView
+^^^^^^^^^^^^
+
 .. autoclass:: riak.datatypes.map.TypedMapView
    :members:
    :special-members:
+
+^^^^^^^^^^^^^^
+TYPES constant
+^^^^^^^^^^^^^^
 
 .. autodata:: TYPES
 

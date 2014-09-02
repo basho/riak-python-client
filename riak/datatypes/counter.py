@@ -35,6 +35,7 @@ class Counter(Datatype):
     def increment(self, amount=1):
         """
         Increments the counter by one or the given amount.
+
         :param amount: the amount to increment the counter
         :type amount: int
         """
@@ -44,6 +45,7 @@ class Counter(Datatype):
     def decrement(self, amount=1):
         """
         Decrements the counter by one or the given amount.
+
         :param amount: the amount to decrement the counter
         :type amount: int
         """
