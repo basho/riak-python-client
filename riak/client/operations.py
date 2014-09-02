@@ -831,16 +831,15 @@ class RiakClientOperations(RiakClientTransport):
         transport.fulltext_delete(index, docs, queries)
 
     def multiget(self, pairs, **params):
-        """
-        Fetches many keys in parallel via threads.
+        """Fetches many keys in parallel via threads.
 
         :param pairs: list of bucket_type/bucket/key tuple triples
         :type pairs: list
         :param params: additional request flags, e.g. r, pr
         :type params: dict
-        :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>`
-                or tuples of bucket_type, bucket, key, and the exception
-                raised
+        :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>`,
+            :class:`Datatypes <riak.datatypes.Datatype>`, or tuples of
+            bucket_type, bucket, key, and the exception raised on fetch
         """
         if self._multiget_pool:
             params['pool'] = self._multiget_pool

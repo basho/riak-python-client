@@ -160,6 +160,10 @@ Bucket Type objects
 
       The name of the Bucket Type, a string.
 
+.. automethod:: BucketType.is_default
+
+.. automethod:: BucketType.bucket
+
 ----------------------
 Bucket Type properties
 ----------------------
@@ -167,12 +171,11 @@ Bucket Type properties
 Bucket Type properties are flags and defaults that apply to all buckets in the
 Bucket Type.
 
-.. automethod:: BucketType.is_default
 .. automethod:: BucketType.get_properties
 .. automethod:: BucketType.set_properties
 .. automethod:: BucketType.get_property
 .. automethod:: BucketType.set_property
-.. method:: BucketType.datatype
+.. attribute:: BucketType.datatype
 
    The assigned datatype for this bucket type, if present.
 
@@ -188,7 +191,6 @@ Shortcuts for :meth:`RiakClient.get_buckets()
 <riak.client.RiakClient.stream_buckets>` are exposed on the bucket
 type object.  This is similar to `Listing keys`_ on buckets.
 
-.. automethod:: BucketType.bucket
 .. automethod:: BucketType.get_buckets
 .. automethod:: BucketType.stream_buckets
 
@@ -196,11 +198,11 @@ type object.  This is similar to `Listing keys`_ on buckets.
 Deprecated Features
 -------------------
 
-^^^^^^^^^^^^^^^^^^^^
-Shortcuts for search
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Shortcuts for Riak Search 1.0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When Legacy Riak Search is enabled on the server, you can toggle which
+When Riak Search 1.0 is enabled on the server, you can toggle which
 buckets have automatic indexing turned on using the ``search`` bucket
 property (and on older versions, the ``precommit`` property). These
 methods simplify interacting with that configuration.
@@ -208,3 +210,16 @@ methods simplify interacting with that configuration.
 .. automethod:: RiakBucket.search_enabled
 .. automethod:: RiakBucket.enable_search
 .. automethod:: RiakBucket.disable_search
+
+^^^^^^^^^^^^^^^
+Legacy Counters
+^^^^^^^^^^^^^^^
+
+The :meth:`~RiakBucket.get_counter` and
+:meth:`~RiakBucket.update_counter`. See :ref:`legacy_counters` for
+more details.
+
+.. warning:: Legacy counters are incompatible with Bucket Types.
+
+.. automethod:: RiakBucket.get_counter
+.. automethod:: RiakBucket.update_counter
