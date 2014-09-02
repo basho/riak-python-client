@@ -59,6 +59,10 @@ Bucket objects
 
       The name of the bucket, a string.
 
+   .. attribute:: bucket_type
+
+      The parent :class:`BucketType` for the bucket.
+
    .. autoattribute:: resolver
 
 -----------------
