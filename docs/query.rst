@@ -37,9 +37,6 @@ Secondary indexes are also available via :meth:`MapReduce
 Streaming and Paginating Indexes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. note:: The features below will raise ``NotImplementedError`` if
-   requested against a server that does not support them.
-
 Sometimes the number of results from such a query is too great to
 process in one payload, so you can also :meth:`stream the results
 <riak.bucket.RiakBucket.stream_index>`::
@@ -297,8 +294,8 @@ specify a schema. If you do not, the default schema will be used::
 
     client.create_search_index('nacho')
 
-Likewise you can specify a schema, e.g. the index `nacho` is associated
-with the schema `jalapeno`::
+Likewise you can specify a schema, e.g. the index ``"nacho"`` is
+associated with the schema ``"jalapeno"``::
 
     client.create_search_index('nacho', 'jalapeno')
 
@@ -343,9 +340,9 @@ Or simply create an empty Bucket Type::
 Then change the bucket properties on the associated bucket or Bucket Type::
 
    b = client.bucket('peppers')
-   b.set_property('search_index', 'jalepeno')
+   b.set_property('search_index', 'jalapeno')
    btype = client.bucket_type('spicy')
-   btype.set_property('search_index', 'jalepeno')
+   btype.set_property('search_index', 'jalapeno')
 
 ^^^^^^^^^^^^^^^^^
 Querying an index
@@ -370,14 +367,15 @@ Here is a brief example of loading and querying data:::
                            "scoville_high_i": 23000}).store()
     bucket.new("habanero", {"name_s": "habanero", "scoville_low_i": 100000,
                             "scoville_high_i": 350000}).store()
-    results = bucket.search("name_s:/c.*/")
+    results = bucket.search("name_s:/c.*/", index='jalapeno')
     # Yields single document 'chipotle'
     print results['docs'][0]['name_s']
     results = bucket.search("scoville_high_i:[20000 TO 500000]")
     # Yields two documents
     for result in results['docs']:
         print result['name_s']
-    results = bucket.search('name_s:*', sort="scoville_low_i desc")
+    results = bucket.search('name_s:*', index='jalapeno', 
+                            sort="scoville_low_i desc")
     # Yields all documents, sorted in descending order. We take the top one
     print "The hottest pepper is {0}".format(results['docs'][0]['name_s'])
 
