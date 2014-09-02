@@ -544,6 +544,10 @@ class RiakBucket(object):
         :meth:`RiakClient.get_counter()
         <riak.client.RiakClient.get_counter>` for options.
 
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
+
         :param key: the key of the counter
         :type key: string
         :rtype: int
@@ -556,6 +560,10 @@ class RiakBucket(object):
         values increment the counter, negative values decrement. See
         :meth:`RiakClient.update_counter()
         <riak.client.RiakClient.update_counter>` for options.
+
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
 
         :param key: the key of the counter
         :type key: string
