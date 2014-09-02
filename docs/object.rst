@@ -11,6 +11,9 @@ by :class:`objects <RiakObject>`, not to be confused with Python
 :ref:`vclock`, the value(s) and any metadata associated with the
 value(s).
 
+Values may also be :class:`datatypes <riak.datatypes.Datatype>`, but
+are not discussed here.
+
 ----------
 RiakObject
 ----------
