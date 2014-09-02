@@ -6,12 +6,12 @@ Buckets & Bucket Types
 
 .. currentmodule:: riak.bucket
 
-**Buckets** are both namespaces for the key-value pairs you store in Riak,
-and containers for properties that apply to that namespace.  In older
-versions of Riak, this was the only logical organization available.
-Now a higher-level collection called a **Bucket Type** can group buckets
-together.  They also allows for efficiently setting properties on a
-group of buckets at the same time.
+**Buckets** are both namespaces for the key-value pairs you store in
+Riak, and containers for properties that apply to that namespace. In
+older versions of Riak, this was the only logical organization
+available. Now a higher-level collection called a **Bucket Type** can
+group buckets together. They allow for efficiently setting properties
+on a group of buckets at the same time.
 
 Unlike buckets, Bucket Types must be `explicitly created
 <http://docs.basho.com/riak/2.0.0/dev/advanced/bucket-types/#Managing-Bucket-Types-Through-the-Command-Line>`_
@@ -20,18 +20,13 @@ and activated before being used::
    riak-admin bucket-type create n_equals_1 '{"props":{"n_val":1}}'
    riak-admin bucket-type activate n_equals_1
 
-Note that these two properties may not be modified after creation:
-``consistent`` and ``datatype``. Other properties may be updated. Buckets
-grouped under a Bucket Type inherit all of the Type's properties. Each
-bucket may override individual properties but some properties cannot be
-overridden.
+Bucket Type creation and activation is only supported via the
+``riak-admin bucket-type`` command-line tool. Riak 2.0 does not
+include an API to perform these actions, but the Python client *can*
+:meth:`retrieve <BucketType.get_properties>` and :meth:`set
+<BucketType.set_properties>` bucket-type properties.
 
-Bucket Type administration is only supported via the ``riak-admin bucket-type``
-command interface. This release does not include an API to perform these
-actions.  However, the Python client has been updated to set and retrieve
-bucket properties for a bucket under a given Bucket Type.
-
-If Bucket Types are not specifed, the *default* bucket
+If Bucket Types are not specified, the *default* bucket
 type is used.  These buckets should be created via the :meth:`bucket()
 <riak.client.RiakClient.bucket>` method on the client object, like so::
 
@@ -45,14 +40,13 @@ Buckets with a user-specified Bucket Type can also be created via the same
 an additional parameter or explicitly via
 :meth:`bucket_type()<riak.client.RiakClient.bucket_type>`::
 
-    import riak
-
-    client = riak.RiakClient()
-    mybucket = client.bucket('mybucket','mybuckettype')
     othertype = client.bucket_type('othertype')
     otherbucket = othertype.bucket('otherbucket')
 
-For more detailed discussion see `Using Bucket Types
+    # Alternate way to get a bucket within a bucket-type
+    mybucket = client.bucket('mybucket', bucket_type='mybuckettype')
+
+For more detailed discussion, see `Using Bucket Types
 <http://docs.basho.com/riak/2.0.0/dev/advanced/bucket-types/>`_.
 
 --------------
