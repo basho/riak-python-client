@@ -165,8 +165,9 @@ Optionally, the certificate or private key may be supplied as a string::
         preloaded_cert = f.read()
     creds = {'username': 'riakuser',
              'password': 'riakpass',
-             'cert': 'preloaded_cert',
-             'pkey': 'prelocated_pkey'}
+             'cert': preloaded_cert,
+             'pkey': prelocated_pkey}
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Certificate revocation lists
