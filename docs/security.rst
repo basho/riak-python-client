@@ -1,5 +1,7 @@
 .. _security-label:
 
+.. currentmodule:: riak.security
+
 ========
 Security
 ========
