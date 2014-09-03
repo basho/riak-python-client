@@ -1,5 +1,32 @@
 # Riak Python Client Release Notes
 
+## 2.1.0 Feature Release - 2014-09-03
+
+Release 2.1.0 features support for Riak 2.0 capabilities including:
+
+* Bucket Types
+* Riak Data Types (CRDTs)
+* Search 2.0 (codename Yokozuna)
+* Security: SSL/TLS, Authentication, and Authorization
+
+As a result of the new security features, the package now depends on
+[pyOpenSSL](http://pypi.python.org/pypi/pyOpenSSL) and will warn if
+your version of OpenSSL is too old.
+
+This release also includes many bugfixes and enhancements, most
+notably:
+
+* The default protocol is now 'pbc', not 'http'.
+* When used correctly, streaming requests no longer result in leaks
+  from the connection pool.
+* The size of the multiget worker pool can be set when initializing
+  the client.
+* Secondary index queries can now iterate over all pages in a query.
+* The number of times a request is retried after network failure is
+  now configurable.
+* The additional request options `basic_quorum` and `notfound_ok` are
+  now supported.
+
 ## 2.0.3 Patch Release - 2014-03-06
 
 Release 2.0.3 includes support for 1.4.4's 2I regexp feature and fixes
