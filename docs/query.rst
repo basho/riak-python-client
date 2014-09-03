@@ -396,7 +396,7 @@ used in Solr since they do not fit into the default schema, e.g.:
 .. code:: python
 
    client.create_search_index('website')
-   bucket = client.bucket('hits', 'visitors')
+   bucket = client.bucket_type('visitors').bucket('hits')
    bucket.set_property('search_index', 'website')
 
    site = bucket.new('bbc.co.uk')
@@ -421,7 +421,7 @@ used in Solr since they do not fit into the default schema, e.g.:
    brett = bucket.new()
    brett.registers['fname'].assign("Brett")
    brett.registers['lname'].assign("Hazen")
-   brett.sets['emails'].add('brett@basho.com')
+   brett.sets['emails'].add('spam@basho.com')
    brett.counters['visits'].increment()
    brett.maps['pages'].counters['homepage'].increment()
    brett.update()
