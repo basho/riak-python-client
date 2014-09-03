@@ -423,11 +423,13 @@ used in Solr since they do not fit into the default schema, e.g.:
    brett.registers['lname'].assign("Hazen")
    brett.sets['emails'].add('brett@basho.com')
    brett.counters['visits'].increment()
+   brett.maps['pages'].counters['homepage'].increment()
    brett.update()
 
    # Note that the field name in the index/schema is the field name in
-   # the map joined with its type by an underscore.
-   results = bucket.search('lname_register:Hazen',
+   # the map joined with its type by an underscore. Deeply embedded
+   # fields are joined with their parent field names by an underscore.
+   results = bucket.search('lname_register:Hazen AND pages_map_homepage_counter:[1 TO *]',
                            index='user-profiles')
    
 
