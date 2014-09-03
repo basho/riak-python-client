@@ -80,27 +80,31 @@ instead, it will be turned into this type::
 Authentication Types
 --------------------
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Server-side authentication
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Trust and PAM Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The most basic authentication would be
-`Trust-based Authentication
+The most basic authentication would be `Trust-based Authentication
 <http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Trust-based-Authentication>`_
 which is done exclusively on the server side by adding the appropriate
-``trust`` security source::
+``trust`` security source:
+
+.. code:: bash
 
    riak-admin security add-source all 127.0.0.1/32 trust
 
 `PAM-based Authentication
 <http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#PAM-based-Authentication>`_
-is another server-side solution which can be added by a ``pam`` security
-source with the name of the service::
+is another server-side solution which can be added by a ``pam``
+security source with the name of the service:
+
+.. code:: bash
 
    riak-admin security add-source all 127.0.0.1/32 pam service=riak_pam
 
-These sources are mentioned for completeness, but are not directly supported
-in the Riak Python client.
+Even if you are using Trust authentication or the PAM module doesn't
+require a password, you must supply one to the client API. From the
+client's perspective, these are equivalent to Password authentication.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Password-based authentication
