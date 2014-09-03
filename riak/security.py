@@ -99,6 +99,8 @@ class SecurityCreds:
     def username(self):
         """
         Riak Username
+
+        :rtype: str
         """
         return self._username
 
@@ -106,13 +108,17 @@ class SecurityCreds:
     def password(self):
         """
         Riak Password
+
+        :rtype: str
         """
         return self._password
 
     @property
     def pkey(self):
         """
-        Private key
+        Client Private key
+
+        :rtype: :class:`OpenSSL.crypto.PKey`
         """
         return self._cached_cert('_pkey', crypto.load_privatekey)
 
@@ -120,13 +126,17 @@ class SecurityCreds:
     def cert(self):
         """
         Client Certificate
+
+        :rtype: :class:`OpenSSL.crypto.X509`
         """
         return self._cached_cert('_cert', crypto.load_certificate)
 
     @property
     def cacert(self):
         """
-        Certifying Authority Certificate
+        Certifying Authority (CA) Certificate
+
+        :rtype: :class:`OpenSSL.crypto.X509`
         """
         return self._cached_cert('_cacert', crypto.load_certificate)
 
@@ -134,6 +144,8 @@ class SecurityCreds:
     def crl(self):
         """
         Certificate Revocation List
+
+        :rtype: :class:`OpenSSL.crypto.CRL`
         """
         return self._cached_cert('_crl', crypto.load_crl)
 
@@ -141,13 +153,17 @@ class SecurityCreds:
     def ciphers(self):
         """
         Colon-delimited list of supported ciphers
+
+        :rtype: str
         """
         return self._ciphers
 
     @property
     def ssl_version(self):
-        """
-        SSL Encryption Version
+        """SSL/TLS Protocol to use
+
+        :rtype: an int constant from OpenSSL, like
+            :data:`OpenSSL.SSL.TLSv1_2_METHOD`
         """
         return self._ssl_version
 
@@ -171,7 +187,12 @@ class SecurityCreds:
 
     def has_credential(self, key):
         """
-        True if a credential or filename value has been supplied
+        ``True`` if a credential or filename value has been supplied for the
+        given property.
+
+        :param key: which configuration property to check for
+        :type key: str
+        :rtype: bool
         """
         internal_key = "_" + key
         return (getattr(self, internal_key) is not None) or \

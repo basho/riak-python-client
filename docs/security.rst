@@ -211,5 +211,15 @@ A more detailed discussion can be found at `Security Ciphers
 SecurityCreds object
 --------------------
 
-.. autoclass:: riak.security.SecurityCreds
-   :members:
+.. autoclass:: SecurityCreds
+
+   .. autoattribute:: username
+   .. autoattribute:: password
+   .. autoattribute:: cacert
+   .. autoattribute:: crl
+   .. autoattribute:: cert
+   .. autoattribute:: pkey
+   .. autoattribute:: ciphers
+   .. autoattribute:: ssl_version
+
+.. automethod:: SecurityCreds.has_credential
