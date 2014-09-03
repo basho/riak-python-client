@@ -116,6 +116,7 @@ Security helpers
 .. autoclass:: fileobject
 
 .. automethod:: riak.security.SecurityCreds.check_revoked_cert
+.. automethod:: riak.security.SecurityCreds._has_credential
 
 ^^^^^^^^^^^^^^
 HTTP Transport

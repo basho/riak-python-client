@@ -45,11 +45,11 @@ def configure_context(ssl_ctx, credentials):
     :type credentials: :class:`~riak.security.SecurityCreds`
     """
 
-    if credentials.has_credential('pkey'):
+    if credentials._has_credential('pkey'):
         ssl_ctx.use_privatekey(credentials.pkey)
-    if credentials.has_credential('cert'):
+    if credentials._has_credential('cert'):
         ssl_ctx.use_certificate(credentials.cert)
-    if credentials.has_credential('cacert'):
+    if credentials._has_credential('cacert'):
         store = ssl_ctx.get_cert_store()
         cacerts = credentials.cacert
         if not isinstance(cacerts, list):

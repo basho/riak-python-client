@@ -222,5 +222,3 @@ SecurityCreds object
    .. autoattribute:: pkey
    .. autoattribute:: ciphers
    .. autoattribute:: ssl_version
-
-.. automethod:: SecurityCreds.has_credential

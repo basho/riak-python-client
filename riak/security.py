@@ -185,7 +185,7 @@ class SecurityCreds:
             setattr(self, key, cert_list)
         return getattr(self, key)
 
-    def has_credential(self, key):
+    def _has_credential(self, key):
         """
         ``True`` if a credential or filename value has been supplied for the
         given property.
@@ -207,7 +207,7 @@ class SecurityCreds:
         :rtype: bool
         :raises SecurityError: when the certificate has been revoked
         """
-        if not self.has_credential('crl'):
+        if not self._has_credential('crl'):
             return True
 
         servcert = ssl_socket.get_peer_certificate()
