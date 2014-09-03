@@ -133,12 +133,12 @@ into the :class:`~riak.client.RiakClient` initializer::
      key1 = myBucket.new('hashtag', data=val1)
      key1.store()
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Certificate-based authentication
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Client Certificate Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you are using the **protocol buffer** transport you could also add a layer
-of security by using `Certificate-based Authentication
+If you are using the **Protocol Buffers** transport you could also add
+a layer of security by using `Certificate-based Authentication
 <http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Certificate-based-Authentication>`_.
 This time the server requires a ``certificate`` security source::
 
