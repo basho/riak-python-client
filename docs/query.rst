@@ -409,7 +409,27 @@ used in Solr since they do not fit into the default schema, e.g.:
    site.increment(24)
    site.store()
 
-   results = bucket.search("counter:[10 TO *]", sort="counter desc", rows=5)
+   results = bucket.search("counter:[10 TO *]", index='website',
+                           sort="counter desc", rows=5)
+
+   # Assume you have a bucket-type named "profiles" that has datatype
+   # "map". Let's create and search an index containing maps.
+   client.create_search_index('user-profiles')
+   bucket = client.bucket_type('profiles').bucket('USA')
+   bucket.set_property('search_index', 'user-profiles')
+
+   brett = bucket.new()
+   brett.registers['fname'].assign("Brett")
+   brett.registers['lname'].assign("Hazen")
+   brett.sets['emails'].add('brett@basho.com')
+   brett.counters['visits'].increment()
+   brett.update()
+
+   # Note that the field name in the index/schema is the field name in
+   # the map joined with its type by an underscore.
+   results = bucket.search('lname_register:Hazen',
+                           index='user-profiles')
+   
 
 Details on querying Riak Search 2.0 can be found at `Querying
 <http://docs.basho.com/riak/2.0.0/dev/using/search/#Querying>`_.
