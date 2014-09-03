@@ -43,14 +43,14 @@ can be found at `Authentication and Authorization
           <http://pypi.python.org/pypi/pyOpenSSL/>`_. Earlier versions
           may not support TLS 1.2, the recommended security protocol.
 
---------------------------
-Client-side Authentication
---------------------------
+--------------------
+Client Configuration
+--------------------
 
-One the client, simply create a
+On the client, simply create a
 :py:class:`~riak.security.SecurityCreds` object with just a username,
-password and CA Certificate file.  That would then need to be passed into the
-:py:class:`~riak.client.RiakClient` initializer::
+password and CA Certificate file. That would then need to be passed
+into the :py:class:`~riak.client.RiakClient` initializer::
 
      creds = SecurityCreds('riakuser',
                            'riakpass',
@@ -66,11 +66,11 @@ instead, it will be turned into this type::
              'cacert_file': '/path/to/ca.crt'}
     client = RiakClient(credentials=creds)
 
-.. note:: A Certifying Authority (CA) Certificate must always be supplied
-          to `SecurityCreds` by specifying the path to a CA certificate
-          file via the ``cacert_file`` argument or by setting the ``cacert``
-          argument to an
-          `OpenSSL.crypto.X509 <http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects>`_
+.. note:: A Certifying Authority (CA) Certificate must always be
+          supplied to `SecurityCreds` by specifying the path to a CA
+          certificate file via the ``cacert_file`` argument or by
+          setting the ``cacert`` argument to an `OpenSSL.crypto.X509
+          <http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects>`_
           object.
 
 --------------------
