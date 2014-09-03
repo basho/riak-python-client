@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Values &amp; Objects &mdash; Riak Python Client 2.0.3.post5 documentation</title>
+  <title>Values &amp; Objects &mdash; Riak Python Client 2.1.0 documentation</title>
   
 
   
@@ -18,20 +18,6 @@
 
   
   
-
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:'./',
-        VERSION:'2.0.3.post5',
-        COLLAPSE_INDEX:false,
-        FILE_SUFFIX:'.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
     
 
   
@@ -39,58 +25,65 @@
   
   
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-    <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
   
     <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-    <link rel="top" title="Riak Python Client 2.0.3.post5 documentation" href="index.html"/>
-        <link rel="next" title="Query Methods" href="query.html"/>
-        <link rel="prev" title="Buckets" href="bucket.html"/> 
+    <link rel="top" title="Riak Python Client 2.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Data Types" href="datatypes.html"/>
+        <link rel="prev" title="Buckets &amp; Bucket Types" href="bucket.html"/> 
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-search">
-        <a href="index.html" class="icon icon-home"> Riak Python Client</a>
-        <form class="wy-form" action="search.html" method="get">
-  <input type="text" name="q" placeholder="Search docs" />
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+        <a href="index.html" class="fa fa-home"> Riak Python Client</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix">
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
         
         
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-buckets">Accessing Buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-level-operations">Bucket-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-bucket-types-and-buckets">Accessing Bucket Types and Buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-type-operations">Bucket Type Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-operations">Bucket Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#search-maintenance-operations">Search Maintenance Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-methods">Deprecated Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-features">Deprecated Features</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-methods">Deprecated methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-objects">Bucket Type objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-properties">Bucket Type properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-buckets">Listing buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-features">Deprecated Features</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Values &amp; Objects</a><ul>
@@ -100,18 +93,40 @@
 <li class="toctree-l2"><a class="reference internal" href="#siblings">Siblings</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#sending-operations">Sending Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#context-and-observed-remove">Context and Observed-Remove</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#datatype-abstract-class">Datatype abstract class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#counter">Counter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#set">Set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map">Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map-only-datatypes">Map-only datatypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#register">Register</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#flag">Flag</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#fulltext-search">Fulltext Search</a></li>
 <li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#riak-search-2-0-yokozuna">Riak Search 2.0 (Yokozuna)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="security.html#server-configuration">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#client-configuration">Client Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#authentication-types">Authentication Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#additional-options">Additional options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#securitycreds-object">SecurityCreds object</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#datatypes">Datatypes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#module-commands">distutils commands</a></li>
 </ul>
 </li>
 </ul>
@@ -124,23 +139,30 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="/">Riak Python Client</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Riak Python Client</a>
       </nav>
 
 
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <ul class="wy-breadcrumbs">
-  <li><a href="index.html">Docs</a> &raquo;</li>
-  <li><a href="">Values &amp; Objects</a></li>
-  
-</ul>
-<hr/>
-
-          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Values &amp; Objects</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/object.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
   <div class="section" id="values-objects">
 <h1>Values &amp; Objects<a class="headerlink" href="#values-objects" title="Permalink to this headline">¶</a></h1>
 <p>Keys in Riak are namespaced into <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">buckets</span></tt></a>, and their associated values are represented
@@ -148,6 +170,8 @@ by <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak
 &#8220;objects&#8221;. A <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> is a container for the key, the
 <a class="reference internal" href="#vclock"><em>Vector clock</em></a>, the value(s) and any metadata associated with the
 value(s).</p>
+<p>Values may also be <a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">datatypes</span></tt></a>, but
+are not discussed here.</p>
 <div class="section" id="riakobject">
 <h2>RiakObject<a class="headerlink" href="#riakobject" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -261,7 +285,7 @@ there is no key previously defined</li>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.reload">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">reload</tt><big>(</big><em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.reload" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakObject.</tt><tt class="descname">reload</tt><big>(</big><em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.reload" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reload the object from Riak. When this operation completes, the
 object could contain new metadata and a new value, if the object
 was updated in Riak since it was last retrieved.</p>
@@ -282,6 +306,9 @@ before returning to client.</li>
 be available before performing the read that
 precedes the put</li>
 <li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</li>
+<li><strong>basic_quorum</strong> (<em>bool</em>) &#8211; whether to use the &#8220;basic quorum&#8221; policy
+for not-founds</li>
+<li><strong>notfound_ok</strong> (<em>bool</em>) &#8211; whether to treat not-found responses as successful</li>
 </ul>
 </td>
 </tr>
@@ -294,16 +321,13 @@ precedes the put</li>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.delete">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">delete</tt><big>(</big><em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakObject.</tt><tt class="descname">delete</tt><big>(</big><em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete this object from Riak.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>rw</strong> (<em>integer</em>) &#8211; RW-value. Wait until this many partitions have
-deleted the object before responding. (deprecated in Riak
-1.0+, use R/W/DW)</li>
 <li><strong>r</strong> (<em>integer</em>) &#8211; R-value, wait for this many partitions to read object
 before performing the put</li>
 <li><strong>w</strong> (<em>integer</em>) &#8211; W-value, wait for this many partitions to respond
@@ -500,7 +524,7 @@ if <tt class="docutils literal"><span class="pre">obj</span></tt> is a 3 item li
 there is no way for it to disambiguate writes that happen
 concurrently. The <a class="reference internal" href="#vclock"><em>Vector clock</em></a> helps establish a
 &#8220;happens after&#8221; relationships so that concurrent writes can be
-detected, but with the exception of <a class="reference internal" href="bucket.html#counters"><em>Counters</em></a>, Riak has no way
+detected, but with the exception of <a class="reference internal" href="datatypes.html#datatypes"><em>Data Types</em></a>, Riak has no way
 to determine which write has the correct value.</p>
 <p>Instead, when <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.allow_mult" title="riak.bucket.RiakBucket.allow_mult"><tt class="xref py py-attr docutils literal"><span class="pre">allow_mult</span></tt></a>
 is <tt class="docutils literal"><span class="pre">True</span></tt>, Riak keeps all writes that appear to be concurrent. Thus,
@@ -584,25 +608,28 @@ sibling.</p>
 </div>
 
 
+          </div>
           <footer>
   
-    <div class="rst-footer-buttons">
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="query.html" class="btn btn-neutral float-right" title="Query Methods"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="datatypes.html" class="btn btn-neutral float-right" title="Data Types"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bucket.html" class="btn btn-neutral" title="Buckets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="bucket.html" class="btn btn-neutral" title="Buckets &amp; Bucket Types"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
 
   <hr/>
 
-  <p>
-      &copy; Copyright 2010-2013, Basho Technologies.
-  </p>
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2014, Basho Technologies.
+    </p>
+  </div>
 
-  <a href="https://www.github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="http://readthedocs.org">Read the Docs</a>
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
 </footer>
         </div>
       </div>
@@ -611,6 +638,38 @@ sibling.</p>
 
   </div>
   
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
 
 </body>
 </html>

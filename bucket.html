@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Buckets &mdash; Riak Python Client 2.0.3.post5 documentation</title>
+  <title>Buckets &amp; Bucket Types &mdash; Riak Python Client 2.1.0 documentation</title>
   
 
   
@@ -18,20 +18,6 @@
 
   
   
-
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:'./',
-        VERSION:'2.0.3.post5',
-        COLLAPSE_INDEX:false,
-        FILE_SUFFIX:'.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
     
 
   
@@ -39,58 +25,65 @@
   
   
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-    <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
   
     <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-    <link rel="top" title="Riak Python Client 2.0.3.post5 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.1.0 documentation" href="index.html"/>
         <link rel="next" title="Values &amp; Objects" href="object.html"/>
         <link rel="prev" title="Client &amp; Connections" href="client.html"/> 
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-search">
-        <a href="index.html" class="icon icon-home"> Riak Python Client</a>
-        <form class="wy-form" action="search.html" method="get">
-  <input type="text" name="q" placeholder="Search docs" />
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+        <a href="index.html" class="fa fa-home"> Riak Python Client</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix">
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
         
         
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-buckets">Accessing Buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-level-operations">Bucket-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-bucket-types-and-buckets">Accessing Bucket Types and Buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-type-operations">Bucket Type Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-operations">Bucket Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#search-maintenance-operations">Search Maintenance Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-methods">Deprecated Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-features">Deprecated Features</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Buckets</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Buckets &amp; Bucket Types</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#bucket-objects">Bucket objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bucket-properties">Bucket properties</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#working-with-keys">Working with keys</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#query-operations">Query operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#serialization">Serialization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#listing-keys">Listing keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#deprecated-methods">Deprecated methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bucket-type-objects">Bucket Type objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bucket-type-properties">Bucket Type properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#listing-buckets">Listing buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deprecated-features">Deprecated Features</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a><ul>
@@ -100,18 +93,40 @@
 <li class="toctree-l2"><a class="reference internal" href="object.html#siblings">Siblings</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#sending-operations">Sending Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#context-and-observed-remove">Context and Observed-Remove</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#datatype-abstract-class">Datatype abstract class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#counter">Counter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#set">Set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map">Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map-only-datatypes">Map-only datatypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#register">Register</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#flag">Flag</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#fulltext-search">Fulltext Search</a></li>
 <li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
+<li class="toctree-l2"><a class="reference internal" href="query.html#riak-search-2-0-yokozuna">Riak Search 2.0 (Yokozuna)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="security.html#server-configuration">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#client-configuration">Client Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#authentication-types">Authentication Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#additional-options">Additional options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#securitycreds-object">SecurityCreds object</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#datatypes">Datatypes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#module-commands">distutils commands</a></li>
 </ul>
 </li>
 </ul>
@@ -124,39 +139,73 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="/">Riak Python Client</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Riak Python Client</a>
       </nav>
 
 
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <ul class="wy-breadcrumbs">
-  <li><a href="index.html">Docs</a> &raquo;</li>
-  <li><a href="">Buckets</a></li>
-  
-</ul>
-<hr/>
-
-          
-  <div class="section" id="buckets">
-<h1>Buckets<a class="headerlink" href="#buckets" title="Permalink to this headline">¶</a></h1>
-<p>Buckets are both namespaces for the key-value pairs you store in Riak,
-and containers for properties that apply to that namespace. Buckets
-should be created via the <a class="reference internal" href="client.html#riak.client.RiakClient.bucket" title="riak.client.RiakClient.bucket"><tt class="xref py py-meth docutils literal"><span class="pre">bucket()</span></tt></a> method on the client object, like so:</p>
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Buckets &amp; Bucket Types</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/bucket.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="buckets-bucket-types">
+<span id="bucket-types"></span><h1>Buckets &amp; Bucket Types<a class="headerlink" href="#buckets-bucket-types" title="Permalink to this headline">¶</a></h1>
+<p><strong>Buckets</strong> are both namespaces for the key-value pairs you store in
+Riak, and containers for properties that apply to that namespace. In
+older versions of Riak, this was the only logical organization
+available. Now a higher-level collection called a <strong>Bucket Type</strong> can
+group buckets together. They allow for efficiently setting properties
+on a group of buckets at the same time.</p>
+<p>Unlike buckets, Bucket Types must be <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/bucket-types/#Managing-Bucket-Types-Through-the-Command-Line">explicitly created</a>
+and activated before being used:</p>
+<div class="highlight-python"><div class="highlight"><pre>riak-admin bucket-type create n_equals_1 &#39;{&quot;props&quot;:{&quot;n_val&quot;:1}}&#39;
+riak-admin bucket-type activate n_equals_1
+</pre></div>
+</div>
+<p>Bucket Type creation and activation is only supported via the
+<tt class="docutils literal"><span class="pre">riak-admin</span> <span class="pre">bucket-type</span></tt> command-line tool. Riak 2.0 does not
+include an API to perform these actions, but the Python client <em>can</em>
+<a class="reference internal" href="#riak.bucket.BucketType.get_properties" title="riak.bucket.BucketType.get_properties"><tt class="xref py py-meth docutils literal"><span class="pre">retrieve</span></tt></a> and <a class="reference internal" href="#riak.bucket.BucketType.set_properties" title="riak.bucket.BucketType.set_properties"><tt class="xref py py-meth docutils literal"><span class="pre">set</span></tt></a> bucket-type properties.</p>
+<p>If Bucket Types are not specified, the <em>default</em> bucket
+type is used.  These buckets should be created via the <a class="reference internal" href="client.html#riak.client.RiakClient.bucket" title="riak.client.RiakClient.bucket"><tt class="xref py py-meth docutils literal"><span class="pre">bucket()</span></tt></a> method on the client object, like so:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">riak</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakClient</span><span class="p">()</span>
 <span class="n">mybucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;mybucket&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Buckets with a user-specified Bucket Type can also be created via the same
+<a class="reference internal" href="client.html#riak.client.RiakClient.bucket" title="riak.client.RiakClient.bucket"><tt class="xref py py-meth docutils literal"><span class="pre">bucket()</span></tt></a> method with
+an additional parameter or explicitly via
+<a class="reference internal" href="client.html#riak.client.RiakClient.bucket_type" title="riak.client.RiakClient.bucket_type"><tt class="xref py py-meth docutils literal"><span class="pre">bucket_type()</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">othertype</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;othertype&#39;</span><span class="p">)</span>
+<span class="n">otherbucket</span> <span class="o">=</span> <span class="n">othertype</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;otherbucket&#39;</span><span class="p">)</span>
+
+<span class="c"># Alternate way to get a bucket within a bucket-type</span>
+<span class="n">mybucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;mybucket&#39;</span><span class="p">,</span> <span class="n">bucket_type</span><span class="o">=</span><span class="s">&#39;mybuckettype&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For more detailed discussion, see <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/bucket-types/">Using Bucket Types</a>.</p>
 <div class="section" id="bucket-objects">
 <h2>Bucket objects<a class="headerlink" href="#bucket-objects" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="riak.bucket.RiakBucket">
-<em class="property">class </em><tt class="descclassname">riak.bucket.</tt><tt class="descname">RiakBucket</tt><big>(</big><em>client</em>, <em>name</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">riak.bucket.</tt><tt class="descname">RiakBucket</tt><big>(</big><em>client</em>, <em>name</em>, <em>bucket_type</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <tt class="docutils literal"><span class="pre">RiakBucket</span></tt> object allows you to access and change information
 about a Riak bucket, and provides methods to create or retrieve
 objects within the bucket.</p>
@@ -166,8 +215,10 @@ objects within the bucket.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>) &#8211; A <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a> instance</li>
+<li><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>) &#8211; A <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>
+instance</li>
 <li><strong>name</strong> (<em>string</em>) &#8211; The bucket name</li>
+<li><strong>bucket_type</strong> (<a class="reference internal" href="#riak.bucket.BucketType" title="riak.bucket.BucketType"><tt class="xref py py-class docutils literal"><span class="pre">BucketType</span></tt></a>) &#8211; The parent bucket type of this bucket</li>
 </ul>
 </td>
 </tr>
@@ -177,6 +228,12 @@ objects within the bucket.</p>
 <dt id="riak.bucket.RiakBucket.name">
 <tt class="descname">name</tt><a class="headerlink" href="#riak.bucket.RiakBucket.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the bucket, a string.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="riak.bucket.RiakBucket.bucket_type">
+<tt class="descname">bucket_type</tt><a class="headerlink" href="#riak.bucket.RiakBucket.bucket_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parent <a class="reference internal" href="#riak.bucket.BucketType" title="riak.bucket.BucketType"><tt class="xref py py-class docutils literal"><span class="pre">BucketType</span></tt></a> for the bucket.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -350,32 +407,6 @@ or &#8216;default&#8217;</p>
 </dd></dl>
 
 </div>
-<div class="section" id="shortcuts-for-search">
-<h3>Shortcuts for search<a class="headerlink" href="#shortcuts-for-search" title="Permalink to this headline">¶</a></h3>
-<p>When Riak Search is enabled on the server, you can toggle which
-buckets have automatic indexing turned on using the <tt class="docutils literal"><span class="pre">search</span></tt> bucket
-property (and on older versions, the <tt class="docutils literal"><span class="pre">precommit</span></tt> property). These
-methods simplify interacting with that configuration.</p>
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.search_enabled">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">search_enabled</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.search_enabled" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True if search indexing is enabled for this
-bucket.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.enable_search">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">enable_search</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.enable_search" title="Permalink to this definition">¶</a></dt>
-<dd><p>Enable search indexing for this bucket.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.disable_search">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">disable_search</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.disable_search" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disable search indexing for this bucket.</p>
-</dd></dl>
-
-</div>
 </div>
 <div class="section" id="working-with-keys">
 <h2>Working with keys<a class="headerlink" href="#working-with-keys" title="Permalink to this headline">¶</a></h2>
@@ -385,21 +416,34 @@ such, you can use the bucket object to create, fetch and delete
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.new">
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">new</tt><big>(</big><em>key=None</em>, <em>data=None</em>, <em>content_type='application/json'</em>, <em>encoded_data=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.new" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>
-that will be stored as JSON. A shortcut for manually
-instantiating a <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>.</p>
+<dd><p>A shortcut for manually instantiating a new
+<a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> or a new
+<a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">Datatype</span></tt></a>, based on the presence and value
+of the <a class="reference internal" href="#riak.bucket.BucketType.datatype" title="riak.bucket.BucketType.datatype"><tt class="xref py py-attr docutils literal"><span class="pre">datatype</span></tt></a> bucket property. When
+the bucket contains a <a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">Datatype</span></tt></a>, all
+arguments are ignored except <tt class="docutils literal"><span class="pre">key</span></tt>, otherwise they are used to
+initialize the <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<em>string</em>) &#8211; Name of the key. Leaving this to be None (default)
+<li><strong>key</strong> (<em>str</em>) &#8211; Name of the key. Leaving this to be None (default)
 will make Riak generate the key on store.</li>
-<li><strong>data</strong> (<em>object</em>) &#8211; The data to store.</li>
+<li><strong>data</strong> (<em>object</em>) &#8211; The data to store in a
+<a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>, see
+<a class="reference internal" href="object.html#riak.riak_object.RiakObject.data" title="riak.riak_object.RiakObject.data"><tt class="xref py py-attr docutils literal"><span class="pre">RiakObject.data</span></tt></a>.</li>
+<li><strong>content_type</strong> (<em>str</em>) &#8211; The media type of the data stored in the
+<a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>, see
+<a class="reference internal" href="object.html#riak.riak_object.RiakObject.content_type" title="riak.riak_object.RiakObject.content_type"><tt class="xref py py-attr docutils literal"><span class="pre">RiakObject.content_type</span></tt></a>.</li>
+<li><strong>encoded_data</strong> (<em>str</em>) &#8211; The encoded data to store in a
+<a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>, see
+<a class="reference internal" href="object.html#riak.riak_object.RiakObject.encoded_data" title="riak.riak_object.RiakObject.encoded_data"><tt class="xref py py-attr docutils literal"><span class="pre">RiakObject.encoded_data</span></tt></a>.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> or
+<a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">Datatype</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -412,6 +456,11 @@ will make Riak generate the key on store.</li>
 <dd><p>Create a new Riak object in the bucket, using the contents of
 the specified file. This is a shortcut for <a class="reference internal" href="#riak.bucket.RiakBucket.new" title="riak.bucket.RiakBucket.new"><tt class="xref py py-meth docutils literal"><span class="pre">new()</span></tt></a>, where the
 <tt class="docutils literal"><span class="pre">encoded_data</span></tt> and <tt class="docutils literal"><span class="pre">content_type</span></tt> are set for you.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is not supported for buckets that contain
+<a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">Datatypes</span></tt></a>.</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -431,8 +480,10 @@ the specified file. This is a shortcut for <a class="reference internal" href="#
 
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.get">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get</tt><big>(</big><em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve an object from Riak.</p>
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">get</tt><big>(</big><em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>include_context=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve an <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> or
+<a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">Datatype</span></tt></a>, based on the presence and value
+of the <a class="reference internal" href="#riak.bucket.BucketType.datatype" title="riak.bucket.BucketType.datatype"><tt class="xref py py-attr docutils literal"><span class="pre">datatype</span></tt></a> bucket property.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -442,10 +493,16 @@ the specified file. This is a shortcut for <a class="reference internal" href="#
 <li><strong>r</strong> (<em>integer</em>) &#8211; R-Value of the request (defaults to bucket&#8217;s R)</li>
 <li><strong>pr</strong> (<em>integer</em>) &#8211; PR-Value of the request (defaults to bucket&#8217;s PR)</li>
 <li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</li>
+<li><strong>include_context</strong> (<em>bool</em>) &#8211; if the bucket contains datatypes, include
+the opaque context in the result</li>
+<li><strong>basic_quorum</strong> (<em>bool</em>) &#8211; whether to use the &#8220;basic quorum&#8221; policy
+for not-founds</li>
+<li><strong>notfound_ok</strong> (<em>bool</em>) &#8211; whether to treat not-found responses as successful</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> or
+<a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">Datatype</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -454,7 +511,7 @@ the specified file. This is a shortcut for <a class="reference internal" href="#
 
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.multiget">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">multiget</tt><big>(</big><em>keys</em>, <em>r=None</em>, <em>pr=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.multiget" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">multiget</tt><big>(</big><em>keys</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.multiget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves a list of keys belonging to this bucket in parallel.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -464,10 +521,16 @@ the specified file. This is a shortcut for <a class="reference internal" href="#
 <li><strong>keys</strong> (<em>list</em>) &#8211; the keys to fetch</li>
 <li><strong>r</strong> (<em>integer</em>) &#8211; R-Value for the requests (defaults to bucket&#8217;s R)</li>
 <li><strong>pr</strong> (<em>integer</em>) &#8211; PR-Value for the requests (defaults to bucket&#8217;s PR)</li>
+<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</li>
+<li><strong>basic_quorum</strong> (<em>bool</em>) &#8211; whether to use the &#8220;basic quorum&#8221; policy
+for not-founds</li>
+<li><strong>notfound_ok</strong> (<em>bool</em>) &#8211; whether to treat not-found responses as successful</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObjects</span></tt></a>,
+<a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">Datatypes</span></tt></a>, or tuples of
+bucket_type, bucket, key, and the exception raised on fetch</p>
 </td>
 </tr>
 </tbody>
@@ -477,8 +540,8 @@ the specified file. This is a shortcut for <a class="reference internal" href="#
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.delete">
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">delete</tt><big>(</big><em>key</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.delete" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes an object from riak. Short hand for
-bucket.new(key).delete(). See <a class="reference internal" href="client.html#riak.client.RiakClient.delete" title="riak.client.RiakClient.delete"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.delete()</span></tt></a> for options.</p>
+<dd><p>Deletes a key from Riak. Short hand for
+<tt class="docutils literal"><span class="pre">bucket.new(key).delete()</span></tt>. See <a class="reference internal" href="client.html#riak.client.RiakClient.delete" title="riak.client.RiakClient.delete"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.delete()</span></tt></a> for options.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -491,56 +554,27 @@ bucket.new(key).delete(). See <a class="reference internal" href="client.html#ri
 </table>
 </dd></dl>
 
-<div class="section" id="counters">
-<span id="id1"></span><h3>Counters<a class="headerlink" href="#counters" title="Permalink to this headline">¶</a></h3>
-<p>Rather than returning objects, the counter operations new to Riak 1.4
-act directly on the value of the counter.</p>
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_counter">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_counter</tt><big>(</big><em>key</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value of a counter stored in this bucket. See
-<a class="reference internal" href="client.html#riak.client.RiakClient.get_counter" title="riak.client.RiakClient.get_counter"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.get_counter()</span></tt></a> for options.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>string</em>) &#8211; the key of the counter</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.update_counter">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">update_counter</tt><big>(</big><em>key</em>, <em>value</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.update_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the value of a counter stored in this bucket. Positive
-values increment the counter, negative values decrement. See
-<a class="reference internal" href="client.html#riak.client.RiakClient.update_counter" title="riak.client.RiakClient.update_counter"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.update_counter()</span></tt></a> for options.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<em>string</em>) &#8211; the key of the counter</li>
-<li><strong>value</strong> (<em>integer</em>) &#8211; the amount to increment or decrement</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
 </div>
 <div class="section" id="query-operations">
 <h2>Query operations<a class="headerlink" href="#query-operations" title="Permalink to this headline">¶</a></h2>
 <dl class="method">
 <dt id="riak.bucket.RiakBucket.search">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">search</tt><big>(</big><em>query</em>, <em>**params</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.search" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">search</tt><big>(</big><em>query</em>, <em>index=None</em>, <em>**params</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queries a search index over objects in this bucket/index. See
 <a class="reference internal" href="client.html#riak.client.RiakClient.fulltext_search" title="riak.client.RiakClient.fulltext_search"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.fulltext_search()</span></tt></a> for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>query</strong> (<em>string</em>) &#8211; the search query</li>
+<li><strong>index</strong> (<em>string or None</em>) &#8211; the index to search over. Defaults to the bucket&#8217;s name.</li>
+<li><strong>params</strong> (<em>dict</em>) &#8211; additional query flags</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -555,8 +589,25 @@ returning keys or index/key pairs. See
 <dt id="riak.bucket.RiakBucket.stream_index">
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">stream_index</tt><big>(</big><em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.stream_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queries a secondary index over objects in this bucket,
-streaming keys or index/key pairs via an iterator. See
+streaming keys or index/key pairs via an iterator.
+The caller must close the stream when finished.  See
 <a class="reference internal" href="client.html#riak.client.RiakClient.stream_index" title="riak.client.RiakClient.stream_index"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.stream_index()</span></tt></a> for more details.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.paginate_index">
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">paginate_index</tt><big>(</big><em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=1000</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.paginate_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paginates through a secondary index over objects in this bucket,
+returning keys or index/key pairs. See
+<a class="reference internal" href="client.html#riak.client.RiakClient.paginate_index" title="riak.client.RiakClient.paginate_index"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.paginate_index()</span></tt></a> for more details.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.paginate_stream_index">
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">paginate_stream_index</tt><big>(</big><em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=1000</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.paginate_stream_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paginates through a secondary index over objects in this bucket,
+streaming keys or index/key pairs. The caller must close the stream
+when finished.  See <a class="reference internal" href="client.html#riak.client.RiakClient.paginate_stream_index" title="riak.client.RiakClient.paginate_stream_index"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.paginate_stream_index()</span></tt></a> for more details.</p>
 </dd></dl>
 
 </div>
@@ -667,6 +718,8 @@ object. The same admonitions for these operations apply.</p>
 <dt id="riak.bucket.RiakBucket.stream_keys">
 <tt class="descclassname">RiakBucket.</tt><tt class="descname">stream_keys</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.stream_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams all keys within the bucket through an iterator.</p>
+<p>The caller must close the stream when finished.  See
+<a class="reference internal" href="client.html#riak.client.RiakClient.stream_keys" title="riak.client.RiakClient.stream_keys"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.stream_keys()</span></tt></a> for more details.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -678,337 +731,329 @@ object. The same admonitions for these operations apply.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="deprecated-methods">
-<h2>Deprecated methods<a class="headerlink" href="#deprecated-methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bucket-type-objects">
+<h2>Bucket Type objects<a class="headerlink" href="#bucket-type-objects" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="riak.bucket.BucketType">
+<em class="property">class </em><tt class="descclassname">riak.bucket.</tt><tt class="descname">BucketType</tt><big>(</big><em>client</em>, <em>name</em><big>)</big><a class="headerlink" href="#riak.bucket.BucketType" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">BucketType</span></tt> object allows you to access and change
+properties on a Riak bucket type and access buckets within its
+namespace.</p>
+<p>Returns a new <tt class="docutils literal"><span class="pre">BucketType</span></tt> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>) &#8211; A <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>
+instance</li>
+<li><strong>name</strong> (<em>string</em>) &#8211; The bucket-type&#8217;s name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="riak.bucket.BucketType.name">
+<tt class="descname">name</tt><a class="headerlink" href="#riak.bucket.BucketType.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the Bucket Type, a string.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.BucketType.is_default">
+<tt class="descclassname">BucketType.</tt><tt class="descname">is_default</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.is_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether this bucket type is the default type, or a user-defined type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.BucketType.bucket">
+<tt class="descclassname">BucketType.</tt><tt class="descname">bucket</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.bucket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a bucket that belongs to this bucket-type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; the bucket name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="bucket-type-properties">
+<h2>Bucket Type properties<a class="headerlink" href="#bucket-type-properties" title="Permalink to this headline">¶</a></h2>
+<p>Bucket Type properties are flags and defaults that apply to all buckets in the
+Bucket Type.</p>
+<dl class="method">
+<dt id="riak.bucket.BucketType.get_properties">
+<tt class="descclassname">BucketType.</tt><tt class="descname">get_properties</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.get_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a dict of all bucket-type properties.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.BucketType.set_properties">
+<tt class="descclassname">BucketType.</tt><tt class="descname">set_properties</tt><big>(</big><em>props</em><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.set_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set multiple bucket-type properties in one call.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>props</strong> (<em>dict</em>) &#8211; A dictionary of properties</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.BucketType.get_property">
+<tt class="descclassname">BucketType.</tt><tt class="descname">get_property</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.get_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a bucket-type property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>string</em>) &#8211; The property to retrieve.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.BucketType.set_property">
+<tt class="descclassname">BucketType.</tt><tt class="descname">set_property</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.set_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a bucket-type property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<em>string</em>) &#8211; Property to set.</li>
+<li><strong>value</strong> (<em>mixed</em>) &#8211; Property value.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="riak.bucket.BucketType.datatype">
+<tt class="descclassname">BucketType.</tt><tt class="descname">datatype</tt><a class="headerlink" href="#riak.bucket.BucketType.datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>The assigned datatype for this bucket type, if present.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None or str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="listing-buckets">
+<h2>Listing buckets<a class="headerlink" href="#listing-buckets" title="Permalink to this headline">¶</a></h2>
+<p>Shortcuts for <a class="reference internal" href="client.html#riak.client.RiakClient.get_buckets" title="riak.client.RiakClient.get_buckets"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.get_buckets()</span></tt></a> and
+<a class="reference internal" href="client.html#riak.client.RiakClient.stream_buckets" title="riak.client.RiakClient.stream_buckets"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.stream_buckets()</span></tt></a> are exposed on the bucket
+type object.  This is similar to <a class="reference internal" href="#listing-keys">Listing keys</a> on buckets.</p>
+<dl class="method">
+<dt id="riak.bucket.BucketType.get_buckets">
+<tt class="descclassname">BucketType.</tt><tt class="descname">get_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.get_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of buckets under this bucket-type as
+<a class="reference internal" href="#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></tt></a> instances.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">These methods exist solely for backwards-compatibility and should not
-be used unless code is being ported from an older version.</p>
+<p class="last">Do not use this in production, as it requires
+traversing through all keys stored in a cluster.</p>
 </div>
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.new_binary">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">new_binary</tt><big>(</big><em>key=None</em>, <em>data=None</em>, <em>content_type='application/octet-stream'</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.new_binary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>
-that will be stored as plain text/binary. A shortcut for
-manually instantiating a <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.new" title="riak.bucket.RiakBucket.new"><tt class="xref py py-meth docutils literal"><span class="pre">new()</span></tt></a> instead.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This request is automatically retried <tt class="xref py py-attr docutils literal"><span class="pre">retries</span></tt>
+times if it fails due to network error.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<em>string</em>) &#8211; Name of the key.</li>
-<li><strong>data</strong> (<em>object</em>) &#8211; The data to store.</li>
-<li><strong>content_type</strong> (<em>string</em>) &#8211; The content type of the object.</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list of <a class="reference internal" href="#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></tt></a>
+instances</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.BucketType.stream_buckets">
+<tt class="descclassname">BucketType.</tt><tt class="descname">stream_buckets</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.bucket.BucketType.stream_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams the list of buckets under this bucket-type. This is a
+generator method that should be iterated over.</p>
+<p>The caller must close the stream when finished.  See
+<a class="reference internal" href="client.html#riak.client.RiakClient.stream_buckets" title="riak.client.RiakClient.stream_buckets"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.stream_buckets()</span></tt></a> for more details.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not use this in production, as it requires
+traversing through all keys stored in a cluster.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">iterator that yields lists of <a class="reference internal" href="#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></tt></a> instances</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="deprecated-features">
+<h2>Deprecated Features<a class="headerlink" href="#deprecated-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="shortcuts-for-riak-search-1-0">
+<h3>Shortcuts for Riak Search 1.0<a class="headerlink" href="#shortcuts-for-riak-search-1-0" title="Permalink to this headline">¶</a></h3>
+<p>When Riak Search 1.0 is enabled on the server, you can toggle which
+buckets have automatic indexing turned on using the <tt class="docutils literal"><span class="pre">search</span></tt> bucket
+property (and on older versions, the <tt class="docutils literal"><span class="pre">precommit</span></tt> property). These
+methods simplify interacting with that configuration.</p>
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.search_enabled">
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">search_enabled</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.search_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if search indexing is enabled for this
+bucket.</p>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0)
+Use <a class="reference internal" href="query.html#yz-label"><em>Riak Search 2.0</em></a> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.enable_search">
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">enable_search</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.enable_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable search indexing for this bucket.</p>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0)
+Use <a class="reference internal" href="query.html#yz-label"><em>Riak Search 2.0</em></a> instead.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.disable_search">
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">disable_search</tt><big>(</big><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.disable_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable search indexing for this bucket.</p>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0)
+Use <a class="reference internal" href="query.html#yz-label"><em>Riak Search 2.0</em></a> instead.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="legacy-counters">
+<h3>Legacy Counters<a class="headerlink" href="#legacy-counters" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="#riak.bucket.RiakBucket.get_counter" title="riak.bucket.RiakBucket.get_counter"><tt class="xref py py-meth docutils literal"><span class="pre">get_counter()</span></tt></a> and
+<a class="reference internal" href="#riak.bucket.RiakBucket.update_counter" title="riak.bucket.RiakBucket.update_counter"><tt class="xref py py-meth docutils literal"><span class="pre">update_counter()</span></tt></a>. See <a class="reference internal" href="client.html#legacy-counters"><em>Legacy Counters</em></a> for
+more details.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Legacy counters are incompatible with Bucket Types.</p>
+</div>
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.get_counter">
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_counter</tt><big>(</big><em>key</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the value of a counter stored in this bucket. See
+<a class="reference internal" href="client.html#riak.client.RiakClient.get_counter" title="riak.client.RiakClient.get_counter"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.get_counter()</span></tt></a> for options.</p>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0) Riak 1.4-style counters are
+deprecated in favor of the <a class="reference internal" href="datatypes.html#riak.datatypes.Counter" title="riak.datatypes.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a>
+datatype.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>string</em>) &#8211; the key of the counter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.bucket.RiakBucket.update_counter">
+<tt class="descclassname">RiakBucket.</tt><tt class="descname">update_counter</tt><big>(</big><em>key</em>, <em>value</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.update_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the value of a counter stored in this bucket. Positive
+values increment the counter, negative values decrement. See
+<a class="reference internal" href="client.html#riak.client.RiakClient.update_counter" title="riak.client.RiakClient.update_counter"><tt class="xref py py-meth docutils literal"><span class="pre">RiakClient.update_counter()</span></tt></a> for options.</p>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0) Riak 1.4-style counters are
+deprecated in favor of the <a class="reference internal" href="datatypes.html#riak.datatypes.Counter" title="riak.datatypes.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a>
+datatype.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<em>string</em>) &#8211; the key of the counter</li>
+<li><strong>value</strong> (<em>integer</em>) &#8211; the amount to increment or decrement</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.new_binary_from_file">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">new_binary_from_file</tt><big>(</big><em>key</em>, <em>filename</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.new_binary_from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new Riak object in the bucket, using the contents of
-the specified file. This is a shortcut for <a class="reference internal" href="#riak.bucket.RiakBucket.new" title="riak.bucket.RiakBucket.new"><tt class="xref py py-meth docutils literal"><span class="pre">new()</span></tt></a>, where the
-<tt class="docutils literal"><span class="pre">encoded_data</span></tt> and <tt class="docutils literal"><span class="pre">content_type</span></tt> are set for you.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.new_from_file" title="riak.bucket.RiakBucket.new_from_file"><tt class="xref py py-meth docutils literal"><span class="pre">new_from_file()</span></tt></a> instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<em>string</em>) &#8211; the key of the new object</li>
-<li><strong>filename</strong> (<em>string</em>) &#8211; the file to read the contents from</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_binary">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_binary</tt><big>(</big><em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_binary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve a binary/string object from Riak.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use <a class="reference internal" href="#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<em>string</em>) &#8211; Name of the key.</li>
-<li><strong>r</strong> (<em>integer</em>) &#8211; R-Value of the request (defaults to bucket&#8217;s R)</li>
-<li><strong>pr</strong> (<em>integer</em>) &#8211; PR-Value of the request (defaults to bucket&#8217;s PR)</li>
-<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_r">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_r</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_r" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value used in requests for the &#8216;r&#8217; quorum.
-If not set, returns the passed value.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;r&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.set_r">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">set_r</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_r" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value used in requests for the &#8216;r&#8217; quorum.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;r&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_pr">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_pr</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_pr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value used in requests for the &#8216;pr&#8217; quorum.
-If not set, returns the passed value.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pr&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.set_pr">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">set_pr</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_pr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value used in requests for the &#8216;pr&#8217; quorum.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pr&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_w">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_w</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_w" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value used in requests for the &#8216;w&#8217; quorum.
-If not set, returns the passed value.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;w&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.set_w">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">set_w</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_w" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value used in requests for the &#8216;w&#8217; quorum.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;w&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_dw">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_dw</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_dw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value used in requests for the &#8216;dw&#8217; quorum.
-If not set, returns the passed value.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;dw&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.set_dw">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">set_dw</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_dw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value used in requests for the &#8216;dw&#8217; quorum.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;dw&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_pw">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_pw</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_pw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value used in requests for the &#8216;pw&#8217; quorum.
-If not set, returns the passed value.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pw&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.set_pw">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">set_pw</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_pw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value used in requests for the &#8216;pw&#8217; quorum.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;pw&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.get_rw">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">get_rw</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.get_rw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the value used in requests for the &#8216;rw&#8217; quorum.
-If not set, returns the passed value.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;rw&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.bucket.RiakBucket.set_rw">
-<tt class="descclassname">RiakBucket.</tt><tt class="descname">set_rw</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#riak.bucket.RiakBucket.set_rw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the value used in requests for the &#8216;rw&#8217; quorum.</p>
-<div class="deprecated">
-<p><span class="versionmodified">Deprecated since version 2.0.0: </span>Use the &#8216;rw&#8217; bucket property or request option instead.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>mixed</em>) &#8211; the value to use if not set</td>
-</tr>
 </tbody>
 </table>
 </dd></dl>
 
 </div>
 </div>
+</div>
 
 
+          </div>
           <footer>
   
-    <div class="rst-footer-buttons">
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="object.html" class="btn btn-neutral float-right" title="Values &amp; Objects"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="object.html" class="btn btn-neutral float-right" title="Values &amp; Objects"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="client.html" class="btn btn-neutral" title="Client &amp; Connections"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="client.html" class="btn btn-neutral" title="Client &amp; Connections"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
 
   <hr/>
 
-  <p>
-      &copy; Copyright 2010-2013, Basho Technologies.
-  </p>
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2014, Basho Technologies.
+    </p>
+  </div>
 
-  <a href="https://www.github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="http://readthedocs.org">Read the Docs</a>
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
 </footer>
         </div>
       </div>
@@ -1017,6 +1062,38 @@ If not set, returns the passed value.</p>
 
   </div>
   
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
 
 </body>
 </html>

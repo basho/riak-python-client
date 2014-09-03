@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Query Methods &mdash; Riak Python Client 2.0.3.post5 documentation</title>
+  <title>Query Methods &mdash; Riak Python Client 2.1.0 documentation</title>
   
 
   
@@ -18,20 +18,6 @@
 
   
   
-
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:'./',
-        VERSION:'2.0.3.post5',
-        COLLAPSE_INDEX:false,
-        FILE_SUFFIX:'.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
     
 
   
@@ -39,58 +25,65 @@
   
   
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-    <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
   
     <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-    <link rel="top" title="Riak Python Client 2.0.3.post5 documentation" href="index.html"/>
-        <link rel="next" title="Advanced Usage &amp; Internals" href="advanced.html"/>
-        <link rel="prev" title="Values &amp; Objects" href="object.html"/> 
+    <link rel="top" title="Riak Python Client 2.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Security" href="security.html"/>
+        <link rel="prev" title="Data Types" href="datatypes.html"/> 
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-search">
-        <a href="index.html" class="icon icon-home"> Riak Python Client</a>
-        <form class="wy-form" action="search.html" method="get">
-  <input type="text" name="q" placeholder="Search docs" />
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+        <a href="index.html" class="fa fa-home"> Riak Python Client</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix">
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
         
         
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-buckets">Accessing Buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-level-operations">Bucket-level Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-bucket-types-and-buckets">Accessing Bucket Types and Buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-type-operations">Bucket Type Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-operations">Bucket Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#search-maintenance-operations">Search Maintenance Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-methods">Deprecated Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-features">Deprecated Features</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-methods">Deprecated methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-objects">Bucket Type objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-properties">Bucket Type properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-buckets">Listing buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-features">Deprecated Features</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a><ul>
@@ -100,18 +93,40 @@
 <li class="toctree-l2"><a class="reference internal" href="object.html#siblings">Siblings</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#sending-operations">Sending Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#context-and-observed-remove">Context and Observed-Remove</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#datatype-abstract-class">Datatype abstract class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#counter">Counter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#set">Set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map">Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map-only-datatypes">Map-only datatypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#register">Register</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datatypes.html#flag">Flag</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Query Methods</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#secondary-indexes">Secondary Indexes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#fulltext-search">Fulltext Search</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mapreduce">MapReduce</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#riak-search-2-0-yokozuna">Riak Search 2.0 (Yokozuna)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="security.html#server-configuration">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#client-configuration">Client Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#authentication-types">Authentication Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#additional-options">Additional options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#securitycreds-object">SecurityCreds object</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#datatypes">Datatypes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#module-commands">distutils commands</a></li>
 </ul>
 </li>
 </ul>
@@ -124,23 +139,30 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="/">Riak Python Client</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Riak Python Client</a>
       </nav>
 
 
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <ul class="wy-breadcrumbs">
-  <li><a href="index.html">Docs</a> &raquo;</li>
-  <li><a href="">Query Methods</a></li>
-  
-</ul>
-<hr/>
-
-          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Query Methods</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/query.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
   <div class="section" id="query-methods">
 <h1>Query Methods<a class="headerlink" href="#query-methods" title="Permalink to this headline">¶</a></h1>
 <p>Although most operations you will do involve directly interacting with
@@ -168,13 +190,8 @@ for equality or across ranges.:</p>
 </pre></div>
 </div>
 <p>Secondary indexes are also available via <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.index" title="riak.mapreduce.RiakMapReduce.index"><tt class="xref py py-meth docutils literal"><span class="pre">MapReduce</span></tt></a>.</p>
-<div class="section" id="riak-1-4-features">
-<h3>Riak 1.4+ Features<a class="headerlink" href="#riak-1-4-features" title="Permalink to this headline">¶</a></h3>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The features below will raise <tt class="docutils literal"><span class="pre">NotImplementedError</span></tt> if
-requested against a server that does not support them.</p>
-</div>
+<div class="section" id="streaming-and-paginating-indexes">
+<h3>Streaming and Paginating Indexes<a class="headerlink" href="#streaming-and-paginating-indexes" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes the number of results from such a query is too great to
 process in one payload, so you can also <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.stream_index" title="riak.bucket.RiakBucket.stream_index"><tt class="xref py py-meth docutils literal"><span class="pre">stream</span> <span class="pre">the</span> <span class="pre">results</span></tt></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">stream_index</span><span class="p">(</span><span class="s">&quot;bmonth_int&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
@@ -193,6 +210,15 @@ return the index entry along with the matching key as tuples using the
 <p>You can also limit the number of results using the <tt class="docutils literal"><span class="pre">max_results</span></tt>
 option, which enables pagination:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s">&quot;S&quot;</span><span class="p">,</span> <span class="s">&quot;T&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Optionally you can use <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.paginate_index" title="riak.bucket.RiakBucket.paginate_index"><tt class="xref py py-meth docutils literal"><span class="pre">paginate_index()</span></tt></a>
+or <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.paginate_stream_index" title="riak.bucket.RiakBucket.paginate_stream_index"><tt class="xref py py-meth docutils literal"><span class="pre">paginate_stream_index()</span></tt></a> to create a
+generator of paged results:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">paginate_stream_index</span><span class="p">(</span><span class="s">&quot;maestro_bin&quot;</span><span class="p">,</span> <span class="s">&quot;Cribbs&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">page</span><span class="p">:</span>
+        <span class="n">do_something</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>All of these features are implemented using the
@@ -285,22 +311,6 @@ existing result set.</p>
 </dd></dl>
 
 </div>
-</div>
-<div class="section" id="fulltext-search">
-<h2>Fulltext Search<a class="headerlink" href="#fulltext-search" title="Permalink to this headline">¶</a></h2>
-<p>If Riak Search is enabled, you can query an index via the bucket&#8217;s
-<a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.search" title="riak.bucket.RiakBucket.search"><tt class="xref py py-meth docutils literal"><span class="pre">search()</span></tt></a> method:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">bucket</span><span class="o">.</span><span class="n">enable_search</span><span class="p">()</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;one&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;value&#39;</span><span class="p">:</span><span class="s">&#39;one&#39;</span><span class="p">},</span>
-           <span class="n">content_type</span><span class="o">=</span><span class="s">&quot;application/json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-
-<span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;value=one&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>To manually add and remove documents from an index (without an
-associated key), use the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>
-<a class="reference internal" href="client.html#riak.client.RiakClient.fulltext_add" title="riak.client.RiakClient.fulltext_add"><tt class="xref py py-meth docutils literal"><span class="pre">fulltext_add()</span></tt></a> and
-<a class="reference internal" href="client.html#riak.client.RiakClient.fulltext_delete" title="riak.client.RiakClient.fulltext_delete"><tt class="xref py py-meth docutils literal"><span class="pre">fulltext_delete()</span></tt></a> methods directly.</p>
 </div>
 <div class="section" id="mapreduce">
 <h2>MapReduce<a class="headerlink" href="#mapreduce" title="Permalink to this headline">¶</a></h2>
@@ -457,7 +467,7 @@ given in arg1)</li>
 
 <dl class="method">
 <dt id="riak.mapreduce.RiakMapReduce.search">
-<tt class="descclassname">RiakMapReduce.</tt><tt class="descname">search</tt><big>(</big><em>bucket</em>, <em>query</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.search" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">RiakMapReduce.</tt><tt class="descname">search</tt><big>(</big><em>index</em>, <em>query</em><big>)</big><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Begin a map/reduce operation using a Search. This command will
 return an error unless executed against a Riak Search cluster.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -465,7 +475,7 @@ return an error unless executed against a Riak Search cluster.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bucket</strong> (<em>string</em>) &#8211; The bucket over which to perform the search</li>
+<li><strong>index</strong> (<em>string</em>) &#8211; The Solr index used in the search</li>
 <li><strong>query</strong> (<em>string</em>) &#8211; The search query</li>
 </ul>
 </td>
@@ -955,28 +965,237 @@ A shortcut for <a class="reference internal" href="#riak.mapreduce.RiakMapReduce
 
 </div>
 </div>
+<div class="section" id="riak-search-2-0-yokozuna">
+<span id="yz-label"></span><h2>Riak Search 2.0 (Yokozuna)<a class="headerlink" href="#riak-search-2-0-yokozuna" title="Permalink to this headline">¶</a></h2>
+<p>With Riak 2.0 came the introduction of <strong>Riak Search 2.0</strong>, a.k.a <cite>Yokozuna</cite>
+(the top rank in sumo).  Riak Search 2.0 is an integration of Solr (for
+indexing and querying) and Riak (for storage and distribution).
+It allows for distributed, scalable,
+fault-tolerant, transparent indexing and querying of Riak values.
+After connecting a bucket (or bucket type) to a
+<a class="reference external" href="http://lucene.apache.org/solr">Apache Solr</a> index, you simply write
+values (such as JSON, XML, plain text, Data Types, etc.) into Riak as
+normal, and then query those indexed values using the Solr API.
+Unlike traditional Riak data, however, Solr needs to know the format
+of the stored data so it can index it.  Solr is a document-based
+search engine so it treats each value stored in Riak as a document.</p>
+<div class="section" id="creating-a-schema">
+<h3>Creating a schema<a class="headerlink" href="#creating-a-schema" title="Permalink to this headline">¶</a></h3>
+<p>The first thing which needs to be done is to define a Solr schema for
+your data.  Riak Search comes bundled with a default schema named
+<tt class="docutils literal"><span class="pre">_yz_default</span></tt>. It defaults to many dynamic field types, where the
+suffix defines its type. This is an easy path to start development,
+but we recommend in production that you define your own schema.</p>
+<p>You can find information about defining your own schema at
+<a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/search-schema">Search Schema</a>,
+with a short section dedicated to the <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/search-schema/#The-Default-Schema">default schema</a>.</p>
+<p>Here is a brief example of creating a custom schema with
+<a class="reference internal" href="client.html#riak.client.RiakClient.create_search_schema" title="riak.client.RiakClient.create_search_schema"><tt class="xref py py-meth docutils literal"><span class="pre">create_search_schema()</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">content</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="s">&lt;schema name=&quot;test&quot; version=&quot;1.5&quot;&gt;</span>
+<span class="s">&lt;fields&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_id&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; required=&quot;true&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_ed&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_pn&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_fpn&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_vtag&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_rk&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_rb&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_rt&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">   &lt;field name=&quot;_yz_err&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot;</span>
+<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s">&lt;/fields&gt;</span>
+<span class="s">&lt;uniqueKey&gt;_yz_id&lt;/uniqueKey&gt;</span>
+<span class="s">&lt;types&gt;</span>
+<span class="s">    &lt;fieldType name=&quot;_yz_str&quot; class=&quot;solr.StrField&quot;</span>
+<span class="s">     sortMissingLast=&quot;true&quot; /&gt;</span>
+<span class="s">&lt;/types&gt;</span>
+<span class="s">&lt;/schema&gt;&quot;&quot;&quot;</span>
+<span class="n">schema_name</span> <span class="o">=</span> <span class="s">&#39;jalapeno&#39;</span>
+<span class="n">client</span><span class="o">.</span><span class="n">create_search_schema</span><span class="p">(</span><span class="n">schema_name</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you would like to retrieve the current XML Solr schema,
+<a class="reference internal" href="client.html#riak.client.RiakClient.get_search_schema" title="riak.client.RiakClient.get_search_schema"><tt class="xref py py-meth docutils literal"><span class="pre">get_search_schema()</span></tt></a> is available:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">schema</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_schema</span><span class="p">(</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="solr-indexes">
+<h3>Solr indexes<a class="headerlink" href="#solr-indexes" title="Permalink to this headline">¶</a></h3>
+<p>Once a schema has been created, then a Solr index must also be created.
+This index represents a collection of similar data that you use to perform
+queries. When creating an index with
+<a class="reference internal" href="client.html#riak.client.RiakClient.create_search_index" title="riak.client.RiakClient.create_search_index"><tt class="xref py py-meth docutils literal"><span class="pre">create_search_index()</span></tt></a>, you can optionally
+specify a schema. If you do not, the default schema will be used:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;nacho&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Likewise you can specify a schema, e.g. the index <tt class="docutils literal"><span class="pre">&quot;nacho&quot;</span></tt> is
+associated with the schema <tt class="docutils literal"><span class="pre">&quot;jalapeno&quot;</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;nacho&#39;</span><span class="p">,</span> <span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Just as easily you can delete an index with
+<a class="reference internal" href="client.html#riak.client.RiakClient.delete_search_index" title="riak.client.RiakClient.delete_search_index"><tt class="xref py py-meth docutils literal"><span class="pre">delete_search_index()</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">delete_search_index</span><span class="p">(</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A single index can be retrieved with
+<a class="reference internal" href="client.html#riak.client.RiakClient.get_search_index" title="riak.client.RiakClient.get_search_index"><tt class="xref py py-meth docutils literal"><span class="pre">get_search_index()</span></tt></a> or all of them
+with <a class="reference internal" href="client.html#riak.client.RiakClient.list_search_indexes" title="riak.client.RiakClient.list_search_indexes"><tt class="xref py py-meth docutils literal"><span class="pre">list_search_indexes()</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">index</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_index</span><span class="p">(</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+<span class="n">schema</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s">&#39;schema&#39;</span><span class="p">]</span>
+<span class="n">indexes</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_search_indexes</span><span class="p">()</span>
+<span class="n">first_nval</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;n_val&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that index names may only be ASCII values from 32-127
+(spaces, standard punctuation, digits and word characters).
+This may change in the future to allow full unicode support.</p>
+</div>
+<p>More discussion about Riak Search 2.0 Indexes can be found at <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/search/#Indexes">Indexes</a>.</p>
+</div>
+<div class="section" id="linking-a-bucket-type-to-an-index">
+<h3>Linking a bucket type to an index<a class="headerlink" href="#linking-a-bucket-type-to-an-index" title="Permalink to this headline">¶</a></h3>
+<p>The last step to setting up Riak Search 2.0 is to link a Bucket Type
+to a Solr index.  This lets Riak know when to index values.  This can be
+done via the command line:</p>
+<div class="highlight-python"><div class="highlight"><pre>riak-admin bucket-type create spicy &#39;{&quot;props&quot;:{&quot;search_index&quot;:&quot;jalapeno&quot;}}&#39;
+riak-admin bucket-type activate spicy
+</pre></div>
+</div>
+<p>Or simply create an empty Bucket Type:</p>
+<div class="highlight-python"><div class="highlight"><pre>riak-admin bucket-type create spicy &#39;{&quot;props&quot;:{}}&#39;
+riak-admin bucket-type activate spicy
+</pre></div>
+</div>
+<p>Then change the bucket properties on the associated bucket or Bucket Type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;peppers&#39;</span><span class="p">)</span>
+<span class="n">b</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+<span class="n">btype</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;spicy&#39;</span><span class="p">)</span>
+<span class="n">btype</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="querying-an-index">
+<h3>Querying an index<a class="headerlink" href="#querying-an-index" title="Permalink to this headline">¶</a></h3>
+<p>Once the schema, index and bucket properties have all been properly configured,
+adding data is as simple as writing to Riak.  Solr is automatically updated.</p>
+<p>To query, on the other hand, is as easy as writing Solr queries.  This allows
+for the full use of existing Solr tools as well as its rich semantics.</p>
+<p>Here is a brief example of loading and querying data::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;peppers&#39;</span><span class="p">)</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;bell&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;bell&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;anaheim&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;anaheim&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+                       <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">2500</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;chipotle&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;chipotle&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">3500</span><span class="p">,</span>
+                        <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;serrano&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;serrano&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
+                       <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">23000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;habanero&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;habanero&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">100000</span><span class="p">,</span>
+                        <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">350000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;name_s:/c.*/&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+<span class="c"># Yields single document &#39;chipotle&#39;</span>
+<span class="k">print</span> <span class="n">results</span><span class="p">[</span><span class="s">&#39;docs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;name_s&#39;</span><span class="p">]</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;scoville_high_i:[20000 TO 500000]&quot;</span><span class="p">)</span>
+<span class="c"># Yields two documents</span>
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="s">&#39;docs&#39;</span><span class="p">]:</span>
+    <span class="k">print</span> <span class="n">result</span><span class="p">[</span><span class="s">&#39;name_s&#39;</span><span class="p">]</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;name_s:*&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s">&#39;jalapeno&#39;</span><span class="p">,</span>
+                        <span class="n">sort</span><span class="o">=</span><span class="s">&quot;scoville_low_i desc&quot;</span><span class="p">)</span>
+<span class="c"># Yields all documents, sorted in descending order. We take the top one</span>
+<span class="k">print</span> <span class="s">&quot;The hottest pepper is {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s">&#39;docs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;name_s&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The results returned by <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.search" title="riak.bucket.RiakBucket.search"><tt class="xref py py-meth docutils literal"><span class="pre">search()</span></tt></a> is a dictionary
+with lots of search metadata like the number of results, the maxium
+<a class="reference external" href="https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/search/package-summary.html#scoring">Lucene Score</a>
+as well as the matching documents.</p>
+<p>When querying on <a class="reference internal" href="datatypes.html#datatypes"><em>Data Types</em></a> the datatype is the name of the field
+used in Solr since they do not fit into the default schema, e.g.:</p>
+<div class="code highlight-python"><div class="highlight"><pre>riak-admin bucket-type create visitors &#39;{&quot;props&quot;:{&quot;datatype&quot;: &quot;counter}}&#39;
+riak-admin bucket-type activate visitors
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;website&#39;</span><span class="p">)</span>
+<span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;visitors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;hits&#39;</span><span class="p">)</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;website&#39;</span><span class="p">)</span>
+
+<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;bbc.co.uk&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;cnn.com&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;abc.net.au&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;counter:[10 TO *]&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s">&#39;website&#39;</span><span class="p">,</span>
+                        <span class="n">sort</span><span class="o">=</span><span class="s">&quot;counter desc&quot;</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c"># Assume you have a bucket-type named &quot;profiles&quot; that has datatype</span>
+<span class="c"># &quot;map&quot;. Let&#39;s create and search an index containing maps.</span>
+<span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;user-profiles&#39;</span><span class="p">)</span>
+<span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;profiles&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;USA&#39;</span><span class="p">)</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;user-profiles&#39;</span><span class="p">)</span>
+
+<span class="n">brett</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;fname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="s">&quot;Brett&quot;</span><span class="p">)</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;lname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="s">&quot;Hazen&quot;</span><span class="p">)</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;emails&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;spam@basho.com&#39;</span><span class="p">)</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s">&#39;visits&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">maps</span><span class="p">[</span><span class="s">&#39;pages&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s">&#39;homepage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+<span class="c"># Note that the field name in the index/schema is the field name in</span>
+<span class="c"># the map joined with its type by an underscore. Deeply embedded</span>
+<span class="c"># fields are joined with their parent field names by an underscore.</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;lname_register:Hazen AND pages_map_homepage_counter:[1 TO *]&#39;</span><span class="p">,</span>
+                        <span class="n">index</span><span class="o">=</span><span class="s">&#39;user-profiles&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Details on querying Riak Search 2.0 can be found at <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/using/search/#Querying">Querying</a>.</p>
+</div>
+</div>
 </div>
 
 
+          </div>
           <footer>
   
-    <div class="rst-footer-buttons">
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="advanced.html" class="btn btn-neutral float-right" title="Advanced Usage &amp; Internals"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="security.html" class="btn btn-neutral float-right" title="Security"/>Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="object.html" class="btn btn-neutral" title="Values &amp; Objects"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="datatypes.html" class="btn btn-neutral" title="Data Types"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
 
   <hr/>
 
-  <p>
-      &copy; Copyright 2010-2013, Basho Technologies.
-  </p>
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2014, Basho Technologies.
+    </p>
+  </div>
 
-  <a href="https://www.github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="http://readthedocs.org">Read the Docs</a>
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
 </footer>
         </div>
       </div>
@@ -985,6 +1204,38 @@ A shortcut for <a class="reference internal" href="#riak.mapreduce.RiakMapReduce
 
   </div>
   
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
 
 </body>
 </html>
