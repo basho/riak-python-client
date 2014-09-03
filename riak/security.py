@@ -198,7 +198,7 @@ class SecurityCreds:
         return (getattr(self, internal_key) is not None) or \
             (getattr(self, internal_key + "_file") is not None)
 
-    def check_revoked_cert(self, ssl_socket):
+    def _check_revoked_cert(self, ssl_socket):
         """
         Checks whether the server certificate on the passed socket has been
         revoked by checking the CRL.
