@@ -69,12 +69,12 @@ instead, it will be turned into this type::
     client = RiakClient(credentials=creds)
 
 .. note:: A Certifying Authority (CA) Certificate must always be
-          supplied to `SecurityCreds` by specifying the path to a CA
           supplied to :class:`SecurityCreds` by specifying the path to
           a CA certificate file via the ``cacert_file`` argument or by
           setting the ``cacert`` argument to an `OpenSSL.crypto.X509
           <http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects>`_
-          object.
+          object. This mitigates MITM (man-in-the-middle) attacks by
+          ensuring correct certificate validation.
 
 --------------------
 Authentication Types
@@ -130,9 +130,6 @@ into the :class:`~riak.client.RiakClient` initializer::
      val1 = "#SeanCribbsHoldingThings"
      key1 = myBucket.new('hashtag', data=val1)
      key1.store()
-
-.. note:: A Certifying Authority (CA) Certificate must always be supplied
-          to `SecurityCreds`
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Certificate-based authentication
