@@ -50,9 +50,9 @@ Client Configuration
 --------------------
 
 On the client, simply create a
-:py:class:`~riak.security.SecurityCreds` object with just a username,
+:class:`SecurityCreds` object with just a username,
 password and CA Certificate file. That would then need to be passed
-into the :py:class:`~riak.client.RiakClient` initializer::
+into the :class:`~riak.client.RiakClient` initializer::
 
      creds = SecurityCreds('riakuser',
                            'riakpass',
@@ -60,7 +60,7 @@ into the :py:class:`~riak.client.RiakClient` initializer::
      client = RiakClient(credentials=creds)
 
 The ``credentials`` argument of a :class:`~riak.client.RiakClient` constructor
-is a :class:`~riak.security.SecurityCreds` object. If you specify a dictionary
+is a :class:`SecurityCreds` object. If you specify a dictionary
 instead, it will be turned into this type::
 
     creds = {'username': 'riakuser',
@@ -70,7 +70,8 @@ instead, it will be turned into this type::
 
 .. note:: A Certifying Authority (CA) Certificate must always be
           supplied to `SecurityCreds` by specifying the path to a CA
-          certificate file via the ``cacert_file`` argument or by
+          supplied to :class:`SecurityCreds` by specifying the path to
+          a CA certificate file via the ``cacert_file`` argument or by
           setting the ``cacert`` argument to an `OpenSSL.crypto.X509
           <http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects>`_
           object.
@@ -113,10 +114,9 @@ The server needs to first have a user and a ``password`` security source::
     riak-admin security add-user riakuser password=captheorem4life
     riak-admin security add-source riakuser 127.0.0.1/32 password
 
-One the client, simply create a
-:py:class:`~riak.security.SecurityCreds` object with just a username and
-password.  That would then need to be passed into the
-:py:class:`~riak.client.RiakClient` initializer::
+On the client, simply create a :class:`~SecurityCreds` object or dict
+with just a username and password. That would then need to be passed
+into the :class:`~riak.client.RiakClient` initializer::
 
      creds = {'username': 'riakuser',
               'password': 'riakpass',
@@ -145,7 +145,7 @@ When the ``certificate`` source is used, the Riak username must match
 the common name, aka ``CN``, that you specified when you generated your
 certificate.  You can add a ``certificate`` source to any number of clients.
 
-The :py:class:`~riak.security.SecurityCreds` must then include the include a client
+The :class:`SecurityCreds` must then include the include a client
 certificate file and a private key file, too::
 
     creds = {'username': 'riakuser',
@@ -189,10 +189,9 @@ containing the private key has been lost or stolen)::
 Cipher options
 ^^^^^^^^^^^^^^
 
-The last interesting setting on
-:py:class:`~riak.security.SecurityCreds` is the cipher option which
-is a colon-delimited list of supported ciphers for encryption::
-
+The last interesting setting on :class:`SecurityCreds` is the
+``ciphers`` option which is a colon-delimited list of supported
+ciphers for encryption::
 
     creds = {'username': 'riakuser',
              'password': 'riakpass',
