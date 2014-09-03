@@ -26,9 +26,9 @@ Several important caveats when enabling security:
   halted before security is enabled and brought back online with support
   for the new security features.
 
-----------------------
-Security Configuration
-----------------------
+--------------------
+Server Configuration
+--------------------
 
 The server must first be configured to `enable security
 <http://docs.basho.com/riak/2.0.0/ops/running/authz/#Security-Basics>`_,
@@ -40,14 +40,15 @@ applied and the correct certificates must be installed.  An overview
 can be found at `Authentication and Authorization
 <http://docs.basho.com/riak/2.0.0/ops/running/authz/>`_.
 
-.. note:: OpenSSL 1.0.1g or later (or patched version built after
-          2014-04-01) is required for `pyOpenSSL
-          <http://pypi.python.org/pypi/pyOpenSSL/>`_. Earlier versions
-          may not support TLS 1.2, the recommended security protocol.
-
 --------------------
 Client Configuration
 --------------------
+
+.. note:: OpenSSL 1.0.1g or later (or patched version built after
+          2014-04-01) is required for `pyOpenSSL
+          <http://pypi.python.org/pypi/pyOpenSSL/>`_, which is used
+          for secure transport in the Riak client. Earlier versions
+          may not support TLS 1.2, the recommended security protocol.
 
 On the client, simply create a
 :class:`SecurityCreds` object with just a username,
