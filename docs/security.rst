@@ -38,9 +38,10 @@ applied and the correct certificates must be installed.  An overview
 can be found at `Authentication and Authorization
 <http://docs.basho.com/riak/2.0.0/ops/running/authz/>`_.
 
-.. note:: OpenSSL 1.0.1g or later (or patched version built after 2014-04-01)
-          is required for **pyOpenSSL**. Earlier versions may not support
-          TLS 1.2, the recommended security protocol.
+.. note:: OpenSSL 1.0.1g or later (or patched version built after
+          2014-04-01) is required for `pyOpenSSL
+          <http://pypi.python.org/pypi/pyOpenSSL/>`_. Earlier versions
+          may not support TLS 1.2, the recommended security protocol.
 
 --------------------------
 Client-side Authentication
