@@ -4,25 +4,25 @@
 Security
 ========
 
-Riak 2.0 adds authentication and authorization by optionally encrypting
-traffic between the client and server via OpenSSL.
-This is useful to prevent accidental collisions between environments (e.g.,
-pointing application software under active development at the production
-cluster) and offers protection against malicious attack, although Riak still
-should not be exposed directly to any unsecured network.
+Riak 2.0 supports authentication and authorization over encrypted
+channels via OpenSSL. This is useful to prevent accidental collisions
+between environments (e.g., pointing application software under active
+development at the production cluster) and offers protection against
+some malicious attacks, although Riak still should not be exposed
+directly to any unsecured network.
 
 Several important caveats when enabling security:
 
-   * There is no support yet for auditing. This is on the roadmap for a future
-     release.
-   * Two deprecated features will not work if security is enabled: link
-     walking and Riak's original full-text search tool.
-   * There are restrictions on Erlang modules exposed to MapReduce jobs when
-     security is enabled.
-   * Enabling security requires applications be designed to transition
-     gracefully based on the server response or applications will need to be
-     halted before security is enabled and brought back online with support
-     for the new security features.
+* There is no support yet for auditing. This is on the roadmap for a future
+  release.
+* Two deprecated features will not work if security is enabled: link
+  walking and Riak Search 1.0.
+* There are restrictions on Erlang modules exposed to MapReduce jobs when
+  security is enabled.
+* Enabling security requires applications be designed to transition
+  gracefully based on the server response or applications will need to be
+  halted before security is enabled and brought back online with support
+  for the new security features.
 
 ----------------------
 Security Configuration
