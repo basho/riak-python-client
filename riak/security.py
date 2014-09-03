@@ -199,6 +199,14 @@ class SecurityCreds:
             (getattr(self, internal_key + "_file") is not None)
 
     def check_revoked_cert(self, ssl_socket):
+        """
+        Checks whether the server certificate on the passed socket has been
+        revoked by checking the CRL.
+
+        :param ssl_socket: the SSL/TLS socket
+        :rtype: bool
+        :raises SecurityError: when the certificate has been revoked
+        """
         if not self.has_credential('crl'):
             return True
 

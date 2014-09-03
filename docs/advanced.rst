@@ -115,6 +115,8 @@ Security helpers
 .. autoclass:: RiakWrappedSocket
 .. autoclass:: fileobject
 
+.. automethod:: riak.security.SecurityCreds.check_revoked_cert
+
 ^^^^^^^^^^^^^^
 HTTP Transport
 ^^^^^^^^^^^^^^
