@@ -171,6 +171,9 @@ Optionally, the certificate or private key may be supplied as a string::
              'cert': preloaded_cert,
              'pkey': prelocated_pkey}
 
+------------------
+Additional options
+------------------
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Certificate revocation lists
