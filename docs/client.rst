@@ -31,6 +31,10 @@ Client objects
 .. autoclass:: RiakClient
 
    .. autoattribute:: PROTOCOLS
+
+      Prior to Riak 2.0 the ``'https'`` protocol was also an option, but now
+      secure connections are handled by the :ref:`security-label` feature.
+
    .. autoattribute:: protocol
    .. autoattribute:: client_id
    .. autoattribute:: resolver
@@ -71,27 +75,36 @@ behavior.
 Client-level Operations
 -----------------------
 
-Some operations are not scoped by buckets and can be performed on the
-client directly:
+Some operations are not scoped by buckets or bucket types and can be
+performed on the client directly:
 
 .. automethod:: RiakClient.ping
 .. automethod:: RiakClient.get_buckets
 .. automethod:: RiakClient.stream_buckets
 
------------------
-Accessing Buckets
------------------
+----------------------------------
+Accessing Bucket Types and Buckets
+----------------------------------
 
-Most client operations are on :py:class:`bucket objects
-<riak.bucket.RiakBucket>` or keys within those buckets. Use the
-``bucket`` method for creating buckets that will proxy operations to
-the called client.
+Most client operations are on :py:class:`bucket type objects
+<riak.bucket.BucketType>`, the :py:class:`bucket objects
+<riak.bucket.RiakBucket>` they contain or keys within those buckets. Use the
+``bucket_type`` or ``bucket`` methods for creating bucket types and buckets
+that will proxy operations to the called client.
 
+.. automethod:: RiakClient.bucket_type
 .. automethod:: RiakClient.bucket
 
------------------------
-Bucket-level Operations
------------------------
+----------------------
+Bucket Type Operations
+----------------------
+
+.. automethod:: RiakClient.get_bucket_type_props
+.. automethod:: RiakClient.set_bucket_type_props
+
+-----------------
+Bucket Operations
+-----------------
 
 .. automethod:: RiakClient.get_bucket_props
 .. automethod:: RiakClient.set_bucket_props
@@ -107,8 +120,8 @@ Key-level Operations
 .. automethod:: RiakClient.put
 .. automethod:: RiakClient.delete
 .. automethod:: RiakClient.multiget
-.. automethod:: RiakClient.get_counter
-.. automethod:: RiakClient.update_counter
+.. automethod:: RiakClient.fetch_datatype
+.. automethod:: RiakClient.update_datatype
 
 ----------------
 Query Operations
@@ -119,8 +132,19 @@ Query Operations
 .. automethod:: RiakClient.get_index
 .. automethod:: RiakClient.stream_index
 .. automethod:: RiakClient.fulltext_search
-.. automethod:: RiakClient.fulltext_add
-.. automethod:: RiakClient.fulltext_delete
+.. automethod:: RiakClient.paginate_index
+.. automethod:: RiakClient.paginate_stream_index
+
+-----------------------------
+Search Maintenance Operations
+-----------------------------
+
+.. automethod:: RiakClient.create_search_schema
+.. automethod:: RiakClient.get_search_schema
+.. automethod:: RiakClient.create_search_index
+.. automethod:: RiakClient.get_search_index
+.. automethod:: RiakClient.delete_search_index
+.. automethod:: RiakClient.list_search_indexes
 
 -------------
 Serialization
@@ -136,3 +160,48 @@ media-types. Supported by default are ``application/json`` and
 .. automethod:: RiakClient.set_encoder
 .. automethod:: RiakClient.get_decoder
 .. automethod:: RiakClient.set_decoder
+
+-------------------
+Deprecated Features
+-------------------
+
+^^^^^^^^^^^^^^^^
+Full-text search
+^^^^^^^^^^^^^^^^
+
+The original version of Riak Search has been replaced by :ref:`yz-label`,
+which is full-blown Solr integration with Riak.
+
+If Riak Search 1.0 is enabled, you can query an index via the bucket's
+:meth:`~riak.bucket.RiakBucket.search` method::
+
+    bucket.enable_search()
+    bucket.new("one", data={'value':'one'},
+               content_type="application/json").store()
+
+    bucket.search('value=one')
+
+To manually add and remove documents from an index (without an
+associated key), use the :class:`~riak.client.RiakClient`
+:meth:`~riak.client.RiakClient.fulltext_add` and
+:meth:`~riak.client.RiakClient.fulltext_delete` methods directly.
+
+.. automethod:: RiakClient.fulltext_add
+.. automethod:: RiakClient.fulltext_delete
+
+.. _legacy_counters:
+
+^^^^^^^^^^^^^^^
+Legacy Counters
+^^^^^^^^^^^^^^^
+
+The first Data Type introduced in Riak 1.4 were `counters`.  These pre-date
+:ref:`Bucket Types <bucket_types>` and the current implementation.
+Rather than returning objects, the counter operations
+act directly on the value of the counter.  Legacy counters are deprecated
+as of Riak 2.0.  Please use :py:class:`~riak.datatypes.Counter` instead.
+
+.. warning:: Legacy counters are incompatible with Bucket Types.
+
+.. automethod:: RiakClient.get_counter
+.. automethod:: RiakClient.update_counter

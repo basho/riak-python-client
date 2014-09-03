@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Riak Python Client'
-copyright = u'2010-2013, Basho Technologies'
+copyright = u'2010-2014, Basho Technologies'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -271,3 +271,4 @@ htmlhelp_basename = 'RiakPythonbindingdoc'
 autodoc_default_flags = ['no-undoc-members']
 autodoc_member_order = 'groupwise'
 autoclass_content = 'both'
+primary_domain = 'py'

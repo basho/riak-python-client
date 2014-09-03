@@ -5,8 +5,22 @@ __all__ = ['Set']
 
 
 class Set(collections.Set, Datatype):
-    """
-    Riak Datatype representing a Set with observed-remove semantics.
+    """A convergent datatype representing a Set with observed-remove
+    semantics. Currently strings are the only supported value type.
+    Example::
+
+        myset.add('barista')
+        myset.add('roaster')
+        myset.add('brewer')
+
+    Likewise they can simply be removed::
+
+        myset.discard('barista')
+
+    This datatype also implements the `Set ABC
+    <https://docs.python.org/2/library/collections.html>`_, meaning it
+    supports ``len()``, ``in``, and iteration.
+
     """
 
     type_name = 'set'

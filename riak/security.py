@@ -64,19 +64,19 @@ class SecurityCreds:
         :param pkey_file: Full path to security key file
         :type pkey_file: str
         :param key: Loaded security key file
-        :type key: :class:`~OpenSSL.crypto.PKey`
+        :type key: :class:`OpenSSL.crypto.PKey`
         :param cert_file: Full path to certificate file
         :type cert_file: str
         :param cert: Loaded client certificate
-        :type cert: :class:`~OpenSSL.crypto.X509`
-        :param cacert_file: List of full paths to CA certificate files
+        :type cert: :class:`OpenSSL.crypto.X509`
+        :param cacert_file: Full path to CA certificate file
         :type cacert_file: str
-        :param cacert: Loaded CA certificates
-        :type cacert: list of :class:`~OpenSSL.crypto.X509`
+        :param cacert: Loaded CA certificate
+        :type cacert: :class:`OpenSSL.crypto.X509`
         :param crl_file: Full path to revoked certificates file
         :type crl_file: str
         :param crl: Loaded revoked certificates list
-        :type crl: :class:`~OpenSSL.crypto.CRL`
+        :type crl: :class:`OpenSSL.crypto.CRL`
         :param ciphers: List of supported SSL ciphers
         :type ciphers: str
         :param ssl_version: OpenSSL security version
@@ -99,6 +99,8 @@ class SecurityCreds:
     def username(self):
         """
         Riak Username
+
+        :rtype: str
         """
         return self._username
 
@@ -106,13 +108,17 @@ class SecurityCreds:
     def password(self):
         """
         Riak Password
+
+        :rtype: str
         """
         return self._password
 
     @property
     def pkey(self):
         """
-        Private key
+        Client Private key
+
+        :rtype: :class:`OpenSSL.crypto.PKey`
         """
         return self._cached_cert('_pkey', crypto.load_privatekey)
 
@@ -120,13 +126,17 @@ class SecurityCreds:
     def cert(self):
         """
         Client Certificate
+
+        :rtype: :class:`OpenSSL.crypto.X509`
         """
         return self._cached_cert('_cert', crypto.load_certificate)
 
     @property
     def cacert(self):
         """
-        Certifying Authority Certificate
+        Certifying Authority (CA) Certificate
+
+        :rtype: :class:`OpenSSL.crypto.X509`
         """
         return self._cached_cert('_cacert', crypto.load_certificate)
 
@@ -134,6 +144,8 @@ class SecurityCreds:
     def crl(self):
         """
         Certificate Revocation List
+
+        :rtype: :class:`OpenSSL.crypto.CRL`
         """
         return self._cached_cert('_crl', crypto.load_crl)
 
@@ -141,13 +153,17 @@ class SecurityCreds:
     def ciphers(self):
         """
         Colon-delimited list of supported ciphers
+
+        :rtype: str
         """
         return self._ciphers
 
     @property
     def ssl_version(self):
-        """
-        SSL Encryption Version
+        """SSL/TLS Protocol to use
+
+        :rtype: an int constant from OpenSSL, like
+            :data:`OpenSSL.SSL.TLSv1_2_METHOD`
         """
         return self._ssl_version
 
@@ -169,16 +185,29 @@ class SecurityCreds:
             setattr(self, key, cert_list)
         return getattr(self, key)
 
-    def has_credential(self, key):
+    def _has_credential(self, key):
         """
-        True if a credential or filename value has been supplied
+        ``True`` if a credential or filename value has been supplied for the
+        given property.
+
+        :param key: which configuration property to check for
+        :type key: str
+        :rtype: bool
         """
         internal_key = "_" + key
         return (getattr(self, internal_key) is not None) or \
             (getattr(self, internal_key + "_file") is not None)
 
-    def check_revoked_cert(self, ssl_socket):
-        if not self.has_credential('crl'):
+    def _check_revoked_cert(self, ssl_socket):
+        """
+        Checks whether the server certificate on the passed socket has been
+        revoked by checking the CRL.
+
+        :param ssl_socket: the SSL/TLS socket
+        :rtype: bool
+        :raises SecurityError: when the certificate has been revoked
+        """
+        if not self._has_credential('crl'):
             return True
 
         servcert = ssl_socket.get_peer_certificate()

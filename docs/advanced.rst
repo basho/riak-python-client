@@ -1,6 +1,6 @@
-============================
- Advanced Usage & Internals
-============================
+==========================
+Advanced Usage & Internals
+==========================
 
 This page contains documentation for aspects of library internals that
 you will rarely need to interact with, but are important for
@@ -13,7 +13,7 @@ Connection pool
 .. currentmodule:: riak.transports.pool
 
 .. autoexception:: BadResource
-.. autoclass:: Element
+.. autoclass:: Resource
    :members:
 .. autoclass:: Pool
    :members:
@@ -54,6 +54,39 @@ Multiget
 
 .. autofunction:: multiget
 
+---------
+Datatypes
+---------
+
+.. currentmodule:: riak.datatypes
+
+^^^^^^^^^^^^^^^^^^
+Datatype internals
+^^^^^^^^^^^^^^^^^^
+
+.. automethod:: Datatype.to_op
+.. automethod:: Datatype._check_type
+.. automethod:: Datatype._coerce_value
+.. automethod:: Datatype._default_value
+.. automethod:: Datatype._post_init
+.. automethod:: Datatype._require_context
+.. autoattribute:: Datatype.type_name
+.. autoattribute:: Datatype._type_error_msg
+
+^^^^^^^^^^^^
+TypedMapView
+^^^^^^^^^^^^
+
+.. autoclass:: riak.datatypes.map.TypedMapView
+   :members:
+   :special-members:
+
+^^^^^^^^^^^^^^
+TYPES constant
+^^^^^^^^^^^^^^
+
+.. autodata:: TYPES
+
 ----------
 Transports
 ----------
@@ -69,6 +102,21 @@ Transports
 .. autoclass:: FeatureDetection
    :members:
    :private-members:
+
+^^^^^^^^^^^^^^^^
+Security helpers
+^^^^^^^^^^^^^^^^
+
+.. currentmodule:: riak.transports.security
+
+.. autofunction:: verify_cb
+.. autofunction:: configure_context
+
+.. autoclass:: RiakWrappedSocket
+.. autoclass:: fileobject
+
+.. automethod:: riak.security.SecurityCreds._check_revoked_cert
+.. automethod:: riak.security.SecurityCreds._has_credential
 
 ^^^^^^^^^^^^^^
 HTTP Transport
@@ -142,3 +190,17 @@ Miscellaneous
 .. autofunction:: deprecated
 
 .. autoclass:: lazy_property
+
+------------------
+distutils commands
+------------------
+
+.. automodule:: commands
+   :members:
+   :undoc-members:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Version extraction (``version`` module)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: version

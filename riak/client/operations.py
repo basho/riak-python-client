@@ -50,7 +50,8 @@ class RiakClientOperations(RiakClientTransport):
         :type bucket_type: :class:`~riak.bucket.BucketType`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
+        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>`
+                instances
         """
         _validate_timeout(timeout)
         if bucket_type:
@@ -71,7 +72,7 @@ class RiakClientOperations(RiakClientTransport):
            traversing through all keys stored in a cluster.
 
         The caller should explicitly close the returned iterator,
-        either using :func:`contextlib.closing` or calling `close`
+        either using :func:`contextlib.closing` or calling ``close()``
         explicitly. Consuming the entire iterator will also close the
         stream. If it does not, the associated connection might not be
         returned to the pool. Example::
@@ -87,7 +88,6 @@ class RiakClientOperations(RiakClientTransport):
             stream = client.stream_buckets()
             for bucket_list in stream:
                  do_something(bucket_list)
-
             stream.close()
 
         :param bucket_type: the optional containing bucket type
@@ -166,7 +166,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
-        :rtype: :class:`riak.client.index_page.IndexPage`
+        :rtype: :class:`~riak.client.index_page.IndexPage`
         """
         if timeout != 'infinity':
             _validate_timeout(timeout)
@@ -188,11 +188,12 @@ class RiakClientOperations(RiakClientTransport):
                        continuation=None, timeout=None, term_regex=None):
         """
         Iterates over a paginated index query. This is equivalent to calling
-        :meth:`get_index` and then successively calling :meth:`next_page
-        <riak.client.IndexPage.next_page>` until all results are exhausted.
+        :meth:`get_index` and then successively calling
+        :meth:`~riak.client.index_page.IndexPage.next_page` until all
+        results are exhausted.
 
         Because limiting the result set is necessary to invoke pagination,
-        the `max_results` option has a default of `1000`.
+        the ``max_results`` option has a default of ``1000``.
 
         :param bucket: the bucket whose index will be queried
         :type bucket: RiakBucket
@@ -215,7 +216,7 @@ class RiakClientOperations(RiakClientTransport):
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
         :rtype: generator over instances of
-          :class:`riak.client.index_page.IndexPage`
+          :class:`~riak.client.index_page.IndexPage`
 
         """
         page = self.get_index(bucket, index, startkey,
@@ -236,7 +237,7 @@ class RiakClientOperations(RiakClientTransport):
         iterator.
 
         The caller should explicitly close the returned iterator,
-        either using :func:`contextlib.closing` or calling `close`
+        either using :func:`contextlib.closing` or calling ``close()``
         explicitly. Consuming the entire iterator will also close the
         stream. If it does not, the associated connection might not be
         returned to the pool. Example::
@@ -253,7 +254,6 @@ class RiakClientOperations(RiakClientTransport):
             stream = client.stream_index(mybucket, 'name_bin', 'Smith')
             for key in stream:
                  do_something(key)
-
             stream.close()
 
         :param bucket: the bucket whose index will be queried
@@ -275,7 +275,7 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
-        :rtype: :class:`riak.client.index_page.IndexPage`
+        :rtype: :class:`~riak.client.index_page.IndexPage`
 
         """
         if timeout != 'infinity':
@@ -298,16 +298,16 @@ class RiakClientOperations(RiakClientTransport):
                               continuation=None, timeout=None,
                               term_regex=None):
         """
-        Iterates over a streaming paginated index query. This is
-        equivalent to calling :meth:`stream_index` and then successively
-        calling :meth:`next_page <riak.client.IndexPage.next_page>`
-        until all results are exhausted.
+        Iterates over a streaming paginated index query. This is equivalent to
+        calling :meth:`stream_index` and then successively calling
+        :meth:`~riak.client.index_page.IndexPage.next_page` until all
+        results are exhausted.
 
         Because limiting the result set is necessary to invoke
-        pagination, the `max_results` option has a default of `1000`.
+        pagination, the ``max_results`` option has a default of ``1000``.
 
         The caller should explicitly close each yielded page, either using
-        :func:`contextlib.closing` or calling `close` explicitly. Consuming
+        :func:`contextlib.closing` or calling ``close()`` explicitly. Consuming
         the entire page will also close the stream. If it does not, the
         associated connection might not be returned to the pool. Example::
 
@@ -315,7 +315,7 @@ class RiakClientOperations(RiakClientTransport):
 
             # Using contextlib.closing
             for page in client.paginate_stream_index(mybucket, 'name_bin',
-                                                     'Smith')):
+                                                     'Smith'):
                 with closing(page):
                     for key in page:
                         do_something(key)
@@ -325,7 +325,6 @@ class RiakClientOperations(RiakClientTransport):
                                                      'Smith'):
                 for key in page:
                     do_something(key)
-
                 page.close()
 
         :param bucket: the bucket whose index will be queried
@@ -349,7 +348,7 @@ class RiakClientOperations(RiakClientTransport):
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
         :rtype: generator over instances of
-          :class:`riak.client.index_page.IndexPage`
+          :class:`~riak.client.index_page.IndexPage`
 
         """
         page = self.stream_index(bucket, index, startkey,
@@ -476,7 +475,7 @@ class RiakClientOperations(RiakClientTransport):
            traversing through all keys stored in a cluster.
 
         The caller should explicitly close the returned iterator,
-        either using :func:`contextlib.closing` or calling `close`
+        either using :func:`contextlib.closing` or calling ``close()``
         explicitly. Consuming the entire iterator will also close the
         stream. If it does not, the associated connection might
         not be returned to the pool. Example::
@@ -492,7 +491,6 @@ class RiakClientOperations(RiakClientTransport):
             stream = client.stream_keys(mybucket)
             for key_list in stream:
                  do_something(key_list)
-
             stream.close()
 
         :param bucket: the bucket whose properties will be set
@@ -642,7 +640,7 @@ class RiakClientOperations(RiakClientTransport):
         generator method which should be iterated over.
 
         The caller should explicitly close the returned iterator,
-        either using :func:`contextlib.closing` or calling `close`
+        either using :func:`contextlib.closing` or calling ``close()``
         explicitly. Consuming the entire iterator will also close the
         stream. If it does not, the associated connection might
         not be returned to the pool. Example::
@@ -658,7 +656,6 @@ class RiakClientOperations(RiakClientTransport):
             stream = mymapred.stream()
             for phase, result in stream:
                  do_something(phase, result)
-
             stream.close()
 
         :param inputs: the input list/structure
@@ -683,7 +680,7 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def create_search_index(self, transport, index, schema=None, n_val=None):
         """
-        create_search_index(index, schema, n_val)
+        create_search_index(index, schema=None, n_val=None)
 
         Create a search index of the given name, and optionally set
         a schema. If no schema is set, the default will be used.
@@ -702,22 +699,25 @@ class RiakClientOperations(RiakClientTransport):
         """
         get_search_index(index)
 
-        Gets a search index of the given name if it exists,
-        which will also return the schema. Raises a RiakError
-        if no such schema exists.
+        Gets a search index of the given name if it exists, which will also
+        return the schema. Raises a RiakError if no such schema exists. The
+        returned dict contains keys ``'name'``, ``'schema'`` and
+        ``'n_val'``.
 
         :param index: the name of the index to create
         :type index: string
+        :rtype: dict
         """
         return transport.get_search_index(index)
 
     @retryable
     def list_search_indexes(self, transport):
-        """
-        list_search_indexes(bucket)
+        """list_search_indexes()
 
-        Gets all search indexes and their schemas. Returns
-        a blank list if none exist
+        Gets all search indexes and their schemas. The returned list
+        contains dicts with keys ``'name'``, ``'schema'`` and ``'n_val'``.
+
+        :return: list of dicts
         """
         return transport.list_search_indexes()
 
@@ -738,13 +738,13 @@ class RiakClientOperations(RiakClientTransport):
         """
         create_search_schema(schema, content)
 
-        Creates a solr schema of the given name and content.
-        Content must be valid solr schema xml.
+        Creates a Solr schema of the given name and content.
+        Content must be valid Solr schema XML.
 
         :param schema: the name of the schema to create
         :type schema: string
-        :param schema: the solr schema xml content
-        :type schema: string
+        :param content: the solr schema xml content
+        :type content: string
         """
         return transport.create_search_schema(schema, content)
 
@@ -754,10 +754,13 @@ class RiakClientOperations(RiakClientTransport):
         get_search_schema(schema)
 
         Gets a search schema of the given name if it exists.
-        Raises a RiakError if no such schema exists.
+        Raises a RiakError if no such schema exists.  The schema is
+        returned as a dict with keys ``'name'`` and ``'content'``.
 
         :param schema: the name of the schema to get
         :type schema: string
+
+        :return: dict
         """
         return transport.get_search_schema(schema)
 
@@ -777,6 +780,7 @@ class RiakClientOperations(RiakClientTransport):
         :type query: string
         :param params: additional query flags
         :type params: dict
+        :rtype: dict
         """
         return transport.search(index, query, **params)
 
@@ -784,6 +788,10 @@ class RiakClientOperations(RiakClientTransport):
     def fulltext_add(self, transport, index, docs):
         """
         fulltext_add(index, docs)
+
+        .. deprecated:: 2.1.0 (Riak 2.0)
+           Manual index maintenance is not supported for
+           :ref:`Riak Search 2.0 <yz-label>`.
 
         Adds documents to the full-text index.
 
@@ -803,6 +811,10 @@ class RiakClientOperations(RiakClientTransport):
         """
         fulltext_delete(index, docs=None, queries=None)
 
+        .. deprecated:: 2.1.0 (Riak 2.0)
+           Manual index maintenance is not supported for
+           :ref:`Riak Search 2.0 <yz-label>`.
+
         Removes documents from the full-text index.
 
         .. note:: This request is automatically retried
@@ -819,15 +831,15 @@ class RiakClientOperations(RiakClientTransport):
         transport.fulltext_delete(index, docs, queries)
 
     def multiget(self, pairs, **params):
-        """
-        Fetches many keys in parallel via threads.
+        """Fetches many keys in parallel via threads.
 
         :param pairs: list of bucket_type/bucket/key tuple triples
         :type pairs: list
         :param params: additional request flags, e.g. r, pr
         :type params: dict
-        :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>` or
-                tuples of bucket_type, bucket, key, and the exception raised
+        :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>`,
+            :class:`Datatypes <riak.datatypes.Datatype>`, or tuples of
+            bucket_type, bucket, key, and the exception raised on fetch
         """
         if self._multiget_pool:
             params['pool'] = self._multiget_pool
@@ -836,11 +848,14 @@ class RiakClientOperations(RiakClientTransport):
     @retryable
     def get_counter(self, transport, bucket, key, r=None, pr=None,
                     basic_quorum=None, notfound_ok=None):
-        """
-        get_counter(bucket, key, r=None, pr=None, basic_quorum=None,\
-                    notfound_ok=None)
+        """get_counter(bucket, key, r=None, pr=None, basic_quorum=None,\
+                       notfound_ok=None)
 
         Gets the value of a counter.
+
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
 
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
@@ -859,6 +874,7 @@ class RiakClientOperations(RiakClientTransport):
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
         :rtype: integer
+
         """
         return transport.get_counter(bucket, key, r=r, pr=pr)
 
@@ -867,6 +883,10 @@ class RiakClientOperations(RiakClientTransport):
         """
         update_counter(bucket, key, value, w=None, dw=None, pw=None,\
                        returnvalue=False)
+
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
 
         Updates a counter by the given value. This operation is not
         idempotent and so should not be retried automatically.
@@ -902,17 +922,14 @@ class RiakClientOperations(RiakClientTransport):
                        basic_quorum=None, notfound_ok=None,
                        timeout=None, include_context=None):
         """
-        fetch_datatype(bucket, key, r=None, pr=None, basic_quorum=None,
-                       notfound_ok=None, timeout=None, include_context=None)
-
         Fetches the value of a Riak Datatype.
 
         .. note:: This request is automatically retried :attr:`retries`
            times if it fails due to network error.
 
         :param bucket: the bucket of the datatype, which must belong to a
-          :class:`~riak.BucketType`
-        :type bucket: RiakBucket
+          :class:`~riak.bucket.BucketType`
+        :type bucket: :class:`~riak.bucket.RiakBucket`
         :param key: the key of the datatype
         :type key: string
         :param r: the read quorum
@@ -944,8 +961,8 @@ class RiakClientOperations(RiakClientTransport):
                         return_body=None, timeout=None,
                         include_context=None):
         """
-        Updates a Riak Datatype. This operation is not idempotent and
-        so will not be retried automatically.
+        Sends an update to a Riak Datatype to the server. This operation is not
+        idempotent and so will not be retried automatically.
 
         :param datatype: the datatype with pending updates
         :type datatype: :class:`~riak.datatypes.Datatype`
@@ -962,6 +979,7 @@ class RiakClientOperations(RiakClientTransport):
           on sets and maps
         :type include_context: bool
         :rtype: tuple of datatype, opaque value and opaque context
+
         """
         _validate_timeout(timeout)
 

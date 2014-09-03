@@ -102,8 +102,7 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
             break
 
         self.sock = RiakWrappedSocket(cxn, sock)
-        if self.credentials.has_credential('crl'):
-            self.credentials.check_revoked_cert(self.sock)
+        self.credentials._check_revoked_cert(self.sock)
 
 
 class RiakHttpPool(Pool):

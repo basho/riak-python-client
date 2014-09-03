@@ -6,18 +6,16 @@ If in a git repository, it is the current git tag.
 Otherwise it is the one contained in the PKG-INFO file.
 
 To use this script, simply import it in your setup.py file
-and use the results of get_version() as your package version:
+and use the results of get_version() as your package version::
 
     from version import *
 
     setup(
-        ...
-        version=get_version(),
-        ...
+        version=get_version()
     )
 """
 
-__all__ = ('get_version')
+__all__ = ['get_version']
 
 from os.path import dirname, isdir, join
 import re

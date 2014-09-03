@@ -42,7 +42,8 @@ class RiakBucket(object):
         """
         Returns a new ``RiakBucket`` instance.
 
-        :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
+        :param client: A :class:`RiakClient <riak.client.RiakClient>`
+               instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
         :param name: The bucket name
         :type name: string
@@ -140,19 +141,32 @@ class RiakBucket(object):
 
     def new(self, key=None, data=None, content_type='application/json',
             encoded_data=None):
-        """
-        Create a new :class:`RiakObject <riak.riak_object.RiakObject>`
-        that will be stored as JSON. A shortcut for manually
-        instantiating a :class:`RiakObject
-        <riak.riak_object.RiakObject>` or :class:`Datatype
-        <riak.datatypes.Datatype>`.
+        """A shortcut for manually instantiating a new
+        :class:`~riak.riak_object.RiakObject` or a new
+        :class:`~riak.datatypes.Datatype`, based on the presence and value
+        of the :attr:`datatype <BucketType.datatype>` bucket property. When
+        the bucket contains a :class:`~riak.datatypes.Datatype`, all
+        arguments are ignored except ``key``, otherwise they are used to
+        initialize the :class:`~riak.riak_object.RiakObject`.
 
         :param key: Name of the key. Leaving this to be None (default)
                     will make Riak generate the key on store.
-        :type key: string
-        :param data: The data to store.
+        :type key: str
+        :param data: The data to store in a
+           :class:`~riak.riak_object.RiakObject`, see
+           :attr:`RiakObject.data <riak.riak_object.RiakObject.data>`.
         :type data: object
-        :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
+        :param content_type: The media type of the data stored in the
+           :class:`~riak.riak_object.RiakObject`, see
+           :attr:`RiakObject.content_type
+           <riak.riak_object.RiakObject.content_type>`.
+        :type content_type: str
+        :param encoded_data: The encoded data to store in a
+           :class:`~riak.riak_object.RiakObject`, see
+           :attr:`RiakObject.encoded_data
+           <riak.riak_object.RiakObject.encoded_data>`.
+        :type encoded_data: str
+        :rtype: :class:`~riak.riak_object.RiakObject` or
                 :class:`~riak.datatypes.Datatype`
 
         """
@@ -176,7 +190,9 @@ class RiakBucket(object):
     def get(self, key, r=None, pr=None, timeout=None, include_context=None,
             basic_quorum=None, notfound_ok=None):
         """
-        Retrieve an object or datatype from Riak.
+        Retrieve an :class:`~riak.riak_object.RiakObject` or
+        :class:`~riak.datatypes.Datatype`, based on the presence and value
+        of the :attr:`datatype <BucketType.datatype>` bucket property.
 
         :param key: Name of the key.
         :type key: string
@@ -196,6 +212,7 @@ class RiakBucket(object):
         :type notfound_ok: bool
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
            :class:`~riak.datatypes.Datatype`
+
         """
         if self.bucket_type.datatype:
             return self._client.fetch_datatype(self, key, r=r, pr=pr,
@@ -227,7 +244,9 @@ class RiakBucket(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
-        :rtype: list of :class:`RiakObject <riak.riak_object.RiakObject>`
+        :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>`,
+            :class:`Datatypes <riak.datatypes.Datatype>`, or tuples of
+            bucket_type, bucket, key, and the exception raised on fetch
         """
         bkeys = [(self.bucket_type.name, self.name, key) for key in keys]
         return self._client.multiget(bkeys, r=r, pr=pr, timeout=timeout,
@@ -362,15 +381,21 @@ class RiakBucket(object):
         """
         Streams all keys within the bucket through an iterator.
 
+        The caller must close the stream when finished.  See
+        :meth:`RiakClient.stream_keys()
+        <riak.client.RiakClient.stream_keys>` for more details.
+
         :rtype: iterator
         """
         return self._client.stream_keys(self)
 
     def new_from_file(self, key, filename):
-        """
-        Create a new Riak object in the bucket, using the contents of
+        """Create a new Riak object in the bucket, using the contents of
         the specified file. This is a shortcut for :meth:`new`, where the
         ``encoded_data`` and ``content_type`` are set for you.
+
+        .. warning:: This is not supported for buckets that contain
+           :class:`Datatypes <riak.datatypes.Datatype>`.
 
         :param key: the key of the new object
         :type key: string
@@ -392,12 +417,18 @@ class RiakBucket(object):
         """
         Returns True if search indexing is enabled for this
         bucket.
+
+        .. deprecated:: 2.1.0 (Riak 2.0)
+           Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         return self.get_properties().get('search', False)
 
     def enable_search(self):
         """
         Enable search indexing for this bucket.
+
+        .. deprecated:: 2.1.0 (Riak 2.0)
+           Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         if not self.search_enabled():
             self.set_property('search', True)
@@ -406,6 +437,9 @@ class RiakBucket(object):
     def disable_search(self):
         """
         Disable search indexing for this bucket.
+
+        .. deprecated:: 2.1.0 (Riak 2.0)
+           Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         if self.search_enabled():
             self.set_property('search', False)
@@ -419,12 +453,12 @@ class RiakBucket(object):
 
         :param query: the search query
         :type query: string
-        :param index: the index to search over
+        :param index: the index to search over. Defaults to the bucket's name.
         :type index: string or None
         :param params: additional query flags
         :type params: dict
         """
-        search_index = self.name if index is None else index
+        search_index = index or self.name
         return self._client.fulltext_search(search_index, query, **params)
 
     def get_index(self, index, startkey, endkey=None, return_terms=None,
@@ -463,7 +497,8 @@ class RiakBucket(object):
                      term_regex=None):
         """
         Queries a secondary index over objects in this bucket,
-        streaming keys or index/key pairs via an iterator. See
+        streaming keys or index/key pairs via an iterator.
+        The caller must close the stream when finished.  See
         :meth:`RiakClient.stream_index()
         <riak.client.RiakClient.stream_index>` for more details.
         """
@@ -480,8 +515,8 @@ class RiakBucket(object):
                               term_regex=None):
         """
         Paginates through a secondary index over objects in this bucket,
-        streaming keys or index/key pairs. See
-        :meth:`RiakClient.paginate_stream_index()
+        streaming keys or index/key pairs. The caller must close the stream
+        when finished.  See :meth:`RiakClient.paginate_stream_index()
         <riak.client.RiakClient.paginate_stream_index>` for more details.
         """
         return self._client.paginate_stream_index(self, index, startkey,
@@ -493,8 +528,8 @@ class RiakBucket(object):
                                                   term_regex=term_regex)
 
     def delete(self, key, **kwargs):
-        """Deletes an object from riak. Short hand for
-        bucket.new(key).delete(). See :meth:`RiakClient.delete()
+        """Deletes a key from Riak. Short hand for
+        ``bucket.new(key).delete()``. See :meth:`RiakClient.delete()
         <riak.client.RiakClient.delete>` for options.
 
         :param key: The key for the object
@@ -509,6 +544,10 @@ class RiakBucket(object):
         :meth:`RiakClient.get_counter()
         <riak.client.RiakClient.get_counter>` for options.
 
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
+
         :param key: the key of the counter
         :type key: string
         :rtype: int
@@ -522,6 +561,9 @@ class RiakBucket(object):
         :meth:`RiakClient.update_counter()
         <riak.client.RiakClient.update_counter>` for options.
 
+        .. deprecated:: 2.1.0 (Riak 2.0) Riak 1.4-style counters are
+           deprecated in favor of the :class:`~riak.datatypes.Counter`
+           datatype.
 
         :param key: the key of the counter
         :type key: string
@@ -552,7 +594,8 @@ class BucketType(object):
         """
         Returns a new ``BucketType`` instance.
 
-        :param client: A :class:`RiakClient <riak.client.RiakClient>` instance
+        :param client: A :class:`RiakClient <riak.client.RiakClient>`
+               instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
         :param name: The bucket-type's name
         :type name: string
@@ -562,10 +605,10 @@ class BucketType(object):
 
     def is_default(self):
         """
-        Whether this bucket type is the default type, or a
-        user-defined type.
+        Whether this bucket type is the default type, or a user-defined type.
 
         :rtype: bool
+
         """
         return self.name == 'default'
 
@@ -630,7 +673,8 @@ class BucketType(object):
 
         :param timeout: a timeout value in milliseconds
         :type timeout: int
-        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>` instances
+        :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>`
+                instances
         """
         return self._client.get_buckets(bucket_type=self, timeout=timeout)
 
@@ -638,6 +682,10 @@ class BucketType(object):
         """
         Streams the list of buckets under this bucket-type. This is a
         generator method that should be iterated over.
+
+        The caller must close the stream when finished.  See
+        :meth:`RiakClient.stream_buckets()
+        <riak.client.RiakClient.stream_buckets>` for more details.
 
         .. warning:: Do not use this in production, as it requires
            traversing through all keys stored in a cluster.
@@ -653,6 +701,8 @@ class BucketType(object):
     def datatype(self):
         """
         The assigned datatype for this bucket type, if present.
+
+        :rtype: None or string
         """
         if self.is_default():
             return None

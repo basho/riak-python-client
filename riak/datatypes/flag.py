@@ -26,13 +26,13 @@ class Flag(Datatype):
 
     def enable(self):
         """
-        Turns the flag on, effectively setting its value to 'True'.
+        Turns the flag on, effectively setting its value to ``True``.
         """
         self._op = 'enable'
 
     def disable(self):
         """
-        Turns the flag off, effectively setting its value to 'False'.
+        Turns the flag off, effectively setting its value to ``False``.
         """
         self._require_context()
         self._op = 'disable'

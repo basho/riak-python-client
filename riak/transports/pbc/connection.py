@@ -126,8 +126,7 @@ class RiakPbcConnection(object):
                 # ssl handshake successful
                 self._socket = ssl_socket
 
-                if self._client._credentials.has_credential('crl'):
-                    self._client._credentials.check_revoked_cert(ssl_socket)
+                self._client._credentials._check_revoked_cert(ssl_socket)
 
                 return True
             except Exception as e:

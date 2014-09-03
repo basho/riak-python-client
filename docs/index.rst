@@ -55,5 +55,7 @@ Contents
    client
    bucket
    object
+   datatypes
    query
+   security
    advanced
