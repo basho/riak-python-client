@@ -106,14 +106,16 @@ Even if you are using Trust authentication or the PAM module doesn't
 require a password, you must supply one to the client API. From the
 client's perspective, these are equivalent to Password authentication.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Password-based authentication
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+Password Authentication
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The next level of security would be simply a username and password for
 `Password-based Authentication
 <http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Password-based-Authentication>`_.
-The server needs to first have a user and a ``password`` security source::
+The server needs to first have a user and a ``password`` security source:
+
+.. code:: bash
 
     riak-admin security add-user riakuser password=captheorem4life
     riak-admin security add-source riakuser 127.0.0.1/32 password
