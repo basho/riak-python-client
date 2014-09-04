@@ -33,7 +33,7 @@ class TypedMapView(Mapping):
         for key in self.map.value:
             name, datatype = key
             if datatype == self.datatype:
-                yield self.map[key]
+                yield name
 
     def __len__(self):
         """
