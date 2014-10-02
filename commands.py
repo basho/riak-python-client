@@ -362,6 +362,7 @@ class preconfigure(Command):
         * ssl.certfile = $pwd/tests/resources/server.crt
         * ssl.keyfile = $pwd/tests/resources/server.key
         * ssl.cacertfile = $pwd/tests/resources/ca.crt
+        * check_crl = off
     """
 
     description = "preconfigure security settings used in integration tests"
@@ -421,6 +422,7 @@ class preconfigure(Command):
         conf = re.sub(r'listener.protobuf.internal\s+=\s+\S+',
                       r'listener.protobuf.internal = ' + pb_host,
                       conf)
+        conf += 'check_crl = off\n'
         f = open(self.riak_conf, 'w', False)
         f.write(conf)
         f.close()

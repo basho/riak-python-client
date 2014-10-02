@@ -2,7 +2,7 @@ RIAK_CONF = ${RIAK_DIR}/etc/riak.conf
 # ADVANCED_CONF = ${RIAK_DIR}/etc/advanced.config
 # RIAK = ${RIAK_DIR}/bin/riak
 RIAK_ADMIN = ${RIAK_DIR}/bin/riak-admin
-# CERTS_DIR = $(shell pwd)/../src/test/resources
+CERTS_DIR = $(shell pwd)/../riak/tests/resources
 
 preconfigure:
 	@../setup.py preconfigure --riak-conf=${RIAK_CONF}
@@ -18,6 +18,8 @@ lint:
 	@pip install --upgrade pep8 pyflakes
 	@cd ..; pep8 riak *.py
 	@cd ..; pyflakes riak *.py
+	@openssl verify -CAfile ${CERTS_DIR}/ca.crt ${CERTS_DIR}/client.crt
+	@openssl verify -CAfile ${CERTS_DIR}/ca.crt ${CERTS_DIR}/server.crt
 
 test: test_normal test_security
 
