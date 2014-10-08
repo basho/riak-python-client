@@ -136,8 +136,8 @@ class create_bucket_types(Command):
         except CalledProcessError as e:
             status = e.output
 
-        exists = ('not an existing bucket type' not in status)
-        active = ('is active' in status)
+        exists = ('not an existing bucket type' not in status.decode('ascii'))
+        active = ('is active' in status.decode('ascii'))
 
         if exists or active:
             log.info("Updating {0} bucket-type with props {1}"
@@ -146,8 +146,6 @@ class create_bucket_types(Command):
                                      json.dumps({'props': props},
                                                 separators=(',', ':')))
         else:
-            print name
-            print props
             log.info("Creating {0} bucket-type with props {1}"
                      .format(repr(name), repr(props)))
             self.check_btype_command("create", name,
@@ -395,7 +393,7 @@ class preconfigure(Command):
         https_host = self.host + ':' + self.https_port
         pb_host = self.host + ':' + self.pb_port
         self._backup_file(self.riak_conf)
-        f = open(self.riak_conf, 'r', False)
+        f = open(self.riak_conf, 'r', buffering=1)
         conf = f.read()
         f.close()
         conf = re.sub(r'search\s+=\s+off', r'search = on', conf)
@@ -423,7 +421,7 @@ class preconfigure(Command):
                       r'listener.protobuf.internal = ' + pb_host,
                       conf)
         conf += 'check_crl = off\n'
-        f = open(self.riak_conf, 'w', False)
+        f = open(self.riak_conf, 'w', buffering=1)
         f.write(conf)
         f.close()
 
