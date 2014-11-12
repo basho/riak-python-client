@@ -20,10 +20,11 @@ under the License.
 import base64
 import random
 import threading
-import platform
 import os
 import json
-from feature_detect import FeatureDetection
+import platform
+from six import PY2
+from riak.transports.feature_detect import FeatureDetection
 
 
 class RiakTransport(FeatureDetection):
@@ -46,8 +47,13 @@ class RiakTransport(FeatureDetection):
         """
         Returns a random client identifier
         """
-        return ('py_%s' %
-                base64.b64encode(str(random.randint(1, 0x40000000))))
+        if PY2:
+            return ('py_%s' %
+                    base64.b64encode(str(random.randint(1, 0x40000000))))
+        else:
+            return ('py_%s' %
+                    base64.b64encode(bytes(str(random.randint(1, 0x40000000)),
+                                     'ascii')))
 
     @classmethod
     def make_fixed_client_id(self):

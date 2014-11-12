@@ -23,11 +23,14 @@ import riak_pb
 from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
-from riak.util import decode_index_value
-from connection import RiakPbcConnection
-from stream import (RiakPbcKeyStream, RiakPbcMapredStream, RiakPbcBucketStream,
-                    RiakPbcIndexStream)
-from codec import RiakPbcCodec
+from riak.util import decode_index_value, str_to_bytes, bytes_to_str
+from riak.transports.pbc.connection import RiakPbcConnection
+from riak.transports.pbc.stream import (RiakPbcKeyStream,
+                                        RiakPbcMapredStream,
+                                        RiakPbcBucketStream,
+                                        RiakPbcIndexStream)
+from riak.transports.pbc.codec import RiakPbcCodec
+from six import PY2, PY3
 
 from riak_pb.messages import (
     MSG_CODE_PING_REQ,
@@ -102,7 +105,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     # FeatureDetection API
     def _server_version(self):
-        return self.get_server_info()['server_version']
+        return bytes_to_str(self.get_server_info()['server_version'])
 
     def ping(self):
         """
@@ -121,16 +124,17 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         """
         msg_code, resp = self._request(MSG_CODE_GET_SERVER_INFO_REQ,
                                        expect=MSG_CODE_GET_SERVER_INFO_RESP)
-        return {'node': resp.node, 'server_version': resp.server_version}
+        return {'node': bytes_to_str(resp.node),
+                'server_version': bytes_to_str(resp.server_version)}
 
     def _get_client_id(self):
         msg_code, resp = self._request(MSG_CODE_GET_CLIENT_ID_REQ,
                                        expect=MSG_CODE_GET_CLIENT_ID_RESP)
-        return resp.client_id
+        return bytes_to_str(resp.client_id)
 
     def _set_client_id(self, client_id):
         req = riak_pb.RpbSetClientIdReq()
-        req.client_id = client_id
+        req.client_id = str_to_bytes(client_id)
 
         msg_code, resp = self._request(MSG_CODE_SET_CLIENT_ID_REQ, req,
                                        MSG_CODE_SET_CLIENT_ID_RESP)
@@ -162,10 +166,10 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if self.tombstone_vclocks():
             req.deletedvclock = True
 
-        req.bucket = bucket.name
+        req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
 
-        req.key = robj.key
+        req.key = str_to_bytes(robj.key)
 
         msg_code, resp = self._request(MSG_CODE_GET_REQ, req,
                                        MSG_CODE_GET_RESP)
@@ -202,11 +206,11 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if self.client_timeouts() and timeout:
             req.timeout = timeout
 
-        req.bucket = bucket.name
+        req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
 
         if robj.key:
-            req.key = robj.key
+            req.key = str_to_bytes(robj.key)
         if robj.vclock:
             req.vclock = robj.vclock.encode('binary')
 
@@ -217,7 +221,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         if resp is not None:
             if resp.HasField('key'):
-                robj.key = resp.key
+                robj.key = bytes_to_str(resp.key)
             if resp.HasField("vclock"):
                 robj.vclock = VClock(resp.vclock, 'binary')
             if resp.content:
@@ -252,9 +256,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             req.vclock = robj.vclock.encode('binary')
 
         bucket = robj.bucket
-        req.bucket = bucket.name
+        req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
-        req.key = robj.key
+        req.key = str_to_bytes(robj.key)
 
         msg_code, resp = self._request(MSG_CODE_DEL_REQ, req,
                                        MSG_CODE_DEL_RESP)
@@ -267,7 +271,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         keys = []
         for keylist in self.stream_keys(bucket, timeout=timeout):
             for key in keylist:
-                keys.append(key)
+                keys.append(bytes_to_str(key))
 
         return keys
 
@@ -277,7 +281,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         lists of keys.
         """
         req = riak_pb.RpbListKeysReq()
-        req.bucket = bucket.name
+        req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
         if self.client_timeouts() and timeout:
             req.timeout = timeout
@@ -326,7 +330,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         Serialize bucket property request and deserialize response
         """
         req = riak_pb.RpbGetBucketReq()
-        req.bucket = bucket.name
+        req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
 
         msg_code, resp = self._request(MSG_CODE_GET_BUCKET_REQ, req,
@@ -339,7 +343,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         Serialize set bucket property request and deserialize response
         """
         req = riak_pb.RpbSetBucketReq()
-        req.bucket = bucket.name
+        req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
 
         if not self.pb_all_bucket_props():
@@ -362,7 +366,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             return False
 
         req = riak_pb.RpbResetBucketReq()
-        req.bucket = bucket.name
+        req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
         self._request(MSG_CODE_RESET_BUCKET_REQ, req,
                       MSG_CODE_RESET_BUCKET_RESP)
@@ -375,7 +379,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._check_bucket_types(bucket_type)
 
         req = riak_pb.RpbGetBucketTypeReq()
-        req.type = bucket_type.name
+        req.type = str_to_bytes(bucket_type.name)
 
         msg_code, resp = self._request(MSG_CODE_GET_BUCKET_TYPE_REQ, req,
                                        MSG_CODE_GET_BUCKET_RESP)
@@ -389,7 +393,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._check_bucket_types(bucket_type)
 
         req = riak_pb.RpbSetBucketTypeReq()
-        req.type = bucket_type.name
+        req.type = str_to_bytes(bucket_type.name)
 
         self._encode_bucket_props(props, req)
 
@@ -421,8 +425,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         content = self._construct_mapred_json(inputs, query, timeout)
 
         req = riak_pb.RpbMapRedReq()
-        req.request = content
-        req.content_type = "application/json"
+        req.request = str_to_bytes(content)
+        req.content_type = str_to_bytes("application/json")
 
         self._send_msg(MSG_CODE_MAP_RED_REQ, req)
 
@@ -446,13 +450,16 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                                        MSG_CODE_INDEX_RESP)
 
         if return_terms and resp.results:
-            results = [(decode_index_value(index, pair.key), pair.value)
+            results = [(decode_index_value(index, pair.key),
+                        bytes_to_str(pair.value))
                        for pair in resp.results]
         else:
             results = resp.keys[:]
+            if PY3:
+                results = [bytes_to_str(key) for key in resp.keys]
 
         if max_results is not None and resp.HasField('continuation'):
-            return (results, resp.continuation)
+            return (results, bytes_to_str(resp.continuation))
         else:
             return (results, None)
 
@@ -480,9 +487,10 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search_admin():
             raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
+        index = str_to_bytes(index)
         idx = riak_pb.RpbYokozunaIndex(name=index)
         if schema:
-            idx.schema = schema
+            idx.schema = str_to_bytes(schema)
         if n_val:
             idx.n_val = n_val
         req = riak_pb.RpbYokozunaIndexPutReq(index=idx)
@@ -495,7 +503,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search_admin():
             raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
-        req = riak_pb.RpbYokozunaIndexGetReq(name=index)
+        req = riak_pb.RpbYokozunaIndexGetReq(name=str_to_bytes(index))
 
         msg_code, resp = self._request(MSG_CODE_YOKOZUNA_INDEX_GET_REQ, req,
                                        MSG_CODE_YOKOZUNA_INDEX_GET_RESP)
@@ -519,7 +527,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search_admin():
             raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
-        req = riak_pb.RpbYokozunaIndexDeleteReq(name=index)
+        req = riak_pb.RpbYokozunaIndexDeleteReq(name=str_to_bytes(index))
 
         self._request(MSG_CODE_YOKOZUNA_INDEX_DELETE_REQ, req,
                       MSG_CODE_DEL_RESP)
@@ -530,7 +538,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search_admin():
             raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
-        scma = riak_pb.RpbYokozunaSchema(name=schema, content=content)
+        scma = riak_pb.RpbYokozunaSchema(name=str_to_bytes(schema),
+                                         content=str_to_bytes(content))
         req = riak_pb.RpbYokozunaSchemaPutReq(schema=scma)
 
         self._request(MSG_CODE_YOKOZUNA_SCHEMA_PUT_REQ, req,
@@ -541,23 +550,24 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search_admin():
             raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
-        req = riak_pb.RpbYokozunaSchemaGetReq(name=schema)
+        req = riak_pb.RpbYokozunaSchemaGetReq(name=str_to_bytes(schema))
 
         msg_code, resp = self._request(MSG_CODE_YOKOZUNA_SCHEMA_GET_REQ, req,
                                        MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP)
         result = {}
-        result['name'] = resp.schema.name
-        result['content'] = resp.schema.content
+        result['name'] = bytes_to_str(resp.schema.name)
+        result['content'] = bytes_to_str(resp.schema.content)
         return result
 
     def search(self, index, query, **params):
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
 
-        if isinstance(query, unicode):
+        if PY2 and isinstance(query, unicode):
             query = query.encode('utf8')
 
-        req = riak_pb.RpbSearchQueryReq(index=index, q=query)
+        req = riak_pb.RpbSearchQueryReq(index=str_to_bytes(index),
+                                        q=str_to_bytes(query))
         self._encode_search_query(req, params)
 
         msg_code, resp = self._request(MSG_CODE_SEARCH_QUERY_REQ, req,
@@ -581,8 +591,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             raise NotImplementedError("Counters are not supported")
 
         req = riak_pb.RpbCounterGetReq()
-        req.bucket = bucket.name
-        req.key = key
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
         if params.get('r') is not None:
             req.r = self._encode_quorum(params['r'])
         if params.get('pr') is not None:
@@ -609,8 +619,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             raise NotImplementedError("Counters are not supported")
 
         req = riak_pb.RpbCounterUpdateReq()
-        req.bucket = bucket.name
-        req.key = key
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
         req.amount = value
         if params.get('w') is not None:
             req.w = self._encode_quorum(params['w'])
@@ -638,9 +648,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             raise NotImplementedError("Datatypes are not supported.")
 
         req = riak_pb.DtFetchReq()
-        req.type = bucket.bucket_type.name
-        req.bucket = bucket.name
-        req.key = key
+        req.type = str_to_bytes(bucket.bucket_type.name)
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
         self._encode_dt_options(req, options)
 
         msg_code, resp = self._request(MSG_CODE_DT_FETCH_REQ, req,
@@ -664,11 +674,11 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                              format(datatype))
 
         req = riak_pb.DtUpdateReq()
-        req.bucket = datatype.bucket.name
-        req.type = datatype.bucket.bucket_type.name
+        req.bucket = str_to_bytes(datatype.bucket.name)
+        req.type = str_to_bytes(datatype.bucket.bucket_type.name)
 
         if datatype.key:
-            req.key = datatype.key
+            req.key = str_to_bytes(datatype.key)
         if datatype._context:
             req.context = datatype._context
 

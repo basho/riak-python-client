@@ -20,7 +20,11 @@ from riak.transports.pool import BadResource
 from riak.transports.pbc import is_retryable as is_pbc_retryable
 from riak.transports.http import is_retryable as is_http_retryable
 import threading
-import httplib
+from six import PY2
+if PY2:
+    from httplib import HTTPException
+else:
+    from http.client import HTTPException
 
 #: The default (global) number of times to retry requests that are
 #: retryable. This can be modified locally, per-thread, via the
@@ -132,7 +136,7 @@ class RiakClientTransport(object):
                 with pool.transaction(_filter=_skip_bad_nodes) as transport:
                     try:
                         return fn(transport)
-                    except (IOError, httplib.HTTPException) as e:
+                    except (IOError, HTTPException) as e:
                         if _is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)

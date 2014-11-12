@@ -16,20 +16,50 @@ specific language governing permissions and limitations
 under the License.
 """
 
-import OpenSSL.SSL
-from OpenSSL import crypto
 import warnings
+from six import PY2
 from riak import RiakError
+from riak.util import str_to_long
 
 OPENSSL_VERSION_101G = 268439679
-sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
-# Be sure to use at least OpenSSL 1.0.1g
-if (sslver < OPENSSL_VERSION_101G) or \
-        not hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
-    verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
-    msg = "Found {0} version, but expected at least OpenSSL 1.0.1g.  " \
-          "Security may not support TLS 1.2.".format(verstring)
-    warnings.warn(msg, UserWarning)
+if PY2:
+    import OpenSSL.SSL
+    from OpenSSL import crypto
+    sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
+    # Be sure to use at least OpenSSL 1.0.1g
+    if (sslver < OPENSSL_VERSION_101G) or \
+            not hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
+        verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
+        msg = "Found {0} version, but expected at least OpenSSL 1.0.1g.  " \
+              "Security may not support TLS 1.2.".format(verstring)
+        warnings.warn(msg, UserWarning)
+    if hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_2_METHOD
+    elif hasattr(OpenSSL.SSL, 'TLSv1_1_METHOD'):
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_1_METHOD
+    elif hasattr(OpenSSL.SSL, 'TLSv1_METHOD'):
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_METHOD
+    else:
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.SSLv23_METHOD
+else:
+    import ssl
+
+    sslver = ssl.OPENSSL_VERSION_NUMBER
+    # Be sure to use at least OpenSSL 1.0.1g
+    if sslver < OPENSSL_VERSION_101G or \
+       not hasattr(ssl, 'PROTOCOL_TLSv1_2'):
+        verstring = ssl.OPENSSL_VERSION
+        msg = "Found {0} version, but expected at least OpenSSL 1.0.1g.  " \
+              "Security may not support TLS 1.2.".format(verstring)
+        warnings.warn(msg, UserWarning)
+    if hasattr(ssl, 'PROTOCOL_TLSv1_2'):
+        DEFAULT_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
+    elif hasattr(ssl, 'PROTOCOL_TLSv1_1'):
+        DEFAULT_TLS_VERSION = ssl.PROTOCOL_TLSv1_1
+    elif hasattr(ssl, 'PROTOCOL_TLSv1'):
+        DEFAULT_TLS_VERSION = ssl.PROTOCOL_TLSv1
+    else:
+        DEFAULT_TLS_VERSION = ssl.PROTOCOL_SSLv23
 
 
 class SecurityError(RiakError):
@@ -53,7 +83,7 @@ class SecurityCreds:
                  crl_file=None,
                  crl=None,
                  ciphers=None,
-                 ssl_version=OpenSSL.SSL.TLSv1_2_METHOD):
+                 ssl_version=DEFAULT_TLS_VERSION):
         """
         Container class for security-related settings
 
@@ -114,40 +144,40 @@ class SecurityCreds:
         return self._password
 
     @property
-    def pkey(self):
+    def pkey_file(self):
         """
-        Client Private key
+        Client Private Key file
 
-        :rtype: :class:`OpenSSL.crypto.PKey`
+        :rtype: str
         """
-        return self._cached_cert('_pkey', crypto.load_privatekey)
-
-    @property
-    def cert(self):
-        """
-        Client Certificate
-
-        :rtype: :class:`OpenSSL.crypto.X509`
-        """
-        return self._cached_cert('_cert', crypto.load_certificate)
+        return self._pkey_file
 
     @property
-    def cacert(self):
+    def cert_file(self):
         """
-        Certifying Authority (CA) Certificate
+        Client Certificate file
 
-        :rtype: :class:`OpenSSL.crypto.X509`
+        :rtype: str
         """
-        return self._cached_cert('_cacert', crypto.load_certificate)
+        return self._cert_file
 
     @property
-    def crl(self):
+    def cacert_file(self):
         """
-        Certificate Revocation List
+        Certifying Authority (CA) Certificate file
 
-        :rtype: :class:`OpenSSL.crypto.CRL`
+        :rtype: str
         """
-        return self._cached_cert('_crl', crypto.load_crl)
+        return self._cacert_file
+
+    @property
+    def crl_file(self):
+        """
+        Certificate Revocation List file
+
+        :rtype: str
+        """
+        return self._crl_file
 
     @property
     def ciphers(self):
@@ -167,36 +197,74 @@ class SecurityCreds:
         """
         return self._ssl_version
 
-    def _cached_cert(self, key, loader):
-        # If the key is associated with a file, then lazily load and cache it
-        key_file = getattr(self, key + "_file")
-        if (getattr(self, key) is None) and (key_file is not None):
-            cert_list = []
-            # The _file may be a list of files
-            if not isinstance(key_file, list):
-                key_file = [key_file]
-            for filename in key_file:
-                with open(filename, 'r') as f:
-                    cert_list.append(loader(OpenSSL.SSL.FILETYPE_PEM,
-                                            f.read()))
-            # If it is not a list, just store the first element
-            if len(cert_list) == 1:
-                cert_list = cert_list[0]
-            setattr(self, key, cert_list)
-        return getattr(self, key)
+    if PY2:
+        @property
+        def pkey(self):
+            """
+            Client Private key
 
-    def _has_credential(self, key):
-        """
-        ``True`` if a credential or filename value has been supplied for the
-        given property.
+            :rtype: :class:`OpenSSL.crypto.PKey`
+            """
+            return self._cached_cert('_pkey', crypto.load_privatekey)
 
-        :param key: which configuration property to check for
-        :type key: str
-        :rtype: bool
-        """
-        internal_key = "_" + key
-        return (getattr(self, internal_key) is not None) or \
-            (getattr(self, internal_key + "_file") is not None)
+        @property
+        def cert(self):
+            """
+            Client Certificate
+
+            :rtype: :class:`OpenSSL.crypto.X509`
+            """
+            return self._cached_cert('_cert', crypto.load_certificate)
+
+        @property
+        def cacert(self):
+            """
+            Certifying Authority (CA) Certificate
+
+            :rtype: :class:`OpenSSL.crypto.X509`
+            """
+            return self._cached_cert('_cacert', crypto.load_certificate)
+
+        @property
+        def crl(self):
+            """
+            Certificate Revocation List
+
+            :rtype: :class:`OpenSSL.crypto.CRL`
+            """
+            return self._cached_cert('_crl', crypto.load_crl)
+
+        def _cached_cert(self, key, loader):
+            # If the key is associated with a file,
+            # then lazily load and cache it
+            key_file = getattr(self, key + "_file")
+            if (getattr(self, key) is None) and (key_file is not None):
+                cert_list = []
+                # The _file may be a list of files
+                if not isinstance(key_file, list):
+                    key_file = [key_file]
+                for filename in key_file:
+                    with open(filename, 'r') as f:
+                        cert_list.append(loader(OpenSSL.SSL.FILETYPE_PEM,
+                                                f.read()))
+                # If it is not a list, just store the first element
+                if len(cert_list) == 1:
+                    cert_list = cert_list[0]
+                setattr(self, key, cert_list)
+            return getattr(self, key)
+
+        def _has_credential(self, key):
+            """
+            ``True`` if a credential or filename value has been supplied for
+            the given property.
+
+            :param key: which configuration property to check for
+            :type key: str
+            :rtype: bool
+            """
+            internal_key = "_" + key
+            return (getattr(self, internal_key) is not None) or \
+                (getattr(self, internal_key + "_file") is not None)
 
     def _check_revoked_cert(self, ssl_socket):
         """
@@ -213,5 +281,5 @@ class SecurityCreds:
         servcert = ssl_socket.get_peer_certificate()
         servserial = servcert.get_serial_number()
         for rev in self.crl.get_revoked():
-            if servserial == long(rev.get_serial(), 16):
+            if servserial == str_to_long(rev.get_serial(), 16):
                 raise SecurityError("Server certificate has been revoked")

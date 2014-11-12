@@ -1,5 +1,6 @@
 from collections import Sized
 from riak.datatypes.datatype import Datatype
+from six import string_types
 
 
 class Register(Sized, Datatype):
@@ -57,7 +58,7 @@ class Register(Sized, Datatype):
         return len(self.value)
 
     def _check_type(self, new_value):
-        return isinstance(new_value, basestring)
+        return isinstance(new_value, string_types)
 
 
 from riak.datatypes import TYPES

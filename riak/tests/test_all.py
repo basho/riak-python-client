@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import random
 import platform
+from six import PY2
 from threading import Thread
-from Queue import Queue
-
+if PY2:
+    from Queue import Queue
+else:
+    from queue import Queue
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
@@ -27,7 +30,7 @@ from riak.tests.test_datatypes import DatatypeIntegrationTests
 
 from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
     HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
-    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS, SKIP_POOL
+    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS, SKIP_POOL, test_six
 
 testrun_search_bucket = None
 testrun_props_bucket = None
@@ -244,14 +247,22 @@ class ClientTests(object):
         """
         keys = [self.key_name, self.randname(), self.randname()]
         for key in keys:
-            self.client.bucket(self.bucket_name)\
-                .new(key, encoded_data=key, content_type="text/plain")\
-                .store()
+            if PY2:
+                self.client.bucket(self.bucket_name)\
+                    .new(key, encoded_data=key, content_type="text/plain")\
+                    .store()
+            else:
+                self.client.bucket(self.bucket_name)\
+                    .new(key, data=key,
+                         content_type="text/plain").store()
         results = self.client.bucket(self.bucket_name).multiget(keys)
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
             self.assertTrue(obj.exists)
-            self.assertEqual(obj.key, obj.encoded_data)
+            if PY2:
+                self.assertEqual(obj.key, obj.encoded_data)
+            else:
+                self.assertEqual(obj.key, obj.data)
 
     def test_multiget_errors(self):
         """
@@ -267,7 +278,10 @@ class ClientTests(object):
             self.assertEqual(failure[0], 'default')
             self.assertEqual(failure[1], self.bucket_name)
             self.assertIn(failure[2], keys)
-            self.assertIsInstance(failure[3], StandardError)
+            if PY2:
+                self.assertIsInstance(failure[3], StandardError)
+            else:
+                self.assertIsInstance(failure[3], Exception)
 
     def test_multiget_notfounds(self):
         """
@@ -290,15 +304,23 @@ class ClientTests(object):
 
         keys = [self.key_name, self.randname(), self.randname()]
         for key in keys:
-            client.bucket(self.bucket_name)\
-                .new(key, encoded_data=key, content_type="text/plain")\
-                .store()
+            if PY2:
+                client.bucket(self.bucket_name)\
+                    .new(key, encoded_data=key, content_type="text/plain")\
+                    .store()
+            else:
+                client.bucket(self.bucket_name)\
+                    .new(key, data=key, content_type="text/plain")\
+                    .store()
 
         results = client.bucket(self.bucket_name).multiget(keys)
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
             self.assertTrue(obj.exists)
-            self.assertEqual(obj.key, obj.encoded_data)
+            if PY2:
+                self.assertEqual(obj.key, obj.encoded_data)
+            else:
+                self.assertEqual(obj.key, obj.data)
 
     @unittest.skipIf(SKIP_POOL, 'SKIP_POOL is set')
     def test_pool_close(self):
@@ -335,7 +357,8 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                SecurityTests,
                                DatatypeIntegrationTests,
                                BaseTestCase,
-                               unittest.TestCase):
+                               unittest.TestCase,
+                               test_six.Comparison):
 
     def setUp(self):
         if not HAVE_PROTO:
@@ -370,7 +393,8 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 SecurityTests,
                                 DatatypeIntegrationTests,
                                 BaseTestCase,
-                                unittest.TestCase):
+                                unittest.TestCase,
+                                test_six.Comparison):
 
     def setUp(self):
         self.host = HTTP_HOST

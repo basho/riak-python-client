@@ -1,10 +1,9 @@
 # (c) 2005 Ian Bicking and contributors; written for Paste
 # (http://pythonpaste.org) Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license.php
-from UserDict import DictMixin
 
 
-class MultiDict(DictMixin):
+class MultiDict(dict):
 
     """
     An ordered dictionary that can have multiple values for each key.
@@ -20,13 +19,13 @@ class MultiDict(DictMixin):
             if hasattr(args[0], 'iteritems'):
                 items = list(args[0].iteritems())
             elif hasattr(args[0], 'items'):
-                items = args[0].items()
+                items = list(args[0].items())
             else:
                 items = list(args[0])
             self._items = items
         else:
             self._items = []
-        self._items.extend(kw.iteritems())
+        self._items.extend(list(kw.items()))
 
     def __getitem__(self, key):
         for k, v in self._items:

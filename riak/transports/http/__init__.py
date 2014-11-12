@@ -16,18 +16,35 @@ specific language governing permissions and limitations
 under the License.
 """
 
-import OpenSSL.SSL
-import httplib
 import socket
 import select
+from six import PY2
+if PY2:
+    import OpenSSL.SSL
+    from httplib import HTTPConnection, \
+        NotConnected, \
+        IncompleteRead, \
+        ImproperConnectionState, \
+        BadStatusLine, \
+        HTTPSConnection
+    from riak.transports.security import RiakWrappedSocket,\
+        configure_pyopenssl_context
+else:
+    from http.client import HTTPConnection, \
+        HTTPSConnection, \
+        NotConnected, \
+        IncompleteRead, \
+        ImproperConnectionState, \
+        BadStatusLine
+    import ssl
+    from riak.transports.security import configure_ssl_context
 
 from riak.security import SecurityError
-from riak.transports.security import RiakWrappedSocket, configure_context
 from riak.transports.pool import Pool
 from riak.transports.http.transport import RiakHttpTransport
 
 
-class NoNagleHTTPConnection(httplib.HTTPConnection):
+class NoNagleHTTPConnection(HTTPConnection):
     """
     Setup a connection class which does not use Nagle - deal with
     latency on PUT requests lower than MTU
@@ -36,20 +53,19 @@ class NoNagleHTTPConnection(httplib.HTTPConnection):
         """
         Set TCP_NODELAY on socket
         """
-        httplib.HTTPConnection.connect(self)
+        HTTPConnection.connect(self)
         self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
 
 # Inspired by
 # http://code.activestate.com/recipes/577548-https-httplib-client-connection-with-certificate-v/
-class RiakHTTPSConnection(httplib.HTTPSConnection):
+class RiakHTTPSConnection(HTTPSConnection):
     def __init__(self,
                  host,
                  port,
                  credentials,
                  pkey_file=None,
                  cert_file=None,
-                 ciphers=None,
                  timeout=None):
         """
         Class to make a HTTPS connection,
@@ -65,16 +81,21 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         :type pkey_file: str
         :param cert_file: PEM formatted certificate chain file
         :type cert_file: str
-        :param ciphers: List of supported SSL ciphers
-        :type ciphers: str
         :param timeout: Number of seconds before timing out
         :type timeout: int
         """
-        httplib.HTTPSConnection.__init__(self,
-                                         host,
-                                         port,
-                                         key_file=pkey_file,
-                                         cert_file=cert_file)
+        if PY2:
+            HTTPSConnection.__init__(self,
+                                     host,
+                                     port,
+                                     key_file=pkey_file,
+                                     cert_file=cert_file)
+        else:
+            super(RiakHTTPSConnection, self). \
+                __init__(host=host,
+                         port=port,
+                         key_file=credentials._pkey_file,
+                         cert_file=credentials._cert_file)
         self.pkey_file = pkey_file
         self.cert_file = cert_file
         self.credentials = credentials
@@ -85,24 +106,35 @@ class RiakHTTPSConnection(httplib.HTTPSConnection):
         Connect to a host on a given (SSL) port using PyOpenSSL.
         """
         sock = socket.create_connection((self.host, self.port), self.timeout)
-        ssl_ctx = OpenSSL.SSL.Context(self.credentials.ssl_version)
-        configure_context(ssl_ctx, self.credentials)
+        if PY2:
+            ssl_ctx = configure_pyopenssl_context(self.credentials)
 
-        # attempt to upgrade the socket to SSL
-        cxn = OpenSSL.SSL.Connection(ssl_ctx, sock)
-        cxn.set_connect_state()
-        while True:
-            try:
-                cxn.do_handshake()
-            except OpenSSL.SSL.WantReadError:
-                select.select([sock], [], [])
-                continue
-            except OpenSSL.SSL.Error as e:
-                raise SecurityError('bad handshake - ' + str(e))
-            break
+            # attempt to upgrade the socket to TLS
+            cxn = OpenSSL.SSL.Connection(ssl_ctx, sock)
+            cxn.set_connect_state()
+            while True:
+                try:
+                    cxn.do_handshake()
+                except OpenSSL.SSL.WantReadError:
+                    select.select([sock], [], [])
+                    continue
+                except OpenSSL.SSL.Error as e:
+                    raise SecurityError('bad handshake - ' + str(e))
+                break
 
-        self.sock = RiakWrappedSocket(cxn, sock)
-        self.credentials._check_revoked_cert(self.sock)
+            self.sock = RiakWrappedSocket(cxn, sock)
+            self.credentials._check_revoked_cert(self.sock)
+        else:
+            ssl_ctx = configure_ssl_context(self.credentials)
+            host = "riak@" + self.host
+            self.sock = ssl.SSLSocket(sock=sock,
+                                      keyfile=self.credentials.pkey_file,
+                                      certfile=self.credentials.cert_file,
+                                      cert_reqs=ssl.CERT_REQUIRED,
+                                      ca_certs=self.credentials.cacert_file,
+                                      ciphers=self.credentials.ciphers,
+                                      server_hostname=host)
+            self.sock.context = ssl_ctx
 
 
 class RiakHttpPool(Pool):
@@ -130,10 +162,10 @@ class RiakHttpPool(Pool):
 
 
 CONN_CLOSED_ERRORS = (
-    httplib.NotConnected,
-    httplib.IncompleteRead,
-    httplib.ImproperConnectionState,
-    httplib.BadStatusLine
+    NotConnected,
+    IncompleteRead,
+    ImproperConnectionState,
+    BadStatusLine
 )
 
 

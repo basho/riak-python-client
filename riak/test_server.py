@@ -6,8 +6,10 @@ import random
 import shutil
 import socket
 import time
+import stat
 from subprocess import Popen, PIPE
 from riak.util import deep_merge
+from six import string_types
 
 try:
     bytes
@@ -35,7 +37,7 @@ class Atom(object):
 def erlang_config(hash, depth=1):
     def printable(item):
         k, v = item
-        if isinstance(v, str):
+        if isinstance(v, string_types):
             p = '"%s"' % v
         elif isinstance(v, dict):
             p = erlang_config(v, depth + 1)
@@ -191,7 +193,7 @@ class TestServer(object):
             try:
                 socket.create_connection((self._http_ip(), self._http_port()),
                                          1.0)
-            except socket.error, (value, message):
+            except IOError:
                 pass
             else:
                 listening = True
@@ -232,7 +234,9 @@ class TestServer(object):
 
                     temp_bin_file.write(line)
 
-                os.fchmod(temp_bin_file.fileno(), 0755)
+                os.fchmod(temp_bin_file.fileno(),
+                          stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP |
+                          stat.S_IROTH | stat.S_IXOTH)
 
     def write_vm_args(self):
         with open(self._vm_args_path(), 'wb') as vm_args:

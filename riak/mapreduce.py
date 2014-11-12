@@ -20,6 +20,7 @@ under the License.
 
 from collections import Iterable, namedtuple
 from riak import RiakError
+from six import string_types, PY2
 
 #: Links are just bucket/key/tag tuples, this class provides a
 #: backwards-compatible format: ``RiakLink(bucket, key, tag)``
@@ -98,7 +99,7 @@ class RiakMapReduce(object):
             raise ValueError('Already added a query, can\'t add an object.')
         else:
             if isinstance(key, Iterable) and \
-                    not isinstance(key, basestring):
+                    not isinstance(key, string_types):
                 for k in key:
                     self._inputs.append([bucket, k, data])
             else:
@@ -526,7 +527,7 @@ class RiakMapReducePhase(object):
         :type arg: string, dict, list
         """
         try:
-            if isinstance(function, basestring):
+            if isinstance(function, string_types) and PY2:
                 function = function.encode('ascii')
         except UnicodeError:
             raise TypeError('Unicode encoded functions are not supported.')
@@ -552,7 +553,7 @@ class RiakMapReducePhase(object):
             if isinstance(self._function, list):
                 stepdef['bucket'] = self._function[0]
                 stepdef['key'] = self._function[1]
-            elif isinstance(self._function, str):
+            elif isinstance(self._function, string_types):
                 if ("{" in self._function):
                     stepdef['source'] = self._function
                 else:
@@ -562,7 +563,8 @@ class RiakMapReducePhase(object):
             stepdef['module'] = self._function[0]
             stepdef['function'] = self._function[1]
 
-        elif (self._language == 'erlang' and isinstance(self._function, str)):
+        elif (self._language == 'erlang' and
+              isinstance(self._function, string_types)):
             stepdef['source'] = self._function
 
         return {self._type: stepdef}
@@ -615,7 +617,7 @@ class RiakKeyFilter(object):
         f1 = RiakKeyFilter().starts_with('2005')
         f2 = RiakKeyFilter().ends_with('-01')
         f3 = f1 & f2
-        print f3
+        print(f3)
         # => [['and', [['starts_with', '2005']], [['ends_with', '-01']]]]
     """
 

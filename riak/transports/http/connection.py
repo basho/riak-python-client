@@ -16,8 +16,13 @@ specific language governing permissions and limitations
 under the License.
 """
 
-import httplib
+from six import PY2
+if PY2:
+    from httplib import NotConnected, HTTPConnection
+else:
+    from http.client import NotConnected, HTTPConnection
 import base64
+from riak.util import str_to_bytes
 
 
 class RiakHttpConnection(object):
@@ -78,11 +83,11 @@ class RiakHttpConnection(object):
         """
         try:
             self._connection.close()
-        except httplib.NotConnected:
+        except NotConnected:
             pass
 
     # These are set by the RiakHttpTransport initializer
-    _connection_class = httplib.HTTPConnection
+    _connection_class = HTTPConnection
     _node = None
 
     def _security_auth_headers(self, username, password, headers):
@@ -97,6 +102,6 @@ class RiakHttpConnection(object):
         :type dict
         """
         userColonPassword = username + ":" + password
-        b64UserColonPassword = base64.b64encode(userColonPassword) \
-            .decode("ascii")
+        b64UserColonPassword = base64. \
+            b64encode(str_to_bytes(userColonPassword)).decode("ascii")
         headers['Authorization'] = 'Basic %s' % b64UserColonPassword

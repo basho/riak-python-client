@@ -17,13 +17,13 @@ under the License.
 """
 
 import json
-import string
 import re
 from cgi import parse_header
 from email import message_from_string
 from riak.util import decode_index_value
 from riak.client.index_page import CONTINUATION
 from riak import RiakError
+from six import PY2
 
 
 class RiakHttpStream(object):
@@ -44,9 +44,17 @@ class RiakHttpStream(object):
 
     def _read(self):
         chunk = self.response.read(self.BLOCK_SIZE)
-        if chunk == '':
-            self.response_done = True
-        self.buffer += chunk
+        if PY2:
+            if chunk == '':
+                self.response_done = True
+            self.buffer += chunk
+        else:
+            if chunk == b'':
+                self.response_done = True
+            self.buffer += chunk.decode('utf-8')
+
+    def __next__(self):
+        raise NotImplementedError
 
     def next(self):
         raise NotImplementedError
@@ -62,11 +70,12 @@ class RiakHttpJsonStream(RiakHttpStream):
     _json_field = None
 
     def next(self):
+        # Python 2.x Version
         while '}' not in self.buffer and not self.response_done:
             self._read()
 
         if '}' in self.buffer:
-            idx = string.index(self.buffer, '}') + 1
+            idx = self.buffer.index('}') + 1
             chunk = self.buffer[:idx]
             self.buffer = self.buffer[idx:]
             jsdict = json.loads(chunk)
@@ -77,6 +86,10 @@ class RiakHttpJsonStream(RiakHttpStream):
             return field
         else:
             raise StopIteration
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
 
 
 class RiakHttpKeyStream(RiakHttpJsonStream):
@@ -122,6 +135,10 @@ class RiakHttpMultipartStream(RiakHttpStream):
         else:
             raise StopIteration
 
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
+
     def try_match(self):
         self.next_boundary = self.boundary_re.search(self.buffer)
         return self.next_boundary
@@ -147,6 +164,10 @@ class RiakHttpMapReduceStream(RiakHttpMultipartStream):
         payload = json.loads(message.get_payload())
         return payload['phase'], payload['data']
 
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
+
 
 class RiakHttpIndexStream(RiakHttpMultipartStream):
     """
@@ -168,9 +189,13 @@ class RiakHttpIndexStream(RiakHttpMultipartStream):
         elif u'results' in payload:
             structs = payload[u'results']
             # Format is {"results":[{"2ikey":"primarykey"}, ...]}
-            return [self._decode_pair(d.items()[0]) for d in structs]
+            return [self._decode_pair(list(d.items())[0]) for d in structs]
         elif u'continuation' in payload:
             return CONTINUATION(payload[u'continuation'])
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
 
     def _decode_pair(self, pair):
         return (decode_index_value(self.index, pair[0]), pair[1])
