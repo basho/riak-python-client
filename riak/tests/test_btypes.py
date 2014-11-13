@@ -123,7 +123,7 @@ class BucketTypeTests(object):
 
         self.assertIn(bucket, buckets)
 
-        self.assert_items_equal(buckets, self.client.get_buckets())
+        self.assertItemsEqual(buckets, self.client.get_buckets())
 
     @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
     def test_default_btype_list_keys(self):
@@ -142,7 +142,7 @@ class BucketTypeTests(object):
         self.assertIn(self.key_name, keys)
 
         oldapikeys = self.client.get_keys(self.client.bucket(self.bucket_name))
-        self.assert_items_equal(keys, oldapikeys)
+        self.assertItemsEqual(keys, oldapikeys)
 
     @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
     def test_multiget_bucket_types(self):

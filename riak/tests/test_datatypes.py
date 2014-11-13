@@ -104,7 +104,7 @@ class SetUnitTests(DatatypeUnitTests,
 
     def check_op_output(self, op):
         self.assertIn('adds', op)
-        self.assert_items_equal(op['adds'], ['bar', 'foo'])
+        self.assertItemsEqual(op['adds'], ['bar', 'foo'])
         self.assertIn('removes', op)
         self.assertIn('foo', op['removes'])
 
@@ -227,7 +227,7 @@ class DatatypeIntegrationTests(object):
         mymap.reload()
         self.assertNotIn('a', mymap.counters)
         self.assertIn('f', mymap.sets)
-        self.assert_items_equal(['thing1', 'thing2'], mymap.sets['f'].value)
+        self.assertItemsEqual(['thing1', 'thing2'], mymap.sets['f'].value)
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_remove_without_context(self):
@@ -256,7 +256,7 @@ class DatatypeIntegrationTests(object):
         set.store()
 
         set2 = bucket.get(self.key_name)
-        self.assert_items_equal(['X', 'Y'], set2.value)
+        self.assertItemsEqual(['X', 'Y'], set2.value)
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_add_twice(self):
@@ -273,7 +273,7 @@ class DatatypeIntegrationTests(object):
         set.store()
 
         set2 = bucket.get(self.key_name)
-        self.assert_items_equal(['X', 'Y'], set2.value)
+        self.assertItemsEqual(['X', 'Y'], set2.value)
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_add_wins_in_same_op(self):
@@ -291,7 +291,7 @@ class DatatypeIntegrationTests(object):
         set.store()
 
         set2 = bucket.get(self.key_name)
-        self.assert_items_equal(['X', 'Y'], set2.value)
+        self.assertItemsEqual(['X', 'Y'], set2.value)
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_add_wins_in_same_op_reversed(self):
@@ -309,7 +309,7 @@ class DatatypeIntegrationTests(object):
         set.store()
 
         set2 = bucket.get(self.key_name)
-        self.assert_items_equal(['X', 'Y'], set2.value)
+        self.assertItemsEqual(['X', 'Y'], set2.value)
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_remove_old_context(self):
@@ -331,7 +331,7 @@ class DatatypeIntegrationTests(object):
         set.store()
 
         set2 = bucket.get(self.key_name)
-        self.assert_items_equal(['X', 'Y', 'Z'], set2.value)
+        self.assertItemsEqual(['X', 'Y', 'Z'], set2.value)
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_remove_updated_context(self):
@@ -352,7 +352,7 @@ class DatatypeIntegrationTests(object):
         set.store()
 
         set2 = bucket.get(self.key_name)
-        self.assert_items_equal(['X', 'Y'], set2.value)
+        self.assertItemsEqual(['X', 'Y'], set2.value)
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map_remove_set_update_same_op(self):
@@ -370,7 +370,7 @@ class DatatypeIntegrationTests(object):
         map.store()
 
         map2 = bucket.get(self.key_name)
-        self.assert_items_equal(["Z"], map2.sets['set'])
+        self.assertItemsEqual(["Z"], map2.sets['set'])
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map_remove_counter_increment_same_op(self):
@@ -406,7 +406,7 @@ class DatatypeIntegrationTests(object):
         map.store()
 
         map2 = bucket.get(self.key_name)
-        self.assert_items_equal(["Z"], map2.maps['map'].sets['set'])
+        self.assertItemsEqual(["Z"], map2.maps['map'].sets['set'])
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_return_body_true_default(self):
@@ -420,11 +420,11 @@ class DatatypeIntegrationTests(object):
 
         myset.add('Y')
         myset.store()
-        self.assert_items_equal(myset.value, ['X', 'Y'])
+        self.assertItemsEqual(myset.value, ['X', 'Y'])
 
         myset.discard('X')
         myset.store()
-        self.assert_items_equal(myset.value, ['Y'])
+        self.assertItemsEqual(myset.value, ['Y'])
 
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map_return_body_true_default(self):
@@ -440,11 +440,11 @@ class DatatypeIntegrationTests(object):
 
         mymap.sets['a'].add('Y')
         mymap.store()
-        self.assert_items_equal(mymap.sets['a'].value, ['X', 'Y'])
+        self.assertItemsEqual(mymap.sets['a'].value, ['X', 'Y'])
 
         mymap.sets['a'].discard('X')
         mymap.store()
-        self.assert_items_equal(mymap.sets['a'].value, ['Y'])
+        self.assertItemsEqual(mymap.sets['a'].value, ['Y'])
 
         del mymap.sets['a']
         mymap.store()

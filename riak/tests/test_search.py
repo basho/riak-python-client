@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import platform
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')

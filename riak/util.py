@@ -16,6 +16,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from __future__ import print_function
 import warnings
 from collections import Mapping
 from six import string_types, PY2

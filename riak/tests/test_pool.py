@@ -263,7 +263,7 @@ class PoolTest(unittest.TestCase,
             for thr in threads:
                 thr.join()
 
-            self.assert_items_equal(pool.resources, touched)
+            self.assertItemsEqual(pool.resources, touched)
 
     def test_clear(self):
         """

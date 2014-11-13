@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 from six import PY2
 if PY2:
     from Queue import Queue

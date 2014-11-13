@@ -24,7 +24,6 @@ def wait_for_yz_index(bucket, key, index=None):
 class YZSearchTests(object):
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_from_bucket(self):
-        return
         bucket = self.client.bucket(self.yz['bucket'])
         bucket.new("user", {"user_s": "Z"}).store()
         wait_for_yz_index(bucket, "user")
@@ -137,7 +136,6 @@ class YZSearchTests(object):
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_queries(self):
-        return
         bucket = self.client.bucket(self.yz['bucket'])
         bucket.new("Z", {"username_s": "Z", "name_s": "ryan",
                          "age_i": 30}).store()
@@ -176,7 +174,6 @@ class YZSearchTests(object):
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_utf8(self):
-        return
         bucket = self.client.bucket(self.yz['bucket'])
         body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
         bucket.new(self.key_name, body).store()
@@ -198,4 +195,4 @@ class YZSearchTests(object):
         self.assertIn('groups_ss', doc)
         field = doc['groups_ss']
         self.assertIsInstance(field, list)
-        self.assert_items_equal(['a', 'b', 'c'], field)
+        self.assertItemsEqual(['a', 'b', 'c'], field)

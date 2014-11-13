@@ -16,6 +16,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from __future__ import print_function
 import os
 import gc
 
@@ -113,7 +114,7 @@ class Benchmark(object):
 
     def __next__(self):
         # Python 3.x Version
-        self.next()
+        return self.next()
 
     def report(self, name):
         """

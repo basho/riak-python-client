@@ -16,6 +16,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from __future__ import print_function
 from collections import namedtuple
 from threading import Thread, Lock, Event
 from multiprocessing import cpu_count

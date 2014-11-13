@@ -18,6 +18,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from __future__ import print_function
 from collections import Iterable, namedtuple
 from riak import RiakError
 from six import string_types, PY2

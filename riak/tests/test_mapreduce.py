@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 from six import PY2
 from riak.mapreduce import RiakMapReduce
 from riak import key_filter, RiakError

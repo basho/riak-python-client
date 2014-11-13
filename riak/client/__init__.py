@@ -43,7 +43,7 @@ def default_encoder(obj):
     Default encoder for JSON datatypes, which returns UTF-8 encoded
     json instead of the default bloated backslash u XXXX escaped ASCII strings.
     """
-    if type(obj) == bytes:
+    if isinstance(obj, bytes):
         return json.dumps(bytes_to_str(obj),
                           ensure_ascii=False).encode("utf-8")
     else:
@@ -55,7 +55,7 @@ def binary_json_encoder(obj):
     Default encoder for JSON datatypes, which returns UTF-8 encoded
     json instead of the default bloated backslash u XXXX escaped ASCII strings.
     """
-    if type(obj) == bytes:
+    if isinstance(obj, bytes):
         return json.dumps(bytes_to_str(obj),
                           ensure_ascii=False).encode("utf-8")
     else:
