@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import platform
 from six import PY2
 from setuptools import setup, find_packages
