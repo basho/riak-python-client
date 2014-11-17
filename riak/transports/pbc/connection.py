@@ -62,7 +62,7 @@ class RiakPbcConnection(object):
         Similar to self._send, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
         """
-        self._socket.send(self._encode_msg(msg_code, msg))
+        self._socket.sendall(self._encode_msg(msg_code, msg))
 
     def _send_msg(self, msg_code, msg):
         self._connect()
