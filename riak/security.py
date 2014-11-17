@@ -31,6 +31,15 @@ if (sslver < OPENSSL_VERSION_101G) or \
           "Security may not support TLS 1.2.".format(verstring)
     warnings.warn(msg, UserWarning)
 
+if hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
+    DEFAULT_TLS_METHOD = OpenSSL.SSL.TLSv1_2_METHOD
+elif hasattr(OpenSSL.SSL, 'TLSv1_1_METHOD'):
+    DEFAULT_TLS_METHOD = OpenSSL.SSL.TLSv1_1_METHOD
+elif hasattr(OpenSSL.SSL, 'TLSv1_METHOD'):
+    DEFAULT_TLS_METHOD = OpenSSL.SSL.TLSv1_METHOD
+else:
+    DEFAULT_TLS_METHOD = OpenSSL.SSL.SSLv23_METHOD
+
 
 class SecurityError(RiakError):
     """
@@ -53,7 +62,7 @@ class SecurityCreds:
                  crl_file=None,
                  crl=None,
                  ciphers=None,
-                 ssl_version=OpenSSL.SSL.TLSv1_2_METHOD):
+                 ssl_version=DEFAULT_TLS_METHOD):
         """
         Container class for security-related settings
 
