@@ -98,6 +98,23 @@ class ErlangMapReduceTests(object):
             .run()
         self.assertEqual(len(result), 2)
 
+    def test_erlang_map_reduce_bucket_type(self):
+        # Create the object...
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 2).store()
+        bucket.new("baz", 4).store()
+        # Run the map...
+        result = self.client \
+            .add(self.bucket_name, "foo", bucket_type="pytest") \
+            .add(self.bucket_name, "bar", bucket_type="pytest") \
+            .add(self.bucket_name, "baz", bucket_type="pytest") \
+            .map(["riak_kv_mapreduce", "map_object_value"]) \
+            .reduce(["riak_kv_mapreduce", "reduce_set_union"]) \
+            .run()
+        self.assertEqual(len(result), 2)
+
     def test_erlang_source_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
@@ -121,6 +138,30 @@ class ErlangMapReduceTests(object):
                 strfun_allowed = False
             else:
                 print("test_erlang_source_map_reduce {}".format(e.value))
+        if strfun_allowed:
+            self.assertEqual(result, ['2', '3', '4'])
+
+    def test_erlang_source_map_reduce_bucket_type(self):
+        # Create the object...
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 3).store()
+        bucket.new("baz", 4).store()
+        strfun_allowed = True
+        # Run the map...
+        try:
+            result = self.client \
+                .add(self.bucket_name, "foo", bucket_type="pytest") \
+                .add(self.bucket_name, "bar", bucket_type="pytest") \
+                .add(self.bucket_name, "baz", bucket_type="pytest") \
+                .map("""fun(Object, _KD, _A) ->
+            Value = riak_object:get_value(Object),
+            [Value]
+        end.""", {'language': 'erlang'}).run()
+        except RiakError as e:
+            if e.value.startswith('May have tried'):
+                strfun_allowed = False
         if strfun_allowed:
             self.assertEqual(result, ['2', '3', '4'])
 
@@ -195,6 +236,18 @@ class JSMapReduceTests(object):
             .run()
         self.assertEqual(result, [2])
 
+    def test_javascript_named_map_bucket_type(self):
+        # Create the object...
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        # Run the map...
+        result = self.client \
+            .add(self.bucket_name, "foo", bucket_type="pytest") \
+            .map("Riak.mapValuesJson") \
+            .run()
+        self.assertEqual(result, [2])
+
     def test_javascript_source_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
@@ -206,6 +259,23 @@ class JSMapReduceTests(object):
             .add(self.bucket_name, "foo") \
             .add(self.bucket_name, "bar") \
             .add(self.bucket_name, "baz") \
+            .map("function (v) { return [1]; }") \
+            .reduce("Riak.reduceSum") \
+            .run()
+        self.assertEqual(result, [3])
+
+    def test_javascript_source_map_reduce_bucket_type(self):
+        # Create the object...
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 3).store()
+        bucket.new("baz", 4).store()
+        # Run the map...
+        result = self.client \
+            .add(self.bucket_name, "foo", bucket_type="pytest") \
+            .add(self.bucket_name, "bar", bucket_type="pytest") \
+            .add(self.bucket_name, "baz", bucket_type="pytest") \
             .map("function (v) { return [1]; }") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -227,6 +297,23 @@ class JSMapReduceTests(object):
             .run()
         self.assertEqual(result, [9])
 
+    def test_javascript_named_map_reduce_bucket_type(self):
+        # Create the object...
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 3).store()
+        bucket.new("baz", 4).store()
+        # Run the map...
+        result = self.client \
+            .add(self.bucket_name, "foo", bucket_type="pytest") \
+            .add(self.bucket_name, "bar", bucket_type="pytest") \
+            .add(self.bucket_name, "baz", bucket_type="pytest") \
+            .map("Riak.mapValuesJson") \
+            .reduce("Riak.reduceSum") \
+            .run()
+        self.assertEqual(result, [9])
+
     def test_javascript_bucket_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket("bucket_%s" % self.randint())
@@ -236,6 +323,21 @@ class JSMapReduceTests(object):
         # Run the map...
         result = self.client \
             .add(bucket.name) \
+            .map("Riak.mapValuesJson") \
+            .reduce("Riak.reduceSum") \
+            .run()
+        self.assertEqual(result, [9])
+
+    def test_javascript_bucket_map_reduceP_bucket_type(self):
+        # Create the object...
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket("bucket_%s" % self.randint())
+        bucket.new("foo", 2).store()
+        bucket.new("bar", 3).store()
+        bucket.new("baz", 4).store()
+        # Run the map...
+        result = self.client \
+            .add(bucket.name, bucket_type="pytest") \
             .map("Riak.mapValuesJson") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -257,6 +359,23 @@ class JSMapReduceTests(object):
             .run()
         self.assertEqual(result, [10])
 
+    def test_javascript_arg_map_reduce_bucket_type(self):
+        # Create the object...
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket(self.bucket_name)
+        bucket.new("foo", 2).store()
+        # Run the map...
+        result = self.client \
+            .add(self.bucket_name, "foo", 5, bucket_type="pytest") \
+            .add(self.bucket_name, "foo", 10, bucket_type="pytest") \
+            .add(self.bucket_name, "foo", 15, bucket_type="pytest") \
+            .add(self.bucket_name, "foo", -15, bucket_type="pytest") \
+            .add(self.bucket_name, "foo", -5, bucket_type="pytest") \
+            .map("function(v, arg) { return [arg]; }") \
+            .reduce("Riak.reduceSum") \
+            .run()
+        self.assertEqual(result, [10])
+
     def test_key_filters(self):
         bucket = self.client.bucket("kftest")
         bucket.new("basho-20101215", 1).store()
@@ -265,6 +384,22 @@ class JSMapReduceTests(object):
 
         result = self.client \
             .add("kftest") \
+            .add_key_filters([["tokenize", "-", 2]]) \
+            .add_key_filter("ends_with", "0613") \
+            .map("function (v, keydata) { return [v.key]; }") \
+            .run()
+
+        self.assertEqual(result, ["yahoo-20090613"])
+
+    def test_key_filters_bucket_type(self):
+        btype = self.client.bucket_type("pytest")
+        bucket = btype.bucket("kftest")
+        bucket.new("basho-20101215", 1).store()
+        bucket.new("google-20110103", 2).store()
+        bucket.new("yahoo-20090613", 3).store()
+
+        result = self.client \
+            .add("kftest", bucket_type="pytest") \
             .add_key_filters([["tokenize", "-", 2]]) \
             .add_key_filter("ends_with", "0613") \
             .map("function (v, keydata) { return [v.key]; }") \
