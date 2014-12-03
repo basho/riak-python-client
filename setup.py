@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 import platform
-from six import PY2
 from setuptools import setup, find_packages
 from version import get_version
 from commands import preconfigure, configure, create_bucket_types, \
     setup_security, enable_security, disable_security
 
-install_requires = []
-requires = []
-if PY2:
+install_requires = ['six >= 1.8.0']
+requires = ['six(>=1.8.0)']
+if platform.python_version() < '3.0':
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
     install_requires.append("riak_pb >=2.0.0")
