@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+from six import PY2
 from riak.mapreduce import RiakMapReduce
 from riak import key_filter, RiakError
 from riak.tests.test_yokozuna import wait_for_yz_index
@@ -17,12 +19,20 @@ class LinkTests(object):
     def test_store_and_get_links(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
-        bucket.new(key=self.key_name, encoded_data='2',
-                   content_type='application/octet-stream') \
-            .add_link(bucket.new("foo1")) \
-            .add_link(bucket.new("foo2"), "tag") \
-            .add_link(bucket.new("foo3"), "tag2!@#%^&*)") \
-            .store()
+        if PY2:
+            bucket.new(key=self.key_name, encoded_data='2',
+                       content_type='application/octet-stream') \
+                .add_link(bucket.new("foo1")) \
+                .add_link(bucket.new("foo2"), "tag") \
+                .add_link(bucket.new("foo3"), "tag2!@#%^&*)") \
+                .store()
+        else:
+            bucket.new(key=self.key_name, data='2',
+                       content_type='application/octet-stream') \
+                .add_link(bucket.new("foo1")) \
+                .add_link(bucket.new("foo2"), "tag") \
+                .add_link(bucket.new("foo3"), "tag2!@#%^&*)") \
+                .store()
         obj = bucket.get(self.key_name)
         links = obj.links
         self.assertEqual(len(links), 3)
@@ -95,6 +105,7 @@ class ErlangMapReduceTests(object):
         bucket.new("bar", 3).store()
         bucket.new("baz", 4).store()
         strfun_allowed = True
+        result = []
         # Run the map...
         try:
             result = self.client \
@@ -108,6 +119,8 @@ class ErlangMapReduceTests(object):
         except RiakError as e:
             if e.value.startswith('May have tried'):
                 strfun_allowed = False
+            else:
+                print("test_erlang_source_map_reduce {}".format(e.value))
         if strfun_allowed:
             self.assertEqual(result, ['2', '3', '4'])
 
@@ -147,20 +160,29 @@ class JSMapReduceTests(object):
         # test ASCII-encodable unicode is accepted
         mr.map(u"function (v) { return [JSON.parse(v.values[0].data)]; }")
 
-        # test non-ASCII-encodable unicode is rejected
-        self.assertRaises(TypeError, mr.map,
-                          u"""
-                          function (v) {
-                          /* æ */
-                            return [JSON.parse(v.values[0].data)];
-                          }""")
+        # test non-ASCII-encodable unicode is rejected in Python 2.x
+        if PY2:
+            self.assertRaises(TypeError, mr.map,
+                              u"""
+                              function (v) {
+                              /* æ */
+                                return [JSON.parse(v.values[0].data)];
+                              }""")
+        else:
+            mr = self.client.add(self.bucket_name, "foo")
+            result = mr.map("""function (v) {
+                      /* æ */
+                        return [JSON.parse(v.values[0].data)];
+                      }""").run()
+            self.assertEqual(result, [2])
 
-        # test non-ASCII-encodable string is rejected
-        self.assertRaises(TypeError, mr.map,
-                          """function (v) {
-                               /* æ */
-                               return [JSON.parse(v.values[0].data)];
-                             }""")
+        # test non-ASCII-encodable string is rejected in Python 2.x
+        if PY2:
+            self.assertRaises(TypeError, mr.map,
+                              """function (v) {
+                                   /* æ */
+                                   return [JSON.parse(v.values[0].data)];
+                                 }""")
 
     def test_javascript_named_map(self):
         # Create the object...
@@ -387,7 +409,7 @@ class JSMapReduceTests(object):
             return [solr_doc["calories_i"]]; }""")
         result = mr.reduce('function(values, arg) ' +
                            '{ return [values.sort()[0]]; }').run()
-        self.assertEquals(result, [100])
+        self.assertEqual(result, [100])
 
 
 class MapReduceAliasTests(object):
@@ -396,10 +418,16 @@ class MapReduceAliasTests(object):
     def test_map_values(self):
         # Add a value to the bucket
         bucket = self.client.bucket(self.bucket_name)
-        bucket.new('one', encoded_data='value_1',
-                   content_type='text/plain').store()
-        bucket.new('two', encoded_data='value_2',
-                   content_type='text/plain').store()
+        if PY2:
+            bucket.new('one', encoded_data='value_1',
+                       content_type='text/plain').store()
+            bucket.new('two', encoded_data='value_2',
+                       content_type='text/plain').store()
+        else:
+            bucket.new('one', data='value_1',
+                       content_type='text/plain').store()
+            bucket.new('two', data='value_2',
+                       content_type='text/plain').store()
 
         # Create a map reduce object and use one and two as inputs
         mr = self.client.add(self.bucket_name, 'one')\
@@ -610,4 +638,7 @@ class MapReduceStreamTests(object):
 
         # This should not raise an exception
         obj = bucket.get('one')
-        self.assertEqual('1', obj.encoded_data)
+        if PY2:
+            self.assertEqual('1', obj.encoded_data)
+        else:
+            self.assertEqual(b'1', obj.encoded_data)

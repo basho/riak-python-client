@@ -16,6 +16,7 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from __future__ import print_function
 import os
 import gc
 
@@ -104,12 +105,16 @@ class Benchmark(object):
         else:
             if self.rehearse:
                 gc.collect()
-                print ("-" * 59)
-                print
+                print("-" * 59)
+                print()
             print_header()
 
         self.count -= 1
         return self
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
 
     def report(self, name):
         """
@@ -124,22 +129,25 @@ def print_rehearsal_header():
     Prints the header for the rehearsal phase of a benchmark.
     """
     print
-    print "Rehearsal -------------------------------------------------"
+    print("Rehearsal -------------------------------------------------")
 
 
 def print_report(label, user, system, real):
     """
     Prints the report of one step of a benchmark.
     """
-    print "{:<12s} {:12f} {:12f} ( {:12f} )".format(label, user, system, real)
+    print("{:<12s} {:12f} {:12f} ( {:12f} )".format(label,
+                                                    user,
+                                                    system,
+                                                    real))
 
 
 def print_header():
     """
     Prints the header for the normal phase of a benchmark.
     """
-    print "{:<12s} {:<12s} {:<12s} ( {:<12s} )"\
-        .format('', 'user', 'system', 'real')
+    print("{:<12s} {:<12s} {:<12s} ( {:<12s} )"
+          .format('', 'user', 'system', 'real'))
 
 
 class BenchmarkReport(object):
@@ -164,5 +172,5 @@ class BenchmarkReport(object):
         elif exc_type is KeyboardInterrupt:
             return False
         else:
-            print "EXCEPTION! %r" % ((exc_type, exc_val, exc_tb),)
+            print("EXCEPTION! %r" % ((exc_type, exc_val, exc_tb),))
         return True

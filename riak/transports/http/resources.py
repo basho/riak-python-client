@@ -17,9 +17,13 @@ under the License.
 """
 
 import re
-from urllib import quote_plus, urlencode
+from six import PY2
+if PY2:
+    from urllib import quote_plus, urlencode
+else:
+    from urllib.parse import quote_plus, urlencode
 from riak import RiakError
-from riak.util import lazy_property
+from riak.util import lazy_property, bytes_to_str
 
 
 class RiakHttpResources(object):
@@ -248,7 +252,7 @@ def mkpath(*segments, **query):
     and a dict.
     """
     # Remove empty segments (e.g. no key specified)
-    segments = [s for s in segments if s is not None]
+    segments = [bytes_to_str(s) for s in segments if s is not None]
     # Join the segments into a path
     pathstring = '/'.join(segments)
     # Remove extra slashes
@@ -260,7 +264,7 @@ def mkpath(*segments, **query):
         if query[key] in [False, True]:
             _query[key] = str(query[key]).lower()
         elif query[key] is not None:
-            if isinstance(query[key], unicode):
+            if PY2 and isinstance(query[key], unicode):
                 _query[key] = query[key].encode('utf-8')
             else:
                 _query[key] = query[key]

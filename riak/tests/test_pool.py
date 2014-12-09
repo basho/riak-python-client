@@ -16,8 +16,12 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from six import PY2
 import platform
-from Queue import Queue
+if PY2:
+    from Queue import Queue
+else:
+    from queue import Queue
 from threading import Thread, currentThread
 from riak.transports.pool import Pool, BadResource
 from random import SystemRandom
@@ -28,6 +32,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 from . import SKIP_POOL
+from riak.tests import test_six
 
 
 class SimplePool(Pool):
@@ -50,7 +55,9 @@ class EmptyListPool(Pool):
 
 @unittest.skipIf(SKIP_POOL,
                  'Skipping connection pool tests')
-class PoolTest(unittest.TestCase):
+class PoolTest(unittest.TestCase,
+               test_six.Comparison):
+
     def test_yields_new_object_when_empty(self):
         """
         The pool should create new resources as needed.

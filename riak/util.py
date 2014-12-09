@@ -1,5 +1,5 @@
 """
-Copyright 2010 Basho Technologies, Inc.
+Copyright 2014 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -16,8 +16,10 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from __future__ import print_function
 import warnings
 from collections import Mapping
+from six import string_types, PY2
 
 
 def quacks_like_dict(object):
@@ -81,7 +83,36 @@ class lazy_property(object):
 
 
 def decode_index_value(index, value):
-    if "_int" in index:
-        return long(value)
-    else:
+    if "_int" in bytes_to_str(index):
+        return str_to_long(value)
+    elif PY2:
         return str(value)
+    else:
+        return bytes_to_str(value)
+
+
+def bytes_to_str(value, encoding='utf-8'):
+    if isinstance(value, string_types) or value is None:
+        return value
+    elif isinstance(value, list):
+        return [bytes_to_str(elem) for elem in value]
+    else:
+        return value.decode(encoding)
+
+
+def str_to_bytes(value, encoding='utf-8'):
+    if PY2 or value is None:
+        return value
+    elif isinstance(value, list):
+        return [str_to_bytes(elem) for elem in value]
+    else:
+        return value.encode(encoding)
+
+
+def str_to_long(value, base=10):
+    if value is None:
+        return None
+    elif PY2:
+        return long(value, base)
+    else:
+        return int(value, base)

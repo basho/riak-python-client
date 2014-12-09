@@ -188,25 +188,25 @@ class TwoITests(object):
 
         # Test an equality query...
         results = bucket.get_index('field1_bin', 'val2')
-        self.assertEquals(1, len(results))
-        self.assertEquals(o2.key, str(results[0]))
+        self.assertEqual(1, len(results))
+        self.assertEqual(o2.key, str(results[0]))
 
         # Test a range query...
         results = bucket.get_index('field1_bin', 'val2', 'val4')
         vals = set([str(key) for key in results])
-        self.assertEquals(3, len(results))
-        self.assertEquals(set([o2.key, o3.key, o4.key]), vals)
+        self.assertEqual(3, len(results))
+        self.assertEqual(set([o2.key, o3.key, o4.key]), vals)
 
         # Test an equality query...
         results = bucket.get_index('field2_int', 1002)
-        self.assertEquals(1, len(results))
-        self.assertEquals(o2.key, str(results[0]))
+        self.assertEqual(1, len(results))
+        self.assertEqual(o2.key, str(results[0]))
 
         # Test a range query...
         results = bucket.get_index('field2_int', 1002, 1004)
         vals = set([str(key) for key in results])
-        self.assertEquals(3, len(results))
-        self.assertEquals(set([o2.key, o3.key, o4.key]), vals)
+        self.assertEqual(3, len(results))
+        self.assertEqual(set([o2.key, o3.key, o4.key]), vals)
 
     @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
     def test_secondary_index_invalid_name(self):

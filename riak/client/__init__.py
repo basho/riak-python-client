@@ -34,15 +34,46 @@ from riak.resolver import default_resolver
 from riak.transports.http import RiakHttpPool
 from riak.transports.pbc import RiakPbcPool
 from riak.security import SecurityCreds
-from riak.util import lazy_property
+from riak.util import lazy_property, bytes_to_str, str_to_bytes
+from six import string_types, PY2
 
 
 def default_encoder(obj):
     """
     Default encoder for JSON datatypes, which returns UTF-8 encoded
-    json instead of the default bloated \uXXXX escaped ASCII strings.
+    json instead of the default bloated backslash u XXXX escaped ASCII strings.
     """
-    return json.dumps(obj, ensure_ascii=False).encode("utf-8")
+    if isinstance(obj, bytes):
+        return json.dumps(bytes_to_str(obj),
+                          ensure_ascii=False).encode("utf-8")
+    else:
+        return json.dumps(obj, ensure_ascii=False).encode("utf-8")
+
+
+def binary_json_encoder(obj):
+    """
+    Default encoder for JSON datatypes, which returns UTF-8 encoded
+    json instead of the default bloated backslash u XXXX escaped ASCII strings.
+    """
+    if isinstance(obj, bytes):
+        return json.dumps(bytes_to_str(obj),
+                          ensure_ascii=False).encode("utf-8")
+    else:
+        return json.dumps(obj, ensure_ascii=False).encode("utf-8")
+
+
+def binary_json_decoder(obj):
+    """
+    Default decoder from JSON datatypes.
+    """
+    return json.loads(bytes_to_str(obj))
+
+
+def binary_encoder_decoder(obj):
+    """
+    Assumes value is already in binary format, so passes unchanged.
+    """
+    return obj
 
 
 class RiakClient(RiakMapReduceChain, RiakClientOperations):
@@ -90,12 +121,22 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._http_pool = RiakHttpPool(self, **transport_options)
         self._pb_pool = RiakPbcPool(self, **transport_options)
 
-        self._encoders = {'application/json': default_encoder,
-                          'text/json': default_encoder,
-                          'text/plain': str}
-        self._decoders = {'application/json': json.loads,
-                          'text/json': json.loads,
-                          'text/plain': str}
+        if PY2:
+            self._encoders = {'application/json': default_encoder,
+                              'text/json': default_encoder,
+                              'text/plain': str}
+            self._decoders = {'application/json': json.loads,
+                              'text/json': json.loads,
+                              'text/plain': str}
+        else:
+            self._encoders = {'application/json': binary_json_encoder,
+                              'text/json': binary_json_encoder,
+                              'text/plain': str_to_bytes,
+                              'binary/octet-stream': binary_encoder_decoder}
+            self._decoders = {'application/json': binary_json_decoder,
+                              'text/json': binary_json_decoder,
+                              'text/plain': bytes_to_str,
+                              'binary/octet-stream': binary_encoder_decoder}
         self._buckets = WeakValueDictionary()
         self._bucket_types = WeakValueDictionary()
 
@@ -167,7 +208,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :param content_type: the requested media type
         :type content_type: str
         :param encoder: an encoding function, takes a single object
-            argument and returns a string
+            argument and returns encoded data
         :type encoder: function
         """
         self._encoders[content_type] = encoder
@@ -188,7 +229,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
         :param content_type: the requested media type
         :type content_type: str
-        :param decoder: a decoding function, takes a string and
+        :param decoder: a decoding function, takes encoded data and
             returns a Python type
         :type decoder: function
         """
@@ -217,10 +258,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
 
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, string_types):
             raise TypeError('Bucket name must be a string')
 
-        if isinstance(bucket_type, basestring):
+        if isinstance(bucket_type, string_types):
             bucket_type = self.bucket_type(bucket_type)
         elif not isinstance(bucket_type, BucketType):
             raise TypeError('bucket_type must be a string '
@@ -243,7 +284,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :type name: str
         :rtype: :class:`BucketType <riak.bucket.BucketType>`
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, string_types):
             raise TypeError('Bucket name must be a string')
 
         if name in self._bucket_types:

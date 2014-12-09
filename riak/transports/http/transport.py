@@ -24,8 +24,11 @@ try:
 except ImportError:
     import json
 
-
-import httplib
+from six import PY2
+if PY2:
+    from httplib import HTTPConnection
+else:
+    from http.client import HTTPConnection
 from xml.dom.minidom import Document
 from riak.transports.transport import RiakTransport
 from riak.transports.http.resources import RiakHttpResources
@@ -38,7 +41,7 @@ from riak.transports.http.stream import (
     RiakHttpIndexStream)
 from riak import RiakError
 from riak.security import SecurityError
-from riak.util import decode_index_value
+from riak.util import decode_index_value, bytes_to_str, str_to_long
 
 
 class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
@@ -50,7 +53,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
     def __init__(self, node=None,
                  client=None,
-                 connection_class=httplib.HTTPConnection,
+                 connection_class=HTTPConnection,
                  client_id=None,
                  **unused_options):
         """
@@ -71,7 +74,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         Check server is alive over HTTP
         """
         status, _, body = self._request('GET', self.ping_path())
-        return(status is not None) and (body == 'OK')
+        return(status is not None) and (bytes_to_str(body) == 'OK')
 
     def stats(self):
         """
@@ -80,7 +83,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, body = self._request('GET', self.stats_path(),
                                         {'Accept': 'application/json'})
         if status == 200:
-            return json.loads(body)
+            return json.loads(bytes_to_str(body))
         else:
             return None
 
@@ -105,7 +108,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, body = self._request('GET', '/',
                                         {'Accept': 'application/json'})
         if status == 200:
-            tmp, resources = json.loads(body), {}
+            tmp, resources = json.loads(bytes_to_str(body)), {}
             for k in tmp:
                 # The keys and values returned by json.loads() are unicode,
                 # which will cause problems when passed into httplib later
@@ -151,7 +154,10 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                                bucket_type=bucket_type,
                                **params)
         headers = self._build_put_headers(robj, if_none_match=if_none_match)
-        content = bytearray(robj.encoded_data)
+        if PY2:
+            content = bytearray(robj.encoded_data)
+        else:
+            content = robj.encoded_data
 
         if robj.key is None:
             expect = [201]
@@ -198,7 +204,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, _, body = self._request('GET', url)
 
         if status == 200:
-            props = json.loads(body)
+            props = json.loads(bytes_to_str(body))
             return props['keys']
         else:
             raise RiakError('Error listing keys.')
@@ -224,7 +230,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, body = self._request('GET', url)
 
         if status == 200:
-            props = json.loads(body)
+            props = json.loads(bytes_to_str(body))
             return props['buckets']
         else:
             raise RiakError('Error getting buckets.')
@@ -257,7 +263,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, body = self._request('GET', url)
 
         if status == 200:
-            props = json.loads(body)
+            props = json.loads(bytes_to_str(body))
             return props['props']
         else:
             raise RiakError('Error getting bucket properties.')
@@ -311,7 +317,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, body = self._request('GET', url)
 
         if status == 200:
-            props = json.loads(body)
+            props = json.loads(bytes_to_str(body))
             return props['props']
         else:
             raise RiakError('Error getting bucket-type properties.')
@@ -350,7 +356,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                 'Error running MapReduce operation. Headers: %s Body: %s' %
                 (repr(headers), repr(body)))
 
-        result = json.loads(body)
+        result = json.loads(bytes_to_str(body))
         return result
 
     def stream_mapred(self, inputs, query, timeout=None):
@@ -390,11 +396,11 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                               bucket_type=bucket_type, **params)
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
-        json_data = json.loads(body)
+        json_data = json.loads(bytes_to_str(body))
         if return_terms and u'results' in json_data:
             results = []
             for result in json_data[u'results'][:]:
-                term, key = result.items()[0]
+                term, key = list(result.items())[0]
                 results.append((decode_index_value(index, term), key),)
         else:
             results = json_data[u'keys'][:]
@@ -488,7 +494,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, body = self._request('GET', url)
 
         if status == 200:
-            return json.loads(body)
+            return json.loads(bytes_to_str(body))
         else:
             raise RiakError('Error getting Search 2.0 index.')
 
@@ -508,7 +514,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, body = self._request('GET', url)
 
         if status == 200:
-            json_data = json.loads(body)
+            json_data = json.loads(bytes_to_str(body))
             # Return a list of dictionaries
             return json_data
         else:
@@ -581,7 +587,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         if status == 200:
             result = {}
             result['name'] = schema
-            result['content'] = body
+            result['content'] = bytes_to_str(body)
             return result
         else:
             raise RiakError('Error getting Search 2.0 schema.')
@@ -603,7 +609,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, data = self._request('GET', url)
         self.check_http_code(status, [200])
         if 'json' in headers['content-type']:
-            results = json.loads(data)
+            results = json.loads(bytes_to_str(data))
             return self._normalize_json_search_response(results)
         elif 'xml' in headers['content-type']:
             return self._normalize_xml_search_response(data)
@@ -673,7 +679,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
         self.check_http_code(status, [200, 404])
         if status == 200:
-            return long(body.strip())
+            return str_to_long(body.strip())
         elif status == 404:
             return None
 
@@ -694,7 +700,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, body = self._request('POST', url, headers,
                                               str(amount))
         if return_value and status == 200:
-            return long(body.strip())
+            return str_to_long(body.strip())
         elif status == 204:
             return True
         else:
@@ -713,7 +719,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, body = self._request('GET', url)
 
         self.check_http_code(status, [200, 404])
-        response = json.loads(body)
+        response = json.loads(bytes_to_str(body))
         dtype = response['type']
         if status == 404:
             return (dtype, None, None)
@@ -760,7 +766,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             datatype.key = headers['location'].strip().split('/')[-1]
 
         if status != 204:
-            response = json.loads(body)
+            response = json.loads(bytes_to_str(body))
             datatype._context = response.get('context')
             datatype._set_value(self._decode_datatype(type_name,
                                                       response['value']))

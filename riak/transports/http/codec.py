@@ -25,17 +25,21 @@ MAX_LINK_HEADER_SIZE = 8192 - 8
 
 import re
 import csv
-import urllib
+from six import PY2, PY3
+if PY2:
+    from urllib import unquote_plus
+else:
+    from urllib.parse import unquote_plus
 from cgi import parse_header
 from email import message_from_string
-from rfc822 import parsedate_tz, mktime_tz
+from email.utils import parsedate_tz, mktime_tz
 from xml.etree import ElementTree
 from riak import RiakError
 from riak.content import RiakContent
 from riak.riak_object import VClock
 from riak.multidict import MultiDict
 from riak.transports.http.search import XMLSearchResult
-from riak.util import decode_index_value
+from riak.util import decode_index_value, bytes_to_str
 
 
 class RiakHttpCodec(object):
@@ -78,6 +82,8 @@ class RiakHttpCodec(object):
         elif status == 300:
             ctype, params = parse_header(headers['content-type'])
             if ctype == 'multipart/mixed':
+                if PY3:
+                    data = bytes_to_str(data)
                 boundary = re.compile('\r?\n--%s(?:--)?\r?\n' %
                                       re.escape(params['boundary']))
                 parts = [message_from_string(p)
@@ -97,7 +103,8 @@ class RiakHttpCodec(object):
                                 format(ctype))
 
         robj.siblings = [self._parse_sibling(RiakContent(robj),
-                                             headers.items(), data)]
+                                             headers.items(),
+                                             data)]
 
         return robj
 
@@ -159,9 +166,9 @@ class RiakHttpCodec(object):
             matches = (re.match(oldform, linkHeader) or
                        re.match(newform, linkHeader))
             if matches is not None:
-                link = (urllib.unquote_plus(matches.group(2)),
-                        urllib.unquote_plus(matches.group(3)),
-                        urllib.unquote_plus(matches.group(4)))
+                link = (unquote_plus(matches.group(2)),
+                        unquote_plus(matches.group(3)),
+                        unquote_plus(matches.group(4)))
                 links.append(link)
         return links
 
@@ -203,8 +210,8 @@ class RiakHttpCodec(object):
         # Create the header from metadata
         self._add_links_for_riak_object(robj, headers)
 
-        for key, value in robj.usermeta.iteritems():
-            headers['X-Riak-Meta-%s' % key] = value
+        for key in robj.usermeta.keys():
+            headers['X-Riak-Meta-%s' % key] = robj.usermeta[key]
 
         for field, value in robj.indexes:
             key = 'X-Riak-Index-%s' % field

@@ -8,6 +8,7 @@ else:
 from riak import RiakBucket, BucketType
 import riak.datatypes as datatypes
 from . import SKIP_DATATYPES
+from riak.tests import test_six
 
 
 class DatatypeUnitTests(object):
@@ -91,7 +92,8 @@ class CounterUnitTests(DatatypeUnitTests,
 
 
 class SetUnitTests(DatatypeUnitTests,
-                   unittest.TestCase):
+                   unittest.TestCase,
+                   test_six.Comparison):
     dtype = datatypes.Set
 
     def op(self, dtype):

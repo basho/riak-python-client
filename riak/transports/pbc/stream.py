@@ -24,8 +24,9 @@ from riak_pb.messages import (
     MSG_CODE_LIST_BUCKETS_RESP,
     MSG_CODE_INDEX_RESP
 )
-from riak.util import decode_index_value
+from riak.util import decode_index_value, bytes_to_str
 from riak.client.index_page import CONTINUATION
+from six import PY2
 
 
 class RiakPbcStream(object):
@@ -58,6 +59,10 @@ class RiakPbcStream(object):
             self.finished = True
 
         return resp
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
 
     def _is_done(self, response):
         # This could break if new messages don't name the field the
@@ -94,6 +99,10 @@ class RiakPbcKeyStream(RiakPbcStream):
 
         return response.keys
 
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
+
 
 class RiakPbcMapredStream(RiakPbcStream):
     """
@@ -109,7 +118,11 @@ class RiakPbcMapredStream(RiakPbcStream):
         if response.done and not response.HasField('response'):
             raise StopIteration
 
-        return response.phase, json.loads(response.response)
+        return response.phase, json.loads(bytes_to_str(response.response))
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
 
 
 class RiakPbcBucketStream(RiakPbcStream):
@@ -126,6 +139,10 @@ class RiakPbcBucketStream(RiakPbcStream):
             raise StopIteration
 
         return response.buckets
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
 
 
 class RiakPbcIndexStream(RiakPbcStream):
@@ -150,9 +167,17 @@ class RiakPbcIndexStream(RiakPbcStream):
             raise StopIteration
 
         if self.return_terms and response.results:
-            return [(decode_index_value(self.index, r.key), r.value)
+            return [(decode_index_value(self.index, r.key),
+                     bytes_to_str(r.value))
                     for r in response.results]
         elif response.keys:
-            return response.keys[:]
+            if PY2:
+                return response.keys[:]
+            else:
+                return [bytes_to_str(key) for key in response.keys]
         elif response.continuation:
-            return CONTINUATION(response.continuation)
+            return CONTINUATION(bytes_to_str(response.continuation))
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()

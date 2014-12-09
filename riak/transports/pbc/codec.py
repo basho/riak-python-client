@@ -18,8 +18,9 @@ under the License.
 import riak_pb
 from riak import RiakError
 from riak.content import RiakContent
-from riak.util import decode_index_value
+from riak.util import decode_index_value, str_to_bytes, bytes_to_str
 from riak.multidict import MultiDict
+from six import string_types, PY2
 
 
 def _invert(d):
@@ -150,13 +151,14 @@ class RiakPbcCodec(object):
         else:
             sibling.exists = True
         if rpb_content.HasField("content_type"):
-            sibling.content_type = rpb_content.content_type
+            sibling.content_type = bytes_to_str(rpb_content.content_type)
         if rpb_content.HasField("charset"):
-            sibling.charset = rpb_content.charset
+            sibling.charset = bytes_to_str(rpb_content.charset)
         if rpb_content.HasField("content_encoding"):
-            sibling.content_encoding = rpb_content.content_encoding
+            sibling.content_encoding = \
+                bytes_to_str(rpb_content.content_encoding)
         if rpb_content.HasField("vtag"):
-            sibling.etag = rpb_content.vtag
+            sibling.etag = bytes_to_str(rpb_content.vtag)
 
         sibling.links = [self._decode_link(link)
                          for link in rpb_content.links]
@@ -165,12 +167,12 @@ class RiakPbcCodec(object):
             if rpb_content.HasField("last_mod_usecs"):
                 sibling.last_modified += rpb_content.last_mod_usecs / 1000000.0
 
-        sibling.usermeta = dict([(usermd.key, usermd.value)
+        sibling.usermeta = dict([(bytes_to_str(usermd.key),
+                                  bytes_to_str(usermd.value))
                                  for usermd in rpb_content.usermeta])
-        sibling.indexes = set([(index.key,
+        sibling.indexes = set([(bytes_to_str(index.key),
                                 decode_index_value(index.key, index.value))
                                for index in rpb_content.indexes])
-
         sibling.encoded_data = rpb_content.value
 
         return sibling
@@ -186,15 +188,15 @@ class RiakPbcCodec(object):
         :type rpb_content: riak_pb.RpbContent
         """
         if robj.content_type:
-            rpb_content.content_type = robj.content_type
+            rpb_content.content_type = str_to_bytes(robj.content_type)
         if robj.charset:
-            rpb_content.charset = robj.charset
+            rpb_content.charset = str_to_bytes(robj.charset)
         if robj.content_encoding:
-            rpb_content.content_encoding = robj.content_encoding
+            rpb_content.content_encoding = str_to_bytes(robj.content_encoding)
         for uk in robj.usermeta:
             pair = rpb_content.usermeta.add()
-            pair.key = uk
-            pair.value = robj.usermeta[uk]
+            pair.key = str_to_bytes(uk)
+            pair.value = str_to_bytes(robj.usermeta[uk])
         for link in robj.links:
             pb_link = rpb_content.links.add()
             try:
@@ -202,19 +204,23 @@ class RiakPbcCodec(object):
             except ValueError:
                 raise RiakError("Invalid link tuple %s" % link)
 
-            pb_link.bucket = bucket
-            pb_link.key = key
+            pb_link.bucket = str_to_bytes(bucket)
+            pb_link.key = str_to_bytes(key)
             if tag:
-                pb_link.tag = tag
+                pb_link.tag = str_to_bytes(tag)
             else:
-                pb_link.tag = ''
+                pb_link.tag = str_to_bytes('')
 
         for field, value in robj.indexes:
             pair = rpb_content.indexes.add()
-            pair.key = field
-            pair.value = str(value)
+            pair.key = str_to_bytes(field)
+            pair.value = str_to_bytes(str(value))
 
-        rpb_content.value = str(robj.encoded_data)
+        # Python 2.x data is stored in a string
+        if PY2:
+            rpb_content.value = str(robj.encoded_data)
+        else:
+            rpb_content.value = robj.encoded_data
 
     def _decode_link(self, link):
         """
@@ -226,15 +232,15 @@ class RiakPbcCodec(object):
         """
 
         if link.HasField("bucket"):
-            bucket = link.bucket
+            bucket = bytes_to_str(link.bucket)
         else:
             bucket = None
         if link.HasField("key"):
-            key = link.key
+            key = bytes_to_str(link.key)
         else:
             key = None
         if link.HasField("tag"):
-            tag = link.tag
+            tag = bytes_to_str(link.tag)
         else:
             tag = None
 
@@ -252,7 +258,7 @@ class RiakPbcCodec(object):
         if index.endswith("_int"):
             return int(value)
         else:
-            return value
+            return bytes_to_str(value)
 
     def _encode_bucket_props(self, props, msg):
         """
@@ -265,7 +271,10 @@ class RiakPbcCodec(object):
         """
         for prop in NORMAL_PROPS:
             if prop in props and props[prop] is not None:
-                setattr(msg.props, prop, props[prop])
+                if isinstance(props[prop], string_types):
+                    setattr(msg.props, prop, str_to_bytes(props[prop]))
+                else:
+                    setattr(msg.props, prop, props[prop])
         for prop in COMMIT_HOOK_PROPS:
             if prop in props:
                 setattr(msg.props, 'has_' + prop, True)
@@ -277,7 +286,10 @@ class RiakPbcCodec(object):
             if prop in props and props[prop] not in (None, 'default'):
                 value = self._encode_quorum(props[prop])
                 if value is not None:
-                    setattr(msg.props, prop, value)
+                    if isinstance(value, string_types):
+                        setattr(msg.props, prop, str_to_bytes(value))
+                    else:
+                        setattr(msg.props, prop, value)
         if 'repl' in props:
             msg.props.repl = REPL_TO_PY[props['repl']]
 
@@ -296,6 +308,8 @@ class RiakPbcCodec(object):
         for prop in NORMAL_PROPS:
             if msg.HasField(prop):
                 props[prop] = getattr(msg, prop)
+                if isinstance(props[prop], bytes):
+                    props[prop] = bytes_to_str(props[prop])
         for prop in COMMIT_HOOK_PROPS:
             if getattr(msg, 'has_' + prop):
                 props[prop] = self._decode_hooklist(getattr(msg, prop))
@@ -319,8 +333,8 @@ class RiakPbcCodec(object):
         :type modfun: riak_pb.RpbModFun
         :rtype dict
         """
-        return {'mod': modfun.module,
-                'fun': modfun.function}
+        return {'mod': bytes_to_str(modfun.module),
+                'fun': bytes_to_str(modfun.function)}
 
     def _encode_modfun(self, props, msg=None):
         """
@@ -335,8 +349,8 @@ class RiakPbcCodec(object):
         """
         if msg is None:
             msg = riak_pb.RpbModFun()
-        msg.module = props['mod']
-        msg.function = props['fun']
+        msg.module = str_to_bytes(props['mod'])
+        msg.function = str_to_bytes(props['fun'])
         return msg
 
     def _decode_hooklist(self, hooklist):
@@ -375,7 +389,7 @@ class RiakPbcCodec(object):
         if hook.HasField('modfun'):
             return self._decode_modfun(hook.modfun)
         else:
-            return {'name': hook.name}
+            return {'name': bytes_to_str(hook.name)}
 
     def _encode_hook(self, hook, msg):
         """
@@ -389,7 +403,7 @@ class RiakPbcCodec(object):
         :rtype riak_pb.RpbCommitHook
         """
         if 'name' in hook:
-            msg.name = hook['name']
+            msg.name = str_to_bytes(hook['name'])
         else:
             self._encode_modfun(hook, msg.modfun)
         return msg
@@ -417,30 +431,33 @@ class RiakPbcCodec(object):
         :type continuation: string
         :param timeout: a timeout value in milliseconds, or 'infinity'
         :type timeout: int
+        :param term_regex: a regular expression used to filter index terms
+        :type term_regex: string
         :rtype riak_pb.RpbIndexReq
         """
-        req = riak_pb.RpbIndexReq(bucket=bucket.name, index=index)
+        req = riak_pb.RpbIndexReq(bucket=str_to_bytes(bucket.name),
+                                  index=str_to_bytes(index))
         self._add_bucket_type(req, bucket.bucket_type)
         if endkey:
             req.qtype = riak_pb.RpbIndexReq.range
-            req.range_min = str(startkey)
-            req.range_max = str(endkey)
+            req.range_min = str_to_bytes(str(startkey))
+            req.range_max = str_to_bytes(str(endkey))
         else:
             req.qtype = riak_pb.RpbIndexReq.eq
-            req.key = str(startkey)
+            req.key = str_to_bytes(str(startkey))
         if return_terms is not None:
             req.return_terms = return_terms
         if max_results:
             req.max_results = max_results
         if continuation:
-            req.continuation = continuation
+            req.continuation = str_to_bytes(continuation)
         if timeout:
             if timeout == 'infinity':
                 req.timeout = 0
             else:
                 req.timeout = timeout
         if term_regex:
-            req.term_regex = term_regex
+            req.term_regex = str_to_bytes(term_regex)
         return req
 
     def _decode_search_index(self, index):
@@ -452,9 +469,9 @@ class RiakPbcCodec(object):
         :rtype dict
         """
         result = {}
-        result['name'] = index.name
+        result['name'] = bytes_to_str(index.name)
         if index.HasField('schema'):
-            result['schema'] = index.schema
+            result['schema'] = bytes_to_str(index.schema)
         if index.HasField('n_val'):
             result['n_val'] = index.n_val
         return result
@@ -464,7 +481,7 @@ class RiakPbcCodec(object):
             if not self.bucket_types():
                 raise NotImplementedError(
                     'Server does not support bucket-types')
-            req.type = bucket_type.name
+            req.type = str_to_bytes(bucket_type.name)
 
     def _encode_search_query(self, req, params):
         if 'rows' in params:
@@ -472,13 +489,13 @@ class RiakPbcCodec(object):
         if 'start' in params:
             req.start = params['start']
         if 'sort' in params:
-            req.sort = params['sort']
+            req.sort = str_to_bytes(params['sort'])
         if 'filter' in params:
-            req.filter = params['filter']
+            req.filter = str_to_bytes(params['filter'])
         if 'df' in params:
-            req.df = params['df']
+            req.df = str_to_bytes(params['df'])
         if 'op' in params:
-            req.op = params['op']
+            req.op = str_to_bytes(params['op'])
         if 'q.op' in params:
             req.op = params['q.op']
         if 'fl' in params:
@@ -492,8 +509,12 @@ class RiakPbcCodec(object):
     def _decode_search_doc(self, doc):
         resultdoc = MultiDict()
         for pair in doc.fields:
-            ukey = unicode(pair.key, 'utf-8')
-            uval = unicode(pair.value, 'utf-8')
+            if PY2:
+                ukey = unicode(pair.key, 'utf-8')
+                uval = unicode(pair.value, 'utf-8')
+            else:
+                ukey = bytes_to_str(pair.key)
+                uval = bytes_to_str(pair.value)
             resultdoc.add(ukey, uval)
         return resultdoc.mixed()
 
@@ -532,14 +553,14 @@ class RiakPbcCodec(object):
     def _decode_map_value(self, entries):
         out = {}
         for entry in entries:
-            name = entry.field.name[:]
+            name = bytes_to_str(entry.field.name[:])
             dtype = MAP_FIELD_TYPES[entry.field.type]
             if dtype == 'counter':
                 value = entry.counter_value
             elif dtype == 'set':
                 value = self._decode_set_value(entry.set_value)
             elif dtype == 'register':
-                value = entry.register_value[:]
+                value = bytes_to_str(entry.register_value[:])
             elif dtype == 'flag':
                 value = entry.flag_value
             elif dtype == 'map':
@@ -548,7 +569,7 @@ class RiakPbcCodec(object):
         return out
 
     def _decode_set_value(self, set_value):
-        return [string[:] for string in set_value]
+        return [bytes_to_str(string[:]) for string in set_value]
 
     def _encode_dt_op(self, dtype, req, op):
         if dtype == 'counter':
@@ -563,9 +584,9 @@ class RiakPbcCodec(object):
 
     def _encode_set_op(self, msg, op):
         if 'adds' in op:
-            msg.set_op.adds.extend(op['adds'])
+            msg.set_op.adds.extend(str_to_bytes(op['adds']))
         if 'removes' in op:
-            msg.set_op.removes.extend(op['removes'])
+            msg.set_op.removes.extend(str_to_bytes(op['removes']))
 
     def _encode_map_op(self, msg, ops):
         for op in ops:
@@ -573,15 +594,15 @@ class RiakPbcCodec(object):
             ftype = MAP_FIELD_TYPES[dtype]
             if op[0] == 'add':
                 add = msg.adds.add()
-                add.name = name
+                add.name = str_to_bytes(name)
                 add.type = ftype
             elif op[0] == 'remove':
                 remove = msg.removes.add()
-                remove.name = name
+                remove.name = str_to_bytes(name)
                 remove.type = ftype
             elif op[0] == 'update':
                 update = msg.updates.add()
-                update.field.name = name
+                update.field.name = str_to_bytes(name)
                 update.field.type = ftype
                 self._encode_map_update(dtype, update, op[2])
 
@@ -595,7 +616,7 @@ class RiakPbcCodec(object):
             self._encode_map_op(msg.map_op, op)
         elif dtype == 'register':
             # ('assign', some_str)
-            msg.register_op = op[1]
+            msg.register_op = str_to_bytes(op[1])
         elif dtype == 'flag':
             if op == 'enable':
                 msg.flag_op = riak_pb.MapUpdate.ENABLE

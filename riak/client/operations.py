@@ -16,10 +16,13 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from transport import RiakClientTransport, retryable, retryableHttpOnly
-from multiget import multiget
-from index_page import IndexPage
+from riak.client.transport import RiakClientTransport, \
+    retryable, retryableHttpOnly
+from riak.client.multiget import multiget
+from riak.client.index_page import IndexPage
 from riak.datatypes import TYPES
+from riak.util import bytes_to_str
+from six import string_types, PY2
 
 
 class RiakClientOperations(RiakClientTransport):
@@ -59,7 +62,7 @@ class RiakClientOperations(RiakClientTransport):
         else:
             bucketfn = lambda name: self.bucket(name)
 
-        return [bucketfn(name) for name in
+        return [bucketfn(bytes_to_str(name)) for name in
                 transport.get_buckets(bucket_type=bucket_type,
                                       timeout=timeout)]
 
@@ -111,7 +114,8 @@ class RiakClientOperations(RiakClientTransport):
         stream.attach(resource)
         try:
             for bucket_list in stream:
-                bucket_list = [bucketfn(name) for name in bucket_list]
+                bucket_list = [bucketfn(bytes_to_str(name))
+                               for name in bucket_list]
                 if len(bucket_list) > 0:
                     yield bucket_list
         finally:
@@ -507,7 +511,10 @@ class RiakClientOperations(RiakClientTransport):
         try:
             for keylist in stream:
                 if len(keylist) > 0:
-                    yield keylist
+                    if PY2:
+                        yield keylist
+                    else:
+                        yield [bytes_to_str(item) for item in keylist]
         finally:
             stream.close()
 
@@ -572,7 +579,7 @@ class RiakClientOperations(RiakClientTransport):
         :type notfound_ok: bool
         """
         _validate_timeout(timeout)
-        if not isinstance(robj.key, basestring):
+        if not isinstance(robj.key, string_types):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
@@ -906,7 +913,11 @@ class RiakClientOperations(RiakClientTransport):
         :param returnvalue: whether to return the updated value of the counter
         :type returnvalue: bool
         """
-        if type(value) not in (int, long):
+        if PY2:
+            valid_types = (int, long)
+        else:
+            valid_types = (int,)
+        if type(value) not in valid_types:
             raise TypeError("Counter update amount must be an integer")
         if value == 0:
             raise ValueError("Cannot increment counter by 0")
@@ -1041,6 +1052,6 @@ def _validate_timeout(timeout):
     Raises an exception if the given timeout is an invalid value.
     """
     if not (timeout is None or
-            (type(timeout) in (int, long) and
-             timeout > 0)):
+            ((type(timeout) == int or (PY2 and type(timeout) == long))
+             and timeout > 0)):
         raise ValueError("timeout must be a positive integer")

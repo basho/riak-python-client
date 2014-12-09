@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 import os
-import cPickle
-import copy
 import platform
+from six import string_types, PY2, PY3
+if PY2:
+    import cPickle
+    test_pickle_dumps = cPickle.dumps
+    test_pickle_loads = cPickle.loads
+else:
+    import pickle
+    test_pickle_dumps = pickle.dumps
+    test_pickle_loads = pickle.loads
+import copy
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
@@ -37,7 +45,7 @@ class NotJsonSerializable(object):
         value2_args = copy.copy(other.args)
         value1_args.sort()
         value2_args.sort()
-        for i in xrange(len(value1_args)):
+        for i in range(len(value1_args)):
             if value1_args[i] != value2_args[i]:
                 return False
         return True
@@ -60,18 +68,34 @@ class BasicKVTests(object):
 
         # unicode objects are fine, as long as they don't
         # contain any non-ASCII chars
-        self.client.bucket(unicode(self.bucket_name))
-        self.assertRaises(TypeError, self.client.bucket, u'búcket')
-        self.assertRaises(TypeError, self.client.bucket, 'búcket')
+        if PY2:
+            self.client.bucket(unicode(self.bucket_name))
+        else:
+            self.client.bucket(self.bucket_name)
+        if PY2:
+            self.assertRaises(TypeError, self.client.bucket, u'búcket')
+            self.assertRaises(TypeError, self.client.bucket, 'búcket')
+        else:
+            self.client.bucket(u'búcket')
+            self.client.bucket('búcket')
 
         bucket.get(u'foo')
-        self.assertRaises(TypeError, bucket.get, u'føø')
-        self.assertRaises(TypeError, bucket.get, 'føø')
+        if PY2:
+            self.assertRaises(TypeError, bucket.get, u'føø')
+            self.assertRaises(TypeError, bucket.get, 'føø')
 
-        self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
-        self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
-        self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
-        self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
+            self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
+            self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
+            self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
+            self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
+        else:
+            bucket.get(u'føø')
+            bucket.get('føø')
+
+            bucket.new(u'foo', 'éå')
+            bucket.new(u'foo', 'éå')
+            bucket.new('foo', u'éå')
+            bucket.new('foo', u'éå')
 
         obj2 = bucket.new('baz', rand, 'application/json')
         obj2.charset = 'UTF-8'
@@ -100,17 +124,22 @@ class BasicKVTests(object):
     def test_string_bucket_name(self):
         # Things that are not strings cannot be bucket names
         for bad in (12345, True, None, {}, []):
-            with self.assertRaisesRegexp(TypeError, 'must be a string'):
+            with self.assert_raises_regex(TypeError, 'must be a string'):
                 self.client.bucket(bad)
 
-            with self.assertRaisesRegexp(TypeError, 'must be a string'):
-                RiakBucket(self.client, bad, None)
+            if PY2:
+                with self.assert_raises_regex(TypeError, 'must be a string'):
+                    RiakBucket(self.client, bad, None)
 
-        # Unicode bucket names are not supported, if they can't be
-        # encoded to ASCII. This should be changed in a future
-        # release.
-        with self.assertRaisesRegexp(TypeError,
-                                     'Unicode bucket names are not supported'):
+        # Unicode bucket names are not supported in Python 2.x,
+        # if they can't be encoded to ASCII. This should be changed in a
+        # future  release.
+        if PY2:
+            with self.assert_raises_regex(TypeError,
+                                          'Unicode bucket names '
+                                          'are not supported'):
+                self.client.bucket(u'føø')
+        else:
             self.client.bucket(u'føø')
 
         # This is fine, since it's already ASCII
@@ -137,7 +166,7 @@ class BasicKVTests(object):
         for keylist in bucket.stream_keys():
             self.assertNotEqual([], keylist)
             for key in keylist:
-                self.assertIsInstance(key, basestring)
+                self.assertIsInstance(key, string_types)
             streamed_keys += keylist
         self.assertEqual(sorted(regular_keys), sorted(streamed_keys))
 
@@ -148,7 +177,7 @@ class BasicKVTests(object):
             for keylist in self.client.stream_keys(bucket, timeout=1):
                 self.assertNotEqual([], keylist)
                 for key in keylist:
-                    self.assertIsInstance(key, basestring)
+                    self.assertIsInstance(key, string_types)
                 streamed_keys += keylist
 
     def test_stream_keys_abort(self):
@@ -182,6 +211,10 @@ class BasicKVTests(object):
         bucket = self.client.bucket(self.bucket_name)
         # Store as binary, retrieve as binary, then compare...
         rand = str(self.randint())
+        if PY2:
+            rand = bytes(rand)
+        else:
+            rand = bytes(rand, 'utf-8')
         obj = bucket.new(self.key_name, encoded_data=rand,
                          content_type='text/plain')
         obj.store()
@@ -194,23 +227,28 @@ class BasicKVTests(object):
         obj = bucket.new(key2, data)
         obj.store()
         obj = bucket.get(key2)
-        self.assertEqual(data, json.loads(obj.encoded_data))
+        self.assertEqual(data, json.loads(obj.encoded_data.decode()))
 
     def test_blank_binary_204(self):
         bucket = self.client.bucket(self.bucket_name)
 
         # this should *not* raise an error
-        obj = bucket.new('foo2', encoded_data='', content_type='text/plain')
+        empty = ""
+        if PY2:
+            empty = bytes(empty)
+        else:
+            empty = bytes(empty, 'utf-8')
+        obj = bucket.new('foo2', encoded_data=empty, content_type='text/plain')
         obj.store()
         obj = bucket.get('foo2')
         self.assertTrue(obj.exists)
-        self.assertEqual(obj.encoded_data, '')
+        self.assertEqual(obj.encoded_data, empty)
 
     def test_custom_bucket_encoder_decoder(self):
         bucket = self.client.bucket(self.bucket_name)
         # Teach the bucket how to pickle
-        bucket.set_encoder('application/x-pickle', cPickle.dumps)
-        bucket.set_decoder('application/x-pickle', cPickle.loads)
+        bucket.set_encoder('application/x-pickle', test_pickle_dumps)
+        bucket.set_decoder('application/x-pickle', test_pickle_loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
         obj = bucket.new(self.key_name, data, 'application/x-pickle')
         obj.store()
@@ -220,8 +258,8 @@ class BasicKVTests(object):
     def test_custom_client_encoder_decoder(self):
         bucket = self.client.bucket(self.bucket_name)
         # Teach the client how to pickle
-        self.client.set_encoder('application/x-pickle', cPickle.dumps)
-        self.client.set_decoder('application/x-pickle', cPickle.loads)
+        self.client.set_encoder('application/x-pickle', test_pickle_dumps)
+        self.client.set_decoder('application/x-pickle', test_pickle_loads)
         data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
         obj = bucket.new(self.key_name, data, 'application/x-pickle')
         obj.store()
@@ -229,9 +267,12 @@ class BasicKVTests(object):
         self.assertEqual(data, obj2.data)
 
     def test_unknown_content_type_encoder_decoder(self):
-        # Teach the bucket how to pickle
+        # Bypass the content_type encoders
         bucket = self.client.bucket(self.bucket_name)
         data = "some funny data"
+        if PY3:
+            # Python 3.x needs to store binaries
+            data = data.encode()
         obj = bucket.new(self.key_name,
                          encoded_data=data,
                          content_type='application/x-frobnicator')
@@ -316,8 +357,8 @@ class BasicKVTests(object):
 
         # Even if it previously existed, let's store a base resolved version
         # from which we can diverge by sending a stale vclock.
-        obj.encoded_data = 'start'
-        obj.content_type = 'application/octet-stream'
+        obj.data = 'start'
+        obj.content_type = 'text/plain'
         obj.store()
 
         vals = set(self.generate_siblings(obj, count=5))
@@ -334,7 +375,7 @@ class BasicKVTests(object):
 
         # Get each of the values - make sure they match what was
         # assigned
-        vals2 = set([sibling.encoded_data for sibling in obj.siblings])
+        vals2 = set([sibling.data for sibling in obj.siblings])
         self.assertEqual(vals, vals2)
 
         # Resolve the conflict, and then do a get...
@@ -344,7 +385,7 @@ class BasicKVTests(object):
 
         obj.reload()
         self.assertEqual(len(obj.siblings), 1)
-        self.assertEqual(obj.encoded_data, resolved_sibling.encoded_data)
+        self.assertEqual(obj.data, resolved_sibling.data)
 
     @unittest.skipIf(SKIP_RESOLVE == '1',
                      "skip requested for resolvers test")
@@ -355,7 +396,7 @@ class BasicKVTests(object):
 
         # Even if it previously existed, let's store a base resolved version
         # from which we can diverge by sending a stale vclock.
-        obj.encoded_data = 'start'
+        obj.data = 'start'
         obj.content_type = 'text/plain'
         obj.store()
 
@@ -418,8 +459,8 @@ class BasicKVTests(object):
         obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
-        obj.encoded_data = 'start'
-        obj.content_type = 'application/octet-stream'
+        obj.data = 'start'
+        obj.content_type = 'text/plain'
         obj.store(return_body=True)
 
         obj.delete()
@@ -432,7 +473,7 @@ class BasicKVTests(object):
         for sib in obj.siblings:
             if sib.exists:
                 non_tombstones += 1
-            self.assertTrue(sib.encoded_data in vals or not sib.exists)
+            self.assertTrue(not sib.exists or sib.data in vals)
         self.assertEqual(non_tombstones, 4)
 
     def test_store_of_missing_object(self):
@@ -450,11 +491,17 @@ class BasicKVTests(object):
         # for binary objects
         o = bucket.get(self.randname())
         self.assertEqual(o.exists, False)
-        o.encoded_data = "1234567890"
+        if PY2:
+            o.encoded_data = "1234567890"
+        else:
+            o.encoded_data = "1234567890".encode()
         o.content_type = 'application/octet-stream'
 
         o = o.store()
-        self.assertEqual(o.encoded_data, "1234567890")
+        if PY2:
+            self.assertEqual(o.encoded_data, "1234567890")
+        else:
+            self.assertEqual(o.encoded_data, "1234567890".encode())
         self.assertEqual(o.content_type, "application/octet-stream")
         o.delete()
 
@@ -513,18 +560,18 @@ class BasicKVTests(object):
 
     def generate_siblings(self, original, count=5, delay=None):
         vals = []
-        for i in range(count):
+        for _ in range(count):
             while True:
-                randval = self.randint()
-                if str(randval) not in vals:
+                randval = str(self.randint())
+                if randval not in vals:
                     break
 
             other_obj = original.bucket.new(key=original.key,
-                                            encoded_data=str(randval),
+                                            data=randval,
                                             content_type='text/plain')
             other_obj.vclock = original.vclock
             other_obj.store()
-            vals.append(str(randval))
+            vals.append(randval)
             if delay:
                 sleep(delay)
         return vals

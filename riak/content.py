@@ -16,6 +16,7 @@ specific language governing permissions and limitations
 under the License.
 """
 from riak import RiakError
+from six import string_types
 
 
 class RiakContent(object):
@@ -75,13 +76,13 @@ class RiakContent(object):
         will result in encoding the `data` property into a string. The
         encoding is dependent on the `content_type` property and the
         bucket's registered encoders.
-        :type basestring""")
+        :type str""")
 
     def _serialize(self, value):
         encoder = self._robject.bucket.get_encoder(self.content_type)
         if encoder:
             return encoder(value)
-        elif isinstance(value, basestring):
+        elif isinstance(value, string_types):
             return value.encode()
         else:
             raise TypeError('No encoder for non-string data '

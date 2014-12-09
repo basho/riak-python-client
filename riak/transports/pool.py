@@ -16,12 +16,13 @@ specific language governing permissions and limitations
 under the License.
 """
 
+from __future__ import print_function
 from contextlib import contextmanager
 import threading
 
 
 # This file is a rough port of the Innertube Ruby library
-class BadResource(StandardError):
+class BadResource(Exception):
     """
     Users of a :class:`Pool` should raise this error when the pool
     resource currently in-use is bad and should be removed from the
@@ -88,7 +89,7 @@ class Pool(object):
         with pool.transaction() as resource:
             resource.append(1)
         with pool.transaction() as resource2:
-            print repr(resource2) # should be [1]
+            print(repr(resource2)) # should be [1]
 
     """
 
@@ -249,11 +250,16 @@ class PoolIterator(object):
         return self
 
     def next(self):
+        # Python 2.x version
         if len(self.targets) == 0:
             raise StopIteration
         if len(self.unlocked) == 0:
             self.__claim_resources()
         return self.unlocked.pop(0)
+
+    def __next__(self):
+        # Python 3.x version
+        return self.next()
 
     def __claim_resources(self):
         with self.lock:

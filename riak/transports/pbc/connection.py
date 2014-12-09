@@ -20,7 +20,6 @@ import socket
 import struct
 import riak_pb
 from riak.security import SecurityError
-from riak.transports.security import configure_context
 from riak import RiakError
 from riak_pb.messages import (
     MESSAGE_CLASSES,
@@ -29,7 +28,14 @@ from riak_pb.messages import (
     MSG_CODE_AUTH_REQ,
     MSG_CODE_AUTH_RESP
 )
-from OpenSSL.SSL import Context, Connection
+from riak.util import bytes_to_str, str_to_bytes
+from six import PY2
+if PY2:
+    from OpenSSL.SSL import Connection
+    from riak.transports.security import configure_pyopenssl_context
+else:
+    import ssl
+    from riak.transports.security import configure_ssl_context
 
 
 class RiakPbcConnection(object):
@@ -98,8 +104,8 @@ class RiakPbcConnection(object):
               auth request/response to prevent denial of service attacks
         """
         req = riak_pb.RpbAuthReq()
-        req.user = self._client._credentials.username
-        req.password = self._client._credentials.password
+        req.user = str_to_bytes(self._client._credentials.username)
+        req.password = str_to_bytes(self._client._credentials.password)
         msg_code, _ = self._non_connect_request(MSG_CODE_AUTH_REQ, req,
                                                 MSG_CODE_AUTH_RESP)
         if msg_code == MSG_CODE_AUTH_RESP:
@@ -107,38 +113,69 @@ class RiakPbcConnection(object):
         else:
             return False
 
-    def _ssl_handshake(self):
-        """
-        Perform an SSL handshake w/ the server.
-        Precondition: a successful STARTTLS exchange has
-                     taken place with Riak
-        returns True upon success, otherwise an exception is raised
-        """
-        if self._client._credentials:
-            ssl_ctx = \
-                Context(self._client._credentials.ssl_version)
-            try:
-                configure_context(ssl_ctx, self._client._credentials)
-                # attempt to upgrade the socket to SSL
-                ssl_socket = Connection(ssl_ctx, self._socket)
-                ssl_socket.set_connect_state()
-                ssl_socket.do_handshake()
-                # ssl handshake successful
-                self._socket = ssl_socket
+    if PY2:
+        def _ssl_handshake(self):
+            """
+            Perform an SSL handshake w/ the server.
+            Precondition: a successful STARTTLS exchange has
+                         taken place with Riak
+            returns True upon success, otherwise an exception is raised
+            """
+            if self._client._credentials:
+                try:
+                    ssl_ctx = configure_pyopenssl_context(self.
+                                                          _client._credentials)
+                    # attempt to upgrade the socket to SSL
+                    ssl_socket = Connection(ssl_ctx, self._socket)
+                    ssl_socket.set_connect_state()
+                    ssl_socket.do_handshake()
+                    # ssl handshake successful
+                    self._socket = ssl_socket
 
-                self._client._credentials._check_revoked_cert(ssl_socket)
+                    self._client._credentials._check_revoked_cert(ssl_socket)
+                    return True
+                except Exception as e:
+                    # fail if *any* exceptions are thrown during SSL handshake
+                    raise SecurityError(e.message)
+    else:
+        def _ssl_handshake(self):
+            """
+            Perform an SSL handshake w/ the server.
+            Precondition: a successful STARTTLS exchange has
+                         taken place with Riak
+            returns True upon success, otherwise an exception is raised
+            """
+            credentials = self._client._credentials
+            if credentials:
+                try:
+                    ssl_ctx = configure_ssl_context(credentials)
+                    host = "riak@" + self._address[0]
+                    ssl_socket = ssl.SSLSocket(sock=self._socket,
+                                               keyfile=credentials.pkey_file,
+                                               certfile=credentials.cert_file,
+                                               cert_reqs=ssl.CERT_REQUIRED,
+                                               ca_certs=credentials.
+                                               cacert_file,
+                                               ciphers=credentials.ciphers,
+                                               server_hostname=host)
+                    ssl_socket.context = ssl_ctx
+                    # ssl handshake successful
+                    ssl_socket.do_handshake()
+                    self._socket = ssl_socket
 
-                return True
-            except Exception as e:
-                # fail if *any* exceptions are thrown during SSL handshake
-                raise SecurityError(e.message)
+                    return True
+                except ssl.SSLError as e:
+                    raise SecurityError(e.library + ": " + e.reason)
+                except Exception as e:
+                    # fail if *any* exceptions are thrown during SSL handshake
+                    raise SecurityError(e)
 
     def _recv_msg(self, expect=None):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code is MSG_CODE_ERROR_RESP:
             err = self._parse_msg(msg_code, self._inbuf[1:])
-            raise RiakError(err.errmsg)
+            raise RiakError(bytes_to_str(err.errmsg))
         elif msg_code in MESSAGE_CLASSES:
             msg = self._parse_msg(msg_code, self._inbuf[1:])
         else:
@@ -162,7 +199,10 @@ class RiakPbcConnection(object):
                 % len(nmsglen))
         msglen, = struct.unpack('!i', nmsglen)
         self._inbuf_len = msglen
-        self._inbuf = ''
+        if PY2:
+            self._inbuf = ''
+        else:
+            self._inbuf = bytes()
         while len(self._inbuf) < msglen:
             want_len = min(8192, msglen - len(self._inbuf))
             recv_buf = self._socket.recv(want_len)
