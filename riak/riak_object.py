@@ -358,16 +358,25 @@ class RiakObject(object):
         self.siblings = []
         return self
 
-    def add(self, *args):
+    def add(self, arg1, arg2=None, arg3=None, bucket_type=None):
         """
         Start assembling a Map/Reduce operation.
         A shortcut for :meth:`~riak.mapreduce.RiakMapReduce.add`.
 
+        :param arg1: the object or bucket to add
+        :type arg1: RiakObject, string
+        :param arg2: a key or list of keys to add (if a bucket is
+          given in arg1)
+        :type arg2: string, list, None
+        :param arg3: key data for this input (must be convertible to JSON)
+        :type arg3: string, list, dict, None
+        :param bucket_type: Optional name of a bucket type
+        :type bucket_type: string, None
         :rtype: :class:`~riak.mapreduce.RiakMapReduce`
         """
         mr = RiakMapReduce(self.client)
-        mr.add(self.bucket.name, self.key)
-        return mr.add(*args)
+        mr.add(self.bucket.name, self.key, bucket_type=bucket_type)
+        return mr.add(arg1, arg2, arg3, bucket_type)
 
     def link(self, *args):
         """
