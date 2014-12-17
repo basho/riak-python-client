@@ -267,9 +267,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             raise TypeError('bucket_type must be a string '
                             'or riak.bucket.BucketType')
 
-        if (bucket_type, name) in self._buckets:
+        try:
             return self._buckets[(bucket_type, name)]
-        else:
+        except KeyError:
             bucket = RiakBucket(self, name, bucket_type)
             self._buckets[(bucket_type, name)] = bucket
             return bucket
