@@ -252,7 +252,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if self.client_timeouts() and timeout:
             req.timeout = timeout
 
-        if self.tombstone_vclocks() and robj.vclock:
+        use_vclocks = (self.tombstone_vclocks() and hasattr(robj, 'vclock')
+                       and robj.vclock)
+        if use_vclocks:
             req.vclock = robj.vclock.encode('binary')
 
         bucket = robj.bucket

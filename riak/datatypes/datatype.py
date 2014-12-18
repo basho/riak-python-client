@@ -104,6 +104,17 @@ class Datatype(object):
         self._set_value(value)
         return self
 
+    def delete(self, **params):
+        """
+        Deletes the datatype from Riak. See :meth:`RiakClient.delete()
+        <riak.client.RiakClient.delete>` for options.
+        """
+        self.clear()
+        self._context = None
+        self._set_value(self._default_value())
+        self.bucket._client.delete(self, **params)
+        return self
+
     def update(self, **params):
         """
         Sends locally staged mutations to Riak.
