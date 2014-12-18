@@ -97,7 +97,7 @@ class RiakHttpResources(object):
                    **options):
         if not self.riak_kv_wm_buckets:
             raise RiakError("Indexes are unsupported by this Riak node")
-        if finish:
+        if finish is not None:
             finish = quote_plus(str(finish))
         if self.riak_kv_wm_bucket_type and bucket_type:
             return mkpath("/types", quote_plus(bucket_type),

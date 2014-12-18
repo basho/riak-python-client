@@ -438,7 +438,7 @@ class RiakPbcCodec(object):
         req = riak_pb.RpbIndexReq(bucket=str_to_bytes(bucket.name),
                                   index=str_to_bytes(index))
         self._add_bucket_type(req, bucket.bucket_type)
-        if endkey:
+        if endkey is not None:
             req.qtype = riak_pb.RpbIndexReq.range
             req.range_min = str_to_bytes(str(startkey))
             req.range_max = str_to_bytes(str(endkey))

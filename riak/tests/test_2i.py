@@ -464,7 +464,21 @@ class TwoITests(object):
 
         self.assertEqual([('val2', o2.key)], results)
 
-    def _create_index_objects(self):
+    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEX is defined')
+    def test_index_falsey_endkey_gh378(self):
+        if not self.is_2i_supported():
+            raise unittest.SkipTest("2I is not supported")
+
+        bucket, o1, o2, o3, o4 = self._create_index_objects(int_sign=-1)
+
+        results = []
+        for item in bucket.stream_index('field2_int', -10000, 0):
+            results.extend(item)
+
+        self.assertEqual(set([o4.key, o3.key, o2.key, o1.key]),
+                         set(results))
+
+    def _create_index_objects(self, int_sign=1):
         """
         Creates a number of index objects to be used in 2i test
         """
@@ -473,22 +487,22 @@ class TwoITests(object):
         o1 = bucket.\
             new(self.randname(), 'data1').\
             add_index('field1_bin', 'val1').\
-            add_index('field2_int', 1001).\
+            add_index('field2_int', int_sign*1001).\
             store()
         o2 = bucket.\
             new(self.randname(), 'data1').\
             add_index('field1_bin', 'val2').\
-            add_index('field2_int', 1002).\
+            add_index('field2_int', int_sign*1002).\
             store()
         o3 = bucket.\
             new(self.randname(), 'data1').\
             add_index('field1_bin', 'val3').\
-            add_index('field2_int', 1003).\
+            add_index('field2_int', int_sign*1003).\
             store()
         o4 = bucket.\
             new(self.randname(), 'data1').\
             add_index('field1_bin', 'val4').\
-            add_index('field2_int', 1004).\
+            add_index('field2_int', int_sign*1004).\
             store()
 
         return bucket, o1, o2, o3, o4
