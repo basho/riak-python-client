@@ -1,5 +1,32 @@
 # Riak Python Client Release Notes
 
+## 2.2.0 Feature Release - 2014-12-18
+
+Release 2.2.0 features support for
+[Python 3](https://github.com/basho/riak-python-client/pull/379),
+specifically 3.3 and 3.4.  This version uses the native SSL security instead
+of [pyOpenSSL](http://pypi.python.org/pypi/pyOpenSSL) which is required
+for the Python 2 series.
+
+This release also includes many bugfixes and enhancements, most
+notably:
+
+* [Fixed an issue with the implementation of `Mapping.__iter__`]
+  (https://github.com/basho/riak-python-client/pull/367)
+* [Test client certificate generation updated]
+  (https://github.com/basho/riak-python-client/pull/373)
+* [Protocol Buffers had a socket.send issue]
+  (https://github.com/basho/riak-python-client/pull/382)
+* [Support for bucket types in Map/Reduce jobs added]
+  (https://github.com/basho/riak-python-client/pull/385)
+* [Race condition in `RiakBucket` creation fixed]
+  (https://github.com/basho/riak-python-client/pull/386)
+* [Data Types can now be deleted]
+  (https://github.com/basho/riak-python-client/pull/387)
+* [2i Range Queries with a zero end index now work]
+  (https://github.com/basho/riak-python-client/pull/388)
+
+
 ## 2.1.0 Feature Release - 2014-09-03
 
 Release 2.1.0 features support for Riak 2.0 capabilities including:
