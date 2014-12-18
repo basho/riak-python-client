@@ -5,7 +5,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-from riak import RiakBucket, BucketType
+from riak import RiakBucket, BucketType, RiakObject
 import riak.datatypes as datatypes
 from . import SKIP_DATATYPES
 from riak.tests import test_six
@@ -450,3 +450,30 @@ class DatatypeIntegrationTests(object):
         mymap.store()
 
         self.assertEqual(mymap.value, {})
+
+    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
+    def test_delete_datatype(self):
+        ctype = self.client.bucket_type('pytest-counters')
+        cbucket = ctype.bucket(self.bucket_name)
+        counter = cbucket.new(self.key_name)
+        counter.increment(5)
+        counter.store()
+
+        stype = self.client.bucket_type('pytest-sets')
+        sbucket = stype.bucket(self.bucket_name)
+        set_ = sbucket.new(self.key_name)
+        set_.add("Brett")
+        set_.store()
+
+        mtype = self.client.bucket_type('pytest-maps')
+        mbucket = mtype.bucket(self.bucket_name)
+        map_ = mbucket.new(self.key_name)
+        map_.sets['people'].add('Sean')
+        map_.store()
+
+        for t in [counter, set_, map_]:
+            t.delete()
+            obj = RiakObject(self.client, t.bucket, t.key)
+            self.client.get(obj)
+            self.assertFalse(obj.exists,
+                             "{0} exists after deletion".format(t.type_name))
