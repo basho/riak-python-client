@@ -125,6 +125,7 @@ Persistence methods
 
     This is an alias for :meth:`~riak.datatypes.Datatype.update`.
 
+.. automethod:: Datatype.delete
 .. automethod:: Datatype.clear
 
 -------
