@@ -11,7 +11,6 @@ configure:
 	@../setup.py configure --riak-admin=${RIAK_ADMIN}
 
 compile:
-	-@yes y | pip uninstall riak-pb protobuf pyOpenSSL
 	@../setup.py develop
 
 lint:
