@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import platform
+import sys
 from setuptools import setup, find_packages
 from version import get_version
 from commands import preconfigure, configure, create_bucket_types, \
@@ -7,16 +7,17 @@ from commands import preconfigure, configure, create_bucket_types, \
 
 install_requires = ['six >= 1.8.0']
 requires = ['six(>=1.8.0)']
-if platform.python_version() < '3.0':
+if sys.version_info < (2, 7, 9):
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
+if sys.version_info < (3, ):
     install_requires.append("riak_pb >=2.0.0")
     requires.append("riak_pb(>=2.0.0)")
 else:
     install_requires.append("python3_riak_pb >=2.0.0")
     requires.append("python3_riak_pb(>=2.0.0)")
 tests_require = []
-if platform.python_version() < '2.7':
+if sys.version_info < (2, 7):
     tests_require.append("unittest2")
 
 setup(
