@@ -16,34 +16,25 @@ specific language governing permissions and limitations
 under the License.
 """
 
+import ssl
 import warnings
-from six import PY2
 from riak import RiakError
 from riak.util import str_to_long
 
-OPENSSL_VERSION_101G = 268439679
-if PY2:
+if hasattr(ssl, 'SSLContext'):
+    # For Python >= 2.7.9 and Python 3.x
+    USE_STDLIB_SSL = True
+else:
+    # For Python 2.6 and <= 2.7.8
+    USE_STDLIB_SSL = False
+
+if not USE_STDLIB_SSL:
     import OpenSSL.SSL
     from OpenSSL import crypto
-    sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
-    # Be sure to use at least OpenSSL 1.0.1g
-    if (sslver < OPENSSL_VERSION_101G) or \
-            not hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
-        verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
-        msg = "Found {0} version, but expected at least OpenSSL 1.0.1g.  " \
-              "Security may not support TLS 1.2.".format(verstring)
-        warnings.warn(msg, UserWarning)
-    if hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
-        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_2_METHOD
-    elif hasattr(OpenSSL.SSL, 'TLSv1_1_METHOD'):
-        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_1_METHOD
-    elif hasattr(OpenSSL.SSL, 'TLSv1_METHOD'):
-        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_METHOD
-    else:
-        DEFAULT_TLS_VERSION = OpenSSL.SSL.SSLv23_METHOD
-else:
-    import ssl
 
+OPENSSL_VERSION_101G = 268439679
+if hasattr(ssl, 'OPENSSL_VERSION_NUMBER'):
+    # For Python 2.7 and Python 3.x
     sslver = ssl.OPENSSL_VERSION_NUMBER
     # Be sure to use at least OpenSSL 1.0.1g
     if sslver < OPENSSL_VERSION_101G or \
@@ -60,6 +51,25 @@ else:
         DEFAULT_TLS_VERSION = ssl.PROTOCOL_TLSv1
     else:
         DEFAULT_TLS_VERSION = ssl.PROTOCOL_SSLv23
+
+else:
+    # For Python 2.6
+    sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
+    # Be sure to use at least OpenSSL 1.0.1g
+    if (sslver < OPENSSL_VERSION_101G) or \
+            not hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
+        verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
+        msg = "Found {0} version, but expected at least OpenSSL 1.0.1g.  " \
+              "Security may not support TLS 1.2.".format(verstring)
+        warnings.warn(msg, UserWarning)
+    if hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_2_METHOD
+    elif hasattr(OpenSSL.SSL, 'TLSv1_1_METHOD'):
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_1_METHOD
+    elif hasattr(OpenSSL.SSL, 'TLSv1_METHOD'):
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_METHOD
+    else:
+        DEFAULT_TLS_VERSION = OpenSSL.SSL.SSLv23_METHOD
 
 
 class SecurityError(RiakError):
@@ -197,7 +207,7 @@ class SecurityCreds:
         """
         return self._ssl_version
 
-    if PY2:
+    if not USE_STDLIB_SSL:
         @property
         def pkey(self):
             """
@@ -266,20 +276,20 @@ class SecurityCreds:
             return (getattr(self, internal_key) is not None) or \
                 (getattr(self, internal_key + "_file") is not None)
 
-    def _check_revoked_cert(self, ssl_socket):
-        """
-        Checks whether the server certificate on the passed socket has been
-        revoked by checking the CRL.
+        def _check_revoked_cert(self, ssl_socket):
+            """
+            Checks whether the server certificate on the passed socket has been
+            revoked by checking the CRL.
 
-        :param ssl_socket: the SSL/TLS socket
-        :rtype: bool
-        :raises SecurityError: when the certificate has been revoked
-        """
-        if not self._has_credential('crl'):
-            return True
+            :param ssl_socket: the SSL/TLS socket
+            :rtype: bool
+            :raises SecurityError: when the certificate has been revoked
+            """
+            if not self._has_credential('crl'):
+                return True
 
-        servcert = ssl_socket.get_peer_certificate()
-        servserial = servcert.get_serial_number()
-        for rev in self.crl.get_revoked():
-            if servserial == str_to_long(rev.get_serial(), 16):
-                raise SecurityError("Server certificate has been revoked")
+            servcert = ssl_socket.get_peer_certificate()
+            servserial = servcert.get_serial_number()
+            for rev in self.crl.get_revoked():
+                if servserial == str_to_long(rev.get_serial(), 16):
+                    raise SecurityError("Server certificate has been revoked")
