@@ -340,6 +340,27 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             raise RiakError('Error setting bucket-type properties.')
         return True
 
+    def get_api_entry_point(self, bucket, key, proto):
+        """
+        Fetch host:port of API entry point at riak_kv node containing
+        given bucket and key.
+        """
+        url = self.api_entry_point_path(
+            bucket.name, key,
+            {'proto': proto})
+        status, _, body = self._request('GET', url)
+
+        if status == 200:
+            hplist = json.loads(bytes_to_str(body))
+            if hplist:
+                host = hplist.keys[0]
+                port = hplist[host]['ports'][0]
+                return host, port
+            else:
+                return "", 0
+        else:
+            raise RiakError('Error getting api entry point details.')
+
     def mapred(self, inputs, query, timeout=None):
         """
         Run a MapReduce query.

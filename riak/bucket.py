@@ -392,6 +392,14 @@ class RiakBucket(object):
         """
         return self._client.stream_keys(self)
 
+    def get_api_entry_point(self, key, proto):
+        """
+        Return API entry point for a given protocol and bucket.
+
+        :rtype: (host, port)
+        """
+        return self._client.get_api_entry_point(self, key, proto)
+
     def new_from_file(self, key, filename):
         """Create a new Riak object in the bucket, using the contents of
         the specified file. This is a shortcut for :meth:`new`, where the

@@ -470,6 +470,41 @@ class RiakClientOperations(RiakClientTransport):
         _validate_timeout(timeout)
         return transport.get_keys(bucket, timeout=timeout)
 
+    @retryable
+    def get_api_entry_point(self, transport, bucket, key, proto = 'pbc'):
+        """
+        get_api_entry_point(transport, bucket, key, proto = 'pbc')
+
+        Fetch [(ip, [port])] of API entry points to riak_kv nodes containing
+        given bucket and key, accessible via protocol as specified.
+
+        :param bucket: the bucket to find API entry point for
+        :type bucket: RiakBucket
+        :param key: the particular key in that bucket to find API ep for
+        :type key: string
+        :param proto: entry point API protocol ('pbc' or 'http')
+        :type proto: string
+        :returns: [(host, [port])]
+        :rtype: list
+        """
+        return transport.get_api_entry_point(bucket, key,
+                                             {'pbc':0, 'http':1}[proto])
+
+    @retryable
+    def get_api_entry_points_map(self, transport, proto = 'pbc'):
+        """
+        get_api_entry_points_map(transport, proto = 'pbc')
+
+        Fetch [(ip, [port])] pairs of all API entry point into a riak cluster,
+        accessible via protocol as specified.
+
+        :param proto: entry point API protocol ('pbc' or 'http')
+        :type proto: string
+        :returns: [(ip, [port])]
+        :rtype: list
+        """
+        return transport.get_api_entry_points_map({'pbc':0, 'http':1}[proto])
+
     def stream_keys(self, bucket, timeout=None):
         """
         Lists all keys in a bucket via a stream. This is a generator
