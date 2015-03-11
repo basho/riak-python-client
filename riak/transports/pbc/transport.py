@@ -45,8 +45,6 @@ from riak_pb.messages import (
     MSG_CODE_GET_RESP,
     MSG_CODE_API_EP_REQ,
     MSG_CODE_API_EP_RESP,
-    MSG_CODE_API_EP_MAP_REQ,
-    MSG_CODE_API_EP_MAP_RESP,
     MSG_CODE_PUT_REQ,
     MSG_CODE_PUT_RESP,
     MSG_CODE_DEL_REQ,
@@ -407,32 +405,22 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                                        MSG_CODE_SET_BUCKET_RESP)
         return True
 
-    def get_api_entry_point(self, bucket, key, proto):
+    def get_api_entry_points(self, bucket, key, proto, force_update):
         """
-        Fetch host:port of API entry point at riak_kv node containing
-        given bucket and key.
+        Fetch (addr, port, last_checked) of API entry point at riak_kv
+        node containing given bucket and key, or all entry points of
+        the cluster if bucket or key are None.
         """
         req = riak_pb.RpbApiEpReq()
-        req.bucket = str_to_bytes(bucket.name)
-        req.key = str_to_bytes(key)
+        req.bkey.bucket = str_to_bytes(bucket.name if bucket else "")
+        req.bkey.key = str_to_bytes(key if key else "")
         req.proto = proto
+        req.force_update = force_update
 
         msg_code, resp = self._request(MSG_CODE_API_EP_REQ, req,
                                        MSG_CODE_API_EP_RESP)
 
-        return [(ep.ip, ep.ports,) for ep in resp.eplist]
-
-    def get_api_entry_points_map(self, proto):
-        """
-        Fetch a host:port list of all API entry points of a riak cluster.
-        """
-        req = riak_pb.RpbApiEpMapReq()
-        req.proto = proto
-
-        msg_code, resp = self._request(MSG_CODE_API_EP_MAP_REQ, req,
-                                       MSG_CODE_API_EP_MAP_RESP)
-
-        return [(ep.ip, ep.ports,) for ep in resp.eplist]
+        return [(ep.addr, ep.port, ep.last_checked) for ep in resp.eplist]
 
     def mapred(self, inputs, query, timeout=None):
         # dictionary of phase results - each content should be an encoded array
