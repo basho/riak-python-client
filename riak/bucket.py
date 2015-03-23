@@ -191,7 +191,7 @@ class RiakBucket(object):
         return obj
 
     def get(self, key, r=None, pr=None, timeout=None, include_context=None,
-            basic_quorum=None, notfound_ok=None):
+            basic_quorum=None, notfound_ok=None, apiep_proto=None):
         """
         Retrieve an :class:`~riak.riak_object.RiakObject` or
         :class:`~riak.datatypes.Datatype`, based on the presence and value
@@ -213,6 +213,8 @@ class RiakBucket(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param apiep_proto: 'http', 'pbc' or None, protocol to request API entry points of
+        :type apiep_proto: string or NoneType
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
            :class:`~riak.datatypes.Datatype`
 
@@ -227,7 +229,8 @@ class RiakBucket(object):
             obj = RiakObject(self._client, self, key)
             return obj.reload(r=r, pr=pr, timeout=timeout,
                               basic_quorum=basic_quorum,
-                              notfound_ok=notfound_ok)
+                              notfound_ok=notfound_ok,
+                              apiep_proto=apiep_proto)
 
     def multiget(self, keys, r=None, pr=None, timeout=None,
                  basic_quorum=None, notfound_ok=None):

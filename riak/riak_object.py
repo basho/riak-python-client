@@ -288,7 +288,7 @@ class RiakObject(object):
         return self
 
     def reload(self, r=None, pr=None, timeout=None, basic_quorum=None,
-               notfound_ok=None):
+               notfound_ok=None, apiep_proto=None):
         """
         Reload the object from Riak. When this operation completes, the
         object could contain new metadata and a new value, if the object
@@ -312,10 +312,12 @@ class RiakObject(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param apiep_proto: 'http', 'pbc' or None, protocol to request API entry points of
+        :type apiep_proto: string or NoneType
         :rtype: :class:`RiakObject`
         """
 
-        self.client.get(self, r=r, pr=pr, timeout=timeout)
+        self.client.get(self, r=r, pr=pr, timeout=timeout, apiep_proto=apiep_proto)
         return self
 
     def delete(self, r=None, w=None, dw=None, pr=None, pw=None,

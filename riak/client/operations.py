@@ -583,7 +583,7 @@ class RiakClientOperations(RiakClientTransport):
 
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,
-            basic_quorum=None, notfound_ok=None):
+            basic_quorum=None, notfound_ok=None, apiep_proto=None):
         """
         get(robj, r=None, pr=None, timeout=None)
 
@@ -605,15 +605,19 @@ class RiakClientOperations(RiakClientTransport):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param apiep_proto: 'http', 'pbc' or None, protocol to request API entry points of
+        :type apiep_proto: string or NoneType
         """
         _validate_timeout(timeout)
+        _validate_apiep_proto(apiep_proto)
         if not isinstance(robj.key, string_types):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
         return transport.get(robj, r=r, pr=pr, timeout=timeout,
                              basic_quorum=basic_quorum,
-                             notfound_ok=notfound_ok)
+                             notfound_ok=notfound_ok,
+                             apiep_proto={None:None, 'pbc':0, 'http':1}[apiep_proto])
 
     @retryable
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,
@@ -1083,3 +1087,7 @@ def _validate_timeout(timeout):
             ((type(timeout) == int or (PY2 and type(timeout) == long))
              and timeout > 0)):
         raise ValueError("timeout must be a positive integer")
+
+def _validate_apiep_proto(proto):
+    if proto not in ['http', 'pbc', None]:
+        raise ValueError("apiep_proto must be one of ('http', 'pbc', None)")

@@ -28,7 +28,7 @@ class RiakContent(object):
     def __init__(self, robject, data=None, encoded_data=None, charset=None,
                  content_type='application/json', content_encoding=None,
                  last_modified=None, etag=None, usermeta=None, links=None,
-                 indexes=None, exists=False):
+                 indexes=None, exists=False, apieps=None):
         self._robject = robject
         self._data = data
         self._encoded_data = encoded_data
@@ -41,6 +41,7 @@ class RiakContent(object):
         self.links = links or []
         self.indexes = indexes or set()
         self.exists = exists
+        self.apieps = apieps or []
 
     def _get_data(self):
         if self._encoded_data is not None and self._data is None:
