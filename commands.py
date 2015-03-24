@@ -421,6 +421,9 @@ class preconfigure(Command):
                       r'listener.protobuf.internal = ' + pb_host,
                       conf)
         conf += 'check_crl = off\n'
+        # Older versions of OpenSSL client library need to match on the server
+        conf += 'tls_protocols.tlsv1 = on\n'
+        conf += 'tls_protocols.tlsv1.1 = on\n'
         f = open(self.riak_conf, 'w', buffering=1)
         f.write(conf)
         f.close()
