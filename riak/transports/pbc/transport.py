@@ -414,8 +414,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         the cluster if bucket or key are None.
         """
         req = riak_pb.RpbApiEpReq()
-        req.bkey.bucket = str_to_bytes(bucket.name if bucket else "")
-        req.bkey.key = str_to_bytes(key if key else "")
+        req.bucket = str_to_bytes(bucket.name if bucket else "")
+        req.key = str_to_bytes(key if key else "")
         req.proto = proto
         req.force_update = force_update
 
