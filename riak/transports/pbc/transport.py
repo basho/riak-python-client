@@ -407,7 +407,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                                        MSG_CODE_SET_BUCKET_RESP)
         return True
 
-    def get_api_entry_points(self, bucket, key, proto, force_update):
+    def get_api_entry_points(self, bucket, key, proto,
+                             force_update, check_key_exist):
         """
         Fetch (addr, port, last_checked) of API entry point at riak_kv
         node containing given bucket and key, or all entry points of
@@ -418,6 +419,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req.key = str_to_bytes(key if key else "")
         req.proto = proto
         req.force_update = force_update
+        req.check_key_exist = check_key_exist
 
         msg_code, resp = self._request(MSG_CODE_API_EP_REQ, req,
                                        MSG_CODE_API_EP_RESP)

@@ -472,7 +472,7 @@ class RiakClientOperations(RiakClientTransport):
 
     @retryable
     def get_api_entry_points(self, transport, bucket, key,
-                             proto = 'pbc', force_update = False):
+                             proto = 'pbc', force_update = False, check_key_exist = True):
         """
         get_api_entry_points(transport, bucket, key, proto = 'pbc')
 
@@ -489,14 +489,16 @@ class RiakClientOperations(RiakClientTransport):
         :type key: string | NoneType
         :param proto: entry point API protocol ('pbc' or 'http')
         :type proto: string
-        :param force_update: whether to force some costly operations
+        :param force_update: whether to force an IPC call and obviate cache
+        :type force_update: boolean
+        :param check_key_exist: ensure (bucket, key) do exist
         :type force_update: boolean
         :returns: [(host, port, last_checked)]
         :rtype: list
         """
         return transport.get_api_entry_points(bucket, key,
                                               {'pbc':0, 'http':1}[proto],
-                                              force_update)
+                                              force_update, check_key_exist)
 
     def stream_keys(self, bucket, timeout=None):
         """
