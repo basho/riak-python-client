@@ -43,6 +43,8 @@ from riak_pb.messages import (
     MSG_CODE_GET_SERVER_INFO_RESP,
     MSG_CODE_GET_REQ,
     MSG_CODE_GET_RESP,
+    MSG_CODE_API_EP_REQ,
+    MSG_CODE_API_EP_RESP,
     MSG_CODE_PUT_REQ,
     MSG_CODE_PUT_RESP,
     MSG_CODE_DEL_REQ,
@@ -145,7 +147,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                          doc="""the client ID for this connection""")
 
     def get(self, robj, r=None, pr=None, timeout=None, basic_quorum=None,
-            notfound_ok=None):
+            notfound_ok=None, apiep_proto=None):
         """
         Serialize get request and deserialize response
         """
@@ -154,6 +156,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         req = riak_pb.RpbGetReq()
         if r:
             req.r = self._encode_quorum(r)
+        if apiep_proto is not None:
+            req.apiep_proto = apiep_proto
         if self.quorum_controls():
             if pr:
                 req.pr = self._encode_quorum(pr)
@@ -402,6 +406,25 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         msg_code, resp = self._request(MSG_CODE_SET_BUCKET_TYPE_REQ, req,
                                        MSG_CODE_SET_BUCKET_RESP)
         return True
+
+    def get_api_entry_points(self, bucket, key, proto,
+                             force_update, check_key_exist):
+        """
+        Fetch (addr, port, last_checked) of API entry point at riak_kv
+        node containing given bucket and key, or all entry points of
+        the cluster if bucket or key are None.
+        """
+        req = riak_pb.RpbApiEpReq()
+        req.bucket = str_to_bytes(bucket.name if bucket else "")
+        req.key = str_to_bytes(key if key else "")
+        req.proto = proto
+        req.force_update = force_update
+        req.check_key_exist = check_key_exist
+
+        msg_code, resp = self._request(MSG_CODE_API_EP_REQ, req,
+                                       MSG_CODE_API_EP_RESP)
+
+        return [(ep.addr, ep.port, ep.last_checked) for ep in resp.eplist]
 
     def mapred(self, inputs, query, timeout=None):
         # dictionary of phase results - each content should be an encoded array

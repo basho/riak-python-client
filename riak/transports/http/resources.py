@@ -68,6 +68,12 @@ class RiakHttpResources(object):
         return mkpath("/types", quote_plus(bucket_type), "props",
                       **options)
 
+    def api_entry_point_path(self, bucket, key, **options):
+        return mkpath("/ring/coverage",
+                      "bucket", quote_plus(bucket),
+                      "key", quote_plus(key),
+                      **options)
+
     def key_list_path(self, bucket, bucket_type=None, **options):
         query = {'keys': True, 'props': False}
         query.update(options)

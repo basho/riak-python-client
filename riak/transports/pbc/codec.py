@@ -175,6 +175,10 @@ class RiakPbcCodec(object):
                                for index in rpb_content.indexes])
         sibling.encoded_data = rpb_content.value
 
+        sibling.apieps = set([(bytes_to_str(ep.addr),
+                               ep.port, ep.last_checked)
+                              for ep in rpb_content.apieps])
+
         return sibling
 
     def _encode_content(self, robj, rpb_content):

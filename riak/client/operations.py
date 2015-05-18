@@ -470,6 +470,36 @@ class RiakClientOperations(RiakClientTransport):
         _validate_timeout(timeout)
         return transport.get_keys(bucket, timeout=timeout)
 
+    @retryable
+    def get_api_entry_points(self, transport, bucket, key,
+                             proto = 'pbc', force_update = False, check_key_exist = True):
+        """
+        get_api_entry_points(transport, bucket, key, proto = 'pbc')
+
+        Fetch [(ip, port, last_checked)] of API entry points to riak_kv nodes
+        containing given bucket and key (or all entry points if both
+        bucket and key are None), accessible via protocol as
+        specified.  If force_update is True, collect the details anew
+        via some expensive rpc calls across the cluster, instead of a
+        quick fetch from cluster metadata.
+
+        :param bucket: the bucket to find API entry point for, or None
+        :type bucket: RiakBucket | NoneType
+        :param key: the particular key in that bucket to find API ep for
+        :type key: string | NoneType
+        :param proto: entry point API protocol ('pbc' or 'http')
+        :type proto: string
+        :param force_update: whether to force an IPC call and obviate cache
+        :type force_update: boolean
+        :param check_key_exist: ensure (bucket, key) do exist
+        :type force_update: boolean
+        :returns: [(host, port, last_checked)]
+        :rtype: list
+        """
+        return transport.get_api_entry_points(bucket, key,
+                                              {'pbc':0, 'http':1}[proto],
+                                              force_update, check_key_exist)
+
     def stream_keys(self, bucket, timeout=None):
         """
         Lists all keys in a bucket via a stream. This is a generator
@@ -555,7 +585,7 @@ class RiakClientOperations(RiakClientTransport):
 
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,
-            basic_quorum=None, notfound_ok=None):
+            basic_quorum=None, notfound_ok=None, apiep_proto=None):
         """
         get(robj, r=None, pr=None, timeout=None)
 
@@ -577,15 +607,19 @@ class RiakClientOperations(RiakClientTransport):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param apiep_proto: 'http', 'pbc' or None, protocol to request API entry points of
+        :type apiep_proto: string or NoneType
         """
         _validate_timeout(timeout)
+        _validate_apiep_proto(apiep_proto)
         if not isinstance(robj.key, string_types):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
         return transport.get(robj, r=r, pr=pr, timeout=timeout,
                              basic_quorum=basic_quorum,
-                             notfound_ok=notfound_ok)
+                             notfound_ok=notfound_ok,
+                             apiep_proto={None:None, 'pbc':0, 'http':1}[apiep_proto])
 
     @retryable
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,
@@ -1055,3 +1089,7 @@ def _validate_timeout(timeout):
             ((type(timeout) == int or (PY2 and type(timeout) == long))
              and timeout > 0)):
         raise ValueError("timeout must be a positive integer")
+
+def _validate_apiep_proto(proto):
+    if proto not in ['http', 'pbc', None]:
+        raise ValueError("apiep_proto must be one of ('http', 'pbc', None)")
