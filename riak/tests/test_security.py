@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 """
 
-import platform
-if platform.python_version() < '2.7':
+import sys
+if sys.version_info < (2, 7):
     unittest = __import__('unittest2')
 else:
     import unittest
@@ -26,7 +26,6 @@ from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
     SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
     SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT
 from riak.security import SecurityCreds
-from six import PY3
 
 
 class SecurityTests(object):
@@ -110,9 +109,9 @@ class SecurityTests(object):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               cacert_file=SECURITY_CACERT,
                               crl_file=SECURITY_REVOKED)
-        # Curenly Python 3.x native CRL doesn't seem to work
-        # as advertised
-        if PY3:
+        # Currently Python >= 2.7.9 and Python 3.x native CRL doesn't seem to
+        # work as advertised
+        if sys.version_info >= (2, 7, 9):
             return
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
