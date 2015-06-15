@@ -36,6 +36,7 @@ from riak.transports.pbc import RiakPbcPool
 from riak.security import SecurityCreds
 from riak.util import lazy_property, bytes_to_str, str_to_bytes
 from six import string_types, PY2
+from riak.client.multiget import MultiGetPool
 
 
 def default_encoder(obj):
@@ -371,5 +372,3 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return hash(self) != hash(other)
         else:
             return True
-
-from riak.client.multiget import MultiGetPool

@@ -1,5 +1,5 @@
 """
-Copyright 2012 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -18,12 +18,12 @@ under the License.
 
 import re
 from six import PY2
+from riak import RiakError
+from riak.util import lazy_property, bytes_to_str
 if PY2:
     from urllib import quote_plus, urlencode
 else:
     from urllib.parse import quote_plus, urlencode
-from riak import RiakError
-from riak.util import lazy_property, bytes_to_str
 
 
 class RiakHttpResources(object):

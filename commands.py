@@ -1,10 +1,6 @@
 """
 distutils commands for riak-python-client
 """
-
-__all__ = ['create_bucket_types', 'setup_security', 'enable_security',
-           'disable_security', 'preconfigure', 'configure']
-
 from distutils import log
 from distutils.core import Command
 from distutils.errors import DistutilsOptionError
@@ -13,6 +9,10 @@ from string import Template
 import shutil
 import re
 import os.path
+
+
+__all__ = ['create_bucket_types', 'setup_security', 'enable_security',
+           'disable_security', 'preconfigure', 'configure']
 
 
 # Exception classes used by this module.

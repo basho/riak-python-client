@@ -22,6 +22,8 @@ from __future__ import print_function
 from collections import Iterable, namedtuple
 from riak import RiakError
 from six import string_types, PY2
+from riak.bucket import RiakBucket
+
 
 #: Links are just bucket/key/tag tuples, this class provides a
 #: backwards-compatible format: ``RiakLink(bucket, key, tag)``
@@ -66,6 +68,7 @@ class RiakMapReduce(object):
         :type bucket_type: string, None
         :rtype: :class:`RiakMapReduce`
         """
+        from riak.riak_object import RiakObject
         if (arg2 is None) and (arg3 is None):
             if isinstance(arg1, RiakObject):
                 return self.add_object(arg1)
@@ -82,6 +85,7 @@ class RiakMapReduce(object):
         :type obj: RiakObject
         :rtype: :class:`RiakMapReduce`
         """
+        from riak.riak_object import RiakObject
         return self.add_bucket_key_data(obj._bucket._name, obj._key, None)
 
     def add_bucket_key_data(self, bucket, key, data, bucket_type=None):
@@ -319,8 +323,8 @@ class RiakMapReduce(object):
             raise e
 
         # If the last phase is NOT a link phase, then return the result.
-        if not (link_results_flag
-                or isinstance(self._phases[-1], RiakLinkPhase)):
+        if not (link_results_flag or
+                isinstance(self._phases[-1], RiakLinkPhase)):
             return result
 
         # If there are no results, then return an empty list.
@@ -780,6 +784,3 @@ class RiakMapReduceChain(object):
         """
         mr = RiakMapReduce(self)
         return mr.reduce(*args)
-
-from riak.riak_object import RiakObject
-from riak.bucket import RiakBucket

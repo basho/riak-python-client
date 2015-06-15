@@ -12,5 +12,5 @@ class ContextRequired(RiakError):
                         "fetch the datatype first")
 
     def __init__(self, message=None):
-        super(ContextRequired, self).__init__(message
-                                              or self._default_message)
+        super(ContextRequired, self).__init__(message or
+                                              self._default_message)

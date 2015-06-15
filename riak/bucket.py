@@ -20,6 +20,7 @@ under the License.
 from six import string_types, PY2
 import mimetypes
 from riak.util import lazy_property
+from riak.datatypes import TYPES
 
 
 def bucket_property(name, doc=None):
@@ -172,6 +173,7 @@ class RiakBucket(object):
                 :class:`~riak.datatypes.Datatype`
 
         """
+        from riak import RiakObject
         if self.bucket_type.datatype:
             return TYPES[self.bucket_type.datatype](bucket=self, key=key)
 
@@ -217,6 +219,7 @@ class RiakBucket(object):
            :class:`~riak.datatypes.Datatype`
 
         """
+        from riak import RiakObject
         if self.bucket_type.datatype:
             return self._client.fetch_datatype(self, key, r=r, pr=pr,
                                                timeout=timeout,
@@ -736,7 +739,3 @@ class BucketType(object):
             return hash(self) != hash(other)
         else:
             return True
-
-
-from riak.riak_object import RiakObject
-from riak.datatypes import TYPES

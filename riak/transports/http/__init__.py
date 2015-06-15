@@ -1,5 +1,5 @@
 """
-Copyright 2014 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -20,6 +20,8 @@ import socket
 import select
 from six import PY2
 from riak.security import SecurityError, USE_STDLIB_SSL
+from riak.transports.pool import Pool
+from riak.transports.http.transport import RiakHttpTransport
 if USE_STDLIB_SSL:
     import ssl
     from riak.transports.security import configure_ssl_context
@@ -41,9 +43,6 @@ else:
         IncompleteRead, \
         ImproperConnectionState, \
         BadStatusLine
-
-from riak.transports.pool import Pool
-from riak.transports.http.transport import RiakHttpTransport
 
 
 class NoNagleHTTPConnection(HTTPConnection):

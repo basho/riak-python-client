@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Copyright 2014 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -18,14 +18,14 @@ under the License.
 """
 
 import sys
-if sys.version_info < (2, 7):
-    unittest = __import__('unittest2')
-else:
-    import unittest
 from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
     SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
     SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT
 from riak.security import SecurityCreds
+if sys.version_info < (2, 7):
+    unittest = __import__('unittest2')
+else:
+    import unittest
 
 
 class SecurityTests(object):

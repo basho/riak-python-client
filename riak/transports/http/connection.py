@@ -1,5 +1,5 @@
 """
-Copyright 2012 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -17,12 +17,12 @@ under the License.
 """
 
 from six import PY2
+import base64
+from riak.util import str_to_bytes
 if PY2:
     from httplib import NotConnected, HTTPConnection
 else:
     from http.client import NotConnected, HTTPConnection
-import base64
-from riak.util import str_to_bytes
 
 
 class RiakHttpConnection(object):
