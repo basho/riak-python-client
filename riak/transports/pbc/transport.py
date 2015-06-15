@@ -20,7 +20,6 @@ under the License.
 """
 
 import riak_pb
-import sys
 from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock

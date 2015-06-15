@@ -85,7 +85,6 @@ class RiakMapReduce(object):
         :type obj: RiakObject
         :rtype: :class:`RiakMapReduce`
         """
-        from riak.riak_object import RiakObject
         return self.add_bucket_key_data(obj._bucket._name, obj._key, None)
 
     def add_bucket_key_data(self, bucket, key, data, bucket_type=None):
