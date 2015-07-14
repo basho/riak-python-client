@@ -429,13 +429,13 @@ class RiakHttpTransportTestCase(BasicKVTests,
     def test_too_many_link_headers_shouldnt_break_http(self):
         bucket = self.client.bucket(self.bucket_name)
         o = bucket.new("lots_of_links", "My god, it's full of links!")
-        for i in range(0, 400):
+        for i in range(0, 300):
             link = ("other", "key%d" % i, "next")
             o.add_link(link)
 
         o.store()
         stored_object = bucket.get("lots_of_links")
-        self.assertEqual(len(stored_object.links), 400)
+        self.assertEqual(len(stored_object.links), 300)
 
 
 if __name__ == '__main__':

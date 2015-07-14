@@ -455,12 +455,13 @@ class TwoITests(object):
 
         bucket, o1, o2, o3, o4 = self._create_index_objects()
 
-        with self.assertRaises(RiakError):
-            bucket.get_index('field1_bin', 'val1', timeout=1)
-
-        with self.assertRaises(RiakError):
-            for i in bucket.stream_index('field1_bin', 'val1', timeout=1):
-                pass
+        # Disable timeouts since they are too racy
+        # with self.assertRaises(RiakError):
+        #        bucket.get_index('field1_bin', 'val1', timeout=1)
+        #
+        #     with self.assertRaises(RiakError):
+        #        for i in bucket.stream_index('field1_bin', 'val1', timeout=1):
+        #             pass
 
         # This should not raise
         self.assertEqual([o1.key], bucket.get_index('field1_bin', 'val1',
