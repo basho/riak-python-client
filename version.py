@@ -16,9 +16,6 @@ and use the results of get_version() as your package version::
 """
 
 from __future__ import print_function
-
-__all__ = ['get_version']
-
 from os.path import dirname, isdir, join
 import re
 from subprocess import CalledProcessError, Popen, PIPE
@@ -61,6 +58,8 @@ except ImportError:
         return output
 
 version_re = re.compile('^Version: (.+)$', re.M)
+
+__all__ = ['get_version']
 
 
 def get_version():

@@ -1,5 +1,5 @@
 """
-Copyright 2012 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 Copyright 2010 Rusty Klophaus <rusty@basho.com>
 Copyright 2010 Justin Sheehy <justin@basho.com>
 Copyright 2009 Jay Baird <jay@mochimedia.com>
@@ -25,10 +25,6 @@ except ImportError:
     import json
 
 from six import PY2
-if PY2:
-    from httplib import HTTPConnection
-else:
-    from http.client import HTTPConnection
 from xml.dom.minidom import Document
 from riak.transports.transport import RiakTransport
 from riak.transports.http.resources import RiakHttpResources
@@ -42,6 +38,10 @@ from riak.transports.http.stream import (
 from riak import RiakError
 from riak.security import SecurityError
 from riak.util import decode_index_value, bytes_to_str, str_to_long
+if PY2:
+    from httplib import HTTPConnection
+else:
+    from http.client import HTTPConnection
 
 
 class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
@@ -188,8 +188,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
         url = self.object_path(robj.bucket.name, robj.key,
                                bucket_type=bucket_type, **params)
-        use_vclocks = (self.tombstone_vclocks() and hasattr(robj, 'vclock')
-                       and robj.vclock is not None)
+        use_vclocks = (self.tombstone_vclocks() and hasattr(robj, 'vclock') and
+                       robj.vclock is not None)
         if use_vclocks:
             headers['X-Riak-Vclock'] = robj.vclock.encode('base64')
         response = self._request('DELETE', url, headers)

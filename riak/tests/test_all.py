@@ -1,16 +1,25 @@
 # -*- coding: utf-8 -*-
+"""
+Copyright 2015 Basho Technologies, Inc.
+
+This file is provided to you under the Apache License,
+Version 2.0 (the "License"); you may not use this file
+except in compliance with the License.  You may obtain
+a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+"""
 import random
 import platform
 from six import PY2
 from threading import Thread
-if PY2:
-    from Queue import Queue
-else:
-    from queue import Queue
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 from riak import RiakError
 from riak.client import RiakClient
@@ -31,6 +40,16 @@ from riak.tests.test_datatypes import DatatypeIntegrationTests
 from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
     HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
     SKIP_SEARCH, RUN_YZ, SECURITY_CREDS, SKIP_POOL, test_six
+
+if PY2:
+    from Queue import Queue
+else:
+    from queue import Queue
+
+if platform.python_version() < '2.7':
+    unittest = __import__('unittest2')
+else:
+    import unittest
 
 testrun_search_bucket = None
 testrun_props_bucket = None
@@ -410,13 +429,13 @@ class RiakHttpTransportTestCase(BasicKVTests,
     def test_too_many_link_headers_shouldnt_break_http(self):
         bucket = self.client.bucket(self.bucket_name)
         o = bucket.new("lots_of_links", "My god, it's full of links!")
-        for i in range(0, 400):
+        for i in range(0, 300):
             link = ("other", "key%d" % i, "next")
             o.add_link(link)
 
         o.store()
         stored_object = bucket.get("lots_of_links")
-        self.assertEqual(len(stored_object.links), 400)
+        self.assertEqual(len(stored_object.links), 300)
 
 
 if __name__ == '__main__':

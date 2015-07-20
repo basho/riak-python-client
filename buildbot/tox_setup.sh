@@ -37,7 +37,7 @@ fi
 
 # Now install tox
 if [ -z "`pip show tox`" ]; then
-    pip install tox
+    pip install -Iv tox=1.9.0
     if [ -z "`pip show tox`" ]; then
         echo "ERROR: Install of tox failed"
         exit 1

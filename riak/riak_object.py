@@ -22,6 +22,7 @@ from riak import ConflictError
 from riak.content import RiakContent
 import base64
 from six import string_types, PY2
+from riak.mapreduce import RiakMapReduce
 
 
 def content_property(name, doc=None):
@@ -410,5 +411,3 @@ class RiakObject(object):
         mr = RiakMapReduce(self.client)
         mr.add(self.bucket.name, self.key)
         return mr.reduce(*args)
-
-from riak.mapreduce import RiakMapReduce
