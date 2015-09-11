@@ -14,9 +14,9 @@ compile:
 	@../setup.py develop
 
 lint:
-	@pip install --upgrade pep8 pyflakes
+	@pip install --upgrade pip pep8 flake8
 	@cd ..; pep8 riak *.py
-	@cd ..; pyflakes riak *.py
+	@cd ..; flake8 riak *.py
 	@openssl verify -CAfile ${CERTS_DIR}/ca.crt ${CERTS_DIR}/client.crt
 	@openssl verify -CAfile ${CERTS_DIR}/ca.crt ${CERTS_DIR}/server.crt
 

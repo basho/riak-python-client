@@ -73,7 +73,7 @@ class Counter(Datatype):
 
     def _check_type(self, new_value):
         return (isinstance(new_value, int) or
-                isinstance(new_value, long))
+                isinstance(new_value, long))  # noqa
 
 
 TYPES['counter'] = Counter

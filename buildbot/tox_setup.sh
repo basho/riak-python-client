@@ -33,7 +33,6 @@ if [[ ! -d $PYENV_ROOT ]]; then
     pyenv virtualenv riak_2.7.10 riak-py27
     pyenv virtualenv riak_2.7.9 riak-py279
     pyenv virtualenv riak_2.6.9 riak-py26
-    pyenv global riak-py34 riak-py33 riak-py27 riak-py279 riak-py26
     pyenv versions
 fi
 

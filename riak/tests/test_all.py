@@ -298,7 +298,7 @@ class ClientTests(object):
             self.assertEqual(failure[1], self.bucket_name)
             self.assertIn(failure[2], keys)
             if PY2:
-                self.assertIsInstance(failure[3], StandardError)
+                self.assertIsInstance(failure[3], StandardError)  # noqa
             else:
                 self.assertIsInstance(failure[3], Exception)
 

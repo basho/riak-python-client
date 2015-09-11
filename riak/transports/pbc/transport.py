@@ -565,7 +565,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
 
-        if PY2 and isinstance(query, unicode):
+        if PY2 and isinstance(query, unicode):  # noqa
             query = query.encode('utf8')
 
         req = riak_pb.RpbSearchQueryReq(index=str_to_bytes(index),
