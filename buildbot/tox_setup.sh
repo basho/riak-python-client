@@ -22,22 +22,25 @@ if [[ ! -d $PYENV_ROOT ]]; then
     eval "$(pyenv virtualenv-init -)"
 
     # Now load up (allthethings)
-    VERSION_ALIAS="riak_2.6.9" pyenv install 2.6.9
-    VERSION_ALIAS="riak_2.7.9" pyenv install 2.7.9
+    VERSION_ALIAS="riak_3.4.3" pyenv install 3.4.3
     VERSION_ALIAS="riak_3.3.6" pyenv install 3.3.6
-    VERSION_ALIAS="riak_3.4.2" pyenv install 3.4.2
+    VERSION_ALIAS="riak_2.7.10" pyenv install 2.7.10
+    VERSION_ALIAS="riak_2.7.9" pyenv install 2.7.9
+    VERSION_ALIAS="riak_2.6.9" pyenv install 2.6.9
 
-    pyenv virtualenv riak_2.6.9 riak-py26
-    pyenv virtualenv riak_2.7.9 riak-py27
+    pyenv virtualenv riak_3.4.3 riak-py34
     pyenv virtualenv riak_3.3.6 riak-py33
-    pyenv virtualenv riak_3.4.2 riak-py34
-    pyenv global riak-py26 riak-py27 riak-py33 riak-py34
+    pyenv virtualenv riak_2.7.10 riak-py27
+    pyenv virtualenv riak_2.7.9 riak-py279
+    pyenv virtualenv riak_2.6.9 riak-py26
+    pyenv global riak-py34 riak-py33 riak-py27 riak-py279 riak-py26
     pyenv versions
 fi
 
 # Now install tox
+pip install --upgrade pip
 if [ -z "`pip show tox`" ]; then
-    pip install -Iv tox=1.9.0
+    pip install -Iv tox
     if [ -z "`pip show tox`" ]; then
         echo "ERROR: Install of tox failed"
         exit 1

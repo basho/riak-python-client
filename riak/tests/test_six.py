@@ -129,8 +129,8 @@ class Comparison(object):
                 diffMsg = '\n'.join(lines)
                 standardMsg = self._truncateMessage(standardMsg, diffMsg)
 
-    def assert_raises_regex(self, exception, regexp, msg=None):
+    def assert_raises_regex(self, exception, regexp):
         if PY2:
-            return self.assertRaisesRegexp(exception, regexp, msg)
+            return self.assertRaisesRegexp(exception, regexp)
         else:
-            return self.assertRaisesRegex(exception, regexp, msg)
+            return self.assertRaisesRegex(exception, regexp)

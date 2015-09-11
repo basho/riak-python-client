@@ -52,12 +52,13 @@ class RiakBucket(object):
         :param bucket_type: The parent bucket type of this bucket
         :type bucket_type: :class:`BucketType`
         """
+
+        if not isinstance(name, string_types):
+            raise TypeError('Bucket name must be a string')
+
         if PY2:
             try:
-                if isinstance(name, string_types):
-                        name = name.encode('ascii')
-                else:
-                    raise TypeError('Bucket name must be a string')
+                name = name.encode('ascii')
             except UnicodeError:
                 raise TypeError('Unicode bucket names are not supported.')
 
