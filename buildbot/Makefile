@@ -3,6 +3,7 @@ RIAK_CONF = ${RIAK_DIR}/etc/riak.conf
 # RIAK = ${RIAK_DIR}/bin/riak
 RIAK_ADMIN = ${RIAK_DIR}/bin/riak-admin
 CERTS_DIR = $(shell pwd)/../riak/tests/resources
+unexport PYENV_VERSION
 
 preconfigure:
 	@../setup.py preconfigure --riak-conf=${RIAK_CONF}
@@ -14,7 +15,7 @@ compile:
 	@../setup.py develop
 
 lint:
-	@pip install --upgrade pip pep8 flake8
+	@pip install --upgrade pep8 flake8
 	@cd ..; pep8 riak *.py
 	@cd ..; flake8 riak *.py
 	@openssl verify -CAfile ${CERTS_DIR}/ca.crt ${CERTS_DIR}/client.crt
