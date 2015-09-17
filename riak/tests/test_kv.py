@@ -89,7 +89,7 @@ class BasicKVTests(object):
         # unicode objects are fine, as long as they don't
         # contain any non-ASCII chars
         if PY2:
-            self.client.bucket(unicode(self.bucket_name))
+            self.client.bucket(unicode(self.bucket_name))  # noqa
         else:
             self.client.bucket(self.bucket_name)
         if PY2:
@@ -147,9 +147,8 @@ class BasicKVTests(object):
             with self.assert_raises_regex(TypeError, 'must be a string'):
                 self.client.bucket(bad)
 
-            if PY2:
-                with self.assert_raises_regex(TypeError, 'must be a string'):
-                    RiakBucket(self.client, bad, None)
+            with self.assert_raises_regex(TypeError, 'must be a string'):
+                RiakBucket(self.client, bad, None)
 
         # Unicode bucket names are not supported in Python 2.x,
         # if they can't be encoded to ASCII. This should be changed in a
@@ -192,6 +191,9 @@ class BasicKVTests(object):
 
     def test_stream_keys_timeout(self):
         bucket = self.client.bucket('random_key_bucket')
+        for key in range(1, 1000):
+            o = bucket.new(None, data={})
+            o.store()
         streamed_keys = []
         with self.assertRaises(RiakError):
             for keylist in self.client.stream_keys(bucket, timeout=1):

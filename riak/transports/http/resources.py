@@ -264,7 +264,7 @@ def mkpath(*segments, **query):
         if query[key] in [False, True]:
             _query[key] = str(query[key]).lower()
         elif query[key] is not None:
-            if PY2 and isinstance(query[key], unicode):
+            if PY2 and isinstance(query[key], unicode):  # noqa
                 _query[key] = query[key].encode('utf-8')
             else:
                 _query[key] = query[key]

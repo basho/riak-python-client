@@ -113,6 +113,6 @@ def str_to_long(value, base=10):
     if value is None:
         return None
     elif PY2:
-        return long(value, base)
+        return long(value, base)  # noqa
     else:
         return int(value, base)

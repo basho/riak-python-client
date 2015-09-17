@@ -914,7 +914,7 @@ class RiakClientOperations(RiakClientTransport):
         :type returnvalue: bool
         """
         if PY2:
-            valid_types = (int, long)
+            valid_types = (int, long)  # noqa
         else:
             valid_types = (int,)
         if type(value) not in valid_types:
@@ -1073,6 +1073,6 @@ def _validate_timeout(timeout):
     Raises an exception if the given timeout is an invalid value.
     """
     if not (timeout is None or
-            ((type(timeout) == int or (PY2 and type(timeout) == long)) and
-             timeout > 0)):
+            ((type(timeout) == int or
+             (PY2 and type(timeout) == long)) and timeout > 0)):  # noqa
         raise ValueError("timeout must be a positive integer")
