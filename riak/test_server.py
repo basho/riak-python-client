@@ -31,8 +31,8 @@ class Atom(object):
     def __eq__(self, other):
         return self.str == other
 
-    def __cmp__(self, other):
-        return cmp(self.str, other)
+    def __lt__(self, other):
+        return self.str < other
 
 
 def erlang_config(hash, depth=1):

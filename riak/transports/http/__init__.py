@@ -1,5 +1,5 @@
 """
-Copyright 2014 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -19,16 +19,23 @@ under the License.
 import socket
 import select
 from six import PY2
-if PY2:
+from riak.security import SecurityError, USE_STDLIB_SSL
+from riak.transports.pool import Pool
+from riak.transports.http.transport import RiakHttpTransport
+if USE_STDLIB_SSL:
+    import ssl
+    from riak.transports.security import configure_ssl_context
+else:
     import OpenSSL.SSL
+    from riak.transports.security import RiakWrappedSocket,\
+        configure_pyopenssl_context
+if PY2:
     from httplib import HTTPConnection, \
         NotConnected, \
         IncompleteRead, \
         ImproperConnectionState, \
         BadStatusLine, \
         HTTPSConnection
-    from riak.transports.security import RiakWrappedSocket,\
-        configure_pyopenssl_context
 else:
     from http.client import HTTPConnection, \
         HTTPSConnection, \
@@ -36,12 +43,6 @@ else:
         IncompleteRead, \
         ImproperConnectionState, \
         BadStatusLine
-    import ssl
-    from riak.transports.security import configure_ssl_context
-
-from riak.security import SecurityError
-from riak.transports.pool import Pool
-from riak.transports.http.transport import RiakHttpTransport
 
 
 class NoNagleHTTPConnection(HTTPConnection):
@@ -106,7 +107,7 @@ class RiakHTTPSConnection(HTTPSConnection):
         Connect to a host on a given (SSL) port using PyOpenSSL.
         """
         sock = socket.create_connection((self.host, self.port), self.timeout)
-        if PY2:
+        if not USE_STDLIB_SSL:
             ssl_ctx = configure_pyopenssl_context(self.credentials)
 
             # attempt to upgrade the socket to TLS

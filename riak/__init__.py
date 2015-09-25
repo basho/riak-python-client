@@ -30,37 +30,17 @@ See the unit_tests.py file for example usage.
 @author Jay Baird (@skatterbean) (jay@mochimedia.com)
 """
 
-__all__ = ['RiakBucket', 'BucketType', 'RiakNode', 'RiakObject', 'RiakClient',
-           'RiakMapReduce', 'RiakKeyFilter', 'RiakLink', 'RiakError',
-           'ConflictError', 'ONE', 'ALL', 'QUORUM', 'key_filter']
-
-
-class RiakError(Exception):
-    """
-    Base class for exceptions generated in the Riak API.
-    """
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
-
-
-class ConflictError(RiakError):
-    """
-    Raised when an operation is attempted on a
-    :class:`~riak.riak_object.RiakObject` that has more than one
-    sibling.
-    """
-    def __init__(self, message="Object in conflict"):
-        super(ConflictError, self).__init__(message)
-
-
+from riak.riak_error import RiakError, ConflictError
 from riak.client import RiakClient
 from riak.bucket import RiakBucket, BucketType
 from riak.node import RiakNode
 from riak.riak_object import RiakObject
 from riak.mapreduce import RiakKeyFilter, RiakMapReduce, RiakLink
+
+
+__all__ = ['RiakBucket', 'BucketType', 'RiakNode', 'RiakObject', 'RiakClient',
+           'RiakMapReduce', 'RiakKeyFilter', 'RiakLink', 'RiakError',
+           'ConflictError', 'ONE', 'ALL', 'QUORUM', 'key_filter']
 
 ONE = "one"
 ALL = "all"

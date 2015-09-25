@@ -16,15 +16,23 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from .types import TYPES
-from .datatype import Datatype
-from .counter import Counter
-from .flag import Flag
-from .register import Register
-from .set import Set
-from .map import Map
-from .errors import ContextRequired
+
+class RiakError(Exception):
+    """
+    Base class for exceptions generated in the Riak API.
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
 
 
-__all__ = ['Datatype', 'Flag', 'Counter', 'Register', 'Set', 'Map', 'TYPES',
-           'ContextRequired']
+class ConflictError(RiakError):
+    """
+    Raised when an operation is attempted on a
+    :class:`~riak.riak_object.RiakObject` that has more than one
+    sibling.
+    """
+    def __init__(self, message="Object in conflict"):
+        super(ConflictError, self).__init__(message)

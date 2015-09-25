@@ -19,7 +19,7 @@ under the License.
 import socket
 import struct
 import riak_pb
-from riak.security import SecurityError
+from riak.security import SecurityError, USE_STDLIB_SSL
 from riak import RiakError
 from riak_pb.messages import (
     MESSAGE_CLASSES,
@@ -30,7 +30,7 @@ from riak_pb.messages import (
 )
 from riak.util import bytes_to_str, str_to_bytes
 from six import PY2
-if PY2:
+if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection
     from riak.transports.security import configure_pyopenssl_context
 else:
@@ -113,7 +113,7 @@ class RiakPbcConnection(object):
         else:
             return False
 
-    if PY2:
+    if not USE_STDLIB_SSL:
         def _ssl_handshake(self):
             """
             Perform an SSL handshake w/ the server.

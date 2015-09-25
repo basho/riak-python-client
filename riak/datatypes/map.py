@@ -1,6 +1,25 @@
+"""
+Copyright 2015 Basho Technologies, Inc.
+
+This file is provided to you under the Apache License,
+Version 2.0 (the "License"); you may not use this file
+except in compliance with the License.  You may obtain
+a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+"""
+
 from collections import Mapping
 from riak.util import lazy_property
 from .datatype import Datatype
+from riak.datatypes import TYPES
 
 
 class TypedMapView(Mapping):
@@ -238,8 +257,7 @@ class Map(Mapping, Datatype):
         """
         Whether the map has staged local modifications.
         """
-        is_modified = lambda x: x.modified
-        values_modified = [is_modified(self._value[v]) for v in self._value]
+        values_modified = [self._value[v].modified for v in self._value]
         modified = (any(values_modified) or self._removes or self._updates)
         if modified:
             return True
@@ -282,5 +300,4 @@ class Map(Mapping, Datatype):
                 yield ('update', key, d[key].to_op())
 
 
-from riak.datatypes import TYPES
 TYPES['map'] = Map

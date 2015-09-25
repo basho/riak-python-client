@@ -58,11 +58,11 @@ class RiakClientOperations(RiakClientTransport):
         """
         _validate_timeout(timeout)
         if bucket_type:
-            bucketfn = lambda name: bucket_type.bucket(name)
+            bucketfn = self._bucket_type_bucket_builder
         else:
-            bucketfn = lambda name: self.bucket(name)
+            bucketfn = self._default_type_bucket_builder
 
-        return [bucketfn(bytes_to_str(name)) for name in
+        return [bucketfn(bytes_to_str(name), bucket_type) for name in
                 transport.get_buckets(bucket_type=bucket_type,
                                       timeout=timeout)]
 
@@ -103,9 +103,9 @@ class RiakClientOperations(RiakClientTransport):
         """
         _validate_timeout(timeout)
         if bucket_type:
-            bucketfn = lambda name: bucket_type.bucket(name)
+            bucketfn = self._bucket_type_bucket_builder
         else:
-            bucketfn = lambda name: self.bucket(name)
+            bucketfn = self._default_type_bucket_builder
 
         resource = self._acquire()
         transport = resource.object
@@ -114,7 +114,7 @@ class RiakClientOperations(RiakClientTransport):
         stream.attach(resource)
         try:
             for bucket_list in stream:
-                bucket_list = [bucketfn(bytes_to_str(name))
+                bucket_list = [bucketfn(bytes_to_str(name), bucket_type)
                                for name in bucket_list]
                 if len(bucket_list) > 0:
                     yield bucket_list
@@ -914,7 +914,7 @@ class RiakClientOperations(RiakClientTransport):
         :type returnvalue: bool
         """
         if PY2:
-            valid_types = (int, long)
+            valid_types = (int, long)  # noqa
         else:
             valid_types = (int,)
         if type(value) not in valid_types:
@@ -1000,6 +1000,27 @@ class RiakClientOperations(RiakClientTransport):
                                              timeout=timeout,
                                              include_context=include_context)
 
+    def _bucket_type_bucket_builder(self, name, bucket_type):
+        """
+        Build a bucket from a bucket type
+
+        :param name: Bucket name
+        :param bucket_type: A bucket type
+        :return: A bucket object
+        """
+        return bucket_type.bucket(name)
+
+    def _default_type_bucket_builder(self, name, unused):
+        """
+        Build a bucket for the default bucket type
+
+        :param name: Default bucket name
+        :param unused: Unused
+        :return: A bucket object
+        """
+        del unused  # Ignored parameters.
+        return self.bucket(name)
+
     @retryable
     def _fetch_datatype(self, transport, bucket, key, r=None, pr=None,
                         basic_quorum=None, notfound_ok=None,
@@ -1052,6 +1073,6 @@ def _validate_timeout(timeout):
     Raises an exception if the given timeout is an invalid value.
     """
     if not (timeout is None or
-            ((type(timeout) == int or (PY2 and type(timeout) == long))
-             and timeout > 0)):
+            ((type(timeout) == int or
+             (PY2 and type(timeout) == long)) and timeout > 0)):  # noqa
         raise ValueError("timeout must be a positive integer")

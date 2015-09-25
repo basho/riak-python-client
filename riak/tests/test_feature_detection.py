@@ -1,5 +1,5 @@
 """
-Copyright 2012-2014 Basho Technologies, Inc.
+Copyright 2012-2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -17,13 +17,12 @@ under the License.
 """
 
 import platform
+from riak.transports.feature_detect import FeatureDetection
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
-
-from riak.transports.feature_detect import FeatureDetection
 
 
 class IncompleteTransport(FeatureDetection):

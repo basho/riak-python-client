@@ -510,8 +510,8 @@ class RiakPbcCodec(object):
         resultdoc = MultiDict()
         for pair in doc.fields:
             if PY2:
-                ukey = unicode(pair.key, 'utf-8')
-                uval = unicode(pair.value, 'utf-8')
+                ukey = unicode(pair.key, 'utf-8')    # noqa
+                uval = unicode(pair.value, 'utf-8')  # noqa
             else:
                 ukey = bytes_to_str(pair.key)
                 uval = bytes_to_str(pair.value)

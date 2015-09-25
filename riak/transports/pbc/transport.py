@@ -1,5 +1,5 @@
 """
-Copyright 2012 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 Copyright 2010 Rusty Klophaus <rusty@basho.com>
 Copyright 2010 Justin Sheehy <justin@basho.com>
 Copyright 2009 Jay Baird <jay@mochimedia.com>
@@ -252,8 +252,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if self.client_timeouts() and timeout:
             req.timeout = timeout
 
-        use_vclocks = (self.tombstone_vclocks() and hasattr(robj, 'vclock')
-                       and robj.vclock)
+        use_vclocks = (self.tombstone_vclocks() and
+                       hasattr(robj, 'vclock') and robj.vclock)
         if use_vclocks:
             req.vclock = robj.vclock.encode('binary')
 
@@ -565,7 +565,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
 
-        if PY2 and isinstance(query, unicode):
+        if PY2 and isinstance(query, unicode):  # noqa
             query = query.encode('utf8')
 
         req = riak_pb.RpbSearchQueryReq(index=str_to_bytes(index),

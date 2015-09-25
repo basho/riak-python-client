@@ -1,19 +1,32 @@
 # -*- coding: utf-8 -*-
+"""
+Copyright 2015 Basho Technologies, Inc.
+
+This file is provided to you under the Apache License,
+Version 2.0 (the "License"); you may not use this file
+except in compliance with the License.  You may obtain
+a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+"""
+
 import os
 import platform
 from six import string_types, PY2, PY3
-if PY2:
-    import cPickle
-    test_pickle_dumps = cPickle.dumps
-    test_pickle_loads = cPickle.loads
-else:
-    import pickle
-    test_pickle_dumps = pickle.dumps
-    test_pickle_loads = pickle.loads
+
 import copy
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
+from . import SKIP_RESOLVE
+
 try:
     import simplejson as json
 except ImportError:
@@ -24,7 +37,14 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-from . import SKIP_RESOLVE
+if PY2:
+    import cPickle
+    test_pickle_dumps = cPickle.dumps
+    test_pickle_loads = cPickle.loads
+else:
+    import pickle
+    test_pickle_dumps = pickle.dumps
+    test_pickle_loads = pickle.loads
 
 
 class NotJsonSerializable(object):
@@ -69,7 +89,7 @@ class BasicKVTests(object):
         # unicode objects are fine, as long as they don't
         # contain any non-ASCII chars
         if PY2:
-            self.client.bucket(unicode(self.bucket_name))
+            self.client.bucket(unicode(self.bucket_name))  # noqa
         else:
             self.client.bucket(self.bucket_name)
         if PY2:
@@ -127,9 +147,8 @@ class BasicKVTests(object):
             with self.assert_raises_regex(TypeError, 'must be a string'):
                 self.client.bucket(bad)
 
-            if PY2:
-                with self.assert_raises_regex(TypeError, 'must be a string'):
-                    RiakBucket(self.client, bad, None)
+            with self.assert_raises_regex(TypeError, 'must be a string'):
+                RiakBucket(self.client, bad, None)
 
         # Unicode bucket names are not supported in Python 2.x,
         # if they can't be encoded to ASCII. This should be changed in a
@@ -172,6 +191,9 @@ class BasicKVTests(object):
 
     def test_stream_keys_timeout(self):
         bucket = self.client.bucket('random_key_bucket')
+        for key in range(1, 1000):
+            o = bucket.new(None, data={})
+            o.store()
         streamed_keys = []
         with self.assertRaises(RiakError):
             for keylist in self.client.stream_keys(bucket, timeout=1):
@@ -426,8 +448,7 @@ class BasicKVTests(object):
         # Define our own custom resolver on the object that returns
         # the maximum value, overriding the bucket and client resolvers
         def max_value_resolver(obj):
-            datafun = lambda s: s.data
-            obj.siblings = [max(obj.siblings, key=datafun), ]
+            obj.siblings = [max(obj.siblings, key=lambda s: s.data), ]
 
         obj.resolver = max_value_resolver
         obj.reload()

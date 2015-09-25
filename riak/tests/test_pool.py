@@ -1,5 +1,5 @@
 """
-Copyright 2012 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -18,21 +18,22 @@ under the License.
 
 from six import PY2
 import platform
-if PY2:
-    from Queue import Queue
-else:
-    from queue import Queue
 from threading import Thread, currentThread
 from riak.transports.pool import Pool, BadResource
 from random import SystemRandom
 from time import sleep
+from . import SKIP_POOL
+from riak.tests import test_six
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
-from . import SKIP_POOL
-from riak.tests import test_six
+
+if PY2:
+    from Queue import Queue
+else:
+    from queue import Queue
 
 
 class SimplePool(Pool):

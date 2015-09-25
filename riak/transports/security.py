@@ -1,5 +1,5 @@
 """
-Copyright 2014 Basho Technologies, Inc.
+Copyright 2015 Basho Technologies, Inc.
 
 This file is provided to you under the Apache License,
 Version 2.0 (the "License"); you may not use this file
@@ -17,16 +17,15 @@ under the License.
 """
 
 import socket
-from six import PY2
-if PY2:
+from riak.security import SecurityError, USE_STDLIB_SSL
+if USE_STDLIB_SSL:
+    import ssl
+else:
     import OpenSSL.SSL
     try:
         from cStringIO import StringIO
     except ImportError:
         from StringIO import StringIO
-else:
-    import ssl
-from riak.security import SecurityError
 
 
 def verify_cb(conn, cert, errnum, depth, ok):
@@ -39,42 +38,10 @@ def verify_cb(conn, cert, errnum, depth, ok):
     return ok
 
 
-if PY2:
-    def configure_pyopenssl_context(credentials):
-        """
-        Set various options on the SSL context for Python 2.x.
-
-        :param credentials: Riak Security Credentials
-        :type credentials: :class:`~riak.security.SecurityCreds`
-        :rtype ssl_ctx: :class:`~OpenSSL.SSL.Context`
-        """
-
-        ssl_ctx = OpenSSL.SSL.Context(credentials.ssl_version)
-        if credentials._has_credential('pkey'):
-            ssl_ctx.use_privatekey(credentials.pkey)
-        if credentials._has_credential('cert'):
-            ssl_ctx.use_certificate(credentials.cert)
-        if credentials._has_credential('cacert'):
-            store = ssl_ctx.get_cert_store()
-            cacerts = credentials.cacert
-            if not isinstance(cacerts, list):
-                cacerts = [cacerts]
-            for cacert in cacerts:
-                store.add_cert(cacert)
-        else:
-            raise SecurityError("cacert_file is required in SecurityCreds")
-        ciphers = credentials.ciphers
-        if ciphers is not None:
-            ssl_ctx.set_cipher_list(ciphers)
-        # Demand a certificate
-        ssl_ctx.set_verify(OpenSSL.SSL.VERIFY_PEER |
-                           OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
-                           verify_cb)
-        return ssl_ctx
-else:
+if USE_STDLIB_SSL:
     def configure_ssl_context(credentials):
         """
-        Set various options on the SSL context for Python 3.x.
+        Set various options on the SSL context for Python >= 2.7.9 and 3.x.
 
         N.B. versions earlier than 3.4 may not support all security
         measures, e.g., hostname check.
@@ -121,49 +88,79 @@ else:
 
         return ssl_ctx
 
-
-# Inspired by
-# https://github.com/shazow/urllib3/blob/master/urllib3/contrib/pyopenssl.py
-class RiakWrappedSocket(socket.socket):
-    def __init__(self, connection, socket):
+else:
+    def configure_pyopenssl_context(credentials):
         """
-        API-compatibility wrapper for Python OpenSSL's Connection-class.
+        Set various options on the SSL context for Python <= 2.7.8.
 
-        :param connection: OpenSSL connection
-        :type connection: OpenSSL.SSL.Connection
-        :param socket: Underlying already connected socket
-        :type socket: socket
+        :param credentials: Riak Security Credentials
+        :type credentials: :class:`~riak.security.SecurityCreds`
+        :rtype ssl_ctx: :class:`~OpenSSL.SSL.Context`
         """
-        self.connection = connection
-        self.socket = socket
 
-    def fileno(self):
-        return self.socket.fileno()
+        ssl_ctx = OpenSSL.SSL.Context(credentials.ssl_version)
+        if credentials._has_credential('pkey'):
+            ssl_ctx.use_privatekey(credentials.pkey)
+        if credentials._has_credential('cert'):
+            ssl_ctx.use_certificate(credentials.cert)
+        if credentials._has_credential('cacert'):
+            store = ssl_ctx.get_cert_store()
+            cacerts = credentials.cacert
+            if not isinstance(cacerts, list):
+                cacerts = [cacerts]
+            for cacert in cacerts:
+                store.add_cert(cacert)
+        else:
+            raise SecurityError("cacert_file is required in SecurityCreds")
+        ciphers = credentials.ciphers
+        if ciphers is not None:
+            ssl_ctx.set_cipher_list(ciphers)
+        # Demand a certificate
+        ssl_ctx.set_verify(OpenSSL.SSL.VERIFY_PEER |
+                           OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
+                           verify_cb)
+        return ssl_ctx
 
-    def makefile(self, mode, bufsize=-1):
-        return fileobject(self.connection, mode, bufsize)
+    # Inspired by
+    # https://github.com/shazow/urllib3/blob/master/urllib3/contrib/pyopenssl.py
+    class RiakWrappedSocket(socket.socket):
+        def __init__(self, connection, socket):
+            """
+            API-compatibility wrapper for Python OpenSSL's Connection-class.
 
-    def settimeout(self, timeout):
-        return self.socket.settimeout(timeout)
+            :param connection: OpenSSL connection
+            :type connection: OpenSSL.SSL.Connection
+            :param socket: Underlying already connected socket
+            :type socket: socket
+            """
+            self.connection = connection
+            self.socket = socket
 
-    def sendall(self, data):
-        # SSL seems to need bytes, so force the data to byte encoding
-        return self.connection.sendall(bytes(data))
+        def fileno(self):
+            return self.socket.fileno()
 
-    def close(self):
-        try:
-            return self.connection.shutdown()
-        except OpenSSL.SSL.Error as err:
-            if err.args == ([],):
-                return False
-            else:
-                raise err
+        def makefile(self, mode, bufsize=-1):
+            return fileobject(self.connection, mode, bufsize)
 
+        def settimeout(self, timeout):
+            return self.socket.settimeout(timeout)
 
-# Blatantly Stolen from
-# https://github.com/shazow/urllib3/blob/master/urllib3/contrib/pyopenssl.py
-# which is basically a port of the `socket._fileobject` class
-if PY2:
+        def sendall(self, data):
+            # SSL seems to need bytes, so force the data to byte encoding
+            return self.connection.sendall(bytes(data))
+
+        def close(self):
+            try:
+                return self.connection.shutdown()
+            except OpenSSL.SSL.Error as err:
+                if err.args == ([],):
+                    return False
+                else:
+                    raise err
+
+    # Blatantly Stolen from
+    # https://github.com/shazow/urllib3/blob/master/urllib3/contrib/pyopenssl.py
+    # which is basically a port of the `socket._fileobject` class
     class fileobject(socket._fileobject):
         """
         Extension of the socket module's fileobject to use PyOpenSSL.

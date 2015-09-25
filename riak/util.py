@@ -48,8 +48,8 @@ def deep_merge(a, b):
             if key not in current_dst:
                 current_dst[key] = current_src[key]
             else:
-                if (quacks_like_dict(current_src[key])
-                        and quacks_like_dict(current_dst[key])):
+                if (quacks_like_dict(current_src[key]) and
+                        quacks_like_dict(current_dst[key])):
                     stack.append((current_dst[key], current_src[key]))
                 else:
                     current_dst[key] = current_src[key]
@@ -113,6 +113,6 @@ def str_to_long(value, base=10):
     if value is None:
         return None
     elif PY2:
-        return long(value, base)
+        return long(value, base)  # noqa
     else:
         return int(value, base)
