@@ -172,6 +172,30 @@ class RiakHttpResources(object):
         return mkpath("/types", quote_plus(bucket_type), "buckets",
                       quote_plus(bucket), "datatypes", key, **options)
 
+    def preflist_path(self, bucket, key, bucket_type=None, **options):
+        """
+        Generate the URL for bucket/key preflist information
+
+        :param bucket: Name of a Riak bucket
+        :type bucket: string
+        :param key: Name of a Key
+        :type key: string
+        :param bucket_type: Optional Riak Bucket Type
+        :type bucket_type: None or string
+        :rtype URL string
+        """
+        if not self.riak_kv_wm_preflist:
+            raise RiakError("Preflists are unsupported by this Riak node")
+        if self.riak_kv_wm_bucket_type and bucket_type:
+            return mkpath("/types", quote_plus(bucket_type),
+                          "buckets", quote_plus(bucket),
+                          "keys", quote_plus(key),
+                          "preflist", **options)
+        else:
+            return mkpath("/buckets", quote_plus(bucket),
+                          "keys", quote_plus(key),
+                          "preflist", **options)
+
     # Feature detection overrides
     def bucket_types(self):
         return self.riak_kv_wm_bucket_type is not None
@@ -224,6 +248,10 @@ class RiakHttpResources(object):
     @lazy_property
     def riak_kv_wm_counter(self):
         return self.resources.get('riak_kv_wm_counter')
+
+    @lazy_property
+    def riak_kv_wm_preflist(self):
+        return self.resources.get('riak_kv_wm_preflist')
 
     @lazy_property
     def yz_wm_search(self):

@@ -586,6 +586,16 @@ class RiakBucket(object):
 
     increment_counter = update_counter
 
+    def get_preflist(self, key):
+        """
+        Retrieve the preflist associated with a given bucket/key
+
+        :param key: Name of the key.
+        :type key: string
+        :rtype: list of dict()
+        """
+        return self._client.get_preflist(self, key)
+
     def __str__(self):
         if self.bucket_type.is_default():
             return '<RiakBucket {0!r}>'.format(self.name)

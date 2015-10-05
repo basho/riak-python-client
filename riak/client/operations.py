@@ -1000,6 +1000,23 @@ class RiakClientOperations(RiakClientTransport):
                                              timeout=timeout,
                                              include_context=include_context)
 
+    @retryable
+    def get_preflist(self, transport, bucket, key):
+        """
+        Fetch the preflist for a given bucket and key.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param bucket: the bucket whose index will be queried
+        :type bucket: RiakBucket
+        :param key: the key of the preflist
+        :type key: string
+
+        :return: list of dicts (partition, node, primary)
+        """
+        return transport.get_preflist(bucket, key)
+
     def _bucket_type_bucket_builder(self, name, bucket_type):
         """
         Build a bucket from a bucket type

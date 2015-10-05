@@ -270,6 +270,12 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def get_preflist(self, bucket, key):
+        """
+        Fetches the preflist for a bucket/key.
+        """
+        raise NotImplementedError
+
     def _search_mapred_emu(self, index, query):
         """
         Emulates a search request via MapReduce. Used in the case

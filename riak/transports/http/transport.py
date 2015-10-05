@@ -775,6 +775,26 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
 
         return True
 
+    def get_preflist(self, bucket, key):
+        """
+        Get the preflist for a bucket/key
+
+        :param bucket: Riak Bucket
+        :type bucket: :class:`~riak.bucket.RiakBucket`
+        :param key: Riak Key
+        :type key: string
+        :rtype: list of dicts
+        """
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.preflist_path(bucket.name, key, bucket_type=bucket_type)
+        status, headers, body = self._request('GET', url)
+
+        if status == 200:
+            preflist = json.loads(bytes_to_str(body))
+            return preflist['preflist']
+        else:
+            raise RiakError('Error getting bucket/key preflist.')
+
     def check_http_code(self, status, expected_statuses):
         if status not in expected_statuses:
             raise RiakError('Expected status %s, received %s' %

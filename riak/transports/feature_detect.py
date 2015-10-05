@@ -26,7 +26,9 @@ versions = {
     1.2: LooseVersion("1.2.0"),
     1.4: LooseVersion("1.4.0"),
     1.44: LooseVersion("1.4.4"),
-    2.0: LooseVersion("2.0.0")
+    2.0: LooseVersion("2.0.0"),
+    2.1: LooseVersion("2.1.0"),
+    2.12: LooseVersion("2.1.2")
 }
 
 
@@ -191,6 +193,14 @@ class FeatureDetection(object):
         :rtype: bool
         """
         return self.server_version >= versions[2.0]
+
+    def preflists(self):
+        """
+        Whether bucket/key preflists are supported.
+
+        :rtype: bool
+        """
+        return self.server_version >= versions[2.1]
 
     @lazy_property
     def server_version(self):

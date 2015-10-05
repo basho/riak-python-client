@@ -622,3 +622,16 @@ class RiakPbcCodec(object):
                 msg.flag_op = riak_pb.MapUpdate.ENABLE
             else:
                 msg.flag_op = riak_pb.MapUpdate.DISABLE
+
+    def _decode_preflist(self, item):
+        """
+        Decodes a preflist response
+
+        :param preflist: a bucket/key preflist
+        :type preflist: list of riak_pb.RpbBucketKeyPreflistItem
+        :rtype dict
+        """
+        result = {'partition': item.partition,
+                  'node': bytes_to_str(item.node),
+                  'primary': item. primary}
+        return result
