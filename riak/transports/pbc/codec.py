@@ -51,7 +51,8 @@ QUORUM_TO_PY = _invert(QUORUM_TO_PB)
 
 NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
                 'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
-                'notfound_ok', 'search', 'backend', 'search_index', 'datatype']
+                'notfound_ok', 'search', 'backend', 'search_index', 'datatype',
+                'write_once']
 COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
 MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']

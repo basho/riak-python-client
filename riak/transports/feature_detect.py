@@ -202,6 +202,14 @@ class FeatureDetection(object):
         """
         return self.server_version >= versions[2.1]
 
+    def write_once(self):
+        """
+        Whether write-once operations are supported.
+
+        :rtype: bool
+        """
+        return self.server_version >= versions[2.1]
+
     @lazy_property
     def server_version(self):
         return LooseVersion(self._server_version())
