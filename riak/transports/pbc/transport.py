@@ -487,7 +487,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return RiakPbcIndexStream(self, index, return_terms)
 
-    def create_search_index(self, index, schema=None, n_val=None):
+    def create_search_index(self, index, schema=None, n_val=None,
+                            timeout=None):
         if not self.pb_search_admin():
             raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
@@ -498,6 +499,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if n_val:
             idx.n_val = n_val
         req = riak_pb.RpbYokozunaIndexPutReq(index=idx)
+        if timeout is not None:
+            req.timeout = timeout
 
         self._request(MSG_CODE_YOKOZUNA_INDEX_PUT_REQ, req,
                       MSG_CODE_PUT_RESP)

@@ -444,7 +444,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise RiakError('Error streaming secondary index.')
 
-    def create_search_index(self, index, schema=None, n_val=None):
+    def create_search_index(self, index, schema=None, n_val=None,
+                            timeout=None):
         """
         Create a Solr search index for Yokozuna.
 
@@ -454,6 +455,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :type schema: string
         :param n_val: N value of the write
         :type n_val: int
+        :param timeout: optional timeout (in ms)
+        :type timeout: integer, None
 
         :rtype boolean
         """
@@ -468,6 +471,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             content_dict['schema'] = schema
         if n_val:
             content_dict['n_val'] = n_val
+        if timeout:
+            content_dict['timeout'] = timeout
         content = json.dumps(content_dict)
 
         # Run the request...

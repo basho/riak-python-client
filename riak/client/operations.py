@@ -685,7 +685,8 @@ class RiakClientOperations(RiakClientTransport):
             stream.close()
 
     @retryable
-    def create_search_index(self, transport, index, schema=None, n_val=None):
+    def create_search_index(self, transport, index, schema=None, n_val=None,
+                            timeout=None):
         """
         create_search_index(index, schema=None, n_val=None)
 
@@ -698,8 +699,10 @@ class RiakClientOperations(RiakClientTransport):
         :type schema: string, None
         :param n_val: this indexes N value
         :type n_val: integer, None
+        :param timeout: optional timeout (in ms)
+        :type timeout: integer, None
         """
-        return transport.create_search_index(index, schema, n_val)
+        return transport.create_search_index(index, schema, n_val, timeout)
 
     @retryable
     def get_search_index(self, transport, index):
