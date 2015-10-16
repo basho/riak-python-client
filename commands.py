@@ -238,6 +238,7 @@ class setup_security(Command, security_commands):
 
     _grants = {
         "riak_kv.get": ["any"],
+        "riak_kv.get_preflist": ["any"],
         "riak_kv.put": ["any"],
         "riak_kv.delete": ["any"],
         "riak_kv.index": ["any"],
