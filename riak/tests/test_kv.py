@@ -585,9 +585,10 @@ class BasicKVTests(object):
                                         "bar": "baz"}).store()
         preflist = bucket.get_preflist(self.key_name)
         preflist2 = self.client.get_preflist(bucket, self.key_name)
+        nodes = ['riak@127.0.0.1', 'dev1@127.0.0.1']
         for pref in (preflist, preflist2):
             self.assertEqual(len(pref), 3)
-            self.assertEqual(pref[0]['node'], 'riak@127.0.0.1')
+            self.assertIn(pref[0]['node'], nodes)
             [self.assertTrue(node['primary']) for node in pref]
 
     def generate_siblings(self, original, count=5, delay=None):
