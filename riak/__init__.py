@@ -33,14 +33,16 @@ See the unit_tests.py file for example usage.
 from riak.riak_error import RiakError, ConflictError
 from riak.client import RiakClient
 from riak.bucket import RiakBucket, BucketType
+from riak.table import Table
 from riak.node import RiakNode
 from riak.riak_object import RiakObject
 from riak.mapreduce import RiakKeyFilter, RiakMapReduce, RiakLink
 
 
-__all__ = ['RiakBucket', 'BucketType', 'RiakNode', 'RiakObject', 'RiakClient',
-           'RiakMapReduce', 'RiakKeyFilter', 'RiakLink', 'RiakError',
-           'ConflictError', 'ONE', 'ALL', 'QUORUM', 'key_filter']
+__all__ = ['RiakBucket', 'Table', 'BucketType', 'RiakNode',
+           'RiakObject', 'RiakClient', 'RiakMapReduce', 'RiakKeyFilter',
+           'RiakLink', 'RiakError', 'ConflictError',
+           'ONE', 'ALL', 'QUORUM', 'key_filter']
 
 ONE = "one"
 ALL = "all"

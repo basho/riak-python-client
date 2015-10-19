@@ -622,3 +622,20 @@ class RiakPbcCodec(object):
                 msg.flag_op = riak_pb.MapUpdate.ENABLE
             else:
                 msg.flag_op = riak_pb.MapUpdate.DISABLE
+
+    def _encode_timeseries(self, tsobj, ts_put_req):
+        """
+        Fills an TsPutReq message with the appropriate data and
+        metadata from a RiakTsObject.
+
+        :param tsobj: a RiakTsObject
+        :type tsobj: RiakTsObject
+        :param ts_put_req: the protobuf message to fill
+        :type ts_put_req: riak_pb.TsPutReq
+        """
+        ts_put_req.table = str_to_bytes(tsobj.table)
+        # TODO RTS-367 columns / rows
+        if tsobj.columns:
+        if tsobj.rows:
+        else:
+            raise RiakError("RiakTsObject requires rows")

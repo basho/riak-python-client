@@ -196,7 +196,7 @@ class RiakBucket(object):
     def get(self, key, r=None, pr=None, timeout=None, include_context=None,
             basic_quorum=None, notfound_ok=None):
         """
-        Retrieve an :class:`~riak.riak_object.RiakObject` or
+        Retrieve a :class:`~riak.riak_object.RiakObject` or
         :class:`~riak.datatypes.Datatype`, based on the presence and value
         of the :attr:`datatype <BucketType.datatype>` bucket property.
 

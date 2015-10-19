@@ -554,6 +554,24 @@ class RiakClientOperations(RiakClientTransport):
                              timeout=timeout)
 
     @retryable
+    def ts_put(self, transport, tsobj, timeout=None):
+        """
+        ts_put(tsobj, timeout=None)
+
+        Stores time series data in the Riak cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param tsobj: the time series object to store
+        :type tsobj: RiakTsObject
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        """
+        _validate_timeout(timeout)
+        return transport.ts_put(tsobj, timeout=timeout)
+
+    @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,
             basic_quorum=None, notfound_ok=None):
         """

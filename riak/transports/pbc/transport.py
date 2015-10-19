@@ -77,7 +77,9 @@ from riak_pb.messages import (
     MSG_CODE_DT_FETCH_REQ,
     MSG_CODE_DT_FETCH_RESP,
     MSG_CODE_DT_UPDATE_REQ,
-    MSG_CODE_DT_UPDATE_RESP
+    MSG_CODE_DT_UPDATE_RESP,
+    MSG_CODE_TS_PUT_REQ,
+    MSG_CODE_TS_PUT_RESP
 )
 
 
@@ -230,6 +232,19 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             raise RiakError("missing response object")
 
         return robj
+
+    def ts_put(self, tsobj):
+        req = riak_pb.TsPutReq()
+
+        self._encode_timeseries(tsobj, req)
+
+        msg_code, resp = self._request(MSG_CODE_TS_PUT_REQ, req,
+                                       MSG_CODE_TS_PUT_RESP)
+
+        if resp is not None:
+            return True
+        elif not robj.key:
+            raise RiakError("missing response object")
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):

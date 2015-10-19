@@ -239,6 +239,9 @@ class ClientTests(object):
                 self.client.put(obj, timeout=bad)
 
             with self.assertRaises(ValueError):
+                self.client.ts_put(obj, timeout=bad)
+
+            with self.assertRaises(ValueError):
                 self.client.get(obj, timeout=bad)
 
             with self.assertRaises(ValueError):
