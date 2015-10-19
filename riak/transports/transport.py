@@ -85,16 +85,22 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def ts_put(self, tsobj, timeout=None):
-        """
-        Stores a time series object.
-        """
-        raise NotImplementedError
-
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None,
                pw=None, timeout=None):
         """
         Deletes an object.
+        """
+        raise NotImplementedError
+
+    def ts_put(self, tsobj):
+        """
+        Stores a timeseries object.
+        """
+        raise NotImplementedError
+
+    def ts_query(self, query, interpolations=None):
+        """
+        Query timeseries data.
         """
         raise NotImplementedError
 

@@ -554,9 +554,9 @@ class RiakClientOperations(RiakClientTransport):
                              timeout=timeout)
 
     @retryable
-    def ts_put(self, transport, tsobj, timeout=None):
+    def ts_put(self, transport, tsobj):
         """
-        ts_put(tsobj, timeout=None)
+        ts_put(tsobj)
 
         Stores time series data in the Riak cluster.
 
@@ -565,11 +565,8 @@ class RiakClientOperations(RiakClientTransport):
 
         :param tsobj: the time series object to store
         :type tsobj: RiakTsObject
-        :param timeout: a timeout value in milliseconds
-        :type timeout: int
         """
-        _validate_timeout(timeout)
-        return transport.ts_put(tsobj, timeout=timeout)
+        return transport.ts_put(tsobj)
 
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,

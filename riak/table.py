@@ -18,9 +18,9 @@ under the License.
 from six import string_types, PY2
 
 
-class RiakTable(object):
+class Table(object):
     """
-    The ``RiakTable`` object allows you to access properties on a Riak table
+    The ``Table`` object allows you to access properties on a Riak table
     (bucket type) and query timeseries data.
     """
     def __init__(self, client, name):
@@ -30,12 +30,12 @@ class RiakTable(object):
         :param client: A :class:`RiakClient <riak.client.RiakClient>`
                instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
-        :param name: The tables's name
+        :param name: The table's name
         :type name: string
         """
 
         if not isinstance(name, string_types):
-            raise TypeError('Bucket name must be a string')
+            raise TypeError('Table name must be a string')
 
         if PY2:
             try:
@@ -46,12 +46,12 @@ class RiakTable(object):
         self._client = client
         self.name = name
 
-    def query(self, key):
+    def query(self, query, interpolations=None):
         """
-        Retrieve a bucket-type property.
+        Queries a timeseries table.
 
-        :param key: The property to retrieve.
-        :type key: string
-        :rtype: mixed
+        :param query: The timeseries query.
+        :type query: string
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
-        return self.get_properties()[key]
+        return self.client.ts_query(query, interpolations)

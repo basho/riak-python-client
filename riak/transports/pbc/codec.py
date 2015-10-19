@@ -639,3 +639,9 @@ class RiakPbcCodec(object):
         if tsobj.rows:
         else:
             raise RiakError("RiakTsObject requires rows")
+
+    def _decode_timeseries(self, ts_put_resp, tsobj):
+        """
+        TODO RTS-367
+        """
+        raise NotImplementedError

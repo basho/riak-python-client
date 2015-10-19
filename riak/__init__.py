@@ -1,4 +1,5 @@
 """
+Copyright 2015 Basho Technologies <dev@basho.com>
 Copyright 2010 Rusty Klophaus <rusty@basho.com>
 Copyright 2010 Justin Sheehy <justin@basho.com>
 Copyright 2009 Jay Baird <jay@mochimedia.com>
