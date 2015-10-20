@@ -16,22 +16,41 @@ Documentation for Riak is available at http://docs.basho.com/riak/latest
 Install
 =======
 
-The recommended version of Python for use with this client is Python
-2.7. From the Riak Python Client root directory, execute::
+The recommended versions of Python for use with this client are Python
+`2.7.x` and `3.3/3.4`.
+
+From the Riak Python Client root directory, execute
+
+From Source
+-----------
+
+.. code-block:: console
 
     python setup.py install
 
 There is an additional dependency on the Python package `setuptools`.
 
+From PyPI
+---------
+
 Official packages are signed and published to `PyPI
 <https://pypi.python.org/pypi/riak>`_.
+
+To install from `PyPI <https://pypi.python.org/pypi/riak>`_ directly you can use
+`pip`.  
+
+.. code-block:: console
+    
+    pip install riak
 
 
 Testing
 =======
 
 To setup the default test configuration build a test Riak node (from
-a ``riak`` directory)::
+a ``riak`` directory)
+
+.. code-block:: console
 
    make rel
 
@@ -41,13 +60,17 @@ for more details.
 
 For all of the simple default values, set the ``RIAK_DIR`` environment
 variable to the root of your Riak installation.  Then from the
-``riak-python-client`` directory ::
+``riak-python-client`` directory 
+
+.. code-block:: console
 
    cd buildbot
    make preconfigure
 
 Start your Riak node with ``riak start`` from the the Riak directory,
-then back in ``buildbot`` type::
+then back in ``buildbot`` type
+
+.. code-block:: console
 
    make configure
    make test
@@ -61,7 +84,9 @@ Testing Options
 If you wish to change the default options you can run the setup by hand.
 First configure the test node by adjusting the ``riak.conf``
 settings, where ``RIAK_DIR`` is the path to the top your
-Riak installation::
+Riak installation
+
+.. code-block:: console
 
    python setup.py preconfigure --riak-conf=$RIAK_DIR/etc/riak.conf
 
@@ -73,7 +98,9 @@ arguments:
     - ``--http-port=`` http port number (default is ``8098``)
     - ``--https-port=`` https port number (default is ``8099``)
 
-You may alternately add these lines to ``setup.cfg``::
+You may alternately add these lines to ``setup.cfg``
+
+.. code-block:: ini
 
     [preconfigure]
     riak-conf=/Users/sean/dev/riak/rel/riak/etc/riak.conf
@@ -83,7 +110,9 @@ You may alternately add these lines to ``setup.cfg``::
     https-port=8099
 
 Next start the test node.  Once it is running, a test configuration is
-installed which includes security test users and bucket types::
+installed which includes security test users and bucket types
+
+.. code-block:: console
 
     python setup.py configure --riak-admin=$RIAK_DIR/bin/riak-admin
 
@@ -97,7 +126,9 @@ Optionally these configuration settings can be changed, too:
      ``certpass``)
 
 Similarly ``setup.cfg`` may be modified instead.  To run the tests against a
-Riak server (with configured TCP port configuration) on localhost, execute::
+Riak server (with configured TCP port configuration) on localhost, execute
+
+.. code-block:: console
 
     python setup.py test
 
@@ -132,11 +163,15 @@ Testing Bucket Types (Riak 2+)
 To test bucket-types, you must run the ``create_bucket_types`` setup
 command, which will create the bucket-types used in testing, or create
 them manually yourself. It can be run like so (substituting ``$RIAK``
-with the root of your Riak install)::
+with the root of your Riak install)
+
+.. code-block:: console
 
     ./setup.py create_bucket_types --riak-admin=$RIAK/bin/riak-admin
 
-You may alternately add these lines to `setup.cfg`::
+You may alternately add these lines to `setup.cfg`
+
+.. code-block:: ini
 
     [create_bucket_types]
     riak-admin=/Users/sean/dev/riak/rel/riak/bin/riak-admin
@@ -160,14 +195,20 @@ enabled on Riak.  Once ``security = on`` is configured in the ``riak.conf``
 file it can be enabled with ``riak-admin``.
 
 If you have set up the test environment outlined in the `Testing`_ section
-you can go ahead and use this command to enable security::
+you can go ahead and use this command to enable security
+
+.. code-block:: console 
 
     python setup.py enable_security --riak-admin=$RIAK_DIR/bin/riak-admin
 
-Once you are done testing security you can also::
+Once you are done testing security you can also
+
+.. code-block:: console
 
     python setup.py disable_security --riak-admin=$RIAK_DIR/bin/riak-admin
 
-To run the tests, then simply::
+To run the tests, then simply
+
+.. code-block:: console
 
     RUN_SECURITY=1 RIAK_TEST_HTTP_PORT=18098 python setup.py test
