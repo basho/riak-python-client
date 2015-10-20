@@ -1,4 +1,5 @@
 *.pyc
+.python-version
 
 docs/_build
 
@@ -9,6 +10,7 @@ build/
 dist/
 riak.egg-info/
 *.egg
+.eggs/
 
 #*#
 *~
