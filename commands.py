@@ -81,6 +81,7 @@ class create_bucket_types(Command):
     * `pytest-sets` with ``{"datatype":"set"}``
     * `pytest-counters` with ``{"datatype":"counter"}``
     * `pytest-consistent` with ``{"consistent":true}``
+    * `pytest-write-once` with ``{"write_once": true}``
     * `pytest-mr`
     * `pytest` with ``{"allow_mult":false}``
     """
@@ -96,6 +97,7 @@ class create_bucket_types(Command):
         'pytest-sets': {'datatype': 'set'},
         'pytest-counters': {'datatype': 'counter'},
         'pytest-consistent': {'consistent': True},
+        'pytest-write-once': {'write_once': True},
         'pytest-mr': {},
         'pytest': {'allow_mult': False}
     }
@@ -236,6 +238,7 @@ class setup_security(Command, security_commands):
 
     _grants = {
         "riak_kv.get": ["any"],
+        "riak_kv.get_preflist": ["any"],
         "riak_kv.put": ["any"],
         "riak_kv.delete": ["any"],
         "riak_kv.index": ["any"],

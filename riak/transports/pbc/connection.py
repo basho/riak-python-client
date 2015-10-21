@@ -136,7 +136,7 @@ class RiakPbcConnection(object):
                     return True
                 except Exception as e:
                     # fail if *any* exceptions are thrown during SSL handshake
-                    raise SecurityError(e.message)
+                    raise SecurityError(e)
     else:
         def _ssl_handshake(self):
             """
@@ -165,7 +165,7 @@ class RiakPbcConnection(object):
 
                     return True
                 except ssl.SSLError as e:
-                    raise SecurityError(e.library + ": " + e.reason)
+                    raise SecurityError(e)
                 except Exception as e:
                     # fail if *any* exceptions are thrown during SSL handshake
                     raise SecurityError(e)

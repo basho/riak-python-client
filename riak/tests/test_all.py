@@ -87,7 +87,7 @@ def setUpModule():
                          'index': 'mrbucket'}
 
         for yz in (testrun_yz, testrun_yz_index, testrun_yz_mr):
-            c.create_search_index(yz['index'])
+            c.create_search_index(yz['index'], timeout=30000)
             if yz['btype'] is not None:
                 t = c.bucket_type(yz['btype'])
                 b = t.bucket(yz['bucket'])

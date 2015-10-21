@@ -685,7 +685,8 @@ class RiakClientOperations(RiakClientTransport):
             stream.close()
 
     @retryable
-    def create_search_index(self, transport, index, schema=None, n_val=None):
+    def create_search_index(self, transport, index, schema=None, n_val=None,
+                            timeout=None):
         """
         create_search_index(index, schema=None, n_val=None)
 
@@ -698,8 +699,10 @@ class RiakClientOperations(RiakClientTransport):
         :type schema: string, None
         :param n_val: this indexes N value
         :type n_val: integer, None
+        :param timeout: optional timeout (in ms)
+        :type timeout: integer, None
         """
-        return transport.create_search_index(index, schema, n_val)
+        return transport.create_search_index(index, schema, n_val, timeout)
 
     @retryable
     def get_search_index(self, transport, index):
@@ -999,6 +1002,23 @@ class RiakClientOperations(RiakClientTransport):
                                              return_body=return_body,
                                              timeout=timeout,
                                              include_context=include_context)
+
+    @retryable
+    def get_preflist(self, transport, bucket, key):
+        """
+        Fetch the preflist for a given bucket and key.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param bucket: the bucket whose index will be queried
+        :type bucket: RiakBucket
+        :param key: the key of the preflist
+        :type key: string
+
+        :return: list of dicts (partition, node, primary)
+        """
+        return transport.get_preflist(bucket, key)
 
     def _bucket_type_bucket_builder(self, name, bucket_type):
         """

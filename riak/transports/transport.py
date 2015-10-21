@@ -172,7 +172,8 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def create_search_index(self, index, schema=None, n_val=None):
+    def create_search_index(self, index, schema=None, n_val=None,
+                            timeout=None):
         """
         Creates a yokozuna search index.
         """
@@ -267,6 +268,12 @@ class RiakTransport(FeatureDetection):
                         return_body=None, timeout=None, include_context=None):
         """
         Updates a Riak Datatype by sending local operations to the server.
+        """
+        raise NotImplementedError
+
+    def get_preflist(self, bucket, key):
+        """
+        Fetches the preflist for a bucket/key.
         """
         raise NotImplementedError
 

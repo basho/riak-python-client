@@ -51,7 +51,8 @@ QUORUM_TO_PY = _invert(QUORUM_TO_PB)
 
 NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
                 'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
-                'notfound_ok', 'search', 'backend', 'search_index', 'datatype']
+                'notfound_ok', 'search', 'backend', 'search_index', 'datatype',
+                'write_once']
 COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
 MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
@@ -622,3 +623,16 @@ class RiakPbcCodec(object):
                 msg.flag_op = riak_pb.MapUpdate.ENABLE
             else:
                 msg.flag_op = riak_pb.MapUpdate.DISABLE
+
+    def _decode_preflist(self, item):
+        """
+        Decodes a preflist response
+
+        :param preflist: a bucket/key preflist
+        :type preflist: list of riak_pb.RpbBucketKeyPreflistItem
+        :rtype dict
+        """
+        result = {'partition': item.partition,
+                  'node': bytes_to_str(item.node),
+                  'primary': item. primary}
+        return result

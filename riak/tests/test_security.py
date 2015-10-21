@@ -20,7 +20,8 @@ under the License.
 import sys
 from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
     SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
-    SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT
+    SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT, \
+    SECURITY_CREDS, SECURITY_CIPHERS
 from riak.security import SecurityCreds
 if sys.version_info < (2, 7):
     unittest = __import__('unittest2')
@@ -31,10 +32,7 @@ else:
 class SecurityTests(object):
     @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is set')
     def test_security_disabled(self):
-        creds = SecurityCreds(username=SECURITY_USER,
-                              password=SECURITY_PASSWD,
-                              cacert_file=SECURITY_CACERT)
-        client = self.create_client(credentials=creds)
+        client = self.create_client(credentials=SECURITY_CREDS)
         myBucket = client.bucket('test')
         val1 = "foobar"
         key1 = myBucket.new('x', data=val1)
@@ -51,31 +49,39 @@ class SecurityTests(object):
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_user(self):
-        creds = SecurityCreds(username='foo', password=SECURITY_PASSWD,
-                              cacert_file=SECURITY_CACERT)
+        creds = SecurityCreds(username='foo',
+                              password=SECURITY_PASSWD,
+                              cacert_file=SECURITY_CACERT,
+                              ciphers=SECURITY_CIPHERS)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_password(self):
-        creds = SecurityCreds(username=SECURITY_USER, password='foo',
-                              cacert_file=SECURITY_CACERT)
+        creds = SecurityCreds(username=SECURITY_USER,
+                              password='foo',
+                              cacert_file=SECURITY_CACERT,
+                              ciphers=SECURITY_CIPHERS)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_invalid_cert(self):
-        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
-                              cacert_file='/tmp/foo')
+        creds = SecurityCreds(username=SECURITY_USER,
+                              password=SECURITY_PASSWD,
+                              cacert_file='/tmp/foo',
+                              ciphers=SECURITY_CIPHERS)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_password_without_cacert(self):
-        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD)
+        creds = SecurityCreds(username=SECURITY_USER,
+                              password=SECURITY_PASSWD,
+                              ciphers=SECURITY_CIPHERS)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             myBucket = client.bucket('test')
@@ -87,6 +93,7 @@ class SecurityTests(object):
     def test_security_cert_authentication(self):
         creds = SecurityCreds(username=SECURITY_CERT_USER,
                               password=SECURITY_CERT_PASSWD,
+                              ciphers=SECURITY_CIPHERS,
                               cert_file=SECURITY_CERT,
                               pkey_file=SECURITY_KEY,
                               cacert_file=SECURITY_CACERT)
@@ -107,6 +114,7 @@ class SecurityTests(object):
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_revoked_cert(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
+                              ciphers=SECURITY_CIPHERS,
                               cacert_file=SECURITY_CACERT,
                               crl_file=SECURITY_REVOKED)
         # Currently Python >= 2.7.9 and Python 3.x native CRL doesn't seem to
@@ -120,6 +128,7 @@ class SecurityTests(object):
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_ca_cert(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
+                              ciphers=SECURITY_CIPHERS,
                               cacert_file=SECURITY_BAD_CERT)
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
@@ -128,8 +137,8 @@ class SecurityTests(object):
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_ciphers(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
-                              cacert_file=SECURITY_CACERT,
-                              ciphers='DHE-RSA-AES256-SHA')
+                              ciphers=SECURITY_CIPHERS,
+                              cacert_file=SECURITY_CACERT)
         client = self.create_client(credentials=creds)
         myBucket = client.bucket('test')
         val1 = "foobar"

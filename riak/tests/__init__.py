@@ -60,9 +60,12 @@ SECURITY_CERT_USER = os.environ.get('RIAK_TEST_SECURITY_CERT_USER',
 SECURITY_CERT_PASSWD = os.environ.get('RIAK_TEST_SECURITY_CERT_PASSWD',
                                       'certpass')
 
+SECURITY_CIPHERS = 'DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:AES128-SHA256:AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA'
+
 SECURITY_CREDS = None
 if RUN_SECURITY:
     SECURITY_CREDS = SecurityCreds(username=SECURITY_USER,
                                    password=SECURITY_PASSWD,
-                                   cacert_file=SECURITY_CACERT)
+                                   cacert_file=SECURITY_CACERT,
+                                   ciphers=SECURITY_CIPHERS)
 SKIP_DATATYPES = int(os.environ.get('SKIP_DATATYPES', '0'))

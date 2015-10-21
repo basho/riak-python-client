@@ -56,6 +56,8 @@ from riak_pb.messages import (
     MSG_CODE_SET_BUCKET_RESP,
     MSG_CODE_GET_BUCKET_TYPE_REQ,
     MSG_CODE_SET_BUCKET_TYPE_REQ,
+    MSG_CODE_GET_BUCKET_KEY_PREFLIST_REQ,
+    MSG_CODE_GET_BUCKET_KEY_PREFLIST_RESP,
     MSG_CODE_MAP_RED_REQ,
     MSG_CODE_INDEX_REQ,
     MSG_CODE_INDEX_RESP,
@@ -485,7 +487,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return RiakPbcIndexStream(self, index, return_terms)
 
-    def create_search_index(self, index, schema=None, n_val=None):
+    def create_search_index(self, index, schema=None, n_val=None,
+                            timeout=None):
         if not self.pb_search_admin():
             raise NotImplementedError("Search 2.0 administration is not "
                                       "supported for this version")
@@ -496,6 +499,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         if n_val:
             idx.n_val = n_val
         req = riak_pb.RpbYokozunaIndexPutReq(index=idx)
+        if timeout is not None:
+            req.timeout = timeout
 
         self._request(MSG_CODE_YOKOZUNA_INDEX_PUT_REQ, req,
                       MSG_CODE_PUT_RESP)
@@ -699,3 +704,24 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             datatype._set_value(self._decode_dt_value(type_name, resp))
 
         return True
+
+    def get_preflist(self, bucket, key):
+        """
+        Get the preflist for a bucket/key
+
+        :param bucket: Riak Bucket
+        :type bucket: :class:`~riak.bucket.RiakBucket`
+        :param key: Riak Key
+        :type key: string
+        :rtype: list of dicts
+        """
+        req = riak_pb.RpbGetBucketKeyPreflistReq()
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
+        req.type = str_to_bytes(bucket.bucket_type.name)
+
+        msg_code, resp = self._request(MSG_CODE_GET_BUCKET_KEY_PREFLIST_REQ,
+                                       req,
+                                       MSG_CODE_GET_BUCKET_KEY_PREFLIST_RESP)
+
+        return [self._decode_preflist(item) for item in resp.preflist]
