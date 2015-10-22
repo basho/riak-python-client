@@ -176,3 +176,24 @@ class BucketTypeTests(object):
             self.assertIsInstance(mobj, RiakObject)
             self.assertEqual(bucket, mobj.bucket)
             self.assertEqual(btype, mobj.bucket.bucket_type)
+
+    @unittest.skipIf(SKIP_BTYPES == '1', "SKIP_BTYPES is set")
+    def test_write_once_bucket_type(self):
+        btype = self.client.bucket_type('pytest-write-once')
+        btype.set_property('write_once', True)
+        bucket = btype.bucket(self.bucket_name)
+
+        for i in range(100):
+            obj = bucket.new(self.key_name + str(i))
+            obj.data = {'id': i}
+            obj.store()
+
+        mget = bucket.multiget([self.key_name + str(i) for i in range(100)])
+        for mobj in mget:
+            self.assertIsInstance(mobj, RiakObject)
+            self.assertEqual(bucket, mobj.bucket)
+            self.assertEqual(btype, mobj.bucket.bucket_type)
+
+        props = btype.get_properties()
+        self.assertIn('write_once', props)
+        self.assertEqual(True, props['write_once'])

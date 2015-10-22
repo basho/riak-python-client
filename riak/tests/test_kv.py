@@ -579,6 +579,18 @@ class BasicKVTests(object):
                              basic_quorum=True)
         self.assertFalse(missing.exists)
 
+    def test_preflist(self):
+        bucket = self.client.bucket(self.bucket_name)
+        bucket.new(self.key_name, data={"foo": "one",
+                                        "bar": "baz"}).store()
+        preflist = bucket.get_preflist(self.key_name)
+        preflist2 = self.client.get_preflist(bucket, self.key_name)
+        nodes = ['riak@127.0.0.1', 'dev1@127.0.0.1']
+        for pref in (preflist, preflist2):
+            self.assertEqual(len(pref), 3)
+            self.assertIn(pref[0]['node'], nodes)
+            [self.assertTrue(node['primary']) for node in pref]
+
     def generate_siblings(self, original, count=5, delay=None):
         vals = []
         for _ in range(count):

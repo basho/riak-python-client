@@ -444,7 +444,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         else:
             raise RiakError('Error streaming secondary index.')
 
-    def create_search_index(self, index, schema=None, n_val=None):
+    def create_search_index(self, index, schema=None, n_val=None,
+                            timeout=None):
         """
         Create a Solr search index for Yokozuna.
 
@@ -454,6 +455,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         :type schema: string
         :param n_val: N value of the write
         :type n_val: int
+        :param timeout: optional timeout (in ms)
+        :type timeout: integer, None
 
         :rtype boolean
         """
@@ -468,6 +471,8 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
             content_dict['schema'] = schema
         if n_val:
             content_dict['n_val'] = n_val
+        if timeout:
+            content_dict['timeout'] = timeout
         content = json.dumps(content_dict)
 
         # Run the request...
@@ -774,6 +779,26 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                                                       response['value']))
 
         return True
+
+    def get_preflist(self, bucket, key):
+        """
+        Get the preflist for a bucket/key
+
+        :param bucket: Riak Bucket
+        :type bucket: :class:`~riak.bucket.RiakBucket`
+        :param key: Riak Key
+        :type key: string
+        :rtype: list of dicts
+        """
+        bucket_type = self._get_bucket_type(bucket.bucket_type)
+        url = self.preflist_path(bucket.name, key, bucket_type=bucket_type)
+        status, headers, body = self._request('GET', url)
+
+        if status == 200:
+            preflist = json.loads(bytes_to_str(body))
+            return preflist['preflist']
+        else:
+            raise RiakError('Error getting bucket/key preflist.')
 
     def check_http_code(self, status, expected_statuses):
         if status not in expected_statuses:
