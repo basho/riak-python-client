@@ -11,8 +11,10 @@ import re
 import os.path
 
 
-__all__ = ['create_bucket_types', 'setup_security', 'enable_security',
-           'disable_security', 'preconfigure', 'configure']
+__all__ = ['create_bucket_types',
+           'setup_security', 'enable_security', 'disable_security',
+           'setup_timeseries',
+           'preconfigure', 'configure']
 
 
 # Exception classes used by this module.
@@ -72,36 +74,7 @@ try:
 except ImportError:
     import json
 
-
-class create_bucket_types(Command):
-    """
-    Creates bucket-types appropriate for testing. By default this will create:
-
-    * `pytest-maps` with ``{"datatype":"map"}``
-    * `pytest-sets` with ``{"datatype":"set"}``
-    * `pytest-counters` with ``{"datatype":"counter"}``
-    * `pytest-consistent` with ``{"consistent":true}``
-    * `pytest-write-once` with ``{"write_once": true}``
-    * `pytest-mr`
-    * `pytest` with ``{"allow_mult":false}``
-    """
-
-    description = "create bucket-types used in integration tests"
-
-    user_options = [
-        ('riak-admin=', None, 'path to the riak-admin script')
-    ]
-
-    _props = {
-        'pytest-maps': {'datatype': 'map'},
-        'pytest-sets': {'datatype': 'set'},
-        'pytest-counters': {'datatype': 'counter'},
-        'pytest-consistent': {'consistent': True},
-        'pytest-write-once': {'write_once': True},
-        'pytest-mr': {},
-        'pytest': {'allow_mult': False}
-    }
-
+class bucket_type_commands:
     def initialize_options(self):
         self.riak_admin = None
 
@@ -169,6 +142,53 @@ class create_bucket_types(Command):
         cmd = [self.riak_admin, "bucket-type"]
         cmd.extend(args)
         return cmd
+
+class create_bucket_types(bucket_type_commands, Command):
+    """
+    Creates bucket-types appropriate for testing. By default this will create:
+
+    * `pytest-maps` with ``{"datatype":"map"}``
+    * `pytest-sets` with ``{"datatype":"set"}``
+    * `pytest-counters` with ``{"datatype":"counter"}``
+    * `pytest-consistent` with ``{"consistent":true}``
+    * `pytest-write-once` with ``{"write_once": true}``
+    * `pytest-mr`
+    * `pytest` with ``{"allow_mult":false}``
+    """
+
+    description = "create bucket-types used in integration tests"
+
+    user_options = [
+        ('riak-admin=', None, 'path to the riak-admin script')
+    ]
+
+    _props = {
+        'pytest-maps': {'datatype': 'map'},
+        'pytest-sets': {'datatype': 'set'},
+        'pytest-counters': {'datatype': 'counter'},
+        'pytest-consistent': {'consistent': True},
+        'pytest-write-once': {'write_once': True},
+        'pytest-mr': {},
+        'pytest': {'allow_mult': False}
+    }
+
+
+class setup_timeseries(bucket_type_commands, Command):
+    """
+    Creates bucket-types appropriate for timeseries. By default this will create:
+
+    * `GeoCheckin` with ``{"props": {"n_val": 3, "table_def": "CREATE TABLE GeoCheckin (geohash varchar not null, user varchar not null, time timestamp not null, weather varchar not null, temperature float, PRIMARY KEY((quantum(time, 15, m),user), time, user))"}}``
+    """
+
+    description = "create bucket-types used in timeseries tests"
+
+    user_options = [
+        ('riak-admin=', None, 'path to the riak-admin script')
+    ]
+
+    _props = {
+        'GeoCheckin': {'n_val': 3, 'table_def': 'CREATE TABLE GeoCheckin (geohash varchar not null, user varchar not null, time timestamp not null, weather varchar not null, temperature float, PRIMARY KEY((quantum(time, 15, m),user), time, user))'},
+    }
 
 
 class security_commands(object):
@@ -469,6 +489,4 @@ class configure(Command):
         for cmd_name in self.get_sub_commands():
             self.run_command(cmd_name)
 
-    sub_commands = [('create_bucket_types', None),
-                    ('setup_security', None)
-                    ]
+    sub_commands = [('create_bucket_types', None), ('setup_security', None)]

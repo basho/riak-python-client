@@ -36,6 +36,8 @@ RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 
 SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '1'))
 
+SKIP_TIMESERIES = int(os.environ.get('SKIP_TIMESERIES', '1'))
+
 SKIP_POOL = os.environ.get('SKIP_POOL')
 SKIP_RESOLVE = int(os.environ.get('SKIP_RESOLVE', '0'))
 SKIP_BTYPES = int(os.environ.get('SKIP_BTYPES', '0'))

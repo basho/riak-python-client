@@ -179,6 +179,28 @@ You may alternately add these lines to `setup.cfg`
 To skip the bucket-type tests, set the ``SKIP_BTYPES`` environment
 variable to ``1``.
 
+Testing Timeseries (Riak 2+)
+------------------------------
+
+To test timeseries data, you must run the ``setup_timeseries`` command,
+which will create the bucket-types used in testing, or create them
+manually yourself. It can be run like so (substituting ``$RIAK`` with
+the root of your Riak install)
+
+.. code-block:: console
+
+    ./setup.py setup_timeseries --riak-admin=$RIAK/bin/riak-admin
+
+You may alternately add these lines to `setup.cfg`
+
+.. code-block:: ini
+
+    [setup_timeseries]
+    riak-admin=/Users/sean/dev/riak/rel/riak/bin/riak-admin
+
+To enable the timeseries tests, set the ``SKIP_TIMESERIES`` environment
+variable to ``0``.
+
 Testing Secondary Indexes
 -------------------------
 

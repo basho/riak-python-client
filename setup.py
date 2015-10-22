@@ -3,7 +3,7 @@ import sys
 from setuptools import setup, find_packages
 from version import get_version
 from commands import preconfigure, configure, create_bucket_types, \
-    setup_security, enable_security, disable_security
+    setup_security, enable_security, disable_security, setup_timeseries
 
 install_requires = ['six >= 1.8.0']
 requires = ['six(>=1.8.0)']
@@ -39,6 +39,7 @@ setup(
     test_suite='riak.tests.suite',
     url='https://github.com/basho/riak-python-client',
     cmdclass={'create_bucket_types': create_bucket_types,
+              'setup_timeseries': setup_timeseries,
               'setup_security': setup_security,
               'preconfigure': preconfigure,
               'configure': configure,

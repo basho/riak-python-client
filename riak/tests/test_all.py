@@ -36,6 +36,7 @@ from riak.tests.test_2i import TwoITests
 from riak.tests.test_btypes import BucketTypeTests
 from riak.tests.test_security import SecurityTests
 from riak.tests.test_datatypes import DatatypeIntegrationTests
+from riak.tests.test_timeseries import TimeseriesTests
 
 from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
     HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
@@ -57,7 +58,6 @@ testrun_sibs_bucket = None
 testrun_yz = {'btype': None, 'bucket': None, 'index': None}
 testrun_yz_index = {'btype': None, 'bucket': None, 'index': None}
 testrun_yz_mr = {'btype': None, 'bucket': None, 'index': None}
-
 
 def setUpModule():
     global testrun_search_bucket, testrun_props_bucket, \
@@ -375,6 +375,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                BucketTypeTests,
                                SecurityTests,
                                DatatypeIntegrationTests,
+                               TimeseriesTests,
                                BaseTestCase,
                                unittest.TestCase,
                                test_six.Comparison):
@@ -393,6 +394,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
         self.assertEqual(zero_client_id, c.client_id)
 
 
+# NB: no Timeseries support in HTTP
 class RiakHttpTransportTestCase(BasicKVTests,
                                 KVFileTests,
                                 BucketPropsTest,
