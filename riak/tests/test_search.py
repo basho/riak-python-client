@@ -1,32 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 from __future__ import print_function
 import platform
-from . import SKIP_SEARCH
+from riak.tests import SKIP_SEARCH
+from riak.tests.base import BaseTestCase
+
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
 
 
-class EnableSearchTests(object):
+class EnableSearchTests(BaseTestCase, unittest.TestCase):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_bucket_search_enabled(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -57,7 +41,7 @@ class EnableSearchTests(object):
         bucket.enable_search()
 
 
-class SolrSearchTests(object):
+class SolrSearchTests(BaseTestCase, unittest.TestCase):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_document_to_index(self):
         self.client.fulltext_add(self.search_bucket,
@@ -116,7 +100,7 @@ class SolrSearchTests(object):
         self.assertEqual(0, len(results['docs']))
 
 
-class SearchTests(object):
+class SearchTests(BaseTestCase, unittest.TestCase):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search_from_bucket(self):
         bucket = self.client.bucket(self.search_bucket)

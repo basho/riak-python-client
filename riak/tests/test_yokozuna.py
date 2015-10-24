@@ -1,28 +1,31 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import platform
-from . import RUN_YZ
+from riak import RiakClient
+from riak.tests import RUN_YZ, PB_HOST, PB_PORT, HTTP_PORT, SECURITY_CREDS
+from riak.tests.base import BaseTestCase
+from riak.tests.yz_setup import yzSetUpModule, yzTearDownModule
+
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
+
+# YZ index on bucket of the same name
+testrun_yz = {'btype': None, 'bucket': 'yzbucket', 'index': 'yzbucket'}
+# YZ index on bucket of a different name
+testrun_yz_index = {'btype': None, 'bucket': 'yzindexbucket', 'index': 'yzindex'}
+
+def setUpModule():
+    if RUN_YZ:
+        c = RiakClient(host=PB_HOST, protocol='pbc',
+                pb_port=PB_PORT, credentials=SECURITY_CREDS)
+        yzSetUpModule(c, testrun_yz, testrun_yz_index)
+
+def tearDownModule():
+    if RUN_YZ:
+        c = RiakClient(host=PB_HOST, protocol='pbc',
+                pb_port=PB_PORT, credentials=SECURITY_CREDS)
+        yzTearDownModule(c, testrun_yz, testrun_yz_index)
 
 
 def wait_for_yz_index(bucket, key, index=None):
@@ -38,10 +41,13 @@ def wait_for_yz_index(bucket, key, index=None):
         pass
 
 
-class YZSearchTests(object):
+class YZSearchTests(BaseTestCase, unittest.TestCase):
+    def setUp(self):
+        super(YZSearchTests, self).setUp()
+
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_from_bucket(self):
-        bucket = self.client.bucket(self.yz['bucket'])
+        bucket = self.client.bucket(testrun_yz['bucket'])
         bucket.new("user", {"user_s": "Z"}).store()
         wait_for_yz_index(bucket, "user")
         results = bucket.search("user_s:Z")
@@ -51,60 +57,60 @@ class YZSearchTests(object):
         self.assertIn('_yz_rk', result)
         self.assertEqual(u'user', result['_yz_rk'])
         self.assertIn('_yz_rb', result)
-        self.assertEqual(self.yz['bucket'], result['_yz_rb'])
+        self.assertEqual(testrun_yz['bucket'], result['_yz_rb'])
         self.assertIn('score', result)
         self.assertIn('user_s', result)
         self.assertEqual(u'Z', result['user_s'])
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_index_using_bucket(self):
-        bucket = self.client.bucket(self.yz_index['bucket'])
+        bucket = self.client.bucket(testrun_yz_index['bucket'])
         bucket.new("feliz",
                    {"name_s": "Felix", "species_s": "Felis catus"}).store()
-        wait_for_yz_index(bucket, "feliz", index=self.yz_index['index'])
-        results = bucket.search('name_s:Felix', index=self.yz_index['index'])
+        wait_for_yz_index(bucket, "feliz", index=testrun_yz_index['index'])
+        results = bucket.search('name_s:Felix', index=testrun_yz_index['index'])
         self.assertEqual(1, len(results['docs']))
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_index_using_wrong_bucket(self):
-        bucket = self.client.bucket(self.yz_index['bucket'])
+        bucket = self.client.bucket(testrun_yz_index['bucket'])
         bucket.new("feliz",
                    {"name_s": "Felix", "species_s": "Felis catus"}).store()
-        wait_for_yz_index(bucket, "feliz", index=self.yz_index['index'])
+        wait_for_yz_index(bucket, "feliz", index=testrun_yz_index['index'])
         with self.assertRaises(Exception):
             bucket.search('name_s:Felix')
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_get_search_index(self):
-        index = self.client.get_search_index(self.yz['bucket'])
-        self.assertEqual(self.yz['bucket'], index['name'])
+        index = self.client.get_search_index(testrun_yz['bucket'])
+        self.assertEqual(testrun_yz['bucket'], index['name'])
         self.assertEqual('_yz_default', index['schema'])
         self.assertEqual(3, index['n_val'])
         with self.assertRaises(Exception):
-            self.client.get_search_index('NOT' + self.yz['bucket'])
+            self.client.get_search_index('NOT' + testrun_yz['bucket'])
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_delete_search_index(self):
         # expected to fail, since there's an attached bucket
         with self.assertRaises(Exception):
-            self.client.delete_search_index(self.yz['bucket'])
+            self.client.delete_search_index(testrun_yz['bucket'])
         # detatch bucket from index then delete
-        b = self.client.bucket(self.yz['bucket'])
+        b = self.client.bucket(testrun_yz['bucket'])
         b.set_property('search_index', '_dont_index_')
-        self.assertTrue(self.client.delete_search_index(self.yz['bucket']))
+        self.assertTrue(self.client.delete_search_index(testrun_yz['bucket']))
         # create it again
-        self.client.create_search_index(self.yz['bucket'], '_yz_default', 3)
-        b = self.client.bucket(self.yz['bucket'])
-        b.set_property('search_index', self.yz['bucket'])
+        self.client.create_search_index(testrun_yz['bucket'], '_yz_default', 3)
+        b = self.client.bucket(testrun_yz['bucket'])
+        b.set_property('search_index', testrun_yz['bucket'])
         # Wait for index to apply
         indexes = []
-        while self.yz['bucket'] not in indexes:
+        while testrun_yz['bucket'] not in indexes:
             indexes = [i['name'] for i in self.client.list_search_indexes()]
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_list_search_indexes(self):
         indexes = self.client.list_search_indexes()
-        self.assertIn(self.yz['bucket'], [item['name'] for item in indexes])
+        self.assertIn(testrun_yz['bucket'], [item['name'] for item in indexes])
         self.assertLessEqual(1, len(indexes))
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
@@ -153,7 +159,7 @@ class YZSearchTests(object):
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_queries(self):
-        bucket = self.client.bucket(self.yz['bucket'])
+        bucket = self.client.bucket(testrun_yz['bucket'])
         bucket.new("Z", {"username_s": "Z", "name_s": "ryan",
                          "age_i": 30}).store()
         bucket.new("R", {"username_s": "R", "name_s": "eric",
@@ -191,7 +197,7 @@ class YZSearchTests(object):
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_utf8(self):
-        bucket = self.client.bucket(self.yz['bucket'])
+        bucket = self.client.bucket(testrun_yz['bucket'])
         body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
         bucket.new(self.key_name, body).store()
         wait_for_yz_index(bucket, self.key_name)
@@ -201,7 +207,7 @@ class YZSearchTests(object):
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_multivalued_fields(self):
-        bucket = self.client.bucket(self.yz['bucket'])
+        bucket = self.client.bucket(testrun_yz['bucket'])
         body = {"groups_ss": ['a', 'b', 'c']}
         bucket.new(self.key_name, body).store()
         wait_for_yz_index(bucket, self.key_name)

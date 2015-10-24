@@ -1,27 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import platform
 from riak import RiakBucket, BucketType, RiakObject
 import riak.datatypes as datatypes
-from . import SKIP_DATATYPES
-from riak.tests import test_six
+from riak.tests import SKIP_DATATYPES
+from riak.tests.base import BaseTestCase
+from riak.tests.comparison import Comparison
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -29,7 +12,7 @@ else:
     import unittest
 
 
-class DatatypeUnitTests(object):
+class DatatypeUnitTestBase(object):
     dtype = None
     bucket = RiakBucket(None, 'test', BucketType(None, 'datatypes'))
 
@@ -67,8 +50,7 @@ class DatatypeUnitTests(object):
         self.check_op_output(op)
 
 
-class FlagUnitTests(DatatypeUnitTests,
-                    unittest.TestCase):
+class FlagUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Flag
 
     def op(self, dtype):
@@ -87,8 +69,7 @@ class FlagUnitTests(DatatypeUnitTests,
         self.assertTrue(dtype.modified)
 
 
-class RegisterUnitTests(DatatypeUnitTests,
-                        unittest.TestCase):
+class RegisterUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Register
 
     def op(self, dtype):
@@ -98,8 +79,7 @@ class RegisterUnitTests(DatatypeUnitTests,
         self.assertEqual(('assign', 'foobarbaz'), op)
 
 
-class CounterUnitTests(DatatypeUnitTests,
-                       unittest.TestCase):
+class CounterUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Counter
 
     def op(self, dtype):
@@ -109,9 +89,7 @@ class CounterUnitTests(DatatypeUnitTests,
         self.assertEqual(('increment', 5), op)
 
 
-class SetUnitTests(DatatypeUnitTests,
-                   unittest.TestCase,
-                   test_six.Comparison):
+class SetUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
     dtype = datatypes.Set
 
     def op(self, dtype):
@@ -136,8 +114,7 @@ class SetUnitTests(DatatypeUnitTests,
         self.assertTrue(dtype.modified)
 
 
-class MapUnitTests(DatatypeUnitTests,
-                   unittest.TestCase):
+class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Map
 
     def op(self, dtype):
@@ -170,7 +147,7 @@ class MapUnitTests(DatatypeUnitTests,
         self.assertTrue(dtype.modified)
 
 
-class DatatypeIntegrationTests(object):
+class DatatypeIntegrationTests(BaseTestCase, unittest.TestCase):
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_counter(self):
         btype = self.client.bucket_type('pytest-counters')

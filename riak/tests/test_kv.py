@@ -1,22 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import os
 import platform
 from six import string_types, PY2, PY3
@@ -25,7 +7,9 @@ import copy
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
-from . import SKIP_RESOLVE
+from riak.tests import SKIP_RESOLVE
+from riak.tests.base import BaseTestCase
+from riak.tests.comparison import Comparison
 
 try:
     import simplejson as json
@@ -71,7 +55,7 @@ class NotJsonSerializable(object):
         return True
 
 
-class BasicKVTests(object):
+class BasicKVTests(BaseTestCase, unittest.TestCase, Comparison):
     def test_is_alive(self):
         self.assertTrue(self.client.is_alive())
 
@@ -610,7 +594,7 @@ class BasicKVTests(object):
         return vals
 
 
-class BucketPropsTest(object):
+class BucketPropsTest(BaseTestCase, unittest.TestCase):
     def test_rw_settings(self):
         bucket = self.client.bucket(self.props_bucket)
         self.assertEqual(bucket.r, "quorum")
@@ -663,7 +647,7 @@ class BucketPropsTest(object):
         self.assertEqual(bucket.n_val, 3)
 
 
-class KVFileTests(object):
+class KVFileTests(BaseTestCase, unittest.TestCase):
     def test_store_binary_object_from_file(self):
         bucket = self.client.bucket(self.bucket_name)
         filepath = os.path.join(os.path.dirname(__file__), 'test_all.py')
@@ -691,7 +675,7 @@ class KVFileTests(object):
         self.assertFalse(obj.exists)
 
 
-class CounterTests(object):
+class CounterTests(BaseTestCase, unittest.TestCase):
     def test_counter_requires_allow_mult(self):
         bucket = self.client.bucket(self.bucket_name)
         if bucket.allow_mult:

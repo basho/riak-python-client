@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import sys
 from setuptools import setup, find_packages
 from version import get_version
@@ -10,12 +11,23 @@ requires = ['six(>=1.8.0)']
 if sys.version_info < (2, 7, 9):
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
-if sys.version_info < (3, ):
-    install_requires.append("riak_pb >=2.0.0")
-    requires.append("riak_pb(>=2.0.0)")
+
+riak_pb_in_pythonpath = False
+PYTHONPATH = os.environ.get('PYTHONPATH')
+if PYTHONPATH is not None and PYTHONPATH.find('riak_pb/python/lib') != -1:
+    riak_pb_in_pythonpath = True
+
+if riak_pb_in_pythonpath:
+    install_requires.append("protobuf ==2.6.1")
+    requires.append("protobuf(==2.6.1)")
 else:
-    install_requires.append("python3_riak_pb >=2.0.0")
-    requires.append("python3_riak_pb(>=2.0.0)")
+    if sys.version_info < (3, ):
+        install_requires.append("riak_pb >=2.0.0")
+        requires.append("riak_pb(>=2.0.0)")
+    else:
+        install_requires.append("python3_riak_pb >=2.0.0")
+        requires.append("python3_riak_pb(>=2.0.0)")
+
 tests_require = []
 if sys.version_info < (2, 7):
     tests_require.append("unittest2")

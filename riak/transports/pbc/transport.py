@@ -80,8 +80,8 @@ from riak_pb.messages import (
     MSG_CODE_DT_FETCH_RESP,
     MSG_CODE_DT_UPDATE_REQ,
     MSG_CODE_DT_UPDATE_RESP,
-    MSG_CODE_TS_PUT_REQ,
-    MSG_CODE_TS_PUT_RESP
+    # MSG_CODE_TS_PUT_REQ,
+    # MSG_CODE_TS_PUT_RESP
 )
 
 

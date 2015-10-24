@@ -636,10 +636,10 @@ class RiakPbcCodec(object):
         """
         ts_put_req.table = str_to_bytes(tsobj.table)
         # TODO RTS-367 columns / rows
-        if tsobj.columns:
-        if tsobj.rows:
-        else:
-            raise RiakError("RiakTsObject requires rows")
+        # if tsobj.columns:
+        # if tsobj.rows:
+        # else:
+        #     raise RiakError("RiakTsObject requires rows")
 
     def _decode_timeseries(self, ts_put_resp, tsobj):
         """

@@ -1,22 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-import random
 import platform
 from six import PY2
 from threading import Thread
@@ -40,7 +22,7 @@ from riak.tests.test_timeseries import TimeseriesTests
 
 from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
     HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
-    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS, SKIP_POOL, test_six
+    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS, SKIP_POOL
 
 if PY2:
     from Queue import Queue
@@ -51,131 +33,6 @@ if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
-
-testrun_search_bucket = None
-testrun_props_bucket = None
-testrun_sibs_bucket = None
-testrun_yz = {'btype': None, 'bucket': None, 'index': None}
-testrun_yz_index = {'btype': None, 'bucket': None, 'index': None}
-testrun_yz_mr = {'btype': None, 'bucket': None, 'index': None}
-
-def setUpModule():
-    global testrun_search_bucket, testrun_props_bucket, \
-        testrun_sibs_bucket, testrun_yz, testrun_yz_index, testrun_yz_mr
-
-    c = RiakClient(host=PB_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
-
-    testrun_props_bucket = 'propsbucket'
-    testrun_sibs_bucket = 'sibsbucket'
-    c.bucket(testrun_sibs_bucket).allow_mult = True
-
-    if (not SKIP_SEARCH and not RUN_YZ):
-        testrun_search_bucket = 'searchbucket'
-        b = c.bucket(testrun_search_bucket)
-        b.enable_search()
-
-    if RUN_YZ:
-        # YZ index on bucket of the same name
-        testrun_yz = {'btype': None, 'bucket': 'yzbucket',
-                      'index': 'yzbucket'}
-        # YZ index on bucket of a different name
-        testrun_yz_index = {'btype': None, 'bucket': 'yzindexbucket',
-                            'index': 'yzindex'}
-        # Add bucket and type for Search 2.0 -> MapReduce
-        testrun_yz_mr = {'btype': 'pytest-mr', 'bucket': 'mrbucket',
-                         'index': 'mrbucket'}
-
-        for yz in (testrun_yz, testrun_yz_index, testrun_yz_mr):
-            c.create_search_index(yz['index'], timeout=30000)
-            if yz['btype'] is not None:
-                t = c.bucket_type(yz['btype'])
-                b = t.bucket(yz['bucket'])
-            else:
-                b = c.bucket(yz['bucket'])
-            # Keep trying to set search bucket property until it succeeds
-            index_set = False
-            while not index_set:
-                try:
-                    b.set_property('search_index', yz['index'])
-                    index_set = True
-                except RiakError:
-                    pass
-
-
-def tearDownModule():
-    global testrun_search_bucket, testrun_props_bucket, \
-        testrun_sibs_bucket, testrun_yz_bucket
-
-    c = RiakClient(host=HTTP_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
-
-    c.bucket(testrun_sibs_bucket).clear_properties()
-    c.bucket(testrun_props_bucket).clear_properties()
-
-    if not SKIP_SEARCH and not RUN_YZ:
-        b = c.bucket(testrun_search_bucket)
-        b.clear_properties()
-
-    if RUN_YZ:
-        for yz in (testrun_yz, testrun_yz_index, testrun_yz_mr):
-            if yz['btype'] is not None:
-                t = c.bucket_type(yz['btype'])
-                b = t.bucket(yz['bucket'])
-            else:
-                b = c.bucket(yz['bucket'])
-            b.set_property('search_index', '_dont_index_')
-            c.delete_search_index(yz['index'])
-            for keys in b.stream_keys():
-                for key in keys:
-                    b.delete(key)
-
-
-class BaseTestCase(object):
-
-    host = None
-    pb_port = None
-    http_port = None
-    credentials = None
-
-    @staticmethod
-    def randint():
-        return random.randint(1, 999999)
-
-    @staticmethod
-    def randname(length=12):
-        out = ''
-        for i in range(length):
-            out += chr(random.randint(ord('a'), ord('z')))
-        return out
-
-    def create_client(self, host=None, http_port=None, pb_port=None,
-                      protocol=None, credentials=None,
-                      **client_args):
-        host = host or self.host or HOST
-        http_port = http_port or self.http_port or HTTP_PORT
-        pb_port = pb_port or self.pb_port or PB_PORT
-        protocol = protocol or self.protocol
-        credentials = credentials or SECURITY_CREDS
-        return RiakClient(protocol=protocol,
-                          host=host,
-                          http_port=http_port,
-                          credentials=credentials,
-                          pb_port=pb_port, **client_args)
-
-    def setUp(self):
-        self.bucket_name = self.randname()
-        self.key_name = self.randname()
-        self.search_bucket = testrun_search_bucket
-        self.sibs_bucket = testrun_sibs_bucket
-        self.props_bucket = testrun_props_bucket
-        self.yz = testrun_yz
-        self.yz_index = testrun_yz_index
-        self.yz_mr = testrun_yz_mr
-        self.credentials = SECURITY_CREDS
-
-        self.client = self.create_client()
-
 
 class ClientTests(object):
     def test_request_retries(self):
@@ -375,10 +232,7 @@ class RiakPbcTransportTestCase(BasicKVTests,
                                BucketTypeTests,
                                SecurityTests,
                                DatatypeIntegrationTests,
-                               TimeseriesTests,
-                               BaseTestCase,
-                               unittest.TestCase,
-                               test_six.Comparison):
+                               unittest.TestCase):
 
     def setUp(self):
         if not HAVE_PROTO:
@@ -413,9 +267,7 @@ class RiakHttpTransportTestCase(BasicKVTests,
                                 BucketTypeTests,
                                 SecurityTests,
                                 DatatypeIntegrationTests,
-                                BaseTestCase,
-                                unittest.TestCase,
-                                test_six.Comparison):
+                                unittest.TestCase):
 
     def setUp(self):
         self.host = HTTP_HOST

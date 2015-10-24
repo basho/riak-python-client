@@ -19,6 +19,8 @@ except ImportError:
 
 HOST = os.environ.get('RIAK_TEST_HOST', '127.0.0.1')
 
+PROTOCOL = 'pbc'
+
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 
@@ -30,7 +32,6 @@ HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 DUMMY_HTTP_PORT = int(os.environ.get('DUMMY_HTTP_PORT', '1023'))
 DUMMY_PB_PORT = int(os.environ.get('DUMMY_PB_PORT', '1022'))
 
-
 SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '1'))
 RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 
@@ -38,7 +39,7 @@ SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '1'))
 
 SKIP_TIMESERIES = int(os.environ.get('SKIP_TIMESERIES', '1'))
 
-SKIP_POOL = os.environ.get('SKIP_POOL')
+SKIP_POOL = int(os.environ.get('SKIP_POOL', '1'))
 SKIP_RESOLVE = int(os.environ.get('SKIP_RESOLVE', '0'))
 SKIP_BTYPES = int(os.environ.get('SKIP_BTYPES', '0'))
 
