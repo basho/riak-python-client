@@ -1,6 +1,8 @@
 *.pyc
 .python-version
 
+.tox/
+
 docs/_build
 
 .*.swp

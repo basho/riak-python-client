@@ -2,7 +2,7 @@
 import platform
 from riak.riak_object import RiakObject
 from riak.bucket import RiakBucket, BucketType
-from riak.tests.base import BaseTestCase
+from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -136,7 +136,7 @@ class RiakObjectComparisonTest(unittest.TestCase):
         self.assertIsNone(b, 'empty object key not allowed')
 
 
-class RiakClientComparisonTest(BaseTestCase, unittest.TestCase):
+class RiakClientComparisonTest(IntegrationTestBase, unittest.TestCase):
     def test_client_eq(self):
         self.protocol = 'http'
         a = self.create_client(host='host1', http_port=11)

@@ -1,28 +1,9 @@
-# -*- coding: utf-8 -*-
 import platform
 from six import PY2
 from threading import Thread
-
-from riak import RiakError
-from riak.client import RiakClient
 from riak.riak_object import RiakObject
-
-from riak.tests.test_yokozuna import YZSearchTests
-from riak.tests.test_search import SearchTests, \
-    EnableSearchTests, SolrSearchTests
-from riak.tests.test_mapreduce import MapReduceAliasTests, \
-    ErlangMapReduceTests, JSMapReduceTests, LinkTests, MapReduceStreamTests
-from riak.tests.test_kv import BasicKVTests, KVFileTests, \
-    BucketPropsTest, CounterTests
-from riak.tests.test_2i import TwoITests
-from riak.tests.test_btypes import BucketTypeTests
-from riak.tests.test_security import SecurityTests
-from riak.tests.test_datatypes import DatatypeIntegrationTests
-from riak.tests.test_timeseries import TimeseriesTests
-
-from riak.tests import HOST, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, \
-    HAVE_PROTO, DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
-    SKIP_SEARCH, RUN_YZ, SECURITY_CREDS, SKIP_POOL
+from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, SKIP_POOL
+from riak.tests.base import IntegrationTestBase
 
 if PY2:
     from Queue import Queue
@@ -34,7 +15,15 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
-class ClientTests(object):
+class ClientTests(IntegrationTestBase, unittest.TestCase):
+    def test_uses_client_id_if_given(self):
+        if self.protocol == 'pbc':
+            zero_client_id = "\0\0\0\0"
+            c = self.create_client(client_id=zero_client_id)
+            self.assertEqual(zero_client_id, c.client_id)
+        else:
+            pass
+
     def test_request_retries(self):
         # We guess at some ports that will be unused by Riak or
         # anything else.
@@ -213,84 +202,3 @@ class ClientTests(object):
         self.client.close()
         self.assertEqual(len(self.client._http_pool.resources), 0)
         self.assertEqual(len(self.client._pb_pool.resources), 0)
-
-
-class RiakPbcTransportTestCase(BasicKVTests,
-                               KVFileTests,
-                               BucketPropsTest,
-                               TwoITests,
-                               LinkTests,
-                               ErlangMapReduceTests,
-                               JSMapReduceTests,
-                               MapReduceAliasTests,
-                               MapReduceStreamTests,
-                               EnableSearchTests,
-                               SearchTests,
-                               YZSearchTests,
-                               ClientTests,
-                               CounterTests,
-                               BucketTypeTests,
-                               SecurityTests,
-                               DatatypeIntegrationTests,
-                               unittest.TestCase):
-
-    def setUp(self):
-        if not HAVE_PROTO:
-            self.skipTest('protobuf is unavailable')
-        self.host = PB_HOST
-        self.pb_port = PB_PORT
-        self.protocol = 'pbc'
-        super(RiakPbcTransportTestCase, self).setUp()
-
-    def test_uses_client_id_if_given(self):
-        zero_client_id = "\0\0\0\0"
-        c = self.create_client(client_id=zero_client_id)
-        self.assertEqual(zero_client_id, c.client_id)
-
-
-# NB: no Timeseries support in HTTP
-class RiakHttpTransportTestCase(BasicKVTests,
-                                KVFileTests,
-                                BucketPropsTest,
-                                TwoITests,
-                                LinkTests,
-                                ErlangMapReduceTests,
-                                JSMapReduceTests,
-                                MapReduceAliasTests,
-                                MapReduceStreamTests,
-                                EnableSearchTests,
-                                SolrSearchTests,
-                                SearchTests,
-                                YZSearchTests,
-                                ClientTests,
-                                CounterTests,
-                                BucketTypeTests,
-                                SecurityTests,
-                                DatatypeIntegrationTests,
-                                unittest.TestCase):
-
-    def setUp(self):
-        self.host = HTTP_HOST
-        self.http_port = HTTP_PORT
-        self.protocol = 'http'
-        super(RiakHttpTransportTestCase, self).setUp()
-
-    def test_no_returnbody(self):
-        bucket = self.client.bucket(self.bucket_name)
-        o = bucket.new(self.key_name, "bar").store(return_body=False)
-        self.assertEqual(o.vclock, None)
-
-    def test_too_many_link_headers_shouldnt_break_http(self):
-        bucket = self.client.bucket(self.bucket_name)
-        o = bucket.new("lots_of_links", "My god, it's full of links!")
-        for i in range(0, 300):
-            link = ("other", "key%d" % i, "next")
-            o.add_link(link)
-
-        o.store()
-        stored_object = bucket.get("lots_of_links")
-        self.assertEqual(len(stored_object.links), 300)
-
-
-if __name__ == '__main__':
-    unittest.main()

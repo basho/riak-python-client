@@ -1,37 +1,13 @@
 # -*- coding: utf-8 -*-
+import logging
+import os
 import random
+import sys
 
 from riak.client import RiakClient
-from riak.tests import HOST, PROTOCOL,PB_PORT, HTTP_PORT, SECURITY_CREDS
+from riak.tests import HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
 
-testrun_search_bucket = 'searchbucket'
-testrun_props_bucket = 'propsbucket'
-testrun_sibs_bucket = 'sibsbucket'
-
-def setUpModule():
-
-    c = RiakClient(host=PB_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
-
-    c.bucket(testrun_sibs_bucket).allow_mult = True
-
-    if (not SKIP_SEARCH and not RUN_YZ):
-        b = c.bucket(testrun_search_bucket)
-        b.enable_search()
-
-
-def tearDownModule():
-    c = RiakClient(host=HTTP_HOST, http_port=HTTP_PORT,
-                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
-
-    c.bucket(testrun_sibs_bucket).clear_properties()
-    c.bucket(testrun_props_bucket).clear_properties()
-
-    if not SKIP_SEARCH and not RUN_YZ:
-        b = c.bucket(testrun_search_bucket)
-        b.clear_properties()
-
-class BaseTestCase(object):
+class IntegrationTestBase(object):
 
     host = None
     pb_port = None
@@ -66,6 +42,9 @@ class BaseTestCase(object):
 
         credentials = credentials or SECURITY_CREDS
 
+        if self.logging_enabled:
+            self.logger.debug("RiakClient(protocol='%s', host='%s', pb_port='%d', http_port='%d', credentials='%s', client_args='%s')", protocol, host, pb_port, http_port, credentials, client_args)
+
         return RiakClient(protocol=protocol,
                           host=host,
                           http_port=http_port,
@@ -73,15 +52,22 @@ class BaseTestCase(object):
                           pb_port=pb_port, **client_args)
 
     def setUp(self):
+        self.logging_enabled = False
+        distutils_debug = os.environ.get('DISTUTILS_DEBUG', '0')
+        if distutils_debug == '1':
+            self.logging_enabled = True
+            self.logger = logging.getLogger()
+            self.logger.level = logging.DEBUG
+            self.logging_stream_handler = logging.StreamHandler(sys.stdout)
+            self.logger.addHandler(self.logging_stream_handler)
+
         self.table_name = 'GeoCheckin'
         self.bucket_name = self.randname()
         self.key_name = self.randname()
-        self.search_bucket = testrun_search_bucket
-        self.sibs_bucket = testrun_sibs_bucket
-        self.props_bucket = testrun_props_bucket
-        # self.yz = testrun_yz
-        # self.yz_index = testrun_yz_index
-        # self.yz_mr = testrun_yz_mr
         self.credentials = SECURITY_CREDS
         self.client = self.create_client()
+
+    def tearDown(self):
+        if self.logging_enabled:
+            self.logger.removeHandler(self.logging_stream_handler)
 

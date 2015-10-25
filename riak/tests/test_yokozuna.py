@@ -1,32 +1,14 @@
 # -*- coding: utf-8 -*-
 import platform
-from riak import RiakClient
-from riak.tests import RUN_YZ, PB_HOST, PB_PORT, HTTP_PORT, SECURITY_CREDS
-from riak.tests.base import BaseTestCase
-from riak.tests.yz_setup import yzSetUpModule, yzTearDownModule
+from riak.tests import RUN_YZ
+from riak.tests.base import IntegrationTestBase
+from riak.tests.comparison import Comparison
+from riak.tests.yz_setup import yzSetUp, yzTearDown
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
-
-# YZ index on bucket of the same name
-testrun_yz = {'btype': None, 'bucket': 'yzbucket', 'index': 'yzbucket'}
-# YZ index on bucket of a different name
-testrun_yz_index = {'btype': None, 'bucket': 'yzindexbucket', 'index': 'yzindex'}
-
-def setUpModule():
-    if RUN_YZ:
-        c = RiakClient(host=PB_HOST, protocol='pbc',
-                pb_port=PB_PORT, credentials=SECURITY_CREDS)
-        yzSetUpModule(c, testrun_yz, testrun_yz_index)
-
-def tearDownModule():
-    if RUN_YZ:
-        c = RiakClient(host=PB_HOST, protocol='pbc',
-                pb_port=PB_PORT, credentials=SECURITY_CREDS)
-        yzTearDownModule(c, testrun_yz, testrun_yz_index)
-
 
 def wait_for_yz_index(bucket, key, index=None):
     """
@@ -40,11 +22,18 @@ def wait_for_yz_index(bucket, key, index=None):
     while len(bucket.search('_yz_rk:' + key, index=index)['docs']) == 0:
         pass
 
+# YZ index on bucket of the same name
+testrun_yz = {'btype': None, 'bucket': 'yzbucket', 'index': 'yzbucket'}
+# YZ index on bucket of a different name
+testrun_yz_index = {'btype': None, 'bucket': 'yzindexbucket', 'index': 'yzindex'}
 
-class YZSearchTests(BaseTestCase, unittest.TestCase):
-    def setUp(self):
-        super(YZSearchTests, self).setUp()
+def setUpModule():
+    yzSetUp(testrun_yz, testrun_yz_index)
 
+def tearDownModule():
+    yzTearDown(testrun_yz, testrun_yz_index)
+
+class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_from_bucket(self):
         bucket = self.client.bucket(testrun_yz['bucket'])

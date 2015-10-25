@@ -2,7 +2,8 @@ import platform
 from riak import RiakError, RiakObject
 from riak.bucket import RiakBucket, BucketType
 from riak.tests import SKIP_BTYPES
-from riak.tests.base import BaseTestCase
+from riak.tests.base import IntegrationTestBase
+from riak.tests.comparison import Comparison
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -10,7 +11,7 @@ else:
     import unittest
 
 
-class BucketTypeTests(BaseTestCase, unittest.TestCase):
+class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
     def test_btype_init(self):
         btype = self.client.bucket_type('foo')
         self.assertIsInstance(btype, BucketType)

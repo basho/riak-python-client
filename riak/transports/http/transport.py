@@ -55,7 +55,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                  client=None,
                  connection_class=HTTPConnection,
                  client_id=None,
-                 **unused_options):
+                 **options):
         """
         Construct a new HTTP connection to Riak.
         """
@@ -65,6 +65,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         self._node = node
         self._connection_class = connection_class
         self._client_id = client_id
+        self._options = options
         if not self._client_id:
             self._client_id = self.make_random_client_id()
         self._connect()

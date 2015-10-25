@@ -3,7 +3,7 @@ import platform
 from riak import RiakBucket, BucketType, RiakObject
 import riak.datatypes as datatypes
 from riak.tests import SKIP_DATATYPES
-from riak.tests.base import BaseTestCase
+from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
 if platform.python_version() < '2.7':
@@ -147,7 +147,7 @@ class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
         self.assertTrue(dtype.modified)
 
 
-class DatatypeIntegrationTests(BaseTestCase, unittest.TestCase):
+class DatatypeIntegrationTests(IntegrationTestBase, unittest.TestCase, Comparison):
     @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_counter(self):
         btype = self.client.bucket_type('pytest-counters')

@@ -5,10 +5,10 @@ from six import string_types, PY2, PY3
 
 import copy
 from time import sleep
-from riak import ConflictError, RiakBucket, RiakError
+from riak import ConflictError, RiakClient, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
-from riak.tests import SKIP_RESOLVE
-from riak.tests.base import BaseTestCase
+from riak.tests import SKIP_RESOLVE, HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
+from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
 try:
@@ -29,6 +29,21 @@ else:
     import pickle
     test_pickle_dumps = pickle.dumps
     test_pickle_loads = pickle.loads
+
+
+testrun_sibs_bucket = 'sibsbucket'
+testrun_props_bucket = 'propsbucket'
+
+def setUpModule():
+    c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
+                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
+    c.bucket(testrun_sibs_bucket).allow_mult = True
+
+def tearDownModule():
+    c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
+                   pb_port=PB_PORT, credentials=SECURITY_CREDS)
+    c.bucket(testrun_sibs_bucket).clear_properties()
+    c.bucket(testrun_props_bucket).clear_properties()
 
 
 class NotJsonSerializable(object):
@@ -55,7 +70,23 @@ class NotJsonSerializable(object):
         return True
 
 
-class BasicKVTests(BaseTestCase, unittest.TestCase, Comparison):
+class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
+    def test_no_returnbody(self):
+        bucket = self.client.bucket(self.bucket_name)
+        o = bucket.new(self.key_name, "bar").store(return_body=False)
+        self.assertEqual(o.vclock, None)
+
+    def test_many_link_headers_should_work_fine(self):
+        bucket = self.client.bucket(self.bucket_name)
+        o = bucket.new("lots_of_links", "My god, it's full of links!")
+        for i in range(0, 300):
+            link = ("other", "key%d" % i, "next")
+            o.add_link(link)
+
+        o.store()
+        stored_object = bucket.get("lots_of_links")
+        self.assertEqual(len(stored_object.links), 300)
+
     def test_is_alive(self):
         self.assertTrue(self.client.is_alive())
 
@@ -324,19 +355,19 @@ class BasicKVTests(BaseTestCase, unittest.TestCase, Comparison):
         self.assertFalse(obj.exists)
 
     def test_set_bucket_properties(self):
-        bucket = self.client.bucket(self.props_bucket)
+        bucket = self.client.bucket(testrun_props_bucket)
         # Test setting allow mult...
         bucket.allow_mult = True
         # Test setting nval...
         bucket.n_val = 1
 
-        bucket2 = self.create_client().bucket(self.props_bucket)
+        bucket2 = self.create_client().bucket(testrun_props_bucket)
         self.assertTrue(bucket2.allow_mult)
         self.assertEqual(bucket2.n_val, 1)
         # Test setting multiple properties...
         bucket.set_properties({"allow_mult": False, "n_val": 2})
 
-        bucket3 = self.create_client().bucket(self.props_bucket)
+        bucket3 = self.create_client().bucket(testrun_props_bucket)
         self.assertFalse(bucket3.allow_mult)
         self.assertEqual(bucket3.n_val, 2)
 
@@ -357,7 +388,7 @@ class BasicKVTests(BaseTestCase, unittest.TestCase, Comparison):
 
     def test_siblings(self):
         # Set up the bucket, clear any existing object...
-        bucket = self.client.bucket(self.sibs_bucket)
+        bucket = self.client.bucket(testrun_sibs_bucket)
         obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
@@ -396,7 +427,7 @@ class BasicKVTests(BaseTestCase, unittest.TestCase, Comparison):
     @unittest.skipIf(SKIP_RESOLVE == '1',
                      "skip requested for resolvers test")
     def test_resolution(self):
-        bucket = self.client.bucket(self.sibs_bucket)
+        bucket = self.client.bucket(testrun_sibs_bucket)
         obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
@@ -454,13 +485,13 @@ class BasicKVTests(BaseTestCase, unittest.TestCase, Comparison):
                      "skip requested for resolvers test")
     def test_resolution_default(self):
         # If no resolver is setup, be sure to resolve to default_resolver
-        bucket = self.client.bucket(self.sibs_bucket)
+        bucket = self.client.bucket(testrun_sibs_bucket)
         self.assertEqual(self.client.resolver, default_resolver)
         self.assertEqual(bucket.resolver, default_resolver)
 
     def test_tombstone_siblings(self):
         # Set up the bucket, clear any existing object...
-        bucket = self.client.bucket(self.sibs_bucket)
+        bucket = self.client.bucket(testrun_sibs_bucket)
         obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
@@ -594,9 +625,9 @@ class BasicKVTests(BaseTestCase, unittest.TestCase, Comparison):
         return vals
 
 
-class BucketPropsTest(BaseTestCase, unittest.TestCase):
+class BucketPropsTest(IntegrationTestBase, unittest.TestCase):
     def test_rw_settings(self):
-        bucket = self.client.bucket(self.props_bucket)
+        bucket = self.client.bucket(testrun_props_bucket)
         self.assertEqual(bucket.r, "quorum")
         self.assertEqual(bucket.w, "quorum")
         self.assertEqual(bucket.dw, "quorum")
@@ -621,7 +652,7 @@ class BucketPropsTest(BaseTestCase, unittest.TestCase):
         bucket.clear_properties()
 
     def test_primary_quora(self):
-        bucket = self.client.bucket(self.props_bucket)
+        bucket = self.client.bucket(testrun_props_bucket)
         self.assertEqual(bucket.pr, 0)
         self.assertEqual(bucket.pw, 0)
 
@@ -635,7 +666,7 @@ class BucketPropsTest(BaseTestCase, unittest.TestCase):
         bucket.clear_properties()
 
     def test_clear_bucket_properties(self):
-        bucket = self.client.bucket(self.props_bucket)
+        bucket = self.client.bucket(testrun_props_bucket)
         bucket.allow_mult = True
         self.assertTrue(bucket.allow_mult)
         bucket.n_val = 1
@@ -647,15 +678,15 @@ class BucketPropsTest(BaseTestCase, unittest.TestCase):
         self.assertEqual(bucket.n_val, 3)
 
 
-class KVFileTests(BaseTestCase, unittest.TestCase):
+class KVFileTests(IntegrationTestBase, unittest.TestCase):
     def test_store_binary_object_from_file(self):
         bucket = self.client.bucket(self.bucket_name)
-        filepath = os.path.join(os.path.dirname(__file__), 'test_all.py')
-        obj = bucket.new_from_file(self.key_name, filepath)
+        obj = bucket.new_from_file(self.key_name, __file__)
         obj.store()
         obj = bucket.get(self.key_name)
         self.assertNotEqual(obj.encoded_data, None)
-        self.assertEqual(obj.content_type, "text/x-python")
+        self.assertTrue(obj.content_type == 'text/x-python' or
+                        obj.content_type == 'application/x-python-code')
 
     def test_store_binary_object_from_file_should_use_default_mimetype(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -675,7 +706,7 @@ class KVFileTests(BaseTestCase, unittest.TestCase):
         self.assertFalse(obj.exists)
 
 
-class CounterTests(BaseTestCase, unittest.TestCase):
+class CounterTests(IntegrationTestBase, unittest.TestCase):
     def test_counter_requires_allow_mult(self):
         bucket = self.client.bucket(self.bucket_name)
         if bucket.allow_mult:
@@ -686,7 +717,7 @@ class CounterTests(BaseTestCase, unittest.TestCase):
             bucket.update_counter(self.key_name, 10)
 
     def test_counter_ops(self):
-        bucket = self.client.bucket(self.sibs_bucket)
+        bucket = self.client.bucket(testrun_sibs_bucket)
         self.assertTrue(bucket.allow_mult)
 
         # Non-existent counter has no value

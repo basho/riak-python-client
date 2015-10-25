@@ -13,9 +13,14 @@ if sys.version_info < (2, 7, 9):
     requires.append("pyOpenSSL(>=0.14)")
 
 riak_pb_in_pythonpath = False
-PYTHONPATH = os.environ.get('PYTHONPATH')
-if PYTHONPATH is not None and PYTHONPATH.find('riak_pb/python/lib') != -1:
-    riak_pb_in_pythonpath = True
+os_env_pythonpath = os.environ.get('PYTHONPATH')
+if os_env_pythonpath is not None:
+    for ppath in os_env_pythonpath.split(os.pathsep):
+        if ppath.find('riak_pb/python/lib') != -1:
+            riak_pb_messages = os.path.join(ppath, 'riak_pb', 'messages.py')
+            if os.path.exists(riak_pb_messages):
+                riak_pb_in_pythonpath = True
+                break
 
 if riak_pb_in_pythonpath:
     install_requires.append("protobuf ==2.6.1")

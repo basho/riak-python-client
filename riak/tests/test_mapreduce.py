@@ -5,34 +5,29 @@ import platform
 
 from six import PY2
 from riak.mapreduce import RiakMapReduce
-from riak import key_filter, RiakClient, RiakError
-from riak.tests import RUN_YZ, PB_HOST, PB_PORT, HTTP_HOST, HTTP_PORT, SECURITY_CREDS
-from riak.tests.base import BaseTestCase
+from riak import key_filter, RiakError
+from riak.tests import RUN_YZ
+from riak.tests.base import IntegrationTestBase
 from riak.tests.test_yokozuna import wait_for_yz_index
 from riak.tests import RUN_SECURITY
-from riak.tests.yz_setup import yzSetUpModule, yzTearDownModule
+from riak.tests.yz_setup import yzSetUp, yzTearDown
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
 
-# Add bucket and type for Search 2.0 -> MapReduce
+
 testrun_yz_mr = {'btype': 'pytest-mr', 'bucket': 'mrbucket', 'index': 'mrbucket'}
 
 def setUpModule():
-    if RUN_YZ:
-        c = RiakClient(host=PB_HOST, http_port=HTTP_PORT,
-                       pb_port=PB_PORT, credentials=SECURITY_CREDS)
-        yzSetUpModule(c, testrun_yz_mr)
+    yzSetUp(testrun_yz_mr)
 
 def tearDownModule():
-    if RUN_YZ:
-        c = RiakClient(host=HTTP_HOST, http_port=HTTP_PORT,
-                       pb_port=PB_PORT, credentials=SECURITY_CREDS)
-        yzTearDownModule(c, testrun_yz_mr)
+    yzTearDown(testrun_yz_mr)
 
-class LinkTests(BaseTestCase, unittest.TestCase):
+
+class LinkTests(IntegrationTestBase, unittest.TestCase):
     def test_store_and_get_links(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
@@ -98,7 +93,7 @@ class LinkTests(BaseTestCase, unittest.TestCase):
         self.assertEqual(len(results), 1)
 
 
-class ErlangMapReduceTests(BaseTestCase, unittest.TestCase):
+class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
     def test_erlang_map_reduce(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
@@ -204,7 +199,8 @@ class ErlangMapReduceTests(BaseTestCase, unittest.TestCase):
             mr.add_key_filter("tokenize", "-", 1)
 
 
-class JSMapReduceTests(BaseTestCase, unittest.TestCase):
+class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
+
     def test_javascript_source_map(self):
         # Create the object...
         bucket = self.client.bucket(self.bucket_name)
@@ -564,7 +560,7 @@ class JSMapReduceTests(BaseTestCase, unittest.TestCase):
         self.assertEqual(result, [100])
 
 
-class MapReduceAliasTests(BaseTestCase, unittest.TestCase):
+class MapReduceAliasTests(IntegrationTestBase, unittest.TestCase):
     """This tests the map reduce aliases"""
 
     def test_map_values(self):
@@ -759,7 +755,7 @@ class MapReduceAliasTests(BaseTestCase, unittest.TestCase):
         self.assertEqual(sorted(result), [1, 2])
 
 
-class MapReduceStreamTests(BaseTestCase, unittest.TestCase):
+class MapReduceStreamTests(IntegrationTestBase, unittest.TestCase):
     def test_stream_results(self):
         bucket = self.client.bucket(self.bucket_name)
         bucket.new('one', data=1).store()
