@@ -234,3 +234,11 @@ To run the tests, then simply
 .. code-block:: console
 
     RUN_SECURITY=1 RIAK_TEST_HTTP_PORT=18098 python setup.py test
+
+Contributors
+--------------------------
+   - Rusty Klophaus <rusty@basho.com>
+   - Justin Sheehy <justin@basho.com>
+   - Jay Baird <jay@mochimedia.com>
+   - Andy Gross <andy@basho.com>
+   - Jon Meredith <jmeredith@basho.com>

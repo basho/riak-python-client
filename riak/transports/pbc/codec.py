@@ -1,27 +1,15 @@
-"""
-Copyright 2012 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
+import datetime
+import json
+import logging
 import riak_pb
+
 from riak import RiakError
 from riak.content import RiakContent
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str
 from riak.multidict import MultiDict
 from six import string_types, PY2
 
+epoch = datetime.datetime.utcfromtimestamp(0)
 
 def _invert(d):
     out = {}
@@ -86,6 +74,12 @@ class RiakPbcCodec(object):
         if riak_pb is None:
             raise NotImplementedError("this transport is not available")
         super(RiakPbcCodec, self).__init__(**unused_args)
+
+    def _unix_time_millis(self, dt):
+        return int((dt - epoch).total_seconds() * 1000.0)
+
+    def _datetime_from_unix_time_millis(self, ut):
+        return datetime.datetime.utcfromtimestamp(ut / 1000.0)
 
     def _encode_quorum(self, rw):
         """
@@ -627,25 +621,126 @@ class RiakPbcCodec(object):
     def _encode_timeseries(self, tsobj, ts_put_req):
         """
         Fills an TsPutReq message with the appropriate data and
-        metadata from a RiakTsObject.
+        metadata from a TsObject.
 
-        :param tsobj: a RiakTsObject
-        :type tsobj: RiakTsObject
+        :param tsobj: a TsObject
+        :type tsobj: TsObject
         :param ts_put_req: the protobuf message to fill
         :type ts_put_req: riak_pb.TsPutReq
         """
-        ts_put_req.table = str_to_bytes(tsobj.table)
-        # TODO RTS-367 columns / rows
-        # if tsobj.columns:
-        # if tsobj.rows:
-        # else:
-        #     raise RiakError("RiakTsObject requires rows")
+        ts_put_req.table = str_to_bytes(tsobj.table.name)
+        if tsobj.columns:
+            raise NotImplementedError("columns are not implemented yet")
+        if tsobj.rows and isinstance(tsobj.rows, list):
+            for row in tsobj.rows:
+                tsr = ts_put_req.rows.add() # NB: type riak_pb.TsRow
+                if not isinstance(row, list):
+                    raise RiakError("TsObject row must be a list of values")
+                for cell in row:
+                    tsc = tsr.cells.add() # NB: type riak_pb.TsCell
+                    if cell is not None:
+                        if isinstance(cell, bytes) or isinstance(cell, bytearray):
+                            logging.debug("cell -> binary_value: '%s'", cell)
+                            tsc.binary_value = cell
+                        elif isinstance(cell, datetime.datetime):
+                            tsc.timestamp_value = self._unix_time_millis(cell)
+                            logging.debug("cell -> timestamp: '%s', timestamp_value '%d'",
+                                cell, tsc.timestamp_value)
+                        elif isinstance(cell, list):
+                            for c in cell:
+                                j = json.dumps(c)
+                                logging.debug("cell -> set_value: '%s'", j)
+                                tsc.set_value.append(str_to_bytes(j))
+                        elif isinstance(cell, bool):
+                            logging.debug("cell -> boolean: '%s'", cell)
+                            tsc.boolean_value = cell
+                        elif isinstance(cell, str):
+                            logging.debug("cell -> str: '%s'", cell)
+                            tsc.binary_value = str_to_bytes(cell)
+                        elif isinstance(cell, int) or isinstance(cell, long):
+                            logging.debug("cell -> int/long: '%s'", cell)
+                            tsc.integer_value = cell
+                        elif isinstance(cell, float):
+                            logging.debug("cell -> float: '%s'", cell)
+                            tsc.double_value = cell
+                        elif isinstance(cell, dict):
+                            logging.debug("cell -> dict: '%s'", cell)
+                            j = json.dumps(cell)
+                            tsc.map_value = str_to_bytes(j)
+                        else:
+                            t = type(cell)
+                            raise RiakError("can't serialize type '{}', value '{}'".format(t, cell))
+        else:
+            raise RiakError("TsObject requires a list of rows")
 
-    def _decode_timeseries(self, ts_put_resp, tsobj):
+    def _decode_timeseries(self, ts_query_rsp, tsobj):
         """
-        TODO RTS-367
+        Fills an TsObject with the appropriate data and
+        metadata from a TsQueryResp.
+
+        :param ts_query_rsp: the protobuf message from which to process data
+        :type ts_query_rsp: riak_pb.TsQueryRsp
+        :param tsobj: a TsObject
+        :type tsobj: TsObject
         """
-        raise NotImplementedError
+        if not isinstance(ts_query_rsp, riak_pb.TsQueryResp):
+            raise RiakError("expected riak_pb.TsQueryResp")
+
+        if tsobj.columns is not None:
+            for ts_col in ts_query_rsp.columns:
+                col_name = bytes_to_str(ts_col.name)
+                col_type = ts_col.type
+                col = (col_name, col_type)
+                logging.debug("column: '%s'", col)
+                tsobj.columns.append(col)
+
+        for ts_row in ts_query_rsp.rows:
+            tsobj.rows.append(self._decode_timeseries_row(ts_row, ts_query_rsp.columns))
+
+    def _decode_timeseries_row(self, ts_row, ts_columns):
+        """
+        Decodes a TsRow into a list
+
+        :param ts_row: the protobuf TsRow to decode.
+        :type ts_row: riak_pb.TsRow
+        :param ts_columns: the protobuf TsColumn data to help decode.
+        :type ts_columns: list
+        :rtype list
+        """
+        row = []
+        for i, ts_cell in enumerate(ts_row.cells):
+            ts_col = ts_columns[i]
+            if ts_col.type == riak_pb.TsColumnType.Value('BINARY'):
+                logging.debug("ts_cell.binary_value: '%s'", ts_cell.binary_value)
+                row.append(ts_cell.binary_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('INTEGER'):
+                logging.debug("ts_cell.integer_value: '%s'", ts_cell.integer_value)
+                row.append(ts_cell.integer_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('FLOAT'):
+                logging.debug("ts_cell.double_value: '%s'", ts_cell.double_value)
+                row.append(ts_cell.double_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('TIMESTAMP'):
+                dt = self._datetime_from_unix_time_millis(ts_cell.timestamp_value)
+                logging.debug("ts_cell.timestamp_value: '%s', datetime: '%s'",
+                    ts_cell.timestamp_value, dt)
+                row.append(dt)
+            elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN'):
+                logging.debug("ts_cell.boolean_value: '%s'", ts_cell.boolean_value)
+                row.append(ts_cell.boolean_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('SET'):
+                logging.debug("ts_cell.set_value: '%s'", ts_cell.set_value)
+                s = []
+                for sv in ts_cell.set_value:
+                    sj = bytes_to_str(sv)
+                    s.append(json.loads(sj))
+                row.append(s)
+            elif ts_col.type == riak_pb.TsColumnType.Value('MAP'):
+                logging.debug("ts_cell.map_value: '%s'", ts_cell.map_value)
+                mj = bytes_to_str(ts_cell.map_value)
+                row.append(json.loads(mj))
+            else:
+                row.append(None)
+        return row
 
     def _decode_preflist(self, item):
         """

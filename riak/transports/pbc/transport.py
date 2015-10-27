@@ -1,28 +1,8 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-Copyright 2010 Rusty Klophaus <rusty@basho.com>
-Copyright 2010 Justin Sheehy <justin@basho.com>
-Copyright 2009 Jay Baird <jay@mochimedia.com>
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import riak_pb
 from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
+from riak.ts_object import TsObject
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str
 from riak.transports.pbc.connection import RiakPbcConnection
 from riak.transports.pbc.stream import (RiakPbcKeyStream,
@@ -80,8 +60,10 @@ from riak_pb.messages import (
     MSG_CODE_DT_FETCH_RESP,
     MSG_CODE_DT_UPDATE_REQ,
     MSG_CODE_DT_UPDATE_RESP,
-    # MSG_CODE_TS_PUT_REQ,
-    # MSG_CODE_TS_PUT_RESP
+    MSG_CODE_TS_PUT_REQ,
+    MSG_CODE_TS_PUT_RESP,
+    MSG_CODE_TS_QUERY_REQ,
+    MSG_CODE_TS_QUERY_RESP
 )
 
 
@@ -247,6 +229,17 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             return True
         elif not robj.key:
             raise RiakError("missing response object")
+
+    def ts_query(self, table, query, interpolations=None):
+        req = riak_pb.TsQueryReq()
+        req.query.base = bytes_to_str(query)
+
+        msg_code, ts_query_resp = self._request(MSG_CODE_TS_QUERY_REQ, req,
+                                                MSG_CODE_TS_QUERY_RESP)
+
+        tsobj = TsObject(self._client, table, [], [])
+        self._decode_timeseries(ts_query_resp, tsobj)
+        return tsobj
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):

@@ -98,7 +98,7 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def ts_query(self, query, interpolations=None):
+    def ts_query(self, table, query, interpolations=None):
         """
         Query timeseries data.
         """

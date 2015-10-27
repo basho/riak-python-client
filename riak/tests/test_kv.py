@@ -38,12 +38,14 @@ def setUpModule():
     c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
                    pb_port=PB_PORT, credentials=SECURITY_CREDS)
     c.bucket(testrun_sibs_bucket).allow_mult = True
+    c.close()
 
 def tearDownModule():
     c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
                    pb_port=PB_PORT, credentials=SECURITY_CREDS)
     c.bucket(testrun_sibs_bucket).clear_properties()
     c.bucket(testrun_props_bucket).clear_properties()
+    c.close()
 
 
 class NotJsonSerializable(object):

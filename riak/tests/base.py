@@ -61,13 +61,13 @@ class IntegrationTestBase(object):
             self.logging_stream_handler = logging.StreamHandler(sys.stdout)
             self.logger.addHandler(self.logging_stream_handler)
 
-        self.table_name = 'GeoCheckin'
         self.bucket_name = self.randname()
         self.key_name = self.randname()
         self.credentials = SECURITY_CREDS
         self.client = self.create_client()
 
     def tearDown(self):
+        self.client.close()
         if self.logging_enabled:
             self.logger.removeHandler(self.logging_stream_handler)
 

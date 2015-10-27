@@ -1,26 +1,9 @@
-"""
-Copyright 2012 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 from riak.client.transport import RiakClientTransport, \
     retryable, retryableHttpOnly
 from riak.client.multiget import multiget
 from riak.client.index_page import IndexPage
 from riak.datatypes import TYPES
+from riak.table import Table
 from riak.util import bytes_to_str
 from six import string_types, PY2
 
@@ -565,8 +548,30 @@ class RiakClientOperations(RiakClientTransport):
 
         :param tsobj: the time series object to store
         :type tsobj: RiakTsObject
+        :rtype: boolean
         """
         return transport.ts_put(tsobj)
+
+    @retryable
+    def ts_query(self, transport, table, query, interpolations=None):
+        """
+        ts_query(table, query, interpolations=None)
+
+        Queries time series data in the Riak cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param query: The timeseries query.
+        :type query: string
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        t = table
+        if isinstance(t, str):
+            t = Table(self, table)
+        return transport.ts_query(t, query, interpolations)
 
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,

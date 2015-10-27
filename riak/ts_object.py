@@ -1,30 +1,12 @@
-"""
-Copyright 2015 Basho Technologies <dev@basho.com>
+from riak import RiakError
+from riak.table import Table
 
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
-# TODO RTS-367
-# Should the table parameter be its own object that has a query method on it?
-# Like Bucket?
 class TsObject(object):
     """
-    The TsObject holds meta information about Timeseries data,
-    plus the data itself.
+    The TsObject holds information about Timeseries data, plus the data
+    itself.
     """
-    def __init__(self, client, table, rows, columns=None):
+    def __init__(self, client, table, rows=[], columns=[]):
         """
         Construct a new TsObject.
 
@@ -32,23 +14,29 @@ class TsObject(object):
         :type client: :class:`RiakClient <riak.client.RiakClient>`
         :param table: The table for the timeseries data as a Table object.
         :type table: :class:`Table` <riak.table.Table>
-        :param rows: An array of arrays with timeseries data
-        :type rows: array
-        :param columns: An array Column names and types. Optional.
-        :type columns: array
+        :param rows: An list of lists with timeseries data
+        :type rows: list
+        :param columns: An list of Column names and types. Optional.
+        :type columns: list
         """
 
-        if table is None or len(table) == 0:
-            raise ValueError('Table must either be a non-empty string.')
+        if not isinstance(table, Table):
+            raise ValueError('table must be an instance of Table.')
 
         self.client = client
         self.table = table
-        # TODO RTS-367 rows, columns
+
+        self.rows = rows
+        if not isinstance(self.rows, list):
+            raise RiakError("TsObject requires a list of rows")
+
+        self.columns = columns
+        if self.columns is not None and not isinstance(self.columns, list):
+            raise RiakError("TsObject columns must be a list")
 
     def store(self):
         """
         Store the timeseries data in Riak.
         :rtype: boolean
         """
-
         return self.client.ts_put(self)

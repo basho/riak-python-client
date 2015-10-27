@@ -23,6 +23,7 @@ def yzSetUp(*yzdata):
                     index_set = True
                 except RiakError:
                     pass
+        c.close()
 
 def yzTearDown(c, *yzdata):
     if RUN_YZ:
@@ -40,3 +41,4 @@ def yzTearDown(c, *yzdata):
             for keys in b.stream_keys():
                 for key in keys:
                     b.delete(key)
+        c.close()

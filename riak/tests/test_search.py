@@ -18,6 +18,7 @@ def setUpModule():
                         pb_port=PB_PORT, credentials=SECURITY_CREDS)
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
+        c.close()
 
 def tearDownModule():
     if not SKIP_SEARCH and not RUN_YZ:
@@ -25,6 +26,7 @@ def tearDownModule():
                         pb_port=PB_PORT, credentials=SECURITY_CREDS)
         b = c.bucket(testrun_search_bucket)
         b.clear_properties()
+        c.close()
 
 class EnableSearchTests(IntegrationTestBase, unittest.TestCase):
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
