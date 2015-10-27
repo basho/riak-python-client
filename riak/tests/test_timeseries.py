@@ -27,24 +27,14 @@ fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
 ts1 = ts0 + fiveMins
 
-s = [ 'foo', 'bar', 'baz' ]
-m = {
-    'foo': 'foo',
-    'bar': 'bar',
-    'baz': 'baz',
-    'set': s
-}
-sj = ['"foo"', '"bar"', '"baz"']
-mj = '{"baz": "baz", "set": ["foo", "bar", "baz"], "foo": "foo", "bar": "bar"}'
-
 class TimeseriesUnitTests(unittest.TestCase):
     def setUp(self):
         self.c = RiakPbcCodec()
         self.ts0ms = self.c._unix_time_millis(ts0)
         self.ts1ms = self.c._unix_time_millis(ts1)
         self.rows = [
-            [ bd0, 0, 1.2, ts0, True, s, m ],
-            [ bd1, 3, 4.5, ts1, False, s, m ]
+            [ bd0, 0, 1.2, ts0, True ],
+            [ bd1, 3, 4.5, ts1, False ]
         ]
         self.test_key = {
             'user' : 'user2',
@@ -83,8 +73,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r0.cells[2].double_value, self.rows[0][2])
         self.assertEqual(r0.cells[3].timestamp_value, self.ts0ms)
         self.assertEqual(r0.cells[4].boolean_value, self.rows[0][4])
-        self.assertEqual(r0.cells[5].set_value, sj)
-        self.assertEqual(r0.cells[6].map_value, mj)
 
         r1 = ts_put_req.rows[1]
         self.assertEqual(r1.cells[0].binary_value, self.rows[1][0])
@@ -92,8 +80,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[2].double_value, self.rows[1][2])
         self.assertEqual(r1.cells[3].timestamp_value, self.ts1ms)
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
-        self.assertEqual(r1.cells[5].set_value, sj)
-        self.assertEqual(r1.cells[6].map_value, mj)
 
     def test_decode_data_from_query(self):
         tqr = riak_pb.TsQueryResp()
@@ -113,12 +99,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         c4 = tqr.columns.add()
         c4.name = str_to_bytes('col_boolean')
         c4.type = riak_pb.TsColumnType.Value('BOOLEAN')
-        c5 = tqr.columns.add()
-        c5.name = str_to_bytes('col_set')
-        c5.type = riak_pb.TsColumnType.Value('SET')
-        c6 = tqr.columns.add()
-        c6.name = str_to_bytes('col_map')
-        c6.type = riak_pb.TsColumnType.Value('MAP')
 
         r0 = tqr.rows.add()
         r0c0 = r0.cells.add()
@@ -131,11 +111,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         r0c3.timestamp_value = self.ts0ms
         r0c4 = r0.cells.add()
         r0c4.boolean_value = self.rows[0][4]
-        r0c5 = r0.cells.add()
-        for j in sj:
-            r0c5.set_value.append(j)
-        r0c6 = r0.cells.add()
-        r0c6.map_value = str_to_bytes(mj)
 
         r1 = tqr.rows.add()
         r1c0 = r1.cells.add()
@@ -148,11 +123,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         r1c3.timestamp_value = self.ts1ms
         r1c4 = r1.cells.add()
         r1c4.boolean_value = self.rows[1][4]
-        r1c5 = r1.cells.add()
-        for j in sj:
-            r1c5.set_value.append(j)
-        r1c6 = r1.cells.add()
-        r1c6.map_value = str_to_bytes(mj)
 
         tsobj = TsObject(None, self.table, [], [])
         c = RiakPbcCodec()
@@ -172,10 +142,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(c[3][1], riak_pb.TsColumnType.Value('TIMESTAMP'))
         self.assertEqual(c[4][0], 'col_boolean')
         self.assertEqual(c[4][1], riak_pb.TsColumnType.Value('BOOLEAN'))
-        self.assertEqual(c[5][0], 'col_set')
-        self.assertEqual(c[5][1], riak_pb.TsColumnType.Value('SET'))
-        self.assertEqual(c[6][0], 'col_map')
-        self.assertEqual(c[6][1], riak_pb.TsColumnType.Value('MAP'))
 
         r0 = tsobj.rows[0]
         self.assertEqual(r0[0], self.rows[0][0])
@@ -183,8 +149,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r0[2], self.rows[0][2])
         self.assertEqual(r0[3], ts0)
         self.assertEqual(r0[4], self.rows[0][4])
-        self.assertEqual(r0[5], s)
-        self.assertEqual(r0[6], m)
 
         r1 = tsobj.rows[1]
         self.assertEqual(r1[0], self.rows[1][0])
@@ -192,8 +156,6 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1[2], self.rows[1][2])
         self.assertEqual(r1[3], ts1)
         self.assertEqual(r1[4], self.rows[1][4])
-        self.assertEqual(r1[5], s)
-        self.assertEqual(r1[6], m)
 
 @unittest.skipIf(SKIP_TIMESERIES == 1, "skip requested for timeseries tests")
 class TimeseriesTests(IntegrationTestBase, unittest.TestCase):

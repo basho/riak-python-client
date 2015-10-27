@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 import riak_pb
 
@@ -632,11 +631,6 @@ class RiakPbcCodec(object):
                 ts_cell.timestamp_value = self._unix_time_millis(cell)
                 logging.debug("cell -> timestamp: '%s', timestamp_value '%d'",
                     cell, ts_cell.timestamp_value)
-            elif isinstance(cell, list):
-                for c in cell:
-                    j = json.dumps(c)
-                    logging.debug("cell -> set_value: '%s'", j)
-                    ts_cell.set_value.append(str_to_bytes(j))
             elif isinstance(cell, bool):
                 logging.debug("cell -> boolean: '%s'", cell)
                 ts_cell.boolean_value = cell
@@ -649,10 +643,6 @@ class RiakPbcCodec(object):
             elif isinstance(cell, float):
                 logging.debug("cell -> float: '%s'", cell)
                 ts_cell.double_value = cell
-            elif isinstance(cell, dict):
-                logging.debug("cell -> dict: '%s'", cell)
-                j = json.dumps(cell)
-                ts_cell.map_value = str_to_bytes(j)
             else:
                 t = type(cell)
                 raise RiakError("can't serialize type '{}', value '{}'".format(t, cell))
@@ -757,17 +747,6 @@ class RiakPbcCodec(object):
             elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN') and ts_cell.HasField('boolean_value'):
                 logging.debug("ts_cell.boolean_value: '%s'", ts_cell.boolean_value)
                 row.append(ts_cell.boolean_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('SET'):
-                logging.debug("ts_cell.set_value: '%s'", ts_cell.set_value)
-                s = []
-                for sv in ts_cell.set_value:
-                    sj = bytes_to_str(sv)
-                    s.append(json.loads(sj))
-                row.append(s)
-            elif ts_col.type == riak_pb.TsColumnType.Value('MAP') and ts_cell.HasField('map_value'):
-                logging.debug("ts_cell.map_value: '%s'", ts_cell.map_value)
-                mj = bytes_to_str(ts_cell.map_value)
-                row.append(json.loads(mj))
             else:
                 row.append(None)
         return row
