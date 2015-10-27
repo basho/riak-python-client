@@ -87,7 +87,7 @@ class RiakHTTPSConnection(HTTPSConnection):
         :type timeout: int
         """
         if PY2:
-            # TODO LRB RTS-367 it appears that pkey_file / cert_file are never set
+            # NB: it appears that pkey_file / cert_file are never set
             # in riak/transports/http/connection.py#_connect() method
             pkf = pkey_file
             if pkf is None and credentials is not None:

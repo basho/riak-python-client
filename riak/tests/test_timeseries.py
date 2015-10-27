@@ -212,7 +212,6 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         cls.fiveMinsAgo = fiveMinsAgo
         cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
 
-    # TODO RTS-367 ts_query test. Ensure that 'None' comes back, somehow
     def test_query_that_returns_no_data(self):
         query = "select * from {} where time > 0 and time < 10 and user = 'user1'".format(table_name)
         ts_obj = self.client.ts_query('GeoCheckin', query)
