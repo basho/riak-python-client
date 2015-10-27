@@ -623,7 +623,55 @@ class RiakPbcCodec(object):
             else:
                 msg.flag_op = riak_pb.MapUpdate.DISABLE
 
-    def _encode_timeseries(self, tsobj, ts_put_req):
+    def _encode_to_ts_cell(self, cell, ts_cell):
+        if cell is not None:
+            if isinstance(cell, bytes) or isinstance(cell, bytearray):
+                logging.debug("cell -> binary_value: '%s'", cell)
+                ts_cell.binary_value = cell
+            elif isinstance(cell, datetime.datetime):
+                ts_cell.timestamp_value = self._unix_time_millis(cell)
+                logging.debug("cell -> timestamp: '%s', timestamp_value '%d'",
+                    cell, ts_cell.timestamp_value)
+            elif isinstance(cell, list):
+                for c in cell:
+                    j = json.dumps(c)
+                    logging.debug("cell -> set_value: '%s'", j)
+                    ts_cell.set_value.append(str_to_bytes(j))
+            elif isinstance(cell, bool):
+                logging.debug("cell -> boolean: '%s'", cell)
+                ts_cell.boolean_value = cell
+            elif isinstance(cell, str):
+                logging.debug("cell -> str: '%s'", cell)
+                ts_cell.binary_value = str_to_bytes(cell)
+            elif isinstance(cell, int) or isinstance(cell, long):
+                logging.debug("cell -> int/long: '%s'", cell)
+                ts_cell.integer_value = cell
+            elif isinstance(cell, float):
+                logging.debug("cell -> float: '%s'", cell)
+                ts_cell.double_value = cell
+            elif isinstance(cell, dict):
+                logging.debug("cell -> dict: '%s'", cell)
+                j = json.dumps(cell)
+                ts_cell.map_value = str_to_bytes(j)
+            else:
+                t = type(cell)
+                raise RiakError("can't serialize type '{}', value '{}'".format(t, cell))
+
+    def _encode_timeseries_get(self, table, key, req):
+        key_vals = None
+        if isinstance(key, list):
+            key_vals = key
+        elif isinstance(key, dict):
+            key_vals = key.values()
+        else:
+            raise ValueError("key must be a list or dict")
+
+        req.table = str_to_bytes(table.name)
+        for cell in key_vals:
+            ts_cell = req.key.add()
+            self._encode_to_ts_cell(cell, ts_cell)
+
+    def _encode_timeseries_put(self, tsobj, ts_put_req):
         """
         Fills an TsPutReq message with the appropriate data and
         metadata from a TsObject.
@@ -634,73 +682,41 @@ class RiakPbcCodec(object):
         :type ts_put_req: riak_pb.TsPutReq
         """
         ts_put_req.table = str_to_bytes(tsobj.table.name)
+
         if tsobj.columns:
             raise NotImplementedError("columns are not implemented yet")
+
         if tsobj.rows and isinstance(tsobj.rows, list):
             for row in tsobj.rows:
                 tsr = ts_put_req.rows.add() # NB: type riak_pb.TsRow
                 if not isinstance(row, list):
-                    raise RiakError("TsObject row must be a list of values")
+                    raise ValueError("TsObject row must be a list of values")
                 for cell in row:
                     tsc = tsr.cells.add() # NB: type riak_pb.TsCell
-                    if cell is not None:
-                        if isinstance(cell, bytes) or isinstance(cell, bytearray):
-                            logging.debug("cell -> binary_value: '%s'", cell)
-                            tsc.binary_value = cell
-                        elif isinstance(cell, datetime.datetime):
-                            tsc.timestamp_value = self._unix_time_millis(cell)
-                            logging.debug("cell -> timestamp: '%s', timestamp_value '%d'",
-                                cell, tsc.timestamp_value)
-                        elif isinstance(cell, list):
-                            for c in cell:
-                                j = json.dumps(c)
-                                logging.debug("cell -> set_value: '%s'", j)
-                                tsc.set_value.append(str_to_bytes(j))
-                        elif isinstance(cell, bool):
-                            logging.debug("cell -> boolean: '%s'", cell)
-                            tsc.boolean_value = cell
-                        elif isinstance(cell, str):
-                            logging.debug("cell -> str: '%s'", cell)
-                            tsc.binary_value = str_to_bytes(cell)
-                        elif isinstance(cell, int) or isinstance(cell, long):
-                            logging.debug("cell -> int/long: '%s'", cell)
-                            tsc.integer_value = cell
-                        elif isinstance(cell, float):
-                            logging.debug("cell -> float: '%s'", cell)
-                            tsc.double_value = cell
-                        elif isinstance(cell, dict):
-                            logging.debug("cell -> dict: '%s'", cell)
-                            j = json.dumps(cell)
-                            tsc.map_value = str_to_bytes(j)
-                        else:
-                            t = type(cell)
-                            raise RiakError("can't serialize type '{}', value '{}'".format(t, cell))
+                    self._encode_to_ts_cell(cell, tsc)
         else:
             raise RiakError("TsObject requires a list of rows")
 
-    def _decode_timeseries(self, ts_query_rsp, tsobj):
+    def _decode_timeseries(self, ts_rsp, tsobj):
         """
         Fills an TsObject with the appropriate data and
         metadata from a TsQueryResp.
 
-        :param ts_query_rsp: the protobuf message from which to process data
-        :type ts_query_rsp: riak_pb.TsQueryRsp
+        :param ts_rsp: the protobuf message from which to process data
+        :type ts_rsp: riak_pb.TsQueryRsp or riak_pb.TsGetResp
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
-        if not isinstance(ts_query_rsp, riak_pb.TsQueryResp):
-            raise RiakError("expected riak_pb.TsQueryResp")
-
         if tsobj.columns is not None:
-            for ts_col in ts_query_rsp.columns:
+            for ts_col in ts_rsp.columns:
                 col_name = bytes_to_str(ts_col.name)
                 col_type = ts_col.type
                 col = (col_name, col_type)
                 logging.debug("column: '%s'", col)
                 tsobj.columns.append(col)
 
-        for ts_row in ts_query_rsp.rows:
-            tsobj.rows.append(self._decode_timeseries_row(ts_row, ts_query_rsp.columns))
+        for ts_row in ts_rsp.rows:
+            tsobj.rows.append(self._decode_timeseries_row(ts_row, ts_rsp.columns))
 
     def _decode_timeseries_row(self, ts_row, ts_columns):
         """

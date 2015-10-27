@@ -537,6 +537,27 @@ class RiakClientOperations(RiakClientTransport):
                              timeout=timeout)
 
     @retryable
+    def ts_get(self, transport, table, key):
+        """
+        ts_get(table, key)
+
+        Retrieve timeseries value by key
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param key: The timeseries value's key.
+        :type key: list or dict
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        t = table
+        if isinstance(t, str):
+            t = Table(self, table)
+        return transport.ts_get(t, key)
+
+    @retryable
     def ts_put(self, transport, tsobj):
         """
         ts_put(tsobj)

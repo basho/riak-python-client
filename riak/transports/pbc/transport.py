@@ -63,7 +63,9 @@ from riak_pb.messages import (
     MSG_CODE_TS_PUT_REQ,
     MSG_CODE_TS_PUT_RESP,
     MSG_CODE_TS_QUERY_REQ,
-    MSG_CODE_TS_QUERY_RESP
+    MSG_CODE_TS_QUERY_RESP,
+    MSG_CODE_TS_GET_REQ,
+    MSG_CODE_TS_GET_RESP
 )
 
 
@@ -217,10 +219,20 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return robj
 
+    def ts_get(self, table, key):
+        req = riak_pb.TsGetReq()
+        self._encode_timeseries_get(table, key, req)
+
+        msg_code, ts_get_resp = self._request(MSG_CODE_TS_GET_REQ, req,
+                                       MSG_CODE_TS_GET_RESP)
+
+        tsobj = TsObject(self._client, table, [], None)
+        self._decode_timeseries(ts_get_resp, tsobj)
+        return tsobj
+
     def ts_put(self, tsobj):
         req = riak_pb.TsPutReq()
-
-        self._encode_timeseries(tsobj, req)
+        self._encode_timeseries_put(tsobj, req)
 
         msg_code, resp = self._request(MSG_CODE_TS_PUT_REQ, req,
                                        MSG_CODE_TS_PUT_RESP)

@@ -9,7 +9,7 @@ import time
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.pbc.codec import RiakPbcCodec
-from riak.util import str_to_bytes
+from riak.util import str_to_bytes, bytes_to_str
 from riak.tests import SKIP_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 
@@ -48,12 +48,26 @@ class TimeseriesUnitTests(unittest.TestCase):
         ]
         self.table = Table(None, 'test-table')
 
-    def test_encode_data(self):
+    def test_encode_data_for_get(self):
+        key = {
+            'user' : 'user2',
+            'time' : ts0
+        }
+        ts_get_req = riak_pb.TsGetReq()
+        self.c._encode_timeseries_get(self.table, key, ts_get_req)
+
+        self.assertEqual(self.table.name, bytes_to_str(ts_get_req.table))
+        self.assertEqual(len(key.values()), len(ts_get_req.key))
+        self.assertEqual('user2', bytes_to_str(ts_get_req.key[0].binary_value))
+        self.assertEqual(self.ts0ms, ts_get_req.key[1].timestamp_value)
+
+    def test_encode_data_for_put(self):
         tsobj = TsObject(None, self.table, self.rows, None)
         ts_put_req = riak_pb.TsPutReq()
-        self.c._encode_timeseries(tsobj, ts_put_req)
+        self.c._encode_timeseries_put(tsobj, ts_put_req)
 
         # NB: expected, actual
+        self.assertEqual(self.table.name, bytes_to_str(ts_put_req.table))
         self.assertEqual(len(self.rows), len(ts_put_req.rows))
 
         r0 = ts_put_req.rows[0]
@@ -74,7 +88,7 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[5].set_value, sj)
         self.assertEqual(r1.cells[6].map_value, mj)
 
-    def test_decode_data(self):
+    def test_decode_data_from_query(self):
         tqr = riak_pb.TsQueryResp()
 
         c0 = tqr.columns.add()
@@ -212,6 +226,16 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         cls.fiveMinsAgo = fiveMinsAgo
         cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
 
+    def validate_data(self, ts_obj):
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 1)
+        row = ts_obj.rows[0]
+        self.assertEqual(row[0], 'hash1')
+        self.assertEqual(row[1], 'user2')
+        self.assertEqual(row[2], self.fiveMinsAgo)
+        self.assertEqual(row[3], 'wind')
+        self.assertIsNone(row[4])
+
     def test_query_that_returns_no_data(self):
         query = "select * from {} where time > 0 and time < 10 and user = 'user1'".format(table_name)
         ts_obj = self.client.ts_query('GeoCheckin', query)
@@ -221,12 +245,17 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     def test_query_that_matches_some_data(self):
         query = "select * from {} where time > {} and time < {} and user = 'user2'".format(table_name, self.tenMinsAgoMsec, self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)
-        self.assertEqual(len(ts_obj.columns), 5)
-        self.assertEqual(len(ts_obj.rows), 1)
+        self.validate_data(ts_obj)
 
-        r0 = ts_obj.rows[0]
-        self.assertEqual(r0[0], 'hash1')
-        self.assertEqual(r0[1], 'user2')
-        self.assertEqual(r0[2], self.fiveMinsAgo)
-        self.assertEqual(r0[3], 'wind')
-        self.assertIsNone(r0[4])
+    def test_get_single_value_using_dict(self):
+        key = {
+            'user' : 'user2',
+            'time' : self.fiveMinsAgo
+        }
+        ts_obj = self.client.ts_get('GeoCheckin', key)
+        self.validate_data(ts_obj)
+
+    def test_get_single_value_using_array(self):
+        key = [ self.fiveMinsAgo, 'user2' ]
+        ts_obj = self.client.ts_get('GeoCheckin', key)
+        self.validate_data(ts_obj)

@@ -127,6 +127,7 @@ Key-level Operations
 Timeseries Operations
 --------------------
 
+.. automethod:: RiakClient.ts_get
 .. automethod:: RiakClient.ts_put
 .. automethod:: RiakClient.ts_query
 

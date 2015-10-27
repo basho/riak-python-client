@@ -48,6 +48,18 @@ class Table(object):
 
         return TsObject(self._client, self, rows, columns)
 
+    def get(self, table, key):
+        """
+        Gets a value from a timeseries table.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param key: The timeseries value's key.
+        :type key: list or dict
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        return self.client.ts_get(self, table, key)
+
     def query(self, query, interpolations=None):
         """
         Queries a timeseries table.
