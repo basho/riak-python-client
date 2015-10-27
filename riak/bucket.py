@@ -410,7 +410,9 @@ class RiakBucket(object):
         :type filename: string
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        binary_data = open(filename, "rb").read()
+        binary_data = None
+        with open(filename, 'rb') as f:
+            binary_data = f.read()
         mimetype, encoding = mimetypes.guess_type(filename)
         if encoding:
             binary_data = bytearray(binary_data, encoding)

@@ -9,9 +9,8 @@ import time
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.pbc.codec import RiakPbcCodec
-from riak import RiakClient
 from riak.util import str_to_bytes
-from riak.tests import SKIP_TIMESERIES, HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
+from riak.tests import SKIP_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
@@ -179,28 +178,39 @@ class TimeseriesUnitTests(unittest.TestCase):
 class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        super(TimeseriesTests, cls).setUpClass()
         cls.now = datetime.datetime.utcfromtimestamp(144379690)
         fiveMinsAgo = cls.now - fiveMins
         tenMinsAgo = fiveMinsAgo - fiveMins
         fifteenMinsAgo = tenMinsAgo - fiveMins
         twentyMinsAgo = fifteenMinsAgo - fiveMins
 
-        client = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
-                    pb_port=PB_PORT, credentials=SECURITY_CREDS)
+        client = cls.create_client()
         table = client.table(table_name)
+        # CREATE TABLE GeoCheckin (
+        #     geohash varchar not null,
+        #     user varchar not null,
+        #     time timestamp not null,
+        #     weather varchar not null,
+        #     temperature float,
+        #     PRIMARY KEY((quantum(time, 15, m), user), time, user)
+        # )
         rows = [
-            [ 'hash1', 'user2', twentyMinsAgo, 'hurricane', None ],
+            [ 'hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3 ],
             [ 'hash1', 'user2', fifteenMinsAgo, 'rain', 79.0 ],
-            [ 'hash1', 'user2', fiveMinsAgo, 'wind', 50.5 ],
+            [ 'hash1', 'user2', fiveMinsAgo, 'wind', None ],
             [ 'hash1', 'user2', cls.now, 'snow', 20.1 ]
         ]
         ts_obj = table.new(rows)
         result = ts_obj.store()
+        if result != True:
+            raise AssertionError("expected success")
+        client.close()
 
         codec = RiakPbcCodec()
         cls.nowMsec = codec._unix_time_millis(cls.now)
+        cls.fiveMinsAgo = fiveMinsAgo
         cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
-        client.close()
 
     # TODO RTS-367 ts_query test. Ensure that 'None' comes back, somehow
     def test_query_that_returns_no_data(self):
@@ -210,7 +220,14 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(len(ts_obj.rows), 0)
 
     def test_query_that_matches_some_data(self):
-        query = "select * from {} where time > {} and time < {} and user = 'user2'".format(table_name, self.tenMinsAgoMsec, self.nowMsec);
+        query = "select * from {} where time > {} and time < {} and user = 'user2'".format(table_name, self.tenMinsAgoMsec, self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.assertEqual(len(ts_obj.columns), 5)
         self.assertEqual(len(ts_obj.rows), 1)
+
+        r0 = ts_obj.rows[0]
+        self.assertEqual(r0[0], 'hash1')
+        self.assertEqual(r0[1], 'user2')
+        self.assertEqual(r0[2], self.fiveMinsAgo)
+        self.assertEqual(r0[3], 'wind')
+        self.assertIsNone(r0[4])

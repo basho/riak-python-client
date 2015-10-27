@@ -76,7 +76,12 @@ class RiakPbcCodec(object):
         super(RiakPbcCodec, self).__init__(**unused_args)
 
     def _unix_time_millis(self, dt):
-        return int((dt - epoch).total_seconds() * 1000.0)
+        td = dt - epoch
+        try:
+            return int(dt.total_seconds() * 1000.0)
+        except AttributeError:
+            # NB: python 2.6 must use this method
+            return int(((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6) * 1000.0)
 
     def _datetime_from_unix_time_millis(self, ut):
         return datetime.datetime.utcfromtimestamp(ut / 1000.0)
@@ -710,21 +715,30 @@ class RiakPbcCodec(object):
         row = []
         for i, ts_cell in enumerate(ts_row.cells):
             ts_col = ts_columns[i]
-            if ts_col.type == riak_pb.TsColumnType.Value('BINARY'):
+            logging.debug("ts_cell: '%s', ts_col: '%d'", ts_cell, ts_col.type)
+            if ts_col.type == riak_pb.TsColumnType.Value('BINARY') and ts_cell.HasField('binary_value'):
                 logging.debug("ts_cell.binary_value: '%s'", ts_cell.binary_value)
                 row.append(ts_cell.binary_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('INTEGER'):
+            elif ts_col.type == riak_pb.TsColumnType.Value('INTEGER') and ts_cell.HasField('integer_value'):
                 logging.debug("ts_cell.integer_value: '%s'", ts_cell.integer_value)
                 row.append(ts_cell.integer_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('FLOAT'):
-                logging.debug("ts_cell.double_value: '%s'", ts_cell.double_value)
-                row.append(ts_cell.double_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('FLOAT') and ts_cell.HasField('double_value'):
+                value = None
+                if ts_cell.HasField('double_value'):
+                    value = ts_cell.double_value
+                elif ts_cell.HasField('float_value'):
+                    value = ts_cell.float_value
+                logging.debug("ts_cell double/float value: '%d'", value)
+                row.append(value)
             elif ts_col.type == riak_pb.TsColumnType.Value('TIMESTAMP'):
-                dt = self._datetime_from_unix_time_millis(ts_cell.timestamp_value)
-                logging.debug("ts_cell.timestamp_value: '%s', datetime: '%s'",
-                    ts_cell.timestamp_value, dt)
+                dt = None
+                if ts_cell.HasField('timestamp_value'):
+                    dt = self._datetime_from_unix_time_millis(ts_cell.timestamp_value)
+                elif ts_cell.HasField('integer_value'):
+                    dt = self._datetime_from_unix_time_millis(ts_cell.integer_value)
+                logging.debug("ts_cell datetime: '%s'", dt)
                 row.append(dt)
-            elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN'):
+            elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN') and ts_cell.HasField('boolean_value'):
                 logging.debug("ts_cell.boolean_value: '%s'", ts_cell.boolean_value)
                 row.append(ts_cell.boolean_value)
             elif ts_col.type == riak_pb.TsColumnType.Value('SET'):
@@ -734,7 +748,7 @@ class RiakPbcCodec(object):
                     sj = bytes_to_str(sv)
                     s.append(json.loads(sj))
                 row.append(s)
-            elif ts_col.type == riak_pb.TsColumnType.Value('MAP'):
+            elif ts_col.type == riak_pb.TsColumnType.Value('MAP') and ts_cell.HasField('map_value'):
                 logging.debug("ts_cell.map_value: '%s'", ts_cell.map_value)
                 mj = bytes_to_str(ts_cell.map_value)
                 row.append(json.loads(mj))

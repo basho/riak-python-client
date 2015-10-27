@@ -416,9 +416,9 @@ class preconfigure(Command):
         https_host = self.host + ':' + self.https_port
         pb_host = self.host + ':' + self.pb_port
         self._backup_file(self.riak_conf)
-        f = open(self.riak_conf, 'r', buffering=1)
-        conf = f.read()
-        f.close()
+        conf = None
+        with open(self.riak_conf, 'r', buffering=1) as f:
+            conf = f.read()
         conf = re.sub(r'search\s+=\s+off', r'search = on', conf)
         conf = re.sub(r'##[ ]+ssl\.', r'ssl.', conf)
         conf = re.sub(r'ssl.certfile\s+=\s+\S+',
@@ -447,9 +447,8 @@ class preconfigure(Command):
         # Older versions of OpenSSL client library need to match on the server
         conf += 'tls_protocols.tlsv1 = on\n'
         conf += 'tls_protocols.tlsv1.1 = on\n'
-        f = open(self.riak_conf, 'w', buffering=1)
-        f.write(conf)
-        f.close()
+        with open(self.riak_conf, 'w', buffering=1) as f:
+            f.write(conf)
 
     def _backup_file(self, name):
         backup = name + ".bak"

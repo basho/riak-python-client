@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import platform
-from riak import RiakClient
-from riak.tests import SKIP_SEARCH, HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
+from riak.tests import SKIP_SEARCH
 from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
@@ -14,16 +13,14 @@ testrun_search_bucket = 'searchbucket'
 
 def setUpModule():
     if not SKIP_SEARCH and not RUN_YZ:
-        c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
-                        pb_port=PB_PORT, credentials=SECURITY_CREDS)
+        c = IntegrationTestBase.create_client()
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
         c.close()
 
 def tearDownModule():
     if not SKIP_SEARCH and not RUN_YZ:
-        c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
-                        pb_port=PB_PORT, credentials=SECURITY_CREDS)
+        c = IntegrationTestBase.create_client()
         b = c.bucket(testrun_search_bucket)
         b.clear_properties()
         c.close()

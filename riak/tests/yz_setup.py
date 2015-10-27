@@ -1,12 +1,12 @@
 import logging
 
-from riak import RiakClient, RiakError
-from riak.tests import RUN_YZ, PROTOCOL, HOST, PB_PORT, HTTP_PORT, SECURITY_CREDS
+from riak import RiakError
+from riak.tests import RUN_YZ
+from riak.tests.base import IntegrationTestBase
 
 def yzSetUp(*yzdata):
     if RUN_YZ:
-        c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
-                        pb_port=PB_PORT, credentials=SECURITY_CREDS)
+        c = IntegrationTestBase.create_client()
         for yz in yzdata:
             logging.debug("yzSetUp: %s", yz)
             c.create_search_index(yz['index'], timeout=30000)
@@ -27,8 +27,7 @@ def yzSetUp(*yzdata):
 
 def yzTearDown(c, *yzdata):
     if RUN_YZ:
-        c = RiakClient(protocol=PROTOCOL, host=HOST, http_port=HTTP_PORT,
-                        pb_port=PB_PORT, credentials=SECURITY_CREDS)
+        c = IntegrationTestBase.create_client()
         for yz in yzdata:
             logging.debug("yzTearDown: %s", yz)
             if yz['btype'] is not None:
