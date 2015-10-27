@@ -38,24 +38,33 @@ class EnableSearchTests(IntegrationTestBase, unittest.TestCase):
     def test_enable_search_commit_hook(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.clear_properties()
-        self.assertFalse(self.create_client().
-                         bucket(testrun_search_bucket).
-                         search_enabled())
+
+        c = self.create_client()
+        self.assertFalse(c.bucket(testrun_search_bucket).search_enabled())
+        c.close()
+
         bucket.enable_search()
-        self.assertTrue(self.create_client().
-                        bucket(testrun_search_bucket).
-                        search_enabled())
+
+        c = self.create_client()
+        self.assertTrue(c.bucket(testrun_search_bucket).search_enabled())
+        c.close()
 
     @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_disable_search_commit_hook(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.clear_properties()
         bucket.enable_search()
-        self.assertTrue(self.create_client().bucket(testrun_search_bucket)
-                            .search_enabled())
+
+        c = self.create_client()
+        self.assertTrue(c.bucket(testrun_search_bucket).search_enabled())
+        c.close()
+
         bucket.disable_search()
-        self.assertFalse(self.create_client().bucket(testrun_search_bucket)
-                             .search_enabled())
+
+        c = self.create_client()
+        self.assertFalse(c.bucket(testrun_search_bucket).search_enabled())
+        c.close()
+
         bucket.enable_search()
 
 

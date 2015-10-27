@@ -363,15 +363,21 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         # Test setting nval...
         bucket.n_val = 1
 
-        bucket2 = self.create_client().bucket(testrun_props_bucket)
+        c2 = self.create_client()
+        bucket2 = c2.bucket(testrun_props_bucket)
         self.assertTrue(bucket2.allow_mult)
         self.assertEqual(bucket2.n_val, 1)
         # Test setting multiple properties...
         bucket.set_properties({"allow_mult": False, "n_val": 2})
 
-        bucket3 = self.create_client().bucket(testrun_props_bucket)
+        c3 = self.create_client()
+        bucket3 = c3.bucket(testrun_props_bucket)
         self.assertFalse(bucket3.allow_mult)
         self.assertEqual(bucket3.n_val, 2)
+
+        # clean up!
+        c2.close()
+        c3.close()
 
     def test_if_none_match(self):
         bucket = self.client.bucket(self.bucket_name)

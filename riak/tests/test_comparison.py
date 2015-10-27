@@ -142,6 +142,8 @@ class RiakClientComparisonTest(IntegrationTestBase, unittest.TestCase):
         a = self.create_client(host='host1', http_port=11)
         b = self.create_client(host='host1', http_port=11)
         self.assertEqual(a, b)
+        a.close()
+        b.close()
 
     def test_client_nq(self):
         self.protocol = 'http'
@@ -150,6 +152,9 @@ class RiakClientComparisonTest(IntegrationTestBase, unittest.TestCase):
         c = self.create_client(host='host1', http_port=12)
         self.assertNotEqual(a, b, 'matched with different hosts')
         self.assertNotEqual(a, c, 'matched with different ports')
+        a.close()
+        b.close()
+        c.close()
 
     def test_client_hash(self):
         self.protocol = 'http'
@@ -158,6 +163,9 @@ class RiakClientComparisonTest(IntegrationTestBase, unittest.TestCase):
         c = self.create_client(host='host2', http_port=11)
         self.assertEqual(hash(a), hash(b), 'same object has different hashes')
         self.assertNotEqual(hash(a), hash(c), 'different object has same hash')
+        a.close()
+        b.close()
+        c.close()
 
 if __name__ == '__main__':
     unittest.main()

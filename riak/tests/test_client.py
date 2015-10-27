@@ -21,6 +21,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
             zero_client_id = "\0\0\0\0"
             c = self.create_client(client_id=zero_client_id)
             self.assertEqual(zero_client_id, c.client_id)
+            c.close()
         else:
             pass
 
@@ -33,6 +34,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         # If retries are exhausted, the final result should also be an
         # error.
         self.assertRaises(IOError, client.ping)
+        client.close()
 
     def test_request_retries_configurable(self):
         # We guess at some ports that will be unused by Riak or
@@ -61,6 +63,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         with client.retry_count(5):
             self.assertEqual(5, client.retries)
             self.assertRaises(IOError, client.ping)
+        client.close()
 
     def test_timeout_validation(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -147,6 +150,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
                 self.assertIsInstance(failure[3], StandardError)  # noqa
             else:
                 self.assertIsInstance(failure[3], Exception)
+        client.close()
 
     def test_multiget_notfounds(self):
         """
@@ -186,6 +190,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
                 self.assertEqual(obj.key, obj.encoded_data)
             else:
                 self.assertEqual(obj.key, obj.data)
+        client.close()
 
     @unittest.skipIf(SKIP_POOL, 'SKIP_POOL is set')
     def test_pool_close(self):

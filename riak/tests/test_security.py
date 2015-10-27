@@ -29,6 +29,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         key1 = myBucket.new('x', data=val1)
         with self.assertRaises(Exception):
             key1.store()
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_basic_connection(self):
@@ -47,6 +48,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_password(self):
@@ -57,6 +59,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_invalid_cert(self):
@@ -67,6 +70,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_password_without_cacert(self):
@@ -79,6 +83,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             val1 = "foobar"
             key1 = myBucket.new('x', data=val1)
             key1.store()
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_cert_authentication(self):
@@ -101,6 +106,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             with self.assertRaises(Exception):
                 key1.store()
                 myBucket.get('x')
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_revoked_cert(self):
@@ -115,6 +121,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_ca_cert(self):
@@ -124,6 +131,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_ciphers(self):
@@ -136,6 +144,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         key1 = myBucket.new('x', data=val1)
         key1.store()
         myBucket.get('x')
+        client.close()
 
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
     def test_security_bad_ciphers(self):
@@ -145,3 +154,4 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         client = self.create_client(credentials=creds)
         with self.assertRaises(Exception):
             client.get_buckets()
+        client.close()
