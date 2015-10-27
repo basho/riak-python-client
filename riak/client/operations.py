@@ -574,6 +574,27 @@ class RiakClientOperations(RiakClientTransport):
         return transport.ts_put(tsobj)
 
     @retryable
+    def ts_delete(self, transport, table, key):
+        """
+        ts_delete(table, key)
+
+        Delete timeseries value by key
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param key: The timeseries value's key.
+        :type key: list or dict
+        :rtype: boolean
+        """
+        t = table
+        if isinstance(t, str):
+            t = Table(self, table)
+        return transport.ts_delete(t, key)
+
+    @retryable
     def ts_query(self, transport, table, query, interpolations=None):
         """
         ts_query(table, query, interpolations=None)

@@ -46,20 +46,27 @@ class TimeseriesUnitTests(unittest.TestCase):
             [ bd0, 0, 1.2, ts0, True, s, m ],
             [ bd1, 3, 4.5, ts1, False, s, m ]
         ]
-        self.table = Table(None, 'test-table')
-
-    def test_encode_data_for_get(self):
-        key = {
+        self.test_key = {
             'user' : 'user2',
             'time' : ts0
         }
-        ts_get_req = riak_pb.TsGetReq()
-        self.c._encode_timeseries_get(self.table, key, ts_get_req)
+        self.table = Table(None, 'test-table')
 
-        self.assertEqual(self.table.name, bytes_to_str(ts_get_req.table))
-        self.assertEqual(len(key.values()), len(ts_get_req.key))
-        self.assertEqual('user2', bytes_to_str(ts_get_req.key[0].binary_value))
-        self.assertEqual(self.ts0ms, ts_get_req.key[1].timestamp_value)
+    def validate_keyreq(self, req):
+        self.assertEqual(self.table.name, bytes_to_str(req.table))
+        self.assertEqual(len(self.test_key.values()), len(req.key))
+        self.assertEqual('user2', bytes_to_str(req.key[0].binary_value))
+        self.assertEqual(self.ts0ms, req.key[1].timestamp_value)
+
+    def test_encode_data_for_get(self):
+        req = riak_pb.TsGetReq()
+        self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
+        self.validate_keyreq(req)
+
+    def test_encode_data_for_delete(self):
+        req = riak_pb.TsDelReq()
+        self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
+        self.validate_keyreq(req)
 
     def test_encode_data_for_put(self):
         tsobj = TsObject(None, self.table, self.rows, None)
@@ -224,6 +231,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         codec = RiakPbcCodec()
         cls.nowMsec = codec._unix_time_millis(cls.now)
         cls.fiveMinsAgo = fiveMinsAgo
+        cls.twentyMinsAgo = twentyMinsAgo
         cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
 
     def validate_data(self, ts_obj):
@@ -259,3 +267,13 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         key = [ self.fiveMinsAgo, 'user2' ]
         ts_obj = self.client.ts_get('GeoCheckin', key)
         self.validate_data(ts_obj)
+
+    def test_delete_single_value_using_dict(self):
+        key = {
+            'user' : 'user2',
+            'time' : self.twentyMinsAgo
+        }
+        rslt = self.client.ts_delete('GeoCheckin', key)
+        self.assertTrue(rslt)
+        ts_obj = self.client.ts_get('GeoCheckin', key)
+        self.assertIsNone(ts_obj)

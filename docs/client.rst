@@ -129,6 +129,7 @@ Timeseries Operations
 
 .. automethod:: RiakClient.ts_get
 .. automethod:: RiakClient.ts_put
+.. automethod:: RiakClient.ts_delete
 .. automethod:: RiakClient.ts_query
 
 ----------------

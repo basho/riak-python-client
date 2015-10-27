@@ -657,7 +657,7 @@ class RiakPbcCodec(object):
                 t = type(cell)
                 raise RiakError("can't serialize type '{}', value '{}'".format(t, cell))
 
-    def _encode_timeseries_get(self, table, key, req):
+    def _encode_timeseries_keyreq(self, table, key, req):
         key_vals = None
         if isinstance(key, list):
             key_vals = key

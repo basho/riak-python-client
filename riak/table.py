@@ -60,6 +60,18 @@ class Table(object):
         """
         return self.client.ts_get(self, table, key)
 
+    def delete(self, table, key):
+        """
+        Deletes a value from a timeseries table.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param key: The timeseries value's key.
+        :type key: list or dict
+        :rtype: boolean
+        """
+        return self.client.ts_delete(self, table, key)
+
     def query(self, query, interpolations=None):
         """
         Queries a timeseries table.

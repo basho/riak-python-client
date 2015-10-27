@@ -65,7 +65,9 @@ from riak_pb.messages import (
     MSG_CODE_TS_QUERY_REQ,
     MSG_CODE_TS_QUERY_RESP,
     MSG_CODE_TS_GET_REQ,
-    MSG_CODE_TS_GET_RESP
+    MSG_CODE_TS_GET_RESP,
+    MSG_CODE_TS_DEL_REQ,
+    MSG_CODE_TS_DEL_RESP
 )
 
 
@@ -221,10 +223,10 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def ts_get(self, table, key):
         req = riak_pb.TsGetReq()
-        self._encode_timeseries_get(table, key, req)
+        self._encode_timeseries_keyreq(table, key, req)
 
         msg_code, ts_get_resp = self._request(MSG_CODE_TS_GET_REQ, req,
-                                       MSG_CODE_TS_GET_RESP)
+                                              MSG_CODE_TS_GET_RESP)
 
         tsobj = TsObject(self._client, table, [], None)
         self._decode_timeseries(ts_get_resp, tsobj)
@@ -239,7 +241,19 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         if resp is not None:
             return True
-        elif not robj.key:
+        else:
+            raise RiakError("missing response object")
+
+    def ts_delete(self, table, key):
+        req = riak_pb.TsDelReq()
+        self._encode_timeseries_keyreq(table, key, req)
+
+        msg_code, ts_del_resp = self._request(MSG_CODE_TS_DEL_REQ, req,
+                                              MSG_CODE_TS_DEL_RESP)
+
+        if ts_del_resp is not None:
+            return True
+        else:
             raise RiakError("missing response object")
 
     def ts_query(self, table, query, interpolations=None):
