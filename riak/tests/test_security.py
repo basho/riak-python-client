@@ -22,7 +22,10 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         Test valid security settings without security enabled
         """
         topts = {'timeout': 1}
-        client = self.create_client(credentials=SECURITY_CREDS,
+        # NB: can't use SECURITY_CREDS here since they won't be set
+        # if RUN_SECURITY is UN-set
+        creds = SecurityCreds(username='foo', password='bar')
+        client = self.create_client(credentials=creds,
                                     transport_options=topts)
         myBucket = client.bucket('test')
         val1 = "foobar"
