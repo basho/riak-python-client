@@ -247,8 +247,48 @@ To run the tests, then simply
 
 Contributors
 --------------------------
-   - Rusty Klophaus <rusty@basho.com>
-   - Justin Sheehy <justin@basho.com>
-   - Jay Baird <jay@mochimedia.com>
-   - Andy Gross <andy@basho.com>
-   - Jon Meredith <jmeredith@basho.com>
+    - Andrew Thompson
+    - Andy Gross <andy@basho.com>
+    - Armon Dadgar
+    - Brett Hazen
+    - Brett Hoerner
+    - Brian Roach
+    - Bryan Fink
+    - Daniel Lindsley
+    - Daniel Néri
+    - Daniel Reverri
+    - David Koblas
+    - Dmitry Rozhkov
+    - Eric Florenzano
+    - Eric Moritz
+    - Filip de Waard
+    - Gilles Devaux
+    - Greg Nelson
+    - Greg Stein
+    - Gregory Burd
+    - Ian Plosker
+    - Jayson Baird <jay@mochimedia.com>
+    - Jeffrey Massung
+    - Jon Meredith <jmeredith@basho.com>
+    - Josip Lisec
+    - Justin Sheehy <justin@basho.com>
+    - Kevin Smith
+    - `Luke Bakken <https://github.com/lukebakken>`_
+    - Mark Erdmann
+    - Mark Phillips
+    - Mathias Meyer
+    - Matt Heitzenroder
+    - Mikhail Sobolev
+    - Reid Draper
+    - Russell Brown
+    - Rusty Klophaus
+    - Rusty Klophaus <rusty@basho.com>
+    - Scott Lystig Fritchie
+    - Sean Cribbs
+    - Shuhao Wu
+    - Silas Sewell
+    - Socrates Lee
+    - Soren Hansen
+    - Sreejith Kesavan
+    - Timothée Peignier
+    - William Kral
