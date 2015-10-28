@@ -18,10 +18,14 @@ else:
     import unittest
 
 
-testrun_yz_mr = {'btype': 'pytest-mr', 'bucket': 'mrbucket', 'index': 'mrbucket'}
+testrun_yz_mr = {'btype': 'pytest-mr',
+                 'bucket': 'mrbucket',
+                 'index': 'mrbucket'}
+
 
 def setUpModule():
     yzSetUp(testrun_yz_mr)
+
 
 def tearDownModule():
     yzTearDown(testrun_yz_mr)
@@ -516,7 +520,7 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
                           u'"fooval2"',
                           u'"fooval3"'])
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
+    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is 0')
     def test_mr_search(self):
         """
         Try a successful map/reduce from search results.

@@ -74,6 +74,7 @@ try:
 except ImportError:
     import json
 
+
 class bucket_type_commands:
     def initialize_options(self):
         self.riak_admin = None
@@ -143,6 +144,7 @@ class bucket_type_commands:
         cmd.extend(args)
         return cmd
 
+
 class create_bucket_types(bucket_type_commands, Command):
     """
     Creates bucket-types appropriate for testing. By default this will create:
@@ -175,9 +177,14 @@ class create_bucket_types(bucket_type_commands, Command):
 
 class setup_timeseries(bucket_type_commands, Command):
     """
-    Creates bucket-types appropriate for timeseries. By default this will create:
+    Creates bucket-types appropriate for timeseries.
+    By default this will create:
 
-    * `GeoCheckin` with ``{"props": {"n_val": 3, "table_def": "CREATE TABLE GeoCheckin (geohash varchar not null, user varchar not null, time timestamp not null, weather varchar not null, temperature float, PRIMARY KEY((quantum(time, 15, m),user), time, user))"}}``
+    * `GeoCheckin` with ``{"props": {"n_val": 3,
+     "table_def": "CREATE TABLE GeoCheckin (geohash varchar not null,
+      user varchar not null, time timestamp not null,
+      weather varchar not null, temperature float,
+      PRIMARY KEY((quantum(time, 15, m),user), time, user))"}}``
     """
 
     description = "create bucket-types used in timeseries tests"
@@ -187,7 +194,13 @@ class setup_timeseries(bucket_type_commands, Command):
     ]
 
     _props = {
-        'GeoCheckin': {'n_val': 3, 'table_def': 'CREATE TABLE GeoCheckin (geohash varchar not null, user varchar not null, time timestamp not null, weather varchar not null, temperature float, PRIMARY KEY((quantum(time, 15, m),user), time, user))'},
+        'GeoCheckin': {
+            'n_val': 3,
+            'table_def':
+                'CREATE TABLE GeoCheckin (geohash varchar not null, ' +
+                'user varchar not null, time timestamp not null, ' +
+                'weather varchar not null, temperature float, ' +
+                'PRIMARY KEY((quantum(time, 15, m),user), time, user))'}
     }
 
 

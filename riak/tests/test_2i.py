@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import platform
 from riak import RiakError
-from riak.tests import SKIP_INDEXES
+from riak.tests import RUN_INDEXES
 from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
@@ -21,7 +21,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
                 return False
             return True  # it failed, but is supported!
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_secondary_index_store(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
@@ -102,7 +102,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         # Clean up...
         bucket.get('mykey1').delete()
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_set_indexes(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
@@ -120,7 +120,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(1, len(result))
         self.assertEqual('foo', str(result[0]))
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_remove_indexes(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
@@ -180,7 +180,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(1, len([x for x in bar.indexes
                                  if x[0] == 'baz_bin']))
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_secondary_index_query(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
@@ -209,7 +209,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(3, len(results))
         self.assertEqual(set([o2.key, o3.key, o4.key]), vals)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_secondary_index_invalid_name(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
@@ -219,7 +219,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         with self.assertRaises(RiakError):
             bucket.new('k', 'a').add_index('field1', 'value1')
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_set_index(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
@@ -237,7 +237,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         obj.set_index('bar2_int', 10)
         self.assertEqual(set((('bar_int', 3), ('bar2_int', 10))), obj.indexes)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_stream_index(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I not supported")
@@ -250,7 +250,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
 
         self.assertEqual(sorted([o1.key, o2.key, o3.key]), sorted(keys))
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_return_terms(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -274,7 +274,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual([(1002, o2.key), (1003, o3.key), (1004, o4.key)],
                          sorted(spairs))
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_pagination(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -309,7 +309,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(3, pagecount)
         self.assertEqual([o1.key, o2.key, o3.key, o4.key], presults)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_pagination_return_terms(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -334,7 +334,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertLessEqual(2, len(results))
         self.assertEqual([('val3', o3.key), ('val4', o4.key)], page2)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_pagination_stream(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -377,7 +377,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(3, pagecount)
         self.assertEqual([o1.key, o2.key, o3.key, o4.key], presults)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_pagination_stream_return_terms(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -409,7 +409,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertLessEqual(2, len(results))
         self.assertEqual([('val3', o3.key), ('val4', o4.key)], results)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_eq_query_return_terms(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -419,7 +419,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         results = bucket.get_index('field2_int', 1001, return_terms=True)
         self.assertEqual([(1001, o1.key)], results)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_eq_query_stream_return_terms(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -432,7 +432,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
 
         self.assertEqual([(1001, o1.key)], results)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_timeout(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -451,7 +451,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual([o1.key], bucket.get_index('field1_bin', 'val1',
                                                     timeout='infinity'))
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_regex(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")
@@ -466,7 +466,7 @@ class TwoITests(IntegrationTestBase, unittest.TestCase):
 
         self.assertEqual([('val2', o2.key)], results)
 
-    @unittest.skipIf(SKIP_INDEXES, 'SKIP_INDEXES is defined')
+    @unittest.skipUnless(RUN_INDEXES, 'RUN_INDEXES is 0')
     def test_index_falsey_endkey_gh378(self):
         if not self.is_2i_supported():
             raise unittest.SkipTest("2I is not supported")

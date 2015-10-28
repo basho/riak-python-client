@@ -16,14 +16,14 @@ else:
 
 
 class SecurityTests(IntegrationTestBase, unittest.TestCase):
-    @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is set')
+    @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is 1')
     def test_security_disabled(self):
-        topts = { 'timeout' : 1 }
-        creds = SecurityCreds(username='foo',
-                              password='bar',
-                              cacert_file=SECURITY_CACERT,
-                              ciphers=SECURITY_CIPHERS)
-        client = self.create_client(credentials=creds, transport_options=topts)
+        """
+        Test valid security settings without security enabled
+        """
+        topts = {'timeout': 1}
+        client = self.create_client(credentials=SECURITY_CREDS,
+                                    transport_options=topts)
         myBucket = client.bucket('test')
         val1 = "foobar"
         key1 = myBucket.new('x', data=val1)
@@ -31,7 +31,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             key1.store()
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_basic_connection(self):
         myBucket = self.client.bucket('test')
         val1 = "foobar"
@@ -39,7 +39,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         key1.store()
         myBucket.get('x')
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_bad_user(self):
         creds = SecurityCreds(username='foo',
                               password=SECURITY_PASSWD,
@@ -50,7 +50,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             client.get_buckets()
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_bad_password(self):
         creds = SecurityCreds(username=SECURITY_USER,
                               password='foo',
@@ -61,7 +61,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             client.get_buckets()
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_invalid_cert(self):
         creds = SecurityCreds(username=SECURITY_USER,
                               password=SECURITY_PASSWD,
@@ -72,7 +72,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             client.get_buckets()
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_password_without_cacert(self):
         creds = SecurityCreds(username=SECURITY_USER,
                               password=SECURITY_PASSWD,
@@ -85,7 +85,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             key1.store()
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_cert_authentication(self):
         creds = SecurityCreds(username=SECURITY_CERT_USER,
                               password=SECURITY_CERT_PASSWD,
@@ -108,9 +108,10 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
                 myBucket.get('x')
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_revoked_cert(self):
-        creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
+        creds = SecurityCreds(username=SECURITY_USER,
+                              password=SECURITY_PASSWD,
                               ciphers=SECURITY_CIPHERS,
                               cacert_file=SECURITY_CACERT,
                               crl_file=SECURITY_REVOKED)
@@ -123,7 +124,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             client.get_buckets()
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_bad_ca_cert(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               ciphers=SECURITY_CIPHERS,
@@ -133,7 +134,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
             client.get_buckets()
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_ciphers(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               ciphers=SECURITY_CIPHERS,
@@ -146,7 +147,7 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
         myBucket.get('x')
         client.close()
 
-    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is not set')
+    @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_bad_ciphers(self):
         creds = SecurityCreds(username=SECURITY_USER, password=SECURITY_PASSWD,
                               cacert_file=SECURITY_CACERT,

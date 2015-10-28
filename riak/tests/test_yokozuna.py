@@ -10,6 +10,7 @@ if platform.python_version() < '2.7':
 else:
     import unittest
 
+
 def wait_for_yz_index(bucket, key, index=None):
     """
     Wait until Solr index has been updated and a value returns from a query.
@@ -25,16 +26,21 @@ def wait_for_yz_index(bucket, key, index=None):
 # YZ index on bucket of the same name
 testrun_yz = {'btype': None, 'bucket': 'yzbucket', 'index': 'yzbucket'}
 # YZ index on bucket of a different name
-testrun_yz_index = {'btype': None, 'bucket': 'yzindexbucket', 'index': 'yzindex'}
+testrun_yz_index = {'btype': None,
+                    'bucket': 'yzindexbucket',
+                    'index': 'yzindex'}
+
 
 def setUpModule():
     yzSetUp(testrun_yz, testrun_yz_index)
 
+
 def tearDownModule():
     yzTearDown(testrun_yz, testrun_yz_index)
 
+
+@unittest.skipUnless(RUN_YZ, 'RUN_YZ is 0')
 class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_from_bucket(self):
         bucket = self.client.bucket(testrun_yz['bucket'])
         bucket.new("user", {"user_s": "Z"}).store()
@@ -51,16 +57,15 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertIn('user_s', result)
         self.assertEqual(u'Z', result['user_s'])
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_index_using_bucket(self):
         bucket = self.client.bucket(testrun_yz_index['bucket'])
         bucket.new("feliz",
                    {"name_s": "Felix", "species_s": "Felis catus"}).store()
         wait_for_yz_index(bucket, "feliz", index=testrun_yz_index['index'])
-        results = bucket.search('name_s:Felix', index=testrun_yz_index['index'])
+        results = bucket.search('name_s:Felix',
+                                index=testrun_yz_index['index'])
         self.assertEqual(1, len(results['docs']))
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_index_using_wrong_bucket(self):
         bucket = self.client.bucket(testrun_yz_index['bucket'])
         bucket.new("feliz",
@@ -69,7 +74,6 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         with self.assertRaises(Exception):
             bucket.search('name_s:Felix')
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_get_search_index(self):
         index = self.client.get_search_index(testrun_yz['bucket'])
         self.assertEqual(testrun_yz['bucket'], index['name'])
@@ -78,7 +82,6 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         with self.assertRaises(Exception):
             self.client.get_search_index('NOT' + testrun_yz['bucket'])
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_delete_search_index(self):
         # expected to fail, since there's an attached bucket
         with self.assertRaises(Exception):
@@ -96,13 +99,11 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         while testrun_yz['bucket'] not in indexes:
             indexes = [i['name'] for i in self.client.list_search_indexes()]
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_list_search_indexes(self):
         indexes = self.client.list_search_indexes()
         self.assertIn(testrun_yz['bucket'], [item['name'] for item in indexes])
         self.assertLessEqual(1, len(indexes))
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_create_schema(self):
         content = """<?xml version="1.0" encoding="UTF-8" ?>
         <schema name="test" version="1.5">
@@ -138,7 +139,6 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertEqual(schema_name, schema['name'])
         self.assertEqual(content, schema['content'])
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_create_bad_schema(self):
         bad_content = """
         <derp nope nope, how do i computer?
@@ -146,7 +146,6 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         with self.assertRaises(Exception):
             self.client.create_search_schema(self.randname(), bad_content)
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_queries(self):
         bucket = self.client.bucket(testrun_yz['bucket'])
         bucket.new("Z", {"username_s": "Z", "name_s": "ryan",
@@ -184,7 +183,6 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         results = bucket.search('username_s:*', sort="age_i asc")
         self.assertEqual(14, int(results['docs'][0]['age_i']))
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_search_utf8(self):
         bucket = self.client.bucket(testrun_yz['bucket'])
         body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
@@ -194,7 +192,6 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
                                 format(self.key_name))
         self.assertEqual(1, len(results['docs']))
 
-    @unittest.skipUnless(RUN_YZ, 'RUN_YZ is undefined')
     def test_yz_multivalued_fields(self):
         bucket = self.client.bucket(testrun_yz['bucket'])
         body = {"groups_ss": ['a', 'b', 'c']}

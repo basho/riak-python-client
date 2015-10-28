@@ -10,6 +10,7 @@ from six import string_types, PY2
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
+
 def _invert(d):
     out = {}
     for key in d:
@@ -80,7 +81,9 @@ class RiakPbcCodec(object):
             return int(dt.total_seconds() * 1000.0)
         except AttributeError:
             # NB: python 2.6 must use this method
-            return int(((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6) * 1000.0)
+            return int(((td.microseconds +
+                         (td.seconds + td.days * 24 * 3600) * 10**6) /
+                        10**6) * 1000.0)
 
     def _datetime_from_unix_time_millis(self, ut):
         return datetime.datetime.utcfromtimestamp(ut / 1000.0)
@@ -630,14 +633,14 @@ class RiakPbcCodec(object):
             elif isinstance(cell, datetime.datetime):
                 ts_cell.timestamp_value = self._unix_time_millis(cell)
                 logging.debug("cell -> timestamp: '%s', timestamp_value '%d'",
-                    cell, ts_cell.timestamp_value)
+                              cell, ts_cell.timestamp_value)
             elif isinstance(cell, bool):
                 logging.debug("cell -> boolean: '%s'", cell)
                 ts_cell.boolean_value = cell
             elif isinstance(cell, str):
                 logging.debug("cell -> str: '%s'", cell)
                 ts_cell.binary_value = str_to_bytes(cell)
-            elif isinstance(cell, int) or isinstance(cell, long):
+            elif isinstance(cell, int) or isinstance(cell, long):  # noqa
                 logging.debug("cell -> int/long: '%s'", cell)
                 ts_cell.integer_value = cell
             elif isinstance(cell, float):
@@ -645,7 +648,8 @@ class RiakPbcCodec(object):
                 ts_cell.double_value = cell
             else:
                 t = type(cell)
-                raise RiakError("can't serialize type '{}', value '{}'".format(t, cell))
+                raise RiakError("can't serialize type '{}', value '{}'"
+                                .format(t, cell))
 
     def _encode_timeseries_keyreq(self, table, key, req):
         key_vals = None
@@ -678,11 +682,11 @@ class RiakPbcCodec(object):
 
         if tsobj.rows and isinstance(tsobj.rows, list):
             for row in tsobj.rows:
-                tsr = ts_put_req.rows.add() # NB: type riak_pb.TsRow
+                tsr = ts_put_req.rows.add()  # NB: type riak_pb.TsRow
                 if not isinstance(row, list):
                     raise ValueError("TsObject row must be a list of values")
                 for cell in row:
-                    tsc = tsr.cells.add() # NB: type riak_pb.TsCell
+                    tsc = tsr.cells.add()  # NB: type riak_pb.TsCell
                     self._encode_to_ts_cell(cell, tsc)
         else:
             raise RiakError("TsObject requires a list of rows")
@@ -706,7 +710,8 @@ class RiakPbcCodec(object):
                 tsobj.columns.append(col)
 
         for ts_row in ts_rsp.rows:
-            tsobj.rows.append(self._decode_timeseries_row(ts_row, ts_rsp.columns))
+            tsobj.rows.append(self._decode_timeseries_row(ts_row,
+                                                          ts_rsp.columns))
 
     def _decode_timeseries_row(self, ts_row, ts_columns):
         """
@@ -722,13 +727,18 @@ class RiakPbcCodec(object):
         for i, ts_cell in enumerate(ts_row.cells):
             ts_col = ts_columns[i]
             logging.debug("ts_cell: '%s', ts_col: '%d'", ts_cell, ts_col.type)
-            if ts_col.type == riak_pb.TsColumnType.Value('BINARY') and ts_cell.HasField('binary_value'):
-                logging.debug("ts_cell.binary_value: '%s'", ts_cell.binary_value)
+            if ts_col.type == riak_pb.TsColumnType.Value('BINARY')\
+                    and ts_cell.HasField('binary_value'):
+                logging.debug("ts_cell.binary_value: '%s'",
+                              ts_cell.binary_value)
                 row.append(ts_cell.binary_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('INTEGER') and ts_cell.HasField('integer_value'):
-                logging.debug("ts_cell.integer_value: '%s'", ts_cell.integer_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('INTEGER')\
+                    and ts_cell.HasField('integer_value'):
+                logging.debug("ts_cell.integer_value: '%s'",
+                              ts_cell.integer_value)
                 row.append(ts_cell.integer_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('FLOAT') and ts_cell.HasField('double_value'):
+            elif ts_col.type == riak_pb.TsColumnType.Value('FLOAT')\
+                    and ts_cell.HasField('double_value'):
                 value = None
                 if ts_cell.HasField('double_value'):
                     value = ts_cell.double_value
@@ -739,13 +749,17 @@ class RiakPbcCodec(object):
             elif ts_col.type == riak_pb.TsColumnType.Value('TIMESTAMP'):
                 dt = None
                 if ts_cell.HasField('timestamp_value'):
-                    dt = self._datetime_from_unix_time_millis(ts_cell.timestamp_value)
+                    dt = self._datetime_from_unix_time_millis(
+                        ts_cell.timestamp_value)
                 elif ts_cell.HasField('integer_value'):
-                    dt = self._datetime_from_unix_time_millis(ts_cell.integer_value)
+                    dt = self._datetime_from_unix_time_millis(
+                        ts_cell.integer_value)
                 logging.debug("ts_cell datetime: '%s'", dt)
                 row.append(dt)
-            elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN') and ts_cell.HasField('boolean_value'):
-                logging.debug("ts_cell.boolean_value: '%s'", ts_cell.boolean_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN')\
+                    and ts_cell.HasField('boolean_value'):
+                logging.debug("ts_cell.boolean_value: '%s'",
+                              ts_cell.boolean_value)
                 row.append(ts_cell.boolean_value)
             else:
                 row.append(None)

@@ -139,6 +139,8 @@ If your Riak server isn't running on localhost or you have built a
 Riak devrel from source, use the environment variables
 ``RIAK_TEST_HOST``, ``RIAK_TEST_HTTP_PORT`` and
 ``RIAK_TEST_PB_PORT`` to specify where to find the Riak server.
+``RIAK_TEST_PROTOCOL`` to specify which protocol to test.  Can be
+either ``pbc`` or ``http``.
 
 Some of the connection tests need port numbers that are NOT in use. If
 ports 1023 and 1022 are in use on your test system, set the
@@ -150,7 +152,7 @@ Testing Search
 
 If you don't have `Riak Search
 <http://docs.basho.com/riak/latest/dev/using/search/>`_ enabled, you
-can set the ``SKIP_SEARCH`` environment variable to 1 skip those
+can set the ``RUN_SEARCH`` environment variable to 0 skip those
 tests.
 
 If you don't have `Search 2.0 <https://github.com/basho/yokozuna>`_
@@ -176,10 +178,18 @@ You may alternately add these lines to `setup.cfg`
     [create_bucket_types]
     riak-admin=/Users/sean/dev/riak/rel/riak/bin/riak-admin
 
-To skip the bucket-type tests, set the ``SKIP_BTYPES`` environment
-variable to ``1``.
+To skip the bucket-type tests, set the ``RUN_BTYPES`` environment
+variable to ``0``.
 
-Testing Timeseries (Riak 2+)
+Testing Data Types (Riak 2+)
+----------------------------
+
+To test data types, you must set up bucket types (see above.)
+
+To skip the data type tests, set the ``RUN_DATATYPES`` environment
+variable to ``0``.
+
+Testing Timeseries (Riak 2.1+)
 ------------------------------
 
 To test timeseries data, you must run the ``setup_timeseries`` command,
@@ -198,15 +208,15 @@ You may alternately add these lines to `setup.cfg`
     [setup_timeseries]
     riak-admin=/Users/sean/dev/riak/rel/riak/bin/riak-admin
 
-To enable the timeseries tests, set the ``SKIP_TIMESERIES`` environment
-variable to ``0``.
+To enable the timeseries tests, set the ``RUN_TIMESERIES`` environment
+variable to ``1``.
 
 Testing Secondary Indexes
 -------------------------
 
 To test
 `Secondary Indexes <http://docs.basho.com/riak/2.0.0/dev/using/2i/>`_,
-the ``SKIP_INDEX`` environment variable must be set to 0 (or 1 to skip them.)
+the ``RUN_INDEXES`` environment variable must be set to 1 (or 0 to skip them.)
 
 Testing Security (Riak 2+)
 --------------------------

@@ -1,5 +1,6 @@
 from six import string_types, PY2
 
+
 class Table(object):
     """
     The ``Table`` object allows you to access properties on a Riak
@@ -36,7 +37,8 @@ class Table(object):
 
     def new(self, rows, columns=None):
         """
-        A shortcut for manually instantiating a new :class:`~riak.ts_object.TsObject`
+        A shortcut for manually instantiating a new
+        :class:`~riak.ts_object.TsObject`
 
         :param rows: An list of lists with timeseries data
         :type rows: list

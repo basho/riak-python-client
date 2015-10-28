@@ -7,7 +7,7 @@ import copy
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
-from riak.tests import SKIP_RESOLVE
+from riak.tests import RUN_RESOLVE
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
@@ -34,10 +34,12 @@ else:
 testrun_sibs_bucket = 'sibsbucket'
 testrun_props_bucket = 'propsbucket'
 
+
 def setUpModule():
     c = IntegrationTestBase.create_client()
     c.bucket(testrun_sibs_bucket).allow_mult = True
     c.close()
+
 
 def tearDownModule():
     c = IntegrationTestBase.create_client()
@@ -430,8 +432,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertEqual(len(obj.siblings), 1)
         self.assertEqual(obj.data, resolved_sibling.data)
 
-    @unittest.skipIf(SKIP_RESOLVE == '1',
-                     "skip requested for resolvers test")
+    @unittest.skipUnless(RUN_RESOLVE, "RUN_RESOLVE is 0")
     def test_resolution(self):
         bucket = self.client.bucket(testrun_sibs_bucket)
         obj = bucket.get(self.key_name)
@@ -487,8 +488,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertEqual(bucket.resolver, default_resolver)  # reset
         self.assertEqual(self.client.resolver, default_resolver)  # reset
 
-    @unittest.skipIf(SKIP_RESOLVE == '1',
-                     "skip requested for resolvers test")
+    @unittest.skipUnless(RUN_RESOLVE, "RUN_RESOLVE is 0")
     def test_resolution_default(self):
         # If no resolver is setup, be sure to resolve to default_resolver
         bucket = self.client.bucket(testrun_sibs_bucket)

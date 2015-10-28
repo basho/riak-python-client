@@ -3,14 +3,12 @@ import datetime
 import os
 import platform
 import riak_pb
-import sys
-import time
 
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.pbc.codec import RiakPbcCodec
 from riak.util import str_to_bytes, bytes_to_str
-from riak.tests import SKIP_TIMESERIES
+from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
@@ -27,18 +25,20 @@ fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
 ts1 = ts0 + fiveMins
 
+
+@unittest.skipUnless(RUN_TIMESERIES, 'RUN_TIMESERIES is 0')
 class TimeseriesUnitTests(unittest.TestCase):
     def setUp(self):
         self.c = RiakPbcCodec()
         self.ts0ms = self.c._unix_time_millis(ts0)
         self.ts1ms = self.c._unix_time_millis(ts1)
         self.rows = [
-            [ bd0, 0, 1.2, ts0, True ],
-            [ bd1, 3, 4.5, ts1, False ]
+            [bd0, 0, 1.2, ts0, True],
+            [bd1, 3, 4.5, ts1, False]
         ]
         self.test_key = {
-            'user' : 'user2',
-            'time' : ts0
+            'user': 'user2',
+            'time': ts0
         }
         self.table = Table(None, 'test-table')
 
@@ -157,7 +157,8 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1[3], ts1)
         self.assertEqual(r1[4], self.rows[1][4])
 
-@unittest.skipIf(SKIP_TIMESERIES == 1, "skip requested for timeseries tests")
+
+@unittest.skipUnless(RUN_TIMESERIES, 'RUN_TIMESERIES is 0')
 class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -179,14 +180,14 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         #     PRIMARY KEY((quantum(time, 15, m), user), time, user)
         # )
         rows = [
-            [ 'hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3 ],
-            [ 'hash1', 'user2', fifteenMinsAgo, 'rain', 79.0 ],
-            [ 'hash1', 'user2', fiveMinsAgo, 'wind', None ],
-            [ 'hash1', 'user2', cls.now, 'snow', 20.1 ]
+            ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
+            ['hash1', 'user2', fifteenMinsAgo, 'rain', 79.0],
+            ['hash1', 'user2', fiveMinsAgo, 'wind', None],
+            ['hash1', 'user2', cls.now, 'snow', 20.1]
         ]
         ts_obj = table.new(rows)
         result = ts_obj.store()
-        if result != True:
+        if not result:
             raise AssertionError("expected success")
         client.close()
 
@@ -207,33 +208,36 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertIsNone(row[4])
 
     def test_query_that_returns_no_data(self):
-        query = "select * from {} where time > 0 and time < 10 and user = 'user1'".format(table_name)
+        query = "select * from {} where time > 0 and " + \
+                "time < 10 and user = 'user1'".format(table_name)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.assertEqual(len(ts_obj.columns), 0)
         self.assertEqual(len(ts_obj.rows), 0)
 
     def test_query_that_matches_some_data(self):
-        query = "select * from {} where time > {} and time < {} and user = 'user2'".format(table_name, self.tenMinsAgoMsec, self.nowMsec)
+        query = "select * from {} where time > {} and " + \
+                " time < {} and user = 'user2'" \
+                .format(table_name, self.tenMinsAgoMsec, self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.validate_data(ts_obj)
 
     def test_get_single_value_using_dict(self):
         key = {
-            'user' : 'user2',
-            'time' : self.fiveMinsAgo
+            'user': 'user2',
+            'time': self.fiveMinsAgo
         }
         ts_obj = self.client.ts_get('GeoCheckin', key)
         self.validate_data(ts_obj)
 
     def test_get_single_value_using_array(self):
-        key = [ self.fiveMinsAgo, 'user2' ]
+        key = [self.fiveMinsAgo, 'user2']
         ts_obj = self.client.ts_get('GeoCheckin', key)
         self.validate_data(ts_obj)
 
     def test_delete_single_value_using_dict(self):
         key = {
-            'user' : 'user2',
-            'time' : self.twentyMinsAgo
+            'user': 'user2',
+            'time': self.twentyMinsAgo
         }
         rslt = self.client.ts_delete('GeoCheckin', key)
         self.assertTrue(rslt)

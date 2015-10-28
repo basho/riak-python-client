@@ -2,7 +2,7 @@ import platform
 from six import PY2
 from threading import Thread
 from riak.riak_object import RiakObject
-from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, SKIP_POOL
+from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, RUN_POOL
 from riak.tests.base import IntegrationTestBase
 
 if PY2:
@@ -14,6 +14,7 @@ if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
+
 
 class ClientTests(IntegrationTestBase, unittest.TestCase):
     def test_uses_client_id_if_given(self):
@@ -192,7 +193,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
                 self.assertEqual(obj.key, obj.data)
         client.close()
 
-    @unittest.skipIf(SKIP_POOL, 'SKIP_POOL is set')
+    @unittest.skipUnless(RUN_POOL, 'RUN_POOL is 0')
     def test_pool_close(self):
         """
         Iterate over the connection pool and close all connections.

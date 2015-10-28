@@ -7,6 +7,7 @@ import sys
 from riak.client import RiakClient
 from riak.tests import HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
 
+
 class IntegrationTestBase(object):
 
     host = None
@@ -43,7 +44,15 @@ class IntegrationTestBase(object):
         credentials = credentials or SECURITY_CREDS
 
         if hasattr(cls, 'logging_enabled') and cls.logging_enabled:
-            cls.logger.debug("RiakClient(protocol='%s', host='%s', pb_port='%d', http_port='%d', credentials='%s', client_args='%s')", protocol, host, pb_port, http_port, credentials, client_args)
+            cls.logger.debug("RiakClient(protocol='%s', host='%s', " +
+                             "pb_port='%d', http_port='%d', " +
+                             "credentials='%s', client_args='%s')",
+                             protocol,
+                             host,
+                             pb_port,
+                             http_port,
+                             credentials,
+                             client_args)
 
         return RiakClient(protocol=protocol,
                           host=host,

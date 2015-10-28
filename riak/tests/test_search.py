@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import platform
-from riak.tests import SKIP_SEARCH
+from riak.tests import RUN_SEARCH, RUN_YZ
 from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
@@ -11,27 +11,29 @@ else:
 
 testrun_search_bucket = 'searchbucket'
 
+
 def setUpModule():
-    if not SKIP_SEARCH and not RUN_YZ:
+    if RUN_SEARCH and not RUN_YZ:
         c = IntegrationTestBase.create_client()
         b = c.bucket(testrun_search_bucket)
         b.enable_search()
         c.close()
 
+
 def tearDownModule():
-    if not SKIP_SEARCH and not RUN_YZ:
+    if RUN_SEARCH and not RUN_YZ:
         c = IntegrationTestBase.create_client()
         b = c.bucket(testrun_search_bucket)
         b.clear_properties()
         c.close()
 
+
+@unittest.skipUnless(RUN_SEARCH, 'RUN_SEARCH is 0')
 class EnableSearchTests(IntegrationTestBase, unittest.TestCase):
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_bucket_search_enabled(self):
         bucket = self.client.bucket(self.bucket_name)
         self.assertFalse(bucket.search_enabled())
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_enable_search_commit_hook(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.clear_properties()
@@ -46,7 +48,6 @@ class EnableSearchTests(IntegrationTestBase, unittest.TestCase):
         self.assertTrue(c.bucket(testrun_search_bucket).search_enabled())
         c.close()
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_disable_search_commit_hook(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.clear_properties()
@@ -65,8 +66,8 @@ class EnableSearchTests(IntegrationTestBase, unittest.TestCase):
         bucket.enable_search()
 
 
+@unittest.skipUnless(RUN_SEARCH, 'RUN_SEARCH is 0')
 class SolrSearchTests(IntegrationTestBase, unittest.TestCase):
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_document_to_index(self):
         self.client.fulltext_add(testrun_search_bucket,
                                  [{"id": "doc", "username": "tony"}])
@@ -74,7 +75,6 @@ class SolrSearchTests(IntegrationTestBase, unittest.TestCase):
                                               "username:tony")
         self.assertEqual("tony", results['docs'][0]['username'])
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_add_multiple_documents_to_index(self):
         self.client.fulltext_add(
             testrun_search_bucket,
@@ -84,7 +84,6 @@ class SolrSearchTests(IntegrationTestBase, unittest.TestCase):
             testrun_search_bucket, "username:russell OR username:dizzy")
         self.assertEqual(2, len(results['docs']))
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_id(self):
         self.client.fulltext_add(
             testrun_search_bucket,
@@ -95,7 +94,6 @@ class SolrSearchTests(IntegrationTestBase, unittest.TestCase):
             testrun_search_bucket, "username:russell OR username:dizzy")
         self.assertEqual(1, len(results['docs']))
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query(self):
         self.client.fulltext_add(
             testrun_search_bucket,
@@ -108,7 +106,6 @@ class SolrSearchTests(IntegrationTestBase, unittest.TestCase):
             testrun_search_bucket, "username:russell OR username:dizzy")
         self.assertEqual(0, len(results['docs']))
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_delete_documents_from_search_by_query_and_id(self):
         self.client.fulltext_add(
             testrun_search_bucket,
@@ -124,22 +121,20 @@ class SolrSearchTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(0, len(results['docs']))
 
 
+@unittest.skipUnless(RUN_SEARCH, 'RUN_SEARCH is 0')
 class SearchTests(IntegrationTestBase, unittest.TestCase):
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search_from_bucket(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.new("user", {"username": "roidrage"}).store()
         results = bucket.search("username:roidrage")
         self.assertEqual(1, len(results['docs']))
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search_with_params_from_bucket(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.new("user", {"username": "roidrage"}).store()
         results = bucket.search("username:roidrage", wt="xml")
         self.assertEqual(1, len(results['docs']))
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search_with_params(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.new("user", {"username": "roidrage"}).store()
@@ -148,7 +143,6 @@ class SearchTests(IntegrationTestBase, unittest.TestCase):
             "username:roidrage", wt="xml")
         self.assertEqual(1, len(results['docs']))
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_solr_search(self):
         bucket = self.client.bucket(testrun_search_bucket)
         bucket.new("user", {"username": "roidrage"}).store()
@@ -156,7 +150,6 @@ class SearchTests(IntegrationTestBase, unittest.TestCase):
                                               "username:roidrage")
         self.assertEqual(1, len(results["docs"]))
 
-    @unittest.skipIf(SKIP_SEARCH, 'SKIP_SEARCH is defined')
     def test_search_integration(self):
         # Create some objects to search across...
         bucket = self.client.bucket(testrun_search_bucket)

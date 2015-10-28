@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-from multiprocessing import util
 from setuptools import setup, find_packages
 from version import get_version
 from commands import preconfigure, configure, create_bucket_types, \

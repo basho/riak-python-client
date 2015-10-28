@@ -5,7 +5,7 @@ from threading import Thread, currentThread
 from riak.transports.pool import Pool, BadResource
 from random import SystemRandom
 from time import sleep
-from riak.tests import SKIP_POOL
+from riak.tests import RUN_POOL
 from riak.tests.comparison import Comparison
 
 if platform.python_version() < '2.7':
@@ -37,7 +37,7 @@ class EmptyListPool(Pool):
         return []
 
 
-@unittest.skipIf(SKIP_POOL, 'Skipping connection pool tests')
+@unittest.skipUnless(RUN_POOL, 'RUN_POOL is 0')
 class PoolTest(unittest.TestCase, Comparison):
 
     def test_yields_new_object_when_empty(self):

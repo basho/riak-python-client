@@ -1,6 +1,7 @@
 from riak import RiakError
 from riak.table import Table
 
+
 class TsObject(object):
     """
     The TsObject holds information about Timeseries data, plus the data

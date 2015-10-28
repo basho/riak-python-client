@@ -4,6 +4,7 @@ from riak import RiakError
 from riak.tests import RUN_YZ
 from riak.tests.base import IntegrationTestBase
 
+
 def yzSetUp(*yzdata):
     if RUN_YZ:
         c = IntegrationTestBase.create_client()
@@ -24,6 +25,7 @@ def yzSetUp(*yzdata):
                 except RiakError:
                     pass
         c.close()
+
 
 def yzTearDown(c, *yzdata):
     if RUN_YZ:
