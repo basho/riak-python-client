@@ -208,16 +208,24 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertIsNone(row[4])
 
     def test_query_that_returns_no_data(self):
-        query = "select * from {} where time > 0 and " + \
-                "time < 10 and user = 'user1'".format(table_name)
+        fmt = """
+        select * from {table} where
+            time > 0 and time < 10 and user = 'user1'
+        """
+        query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.assertEqual(len(ts_obj.columns), 0)
         self.assertEqual(len(ts_obj.rows), 0)
 
     def test_query_that_matches_some_data(self):
-        query = "select * from {} where time > {} and " + \
-                " time < {} and user = 'user2'" \
-                .format(table_name, self.tenMinsAgoMsec, self.nowMsec)
+        fmt = """
+        select * from {table} where
+            time > {t1} and time < {t2} and user = 'user2'
+        """
+        query = fmt.format(
+                table=table_name,
+                t1=self.tenMinsAgoMsec,
+                t2=self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.validate_data(ts_obj)
 
