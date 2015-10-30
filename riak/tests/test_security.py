@@ -5,7 +5,7 @@ import sys
 from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
     SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
     SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT, \
-    SECURITY_CREDS, SECURITY_CIPHERS
+    SECURITY_CIPHERS
 from riak.security import SecurityCreds
 from riak.tests.base import IntegrationTestBase
 

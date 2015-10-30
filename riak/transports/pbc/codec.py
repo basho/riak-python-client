@@ -642,9 +642,9 @@ class RiakPbcCodec(object):
                 ts_cell.binary_value = str_to_bytes(cell)
             elif isinstance(cell, int) or isinstance(cell, long):  # noqa
                 logging.debug("cell -> int/long: '%s'", cell)
-                ts_cell.integer_value = cell
+                ts_cell.sint64_value = cell
             elif isinstance(cell, float):
-                logging.debug("cell -> float: '%s'", cell)
+                logging.debug("cell -> double: '%s'", cell)
                 ts_cell.double_value = cell
             else:
                 t = type(cell)
@@ -732,28 +732,24 @@ class RiakPbcCodec(object):
                 logging.debug("ts_cell.binary_value: '%s'",
                               ts_cell.binary_value)
                 row.append(ts_cell.binary_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('INTEGER')\
-                    and ts_cell.HasField('integer_value'):
-                logging.debug("ts_cell.integer_value: '%s'",
-                              ts_cell.integer_value)
-                row.append(ts_cell.integer_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('FLOAT')\
+            elif ts_col.type == riak_pb.TsColumnType.Value('SINT64')\
+                    and ts_cell.HasField('sint64_value'):
+                logging.debug("ts_cell.sint64_value: '%s'",
+                              ts_cell.sint64_value)
+                row.append(ts_cell.sint64_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('DOUBLE')\
                     and ts_cell.HasField('double_value'):
-                value = None
-                if ts_cell.HasField('double_value'):
-                    value = ts_cell.double_value
-                elif ts_cell.HasField('float_value'):
-                    value = ts_cell.float_value
-                logging.debug("ts_cell double/float value: '%d'", value)
-                row.append(value)
+                logging.debug("ts_cell.double_value: '%d'",
+                              ts_cell.double_value)
+                row.append(ts_cell.double_value)
             elif ts_col.type == riak_pb.TsColumnType.Value('TIMESTAMP'):
                 dt = None
                 if ts_cell.HasField('timestamp_value'):
                     dt = self._datetime_from_unix_time_millis(
                         ts_cell.timestamp_value)
-                elif ts_cell.HasField('integer_value'):
+                elif ts_cell.HasField('sint64_value'):
                     dt = self._datetime_from_unix_time_millis(
-                        ts_cell.integer_value)
+                        ts_cell.sint64_value)
                 logging.debug("ts_cell datetime: '%s'", dt)
                 row.append(dt)
             elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN')\

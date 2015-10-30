@@ -69,14 +69,14 @@ class TimeseriesUnitTests(unittest.TestCase):
 
         r0 = ts_put_req.rows[0]
         self.assertEqual(r0.cells[0].binary_value, self.rows[0][0])
-        self.assertEqual(r0.cells[1].integer_value, self.rows[0][1])
+        self.assertEqual(r0.cells[1].sint64_value, self.rows[0][1])
         self.assertEqual(r0.cells[2].double_value, self.rows[0][2])
         self.assertEqual(r0.cells[3].timestamp_value, self.ts0ms)
         self.assertEqual(r0.cells[4].boolean_value, self.rows[0][4])
 
         r1 = ts_put_req.rows[1]
         self.assertEqual(r1.cells[0].binary_value, self.rows[1][0])
-        self.assertEqual(r1.cells[1].integer_value, self.rows[1][1])
+        self.assertEqual(r1.cells[1].sint64_value, self.rows[1][1])
         self.assertEqual(r1.cells[2].double_value, self.rows[1][2])
         self.assertEqual(r1.cells[3].timestamp_value, self.ts1ms)
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
@@ -89,10 +89,10 @@ class TimeseriesUnitTests(unittest.TestCase):
         c0.type = riak_pb.TsColumnType.Value('BINARY')
         c1 = tqr.columns.add()
         c1.name = str_to_bytes('col_integer')
-        c1.type = riak_pb.TsColumnType.Value('INTEGER')
+        c1.type = riak_pb.TsColumnType.Value('SINT64')
         c2 = tqr.columns.add()
         c2.name = str_to_bytes('col_double')
-        c2.type = riak_pb.TsColumnType.Value('FLOAT')
+        c2.type = riak_pb.TsColumnType.Value('DOUBLE')
         c3 = tqr.columns.add()
         c3.name = str_to_bytes('col_timestamp')
         c3.type = riak_pb.TsColumnType.Value('TIMESTAMP')
@@ -104,7 +104,7 @@ class TimeseriesUnitTests(unittest.TestCase):
         r0c0 = r0.cells.add()
         r0c0.binary_value = self.rows[0][0]
         r0c1 = r0.cells.add()
-        r0c1.integer_value = self.rows[0][1]
+        r0c1.sint64_value = self.rows[0][1]
         r0c2 = r0.cells.add()
         r0c2.double_value = self.rows[0][2]
         r0c3 = r0.cells.add()
@@ -116,7 +116,7 @@ class TimeseriesUnitTests(unittest.TestCase):
         r1c0 = r1.cells.add()
         r1c0.binary_value = self.rows[1][0]
         r1c1 = r1.cells.add()
-        r1c1.integer_value = self.rows[1][1]
+        r1c1.sint64_value = self.rows[1][1]
         r1c2 = r1.cells.add()
         r1c2.double_value = self.rows[1][2]
         r1c3 = r1.cells.add()
@@ -135,9 +135,9 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(c[0][0], 'col_binary')
         self.assertEqual(c[0][1], riak_pb.TsColumnType.Value('BINARY'))
         self.assertEqual(c[1][0], 'col_integer')
-        self.assertEqual(c[1][1], riak_pb.TsColumnType.Value('INTEGER'))
+        self.assertEqual(c[1][1], riak_pb.TsColumnType.Value('SINT64'))
         self.assertEqual(c[2][0], 'col_double')
-        self.assertEqual(c[2][1], riak_pb.TsColumnType.Value('FLOAT'))
+        self.assertEqual(c[2][1], riak_pb.TsColumnType.Value('DOUBLE'))
         self.assertEqual(c[3][0], 'col_timestamp')
         self.assertEqual(c[3][1], riak_pb.TsColumnType.Value('TIMESTAMP'))
         self.assertEqual(c[4][0], 'col_boolean')
@@ -210,7 +210,9 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     def test_query_that_returns_no_data(self):
         fmt = """
         select * from {table} where
-            time > 0 and time < 10 and user = 'user1'
+            time > 0 and time < 10 and
+            geohash = 'hash1' and
+            user = 'user1'
         """
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query('GeoCheckin', query)
@@ -220,7 +222,9 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     def test_query_that_matches_some_data(self):
         fmt = """
         select * from {table} where
-            time > {t1} and time < {t2} and user = 'user2'
+            time > {t1} and time < {t2} and
+            geohash = 'hash1' and
+            user = 'user2'
         """
         query = fmt.format(
                 table=table_name,

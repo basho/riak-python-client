@@ -178,13 +178,6 @@ class create_bucket_types(bucket_type_commands, Command):
 class setup_timeseries(bucket_type_commands, Command):
     """
     Creates bucket-types appropriate for timeseries.
-    By default this will create:
-
-    * `GeoCheckin` with ``{"props": {"n_val": 3,
-     "table_def": "CREATE TABLE GeoCheckin (geohash varchar not null,
-      user varchar not null, time timestamp not null,
-      weather varchar not null, temperature float,
-      PRIMARY KEY((quantum(time, 15, m),user), time, user))"}}``
     """
 
     description = "create bucket-types used in timeseries tests"
@@ -196,11 +189,19 @@ class setup_timeseries(bucket_type_commands, Command):
     _props = {
         'GeoCheckin': {
             'n_val': 3,
-            'table_def':
-                'CREATE TABLE GeoCheckin (geohash varchar not null, ' +
-                'user varchar not null, time timestamp not null, ' +
-                'weather varchar not null, temperature float, ' +
-                'PRIMARY KEY((quantum(time, 15, m),user), time, user))'}
+            'table_def': '''
+                CREATE TABLE GeoCheckin (
+                    geohash varchar not null,
+                    user varchar not null,
+                    time timestamp not null,
+                    weather varchar not null,
+                    temperature float,
+                    PRIMARY KEY(
+                        (geohash, user, quantum(time, 15, m)),
+                        geohash, user, time
+                    )
+                )'''
+        }
     }
 
 
