@@ -655,10 +655,8 @@ class RiakPbcCodec(object):
         key_vals = None
         if isinstance(key, list):
             key_vals = key
-        elif isinstance(key, dict):
-            key_vals = key.values()
         else:
-            raise ValueError("key must be a list or dict")
+            raise ValueError("key must be a list")
 
         req.table = str_to_bytes(table.name)
         for cell in key_vals:

@@ -549,7 +549,7 @@ class RiakClientOperations(RiakClientTransport):
         :param table: The timeseries table.
         :type table: string or :class:`Table <riak.table.Table>`
         :param key: The timeseries value's key.
-        :type key: list or dict
+        :type key: list
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table

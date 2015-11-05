@@ -4,6 +4,7 @@ import os
 import platform
 import riak_pb
 
+from riak import RiakError
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.pbc.codec import RiakPbcCodec
@@ -36,17 +37,15 @@ class TimeseriesUnitTests(unittest.TestCase):
             [bd0, 0, 1.2, ts0, True],
             [bd1, 3, 4.5, ts1, False]
         ]
-        self.test_key = {
-            'user': 'user2',
-            'time': ts0
-        }
+        self.test_key = [ 'hash1', 'user2', ts0 ]
         self.table = Table(None, 'test-table')
 
     def validate_keyreq(self, req):
         self.assertEqual(self.table.name, bytes_to_str(req.table))
-        self.assertEqual(len(self.test_key.values()), len(req.key))
-        self.assertEqual('user2', bytes_to_str(req.key[0].binary_value))
-        self.assertEqual(self.ts0ms, req.key[1].timestamp_value)
+        self.assertEqual(len(self.test_key), len(req.key))
+        self.assertEqual('hash1', bytes_to_str(req.key[0].binary_value))
+        self.assertEqual('user2', bytes_to_str(req.key[1].binary_value))
+        self.assertEqual(self.ts0ms, req.key[2].timestamp_value)
 
     def test_encode_data_for_get(self):
         req = riak_pb.TsGetReq()
@@ -171,14 +170,6 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
 
         client = cls.create_client()
         table = client.table(table_name)
-        # CREATE TABLE GeoCheckin (
-        #     geohash varchar not null,
-        #     user varchar not null,
-        #     time timestamp not null,
-        #     weather varchar not null,
-        #     temperature float,
-        #     PRIMARY KEY((quantum(time, 15, m), user), time, user)
-        # )
         rows = [
             ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
             ['hash1', 'user2', fifteenMinsAgo, 'rain', 79.0],
@@ -198,7 +189,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
 
     def validate_data(self, ts_obj):
-        self.assertEqual(len(ts_obj.columns), 5)
+        # TODO self.assertEqual(len(ts_obj.columns), 5)
         self.assertEqual(len(ts_obj.rows), 1)
         row = ts_obj.rows[0]
         self.assertEqual(row[0], 'hash1')
@@ -233,25 +224,14 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.validate_data(ts_obj)
 
-    def test_get_single_value_using_dict(self):
-        key = {
-            'user': 'user2',
-            'time': self.fiveMinsAgo
-        }
+    def test_get_single_value(self):
+        key = [ 'hash1', 'user2', self.fiveMinsAgo]
         ts_obj = self.client.ts_get('GeoCheckin', key)
         self.validate_data(ts_obj)
 
-    def test_get_single_value_using_array(self):
-        key = [self.fiveMinsAgo, 'user2']
-        ts_obj = self.client.ts_get('GeoCheckin', key)
-        self.validate_data(ts_obj)
-
-    def test_delete_single_value_using_dict(self):
-        key = {
-            'user': 'user2',
-            'time': self.twentyMinsAgo
-        }
+    def test_delete_single_value(self):
+        key = [ 'hash1', 'user2', self.twentyMinsAgo]
         rslt = self.client.ts_delete('GeoCheckin', key)
         self.assertTrue(rslt)
-        ts_obj = self.client.ts_get('GeoCheckin', key)
-        self.assertIsNone(ts_obj)
+        with self.assertRaises(RiakError):
+            self.client.ts_get('GeoCheckin', key)
