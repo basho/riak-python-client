@@ -628,8 +628,8 @@ class RiakPbcCodec(object):
     def _encode_to_ts_cell(self, cell, ts_cell):
         if cell is not None:
             if isinstance(cell, bytes) or isinstance(cell, bytearray):
-                logging.debug("cell -> binary_value: '%s'", cell)
-                ts_cell.binary_value = cell
+                logging.debug("cell -> varchar_value: '%s'", cell)
+                ts_cell.varchar_value = cell
             elif isinstance(cell, datetime.datetime):
                 ts_cell.timestamp_value = self._unix_time_millis(cell)
                 logging.debug("cell -> timestamp: '%s', timestamp_value '%d'",
@@ -639,7 +639,7 @@ class RiakPbcCodec(object):
                 ts_cell.boolean_value = cell
             elif isinstance(cell, str):
                 logging.debug("cell -> str: '%s'", cell)
-                ts_cell.binary_value = str_to_bytes(cell)
+                ts_cell.varchar_value = str_to_bytes(cell)
             elif isinstance(cell, int) or isinstance(cell, long):  # noqa
                 logging.debug("cell -> int/long: '%s'", cell)
                 ts_cell.sint64_value = cell
@@ -725,11 +725,11 @@ class RiakPbcCodec(object):
         for i, ts_cell in enumerate(ts_row.cells):
             ts_col = ts_columns[i]
             logging.debug("ts_cell: '%s', ts_col: '%d'", ts_cell, ts_col.type)
-            if ts_col.type == riak_pb.TsColumnType.Value('BINARY')\
-                    and ts_cell.HasField('binary_value'):
-                logging.debug("ts_cell.binary_value: '%s'",
-                              ts_cell.binary_value)
-                row.append(ts_cell.binary_value)
+            if ts_col.type == riak_pb.TsColumnType.Value('VARCHAR')\
+                    and ts_cell.HasField('varchar_value'):
+                logging.debug("ts_cell.varchar_value: '%s'",
+                              ts_cell.varchar_value)
+                row.append(ts_cell.varchar_value)
             elif ts_col.type == riak_pb.TsColumnType.Value('SINT64')\
                     and ts_cell.HasField('sint64_value'):
                 logging.debug("ts_cell.sint64_value: '%s'",

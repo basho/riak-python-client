@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 import os
 import platform
 import riak_pb
@@ -43,8 +44,8 @@ class TimeseriesUnitTests(unittest.TestCase):
     def validate_keyreq(self, req):
         self.assertEqual(self.table.name, bytes_to_str(req.table))
         self.assertEqual(len(self.test_key), len(req.key))
-        self.assertEqual('hash1', bytes_to_str(req.key[0].binary_value))
-        self.assertEqual('user2', bytes_to_str(req.key[1].binary_value))
+        self.assertEqual('hash1', bytes_to_str(req.key[0].varchar_value))
+        self.assertEqual('user2', bytes_to_str(req.key[1].varchar_value))
         self.assertEqual(self.ts0ms, req.key[2].timestamp_value)
 
     def test_encode_data_for_get(self):
@@ -67,14 +68,14 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(len(self.rows), len(ts_put_req.rows))
 
         r0 = ts_put_req.rows[0]
-        self.assertEqual(r0.cells[0].binary_value, self.rows[0][0])
+        self.assertEqual(r0.cells[0].varchar_value, self.rows[0][0])
         self.assertEqual(r0.cells[1].sint64_value, self.rows[0][1])
         self.assertEqual(r0.cells[2].double_value, self.rows[0][2])
         self.assertEqual(r0.cells[3].timestamp_value, self.ts0ms)
         self.assertEqual(r0.cells[4].boolean_value, self.rows[0][4])
 
         r1 = ts_put_req.rows[1]
-        self.assertEqual(r1.cells[0].binary_value, self.rows[1][0])
+        self.assertEqual(r1.cells[0].varchar_value, self.rows[1][0])
         self.assertEqual(r1.cells[1].sint64_value, self.rows[1][1])
         self.assertEqual(r1.cells[2].double_value, self.rows[1][2])
         self.assertEqual(r1.cells[3].timestamp_value, self.ts1ms)
@@ -84,8 +85,8 @@ class TimeseriesUnitTests(unittest.TestCase):
         tqr = riak_pb.TsQueryResp()
 
         c0 = tqr.columns.add()
-        c0.name = str_to_bytes('col_binary')
-        c0.type = riak_pb.TsColumnType.Value('BINARY')
+        c0.name = str_to_bytes('col_varchar')
+        c0.type = riak_pb.TsColumnType.Value('VARCHAR')
         c1 = tqr.columns.add()
         c1.name = str_to_bytes('col_integer')
         c1.type = riak_pb.TsColumnType.Value('SINT64')
@@ -101,7 +102,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
         r0 = tqr.rows.add()
         r0c0 = r0.cells.add()
-        r0c0.binary_value = self.rows[0][0]
+        r0c0.varchar_value = self.rows[0][0]
         r0c1 = r0.cells.add()
         r0c1.sint64_value = self.rows[0][1]
         r0c2 = r0.cells.add()
@@ -113,7 +114,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
         r1 = tqr.rows.add()
         r1c0 = r1.cells.add()
-        r1c0.binary_value = self.rows[1][0]
+        r1c0.varchar_value = self.rows[1][0]
         r1c1 = r1.cells.add()
         r1c1.sint64_value = self.rows[1][1]
         r1c2 = r1.cells.add()
@@ -131,8 +132,8 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(len(tqr.columns), len(tsobj.columns))
 
         c = tsobj.columns
-        self.assertEqual(c[0][0], 'col_binary')
-        self.assertEqual(c[0][1], riak_pb.TsColumnType.Value('BINARY'))
+        self.assertEqual(c[0][0], 'col_varchar')
+        self.assertEqual(c[0][1], riak_pb.TsColumnType.Value('VARCHAR'))
         self.assertEqual(c[1][0], 'col_integer')
         self.assertEqual(c[1][1], riak_pb.TsColumnType.Value('SINT64'))
         self.assertEqual(c[2][0], 'col_double')
@@ -187,9 +188,13 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         cls.fiveMinsAgo = fiveMinsAgo
         cls.twentyMinsAgo = twentyMinsAgo
         cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
+        cls.twentyMinsAgoMsec = codec._unix_time_millis(twentyMinsAgo)
+        cls.numCols = len(rows[0])
+        cls.rows = rows
 
     def validate_data(self, ts_obj):
-        # TODO self.assertEqual(len(ts_obj.columns), 5)
+        if ts_obj.columns is not None:
+            self.assertEqual(len(ts_obj.columns), self.numCols)
         self.assertEqual(len(ts_obj.rows), 1)
         row = ts_obj.rows[0]
         self.assertEqual(row[0], 'hash1')
@@ -224,14 +229,38 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.validate_data(ts_obj)
 
+    def test_query_that_matches_all_data(self):
+        fmt = """
+        select * from {table} where
+            time >= {t1} and time <= {t2} and
+            geohash = 'hash1' and
+            user = 'user2'
+        """
+        query = fmt.format(
+                table=table_name,
+                t1=self.twentyMinsAgoMsec,
+                t2=self.nowMsec)
+        logging.debug("all data query: %s", query)
+        ts_obj = self.client.ts_query('GeoCheckin', query)
+        for i, want in enumerate(self.rows):
+            got = ts_obj.rows[i]
+            logging.debug("got: %s want: %s", got, want)
+            self.assertListEqual(got, want)
+
+    def test_get_with_invalid_key(self):
+        key = [ 'hash1', 'user2' ]
+        with self.assertRaises(RiakError):
+            self.client.ts_get('GeoCheckin', key)
+
     def test_get_single_value(self):
         key = [ 'hash1', 'user2', self.fiveMinsAgo]
         ts_obj = self.client.ts_get('GeoCheckin', key)
+        self.assertIsNotNone(ts_obj)
         self.validate_data(ts_obj)
 
     def test_delete_single_value(self):
         key = [ 'hash1', 'user2', self.twentyMinsAgo]
         rslt = self.client.ts_delete('GeoCheckin', key)
         self.assertTrue(rslt)
-        with self.assertRaises(RiakError):
-            self.client.ts_get('GeoCheckin', key)
+        ts_obj = self.client.ts_get('GeoCheckin', key)
+        self.assertEqual(len(ts_obj.rows), 0)
