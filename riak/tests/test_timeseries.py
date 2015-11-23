@@ -168,10 +168,12 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         tenMinsAgo = fiveMinsAgo - fiveMins
         fifteenMinsAgo = tenMinsAgo - fiveMins
         twentyMinsAgo = fifteenMinsAgo - fiveMins
+        twentyFiveMinsAgo = twentyMinsAgo - fiveMins
 
         client = cls.create_client()
         table = client.table(table_name)
         rows = [
+            ['hash1', 'user2', twentyFiveMinsAgo, 'typhoon', 90.3],
             ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
             ['hash1', 'user2', fifteenMinsAgo, 'rain', 79.0],
             ['hash1', 'user2', fiveMinsAgo, 'wind', None],
@@ -187,6 +189,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         cls.nowMsec = codec._unix_time_millis(cls.now)
         cls.fiveMinsAgo = fiveMinsAgo
         cls.twentyMinsAgo = twentyMinsAgo
+        cls.twentyFiveMinsAgo = twentyFiveMinsAgo
         cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
         cls.twentyMinsAgoMsec = codec._unix_time_millis(twentyMinsAgo)
         cls.numCols = len(rows[0])
@@ -229,7 +232,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.validate_data(ts_obj)
 
-    def test_query_that_matches_all_data(self):
+    def test_query_that_matches_more_data(self):
         fmt = """
         select * from {table} where
             time >= {t1} and time <= {t2} and
@@ -242,8 +245,12 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 t2=self.nowMsec)
         logging.debug("all data query: %s", query)
         ts_obj = self.client.ts_query('GeoCheckin', query)
+        j = 0
         for i, want in enumerate(self.rows):
-            got = ts_obj.rows[i]
+            if want[2] == self.twentyFiveMinsAgo:
+                continue
+            got = ts_obj.rows[j]
+            j += 1
             logging.debug("got: %s want: %s", got, want)
             self.assertListEqual(got, want)
 
@@ -259,7 +266,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.validate_data(ts_obj)
 
     def test_delete_single_value(self):
-        key = [ 'hash1', 'user2', self.twentyMinsAgo]
+        key = [ 'hash1', 'user2', self.twentyFiveMinsAgo]
         rslt = self.client.ts_delete('GeoCheckin', key)
         self.assertTrue(rslt)
         ts_obj = self.client.ts_get('GeoCheckin', key)

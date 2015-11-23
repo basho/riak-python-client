@@ -740,14 +740,10 @@ class RiakPbcCodec(object):
                 logging.debug("ts_cell.double_value: '%d'",
                               ts_cell.double_value)
                 row.append(ts_cell.double_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('TIMESTAMP'):
-                dt = None
-                if ts_cell.HasField('timestamp_value'):
-                    dt = self._datetime_from_unix_time_millis(
-                        ts_cell.timestamp_value)
-                elif ts_cell.HasField('sint64_value'):
-                    dt = self._datetime_from_unix_time_millis(
-                        ts_cell.sint64_value)
+            elif ts_col.type == riak_pb.TsColumnType.Value('TIMESTAMP')\
+                    and ts_cell.HasField('timestamp_value'):
+                dt = self._datetime_from_unix_time_millis(
+                    ts_cell.timestamp_value)
                 logging.debug("ts_cell datetime: '%s'", dt)
                 row.append(dt)
             elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN')\
