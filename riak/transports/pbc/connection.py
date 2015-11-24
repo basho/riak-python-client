@@ -1,34 +1,12 @@
-"""
-Copyright 2012 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import socket
 import struct
-import riak_pb
+import riak.riak_pb.riak_pb2
+import riak.riak_pb.messages
+
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak import RiakError
-from riak_pb.messages import (
-    MESSAGE_CLASSES,
-    MSG_CODE_ERROR_RESP,
-    MSG_CODE_START_TLS,
-    MSG_CODE_AUTH_REQ,
-    MSG_CODE_AUTH_RESP
-)
 from riak.util import bytes_to_str, str_to_bytes
+
 from six import PY2
 if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection
@@ -90,8 +68,9 @@ class RiakPbcConnection(object):
         Exchange a STARTTLS message with Riak to initiate secure communications
         return True is Riak responds with a STARTTLS response, False otherwise
         """
-        msg_code, _ = self._non_connect_request(MSG_CODE_START_TLS)
-        if msg_code == MSG_CODE_START_TLS:
+        msg_code, _ = self._non_connect_request(
+            riak.riak_pb.messages.MSG_CODE_START_TLS)
+        if msg_code == riak.riak_pb.messages.MSG_CODE_START_TLS:
             return True
         else:
             return False
@@ -103,12 +82,14 @@ class RiakPbcConnection(object):
         Note: Riak will sleep for a short period of time upon a failed
               auth request/response to prevent denial of service attacks
         """
-        req = riak_pb.RpbAuthReq()
+        req = riak.riak_pb.riak_pb2.RpbAuthReq()
         req.user = str_to_bytes(self._client._credentials.username)
         req.password = str_to_bytes(self._client._credentials.password)
-        msg_code, _ = self._non_connect_request(MSG_CODE_AUTH_REQ, req,
-                                                MSG_CODE_AUTH_RESP)
-        if msg_code == MSG_CODE_AUTH_RESP:
+        msg_code, _ = self._non_connect_request(
+            riak.riak_pb.messages.MSG_CODE_AUTH_REQ,
+            req,
+            riak.riak_pb.messages.MSG_CODE_AUTH_RESP)
+        if msg_code == riak.riak_pb.messages.MSG_CODE_AUTH_RESP:
             return True
         else:
             return False
@@ -173,10 +154,10 @@ class RiakPbcConnection(object):
     def _recv_msg(self, expect=None):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
-        if msg_code is MSG_CODE_ERROR_RESP:
+        if msg_code is riak.riak_pb.messages.MSG_CODE_ERROR_RESP:
             err = self._parse_msg(msg_code, self._inbuf[1:])
             raise RiakError(bytes_to_str(err.errmsg))
-        elif msg_code in MESSAGE_CLASSES:
+        elif msg_code in riak.riak_pb.messages.MESSAGE_CLASSES:
             msg = self._parse_msg(msg_code, self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s" % msg_code)
@@ -233,7 +214,7 @@ class RiakPbcConnection(object):
 
     def _parse_msg(self, code, packet):
         try:
-            pbclass = MESSAGE_CLASSES[code]
+            pbclass = riak.riak_pb.messages.MESSAGE_CLASSES[code]
         except KeyError:
             pbclass = None
 

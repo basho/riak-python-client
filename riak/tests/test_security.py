@@ -21,7 +21,7 @@ import sys
 from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
     SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
     SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT, \
-    SECURITY_CREDS, SECURITY_CIPHERS
+    SECURITY_CIPHERS
 from riak.security import SecurityCreds
 if sys.version_info < (2, 7):
     unittest = __import__('unittest2')
@@ -32,7 +32,15 @@ else:
 class SecurityTests(object):
     @unittest.skipIf(RUN_SECURITY, 'RUN_SECURITY is set')
     def test_security_disabled(self):
-        client = self.create_client(credentials=SECURITY_CREDS)
+        """
+        Test valid security settings without security enabled
+        """
+        topts = {'timeout': 1}
+        # NB: can't use SECURITY_CREDS here since they won't be set
+        # if RUN_SECURITY is UN-set
+        creds = SecurityCreds(username='foo', password='bar')
+        client = self.create_client(credentials=creds,
+                                    transport_options=topts)
         myBucket = client.bucket('test')
         val1 = "foobar"
         key1 = myBucket.new('x', data=val1)
