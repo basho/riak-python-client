@@ -38,7 +38,7 @@ class TimeseriesUnitTests(unittest.TestCase):
             [bd0, 0, 1.2, ts0, True],
             [bd1, 3, 4.5, ts1, False]
         ]
-        self.test_key = [ 'hash1', 'user2', ts0 ]
+        self.test_key = ['hash1', 'user2', ts0]
         self.table = Table(None, 'test-table')
 
     def validate_keyreq(self, req):
@@ -255,18 +255,18 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             self.assertListEqual(got, want)
 
     def test_get_with_invalid_key(self):
-        key = [ 'hash1', 'user2' ]
+        key = ['hash1', 'user2']
         with self.assertRaises(RiakError):
             self.client.ts_get('GeoCheckin', key)
 
     def test_get_single_value(self):
-        key = [ 'hash1', 'user2', self.fiveMinsAgo]
+        key = ['hash1', 'user2', self.fiveMinsAgo]
         ts_obj = self.client.ts_get('GeoCheckin', key)
         self.assertIsNotNone(ts_obj)
         self.validate_data(ts_obj)
 
     def test_delete_single_value(self):
-        key = [ 'hash1', 'user2', self.twentyFiveMinsAgo]
+        key = ['hash1', 'user2', self.twentyFiveMinsAgo]
         rslt = self.client.ts_delete('GeoCheckin', key)
         self.assertTrue(rslt)
         ts_obj = self.client.ts_get('GeoCheckin', key)
