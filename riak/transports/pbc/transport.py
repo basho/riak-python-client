@@ -8,7 +8,8 @@ from riak.transports.pbc.connection import RiakPbcConnection
 from riak.transports.pbc.stream import (RiakPbcKeyStream,
                                         RiakPbcMapredStream,
                                         RiakPbcBucketStream,
-                                        RiakPbcIndexStream)
+                                        RiakPbcIndexStream,
+                                        RiakPbcTsKeyStream)
 from riak.transports.pbc.codec import RiakPbcCodec
 from six import PY2, PY3
 
@@ -64,6 +65,7 @@ from riak_pb.messages import (
     MSG_CODE_TS_PUT_RESP,
     MSG_CODE_TS_QUERY_REQ,
     MSG_CODE_TS_QUERY_RESP,
+    MSG_CODE_TS_LIST_KEYS_REQ,
     MSG_CODE_TS_GET_REQ,
     MSG_CODE_TS_GET_RESP,
     MSG_CODE_TS_DEL_REQ,
@@ -266,6 +268,21 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         tsobj = TsObject(self._client, table, [], [])
         self._decode_timeseries(ts_query_resp, tsobj)
         return tsobj
+
+    def ts_stream_keys(self, table, timeout=None):
+        """
+        Streams keys from a timeseries table, returning an iterator that
+        yields lists of keys.
+        """
+        req = riak_pb.TsListKeysReq()
+        t = None
+        if self.client_timeouts() and timeout:
+            t = timeout
+        self._encode_timeseries_listkeysreq(table, req, t)
+
+        self._send_msg(MSG_CODE_TS_LIST_KEYS_REQ, req)
+
+        return RiakPbcTsKeyStream(self)
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):

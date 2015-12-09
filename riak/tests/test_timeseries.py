@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import logging
 import os
 import platform
 import riak_pb
@@ -249,7 +248,6 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 table=table_name,
                 t1=self.twentyMinsAgoMsec,
                 t2=self.nowMsec)
-        logging.debug("all data query: %s", query)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         j = 0
         for i, want in enumerate(self.rows):
@@ -257,7 +255,6 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 continue
             got = ts_obj.rows[j]
             j += 1
-            logging.debug("got: %s want: %s", got, want)
             self.assertListEqual(got, want)
 
     def test_get_with_invalid_key(self):
@@ -270,6 +267,28 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         ts_obj = self.client.ts_get('GeoCheckin', key)
         self.assertIsNotNone(ts_obj)
         self.validate_data(ts_obj)
+
+    def test_get_single_value_via_table(self):
+        key = ['hash1', 'user2', self.fiveMinsAgo]
+        table = Table(self.client, 'GeoCheckin')
+        ts_obj = table.get(key)
+        self.assertIsNotNone(ts_obj)
+        self.validate_data(ts_obj)
+
+    def test_stream_keys(self):
+        table = Table(self.client, 'GeoCheckin')
+        streamed_keys = []
+        for keylist in table.stream_keys():
+            self.assertNotEqual([], keylist)
+            streamed_keys += keylist
+            for key in keylist:
+                self.assertIsInstance(key, list)
+                self.assertEqual(len(key), 3)
+                self.assertEqual('hash1', key[0])
+                self.assertEqual('user2', key[1])
+                # TODO RTS-367 ENABLE
+                # self.assertIsInstance(key[2], datetime.datetime)
+        self.assertEqual(len(streamed_keys), 5)
 
     def test_delete_single_value(self):
         key = ['hash1', 'user2', self.twentyFiveMinsAgo]

@@ -1,5 +1,4 @@
 import datetime
-import logging
 import riak_pb
 
 from riak import RiakError
@@ -628,23 +627,16 @@ class RiakPbcCodec(object):
     def _encode_to_ts_cell(self, cell, ts_cell):
         if cell is not None:
             if isinstance(cell, bytes) or isinstance(cell, bytearray):
-                logging.debug("cell -> varchar_value: '%s'", cell)
                 ts_cell.varchar_value = cell
             elif isinstance(cell, datetime.datetime):
                 ts_cell.timestamp_value = self._unix_time_millis(cell)
-                logging.debug("cell -> timestamp: '%s', timestamp_value '%d'",
-                              cell, ts_cell.timestamp_value)
             elif isinstance(cell, bool):
-                logging.debug("cell -> boolean: '%s'", cell)
                 ts_cell.boolean_value = cell
             elif isinstance(cell, str):
-                logging.debug("cell -> str: '%s'", cell)
                 ts_cell.varchar_value = str_to_bytes(cell)
             elif isinstance(cell, int) or isinstance(cell, long):  # noqa
-                logging.debug("cell -> int/long: '%s'", cell)
                 ts_cell.sint64_value = cell
             elif isinstance(cell, float):
-                logging.debug("cell -> double: '%s'", cell)
                 ts_cell.double_value = cell
             else:
                 t = type(cell)
@@ -665,7 +657,7 @@ class RiakPbcCodec(object):
 
     def _encode_timeseries_listkeysreq(self, table, req, timeout=None):
         req.table = str_to_bytes(table.name)
-        if timeout is not None:
+        if timeout:
             req.timeout = timeout
 
     def _encode_timeseries_put(self, tsobj, req):
@@ -709,14 +701,13 @@ class RiakPbcCodec(object):
                 col_name = bytes_to_str(col.name)
                 col_type = col.type
                 col = (col_name, col_type)
-                logging.debug("column: '%s'", col)
                 tsobj.columns.append(col)
 
         for row in resp.rows:
             tsobj.rows.append(
                 self._decode_timeseries_row(row, resp.columns))
 
-    def _decode_timeseries_row(self, tsrow, tscols):
+    def _decode_timeseries_row(self, tsrow, tscols=None):
         """
         Decodes a TsRow into a list
 
@@ -728,34 +719,36 @@ class RiakPbcCodec(object):
         """
         row = []
         for i, cell in enumerate(tsrow.cells):
-            col = tscols[i]
-            logging.debug("cell: '%s', col: '%d'", cell, col.type)
-            if col.type == riak_pb.TsColumnType.Value('VARCHAR')\
-                    and cell.HasField('varchar_value'):
-                logging.debug("cell.varchar_value: '%s'",
-                              cell.varchar_value)
-                row.append(cell.varchar_value)
-            elif col.type == riak_pb.TsColumnType.Value('SINT64')\
-                    and cell.HasField('sint64_value'):
-                logging.debug("cell.sint64_value: '%s'",
-                              cell.sint64_value)
-                row.append(cell.sint64_value)
-            elif col.type == riak_pb.TsColumnType.Value('DOUBLE')\
-                    and cell.HasField('double_value'):
-                logging.debug("cell.double_value: '%d'",
-                              cell.double_value)
-                row.append(cell.double_value)
-            elif col.type == riak_pb.TsColumnType.Value('TIMESTAMP')\
-                    and cell.HasField('timestamp_value'):
-                dt = self._datetime_from_unix_time_millis(
-                    cell.timestamp_value)
-                logging.debug("cell datetime: '%s'", dt)
-                row.append(dt)
-            elif col.type == riak_pb.TsColumnType.Value('BOOLEAN')\
-                    and cell.HasField('boolean_value'):
-                logging.debug("cell.boolean_value: '%s'",
-                              cell.boolean_value)
-                row.append(cell.boolean_value)
+            col = None
+            if tscols is not None:
+                col = tscols[i]
+            if cell.HasField('varchar_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('VARCHAR'):
+                    raise TypeError('expected VARCHAR column')
+                else:
+                    row.append(cell.varchar_value)
+            elif cell.HasField('sint64_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('SINT64'):
+                    raise TypeError('expected SINT64 column')
+                else:
+                    row.append(cell.sint64_value)
+            elif cell.HasField('double_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('DOUBLE'):
+                    raise TypeError('expected DOUBLE column')
+                else:
+                    row.append(cell.double_value)
+            elif cell.HasField('timestamp_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('TIMESTAMP'):
+                    raise TypeError('expected TIMESTAMP column')
+                else:
+                    dt = self._datetime_from_unix_time_millis(
+                        cell.timestamp_value)
+                    row.append(dt)
+            elif cell.HasField('boolean_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('BOOLEAN'):
+                    raise TypeError('expected BOOLEAN column')
+                else:
+                    row.append(cell.boolean_value)
             else:
                 row.append(None)
         return row

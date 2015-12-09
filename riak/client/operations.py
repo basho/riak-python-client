@@ -615,6 +615,48 @@ class RiakClientOperations(RiakClientTransport):
             t = Table(self, table)
         return transport.ts_query(t, query, interpolations)
 
+    def ts_stream_keys(self, table, timeout=None):
+        """
+        Lists all keys in a time series table via a stream. This is a
+        generator method which should be iterated over.
+
+        The caller should explicitly close the returned iterator,
+        either using :func:`contextlib.closing` or calling ``close()``
+        explicitly. Consuming the entire iterator will also close the
+        stream. If it does not, the associated connection might
+        not be returned to the pool. Example::
+
+            from contextlib import closing
+
+            # Using contextlib.closing
+            with closing(client.ts_stream_keys(mytable)) as keys:
+                for key_list in keys:
+                    do_something(key_list)
+
+            # Explicit close()
+            stream = client.ts_stream_keys(mytable)
+            for key_list in stream:
+                 do_something(key_list)
+            stream.close()
+
+        :param table: the table from which to stream keys
+        :type table: Table
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        :rtype: iterator
+        """
+        _validate_timeout(timeout)
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.ts_stream_keys(table, timeout)
+        stream.attach(resource)
+        try:
+            for keylist in stream:
+                if len(keylist) > 0:
+                    yield keylist
+        finally:
+            stream.close()
+
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,
             basic_quorum=None, notfound_ok=None):

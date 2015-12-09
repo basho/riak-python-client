@@ -16,7 +16,6 @@ class Table(object):
         :param name: The table's name
         :type name: string
         """
-
         if not isinstance(name, string_types):
             raise TypeError('Table name must be a string')
 
@@ -50,29 +49,25 @@ class Table(object):
 
         return TsObject(self._client, self, rows, columns)
 
-    def get(self, table, key):
+    def get(self, key):
         """
         Gets a value from a timeseries table.
 
-        :param table: The timeseries table.
-        :type table: string or :class:`Table <riak.table.Table>`
         :param key: The timeseries value's key.
         :type key: list
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
-        return self.client.ts_get(self, table, key)
+        return self._client.ts_get(self, key)
 
-    def delete(self, table, key):
+    def delete(self, key):
         """
         Deletes a value from a timeseries table.
 
-        :param table: The timeseries table.
-        :type table: string or :class:`Table <riak.table.Table>`
         :param key: The timeseries value's key.
         :type key: list or dict
         :rtype: boolean
         """
-        return self.client.ts_delete(self, table, key)
+        return self._client.ts_delete(self, key)
 
     def query(self, query, interpolations=None):
         """
@@ -82,4 +77,12 @@ class Table(object):
         :type query: string
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
-        return self.client.ts_query(self, query, interpolations)
+        return self._client.ts_query(self, query, interpolations)
+
+    def stream_keys(self, timeout=None):
+        """
+        Streams keys from a timeseries table.
+
+        :rtype: list
+        """
+        return self._client.ts_stream_keys(self, timeout)
