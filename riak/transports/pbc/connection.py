@@ -1,7 +1,7 @@
 import socket
 import struct
-import riak.riak_pb.riak_pb2
-import riak.riak_pb.messages
+import riak.pb.riak_pb2
+import riak.pb.messages
 
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak import RiakError
@@ -69,8 +69,8 @@ class RiakPbcConnection(object):
         return True is Riak responds with a STARTTLS response, False otherwise
         """
         msg_code, _ = self._non_connect_request(
-            riak.riak_pb.messages.MSG_CODE_START_TLS)
-        if msg_code == riak.riak_pb.messages.MSG_CODE_START_TLS:
+            riak.pb.messages.MSG_CODE_START_TLS)
+        if msg_code == riak.pb.messages.MSG_CODE_START_TLS:
             return True
         else:
             return False
@@ -82,14 +82,14 @@ class RiakPbcConnection(object):
         Note: Riak will sleep for a short period of time upon a failed
               auth request/response to prevent denial of service attacks
         """
-        req = riak.riak_pb.riak_pb2.RpbAuthReq()
+        req = riak.pb.riak_pb2.RpbAuthReq()
         req.user = str_to_bytes(self._client._credentials.username)
         req.password = str_to_bytes(self._client._credentials.password)
         msg_code, _ = self._non_connect_request(
-            riak.riak_pb.messages.MSG_CODE_AUTH_REQ,
+            riak.pb.messages.MSG_CODE_AUTH_REQ,
             req,
-            riak.riak_pb.messages.MSG_CODE_AUTH_RESP)
-        if msg_code == riak.riak_pb.messages.MSG_CODE_AUTH_RESP:
+            riak.pb.messages.MSG_CODE_AUTH_RESP)
+        if msg_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
             return True
         else:
             return False
@@ -154,10 +154,10 @@ class RiakPbcConnection(object):
     def _recv_msg(self, expect=None):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
-        if msg_code is riak.riak_pb.messages.MSG_CODE_ERROR_RESP:
+        if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
             err = self._parse_msg(msg_code, self._inbuf[1:])
             raise RiakError(bytes_to_str(err.errmsg))
-        elif msg_code in riak.riak_pb.messages.MESSAGE_CLASSES:
+        elif msg_code in riak.pb.messages.MESSAGE_CLASSES:
             msg = self._parse_msg(msg_code, self._inbuf[1:])
         else:
             raise Exception("unknown msg code %s" % msg_code)
@@ -214,7 +214,7 @@ class RiakPbcConnection(object):
 
     def _parse_msg(self, code, packet):
         try:
-            pbclass = riak.riak_pb.messages.MESSAGE_CLASSES[code]
+            pbclass = riak.pb.messages.MESSAGE_CLASSES[code]
         except KeyError:
             pbclass = None
 

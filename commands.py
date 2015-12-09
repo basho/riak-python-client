@@ -18,24 +18,6 @@ __all__ = ['create_bucket_types', 'build_messages',
            'preconfigure', 'configure']
 
 
-LICENSE = """# Copyright {0} Basho Technologies, Inc.
-#
-# This file is provided to you under the Apache License,
-# Version 2.0 (the "License"); you may not use this file
-# except in compliance with the License.  You may obtain
-# a copy of the License at
-#
-#  http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-""".format(date.today().year)
-
-
 # Exception classes used by this module.
 class CalledProcessError(Exception):
     """This exception is raised when a process run by check_call() or
@@ -529,7 +511,7 @@ class MessageCodeMapping(ComparableMixin):
         self.message = message
         self.proto = proto
         self.message_code_name = self._message_code_name()
-        self.module_name = 'riak.riak_pb.{0}_pb2'.format(self.proto)
+        self.module_name = 'riak.pb.{0}_pb2'.format(self.proto)
         self.message_class = self._message_class()
 
     def _cmpkey(self):
@@ -610,7 +592,7 @@ class build_messages(Command):
         if self.source is None:
             self.source = 'riak_pb/src/riak_pb_messages.csv'
         if self.destination is None:
-            self.destination = 'riak/riak_pb/messages.py'
+            self.destination = 'riak/pb/messages.py'
 
     def run(self):
         self.force = True
@@ -640,7 +622,6 @@ class build_messages(Command):
 
     def _generate_doc(self):
         # Write the license and docstring header
-        self._contents.append(LICENSE)
         self._contents.extend(self._docstring)
 
     def _generate_imports(self):
@@ -689,13 +670,13 @@ class build_messages(Command):
             reader = csv.reader(csvfile)
             for row in reader:
                 _, _, proto = row
-                pb_files.add('riak/riak_pb/{0}_pb2.py'.format(proto))
+                pb_files.add('riak/pb/{0}_pb2.py'.format(proto))
 
         for im in sorted(pb_files):
             with open(im, 'r', buffering=1) as pbfile:
                 contents = 'from six import *\n' + pbfile.read()
                 contents = re.sub(r'riak_pb2',
-                                  r'riak.riak_pb.riak_pb2',
+                                  r'riak.pb.riak_pb2',
                                   contents)
             # Look for this pattern in the protoc-generated file:
             #
