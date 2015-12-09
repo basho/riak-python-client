@@ -81,6 +81,12 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[3].timestamp_value, self.ts1ms)
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
 
+    def test_encode_data_for_listkeys(self):
+        req = riak_pb.TsListKeysReq()
+        self.c._encode_timeseries_listkeysreq(self.table, req, 1234)
+        self.assertEqual(self.table.name, bytes_to_str(req.table))
+        self.assertEqual(1234, req.timeout)
+
     def test_decode_data_from_query(self):
         tqr = riak_pb.TsQueryResp()
 

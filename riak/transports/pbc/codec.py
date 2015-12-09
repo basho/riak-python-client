@@ -663,24 +663,29 @@ class RiakPbcCodec(object):
             ts_cell = req.key.add()
             self._encode_to_ts_cell(cell, ts_cell)
 
-    def _encode_timeseries_put(self, tsobj, ts_put_req):
+    def _encode_timeseries_listkeysreq(self, table, req, timeout=None):
+        req.table = str_to_bytes(table.name)
+        if timeout is not None:
+            req.timeout = timeout
+
+    def _encode_timeseries_put(self, tsobj, req):
         """
         Fills an TsPutReq message with the appropriate data and
         metadata from a TsObject.
 
         :param tsobj: a TsObject
         :type tsobj: TsObject
-        :param ts_put_req: the protobuf message to fill
-        :type ts_put_req: riak_pb.TsPutReq
+        :param req: the protobuf message to fill
+        :type req: riak_pb.TsPutReq
         """
-        ts_put_req.table = str_to_bytes(tsobj.table.name)
+        req.table = str_to_bytes(tsobj.table.name)
 
         if tsobj.columns:
             raise NotImplementedError("columns are not implemented yet")
 
         if tsobj.rows and isinstance(tsobj.rows, list):
             for row in tsobj.rows:
-                tsr = ts_put_req.rows.add()  # NB: type riak_pb.TsRow
+                tsr = req.rows.add()  # NB: type riak_pb.TsRow
                 if not isinstance(row, list):
                     raise ValueError("TsObject row must be a list of values")
                 for cell in row:
@@ -689,68 +694,68 @@ class RiakPbcCodec(object):
         else:
             raise RiakError("TsObject requires a list of rows")
 
-    def _decode_timeseries(self, ts_rsp, tsobj):
+    def _decode_timeseries(self, resp, tsobj):
         """
         Fills an TsObject with the appropriate data and
         metadata from a TsQueryResp.
 
-        :param ts_rsp: the protobuf message from which to process data
-        :type ts_rsp: riak_pb.TsQueryRsp or riak_pb.TsGetResp
+        :param resp: the protobuf message from which to process data
+        :type resp: riak_pb.TsQueryRsp or riak_pb.TsGetResp
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
         if tsobj.columns is not None:
-            for ts_col in ts_rsp.columns:
-                col_name = bytes_to_str(ts_col.name)
-                col_type = ts_col.type
+            for col in resp.columns:
+                col_name = bytes_to_str(col.name)
+                col_type = col.type
                 col = (col_name, col_type)
                 logging.debug("column: '%s'", col)
                 tsobj.columns.append(col)
 
-        for ts_row in ts_rsp.rows:
-            tsobj.rows.append(self._decode_timeseries_row(ts_row,
-                                                          ts_rsp.columns))
+        for row in resp.rows:
+            tsobj.rows.append(
+                self._decode_timeseries_row(row, resp.columns))
 
-    def _decode_timeseries_row(self, ts_row, ts_columns):
+    def _decode_timeseries_row(self, tsrow, tscols):
         """
         Decodes a TsRow into a list
 
-        :param ts_row: the protobuf TsRow to decode.
-        :type ts_row: riak_pb.TsRow
-        :param ts_columns: the protobuf TsColumn data to help decode.
-        :type ts_columns: list
+        :param tsrow: the protobuf TsRow to decode.
+        :type tsrow: riak_pb.TsRow
+        :param tscols: the protobuf TsColumn data to help decode.
+        :type tscols: list
         :rtype list
         """
         row = []
-        for i, ts_cell in enumerate(ts_row.cells):
-            ts_col = ts_columns[i]
-            logging.debug("ts_cell: '%s', ts_col: '%d'", ts_cell, ts_col.type)
-            if ts_col.type == riak_pb.TsColumnType.Value('VARCHAR')\
-                    and ts_cell.HasField('varchar_value'):
-                logging.debug("ts_cell.varchar_value: '%s'",
-                              ts_cell.varchar_value)
-                row.append(ts_cell.varchar_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('SINT64')\
-                    and ts_cell.HasField('sint64_value'):
-                logging.debug("ts_cell.sint64_value: '%s'",
-                              ts_cell.sint64_value)
-                row.append(ts_cell.sint64_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('DOUBLE')\
-                    and ts_cell.HasField('double_value'):
-                logging.debug("ts_cell.double_value: '%d'",
-                              ts_cell.double_value)
-                row.append(ts_cell.double_value)
-            elif ts_col.type == riak_pb.TsColumnType.Value('TIMESTAMP')\
-                    and ts_cell.HasField('timestamp_value'):
+        for i, cell in enumerate(tsrow.cells):
+            col = tscols[i]
+            logging.debug("cell: '%s', col: '%d'", cell, col.type)
+            if col.type == riak_pb.TsColumnType.Value('VARCHAR')\
+                    and cell.HasField('varchar_value'):
+                logging.debug("cell.varchar_value: '%s'",
+                              cell.varchar_value)
+                row.append(cell.varchar_value)
+            elif col.type == riak_pb.TsColumnType.Value('SINT64')\
+                    and cell.HasField('sint64_value'):
+                logging.debug("cell.sint64_value: '%s'",
+                              cell.sint64_value)
+                row.append(cell.sint64_value)
+            elif col.type == riak_pb.TsColumnType.Value('DOUBLE')\
+                    and cell.HasField('double_value'):
+                logging.debug("cell.double_value: '%d'",
+                              cell.double_value)
+                row.append(cell.double_value)
+            elif col.type == riak_pb.TsColumnType.Value('TIMESTAMP')\
+                    and cell.HasField('timestamp_value'):
                 dt = self._datetime_from_unix_time_millis(
-                    ts_cell.timestamp_value)
-                logging.debug("ts_cell datetime: '%s'", dt)
+                    cell.timestamp_value)
+                logging.debug("cell datetime: '%s'", dt)
                 row.append(dt)
-            elif ts_col.type == riak_pb.TsColumnType.Value('BOOLEAN')\
-                    and ts_cell.HasField('boolean_value'):
-                logging.debug("ts_cell.boolean_value: '%s'",
-                              ts_cell.boolean_value)
-                row.append(ts_cell.boolean_value)
+            elif col.type == riak_pb.TsColumnType.Value('BOOLEAN')\
+                    and cell.HasField('boolean_value'):
+                logging.debug("cell.boolean_value: '%s'",
+                              cell.boolean_value)
+                row.append(cell.boolean_value)
             else:
                 row.append(None)
         return row
