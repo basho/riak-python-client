@@ -16,7 +16,7 @@ riak_pb_in_pythonpath = False
 os_env_pythonpath = os.environ.get('PYTHONPATH')
 if os_env_pythonpath is not None:
     for ppath in os_env_pythonpath.split(os.pathsep):
-        if ppath.find('riak_pb/python/lib') != -1:
+        if ppath.find('riak_pb/python/lib') != -1 or ppath.find('riak_pb/python3/lib') != -1:
             riak_pb_messages = os.path.join(ppath, 'riak_pb', 'messages.py')
             if os.path.exists(riak_pb_messages):
                 riak_pb_in_pythonpath = True
