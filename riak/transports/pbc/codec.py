@@ -1,5 +1,6 @@
-import datetime
+import logging
 import riak_pb
+import datetime
 
 from riak import RiakError
 from riak.content import RiakContent
@@ -626,15 +627,16 @@ class RiakPbcCodec(object):
 
     def _encode_to_ts_cell(self, cell, ts_cell):
         if cell is not None:
-            if isinstance(cell, bytes) or isinstance(cell, bytearray):
-                ts_cell.varchar_value = cell
-            elif isinstance(cell, datetime.datetime):
+            if isinstance(cell, datetime.datetime):
                 ts_cell.timestamp_value = self._unix_time_millis(cell)
             elif isinstance(cell, bool):
                 ts_cell.boolean_value = cell
-            elif isinstance(cell, str):
+            elif isinstance(cell, string_types):
+                logging.debug("cell -> str: '%s'", cell)
                 ts_cell.varchar_value = str_to_bytes(cell)
-            elif isinstance(cell, int) or isinstance(cell, long):  # noqa
+            elif (isinstance(cell, int) or
+                 (PY2 and isinstance(cell, long))):  # noqa
+                logging.debug("cell -> int/long: '%s'", cell)
                 ts_cell.sint64_value = cell
             elif isinstance(cell, float):
                 ts_cell.double_value = cell
@@ -726,7 +728,7 @@ class RiakPbcCodec(object):
                 if col and col.type != riak_pb.TsColumnType.Value('VARCHAR'):
                     raise TypeError('expected VARCHAR column')
                 else:
-                    row.append(cell.varchar_value)
+                    row.append(bytes_to_str(cell.varchar_value))
             elif cell.HasField('sint64_value'):
                 if col and col.type != riak_pb.TsColumnType.Value('SINT64'):
                     raise TypeError('expected SINT64 column')

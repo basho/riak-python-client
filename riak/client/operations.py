@@ -553,7 +553,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, str):
+        if isinstance(t, string_types):
             t = Table(self, table)
         return transport.ts_get(t, key)
 
@@ -590,7 +590,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: boolean
         """
         t = table
-        if isinstance(t, str):
+        if isinstance(t, string_types):
             t = Table(self, table)
         return transport.ts_delete(t, key)
 
@@ -611,7 +611,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, str):
+        if isinstance(t, string_types):
             t = Table(self, table)
         return transport.ts_query(t, query, interpolations)
 

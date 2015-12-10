@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import os
 import platform
 import riak_pb
 
@@ -19,8 +18,8 @@ else:
 
 table_name = 'GeoCheckin'
 
-bd0 = os.urandom(16)
-bd1 = os.urandom(16)
+bd0 = '时间序列'
+bd1 = 'временные ряды'
 
 fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
@@ -67,14 +66,16 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(len(self.rows), len(ts_put_req.rows))
 
         r0 = ts_put_req.rows[0]
-        self.assertEqual(r0.cells[0].varchar_value, self.rows[0][0])
+        self.assertEqual(bytes_to_str(r0.cells[0].varchar_value),
+                         self.rows[0][0])
         self.assertEqual(r0.cells[1].sint64_value, self.rows[0][1])
         self.assertEqual(r0.cells[2].double_value, self.rows[0][2])
         self.assertEqual(r0.cells[3].timestamp_value, self.ts0ms)
         self.assertEqual(r0.cells[4].boolean_value, self.rows[0][4])
 
         r1 = ts_put_req.rows[1]
-        self.assertEqual(r1.cells[0].varchar_value, self.rows[1][0])
+        self.assertEqual(bytes_to_str(r1.cells[0].varchar_value),
+                         self.rows[1][0])
         self.assertEqual(r1.cells[1].sint64_value, self.rows[1][1])
         self.assertEqual(r1.cells[2].double_value, self.rows[1][2])
         self.assertEqual(r1.cells[3].timestamp_value, self.ts1ms)
@@ -107,7 +108,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
         r0 = tqr.rows.add()
         r0c0 = r0.cells.add()
-        r0c0.varchar_value = self.rows[0][0]
+        r0c0.varchar_value = str_to_bytes(self.rows[0][0])
         r0c1 = r0.cells.add()
         r0c1.sint64_value = self.rows[0][1]
         r0c2 = r0.cells.add()
@@ -119,7 +120,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
         r1 = tqr.rows.add()
         r1c0 = r1.cells.add()
-        r1c0.varchar_value = self.rows[1][0]
+        r1c0.varchar_value = str_to_bytes(self.rows[1][0])
         r1c1 = r1.cells.add()
         r1c1.sint64_value = self.rows[1][1]
         r1c2 = r1.cells.add()

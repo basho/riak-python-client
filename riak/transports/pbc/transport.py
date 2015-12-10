@@ -260,7 +260,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def ts_query(self, table, query, interpolations=None):
         req = riak_pb.TsQueryReq()
-        req.query.base = bytes_to_str(query)
+        req.query.base = str_to_bytes(query)
 
         msg_code, ts_query_resp = self._request(MSG_CODE_TS_QUERY_REQ, req,
                                                 MSG_CODE_TS_QUERY_RESP)
