@@ -93,6 +93,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                  node=None,
                  client=None,
                  timeout=None,
+                 socket_keepalive=False,
+                 socket_keepalive_options=None,
                  *unused_options):
         """
         Construct a new RiakPbcTransport object.
@@ -104,6 +106,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._address = (node.host, node.pb_port)
         self._timeout = timeout
         self._socket = None
+        self._socket_keepalive = socket_keepalive
+        self._socket_keepalive_options = socket_keepalive_options
 
     # FeatureDetection API
     def _server_version(self):
