@@ -47,19 +47,19 @@ if [[ -z $(pyenv versions | grep riak_3.3.6) ]]; then
     VERSION_ALIAS="riak_3.3.6" pyenv install 3.3.6
     pyenv virtualenv riak_3.3.6 riak-py33
 fi
-if [[ -z $(pyenv versions | grep riak_2.7.10) ]]; then
-    VERSION_ALIAS="riak_2.7.10" pyenv install 2.7.10
-    pyenv virtualenv riak_2.7.10 riak-py27
+if [[ -z $(pyenv versions | grep riak_3.5.1) ]]; then
+    VERSION_ALIAS="riak_3.5.1" pyenv install 3.5.1
+    pyenv virtualenv riak_3.5.1 riak-py35
 fi
-if [[ -z $(pyenv versions | grep riak_2.7.9) ]]; then
-    VERSION_ALIAS="riak_2.7.9" pyenv install 2.7.9
-    pyenv virtualenv riak_2.7.9 riak-py279
+if [[ -z $(pyenv versions | grep riak_2.7.11) ]]; then
+    VERSION_ALIAS="riak_2.7.11" pyenv install 2.7.11
+    pyenv virtualenv riak_2.7.11 riak-py27
 fi
-if [[ -z $(pyenv versions | grep riak_2.6.9) ]]; then
-    VERSION_ALIAS="riak_2.6.9" pyenv install 2.6.9
-    pyenv virtualenv riak_2.6.9 riak-py26
+if [[ -z $(pyenv versions | grep riak_2.7.8) ]]; then
+    VERSION_ALIAS="riak_2.7.8" pyenv install 2.7.8
+    pyenv virtualenv riak_2.7.8 riak-py278
 fi
-pyenv global riak-py34 riak-py33 riak-py27 riak-py279 riak-py26
+pyenv global riak-py34 riak-py33 riak-py35 riak-py27 riak-py278
 pyenv versions
 
 # Now install tox
