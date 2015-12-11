@@ -25,26 +25,6 @@ fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
 ts1 = ts0 + fiveMins
 
-now = datetime.datetime.utcfromtimestamp(144379690)
-fiveMinsAgo = now - fiveMins
-tenMinsAgo = fiveMinsAgo - fiveMins
-fifteenMinsAgo = tenMinsAgo - fiveMins
-twentyMinsAgo = fifteenMinsAgo - fiveMins
-twentyFiveMinsAgo = twentyMinsAgo - fiveMins
-
-codec = RiakPbcCodec()
-nowMsec = codec._unix_time_millis(now)
-tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
-twentyMinsAgoMsec = codec._unix_time_millis(twentyMinsAgo)
-
-rows = [
-    ['hash1', 'user2', twentyFiveMinsAgo, 'typhoon', 90.3],
-    ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
-    ['hash1', 'user2', fifteenMinsAgo, 'rain', 79.0],
-    ['hash1', 'user2', fiveMinsAgo, 'wind', None],
-    ['hash1', 'user2', now, 'snow', 20.1]
-]
-
 
 @unittest.skipUnless(RUN_TIMESERIES, 'RUN_TIMESERIES is 0')
 class TimeseriesUnitTests(unittest.TestCase):
@@ -189,23 +169,46 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTests, cls).setUpClass()
+        cls.now = datetime.datetime.utcfromtimestamp(144379690)
+        fiveMinsAgo = cls.now - fiveMins
+        tenMinsAgo = fiveMinsAgo - fiveMins
+        fifteenMinsAgo = tenMinsAgo - fiveMins
+        twentyMinsAgo = fifteenMinsAgo - fiveMins
+        twentyFiveMinsAgo = twentyMinsAgo - fiveMins
 
         client = cls.create_client()
         table = client.table(table_name)
+        rows = [
+            ['hash1', 'user2', twentyFiveMinsAgo, 'typhoon', 90.3],
+            ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
+            ['hash1', 'user2', fifteenMinsAgo, 'rain', 79.0],
+            ['hash1', 'user2', fiveMinsAgo, 'wind', None],
+            ['hash1', 'user2', cls.now, 'snow', 20.1]
+        ]
         ts_obj = table.new(rows)
         result = ts_obj.store()
         if not result:
             raise AssertionError("expected success")
         client.close()
 
+        codec = RiakPbcCodec()
+        cls.nowMsec = codec._unix_time_millis(cls.now)
+        cls.fiveMinsAgo = fiveMinsAgo
+        cls.twentyMinsAgo = twentyMinsAgo
+        cls.twentyFiveMinsAgo = twentyFiveMinsAgo
+        cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
+        cls.twentyMinsAgoMsec = codec._unix_time_millis(twentyMinsAgo)
+        cls.numCols = len(rows[0])
+        cls.rows = rows
+
     def validate_data(self, ts_obj):
         if ts_obj.columns is not None:
-            self.assertEqual(len(ts_obj.columns), 5)
+            self.assertEqual(len(ts_obj.columns), self.numCols)
         self.assertEqual(len(ts_obj.rows), 1)
         row = ts_obj.rows[0]
         self.assertEqual(row[0], 'hash1')
         self.assertEqual(row[1], 'user2')
-        self.assertEqual(row[2], fiveMinsAgo)
+        self.assertEqual(row[2], self.fiveMinsAgo)
         self.assertEqual(row[3], 'wind')
         self.assertIsNone(row[4])
 
@@ -230,8 +233,8 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         """
         query = fmt.format(
                 table=table_name,
-                t1=tenMinsAgoMsec,
-                t2=nowMsec)
+                t1=self.tenMinsAgoMsec,
+                t2=self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.validate_data(ts_obj)
 
@@ -244,12 +247,12 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         """
         query = fmt.format(
                 table=table_name,
-                t1=twentyMinsAgoMsec,
-                t2=nowMsec)
+                t1=self.twentyMinsAgoMsec,
+                t2=self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         j = 0
-        for i, want in enumerate(rows):
-            if want[2] == twentyFiveMinsAgo:
+        for i, want in enumerate(self.rows):
+            if want[2] == self.twentyFiveMinsAgo:
                 continue
             got = ts_obj.rows[j]
             j += 1
@@ -261,13 +264,13 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             self.client.ts_get('GeoCheckin', key)
 
     def test_get_single_value(self):
-        key = ['hash1', 'user2', fiveMinsAgo]
+        key = ['hash1', 'user2', self.fiveMinsAgo]
         ts_obj = self.client.ts_get('GeoCheckin', key)
         self.assertIsNotNone(ts_obj)
         self.validate_data(ts_obj)
 
     def test_get_single_value_via_table(self):
-        key = ['hash1', 'user2', fiveMinsAgo]
+        key = ['hash1', 'user2', self.fiveMinsAgo]
         table = Table(self.client, 'GeoCheckin')
         ts_obj = table.get(key)
         self.assertIsNotNone(ts_obj)
@@ -286,11 +289,10 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 self.assertEqual('user2', key[1])
                 # TODO RTS-367 ENABLE
                 # self.assertIsInstance(key[2], datetime.datetime)
-        keylen = len(streamed_keys)
-        self.assertTrue(keylen == 5 or keylen == 4)
+        self.assertEqual(len(streamed_keys), 5)
 
     def test_delete_single_value(self):
-        key = ['hash1', 'user2', twentyFiveMinsAgo]
+        key = ['hash1', 'user2', self.twentyFiveMinsAgo]
         rslt = self.client.ts_delete('GeoCheckin', key)
         self.assertTrue(rslt)
         ts_obj = self.client.ts_get('GeoCheckin', key)
