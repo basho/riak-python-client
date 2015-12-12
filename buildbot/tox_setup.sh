@@ -27,21 +27,22 @@ fi
 
 (cd $PYENV_ROOT && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
 
-# Upgrade it, if it's too old
-if [[ -z $(pyenv install --list | grep 3.4.3) ]]
+declare -r pyenv_virtualenv_dir="$PYENV_ROOT/plugins/pyenv-virtualenv"
+if [[ ! -d $pyenv_virtualenv_dir ]]
 then
-    (cd $PYENV_ROOT && git pull -u origin master && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
+    git clone https://github.com/yyuu/pyenv-virtualenv.git $pyenv_virtualenv_dir
+else
+    (cd $pyenv_virtualenv_dir && git fetch --all)
 fi
 
-if [[ ! -d $PYENV_ROOT/plugins/pyenv-virtualenv ]]
-then
-    git clone https://github.com/yyuu/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
-    (cd $PYENV_ROOT/plugins/pyenv-virtualenv && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
-fi
+(cd $pyenv_virtualenv_dir && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
 
-if [[ ! -d $PYENV_ROOT/plugins/pyenv-alias ]]
+declare -r pyenv_alias_dir="$PYENV_ROOT/plugins/pyenv-alias"
+if [[ ! -d $pyenv_alias_dir ]]
 then
-    git clone https://github.com/s1341/pyenv-alias.git $PYENV_ROOT/plugins/pyenv-alias
+    git clone https://github.com/s1341/pyenv-alias.git $pyenv_alias_dir
+else
+    (cd $pyenv_alias_dir && git pull origin master)
 fi
 
 # Add pyenv root to PATH
@@ -84,10 +85,10 @@ then
     pip install --upgrade pip
     for module in six tox python3-protobuf
     do
-        if [[ -z $(pip show $module) ]]
+        if ! pip show --quiet $module
         then
-            pip install -Iv $module
-            if [[ -z $(pip show $module) ]]
+            pip install --ignore-installed $module
+            if ! pip show --quiet $module
             then
                 echo "[ERROR] install of $module failed" 1>&2
                 exit 1
