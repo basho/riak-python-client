@@ -1,17 +1,15 @@
-.PHONY: pb_compile pb_clean pb_build release install
-# TODO: git submodule
-
+.PHONY: pb_clean pb_compile pb_build release
 
 clean: pb_clean
+
+pb_clean:
+	@echo "==> Python (clean)"
+	@rm -rf riak/pb/*_pb2.py riak/pb/*.pyc riak/pb/__pycache__ __pycache__ py-build
 
 pb_compile:
 	echo "==> Python (compile)"
 	protoc -Iriak_pb/src --python_out=riak/pb riak_pb/src/*.proto
 	python setup.py build_messages
-
-pb_clean:
-	@echo "==> Python (clean)"
-	@rm -rf riak/pb/*_pb2.py riak/pb/*.pyc riak/pb/__pycache__ __pycache__ py-build
 
 pb_build: pb_clean pb_compile
 	@echo "==> Python 2.7 (build)"
@@ -36,7 +34,3 @@ else
 	@echo "==> Python 3.5 (release)"
 	@python3.5 setup.py build --build-base=py-build/3.5 sdist upload -s -i $(RELEASE_GPG_KEYNAME)
 endif
-
-install: pb_compile
-	@echo "==> Python (install)"
-	@python setup.py build_messages build --build-base=py-build install
