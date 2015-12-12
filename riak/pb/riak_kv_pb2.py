@@ -9,13 +9,13 @@ from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 
-import riak.riak_pb.riak_pb2
+import riak.pb.riak_pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='riak_kv.proto',
   package='',
-  serialized_pb='\n\rriak_kv.proto\x1a\nriak.proto\"\'\n\x12RpbGetClientIdResp\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"&\n\x11RpbSetClientIdReq\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"\xe9\x01\n\tRpbGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\x12\n\n\x02pr\x18\x04 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x05 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x06 \x01(\x08\x12\x13\n\x0bif_modified\x18\x07 \x01(\x0c\x12\x0c\n\x04head\x18\x08 \x01(\x08\x12\x15\n\rdeletedvclock\x18\t \x01(\x08\x12\x0f\n\x07timeout\x18\n \x01(\r\x12\x15\n\rsloppy_quorum\x18\x0b \x01(\x08\x12\r\n\x05n_val\x18\x0c \x01(\r\x12\x0c\n\x04type\x18\r \x01(\x0c\"M\n\nRpbGetResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x11\n\tunchanged\x18\x03 \x01(\x08\"\xa6\x02\n\tRpbPutReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0e\n\x06vclock\x18\x03 \x01(\x0c\x12\x1c\n\x07\x63ontent\x18\x04 \x02(\x0b\x32\x0b.RpbContent\x12\t\n\x01w\x18\x05 \x01(\r\x12\n\n\x02\x64w\x18\x06 \x01(\r\x12\x13\n\x0breturn_body\x18\x07 \x01(\x08\x12\n\n\x02pw\x18\x08 \x01(\r\x12\x17\n\x0fif_not_modified\x18\t \x01(\x08\x12\x15\n\rif_none_match\x18\n \x01(\x08\x12\x13\n\x0breturn_head\x18\x0b \x01(\x08\x12\x0f\n\x07timeout\x18\x0c \x01(\r\x12\x0c\n\x04\x61sis\x18\r \x01(\x08\x12\x15\n\rsloppy_quorum\x18\x0e \x01(\x08\x12\r\n\x05n_val\x18\x0f \x01(\r\x12\x0c\n\x04type\x18\x10 \x01(\x0c\"G\n\nRpbPutResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x0b\n\x03key\x18\x03 \x01(\x0c\"\xc3\x01\n\tRpbDelReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\n\n\x02rw\x18\x03 \x01(\r\x12\x0e\n\x06vclock\x18\x04 \x01(\x0c\x12\t\n\x01r\x18\x05 \x01(\r\x12\t\n\x01w\x18\x06 \x01(\r\x12\n\n\x02pr\x18\x07 \x01(\r\x12\n\n\x02pw\x18\x08 \x01(\r\x12\n\n\x02\x64w\x18\t \x01(\r\x12\x0f\n\x07timeout\x18\n \x01(\r\x12\x15\n\rsloppy_quorum\x18\x0b \x01(\x08\x12\r\n\x05n_val\x18\x0c \x01(\r\x12\x0c\n\x04type\x18\r \x01(\x0c\"B\n\x11RpbListBucketsReq\x12\x0f\n\x07timeout\x18\x01 \x01(\r\x12\x0e\n\x06stream\x18\x02 \x01(\x08\x12\x0c\n\x04type\x18\x03 \x01(\x0c\"3\n\x12RpbListBucketsResp\x12\x0f\n\x07\x62uckets\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"?\n\x0eRpbListKeysReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0f\n\x07timeout\x18\x02 \x01(\r\x12\x0c\n\x04type\x18\x03 \x01(\x0c\"-\n\x0fRpbListKeysResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"5\n\x0cRpbMapRedReq\x12\x0f\n\x07request\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x02(\x0c\">\n\rRpbMapRedResp\x12\r\n\x05phase\x18\x01 \x01(\r\x12\x10\n\x08response\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\"\xcd\x02\n\x0bRpbIndexReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\r\n\x05index\x18\x02 \x02(\x0c\x12*\n\x05qtype\x18\x03 \x02(\x0e\x32\x1b.RpbIndexReq.IndexQueryType\x12\x0b\n\x03key\x18\x04 \x01(\x0c\x12\x11\n\trange_min\x18\x05 \x01(\x0c\x12\x11\n\trange_max\x18\x06 \x01(\x0c\x12\x14\n\x0creturn_terms\x18\x07 \x01(\x08\x12\x0e\n\x06stream\x18\x08 \x01(\x08\x12\x13\n\x0bmax_results\x18\t \x01(\r\x12\x14\n\x0c\x63ontinuation\x18\n \x01(\x0c\x12\x0f\n\x07timeout\x18\x0b \x01(\r\x12\x0c\n\x04type\x18\x0c \x01(\x0c\x12\x12\n\nterm_regex\x18\r \x01(\x0c\x12\x17\n\x0fpagination_sort\x18\x0e \x01(\x08\"#\n\x0eIndexQueryType\x12\x06\n\x02\x65q\x10\x00\x12\t\n\x05range\x10\x01\"[\n\x0cRpbIndexResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x19\n\x07results\x18\x02 \x03(\x0b\x32\x08.RpbPair\x12\x14\n\x0c\x63ontinuation\x18\x03 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x04 \x01(\x08\"\xc1\x01\n\x0eRpbCSBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x11\n\tstart_key\x18\x02 \x02(\x0c\x12\x0f\n\x07\x65nd_key\x18\x03 \x01(\x0c\x12\x18\n\nstart_incl\x18\x04 \x01(\x08:\x04true\x12\x17\n\x08\x65nd_incl\x18\x05 \x01(\x08:\x05\x66\x61lse\x12\x14\n\x0c\x63ontinuation\x18\x06 \x01(\x0c\x12\x13\n\x0bmax_results\x18\x07 \x01(\r\x12\x0f\n\x07timeout\x18\x08 \x01(\r\x12\x0c\n\x04type\x18\t \x01(\x0c\"W\n\x0fRpbCSBucketResp\x12 \n\x07objects\x18\x01 \x03(\x0b\x32\x0f.RpbIndexObject\x12\x14\n\x0c\x63ontinuation\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\":\n\x0eRpbIndexObject\x12\x0b\n\x03key\x18\x01 \x02(\x0c\x12\x1b\n\x06object\x18\x02 \x02(\x0b\x32\x0b.RpbGetResp\"\xf5\x01\n\nRpbContent\x12\r\n\x05value\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x01(\x0c\x12\x0f\n\x07\x63harset\x18\x03 \x01(\x0c\x12\x18\n\x10\x63ontent_encoding\x18\x04 \x01(\x0c\x12\x0c\n\x04vtag\x18\x05 \x01(\x0c\x12\x17\n\x05links\x18\x06 \x03(\x0b\x32\x08.RpbLink\x12\x10\n\x08last_mod\x18\x07 \x01(\r\x12\x16\n\x0elast_mod_usecs\x18\x08 \x01(\r\x12\x1a\n\x08usermeta\x18\t \x03(\x0b\x32\x08.RpbPair\x12\x19\n\x07indexes\x18\n \x03(\x0b\x32\x08.RpbPair\x12\x0f\n\x07\x64\x65leted\x18\x0b \x01(\x08\"3\n\x07RpbLink\x12\x0e\n\x06\x62ucket\x18\x01 \x01(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0b\n\x03tag\x18\x03 \x01(\x0c\"z\n\x13RpbCounterUpdateReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0e\n\x06\x61mount\x18\x03 \x02(\x12\x12\t\n\x01w\x18\x04 \x01(\r\x12\n\n\x02\x64w\x18\x05 \x01(\r\x12\n\n\x02pw\x18\x06 \x01(\r\x12\x13\n\x0breturnvalue\x18\x07 \x01(\x08\"%\n\x14RpbCounterUpdateResp\x12\r\n\x05value\x18\x01 \x01(\x12\"q\n\x10RpbCounterGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\x12\n\n\x02pr\x18\x04 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x05 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x06 \x01(\x08\"\"\n\x11RpbCounterGetResp\x12\r\n\x05value\x18\x01 \x01(\x12\"G\n\x1aRpbGetBucketKeyPreflistReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0c\n\x04type\x18\x03 \x01(\x0c\"J\n\x1bRpbGetBucketKeyPreflistResp\x12+\n\x08preflist\x18\x01 \x03(\x0b\x32\x19.RpbBucketKeyPreflistItem\"L\n\x18RpbBucketKeyPreflistItem\x12\x11\n\tpartition\x18\x01 \x02(\x03\x12\x0c\n\x04node\x18\x02 \x02(\x0c\x12\x0f\n\x07primary\x18\x03 \x02(\x08\x42#\n\x17\x63om.basho.riak.protobufB\x08RiakKvPB')
+  serialized_pb='\n\rriak_kv.proto\x1a\nriak.proto\"\'\n\x12RpbGetClientIdResp\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"&\n\x11RpbSetClientIdReq\x12\x11\n\tclient_id\x18\x01 \x02(\x0c\"\xe9\x01\n\tRpbGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\x12\n\n\x02pr\x18\x04 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x05 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x06 \x01(\x08\x12\x13\n\x0bif_modified\x18\x07 \x01(\x0c\x12\x0c\n\x04head\x18\x08 \x01(\x08\x12\x15\n\rdeletedvclock\x18\t \x01(\x08\x12\x0f\n\x07timeout\x18\n \x01(\r\x12\x15\n\rsloppy_quorum\x18\x0b \x01(\x08\x12\r\n\x05n_val\x18\x0c \x01(\r\x12\x0c\n\x04type\x18\r \x01(\x0c\"M\n\nRpbGetResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x11\n\tunchanged\x18\x03 \x01(\x08\"\xa6\x02\n\tRpbPutReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0e\n\x06vclock\x18\x03 \x01(\x0c\x12\x1c\n\x07\x63ontent\x18\x04 \x02(\x0b\x32\x0b.RpbContent\x12\t\n\x01w\x18\x05 \x01(\r\x12\n\n\x02\x64w\x18\x06 \x01(\r\x12\x13\n\x0breturn_body\x18\x07 \x01(\x08\x12\n\n\x02pw\x18\x08 \x01(\r\x12\x17\n\x0fif_not_modified\x18\t \x01(\x08\x12\x15\n\rif_none_match\x18\n \x01(\x08\x12\x13\n\x0breturn_head\x18\x0b \x01(\x08\x12\x0f\n\x07timeout\x18\x0c \x01(\r\x12\x0c\n\x04\x61sis\x18\r \x01(\x08\x12\x15\n\rsloppy_quorum\x18\x0e \x01(\x08\x12\r\n\x05n_val\x18\x0f \x01(\r\x12\x0c\n\x04type\x18\x10 \x01(\x0c\"G\n\nRpbPutResp\x12\x1c\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x0b.RpbContent\x12\x0e\n\x06vclock\x18\x02 \x01(\x0c\x12\x0b\n\x03key\x18\x03 \x01(\x0c\"\xc3\x01\n\tRpbDelReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\n\n\x02rw\x18\x03 \x01(\r\x12\x0e\n\x06vclock\x18\x04 \x01(\x0c\x12\t\n\x01r\x18\x05 \x01(\r\x12\t\n\x01w\x18\x06 \x01(\r\x12\n\n\x02pr\x18\x07 \x01(\r\x12\n\n\x02pw\x18\x08 \x01(\r\x12\n\n\x02\x64w\x18\t \x01(\r\x12\x0f\n\x07timeout\x18\n \x01(\r\x12\x15\n\rsloppy_quorum\x18\x0b \x01(\x08\x12\r\n\x05n_val\x18\x0c \x01(\r\x12\x0c\n\x04type\x18\r \x01(\x0c\"B\n\x11RpbListBucketsReq\x12\x0f\n\x07timeout\x18\x01 \x01(\r\x12\x0e\n\x06stream\x18\x02 \x01(\x08\x12\x0c\n\x04type\x18\x03 \x01(\x0c\"3\n\x12RpbListBucketsResp\x12\x0f\n\x07\x62uckets\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"?\n\x0eRpbListKeysReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0f\n\x07timeout\x18\x02 \x01(\r\x12\x0c\n\x04type\x18\x03 \x01(\x0c\"-\n\x0fRpbListKeysResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x0c\n\x04\x64one\x18\x02 \x01(\x08\"5\n\x0cRpbMapRedReq\x12\x0f\n\x07request\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x02(\x0c\">\n\rRpbMapRedResp\x12\r\n\x05phase\x18\x01 \x01(\r\x12\x10\n\x08response\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\"\xf9\x02\n\x0bRpbIndexReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\r\n\x05index\x18\x02 \x02(\x0c\x12*\n\x05qtype\x18\x03 \x02(\x0e\x32\x1b.RpbIndexReq.IndexQueryType\x12\x0b\n\x03key\x18\x04 \x01(\x0c\x12\x11\n\trange_min\x18\x05 \x01(\x0c\x12\x11\n\trange_max\x18\x06 \x01(\x0c\x12\x14\n\x0creturn_terms\x18\x07 \x01(\x08\x12\x0e\n\x06stream\x18\x08 \x01(\x08\x12\x13\n\x0bmax_results\x18\t \x01(\r\x12\x14\n\x0c\x63ontinuation\x18\n \x01(\x0c\x12\x0f\n\x07timeout\x18\x0b \x01(\r\x12\x0c\n\x04type\x18\x0c \x01(\x0c\x12\x12\n\nterm_regex\x18\r \x01(\x0c\x12\x17\n\x0fpagination_sort\x18\x0e \x01(\x08\x12\x15\n\rcover_context\x18\x0f \x01(\x0c\x12\x13\n\x0breturn_body\x18\x10 \x01(\x08\"#\n\x0eIndexQueryType\x12\x06\n\x02\x65q\x10\x00\x12\t\n\x05range\x10\x01\"[\n\x0cRpbIndexResp\x12\x0c\n\x04keys\x18\x01 \x03(\x0c\x12\x19\n\x07results\x18\x02 \x03(\x0b\x32\x08.RpbPair\x12\x14\n\x0c\x63ontinuation\x18\x03 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x04 \x01(\x08\"X\n\x10RpbIndexBodyResp\x12 \n\x07objects\x18\x01 \x03(\x0b\x32\x0f.RpbIndexObject\x12\x14\n\x0c\x63ontinuation\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\"\xd8\x01\n\x0eRpbCSBucketReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x11\n\tstart_key\x18\x02 \x02(\x0c\x12\x0f\n\x07\x65nd_key\x18\x03 \x01(\x0c\x12\x18\n\nstart_incl\x18\x04 \x01(\x08:\x04true\x12\x17\n\x08\x65nd_incl\x18\x05 \x01(\x08:\x05\x66\x61lse\x12\x14\n\x0c\x63ontinuation\x18\x06 \x01(\x0c\x12\x13\n\x0bmax_results\x18\x07 \x01(\r\x12\x0f\n\x07timeout\x18\x08 \x01(\r\x12\x0c\n\x04type\x18\t \x01(\x0c\x12\x15\n\rcover_context\x18\n \x01(\x0c\"W\n\x0fRpbCSBucketResp\x12 \n\x07objects\x18\x01 \x03(\x0b\x32\x0f.RpbIndexObject\x12\x14\n\x0c\x63ontinuation\x18\x02 \x01(\x0c\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\":\n\x0eRpbIndexObject\x12\x0b\n\x03key\x18\x01 \x02(\x0c\x12\x1b\n\x06object\x18\x02 \x02(\x0b\x32\x0b.RpbGetResp\"\xf5\x01\n\nRpbContent\x12\r\n\x05value\x18\x01 \x02(\x0c\x12\x14\n\x0c\x63ontent_type\x18\x02 \x01(\x0c\x12\x0f\n\x07\x63harset\x18\x03 \x01(\x0c\x12\x18\n\x10\x63ontent_encoding\x18\x04 \x01(\x0c\x12\x0c\n\x04vtag\x18\x05 \x01(\x0c\x12\x17\n\x05links\x18\x06 \x03(\x0b\x32\x08.RpbLink\x12\x10\n\x08last_mod\x18\x07 \x01(\r\x12\x16\n\x0elast_mod_usecs\x18\x08 \x01(\r\x12\x1a\n\x08usermeta\x18\t \x03(\x0b\x32\x08.RpbPair\x12\x19\n\x07indexes\x18\n \x03(\x0b\x32\x08.RpbPair\x12\x0f\n\x07\x64\x65leted\x18\x0b \x01(\x08\"3\n\x07RpbLink\x12\x0e\n\x06\x62ucket\x18\x01 \x01(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0b\n\x03tag\x18\x03 \x01(\x0c\"z\n\x13RpbCounterUpdateReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0e\n\x06\x61mount\x18\x03 \x02(\x12\x12\t\n\x01w\x18\x04 \x01(\r\x12\n\n\x02\x64w\x18\x05 \x01(\r\x12\n\n\x02pw\x18\x06 \x01(\r\x12\x13\n\x0breturnvalue\x18\x07 \x01(\x08\"%\n\x14RpbCounterUpdateResp\x12\r\n\x05value\x18\x01 \x01(\x12\"q\n\x10RpbCounterGetReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\t\n\x01r\x18\x03 \x01(\r\x12\n\n\x02pr\x18\x04 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x05 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x06 \x01(\x08\"\"\n\x11RpbCounterGetResp\x12\r\n\x05value\x18\x01 \x01(\x12\"G\n\x1aRpbGetBucketKeyPreflistReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0c\n\x04type\x18\x03 \x01(\x0c\"J\n\x1bRpbGetBucketKeyPreflistResp\x12+\n\x08preflist\x18\x01 \x03(\x0b\x32\x19.RpbBucketKeyPreflistItem\"L\n\x18RpbBucketKeyPreflistItem\x12\x11\n\tpartition\x18\x01 \x02(\x03\x12\x0c\n\x04node\x18\x02 \x02(\x0c\x12\x0f\n\x07primary\x18\x03 \x02(\x08\"x\n\x0eRpbCoverageReq\x12\x0c\n\x04type\x18\x01 \x01(\x0c\x12\x0e\n\x06\x62ucket\x18\x02 \x02(\x0c\x12\x16\n\x0emin_partitions\x18\x03 \x01(\r\x12\x15\n\rreplace_cover\x18\x04 \x01(\x0c\x12\x19\n\x11unavailable_cover\x18\x05 \x03(\x0c\"5\n\x0fRpbCoverageResp\x12\"\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x11.RpbCoverageEntry\"Z\n\x10RpbCoverageEntry\x12\n\n\x02ip\x18\x01 \x02(\x0c\x12\x0c\n\x04port\x18\x02 \x02(\r\x12\x15\n\rkeyspace_desc\x18\x03 \x01(\x0c\x12\x15\n\rcover_context\x18\x04 \x02(\x0c\x42#\n\x17\x63om.basho.riak.protobufB\x08RiakKvPB')
 
 
 
@@ -36,8 +36,8 @@ _RPBINDEXREQ_INDEXQUERYTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1644,
-  serialized_end=1679,
+  serialized_start=1688,
+  serialized_end=1723,
 )
 
 
@@ -874,6 +874,20 @@ _RPBINDEXREQ = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='cover_context', full_name='RpbIndexReq.cover_context', index=14,
+      number=15, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='return_body', full_name='RpbIndexReq.return_body', index=15,
+      number=16, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -885,7 +899,7 @@ _RPBINDEXREQ = _descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=1346,
-  serialized_end=1679,
+  serialized_end=1723,
 )
 
 
@@ -933,8 +947,50 @@ _RPBINDEXRESP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1681,
-  serialized_end=1772,
+  serialized_start=1725,
+  serialized_end=1816,
+)
+
+
+_RPBINDEXBODYRESP = _descriptor.Descriptor(
+  name='RpbIndexBodyResp',
+  full_name='RpbIndexBodyResp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='objects', full_name='RpbIndexBodyResp.objects', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='continuation', full_name='RpbIndexBodyResp.continuation', index=1,
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='done', full_name='RpbIndexBodyResp.done', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=1818,
+  serialized_end=1906,
 )
 
 
@@ -1008,6 +1064,13 @@ _RPBCSBUCKETREQ = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='cover_context', full_name='RpbCSBucketReq.cover_context', index=9,
+      number=10, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -1017,8 +1080,8 @@ _RPBCSBUCKETREQ = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1775,
-  serialized_end=1968,
+  serialized_start=1909,
+  serialized_end=2125,
 )
 
 
@@ -1059,8 +1122,8 @@ _RPBCSBUCKETRESP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1970,
-  serialized_end=2057,
+  serialized_start=2127,
+  serialized_end=2214,
 )
 
 
@@ -1094,8 +1157,8 @@ _RPBINDEXOBJECT = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2059,
-  serialized_end=2117,
+  serialized_start=2216,
+  serialized_end=2274,
 )
 
 
@@ -1192,8 +1255,8 @@ _RPBCONTENT = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2120,
-  serialized_end=2365,
+  serialized_start=2277,
+  serialized_end=2522,
 )
 
 
@@ -1234,8 +1297,8 @@ _RPBLINK = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2367,
-  serialized_end=2418,
+  serialized_start=2524,
+  serialized_end=2575,
 )
 
 
@@ -1304,8 +1367,8 @@ _RPBCOUNTERUPDATEREQ = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2420,
-  serialized_end=2542,
+  serialized_start=2577,
+  serialized_end=2699,
 )
 
 
@@ -1332,8 +1395,8 @@ _RPBCOUNTERUPDATERESP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2544,
-  serialized_end=2581,
+  serialized_start=2701,
+  serialized_end=2738,
 )
 
 
@@ -1395,8 +1458,8 @@ _RPBCOUNTERGETREQ = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2583,
-  serialized_end=2696,
+  serialized_start=2740,
+  serialized_end=2853,
 )
 
 
@@ -1423,8 +1486,8 @@ _RPBCOUNTERGETRESP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2698,
-  serialized_end=2732,
+  serialized_start=2855,
+  serialized_end=2889,
 )
 
 
@@ -1465,8 +1528,8 @@ _RPBGETBUCKETKEYPREFLISTREQ = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2734,
-  serialized_end=2805,
+  serialized_start=2891,
+  serialized_end=2962,
 )
 
 
@@ -1493,8 +1556,8 @@ _RPBGETBUCKETKEYPREFLISTRESP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2807,
-  serialized_end=2881,
+  serialized_start=2964,
+  serialized_end=3038,
 )
 
 
@@ -1535,8 +1598,141 @@ _RPBBUCKETKEYPREFLISTITEM = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2883,
-  serialized_end=2959,
+  serialized_start=3040,
+  serialized_end=3116,
+)
+
+
+_RPBCOVERAGEREQ = _descriptor.Descriptor(
+  name='RpbCoverageReq',
+  full_name='RpbCoverageReq',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='type', full_name='RpbCoverageReq.type', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='bucket', full_name='RpbCoverageReq.bucket', index=1,
+      number=2, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='min_partitions', full_name='RpbCoverageReq.min_partitions', index=2,
+      number=3, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='replace_cover', full_name='RpbCoverageReq.replace_cover', index=3,
+      number=4, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='unavailable_cover', full_name='RpbCoverageReq.unavailable_cover', index=4,
+      number=5, type=12, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=3118,
+  serialized_end=3238,
+)
+
+
+_RPBCOVERAGERESP = _descriptor.Descriptor(
+  name='RpbCoverageResp',
+  full_name='RpbCoverageResp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='entries', full_name='RpbCoverageResp.entries', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=3240,
+  serialized_end=3293,
+)
+
+
+_RPBCOVERAGEENTRY = _descriptor.Descriptor(
+  name='RpbCoverageEntry',
+  full_name='RpbCoverageEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='ip', full_name='RpbCoverageEntry.ip', index=0,
+      number=1, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='port', full_name='RpbCoverageEntry.port', index=1,
+      number=2, type=13, cpp_type=3, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='keyspace_desc', full_name='RpbCoverageEntry.keyspace_desc', index=2,
+      number=3, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='cover_context', full_name='RpbCoverageEntry.cover_context', index=3,
+      number=4, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=3295,
+  serialized_end=3385,
 )
 
 _RPBGETRESP.fields_by_name['content'].message_type = _RPBCONTENT
@@ -1544,13 +1740,15 @@ _RPBPUTREQ.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBPUTRESP.fields_by_name['content'].message_type = _RPBCONTENT
 _RPBINDEXREQ.fields_by_name['qtype'].enum_type = _RPBINDEXREQ_INDEXQUERYTYPE
 _RPBINDEXREQ_INDEXQUERYTYPE.containing_type = _RPBINDEXREQ;
-_RPBINDEXRESP.fields_by_name['results'].message_type = riak.riak_pb.riak_pb2._RPBPAIR
+_RPBINDEXRESP.fields_by_name['results'].message_type = riak.pb.riak_pb2._RPBPAIR
+_RPBINDEXBODYRESP.fields_by_name['objects'].message_type = _RPBINDEXOBJECT
 _RPBCSBUCKETRESP.fields_by_name['objects'].message_type = _RPBINDEXOBJECT
 _RPBINDEXOBJECT.fields_by_name['object'].message_type = _RPBGETRESP
 _RPBCONTENT.fields_by_name['links'].message_type = _RPBLINK
-_RPBCONTENT.fields_by_name['usermeta'].message_type = riak.riak_pb.riak_pb2._RPBPAIR
-_RPBCONTENT.fields_by_name['indexes'].message_type = riak.riak_pb.riak_pb2._RPBPAIR
+_RPBCONTENT.fields_by_name['usermeta'].message_type = riak.pb.riak_pb2._RPBPAIR
+_RPBCONTENT.fields_by_name['indexes'].message_type = riak.pb.riak_pb2._RPBPAIR
 _RPBGETBUCKETKEYPREFLISTRESP.fields_by_name['preflist'].message_type = _RPBBUCKETKEYPREFLISTITEM
+_RPBCOVERAGERESP.fields_by_name['entries'].message_type = _RPBCOVERAGEENTRY
 DESCRIPTOR.message_types_by_name['RpbGetClientIdResp'] = _RPBGETCLIENTIDRESP
 DESCRIPTOR.message_types_by_name['RpbSetClientIdReq'] = _RPBSETCLIENTIDREQ
 DESCRIPTOR.message_types_by_name['RpbGetReq'] = _RPBGETREQ
@@ -1566,6 +1764,7 @@ DESCRIPTOR.message_types_by_name['RpbMapRedReq'] = _RPBMAPREDREQ
 DESCRIPTOR.message_types_by_name['RpbMapRedResp'] = _RPBMAPREDRESP
 DESCRIPTOR.message_types_by_name['RpbIndexReq'] = _RPBINDEXREQ
 DESCRIPTOR.message_types_by_name['RpbIndexResp'] = _RPBINDEXRESP
+DESCRIPTOR.message_types_by_name['RpbIndexBodyResp'] = _RPBINDEXBODYRESP
 DESCRIPTOR.message_types_by_name['RpbCSBucketReq'] = _RPBCSBUCKETREQ
 DESCRIPTOR.message_types_by_name['RpbCSBucketResp'] = _RPBCSBUCKETRESP
 DESCRIPTOR.message_types_by_name['RpbIndexObject'] = _RPBINDEXOBJECT
@@ -1578,6 +1777,9 @@ DESCRIPTOR.message_types_by_name['RpbCounterGetResp'] = _RPBCOUNTERGETRESP
 DESCRIPTOR.message_types_by_name['RpbGetBucketKeyPreflistReq'] = _RPBGETBUCKETKEYPREFLISTREQ
 DESCRIPTOR.message_types_by_name['RpbGetBucketKeyPreflistResp'] = _RPBGETBUCKETKEYPREFLISTRESP
 DESCRIPTOR.message_types_by_name['RpbBucketKeyPreflistItem'] = _RPBBUCKETKEYPREFLISTITEM
+DESCRIPTOR.message_types_by_name['RpbCoverageReq'] = _RPBCOVERAGEREQ
+DESCRIPTOR.message_types_by_name['RpbCoverageResp'] = _RPBCOVERAGERESP
+DESCRIPTOR.message_types_by_name['RpbCoverageEntry'] = _RPBCOVERAGEENTRY
 
 @add_metaclass(_reflection.GeneratedProtocolMessageType)
 class RpbGetClientIdResp(_message.Message):
@@ -1670,6 +1872,12 @@ class RpbIndexResp(_message.Message):
   # @@protoc_insertion_point(class_scope:RpbIndexResp)
 
 @add_metaclass(_reflection.GeneratedProtocolMessageType)
+class RpbIndexBodyResp(_message.Message):
+  DESCRIPTOR = _RPBINDEXBODYRESP
+
+  # @@protoc_insertion_point(class_scope:RpbIndexBodyResp)
+
+@add_metaclass(_reflection.GeneratedProtocolMessageType)
 class RpbCSBucketReq(_message.Message):
   DESCRIPTOR = _RPBCSBUCKETREQ
 
@@ -1740,6 +1948,24 @@ class RpbBucketKeyPreflistItem(_message.Message):
   DESCRIPTOR = _RPBBUCKETKEYPREFLISTITEM
 
   # @@protoc_insertion_point(class_scope:RpbBucketKeyPreflistItem)
+
+@add_metaclass(_reflection.GeneratedProtocolMessageType)
+class RpbCoverageReq(_message.Message):
+  DESCRIPTOR = _RPBCOVERAGEREQ
+
+  # @@protoc_insertion_point(class_scope:RpbCoverageReq)
+
+@add_metaclass(_reflection.GeneratedProtocolMessageType)
+class RpbCoverageResp(_message.Message):
+  DESCRIPTOR = _RPBCOVERAGERESP
+
+  # @@protoc_insertion_point(class_scope:RpbCoverageResp)
+
+@add_metaclass(_reflection.GeneratedProtocolMessageType)
+class RpbCoverageEntry(_message.Message):
+  DESCRIPTOR = _RPBCOVERAGEENTRY
+
+  # @@protoc_insertion_point(class_scope:RpbCoverageEntry)
 
 
 DESCRIPTOR.has_options = True

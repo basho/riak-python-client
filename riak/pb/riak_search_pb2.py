@@ -9,7 +9,7 @@ from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 
-import riak.riak_pb.riak_pb2
+import riak.pb.riak_pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -180,7 +180,7 @@ _RPBSEARCHQUERYRESP = _descriptor.Descriptor(
   serialized_end=322,
 )
 
-_RPBSEARCHDOC.fields_by_name['fields'].message_type = riak.riak_pb.riak_pb2._RPBPAIR
+_RPBSEARCHDOC.fields_by_name['fields'].message_type = riak.pb.riak_pb2._RPBPAIR
 _RPBSEARCHQUERYRESP.fields_by_name['docs'].message_type = _RPBSEARCHDOC
 DESCRIPTOR.message_types_by_name['RpbSearchDoc'] = _RPBSEARCHDOC
 DESCRIPTOR.message_types_by_name['RpbSearchQueryReq'] = _RPBSEARCHQUERYREQ
