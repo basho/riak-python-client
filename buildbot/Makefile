@@ -16,8 +16,8 @@ compile:
 
 lint:
 	@pip install --upgrade pep8 flake8
-	@cd ..; pep8 --exclude=riak_pb riak *.py
-	@cd ..; flake8 --exclude=riak_pb riak *.py
+	@cd ..; pep8 --exclude=riak/pb riak *.py
+	@cd ..; flake8 --exclude=riak/pb riak *.py
 	@openssl verify -CAfile ${CERTS_DIR}/ca.crt ${CERTS_DIR}/client.crt
 	@openssl verify -CAfile ${CERTS_DIR}/ca.crt ${CERTS_DIR}/server.crt
 

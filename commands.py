@@ -4,7 +4,6 @@ import os.path
 import re
 import shutil
 
-from datetime import date
 from distutils.core import Command
 from distutils.errors import DistutilsOptionError
 from distutils.file_util import write_file
