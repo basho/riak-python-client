@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-import os
-import sys
+import platform
 from setuptools import setup, find_packages
 from version import get_version
 from commands import preconfigure, configure, create_bucket_types, \
@@ -8,33 +7,23 @@ from commands import preconfigure, configure, create_bucket_types, \
 
 install_requires = ['six >= 1.8.0']
 requires = ['six(>=1.8.0)']
-if sys.version_info < (2, 7, 9):
+if platform.python_version() < '2.7.9':
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
 
-riak_pb_in_pythonpath = False
-os_env_pythonpath = os.environ.get('PYTHONPATH')
-if os_env_pythonpath is not None:
-    for ppath in os_env_pythonpath.split(os.pathsep):
-        if ppath.find('riak_pb/python/lib') != -1:
-            riak_pb_messages = os.path.join(ppath, 'riak_pb', 'messages.py')
-            if os.path.exists(riak_pb_messages):
-                riak_pb_in_pythonpath = True
-                break
-
-if riak_pb_in_pythonpath:
-    install_requires.append("protobuf ==2.6.1")
-    requires.append("protobuf(==2.6.1)")
+if platform.python_version() < '3.0':
+    install_requires.append('protobuf >=2.4.1, <2.7.0')
+    requires.append('protobuf(>=2.4.1,<2.7.0)')
+    install_requires.append("riak_pb >=2.0.0")
+    requires.append("riak_pb(>=2.0.0)")
 else:
-    if sys.version_info < (3, ):
-        install_requires.append("riak_pb >=2.0.0")
-        requires.append("riak_pb(>=2.0.0)")
-    else:
-        install_requires.append("python3_riak_pb >=2.0.0")
-        requires.append("python3_riak_pb(>=2.0.0)")
+    install_requires.append('python3_protobuf >=2.4.1, <2.6.0')
+    requires.append('python3_protobuf(>=2.4.1,<2.6.0)')
+    install_requires.append("python3_riak_pb >=2.0.0")
+    requires.append("python3_riak_pb(>=2.0.0)")
 
 tests_require = []
-if sys.version_info < (2, 7):
+if platform.python_version() < '2.7.0':
     tests_require.append("unittest2")
 
 setup(
