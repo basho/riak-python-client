@@ -6,12 +6,12 @@ pb_clean:
 	@echo "==> Python (clean)"
 	@rm -rf riak/pb/*_pb2.py riak/pb/*.pyc riak/pb/__pycache__ __pycache__ py-build
 
-pb_compile:
-	echo "==> Python (compile)"
-	protoc -Iriak_pb/src --python_out=riak/pb riak_pb/src/*.proto
-	python setup.py build_messages
+pb_compile: pb_clean
+	@echo "==> Python (compile)"
+	@protoc -Iriak_pb/src --python_out=riak/pb riak_pb/src/*.proto
+	@python setup.py build_messages
 
-pb_build: pb_clean pb_compile
+pb_build: pb_compile
 	@echo "==> Python 2.7 (build)"
 	@python2.7 setup.py build --build-base=py-build/2.7
 	@echo "==> Python 3.3 (build)"

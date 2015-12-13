@@ -67,7 +67,7 @@ do
     then
         declare -i pymaj="${pyver%.*}"
         declare -i pymin="${pyver#*.}"
-        pyver_latest="$(pyenv install --list | grep -E "^[[:space:]]+$pymaj\\.$pymin\\.[[:digit:]]\$" | tail -n1 | sed -e 's/[[:space:]]//g')"
+        pyver_latest="$(pyenv install --list | grep -E "^[[:space:]]+$pymaj\\.$pymin\\.[[:digit:]]+\$" | tail -n1 | sed -e 's/[[:space:]]//g')"
 
         echo "[INFO] installing Python $pyver_latest"
         riak_pyver="riak_$pyver_latest"
