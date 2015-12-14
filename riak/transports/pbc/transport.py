@@ -1,6 +1,8 @@
 import riak.pb.messages
 import riak.pb.riak_pb2
 import riak.pb.riak_kv_pb2
+import riak.pb.riak_ts_pb2
+
 from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
@@ -14,7 +16,6 @@ from riak.transports.pbc.stream import (RiakPbcKeyStream,
                                         RiakPbcTsKeyStream)
 from riak.transports.pbc.codec import RiakPbcCodec
 from six import PY2, PY3
-
 
 
 class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
@@ -173,22 +174,24 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         return robj
 
     def ts_get(self, table, key):
-        req = riak_pb.TsGetReq()
+        req = riak.pb.riak_ts_pb2.TsGetReq()
         self._encode_timeseries_keyreq(table, key, req)
 
-        msg_code, ts_get_resp = self._request(MSG_CODE_TS_GET_REQ, req,
-                                              MSG_CODE_TS_GET_RESP)
+        msg_code, ts_get_resp = self._request(
+            riak.pb.messages.MSG_CODE_TS_GET_REQ, req,
+            riak.pb.messages.MSG_CODE_TS_GET_RESP)
 
         tsobj = TsObject(self._client, table, [], None)
         self._decode_timeseries(ts_get_resp, tsobj)
         return tsobj
 
     def ts_put(self, tsobj):
-        req = riak_pb.TsPutReq()
+        req = riak.pb.riak_ts_pb2.TsPutReq()
         self._encode_timeseries_put(tsobj, req)
 
-        msg_code, resp = self._request(MSG_CODE_TS_PUT_REQ, req,
-                                       MSG_CODE_TS_PUT_RESP)
+        msg_code, resp = self._request(
+            riak.pb.messages.MSG_CODE_TS_PUT_REQ, req,
+            riak.pb.messages.MSG_CODE_TS_PUT_RESP)
 
         if resp is not None:
             return True
@@ -196,11 +199,12 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             raise RiakError("missing response object")
 
     def ts_delete(self, table, key):
-        req = riak_pb.TsDelReq()
+        req = riak.pb.riak_ts_pb2.TsDelReq()
         self._encode_timeseries_keyreq(table, key, req)
 
-        msg_code, ts_del_resp = self._request(MSG_CODE_TS_DEL_REQ, req,
-                                              MSG_CODE_TS_DEL_RESP)
+        msg_code, ts_del_resp = self._request(
+            riak.pb.messages.MSG_CODE_TS_DEL_REQ, req,
+            riak.pb.messages.MSG_CODE_TS_DEL_RESP)
 
         if ts_del_resp is not None:
             return True
@@ -208,11 +212,12 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             raise RiakError("missing response object")
 
     def ts_query(self, table, query, interpolations=None):
-        req = riak_pb.TsQueryReq()
+        req = riak.pb.riak_ts_pb2.TsQueryReq()
         req.query.base = str_to_bytes(query)
 
-        msg_code, ts_query_resp = self._request(MSG_CODE_TS_QUERY_REQ, req,
-                                                MSG_CODE_TS_QUERY_RESP)
+        msg_code, ts_query_resp = self._request(
+            riak.pb.messages.MSG_CODE_TS_QUERY_REQ, req,
+            riak.pb.messages.MSG_CODE_TS_QUERY_RESP)
 
         tsobj = TsObject(self._client, table, [], [])
         self._decode_timeseries(ts_query_resp, tsobj)
@@ -223,13 +228,13 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         Streams keys from a timeseries table, returning an iterator that
         yields lists of keys.
         """
-        req = riak_pb.TsListKeysReq()
+        req = riak.pb.riak_ts_pb2.TsListKeysReq()
         t = None
         if self.client_timeouts() and timeout:
             t = timeout
         self._encode_timeseries_listkeysreq(table, req, t)
 
-        self._send_msg(MSG_CODE_TS_LIST_KEYS_REQ, req)
+        self._send_msg(riak.pb.messages.MSG_CODE_TS_LIST_KEYS_REQ, req)
 
         return RiakPbcTsKeyStream(self)
 

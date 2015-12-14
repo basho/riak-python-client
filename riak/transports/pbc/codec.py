@@ -2,6 +2,7 @@ import riak.pb
 import riak.pb.riak_pb2
 import riak.pb.riak_dt_pb2
 import riak.pb.riak_kv_pb2
+import riak.pb.riak_ts_pb2
 import logging
 import datetime
 
@@ -9,6 +10,7 @@ from riak import RiakError
 from riak.content import RiakContent
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str
 from riak.multidict import MultiDict
+from riak.pb.riak_ts_pb2 import TsColumnType
 
 from six import string_types, PY2
 
@@ -677,7 +679,7 @@ class RiakPbcCodec(object):
         :param tsobj: a TsObject
         :type tsobj: TsObject
         :param req: the protobuf message to fill
-        :type req: riak_pb.TsPutReq
+        :type req: riak.pb.riak_ts_pb2.TsPutReq
         """
         req.table = str_to_bytes(tsobj.table.name)
 
@@ -686,11 +688,11 @@ class RiakPbcCodec(object):
 
         if tsobj.rows and isinstance(tsobj.rows, list):
             for row in tsobj.rows:
-                tsr = req.rows.add()  # NB: type riak_pb.TsRow
+                tsr = req.rows.add()  # NB: type TsRow
                 if not isinstance(row, list):
                     raise ValueError("TsObject row must be a list of values")
                 for cell in row:
-                    tsc = tsr.cells.add()  # NB: type riak_pb.TsCell
+                    tsc = tsr.cells.add() # NB: type TsCell
                     self._encode_to_ts_cell(cell, tsc)
         else:
             raise RiakError("TsObject requires a list of rows")
@@ -701,7 +703,7 @@ class RiakPbcCodec(object):
         metadata from a TsQueryResp.
 
         :param resp: the protobuf message from which to process data
-        :type resp: riak_pb.TsQueryRsp or riak_pb.TsGetResp
+        :type resp: riak.pb.TsQueryRsp or riak.pb.riak_ts_pb2.TsGetResp
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
@@ -721,7 +723,7 @@ class RiakPbcCodec(object):
         Decodes a TsRow into a list
 
         :param tsrow: the protobuf TsRow to decode.
-        :type tsrow: riak_pb.TsRow
+        :type tsrow: riak.pb.riak_ts_pb2.TsRow
         :param tscols: the protobuf TsColumn data to help decode.
         :type tscols: list
         :rtype list
@@ -732,29 +734,29 @@ class RiakPbcCodec(object):
             if tscols is not None:
                 col = tscols[i]
             if cell.HasField('varchar_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('VARCHAR'):
+                if col and col.type != TsColumnType.Value('VARCHAR'):
                     raise TypeError('expected VARCHAR column')
                 else:
                     row.append(bytes_to_str(cell.varchar_value))
             elif cell.HasField('sint64_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('SINT64'):
+                if col and col.type != TsColumnType.Value('SINT64'):
                     raise TypeError('expected SINT64 column')
                 else:
                     row.append(cell.sint64_value)
             elif cell.HasField('double_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('DOUBLE'):
+                if col and col.type != TsColumnType.Value('DOUBLE'):
                     raise TypeError('expected DOUBLE column')
                 else:
                     row.append(cell.double_value)
             elif cell.HasField('timestamp_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('TIMESTAMP'):
+                if col and col.type != TsColumnType.Value('TIMESTAMP'):
                     raise TypeError('expected TIMESTAMP column')
                 else:
                     dt = self._datetime_from_unix_time_millis(
                         cell.timestamp_value)
                     row.append(dt)
             elif cell.HasField('boolean_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('BOOLEAN'):
+                if col and col.type != TsColumnType.Value('BOOLEAN'):
                     raise TypeError('expected BOOLEAN column')
                 else:
                     row.append(cell.boolean_value)

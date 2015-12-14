@@ -55,7 +55,14 @@ then
     eval "$(pyenv virtualenv-init -)"
 fi
 
-# Now install (allthethings) versions for testing
+# 2.7.8 is special case
+if ! pyenv versions | fgrep -q 'riak_2.7.8'
+then
+    echo "[INFO] installing Python 2.7.8"
+    VERSION_ALIAS='riak_2.7.8' pyenv install '2.7.8'
+    pyenv virtualenv 'riak_2.7.8' 'riak-py278'
+fi
+
 for pyver in 2.7 3.3 3.4 3.5
 do
     if ! pyenv versions | fgrep "riak_$pyver"
@@ -71,7 +78,7 @@ do
     fi
 done
 
-(cd $PROJDIR && pyenv local riak-py35 riak-py34 riak-py33 riak-py27)
+(cd $PROJDIR && pyenv local riak-py35 riak-py34 riak-py33 riak-py27 riak-py278)
 
 pyenv versions
 

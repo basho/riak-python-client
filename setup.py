@@ -4,7 +4,7 @@ import platform
 from setuptools import setup, find_packages
 from version import get_version
 from commands import preconfigure, configure, create_bucket_types, \
-    setup_security, enable_security, disable_security, setup_timeseries
+    setup_security, enable_security, disable_security, setup_timeseries, \
     build_messages
 
 install_requires = ['six >= 1.8.0']

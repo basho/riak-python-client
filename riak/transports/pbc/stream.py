@@ -166,7 +166,7 @@ class RiakPbcTsKeyStream(RiakPbcStream, RiakPbcCodec):
     Used internally by RiakPbcTransport to implement key-list streams.
     """
 
-    _expect = MSG_CODE_TS_LIST_KEYS_RESP
+    _expect = riak.pb.messages.MSG_CODE_TS_LIST_KEYS_RESP
 
     def next(self):
         response = super(RiakPbcTsKeyStream, self).next()
