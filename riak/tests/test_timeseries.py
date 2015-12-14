@@ -59,7 +59,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
     def test_encode_data_for_put(self):
         tsobj = TsObject(None, self.table, self.rows, None)
-        ts_put_req = riak.pb.riak_pb_ts2.TsPutReq()
+        ts_put_req = riak.pb.riak_ts_pb2.TsPutReq()
         self.c._encode_timeseries_put(tsobj, ts_put_req)
 
         # NB: expected, actual
@@ -83,20 +83,20 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
 
     def test_encode_data_for_listkeys(self):
-        req = riak.pb.riak_pb_ts2.TsListKeysReq()
+        req = riak.pb.riak_ts_pb2.TsListKeysReq()
         self.c._encode_timeseries_listkeysreq(self.table, req, 1234)
         self.assertEqual(self.table.name, bytes_to_str(req.table))
         self.assertEqual(1234, req.timeout)
 
     def test_decode_data_from_query(self):
-        tqr = riak.pb.riak_pb_ts2.TsQueryResp()
+        tqr = riak.pb.riak_ts_pb2.TsQueryResp()
 
         c0 = tqr.columns.add()
         c0.name = str_to_bytes('col_varchar')
-        c0.type = riak.pb.riak_pb_ts2.TsColumnType.Value('VARCHAR')
+        c0.type = TsColumnType.Value('VARCHAR')
         c1 = tqr.columns.add()
         c1.name = str_to_bytes('col_integer')
-        c1.type = riak.pb.riak_pb_ts2.TsColumnType.Value('SINT64')
+        c1.type = TsColumnType.Value('SINT64')
         c2 = tqr.columns.add()
         c2.name = str_to_bytes('col_double')
         c2.type = TsColumnType.Value('DOUBLE')
@@ -288,9 +288,8 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 self.assertEqual(len(key), 3)
                 self.assertEqual('hash1', key[0])
                 self.assertEqual('user2', key[1])
-                # TODO RTS-367 ENABLE
-                # self.assertIsInstance(key[2], datetime.datetime)
-        self.assertEqual(len(streamed_keys), 5)
+                self.assertIsInstance(key[2], datetime.datetime)
+        self.assertGreater(len(streamed_keys), 0)
 
     def test_delete_single_value(self):
         key = ['hash1', 'user2', self.twentyFiveMinsAgo]
