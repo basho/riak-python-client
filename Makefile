@@ -31,7 +31,7 @@ ifdef RELEASE_GPG_KEYNAME
 	@echo "==> Python 3.4 (release)"
 	@python3.4 setup.py build --build-base=py-build/3.4 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.5 (release)"
-	@python3.5 setup.py build --build-base=py-build/3.5 sdist upload -s -i $(RELEASE_GPG_KEYNAME)
+	@python3.5 setup.py build --build-base=py-build/3.5 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
 else
 $(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
