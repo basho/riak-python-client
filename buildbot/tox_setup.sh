@@ -8,7 +8,7 @@ fi
 declare -r PROJDIR="$PWD/.."
 if [[ ! -s $PROJDIR/riak/__init__.py ]]
 then
-    echo "[ERROR] script must be run from the root of a clone of github.com/basho/riak-python-client" 1>&2
+    echo "[ERROR] script must be run from the buildbot/ dir in github.com/basho/riak-python-client" 1>&2
     exit 1
 fi
 
