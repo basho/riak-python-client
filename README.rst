@@ -17,9 +17,7 @@ Install
 =======
 
 The recommended versions of Python for use with this client are Python
-`2.7.x` and `3.3/3.4`.
-
-From the Riak Python Client root directory, execute
+`2.7.x`, `3.3.x`, `3.4.x` and `3.5.x`.
 
 From Source
 -----------
@@ -28,7 +26,7 @@ From Source
 
     python setup.py install
 
-There is an additional dependency on the Python package `setuptools`.
+There are additional dependencies on Python packages `setuptools` and `protobuf`.
 
 From PyPI
 ---------
@@ -64,16 +62,14 @@ variable to the root of your Riak installation.  Then from the
 
 .. code-block:: console
 
-   cd buildbot
-   make preconfigure
+   make -C buildbot preconfigure
 
-Start your Riak node with ``riak start`` from the the Riak directory,
-then back in ``buildbot`` type
+Start your Riak node with ``riak start`` from the the Riak directory, then 
 
 .. code-block:: console
 
-   make configure
-   make test
+   make -C buildbot configure
+   make -C buildbot test
 
 That will run the test suite twice: once with security enabled and once
 without.

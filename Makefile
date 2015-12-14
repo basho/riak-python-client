@@ -21,7 +21,8 @@ pb_build: pb_compile
 	@echo "==> Python 3.5 (build)"
 	@python3.5 setup.py build --build-base=py-build/3.5
 
-release: pb_build
+
+release:
 ifdef RELEASE_GPG_KEYNAME
 	@echo "==> Python 2.7 (release)"
 	@python2.7 setup.py build --build-base=py-build/2.7 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
