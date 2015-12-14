@@ -1,34 +1,15 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-Copyright 2010 Rusty Klophaus <rusty@basho.com>
-Copyright 2010 Justin Sheehy <justin@basho.com>
-Copyright 2009 Jay Baird <jay@mochimedia.com>
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import riak_pb
 from riak import RiakError
 from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
+from riak.ts_object import TsObject
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str
 from riak.transports.pbc.connection import RiakPbcConnection
 from riak.transports.pbc.stream import (RiakPbcKeyStream,
                                         RiakPbcMapredStream,
                                         RiakPbcBucketStream,
-                                        RiakPbcIndexStream)
+                                        RiakPbcIndexStream,
+                                        RiakPbcTsKeyStream)
 from riak.transports.pbc.codec import RiakPbcCodec
 from six import PY2, PY3
 
@@ -79,7 +60,16 @@ from riak_pb.messages import (
     MSG_CODE_DT_FETCH_REQ,
     MSG_CODE_DT_FETCH_RESP,
     MSG_CODE_DT_UPDATE_REQ,
-    MSG_CODE_DT_UPDATE_RESP
+    MSG_CODE_DT_UPDATE_RESP,
+    MSG_CODE_TS_PUT_REQ,
+    MSG_CODE_TS_PUT_RESP,
+    MSG_CODE_TS_QUERY_REQ,
+    MSG_CODE_TS_QUERY_RESP,
+    MSG_CODE_TS_LIST_KEYS_REQ,
+    MSG_CODE_TS_GET_REQ,
+    MSG_CODE_TS_GET_RESP,
+    MSG_CODE_TS_DEL_REQ,
+    MSG_CODE_TS_DEL_RESP
 )
 
 
@@ -232,6 +222,67 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
             raise RiakError("missing response object")
 
         return robj
+
+    def ts_get(self, table, key):
+        req = riak_pb.TsGetReq()
+        self._encode_timeseries_keyreq(table, key, req)
+
+        msg_code, ts_get_resp = self._request(MSG_CODE_TS_GET_REQ, req,
+                                              MSG_CODE_TS_GET_RESP)
+
+        tsobj = TsObject(self._client, table, [], None)
+        self._decode_timeseries(ts_get_resp, tsobj)
+        return tsobj
+
+    def ts_put(self, tsobj):
+        req = riak_pb.TsPutReq()
+        self._encode_timeseries_put(tsobj, req)
+
+        msg_code, resp = self._request(MSG_CODE_TS_PUT_REQ, req,
+                                       MSG_CODE_TS_PUT_RESP)
+
+        if resp is not None:
+            return True
+        else:
+            raise RiakError("missing response object")
+
+    def ts_delete(self, table, key):
+        req = riak_pb.TsDelReq()
+        self._encode_timeseries_keyreq(table, key, req)
+
+        msg_code, ts_del_resp = self._request(MSG_CODE_TS_DEL_REQ, req,
+                                              MSG_CODE_TS_DEL_RESP)
+
+        if ts_del_resp is not None:
+            return True
+        else:
+            raise RiakError("missing response object")
+
+    def ts_query(self, table, query, interpolations=None):
+        req = riak_pb.TsQueryReq()
+        req.query.base = str_to_bytes(query)
+
+        msg_code, ts_query_resp = self._request(MSG_CODE_TS_QUERY_REQ, req,
+                                                MSG_CODE_TS_QUERY_RESP)
+
+        tsobj = TsObject(self._client, table, [], [])
+        self._decode_timeseries(ts_query_resp, tsobj)
+        return tsobj
+
+    def ts_stream_keys(self, table, timeout=None):
+        """
+        Streams keys from a timeseries table, returning an iterator that
+        yields lists of keys.
+        """
+        req = riak_pb.TsListKeysReq()
+        t = None
+        if self.client_timeouts() and timeout:
+            t = timeout
+        self._encode_timeseries_listkeysreq(table, req, t)
+
+        self._send_msg(MSG_CODE_TS_LIST_KEYS_REQ, req)
+
+        return RiakPbcTsKeyStream(self)
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):

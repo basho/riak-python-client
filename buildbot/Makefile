@@ -26,12 +26,19 @@ test: setup test_normal test_security
 test_normal:
 	@echo "Testing Riak Python Client (without security)"
 	@../setup.py disable_security --riak-admin=${RIAK_ADMIN}
-	@RUN_YZ=1 SKIP_DATATYPES=0 SKIP_INDEXES=0 ./tox_runner.sh ..
+	@RIAK_TEST_PROTOCOL='pbc' RUN_YZ=1 RUN_DATATYPES=1 RUN_INDEXES=1 ./tox_runner.sh ..
+	@RIAK_TEST_PROTOCOL='http' RUN_YZ=1 RUN_DATATYPES=1 RUN_INDEXES=1 ./tox_runner.sh ..
 
 test_security:
 	@echo "Testing Riak Python Client (with security)"
 	@../setup.py enable_security --riak-admin=${RIAK_ADMIN}
-	@RUN_YZ=1 SKIP_INDEXES=0 RUN_SECURITY=1 SKIP_POOL=1 SKIP_RESOLVE=1 RIAK_TEST_HTTP_PORT=18098 ./tox_runner.sh ..
+	@RIAK_TEST_PROTOCOL='pbc' RUN_YZ=1 RUN_INDEXES=1 RUN_SECURITY=1 RUN_POOL=0 RUN_RESOLVE=0 ./tox_runner.sh ..
+	@RIAK_TEST_PROTOCOL='http' RUN_YZ=1 RUN_INDEXES=1 RUN_SECURITY=1 RUN_POOL=0 RUN_RESOLVE=0 RIAK_TEST_HTTP_PORT=18098 ./tox_runner.sh ..
+
+test_timeseries:
+	@echo "Testing Riak Python Client (timeseries)"
+	@../setup.py disable_security --riak-admin=${RIAK_ADMIN}
+	@RIAK_TEST_PROTOCOL='pbc' RUN_YZ=0 RUN_DATATYPES=0 RUN_INDEXES=1 RUN_TIMESERIES=1 ./tox_runner.sh ..
 
 # These are required to actually build all the Python versions:
 # * pip install tox
