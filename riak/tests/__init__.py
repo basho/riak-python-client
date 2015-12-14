@@ -12,7 +12,7 @@ if USE_TEST_SERVER:
     test_server.start()
 
 try:
-    __import__('riak.riak_pb')
+    __import__('riak.pb')
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
