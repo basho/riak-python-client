@@ -2,6 +2,8 @@ import riak.pb
 import riak.pb.riak_pb2
 import riak.pb.riak_dt_pb2
 import riak.pb.riak_kv_pb2
+import logging
+import datetime
 
 from riak import RiakError
 from riak.content import RiakContent
@@ -9,6 +11,8 @@ from riak.util import decode_index_value, str_to_bytes, bytes_to_str
 from riak.multidict import MultiDict
 
 from six import string_types, PY2
+
+epoch = datetime.datetime.utcfromtimestamp(0)
 
 
 def _invert(d):
@@ -76,6 +80,19 @@ class RiakPbcCodec(object):
         if riak.pb is None:
             raise NotImplementedError("this transport is not available")
         super(RiakPbcCodec, self).__init__(**unused_args)
+
+    def _unix_time_millis(self, dt):
+        td = dt - epoch
+        try:
+            return int(dt.total_seconds() * 1000.0)
+        except AttributeError:
+            # NB: python 2.6 must use this method
+            return int(((td.microseconds +
+                         (td.seconds + td.days * 24 * 3600) * 10**6) /
+                        10**6) * 1000.0)
+
+    def _datetime_from_unix_time_millis(self, ut):
+        return datetime.datetime.utcfromtimestamp(ut / 1000.0)
 
     def _encode_quorum(self, rw):
         """
@@ -614,6 +631,136 @@ class RiakPbcCodec(object):
                 msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.ENABLE
             else:
                 msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.DISABLE
+
+    def _encode_to_ts_cell(self, cell, ts_cell):
+        if cell is not None:
+            if isinstance(cell, datetime.datetime):
+                ts_cell.timestamp_value = self._unix_time_millis(cell)
+            elif isinstance(cell, bool):
+                ts_cell.boolean_value = cell
+            elif isinstance(cell, string_types):
+                logging.debug("cell -> str: '%s'", cell)
+                ts_cell.varchar_value = str_to_bytes(cell)
+            elif (isinstance(cell, int) or
+                 (PY2 and isinstance(cell, long))):  # noqa
+                logging.debug("cell -> int/long: '%s'", cell)
+                ts_cell.sint64_value = cell
+            elif isinstance(cell, float):
+                ts_cell.double_value = cell
+            else:
+                t = type(cell)
+                raise RiakError("can't serialize type '{}', value '{}'"
+                                .format(t, cell))
+
+    def _encode_timeseries_keyreq(self, table, key, req):
+        key_vals = None
+        if isinstance(key, list):
+            key_vals = key
+        else:
+            raise ValueError("key must be a list")
+
+        req.table = str_to_bytes(table.name)
+        for cell in key_vals:
+            ts_cell = req.key.add()
+            self._encode_to_ts_cell(cell, ts_cell)
+
+    def _encode_timeseries_listkeysreq(self, table, req, timeout=None):
+        req.table = str_to_bytes(table.name)
+        if timeout:
+            req.timeout = timeout
+
+    def _encode_timeseries_put(self, tsobj, req):
+        """
+        Fills an TsPutReq message with the appropriate data and
+        metadata from a TsObject.
+
+        :param tsobj: a TsObject
+        :type tsobj: TsObject
+        :param req: the protobuf message to fill
+        :type req: riak_pb.TsPutReq
+        """
+        req.table = str_to_bytes(tsobj.table.name)
+
+        if tsobj.columns:
+            raise NotImplementedError("columns are not implemented yet")
+
+        if tsobj.rows and isinstance(tsobj.rows, list):
+            for row in tsobj.rows:
+                tsr = req.rows.add()  # NB: type riak_pb.TsRow
+                if not isinstance(row, list):
+                    raise ValueError("TsObject row must be a list of values")
+                for cell in row:
+                    tsc = tsr.cells.add()  # NB: type riak_pb.TsCell
+                    self._encode_to_ts_cell(cell, tsc)
+        else:
+            raise RiakError("TsObject requires a list of rows")
+
+    def _decode_timeseries(self, resp, tsobj):
+        """
+        Fills an TsObject with the appropriate data and
+        metadata from a TsQueryResp.
+
+        :param resp: the protobuf message from which to process data
+        :type resp: riak_pb.TsQueryRsp or riak_pb.TsGetResp
+        :param tsobj: a TsObject
+        :type tsobj: TsObject
+        """
+        if tsobj.columns is not None:
+            for col in resp.columns:
+                col_name = bytes_to_str(col.name)
+                col_type = col.type
+                col = (col_name, col_type)
+                tsobj.columns.append(col)
+
+        for row in resp.rows:
+            tsobj.rows.append(
+                self._decode_timeseries_row(row, resp.columns))
+
+    def _decode_timeseries_row(self, tsrow, tscols=None):
+        """
+        Decodes a TsRow into a list
+
+        :param tsrow: the protobuf TsRow to decode.
+        :type tsrow: riak_pb.TsRow
+        :param tscols: the protobuf TsColumn data to help decode.
+        :type tscols: list
+        :rtype list
+        """
+        row = []
+        for i, cell in enumerate(tsrow.cells):
+            col = None
+            if tscols is not None:
+                col = tscols[i]
+            if cell.HasField('varchar_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('VARCHAR'):
+                    raise TypeError('expected VARCHAR column')
+                else:
+                    row.append(bytes_to_str(cell.varchar_value))
+            elif cell.HasField('sint64_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('SINT64'):
+                    raise TypeError('expected SINT64 column')
+                else:
+                    row.append(cell.sint64_value)
+            elif cell.HasField('double_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('DOUBLE'):
+                    raise TypeError('expected DOUBLE column')
+                else:
+                    row.append(cell.double_value)
+            elif cell.HasField('timestamp_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('TIMESTAMP'):
+                    raise TypeError('expected TIMESTAMP column')
+                else:
+                    dt = self._datetime_from_unix_time_millis(
+                        cell.timestamp_value)
+                    row.append(dt)
+            elif cell.HasField('boolean_value'):
+                if col and col.type != riak_pb.TsColumnType.Value('BOOLEAN'):
+                    raise TypeError('expected BOOLEAN column')
+                else:
+                    row.append(cell.boolean_value)
+            else:
+                row.append(None)
+        return row
 
     def _decode_preflist(self, item):
         """

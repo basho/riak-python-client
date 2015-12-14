@@ -4,6 +4,8 @@ __pycache__/
 
 .tox/
 
+.tox/
+
 docs/_build
 
 .*.swp

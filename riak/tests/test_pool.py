@@ -1,29 +1,12 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
+# -*- coding: utf-8 -*-
 from six import PY2
 import platform
 from threading import Thread, currentThread
 from riak.transports.pool import Pool, BadResource
 from random import SystemRandom
 from time import sleep
-from . import SKIP_POOL
-from riak.tests import test_six
+from riak.tests import RUN_POOL
+from riak.tests.comparison import Comparison
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -54,10 +37,8 @@ class EmptyListPool(Pool):
         return []
 
 
-@unittest.skipIf(SKIP_POOL,
-                 'Skipping connection pool tests')
-class PoolTest(unittest.TestCase,
-               test_six.Comparison):
+@unittest.skipUnless(RUN_POOL, 'RUN_POOL is 0')
+class PoolTest(unittest.TestCase, Comparison):
 
     def test_yields_new_object_when_empty(self):
         """

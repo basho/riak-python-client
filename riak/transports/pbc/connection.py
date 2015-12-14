@@ -156,7 +156,10 @@ class RiakPbcConnection(object):
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
             err = self._parse_msg(msg_code, self._inbuf[1:])
-            raise RiakError(bytes_to_str(err.errmsg))
+            if err is None:
+                raise RiakError('no error provided!')
+            else:
+                raise RiakError(bytes_to_str(err.errmsg))
         elif msg_code in riak.pb.messages.MESSAGE_CLASSES:
             msg = self._parse_msg(msg_code, self._inbuf[1:])
         else:

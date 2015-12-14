@@ -65,14 +65,21 @@ class RiakHttpConnection(object):
         """
         Use the appropriate connection class; optionally with security.
         """
+        timeout = None
+        if self._options is not None and 'timeout' in self._options:
+            timeout = self._options['timeout']
+
         if self._client._credentials:
-            self._connection = \
-                self._connection_class(self._node.host,
-                                       self._node.http_port,
-                                       self._client._credentials)
+            self._connection = self._connection_class(
+                host=self._node.host,
+                port=self._node.http_port,
+                credentials=self._client._credentials,
+                timeout=timeout)
         else:
-            self._connection = self._connection_class(self._node.host,
-                                                      self._node.http_port)
+            self._connection = self._connection_class(
+                    host=self._node.host,
+                    port=self._node.http_port,
+                    timeout=timeout)
         # Forces the population of stats and resources before any
         # other requests are made.
         self.server_version

@@ -1,7 +1,9 @@
 import json
 import riak.pb.messages
+
 from riak.util import decode_index_value, bytes_to_str
 from riak.client.index_page import CONTINUATION
+from riak.transports.pbc.codec import RiakPbcCodec
 from six import PY2
 
 
@@ -31,7 +33,7 @@ class RiakPbcStream(object):
             self.finished = True
             raise
 
-        if(self._is_done(resp)):
+        if self._is_done(resp):
             self.finished = True
 
         return resp
@@ -153,6 +155,30 @@ class RiakPbcIndexStream(RiakPbcStream):
                 return [bytes_to_str(key) for key in response.keys]
         elif response.continuation:
             return CONTINUATION(bytes_to_str(response.continuation))
+
+    def __next__(self):
+        # Python 3.x Version
+        return self.next()
+
+
+class RiakPbcTsKeyStream(RiakPbcStream, RiakPbcCodec):
+    """
+    Used internally by RiakPbcTransport to implement key-list streams.
+    """
+
+    _expect = MSG_CODE_TS_LIST_KEYS_RESP
+
+    def next(self):
+        response = super(RiakPbcTsKeyStream, self).next()
+
+        if response.done and len(response.keys) is 0:
+            raise StopIteration
+
+        keys = []
+        for tsrow in response.keys:
+            keys.append(self._decode_timeseries_row(tsrow))
+
+        return keys
 
     def __next__(self):
         # Python 3.x Version
