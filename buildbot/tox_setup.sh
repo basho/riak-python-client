@@ -12,11 +12,6 @@ then
     exit 1
 fi
 
-if [[ ! -d $PROJDIR/riak_pb/src ]]
-then
-    (cd $PROJDIR && git submodule update --init)
-fi
-
 # Install pyenv if it's missing
 if [[ ! -d $PYENV_ROOT ]]
 then
