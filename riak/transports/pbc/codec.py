@@ -692,7 +692,7 @@ class RiakPbcCodec(object):
                 if not isinstance(row, list):
                     raise ValueError("TsObject row must be a list of values")
                 for cell in row:
-                    tsc = tsr.cells.add() # NB: type TsCell
+                    tsc = tsr.cells.add()  # NB: type TsCell
                     self._encode_to_ts_cell(cell, tsc)
         else:
             raise RiakError("TsObject requires a list of rows")
