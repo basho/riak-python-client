@@ -34,8 +34,8 @@ test_normal:
 test_security:
 	@echo "Testing Riak Python Client (with security)"
 	@../setup.py enable_security --riak-admin=$(RIAK_ADMIN)
-	@RIAK_TEST_PROTOCOL='pbc' RUN_YZ=1 RUN_INDEXES=1 RUN_SECURITY=1 RUN_POOL=0 RUN_RESOLVE=0 ./tox_runner.sh ..
-	@RIAK_TEST_PROTOCOL='http' RUN_YZ=1 RUN_INDEXES=1 RUN_SECURITY=1 RUN_POOL=0 RUN_RESOLVE=0 RIAK_TEST_HTTP_PORT=18098 ./tox_runner.sh ..
+	@RIAK_TEST_PROTOCOL='pbc' RUN_YZ=1 RUN_INDEXES=1 RUN_SECURITY=1 RUN_POOL=0 RUN_RESOLVE=0 ./tox_runner.sh .. --test-suite=riak.tests.test_security
+	@RIAK_TEST_PROTOCOL='http' RUN_YZ=1 RUN_INDEXES=1 RUN_SECURITY=1 RUN_POOL=0 RUN_RESOLVE=0 RIAK_TEST_HTTP_PORT=18098 ./tox_runner.sh .. --test-suite=riak.tests.test_security
 
 test_timeseries:
 	@echo "Testing Riak Python Client (timeseries)"
