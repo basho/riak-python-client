@@ -12,7 +12,7 @@ if USE_TEST_SERVER:
     test_server.start()
 
 try:
-    __import__('riak_pb')
+    __import__('riak.pb')
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
@@ -65,8 +65,8 @@ SECURITY_CERT_PASSWD = os.environ.get('RIAK_TEST_SECURITY_CERT_PASSWD',
                                       'certpass')
 
 SECURITY_CIPHERS = 'DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:' + \
-                   'DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:' + \
-                   'AES128-SHA256:AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA'
+        'DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:AES128-SHA256:' + \
+        'AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA'
 
 SECURITY_CREDS = None
 if RUN_SECURITY:

@@ -1,11 +1,17 @@
+import riak.pb
+import riak.pb.riak_pb2
+import riak.pb.riak_dt_pb2
+import riak.pb.riak_kv_pb2
+import riak.pb.riak_ts_pb2
 import logging
-import riak_pb
 import datetime
 
 from riak import RiakError
 from riak.content import RiakContent
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str
 from riak.multidict import MultiDict
+from riak.pb.riak_ts_pb2 import TsColumnType
+
 from six import string_types, PY2
 
 epoch = datetime.datetime.utcfromtimestamp(0)
@@ -18,10 +24,12 @@ def _invert(d):
         out[value] = key
     return out
 
-REPL_TO_PY = {riak_pb.RpbBucketProps.FALSE: False,
-              riak_pb.RpbBucketProps.TRUE: True,
-              riak_pb.RpbBucketProps.REALTIME: 'realtime',
-              riak_pb.RpbBucketProps.FULLSYNC: 'fullsync'}
+REPL_TO_PY = {
+    riak.pb.riak_pb2.RpbBucketProps.FALSE: False,
+    riak.pb.riak_pb2.RpbBucketProps.TRUE: True,
+    riak.pb.riak_pb2.RpbBucketProps.REALTIME: 'realtime',
+    riak.pb.riak_pb2.RpbBucketProps.FULLSYNC: 'fullsync'
+}
 
 REPL_TO_PB = _invert(REPL_TO_PY)
 
@@ -46,22 +54,22 @@ MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
 
 MAP_FIELD_TYPES = {
-    riak_pb.MapField.COUNTER: 'counter',
-    riak_pb.MapField.SET: 'set',
-    riak_pb.MapField.REGISTER: 'register',
-    riak_pb.MapField.FLAG: 'flag',
-    riak_pb.MapField.MAP: 'map',
-    'counter': riak_pb.MapField.COUNTER,
-    'set': riak_pb.MapField.SET,
-    'register': riak_pb.MapField.REGISTER,
-    'flag': riak_pb.MapField.FLAG,
-    'map': riak_pb.MapField.MAP
+    riak.pb.riak_dt_pb2.MapField.COUNTER: 'counter',
+    riak.pb.riak_dt_pb2.MapField.SET: 'set',
+    riak.pb.riak_dt_pb2.MapField.REGISTER: 'register',
+    riak.pb.riak_dt_pb2.MapField.FLAG: 'flag',
+    riak.pb.riak_dt_pb2.MapField.MAP: 'map',
+    'counter': riak.pb.riak_dt_pb2.MapField.COUNTER,
+    'set': riak.pb.riak_dt_pb2.MapField.SET,
+    'register': riak.pb.riak_dt_pb2.MapField.REGISTER,
+    'flag': riak.pb.riak_dt_pb2.MapField.FLAG,
+    'map': riak.pb.riak_dt_pb2.MapField.MAP
 }
 
 DT_FETCH_TYPES = {
-    riak_pb.DtFetchResp.COUNTER: 'counter',
-    riak_pb.DtFetchResp.SET: 'set',
-    riak_pb.DtFetchResp.MAP: 'map'
+    riak.pb.riak_dt_pb2.DtFetchResp.COUNTER: 'counter',
+    riak.pb.riak_dt_pb2.DtFetchResp.SET: 'set',
+    riak.pb.riak_dt_pb2.DtFetchResp.MAP: 'map'
 }
 
 
@@ -71,7 +79,7 @@ class RiakPbcCodec(object):
     """
 
     def __init__(self, **unused_args):
-        if riak_pb is None:
+        if riak.pb is None:
             raise NotImplementedError("this transport is not available")
         super(RiakPbcCodec, self).__init__(**unused_args)
 
@@ -142,7 +150,7 @@ class RiakPbcCodec(object):
         a RiakObject.
 
         :param rpb_content: a single RpbContent message
-        :type rpb_content: riak_pb.RpbContent
+        :type rpb_content: riak.pb.riak_pb2.RpbContent
         :param sibling: a RiakContent sibling container
         :type sibling: RiakContent
         :rtype: RiakContent
@@ -187,7 +195,7 @@ class RiakPbcCodec(object):
         :param robj: a RiakObject
         :type robj: RiakObject
         :param rpb_content: the protobuf message to fill
-        :type rpb_content: riak_pb.RpbContent
+        :type rpb_content: riak.pb.riak_pb2.RpbContent
         """
         if robj.content_type:
             rpb_content.content_type = str_to_bytes(robj.content_type)
@@ -229,7 +237,7 @@ class RiakPbcCodec(object):
         Decodes an RpbLink message into a tuple
 
         :param link: an RpbLink message
-        :type link: riak_pb.RpbLink
+        :type link: riak.pb.riak_pb2.RpbLink
         :rtype tuple
         """
 
@@ -269,7 +277,7 @@ class RiakPbcCodec(object):
         :param props: bucket properties
         :type props: dict
         :param msg: the protobuf message to fill
-        :type msg: riak_pb.RpbSetBucketReq
+        :type msg: riak.pb.riak_pb2.RpbSetBucketReq
         """
         for prop in NORMAL_PROPS:
             if prop in props and props[prop] is not None:
@@ -302,7 +310,7 @@ class RiakPbcCodec(object):
         Decodes the protobuf bucket properties message into a dict.
 
         :param msg: the protobuf message to decode
-        :type msg: riak_pb.RpbBucketProps
+        :type msg: riak.pb.riak_pb2.RpbBucketProps
         :rtype dict
         """
         props = {}
@@ -332,7 +340,7 @@ class RiakPbcCodec(object):
         'fun' keys. Used in bucket properties.
 
         :param modfun: the protobuf message to decode
-        :type modfun: riak_pb.RpbModFun
+        :type modfun: riak.pb.riak_pb2.RpbModFun
         :rtype dict
         """
         return {'mod': bytes_to_str(modfun.module),
@@ -346,11 +354,11 @@ class RiakPbcCodec(object):
         :param props: the module/function pair
         :type props: dict
         :param msg: the protobuf message to fill
-        :type msg: riak_pb.RpbModFun
-        :rtype riak_pb.RpbModFun
+        :type msg: riak.pb.riak_pb2.RpbModFun
+        :rtype riak.pb.riak_pb2.RpbModFun
         """
         if msg is None:
-            msg = riak_pb.RpbModFun()
+            msg = riak.pb.riak_pb2.RpbModFun()
         msg.module = str_to_bytes(props['mod'])
         msg.function = str_to_bytes(props['fun'])
         return msg
@@ -385,7 +393,7 @@ class RiakPbcCodec(object):
         bucket properties.
 
         :param hook: the hook to decode
-        :type hook: riak_pb.RpbCommitHook
+        :type hook: riak.pb.riak_pb2.RpbCommitHook
         :rtype dict
         """
         if hook.HasField('modfun'):
@@ -401,8 +409,8 @@ class RiakPbcCodec(object):
         :param hook: the hook to encode
         :type hook: dict
         :param msg: the protobuf message to fill
-        :type msg: riak_pb.RpbCommitHook
-        :rtype riak_pb.RpbCommitHook
+        :type msg: riak.pb.riak_pb2.RpbCommitHook
+        :rtype riak.pb.riak_pb2.RpbCommitHook
         """
         if 'name' in hook:
             msg.name = str_to_bytes(hook['name'])
@@ -435,17 +443,18 @@ class RiakPbcCodec(object):
         :type timeout: int
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
-        :rtype riak_pb.RpbIndexReq
+        :rtype riak.pb.riak_kv_pb2.RpbIndexReq
         """
-        req = riak_pb.RpbIndexReq(bucket=str_to_bytes(bucket.name),
-                                  index=str_to_bytes(index))
+        req = riak.pb.riak_kv_pb2.RpbIndexReq(
+            bucket=str_to_bytes(bucket.name),
+            index=str_to_bytes(index))
         self._add_bucket_type(req, bucket.bucket_type)
         if endkey is not None:
-            req.qtype = riak_pb.RpbIndexReq.range
+            req.qtype = riak.pb.riak_kv_pb2.RpbIndexReq.range
             req.range_min = str_to_bytes(str(startkey))
             req.range_max = str_to_bytes(str(endkey))
         else:
-            req.qtype = riak_pb.RpbIndexReq.eq
+            req.qtype = riak.pb.riak_kv_pb2.RpbIndexReq.eq
             req.key = str_to_bytes(str(startkey))
         if return_terms is not None:
             req.return_terms = return_terms
@@ -467,7 +476,7 @@ class RiakPbcCodec(object):
         Fills an RpbYokozunaIndex message with the appropriate data.
 
         :param index: a yz index message
-        :type index: riak_pb.RpbYokozunaIndex
+        :type index: riak.pb.riak_yokozuna_pb2.RpbYokozunaIndex
         :rtype dict
         """
         result = {}
@@ -621,9 +630,9 @@ class RiakPbcCodec(object):
             msg.register_op = str_to_bytes(op[1])
         elif dtype == 'flag':
             if op == 'enable':
-                msg.flag_op = riak_pb.MapUpdate.ENABLE
+                msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.ENABLE
             else:
-                msg.flag_op = riak_pb.MapUpdate.DISABLE
+                msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.DISABLE
 
     def _encode_to_ts_cell(self, cell, ts_cell):
         if cell is not None:
@@ -670,7 +679,7 @@ class RiakPbcCodec(object):
         :param tsobj: a TsObject
         :type tsobj: TsObject
         :param req: the protobuf message to fill
-        :type req: riak_pb.TsPutReq
+        :type req: riak.pb.riak_ts_pb2.TsPutReq
         """
         req.table = str_to_bytes(tsobj.table.name)
 
@@ -679,11 +688,11 @@ class RiakPbcCodec(object):
 
         if tsobj.rows and isinstance(tsobj.rows, list):
             for row in tsobj.rows:
-                tsr = req.rows.add()  # NB: type riak_pb.TsRow
+                tsr = req.rows.add()  # NB: type TsRow
                 if not isinstance(row, list):
                     raise ValueError("TsObject row must be a list of values")
                 for cell in row:
-                    tsc = tsr.cells.add()  # NB: type riak_pb.TsCell
+                    tsc = tsr.cells.add()  # NB: type TsCell
                     self._encode_to_ts_cell(cell, tsc)
         else:
             raise RiakError("TsObject requires a list of rows")
@@ -694,7 +703,7 @@ class RiakPbcCodec(object):
         metadata from a TsQueryResp.
 
         :param resp: the protobuf message from which to process data
-        :type resp: riak_pb.TsQueryRsp or riak_pb.TsGetResp
+        :type resp: riak.pb.TsQueryRsp or riak.pb.riak_ts_pb2.TsGetResp
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
@@ -714,7 +723,7 @@ class RiakPbcCodec(object):
         Decodes a TsRow into a list
 
         :param tsrow: the protobuf TsRow to decode.
-        :type tsrow: riak_pb.TsRow
+        :type tsrow: riak.pb.riak_ts_pb2.TsRow
         :param tscols: the protobuf TsColumn data to help decode.
         :type tscols: list
         :rtype list
@@ -725,29 +734,29 @@ class RiakPbcCodec(object):
             if tscols is not None:
                 col = tscols[i]
             if cell.HasField('varchar_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('VARCHAR'):
+                if col and col.type != TsColumnType.Value('VARCHAR'):
                     raise TypeError('expected VARCHAR column')
                 else:
                     row.append(bytes_to_str(cell.varchar_value))
             elif cell.HasField('sint64_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('SINT64'):
+                if col and col.type != TsColumnType.Value('SINT64'):
                     raise TypeError('expected SINT64 column')
                 else:
                     row.append(cell.sint64_value)
             elif cell.HasField('double_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('DOUBLE'):
+                if col and col.type != TsColumnType.Value('DOUBLE'):
                     raise TypeError('expected DOUBLE column')
                 else:
                     row.append(cell.double_value)
             elif cell.HasField('timestamp_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('TIMESTAMP'):
+                if col and col.type != TsColumnType.Value('TIMESTAMP'):
                     raise TypeError('expected TIMESTAMP column')
                 else:
                     dt = self._datetime_from_unix_time_millis(
                         cell.timestamp_value)
                     row.append(dt)
             elif cell.HasField('boolean_value'):
-                if col and col.type != riak_pb.TsColumnType.Value('BOOLEAN'):
+                if col and col.type != TsColumnType.Value('BOOLEAN'):
                     raise TypeError('expected BOOLEAN column')
                 else:
                     row.append(cell.boolean_value)
@@ -760,7 +769,8 @@ class RiakPbcCodec(object):
         Decodes a preflist response
 
         :param preflist: a bucket/key preflist
-        :type preflist: list of riak_pb.RpbBucketKeyPreflistItem
+        :type preflist: list of
+                        riak.pb.riak_kv_pb2.RpbBucketKeyPreflistItem
         :rtype dict
         """
         result = {'partition': item.partition,

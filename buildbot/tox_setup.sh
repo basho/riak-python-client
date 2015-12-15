@@ -1,74 +1,104 @@
 #!/usr/bin/env bash
-# pyenv root
-export PYENV_ROOT="$HOME/.pyenv"
-TEST_ROOT=$PWD/..
+
+if [[ ! -d $PYENV_ROOT ]]
+then
+    export PYENV_ROOT="$HOME/.pyenv"
+fi
+
+declare -r PROJDIR="$PWD/.."
+if [[ ! -s $PROJDIR/riak/__init__.py ]]
+then
+    echo "[ERROR] script must be run from the buildbot/ dir in github.com/basho/riak-python-client" 1>&2
+    exit 1
+fi
 
 # Install pyenv if it's missing
-if [[ ! -d $PYENV_ROOT ]]; then
-    git clone git://github.com/yyuu/pyenv.git ${PYENV_ROOT}
-    cd ${PYENV_ROOT}
-    # Get the latest tagged version
-    git checkout `git tag | tail -1`
+if [[ ! -d $PYENV_ROOT ]]
+then
+    git clone https://github.com/yyuu/pyenv.git $PYENV_ROOT
+else
+    (cd $PYENV_ROOT && git fetch --all)
 fi
 
-# Upgrade it, if it's too old
-if [[ -z $(pyenv install --list | grep 3.4.3) ]]; then
-    cd ${PYENV_ROOT}
-    git pull origin master
-    git pull -u origin master
-    # Get the latest tagged version
-    git checkout `git tag | tail -1`
+(cd $PYENV_ROOT && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
+
+declare -r pyenv_virtualenv_dir="$PYENV_ROOT/plugins/pyenv-virtualenv"
+if [[ ! -d $pyenv_virtualenv_dir ]]
+then
+    git clone https://github.com/yyuu/pyenv-virtualenv.git $pyenv_virtualenv_dir
+else
+    (cd $pyenv_virtualenv_dir && git fetch --all)
 fi
 
-if [[ ! -d ${PYENV_ROOT}/plugins/pyenv-virtualenv ]]; then
-    git clone https://github.com/yyuu/pyenv-virtualenv.git ${PYENV_ROOT}/plugins/pyenv-virtualenv
-    cd ${PYENV_ROOT}/plugins/pyenv-virtualenv
-    git checkout `git tag | tail -1`
-fi
+(cd $pyenv_virtualenv_dir && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
 
-if [[ ! -d ${PYENV_ROOT}/plugins/pyenv-alias ]]; then
-    git clone https://github.com/s1341/pyenv-alias.git ${PYENV_ROOT}/plugins/pyenv-alias
+declare -r pyenv_alias_dir="$PYENV_ROOT/plugins/pyenv-alias"
+if [[ ! -d $pyenv_alias_dir ]]
+then
+    git clone https://github.com/s1341/pyenv-alias.git $pyenv_alias_dir
+else
+    (cd $pyenv_alias_dir && git pull origin master)
 fi
 
 # Add pyenv root to PATH
 # and initialize pyenv
-PATH="$PYENV_ROOT/bin:$PATH"
-# initialize pyenv
-eval "$(pyenv init -)"
-# initialize pyenv virtualenv
-eval "$(pyenv virtualenv-init -)"
+if [[ $PATH != */.pyenv* ]]
+then
+    echo "[INFO] adding $PYENV_ROOT/bin to PATH"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+fi
 
-# Now install (allthethings) versions for testing
-if [[ -z $(pyenv versions | grep riak_3.4.3) ]]; then
-    VERSION_ALIAS="riak_3.4.3" pyenv install 3.4.3
-    pyenv virtualenv riak_3.4.3 riak-py34
+if [[ $(type -t pyenv) != 'function' ]]
+then
+    echo "[INFO] init pyenv"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
 fi
-if [[ -z $(pyenv versions | grep riak_3.3.6) ]]; then
-    VERSION_ALIAS="riak_3.3.6" pyenv install 3.3.6
-    pyenv virtualenv riak_3.3.6 riak-py33
+
+# NB: 2.7.8 is special-cased
+for pyver in 2.7 3.3 3.4 3.5
+do
+    if ! pyenv versions | fgrep -v 'riak_2.7.8' | fgrep -q "riak_$pyver"
+    then
+        declare -i pymaj="${pyver%.*}"
+        declare -i pymin="${pyver#*.}"
+        pyver_latest="$(pyenv install --list | grep -E "^[[:space:]]+$pymaj\\.$pymin\\.[[:digit:]]+\$" | tail -n1 | sed -e 's/[[:space:]]//g')"
+
+        echo "[INFO] installing Python $pyver_latest"
+        riak_pyver="riak_$pyver_latest"
+        VERSION_ALIAS="$riak_pyver" pyenv install "$pyver_latest"
+        pyenv virtualenv "$riak_pyver" "riak-py$pymaj$pymin"
+    fi
+done
+
+if ! pyenv versions | fgrep -q 'riak_2.7.8'
+then
+    echo "[INFO] installing Python 2.7.8"
+    VERSION_ALIAS='riak_2.7.8' pyenv install '2.7.8'
+    pyenv virtualenv 'riak_2.7.8' 'riak-py278'
 fi
-if [[ -z $(pyenv versions | grep riak_3.5.1) ]]; then
-    VERSION_ALIAS="riak_3.5.1" pyenv install 3.5.1
-    pyenv virtualenv riak_3.5.1 riak-py35
-fi
-if [[ -z $(pyenv versions | grep riak_2.7.11) ]]; then
-    VERSION_ALIAS="riak_2.7.11" pyenv install 2.7.11
-    pyenv virtualenv riak_2.7.11 riak-py27
-fi
-if [[ -z $(pyenv versions | grep riak_2.7.8) ]]; then
-    VERSION_ALIAS="riak_2.7.8" pyenv install 2.7.8
-    pyenv virtualenv riak_2.7.8 riak-py278
-fi
-pyenv global riak-py34 riak-py33 riak-py35 riak-py27 riak-py278
+
+(cd $PROJDIR && pyenv local riak-py35 riak-py34 riak-py33 riak-py27 riak-py278)
+
 pyenv versions
 
-# Now install tox
-pip install --upgrade pip
-if [ -z "`pip show tox`" ]; then
-    pip install -Iv tox
-    if [ -z "`pip show tox`" ]; then
-        echo "ERROR: Install of tox failed"
-        exit 1
-    fi
+if [[ $(python --version) == Python\ 3.* ]]
+then
+    pip install --upgrade pip
+    for module in six tox python3-protobuf
+    do
+        if ! pip show --quiet $module
+        then
+            pip install --ignore-installed $module
+            if ! pip show --quiet $module
+            then
+                echo "[ERROR] install of $module failed" 1>&2
+                exit 1
+            fi
+        fi
+    done
     pyenv rehash
+else
+    echo "[ERROR] expected Python 3 to be 'python' at this point" 1>&2
+    exit 1
 fi

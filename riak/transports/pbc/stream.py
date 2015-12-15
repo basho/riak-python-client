@@ -1,11 +1,6 @@
 import json
-from riak_pb.messages import (
-    MSG_CODE_LIST_KEYS_RESP,
-    MSG_CODE_MAP_RED_RESP,
-    MSG_CODE_LIST_BUCKETS_RESP,
-    MSG_CODE_INDEX_RESP,
-    MSG_CODE_TS_LIST_KEYS_RESP,
-)
+import riak.pb.messages
+
 from riak.util import decode_index_value, bytes_to_str
 from riak.client.index_page import CONTINUATION
 from riak.transports.pbc.codec import RiakPbcCodec
@@ -72,7 +67,7 @@ class RiakPbcKeyStream(RiakPbcStream):
     Used internally by RiakPbcTransport to implement key-list streams.
     """
 
-    _expect = MSG_CODE_LIST_KEYS_RESP
+    _expect = riak.pb.messages.MSG_CODE_LIST_KEYS_RESP
 
     def next(self):
         response = super(RiakPbcKeyStream, self).next()
@@ -93,7 +88,7 @@ class RiakPbcMapredStream(RiakPbcStream):
     streams.
     """
 
-    _expect = MSG_CODE_MAP_RED_RESP
+    _expect = riak.pb.messages.MSG_CODE_MAP_RED_RESP
 
     def next(self):
         response = super(RiakPbcMapredStream, self).next()
@@ -113,7 +108,7 @@ class RiakPbcBucketStream(RiakPbcStream):
     Used internally by RiakPbcTransport to implement key-list streams.
     """
 
-    _expect = MSG_CODE_LIST_BUCKETS_RESP
+    _expect = riak.pb.messages.MSG_CODE_LIST_BUCKETS_RESP
 
     def next(self):
         response = super(RiakPbcBucketStream, self).next()
@@ -134,7 +129,7 @@ class RiakPbcIndexStream(RiakPbcStream):
     streams.
     """
 
-    _expect = MSG_CODE_INDEX_RESP
+    _expect = riak.pb.messages.MSG_CODE_INDEX_RESP
 
     def __init__(self, transport, index, return_terms=False):
         super(RiakPbcIndexStream, self).__init__(transport)
@@ -171,7 +166,7 @@ class RiakPbcTsKeyStream(RiakPbcStream, RiakPbcCodec):
     Used internally by RiakPbcTransport to implement key-list streams.
     """
 
-    _expect = MSG_CODE_TS_LIST_KEYS_RESP
+    _expect = riak.pb.messages.MSG_CODE_TS_LIST_KEYS_RESP
 
     def next(self):
         response = super(RiakPbcTsKeyStream, self).next()

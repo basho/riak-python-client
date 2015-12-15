@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import platform
-import riak_pb
+import riak.pb.riak_ts_pb2
 
 from riak import RiakError
 from riak.table import Table
@@ -10,6 +10,7 @@ from riak.transports.pbc.codec import RiakPbcCodec
 from riak.util import str_to_bytes, bytes_to_str
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
+from riak.pb.riak_ts_pb2 import TsColumnType
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -47,18 +48,18 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(self.ts0ms, req.key[2].timestamp_value)
 
     def test_encode_data_for_get(self):
-        req = riak_pb.TsGetReq()
+        req = riak.pb.riak_ts_pb2.TsGetReq()
         self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
         self.validate_keyreq(req)
 
     def test_encode_data_for_delete(self):
-        req = riak_pb.TsDelReq()
+        req = riak.pb.riak_ts_pb2.TsDelReq()
         self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
         self.validate_keyreq(req)
 
     def test_encode_data_for_put(self):
         tsobj = TsObject(None, self.table, self.rows, None)
-        ts_put_req = riak_pb.TsPutReq()
+        ts_put_req = riak.pb.riak_ts_pb2.TsPutReq()
         self.c._encode_timeseries_put(tsobj, ts_put_req)
 
         # NB: expected, actual
@@ -82,29 +83,29 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
 
     def test_encode_data_for_listkeys(self):
-        req = riak_pb.TsListKeysReq()
+        req = riak.pb.riak_ts_pb2.TsListKeysReq()
         self.c._encode_timeseries_listkeysreq(self.table, req, 1234)
         self.assertEqual(self.table.name, bytes_to_str(req.table))
         self.assertEqual(1234, req.timeout)
 
     def test_decode_data_from_query(self):
-        tqr = riak_pb.TsQueryResp()
+        tqr = riak.pb.riak_ts_pb2.TsQueryResp()
 
         c0 = tqr.columns.add()
         c0.name = str_to_bytes('col_varchar')
-        c0.type = riak_pb.TsColumnType.Value('VARCHAR')
+        c0.type = TsColumnType.Value('VARCHAR')
         c1 = tqr.columns.add()
         c1.name = str_to_bytes('col_integer')
-        c1.type = riak_pb.TsColumnType.Value('SINT64')
+        c1.type = TsColumnType.Value('SINT64')
         c2 = tqr.columns.add()
         c2.name = str_to_bytes('col_double')
-        c2.type = riak_pb.TsColumnType.Value('DOUBLE')
+        c2.type = TsColumnType.Value('DOUBLE')
         c3 = tqr.columns.add()
         c3.name = str_to_bytes('col_timestamp')
-        c3.type = riak_pb.TsColumnType.Value('TIMESTAMP')
+        c3.type = TsColumnType.Value('TIMESTAMP')
         c4 = tqr.columns.add()
         c4.name = str_to_bytes('col_boolean')
-        c4.type = riak_pb.TsColumnType.Value('BOOLEAN')
+        c4.type = TsColumnType.Value('BOOLEAN')
 
         r0 = tqr.rows.add()
         r0c0 = r0.cells.add()
@@ -139,15 +140,15 @@ class TimeseriesUnitTests(unittest.TestCase):
 
         c = tsobj.columns
         self.assertEqual(c[0][0], 'col_varchar')
-        self.assertEqual(c[0][1], riak_pb.TsColumnType.Value('VARCHAR'))
+        self.assertEqual(c[0][1], TsColumnType.Value('VARCHAR'))
         self.assertEqual(c[1][0], 'col_integer')
-        self.assertEqual(c[1][1], riak_pb.TsColumnType.Value('SINT64'))
+        self.assertEqual(c[1][1], TsColumnType.Value('SINT64'))
         self.assertEqual(c[2][0], 'col_double')
-        self.assertEqual(c[2][1], riak_pb.TsColumnType.Value('DOUBLE'))
+        self.assertEqual(c[2][1], TsColumnType.Value('DOUBLE'))
         self.assertEqual(c[3][0], 'col_timestamp')
-        self.assertEqual(c[3][1], riak_pb.TsColumnType.Value('TIMESTAMP'))
+        self.assertEqual(c[3][1], TsColumnType.Value('TIMESTAMP'))
         self.assertEqual(c[4][0], 'col_boolean')
-        self.assertEqual(c[4][1], riak_pb.TsColumnType.Value('BOOLEAN'))
+        self.assertEqual(c[4][1], TsColumnType.Value('BOOLEAN'))
 
         r0 = tsobj.rows[0]
         self.assertEqual(r0[0], self.rows[0][0])
@@ -287,9 +288,8 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 self.assertEqual(len(key), 3)
                 self.assertEqual('hash1', key[0])
                 self.assertEqual('user2', key[1])
-                # TODO RTS-367 ENABLE
-                # self.assertIsInstance(key[2], datetime.datetime)
-        self.assertEqual(len(streamed_keys), 5)
+                self.assertIsInstance(key[2], datetime.datetime)
+        self.assertGreater(len(streamed_keys), 0)
 
     def test_delete_single_value(self):
         key = ['hash1', 'user2', self.twentyFiveMinsAgo]
