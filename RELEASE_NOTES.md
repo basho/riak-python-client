@@ -17,8 +17,6 @@ There are also many bugfixes and new enhancements:
   (https://github.com/basho/riak-python-client/pull/414)
 * [Support Riak 2.1.1]
   (https://github.com/basho/riak-python-client/pull/407)
-* [Addition of new API entry point methods]
-  (https://github.com/basho/riak-python-client/pull/398)
 * [Native SSL support for Python 2.7.9+]
   (https://github.com/basho/riak-python-client/pull/397)
 
