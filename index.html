@@ -5,16 +5,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Riak Python Client &mdash; Riak Python Client 2.1.0 documentation</title>
+  <title>Riak Python Client &mdash; Riak Python Client 2.3.0 documentation</title>
   
 
   
   
 
   
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   
   
@@ -30,11 +30,13 @@
   
     <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-    <link rel="top" title="Riak Python Client 2.1.0 documentation" href="#"/>
+
+  
+    <link rel="top" title="Riak Python Client 2.3.0 documentation" href="#"/>
         <link rel="next" title="Client &amp; Connections" href="client.html"/> 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -44,95 +46,56 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        <a href="#" class="fa fa-home"> Riak Python Client</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> Riak Python Client
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-      </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
-        
-            <ul>
-<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-bucket-types-and-buckets">Accessing Bucket Types and Buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-type-operations">Bucket Type Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-operations">Bucket Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#search-maintenance-operations">Search Maintenance Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-features">Deprecated Features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-objects">Bucket Type objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-properties">Bucket Type properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-buckets">Listing buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-features">Deprecated Features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="object.html#riakobject">RiakObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="object.html#persistence">Persistence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="object.html#value-and-metadata">Value and Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="object.html#siblings">Siblings</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#sending-operations">Sending Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#context-and-observed-remove">Context and Observed-Remove</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#datatype-abstract-class">Datatype abstract class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#counter">Counter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#set">Set</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map">Map</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map-only-datatypes">Map-only datatypes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#register">Register</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#flag">Flag</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#riak-search-2-0-yokozuna">Riak Search 2.0 (Yokozuna)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="security.html#server-configuration">Server Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#client-configuration">Client Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#authentication-types">Authentication Types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#additional-options">Additional options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#securitycreds-object">SecurityCreds object</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#datatypes">Datatypes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#module-commands">distutils commands</a></li>
-</ul>
-</li>
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a></li>
 </ul>
 
-        
+            
+          
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -147,20 +110,29 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
       
     <li>Riak Python Client</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+          
+            <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="riak-python-client">
 <h1>Riak Python Client<a class="headerlink" href="#riak-python-client" title="Permalink to this headline">¶</a></h1>
@@ -173,15 +145,15 @@ has been moved to the <a class="reference external" href="https://github.com/bas
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li>Ensure Riak installed &amp; running. (<tt class="docutils literal"><span class="pre">riak</span> <span class="pre">ping</span></tt>)</li>
+<li>Ensure Riak installed &amp; running. (<code class="docutils literal"><span class="pre">riak</span> <span class="pre">ping</span></code>)</li>
 <li>Install the Python client:</li>
 </ol>
 <blockquote>
 <div><ol class="arabic simple">
-<li>If you use <a class="reference external" href="http://pip.openplans.org/">Pip</a>, <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">riak</span></tt>.</li>
-<li>If you use <a class="reference external" href="http://pypi.python.org/pypi/setuptools">easy_install</a>, run <tt class="docutils literal"><span class="pre">easy_install</span> <span class="pre">riak</span></tt>.</li>
+<li>If you use <a class="reference external" href="http://pip.openplans.org/">Pip</a>, <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">riak</span></code>.</li>
+<li>If you use <a class="reference external" href="http://pypi.python.org/pypi/setuptools">easy_install</a>, run <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">riak</span></code>.</li>
 <li>You can download the package off <a class="reference external" href="http://pypi.python.org/pypi/riak/">PyPI</a>, extract it and run
-<tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt>.</li>
+<code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code>.</li>
 </ol>
 </div></blockquote>
 </div>
@@ -193,8 +165,8 @@ problems or submit contributions.</p>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
 </ul>
 </div>
 <div class="section" id="contents">
@@ -214,12 +186,13 @@ problems or submit contributions.</p>
 </div>
 
 
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="client.html" class="btn btn-neutral float-right" title="Client &amp; Connections"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="client.html" class="btn btn-neutral float-right" title="Client &amp; Connections" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -230,11 +203,13 @@ problems or submit contributions.</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2010-2014, Basho Technologies.
+
     </p>
   </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
 </footer>
+
         </div>
       </div>
 
@@ -249,7 +224,7 @@ problems or submit contributions.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.1.0',
+            VERSION:'2.3.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -123,6 +123,15 @@ Key-level Operations
 .. automethod:: RiakClient.fetch_datatype
 .. automethod:: RiakClient.update_datatype
 
+--------------------
+Timeseries Operations
+--------------------
+
+.. automethod:: RiakClient.ts_get
+.. automethod:: RiakClient.ts_put
+.. automethod:: RiakClient.ts_delete
+.. automethod:: RiakClient.ts_query
+
 ----------------
 Query Operations
 ----------------

@@ -5,16 +5,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Values &amp; Objects &mdash; Riak Python Client 2.1.0 documentation</title>
+  <title>Values &amp; Objects &mdash; Riak Python Client 2.3.0 documentation</title>
   
 
   
   
 
   
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   
   
@@ -30,12 +30,14 @@
   
     <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-    <link rel="top" title="Riak Python Client 2.1.0 documentation" href="index.html"/>
+
+  
+    <link rel="top" title="Riak Python Client 2.3.0 documentation" href="index.html"/>
         <link rel="next" title="Data Types" href="datatypes.html"/>
         <link rel="prev" title="Buckets &amp; Bucket Types" href="bucket.html"/> 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -45,95 +47,68 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        <a href="index.html" class="fa fa-home"> Riak Python Client</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Riak Python Client
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-      </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
-        
-            <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-bucket-types-and-buckets">Accessing Bucket Types and Buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-type-operations">Bucket Type Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-operations">Bucket Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#search-maintenance-operations">Search Maintenance Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-features">Deprecated Features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-objects">Bucket Type objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-properties">Bucket Type properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-buckets">Listing buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-features">Deprecated Features</a></li>
-</ul>
-</li>
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Values &amp; Objects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#riakobject">RiakObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#riakobject">RiakObject</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#vector-clock">Vector clock</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#persistence">Persistence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#value-and-metadata">Value and Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#siblings">Siblings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#siblings">Siblings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#conflicts-and-resolvers">Conflicts and Resolvers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#sending-operations">Sending Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#context-and-observed-remove">Context and Observed-Remove</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#datatype-abstract-class">Datatype abstract class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#counter">Counter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#set">Set</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map">Map</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map-only-datatypes">Map-only datatypes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#register">Register</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#flag">Flag</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#riak-search-2-0-yokozuna">Riak Search 2.0 (Yokozuna)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="security.html#server-configuration">Server Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#client-configuration">Client Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#authentication-types">Authentication Types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#additional-options">Additional options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="security.html#securitycreds-object">SecurityCreds object</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#datatypes">Datatypes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#module-commands">distutils commands</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a></li>
 </ul>
 
-        
+            
+          
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -148,35 +123,44 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
     <li>Values &amp; Objects</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/object.txt" rel="nofollow"> View page source</a>
+          
+            <a href="_sources/object.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="values-objects">
 <h1>Values &amp; Objects<a class="headerlink" href="#values-objects" title="Permalink to this headline">¶</a></h1>
-<p>Keys in Riak are namespaced into <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">buckets</span></tt></a>, and their associated values are represented
-by <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">objects</span></tt></a>, not to be confused with Python
-&#8220;objects&#8221;. A <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> is a container for the key, the
-<a class="reference internal" href="#vclock"><em>Vector clock</em></a>, the value(s) and any metadata associated with the
+<p>Keys in Riak are namespaced into <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><code class="xref py py-class docutils literal"><span class="pre">buckets</span></code></a>, and their associated values are represented
+by <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">objects</span></code></a>, not to be confused with Python
+&#8220;objects&#8221;. A <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a> is a container for the key, the
+<a class="reference internal" href="#vclock"><span>Vector clock</span></a>, the value(s) and any metadata associated with the
 value(s).</p>
-<p>Values may also be <a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><tt class="xref py py-class docutils literal"><span class="pre">datatypes</span></tt></a>, but
+<p>Values may also be <a class="reference internal" href="datatypes.html#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><code class="xref py py-class docutils literal"><span class="pre">datatypes</span></code></a>, but
 are not discussed here.</p>
 <div class="section" id="riakobject">
 <h2>RiakObject<a class="headerlink" href="#riakobject" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="riak.riak_object.RiakObject">
-<em class="property">class </em><tt class="descclassname">riak.riak_object.</tt><tt class="descname">RiakObject</tt><big>(</big><em>client</em>, <em>bucket</em>, <em>key=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">riak.riak_object.</code><code class="descname">RiakObject</code><span class="sig-paren">(</span><em>client</em>, <em>bucket</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>The RiakObject holds meta information about a Riak object, plus the
 object&#8217;s data.</p>
 <p>Construct a new RiakObject.</p>
@@ -185,10 +169,10 @@ object&#8217;s data.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a>) &#8211; A RiakClient object.</li>
-<li><strong>bucket</strong> (<a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></tt></a>) &#8211; A RiakBucket object.</li>
+<li><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a>) &#8211; A RiakClient object.</li>
+<li><strong>bucket</strong> (<a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><code class="xref py py-class docutils literal"><span class="pre">RiakBucket</span></code></a>) &#8211; A RiakBucket object.</li>
 <li><strong>key</strong> (<em>string</em>) &#8211; An optional key. If not specified, then the key
-is generated by the server when <a class="reference internal" href="#riak.riak_object.RiakObject.store" title="riak.riak_object.RiakObject.store"><tt class="xref py py-func docutils literal"><span class="pre">store()</span></tt></a> is called.</li>
+is generated by the server when <a class="reference internal" href="#riak.riak_object.RiakObject.store" title="riak.riak_object.RiakObject.store"><code class="xref py py-func docutils literal"><span class="pre">store()</span></code></a> is called.</li>
 </ul>
 </td>
 </tr>
@@ -196,21 +180,21 @@ is generated by the server when <a class="reference internal" href="#riak.riak_o
 </table>
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.key">
-<tt class="descname">key</tt><a class="headerlink" href="#riak.riak_object.RiakObject.key" title="Permalink to this definition">¶</a></dt>
+<code class="descname">key</code><a class="headerlink" href="#riak.riak_object.RiakObject.key" title="Permalink to this definition">¶</a></dt>
 <dd><p>The key of this object, a string. If not present, the server
 will generate a key the first time this object is stored.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.bucket">
-<tt class="descname">bucket</tt><a class="headerlink" href="#riak.riak_object.RiakObject.bucket" title="Permalink to this definition">¶</a></dt>
-<dd><p>The <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><tt class="xref py py-class docutils literal"><span class="pre">bucket</span></tt></a> to which this
+<code class="descname">bucket</code><a class="headerlink" href="#riak.riak_object.RiakObject.bucket" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket" title="riak.bucket.RiakBucket"><code class="xref py py-class docutils literal"><span class="pre">bucket</span></code></a> to which this
 object belongs.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.resolver">
-<tt class="descname">resolver</tt><a class="headerlink" href="#riak.riak_object.RiakObject.resolver" title="Permalink to this definition">¶</a></dt>
+<code class="descname">resolver</code><a class="headerlink" href="#riak.riak_object.RiakObject.resolver" title="Permalink to this definition">¶</a></dt>
 <dd><p>The sibling-resolution function for this
 object. If the resolver is not set, the
 bucket&#8217;s resolver will be used.</p>
@@ -218,14 +202,14 @@ bucket&#8217;s resolver will be used.</p>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.vclock">
-<tt class="descname">vclock</tt><a class="headerlink" href="#riak.riak_object.RiakObject.vclock" title="Permalink to this definition">¶</a></dt>
-<dd><p>The <a class="reference internal" href="#vclock"><em>Vector clock</em></a> for this object.</p>
+<code class="descname">vclock</code><a class="headerlink" href="#riak.riak_object.RiakObject.vclock" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#vclock"><span>Vector clock</span></a> for this object.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.exists">
-<tt class="descname">exists</tt><a class="headerlink" href="#riak.riak_object.RiakObject.exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether the object exists. This is only <tt class="docutils literal"><span class="pre">False</span></tt> when there
+<code class="descname">exists</code><a class="headerlink" href="#riak.riak_object.RiakObject.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the object exists. This is only <code class="docutils literal"><span class="pre">False</span></code> when there
 are no siblings (the object was not found), or the solitary
 sibling is a tombstone.</p>
 </dd></dl>
@@ -237,11 +221,11 @@ sibling is a tombstone.</p>
 <p>Vector clocks are Riak&#8217;s means of tracking the relationships between
 writes to a key. It is best practice to fetch the latest version of a
 key before attempting to modify or overwrite the value; if you do not,
-you may create <a class="reference internal" href="#siblings"><em>Siblings</em></a> or lose data! The content of a vector
+you may create <a class="reference internal" href="#siblings"><span>Siblings</span></a> or lose data! The content of a vector
 clock is essentially opaque to the user.</p>
 <dl class="class">
 <dt id="riak.riak_object.VClock">
-<em class="property">class </em><tt class="descclassname">riak.riak_object.</tt><tt class="descname">VClock</tt><big>(</big><em>value</em>, <em>encoding</em><big>)</big><a class="headerlink" href="#riak.riak_object.VClock" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">riak.riak_object.</code><code class="descname">VClock</code><span class="sig-paren">(</span><em>value</em>, <em>encoding</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.VClock" title="Permalink to this definition">¶</a></dt>
 <dd><p>A representation of a vector clock received from Riak.</p>
 </dd></dl>
 
@@ -252,7 +236,7 @@ clock is essentially opaque to the user.</p>
 <p>Fetching, storing, and deleting keys are the bread-and-butter of Riak.</p>
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.store">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">store</tt><big>(</big><em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=True</em>, <em>if_none_match=False</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.store" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">store</code><span class="sig-paren">(</span><em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=True</em>, <em>if_none_match=False</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.store" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the object in Riak. When this operation completes, the
 object could contain new metadata and possibly new data if Riak
 contains a newer version of the object according to the object&#8217;s
@@ -276,7 +260,7 @@ there is no key previously defined</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -285,14 +269,14 @@ there is no key previously defined</li>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.reload">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">reload</tt><big>(</big><em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.reload" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">reload</code><span class="sig-paren">(</span><em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.reload" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reload the object from Riak. When this operation completes, the
 object could contain new metadata and a new value, if the object
 was updated in Riak since it was last retrieved.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Even if the key is not found in Riak, this will
-return a <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>. Check the <a class="reference internal" href="#riak.riak_object.RiakObject.exists" title="riak.riak_object.RiakObject.exists"><tt class="xref py py-attr docutils literal"><span class="pre">exists</span></tt></a>
+return a <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>. Check the <a class="reference internal" href="#riak.riak_object.RiakObject.exists" title="riak.riak_object.RiakObject.exists"><code class="xref py py-attr docutils literal"><span class="pre">exists</span></code></a>
 property to see if the key was found.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
@@ -312,7 +296,7 @@ for not-founds</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -321,7 +305,7 @@ for not-founds</li>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.delete">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">delete</tt><big>(</big><em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">delete</code><span class="sig-paren">(</span><em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete this object from Riak.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -343,7 +327,7 @@ be available before performing the put</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -353,12 +337,12 @@ be available before performing the put</li>
 </div>
 <div class="section" id="value-and-metadata">
 <span id="object-accessors"></span><h2>Value and Metadata<a class="headerlink" href="#value-and-metadata" title="Permalink to this headline">¶</a></h2>
-<p>Unless you have enabled <a class="reference internal" href="#siblings"><em>Siblings</em></a> via the <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.allow_mult" title="riak.bucket.RiakBucket.allow_mult"><tt class="xref py py-attr docutils literal"><span class="pre">allow_mult</span></tt></a> bucket property, you can
+<p>Unless you have enabled <a class="reference internal" href="#siblings"><span>Siblings</span></a> via the <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.allow_mult" title="riak.bucket.RiakBucket.allow_mult"><code class="xref py py-attr docutils literal"><span class="pre">allow_mult</span></code></a> bucket property, you can
 inspect and manipulate the value and metadata of an object directly using these
 properties and methods:</p>
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.data">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">data</tt><a class="headerlink" href="#riak.riak_object.RiakObject.data" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">data</code><a class="headerlink" href="#riak.riak_object.RiakObject.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>The data stored in this object, as Python objects. For the raw
 data, use the <cite>encoded_data</cite> property. If unset, accessing
 this property will result in decoding the <cite>encoded_data</cite>
@@ -368,7 +352,7 @@ property into Python values. The decoding is dependent on the
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.encoded_data">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">encoded_data</tt><a class="headerlink" href="#riak.riak_object.RiakObject.encoded_data" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">encoded_data</code><a class="headerlink" href="#riak.riak_object.RiakObject.encoded_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>The raw data stored in this object, essentially the encoded
 form of the <cite>data</cite> property. If unset, accessing this property
 will result in encoding the <cite>data</cite> property into a string. The
@@ -378,58 +362,58 @@ bucket&#8217;s registered encoders.</p>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.content_type">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">content_type</tt><a class="headerlink" href="#riak.riak_object.RiakObject.content_type" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">content_type</code><a class="headerlink" href="#riak.riak_object.RiakObject.content_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The MIME media type of the encoded data as a string</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.charset">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">charset</tt><a class="headerlink" href="#riak.riak_object.RiakObject.charset" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">charset</code><a class="headerlink" href="#riak.riak_object.RiakObject.charset" title="Permalink to this definition">¶</a></dt>
 <dd><p>The character set of the encoded data as a string</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.content_encoding">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">content_encoding</tt><a class="headerlink" href="#riak.riak_object.RiakObject.content_encoding" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">content_encoding</code><a class="headerlink" href="#riak.riak_object.RiakObject.content_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>The encoding (compression) of the encoded data. Valid values
 are identity, deflate, gzip</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.last_modified">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">last_modified</tt><a class="headerlink" href="#riak.riak_object.RiakObject.last_modified" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">last_modified</code><a class="headerlink" href="#riak.riak_object.RiakObject.last_modified" title="Permalink to this definition">¶</a></dt>
 <dd><p>The UNIX timestamp of the modification time of this value.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.etag">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">etag</tt><a class="headerlink" href="#riak.riak_object.RiakObject.etag" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">etag</code><a class="headerlink" href="#riak.riak_object.RiakObject.etag" title="Permalink to this definition">¶</a></dt>
 <dd><p>A unique entity-tag for the value.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.usermeta">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">usermeta</tt><a class="headerlink" href="#riak.riak_object.RiakObject.usermeta" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">usermeta</code><a class="headerlink" href="#riak.riak_object.RiakObject.usermeta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Arbitrary user-defined metadata dict, mapping strings to strings.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.links">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">links</tt><a class="headerlink" href="#riak.riak_object.RiakObject.links" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">links</code><a class="headerlink" href="#riak.riak_object.RiakObject.links" title="Permalink to this definition">¶</a></dt>
 <dd><p>A set of bucket/key/tag 3-tuples representing links to other
 keys.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.indexes">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">indexes</tt><a class="headerlink" href="#riak.riak_object.RiakObject.indexes" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">indexes</code><a class="headerlink" href="#riak.riak_object.RiakObject.indexes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The set of secondary index entries, consisting of
 index-name/value tuples</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.add_index">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">add_index</tt><big>(</big><em>field</em>, <em>value</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.add_index" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">add_index</code><span class="sig-paren">(</span><em>field</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.add_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tag this object with the specified field/value pair for
 indexing.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -442,7 +426,7 @@ indexing.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -451,7 +435,7 @@ indexing.</p>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.remove_index">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">remove_index</tt><big>(</big><em>field=None</em>, <em>value=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.remove_index" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">remove_index</code><span class="sig-paren">(</span><em>field=None</em>, <em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.remove_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the specified field/value pair as an index on this
 object.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -464,7 +448,7 @@ object.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -473,8 +457,8 @@ object.</p>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.set_index">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">set_index</tt><big>(</big><em>field</em>, <em>value</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.set_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Works like <a class="reference internal" href="#riak.riak_object.RiakObject.add_index" title="riak.riak_object.RiakObject.add_index"><tt class="xref py py-meth docutils literal"><span class="pre">add_index()</span></tt></a>, but ensures that there is only
+<code class="descclassname">RiakObject.</code><code class="descname">set_index</code><span class="sig-paren">(</span><em>field</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.set_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works like <a class="reference internal" href="#riak.riak_object.RiakObject.add_index" title="riak.riak_object.RiakObject.add_index"><code class="xref py py-meth docutils literal"><span class="pre">add_index()</span></code></a>, but ensures that there is only
 one index on given field. If other found, then removes it
 first.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -487,7 +471,7 @@ first.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -496,21 +480,21 @@ first.</p>
 
 <dl class="method">
 <dt id="riak.riak_object.RiakObject.add_link">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">add_link</tt><big>(</big><em>obj</em>, <em>tag=None</em><big>)</big><a class="headerlink" href="#riak.riak_object.RiakObject.add_link" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">add_link</code><span class="sig-paren">(</span><em>obj</em>, <em>tag=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.add_link" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a link to a RiakObject.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>obj</strong> (<em>mixed</em>) &#8211; Either a RiakObject or 3 item link tuple consisting
+<li><strong>obj</strong> (<a class="reference internal" href="advanced.html#riak.multidict.MultiDict.mixed" title="riak.multidict.MultiDict.mixed"><em>mixed</em></a>) &#8211; Either a RiakObject or 3 item link tuple consisting
 of (bucket, key, tag).</li>
 <li><strong>tag</strong> (<em>string</em>) &#8211; Optional link tag. Defaults to bucket name. It is ignored
-if <tt class="docutils literal"><span class="pre">obj</span></tt> is a 3 item link tuple.</li>
+if <code class="docutils literal"><span class="pre">obj</span></code> is a 3 item link tuple.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -522,34 +506,34 @@ if <tt class="docutils literal"><span class="pre">obj</span></tt> is a 3 item li
 <span id="id1"></span><h2>Siblings<a class="headerlink" href="#siblings" title="Permalink to this headline">¶</a></h2>
 <p>Because Riak&#8217;s consistency model is &#8220;eventual&#8221; (and not linearizable),
 there is no way for it to disambiguate writes that happen
-concurrently. The <a class="reference internal" href="#vclock"><em>Vector clock</em></a> helps establish a
+concurrently. The <a class="reference internal" href="#vclock"><span>Vector clock</span></a> helps establish a
 &#8220;happens after&#8221; relationships so that concurrent writes can be
-detected, but with the exception of <a class="reference internal" href="datatypes.html#datatypes"><em>Data Types</em></a>, Riak has no way
+detected, but with the exception of <a class="reference internal" href="datatypes.html#datatypes"><span>Data Types</span></a>, Riak has no way
 to determine which write has the correct value.</p>
-<p>Instead, when <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.allow_mult" title="riak.bucket.RiakBucket.allow_mult"><tt class="xref py py-attr docutils literal"><span class="pre">allow_mult</span></tt></a>
-is <tt class="docutils literal"><span class="pre">True</span></tt>, Riak keeps all writes that appear to be concurrent. Thus,
+<p>Instead, when <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.allow_mult" title="riak.bucket.RiakBucket.allow_mult"><code class="xref py py-attr docutils literal"><span class="pre">allow_mult</span></code></a>
+is <code class="docutils literal"><span class="pre">True</span></code>, Riak keeps all writes that appear to be concurrent. Thus,
 the contents of a key&#8217;s value may, in fact, be multiple values, which
-are called &#8220;siblings&#8221;. Siblings are modeled in <a class="reference internal" href="#riak.content.RiakContent" title="riak.content.RiakContent"><tt class="xref py py-class docutils literal"><span class="pre">RiakContent</span></tt></a> objects, which contain all of the same
-<a class="reference internal" href="#object-accessors"><em>Value and Metadata</em></a> methods and attributes as the parent object.</p>
+are called &#8220;siblings&#8221;. Siblings are modeled in <a class="reference internal" href="#riak.content.RiakContent" title="riak.content.RiakContent"><code class="xref py py-class docutils literal"><span class="pre">RiakContent</span></code></a> objects, which contain all of the same
+<a class="reference internal" href="#object-accessors"><span>Value and Metadata</span></a> methods and attributes as the parent object.</p>
 <dl class="attribute">
 <dt id="riak.riak_object.RiakObject.siblings">
-<tt class="descclassname">RiakObject.</tt><tt class="descname">siblings</tt><em class="property"> = []</em><a class="headerlink" href="#riak.riak_object.RiakObject.siblings" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RiakObject.</code><code class="descname">siblings</code><em class="property"> = []</em><a class="headerlink" href="#riak.riak_object.RiakObject.siblings" title="Permalink to this definition">¶</a></dt>
 <dd><p>The list of sibling values contained in this object</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="riak.content.RiakContent">
-<em class="property">class </em><tt class="descclassname">riak.content.</tt><tt class="descname">RiakContent</tt><big>(</big><em>robject</em>, <em>data=None</em>, <em>encoded_data=None</em>, <em>charset=None</em>, <em>content_type='application/json'</em>, <em>content_encoding=None</em>, <em>last_modified=None</em>, <em>etag=None</em>, <em>usermeta=None</em>, <em>links=None</em>, <em>indexes=None</em>, <em>exists=False</em><big>)</big><a class="headerlink" href="#riak.content.RiakContent" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">riak.content.</code><code class="descname">RiakContent</code><span class="sig-paren">(</span><em>robject</em>, <em>data=None</em>, <em>encoded_data=None</em>, <em>charset=None</em>, <em>content_type='application/json'</em>, <em>content_encoding=None</em>, <em>last_modified=None</em>, <em>etag=None</em>, <em>usermeta=None</em>, <em>links=None</em>, <em>indexes=None</em>, <em>exists=False</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.content.RiakContent" title="Permalink to this definition">¶</a></dt>
 <dd><p>The RiakContent holds the metadata and value of a single sibling
 within a RiakObject. RiakObjects that have more than one sibling
 are considered to be in conflict.</p>
 </dd></dl>
 
-<p>You do not typically have to create <a class="reference internal" href="#riak.content.RiakContent" title="riak.content.RiakContent"><tt class="xref py py-class docutils literal"><span class="pre">RiakContent</span></tt></a> objects yourself, but they will be created
-for you when <a class="reference internal" href="#riak.riak_object.RiakObject.reload" title="riak.riak_object.RiakObject.reload"><tt class="xref py py-meth docutils literal"><span class="pre">fetching</span></tt></a> objects from Riak.</p>
+<p>You do not typically have to create <a class="reference internal" href="#riak.content.RiakContent" title="riak.content.RiakContent"><code class="xref py py-class docutils literal"><span class="pre">RiakContent</span></code></a> objects yourself, but they will be created
+for you when <a class="reference internal" href="#riak.riak_object.RiakObject.reload" title="riak.riak_object.RiakObject.reload"><code class="xref py py-meth docutils literal"><span class="pre">fetching</span></code></a> objects from Riak.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The <a class="reference internal" href="#object-accessors"><em>Value and Metadata</em></a> accessors on <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>
+<p class="last">The <a class="reference internal" href="#object-accessors"><span>Value and Metadata</span></a> accessors on <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>
 are actually proxied to the first sibling when the object has only
 one.</p>
 </div>
@@ -558,20 +542,20 @@ one.</p>
 <p>When an object is <em>not</em> in conflict, it has only one sibling. When it
 is in conflict, you will have to resolve the conflict before it can be
 written again. How you choose to resolve the conflict is up to you,
-but you can automate the process using a <a class="reference internal" href="#riak.riak_object.RiakObject.resolver" title="riak.riak_object.RiakObject.resolver"><tt class="xref py py-attr docutils literal"><span class="pre">resolver</span></tt></a> function.</p>
+but you can automate the process using a <a class="reference internal" href="#riak.riak_object.RiakObject.resolver" title="riak.riak_object.RiakObject.resolver"><code class="xref py py-attr docutils literal"><span class="pre">resolver</span></code></a> function.</p>
 <dl class="function">
 <dt id="riak.resolver.default_resolver">
-<tt class="descclassname">riak.resolver.</tt><tt class="descname">default_resolver</tt><big>(</big><em>riak_object</em><big>)</big><a class="headerlink" href="#riak.resolver.default_resolver" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">riak.resolver.</code><code class="descname">default_resolver</code><span class="sig-paren">(</span><em>riak_object</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.resolver.default_resolver" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default conflict-resolution function, which does nothing. To
 implement a resolver, define a function that sets the
-<a class="reference internal" href="#riak.riak_object.RiakObject.siblings" title="riak.riak_object.RiakObject.siblings"><tt class="xref py py-attr docutils literal"><span class="pre">siblings</span></tt></a> property
-on the passed <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>
-instance to a list containing a single <a class="reference internal" href="#riak.content.RiakContent" title="riak.content.RiakContent"><tt class="xref py py-class docutils literal"><span class="pre">RiakContent</span></tt></a> object.</p>
+<a class="reference internal" href="#riak.riak_object.RiakObject.siblings" title="riak.riak_object.RiakObject.siblings"><code class="xref py py-attr docutils literal"><span class="pre">siblings</span></code></a> property
+on the passed <a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>
+instance to a list containing a single <a class="reference internal" href="#riak.content.RiakContent" title="riak.content.RiakContent"><code class="xref py py-class docutils literal"><span class="pre">RiakContent</span></code></a> object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>riak_object</strong> (<a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>) &#8211; an object-in-conflict that will be resolved</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>riak_object</strong> (<a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>) &#8211; an object-in-conflict that will be resolved</td>
 </tr>
 </tbody>
 </table>
@@ -579,27 +563,27 @@ instance to a list containing a single <a class="reference internal" href="#riak
 
 <dl class="function">
 <dt id="riak.resolver.last_written_resolver">
-<tt class="descclassname">riak.resolver.</tt><tt class="descname">last_written_resolver</tt><big>(</big><em>riak_object</em><big>)</big><a class="headerlink" href="#riak.resolver.last_written_resolver" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">riak.resolver.</code><code class="descname">last_written_resolver</code><span class="sig-paren">(</span><em>riak_object</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.resolver.last_written_resolver" title="Permalink to this definition">¶</a></dt>
 <dd><p>A conflict-resolution function that resolves by selecting the most
 recently-modified sibling by timestamp.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>riak_object</strong> (<a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a>) &#8211; an object-in-conflict that will be resolved</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>riak_object</strong> (<a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>) &#8211; an object-in-conflict that will be resolved</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <p>If you do not supply a resolver function, or your resolver leaves
-multiple siblings present, accessing the <a class="reference internal" href="#object-accessors"><em>Value and Metadata</em></a> will
-result in a <a class="reference internal" href="#riak.ConflictError" title="riak.ConflictError"><tt class="xref py py-exc docutils literal"><span class="pre">ConflictError</span></tt></a> being raised.</p>
+multiple siblings present, accessing the <a class="reference internal" href="#object-accessors"><span>Value and Metadata</span></a> will
+result in a <a class="reference internal" href="#riak.ConflictError" title="riak.ConflictError"><code class="xref py py-exc docutils literal"><span class="pre">ConflictError</span></code></a> being raised.</p>
 <dl class="exception">
 <dt id="riak.ConflictError">
-<em class="property">exception </em><tt class="descclassname">riak.</tt><tt class="descname">ConflictError</tt><big>(</big><em>message='Object in conflict'</em><big>)</big><a class="headerlink" href="#riak.ConflictError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">riak.</code><code class="descname">ConflictError</code><span class="sig-paren">(</span><em>message='Object in conflict'</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.ConflictError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raised when an operation is attempted on a
-<a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><tt class="xref py py-class docutils literal"><span class="pre">RiakObject</span></tt></a> that has more than one
+<a class="reference internal" href="#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a> that has more than one
 sibling.</p>
 </dd></dl>
 
@@ -608,15 +592,16 @@ sibling.</p>
 </div>
 
 
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="datatypes.html" class="btn btn-neutral float-right" title="Data Types"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="datatypes.html" class="btn btn-neutral float-right" title="Data Types" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="bucket.html" class="btn btn-neutral" title="Buckets &amp; Bucket Types"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="bucket.html" class="btn btn-neutral" title="Buckets &amp; Bucket Types" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -626,11 +611,13 @@ sibling.</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2010-2014, Basho Technologies.
+
     </p>
   </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
 </footer>
+
         </div>
       </div>
 
@@ -645,7 +632,7 @@ sibling.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.1.0',
+            VERSION:'2.3.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

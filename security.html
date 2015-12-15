@@ -5,16 +5,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Security &mdash; Riak Python Client 2.1.0 documentation</title>
+  <title>Security &mdash; Riak Python Client 2.3.0 documentation</title>
   
 
   
   
 
   
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   
   
@@ -30,12 +30,14 @@
   
     <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-    <link rel="top" title="Riak Python Client 2.1.0 documentation" href="index.html"/>
+
+  
+    <link rel="top" title="Riak Python Client 2.3.0 documentation" href="index.html"/>
         <link rel="next" title="Advanced Usage &amp; Internals" href="advanced.html"/>
         <link rel="prev" title="Query Methods" href="query.html"/> 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -45,95 +47,72 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        <a href="index.html" class="fa fa-home"> Riak Python Client</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Riak Python Client
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-      </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
-        
-            <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="client.html#client-objects">Client objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#client-level-operations">Client-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#accessing-bucket-types-and-buckets">Accessing Bucket Types and Buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-type-operations">Bucket Type Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#bucket-operations">Bucket Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#key-level-operations">Key-level Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#query-operations">Query Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#search-maintenance-operations">Search Maintenance Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#deprecated-features">Deprecated Features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-objects">Bucket objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-properties">Bucket properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#working-with-keys">Working with keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#query-operations">Query operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#serialization">Serialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-keys">Listing keys</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-objects">Bucket Type objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#bucket-type-properties">Bucket Type properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#listing-buckets">Listing buckets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bucket.html#deprecated-features">Deprecated Features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="object.html#riakobject">RiakObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="object.html#persistence">Persistence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="object.html#value-and-metadata">Value and Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="object.html#siblings">Siblings</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#sending-operations">Sending Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#context-and-observed-remove">Context and Observed-Remove</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#datatype-abstract-class">Datatype abstract class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#counter">Counter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#set">Set</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map">Map</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#map-only-datatypes">Map-only datatypes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#register">Register</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datatypes.html#flag">Flag</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="query.html#secondary-indexes">Secondary Indexes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#mapreduce">MapReduce</a></li>
-<li class="toctree-l2"><a class="reference internal" href="query.html#riak-search-2-0-yokozuna">Riak Search 2.0 (Yokozuna)</a></li>
-</ul>
-</li>
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Security</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#server-configuration">Server Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#client-configuration">Client Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#authentication-types">Authentication Types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#additional-options">Additional options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication-types">Authentication Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#trust-and-pam-authentication">Trust and PAM Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#password-authentication">Password Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-certificate-authentication">Client Certificate Authentication</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-options">Additional options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#certificate-revocation-lists">Certificate revocation lists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cipher-options">Cipher options</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#securitycreds-object">SecurityCreds object</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#connection-pool">Connection pool</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#retry-logic">Retry logic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#multiget">Multiget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#datatypes">Datatypes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#transports">Transports</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#utilities">Utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="advanced.html#module-commands">distutils commands</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Usage &amp; Internals</a></li>
 </ul>
 
-        
+            
+          
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -148,20 +127,29 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
     <li>Security</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/security.txt" rel="nofollow"> View page source</a>
+          
+            <a href="_sources/security.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="security">
 <span id="security-label"></span><h1>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h1>
@@ -202,17 +190,17 @@ for secure transport in the Riak client. Earlier versions
 may not support TLS 1.2, the recommended security protocol.</p>
 </div>
 <p>On the client, simply create a
-<a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><tt class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></tt></a> object with just a username,
+<a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object with just a username,
 password and CA Certificate file. That would then need to be passed
-into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a> initializer:</p>
+into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> initializer:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="n">SecurityCreds</span><span class="p">(</span><span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
                       <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
                       <span class="n">cacert_file</span><span class="o">=</span><span class="s">&#39;/path/to/ca.crt&#39;</span><span class="p">)</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">RiakClient</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="n">creds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">credentials</span></tt> argument of a <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a> constructor
-is a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><tt class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></tt></a> object. If you specify a dictionary
+<p>The <code class="docutils literal"><span class="pre">credentials</span></code> argument of a <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> constructor
+is a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object. If you specify a dictionary
 instead, it will be turned into this type:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
          <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
@@ -223,9 +211,9 @@ instead, it will be turned into this type:</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">A Certifying Authority (CA) Certificate must always be
-supplied to <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><tt class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></tt></a> by specifying the path to
-a CA certificate file via the <tt class="docutils literal"><span class="pre">cacert_file</span></tt> argument or by
-setting the <tt class="docutils literal"><span class="pre">cacert</span></tt> argument to an <a class="reference external" href="http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects">OpenSSL.crypto.X509</a>
+supplied to <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> by specifying the path to
+a CA certificate file via the <code class="docutils literal"><span class="pre">cacert_file</span></code> argument or by
+setting the <code class="docutils literal"><span class="pre">cacert</span></code> argument to an <a class="reference external" href="http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects">OpenSSL.crypto.X509</a>
 object. This mitigates MITM (man-in-the-middle) attacks by
 ensuring correct certificate validation.</p>
 </div>
@@ -236,12 +224,12 @@ ensuring correct certificate validation.</p>
 <h3>Trust and PAM Authentication<a class="headerlink" href="#trust-and-pam-authentication" title="Permalink to this headline">¶</a></h3>
 <p>The most basic authentication would be <a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Trust-based-Authentication">Trust-based Authentication</a>
 which is done exclusively on the server side by adding the appropriate
-<tt class="docutils literal"><span class="pre">trust</span></tt> security source:</p>
+<code class="docutils literal"><span class="pre">trust</span></code> security source:</p>
 <div class="code bash highlight-python"><div class="highlight"><pre>riak-admin security add-source all 127.0.0.1/32 trust
 </pre></div>
 </div>
 <p><a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#PAM-based-Authentication">PAM-based Authentication</a>
-is another server-side solution which can be added by a <tt class="docutils literal"><span class="pre">pam</span></tt>
+is another server-side solution which can be added by a <code class="docutils literal"><span class="pre">pam</span></code>
 security source with the name of the service:</p>
 <div class="code bash highlight-python"><div class="highlight"><pre>riak-admin security add-source all 127.0.0.1/32 pam service=riak_pam
 </pre></div>
@@ -254,14 +242,14 @@ client&#8217;s perspective, these are equivalent to Password authentication.</p>
 <h3>Password Authentication<a class="headerlink" href="#password-authentication" title="Permalink to this headline">¶</a></h3>
 <p>The next level of security would be simply a username and password for
 <a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Password-based-Authentication">Password-based Authentication</a>.
-The server needs to first have a user and a <tt class="docutils literal"><span class="pre">password</span></tt> security source:</p>
+The server needs to first have a user and a <code class="docutils literal"><span class="pre">password</span></code> security source:</p>
 <div class="code bash highlight-python"><div class="highlight"><pre>riak-admin security add-user riakuser password=captheorem4life
 riak-admin security add-source riakuser 127.0.0.1/32 password
 </pre></div>
 </div>
-<p>On the client, simply create a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><tt class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></tt></a> object or dict
+<p>On the client, simply create a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object or dict
 with just a username and password. That would then need to be passed
-into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><tt class="xref py py-class docutils literal"><span class="pre">RiakClient</span></tt></a> initializer:</p>
+into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> initializer:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
          <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
          <span class="s">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/ca.crt&#39;</span><span class="p">}</span>
@@ -277,14 +265,14 @@ into the <a class="reference internal" href="client.html#riak.client.RiakClient"
 <h3>Client Certificate Authentication<a class="headerlink" href="#client-certificate-authentication" title="Permalink to this headline">¶</a></h3>
 <p>If you are using the <strong>Protocol Buffers</strong> transport you could also add
 a layer of security by using <a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Certificate-based-Authentication">Certificate-based Authentication</a>.
-This time the server requires a <tt class="docutils literal"><span class="pre">certificate</span></tt> security source:</p>
+This time the server requires a <code class="docutils literal"><span class="pre">certificate</span></code> security source:</p>
 <div class="highlight-python"><div class="highlight"><pre>riak-admin security add-source riakuser 127.0.0.1/32 certificate
 </pre></div>
 </div>
-<p>When the <tt class="docutils literal"><span class="pre">certificate</span></tt> source is used, the Riak username must match
-the common name, aka <tt class="docutils literal"><span class="pre">CN</span></tt>, that you specified when you generated your
-certificate.  You can add a <tt class="docutils literal"><span class="pre">certificate</span></tt> source to any number of clients.</p>
-<p>The <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><tt class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></tt></a> must then include the include a client
+<p>When the <code class="docutils literal"><span class="pre">certificate</span></code> source is used, the Riak username must match
+the common name, aka <code class="docutils literal"><span class="pre">CN</span></code>, that you specified when you generated your
+certificate.  You can add a <code class="docutils literal"><span class="pre">certificate</span></code> source to any number of clients.</p>
+<p>The <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> must then include the include a client
 certificate file and a private key file, too:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
          <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
@@ -331,8 +319,8 @@ containing the private key has been lost or stolen):</p>
 </div>
 <div class="section" id="cipher-options">
 <h3>Cipher options<a class="headerlink" href="#cipher-options" title="Permalink to this headline">¶</a></h3>
-<p>The last interesting setting on <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><tt class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></tt></a> is the
-<tt class="docutils literal"><span class="pre">ciphers</span></tt> option which is a colon-delimited list of supported
+<p>The last interesting setting on <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> is the
+<code class="docutils literal"><span class="pre">ciphers</span></code> option which is a colon-delimited list of supported
 ciphers for encryption:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
          <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
@@ -346,7 +334,7 @@ ciphers for encryption:</p>
 <h2>SecurityCreds object<a class="headerlink" href="#securitycreds-object" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="riak.security.SecurityCreds">
-<em class="property">class </em><tt class="descclassname">riak.security.</tt><tt class="descname">SecurityCreds</tt><big>(</big><em>username=None</em>, <em>password=None</em>, <em>pkey_file=None</em>, <em>pkey=None</em>, <em>cert_file=None</em>, <em>cert=None</em>, <em>cacert_file=None</em>, <em>cacert=None</em>, <em>crl_file=None</em>, <em>crl=None</em>, <em>ciphers=None</em>, <em>ssl_version=6</em><big>)</big><a class="headerlink" href="#riak.security.SecurityCreds" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">riak.security.</code><code class="descname">SecurityCreds</code><span class="sig-paren">(</span><em>username=None</em>, <em>password=None</em>, <em>pkey_file=None</em>, <em>pkey=None</em>, <em>cert_file=None</em>, <em>cert=None</em>, <em>cacert_file=None</em>, <em>cacert=None</em>, <em>crl_file=None</em>, <em>crl=None</em>, <em>ciphers=None</em>, <em>ssl_version=5</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.security.SecurityCreds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Container class for security-related settings</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -356,13 +344,13 @@ ciphers for encryption:</p>
 <li><strong>username</strong> (<em>str</em>) &#8211; Riak Security username</li>
 <li><strong>password</strong> (<em>str</em>) &#8211; Riak Security password</li>
 <li><strong>pkey_file</strong> (<em>str</em>) &#8211; Full path to security key file</li>
-<li><strong>key</strong> (<tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.PKey</span></tt>) &#8211; Loaded security key file</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.PKey</span></code>) &#8211; Loaded security key file</li>
 <li><strong>cert_file</strong> (<em>str</em>) &#8211; Full path to certificate file</li>
-<li><strong>cert</strong> (<tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></tt>) &#8211; Loaded client certificate</li>
+<li><strong>cert</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></code>) &#8211; Loaded client certificate</li>
 <li><strong>cacert_file</strong> (<em>str</em>) &#8211; Full path to CA certificate file</li>
-<li><strong>cacert</strong> (<tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></tt>) &#8211; Loaded CA certificate</li>
+<li><strong>cacert</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></code>) &#8211; Loaded CA certificate</li>
 <li><strong>crl_file</strong> (<em>str</em>) &#8211; Full path to revoked certificates file</li>
-<li><strong>crl</strong> (<tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.CRL</span></tt>) &#8211; Loaded revoked certificates list</li>
+<li><strong>crl</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.CRL</span></code>) &#8211; Loaded revoked certificates list</li>
 <li><strong>ciphers</strong> (<em>str</em>) &#8211; List of supported SSL ciphers</li>
 <li><strong>ssl_version</strong> (<em>int</em>) &#8211; OpenSSL security version</li>
 </ul>
@@ -372,7 +360,7 @@ ciphers for encryption:</p>
 </table>
 <dl class="attribute">
 <dt id="riak.security.SecurityCreds.username">
-<tt class="descname">username</tt><a class="headerlink" href="#riak.security.SecurityCreds.username" title="Permalink to this definition">¶</a></dt>
+<code class="descname">username</code><a class="headerlink" href="#riak.security.SecurityCreds.username" title="Permalink to this definition">¶</a></dt>
 <dd><p>Riak Username</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -386,7 +374,7 @@ ciphers for encryption:</p>
 
 <dl class="attribute">
 <dt id="riak.security.SecurityCreds.password">
-<tt class="descname">password</tt><a class="headerlink" href="#riak.security.SecurityCreds.password" title="Permalink to this definition">¶</a></dt>
+<code class="descname">password</code><a class="headerlink" href="#riak.security.SecurityCreds.password" title="Permalink to this definition">¶</a></dt>
 <dd><p>Riak Password</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -399,64 +387,8 @@ ciphers for encryption:</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="riak.security.SecurityCreds.cacert">
-<tt class="descname">cacert</tt><a class="headerlink" href="#riak.security.SecurityCreds.cacert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Certifying Authority (CA) Certificate</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></tt></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.security.SecurityCreds.crl">
-<tt class="descname">crl</tt><a class="headerlink" href="#riak.security.SecurityCreds.crl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Certificate Revocation List</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.CRL</span></tt></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.security.SecurityCreds.cert">
-<tt class="descname">cert</tt><a class="headerlink" href="#riak.security.SecurityCreds.cert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Client Certificate</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></tt></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.security.SecurityCreds.pkey">
-<tt class="descname">pkey</tt><a class="headerlink" href="#riak.security.SecurityCreds.pkey" title="Permalink to this definition">¶</a></dt>
-<dd><p>Client Private key</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.PKey</span></tt></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="riak.security.SecurityCreds.ciphers">
-<tt class="descname">ciphers</tt><a class="headerlink" href="#riak.security.SecurityCreds.ciphers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ciphers</code><a class="headerlink" href="#riak.security.SecurityCreds.ciphers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Colon-delimited list of supported ciphers</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -470,14 +402,14 @@ ciphers for encryption:</p>
 
 <dl class="attribute">
 <dt id="riak.security.SecurityCreds.ssl_version">
-<tt class="descname">ssl_version</tt><a class="headerlink" href="#riak.security.SecurityCreds.ssl_version" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ssl_version</code><a class="headerlink" href="#riak.security.SecurityCreds.ssl_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>SSL/TLS Protocol to use</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">an int constant from OpenSSL, like
-<tt class="xref py py-data docutils literal"><span class="pre">OpenSSL.SSL.TLSv1_2_METHOD</span></tt></td>
+<code class="xref py py-data docutils literal"><span class="pre">OpenSSL.SSL.TLSv1_2_METHOD</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -489,15 +421,16 @@ ciphers for encryption:</p>
 </div>
 
 
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="advanced.html" class="btn btn-neutral float-right" title="Advanced Usage &amp; Internals"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="advanced.html" class="btn btn-neutral float-right" title="Advanced Usage &amp; Internals" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="query.html" class="btn btn-neutral" title="Query Methods"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="query.html" class="btn btn-neutral" title="Query Methods" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -507,11 +440,13 @@ ciphers for encryption:</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2010-2014, Basho Technologies.
+
     </p>
   </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
 </footer>
+
         </div>
       </div>
 
@@ -526,7 +461,7 @@ ciphers for encryption:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.1.0',
+            VERSION:'2.3.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

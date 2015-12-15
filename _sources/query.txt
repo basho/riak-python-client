@@ -43,7 +43,7 @@ process in one payload, so you can also :meth:`stream the results
 
     for keys in bucket.stream_index("bmonth_int", 1):
         # keys is a list of matching keys
-        print keys
+        print(keys)
 
 Both the regular :meth:`~riak.bucket.RiakBucket.get_index` method and
 the :meth:`~riak.bucket.RiakBucket.stream_index` method allow you to
@@ -369,15 +369,15 @@ Here is a brief example of loading and querying data:::
                             "scoville_high_i": 350000}).store()
     results = bucket.search("name_s:/c.*/", index='jalapeno')
     # Yields single document 'chipotle'
-    print results['docs'][0]['name_s']
+    print(results['docs'][0]['name_s'])
     results = bucket.search("scoville_high_i:[20000 TO 500000]")
     # Yields two documents
     for result in results['docs']:
-        print result['name_s']
+        print(result['name_s'])
     results = bucket.search('name_s:*', index='jalapeno', 
                             sort="scoville_low_i desc")
     # Yields all documents, sorted in descending order. We take the top one
-    print "The hottest pepper is {0}".format(results['docs'][0]['name_s'])
+    print("The hottest pepper is {0}".format(results['docs'][0]['name_s']))
 
 The results returned by :meth:`~riak.bucket.RiakBucket.search` is a dictionary
 with lots of search metadata like the number of results, the maxium
