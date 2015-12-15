@@ -88,7 +88,20 @@ if USE_STDLIB_SSL:
 
         return ssl_ctx
 
+    def configure_pyopenssl_context():
+        raise NotImplementedError('configure_pyopenssl_context')
+
+    class RiakWrappedSocket(socket.socket):
+        def __init__(self):
+            raise NotImplementedError('RiakWrappedSocket')
+
+    class fileobject():
+        def __init__(self):
+            raise NotImplementedError('fileobject')
 else:
+    def configure_ssl_context(credentials):
+        raise NotImplementedError('configure_ssl_context')
+
     def configure_pyopenssl_context(credentials):
         """
         Set various options on the SSL context for Python <= 2.7.8.

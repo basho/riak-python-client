@@ -110,7 +110,8 @@ Security helpers
 .. currentmodule:: riak.transports.security
 
 .. autofunction:: verify_cb
-.. autofunction:: configure_context
+.. autofunction:: configure_ssl_context
+.. autofunction:: configure_pyopenssl_context
 
 .. autoclass:: RiakWrappedSocket
 .. autoclass:: fileobject

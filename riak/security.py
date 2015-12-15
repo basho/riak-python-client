@@ -103,8 +103,8 @@ class SecurityCreds:
         :type password: str
         :param pkey_file: Full path to security key file
         :type pkey_file: str
-        :param key: Loaded security key file
-        :type key: :class:`OpenSSL.crypto.PKey`
+        :param pkey: Loaded security key file
+        :type pkey: :class:`OpenSSL.crypto.PKey`
         :param cert_file: Full path to certificate file
         :type cert_file: str
         :param cert: Loaded client certificate
@@ -207,46 +207,58 @@ class SecurityCreds:
         """
         return self._ssl_version
 
-    if not USE_STDLIB_SSL:
-        @property
-        def pkey(self):
-            """
-            Client Private key
+    @property
+    def pkey(self):
+        """
+        Client Private key
 
-            :rtype: :class:`OpenSSL.crypto.PKey`
-            """
+        :rtype: :class:`OpenSSL.crypto.PKey`
+        """
+        if USE_STDLIB_SSL:
             return self._cached_cert('_pkey', crypto.load_privatekey)
+        else:
+            raise NotImplementedError('pkey')
 
-        @property
-        def cert(self):
-            """
-            Client Certificate
+    @property
+    def cert(self):
+        """
+        Client Certificate
 
-            :rtype: :class:`OpenSSL.crypto.X509`
-            """
+        :rtype: :class:`OpenSSL.crypto.X509`
+        """
+        if USE_STDLIB_SSL:
             return self._cached_cert('_cert', crypto.load_certificate)
+        else:
+            raise NotImplementedError('cert')
 
-        @property
-        def cacert(self):
-            """
-            Certifying Authority (CA) Certificate
+    @property
+    def cacert(self):
+        """
+        Certifying Authority (CA) Certificate
 
-            :rtype: :class:`OpenSSL.crypto.X509`
-            """
+        :rtype: :class:`OpenSSL.crypto.X509`
+        """
+        if USE_STDLIB_SSL:
             return self._cached_cert('_cacert', crypto.load_certificate)
+        else:
+            raise NotImplementedError('cacert')
 
-        @property
-        def crl(self):
-            """
-            Certificate Revocation List
+    @property
+    def crl(self):
+        """
+        Certificate Revocation List
 
-            :rtype: :class:`OpenSSL.crypto.CRL`
-            """
+        :rtype: :class:`OpenSSL.crypto.CRL`
+        """
+        if USE_STDLIB_SSL:
             return self._cached_cert('_crl', crypto.load_crl)
+        else:
+            raise NotImplementedError('crl')
 
-        def _cached_cert(self, key, loader):
-            # If the key is associated with a file,
-            # then lazily load and cache it
+    def _cached_cert(self, key, loader):
+        # If the key is associated with a file,
+        # then lazily load and cache it
+        if USE_STDLIB_SSL:
             key_file = getattr(self, key + "_file")
             if (getattr(self, key) is None) and (key_file is not None):
                 cert_list = []
@@ -262,34 +274,42 @@ class SecurityCreds:
                     cert_list = cert_list[0]
                 setattr(self, key, cert_list)
             return getattr(self, key)
+        else:
+            raise NotImplementedError('_cached_cert')
 
-        def _has_credential(self, key):
-            """
-            ``True`` if a credential or filename value has been supplied for
-            the given property.
+    def _has_credential(self, key):
+        """
+        ``True`` if a credential or filename value has been supplied for
+        the given property.
 
-            :param key: which configuration property to check for
-            :type key: str
-            :rtype: bool
-            """
+        :param key: which configuration property to check for
+        :type key: str
+        :rtype: bool
+        """
+        if USE_STDLIB_SSL:
             internal_key = "_" + key
             return (getattr(self, internal_key) is not None) or \
                 (getattr(self, internal_key + "_file") is not None)
+        else:
+            raise NotImplementedError('_has_credential')
 
-        def _check_revoked_cert(self, ssl_socket):
-            """
-            Checks whether the server certificate on the passed socket has been
-            revoked by checking the CRL.
+    def _check_revoked_cert(self, ssl_socket):
+        """
+        Checks whether the server certificate on the passed socket has been
+        revoked by checking the CRL.
 
-            :param ssl_socket: the SSL/TLS socket
-            :rtype: bool
-            :raises SecurityError: when the certificate has been revoked
-            """
+        :param ssl_socket: the SSL/TLS socket
+        :rtype: bool
+        :raises SecurityError: when the certificate has been revoked
+        """
+        if USE_STDLIB_SSL:
             if not self._has_credential('crl'):
                 return True
-
             servcert = ssl_socket.get_peer_certificate()
             servserial = servcert.get_serial_number()
             for rev in self.crl.get_revoked():
                 if servserial == str_to_long(rev.get_serial(), 16):
-                    raise SecurityError("Server certificate has been revoked")
+                    raise SecurityError(
+                        "Server certificate has been revoked")
+        else:
+            raise NotImplementedError('_check_revoked_cert')
