@@ -125,7 +125,6 @@ class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
         dtype.maps['f'].counters['g']
         dtype.maps['h'].maps['i'].flags['j']
 
-
     def check_op_output(self, op):
         self.assertIn(('update', ('a', 'counter'), ('increment', 2)), op)
         self.assertIn(('update', ('b', 'register'), ('assign', 'testing')), op)
