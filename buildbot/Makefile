@@ -14,7 +14,7 @@ configure:
 	@../setup.py configure --riak-admin=$(RIAK_ADMIN)
 
 compile:
-	@../setup.py develop
+	@echo NO-OP
 
 lint:
 	@pip install --upgrade pep8 flake8
