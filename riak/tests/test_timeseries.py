@@ -236,6 +236,19 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertGreater(len(ts_obj.columns), 0)
         self.assertGreater(len(ts_obj.rows), 0)
 
+    def test_get_description(self):
+        ts_obj = self.client.ts_describe('GeoCheckin')
+        self.assertIsNotNone(ts_obj)
+        self.assertGreater(len(ts_obj.columns), 0)
+        self.assertGreater(len(ts_obj.rows), 0)
+
+    def test_get_description_via_table(self):
+        table = Table(self.client, 'GeoCheckin')
+        ts_obj = table.describe()
+        self.assertIsNotNone(ts_obj)
+        self.assertGreater(len(ts_obj.columns), 0)
+        self.assertGreater(len(ts_obj.rows), 0)
+
     def test_query_that_returns_no_data(self):
         fmt = """
         select * from {table} where
@@ -275,7 +288,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
 
     def test_query_that_matches_some_data_using_interpolation(self):
         fmt = """
-        select * from {table} where
+        select * from {{table}} where
             time > {t1} and time < {t2} and
             geohash = 'hash1' and
             user = 'user2'
