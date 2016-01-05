@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 import platform
+import random
+import string
 import riak.pb.riak_ts_pb2
 
 from riak import RiakError
@@ -27,7 +29,6 @@ ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
 ts1 = ts0 + fiveMins
 
 
-@unittest.skipUnless(RUN_TIMESERIES, 'RUN_TIMESERIES is 0')
 class TimeseriesUnitTests(unittest.TestCase):
     def setUp(self):
         self.c = RiakPbcCodec()
@@ -212,6 +213,22 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(row[2], self.fiveMinsAgo)
         self.assertEqual(row[3], 'wind')
         self.assertIsNone(row[4])
+
+    def test_query_that_creates_table_using_interpolation(self):
+        table = ''.join(
+            [random.choice(string.ascii_letters + string.digits)
+                for n in range(32)])
+        query = """CREATE TABLE {table} (
+            geohash varchar not null,
+            user varchar not null,
+            time timestamp not null,
+            weather varchar not null,
+            temperature double,
+            PRIMARY KEY((geohash, user, quantum(time, 15, m)),
+                geohash, user, time))
+        """
+        ts_obj = self.client.ts_query(table, query)
+        self.assertIsNotNone(ts_obj)
 
     def test_query_that_returns_table_description(self):
         fmt = 'DESCRIBE {table}'
