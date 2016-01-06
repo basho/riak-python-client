@@ -235,36 +235,36 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.assertIsNotNone(ts_obj)
-        self.assertGreater(len(ts_obj.columns), 0)
-        self.assertGreater(len(ts_obj.rows), 0)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
 
     def test_query_that_returns_table_description_using_interpolation(self):
         query = 'Describe {table}'
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.assertIsNotNone(ts_obj)
-        self.assertGreater(len(ts_obj.columns), 0)
-        self.assertGreater(len(ts_obj.rows), 0)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
 
     def test_query_description_via_table(self):
         query = 'describe {table}'
         table = Table(self.client, 'GeoCheckin')
         ts_obj = table.query(query)
         self.assertIsNotNone(ts_obj)
-        self.assertGreater(len(ts_obj.columns), 0)
-        self.assertGreater(len(ts_obj.rows), 0)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
 
     def test_get_description(self):
         ts_obj = self.client.ts_describe('GeoCheckin')
         self.assertIsNotNone(ts_obj)
-        self.assertGreater(len(ts_obj.columns), 0)
-        self.assertGreater(len(ts_obj.rows), 0)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
 
     def test_get_description_via_table(self):
         table = Table(self.client, 'GeoCheckin')
         ts_obj = table.describe()
         self.assertIsNotNone(ts_obj)
-        self.assertGreater(len(ts_obj.columns), 0)
-        self.assertGreater(len(ts_obj.rows), 0)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
 
     def test_query_that_returns_no_data(self):
         fmt = """
