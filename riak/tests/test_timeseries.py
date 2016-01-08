@@ -218,7 +218,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         table = ''.join(
             [random.choice(string.ascii_letters + string.digits)
                 for n in range(32)])
-        query = """CREATE TABLE {table} (
+        query = """CREATE TABLE test-{table} (
             geohash varchar not null,
             user varchar not null,
             time timestamp not null,
