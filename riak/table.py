@@ -49,6 +49,14 @@ class Table(object):
 
         return TsObject(self._client, self, rows, columns)
 
+    def describe(self):
+        """
+        Retrieves a timeseries table's description.
+
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        return self._client.ts_describe(self)
+
     def get(self, key):
         """
         Gets a value from a timeseries table.

@@ -92,9 +92,27 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def ts_describe(self, table):
+        """
+        Retrieves a timeseries table description.
+        """
+        raise NotImplementedError
+
+    def ts_get(self, table, key):
+        """
+        Retrieves a timeseries object.
+        """
+        raise NotImplementedError
+
     def ts_put(self, tsobj):
         """
         Stores a timeseries object.
+        """
+        raise NotImplementedError
+
+    def ts_delete(self, table, key):
+        """
+        Deletes a timeseries object.
         """
         raise NotImplementedError
 

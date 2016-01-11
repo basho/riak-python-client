@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 import platform
+import random
+import string
 import riak.pb.riak_ts_pb2
 
 from riak import RiakError
@@ -27,7 +29,6 @@ ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
 ts1 = ts0 + fiveMins
 
 
-@unittest.skipUnless(RUN_TIMESERIES, 'RUN_TIMESERIES is 0')
 class TimeseriesUnitTests(unittest.TestCase):
     def setUp(self):
         self.c = RiakPbcCodec()
@@ -213,6 +214,58 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(row[3], 'wind')
         self.assertIsNone(row[4])
 
+    def test_query_that_creates_table_using_interpolation(self):
+        table = ''.join(
+            [random.choice(string.ascii_letters + string.digits)
+                for n in range(32)])
+        query = """CREATE TABLE test-{table} (
+            geohash varchar not null,
+            user varchar not null,
+            time timestamp not null,
+            weather varchar not null,
+            temperature double,
+            PRIMARY KEY((geohash, user, quantum(time, 15, m)),
+                geohash, user, time))
+        """
+        ts_obj = self.client.ts_query(table, query)
+        self.assertIsNotNone(ts_obj)
+
+    def test_query_that_returns_table_description(self):
+        fmt = 'DESCRIBE {table}'
+        query = fmt.format(table=table_name)
+        ts_obj = self.client.ts_query('GeoCheckin', query)
+        self.assertIsNotNone(ts_obj)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
+
+    def test_query_that_returns_table_description_using_interpolation(self):
+        query = 'Describe {table}'
+        ts_obj = self.client.ts_query('GeoCheckin', query)
+        self.assertIsNotNone(ts_obj)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
+
+    def test_query_description_via_table(self):
+        query = 'describe {table}'
+        table = Table(self.client, 'GeoCheckin')
+        ts_obj = table.query(query)
+        self.assertIsNotNone(ts_obj)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
+
+    def test_get_description(self):
+        ts_obj = self.client.ts_describe('GeoCheckin')
+        self.assertIsNotNone(ts_obj)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
+
+    def test_get_description_via_table(self):
+        table = Table(self.client, 'GeoCheckin')
+        ts_obj = table.describe()
+        self.assertIsNotNone(ts_obj)
+        self.assertEqual(len(ts_obj.columns), 5)
+        self.assertEqual(len(ts_obj.rows), 5)
+
     def test_query_that_returns_no_data(self):
         fmt = """
         select * from {table} where
@@ -221,6 +274,17 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             user = 'user1'
         """
         query = fmt.format(table=table_name)
+        ts_obj = self.client.ts_query('GeoCheckin', query)
+        self.assertEqual(len(ts_obj.columns), 0)
+        self.assertEqual(len(ts_obj.rows), 0)
+
+    def test_query_that_returns_no_data_using_interpolation(self):
+        query = """
+        select * from {table} where
+            time > 0 and time < 10 and
+            geohash = 'hash1' and
+            user = 'user1'
+        """
         ts_obj = self.client.ts_query('GeoCheckin', query)
         self.assertEqual(len(ts_obj.columns), 0)
         self.assertEqual(len(ts_obj.rows), 0)
@@ -234,6 +298,19 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         """
         query = fmt.format(
                 table=table_name,
+                t1=self.tenMinsAgoMsec,
+                t2=self.nowMsec)
+        ts_obj = self.client.ts_query('GeoCheckin', query)
+        self.validate_data(ts_obj)
+
+    def test_query_that_matches_some_data_using_interpolation(self):
+        fmt = """
+        select * from {{table}} where
+            time > {t1} and time < {t2} and
+            geohash = 'hash1' and
+            user = 'user2'
+        """
+        query = fmt.format(
                 t1=self.tenMinsAgoMsec,
                 t2=self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)

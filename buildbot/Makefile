@@ -13,6 +13,9 @@ preconfigure:
 configure:
 	@../setup.py configure --riak-admin=$(RIAK_ADMIN)
 
+configure_timeseries:
+	@../setup.py setup_timeseries --riak-admin=$(RIAK_ADMIN)
+
 compile:
 	@echo NO-OP
 

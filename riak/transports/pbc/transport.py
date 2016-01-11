@@ -173,6 +173,10 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
         return robj
 
+    def ts_describe(self, table):
+        query = 'DESCRIBE {table}'.format(table=table.name)
+        return self.ts_query(table, query)
+
     def ts_get(self, table, key):
         req = riak.pb.riak_ts_pb2.TsGetReq()
         self._encode_timeseries_keyreq(table, key, req)
@@ -213,7 +217,12 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
 
     def ts_query(self, table, query, interpolations=None):
         req = riak.pb.riak_ts_pb2.TsQueryReq()
-        req.query.base = str_to_bytes(query)
+
+        q = query
+        if '{table}' in q:
+            q = q.format(table=table.name)
+
+        req.query.base = str_to_bytes(q)
 
         msg_code, ts_query_resp = self._request(
             riak.pb.messages.MSG_CODE_TS_QUERY_REQ, req,
