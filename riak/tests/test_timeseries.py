@@ -189,7 +189,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         ]
         ts_obj = table.new(rows)
         result = ts_obj.store()
-        if not result:
+        if not result == True:
             raise AssertionError("expected success")
         client.close()
 
