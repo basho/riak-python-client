@@ -229,6 +229,8 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         """
         ts_obj = self.client.ts_query(table, query)
         self.assertIsNotNone(ts_obj)
+        self.assertEqual(len(ts_obj.columns), 0)
+        self.assertEqual(len(ts_obj.rows), 0)
 
     def test_query_that_returns_table_description(self):
         fmt = 'DESCRIBE {table}'
