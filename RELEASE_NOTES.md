@@ -1,5 +1,11 @@
 # Riak Python Client Release Notes
 
+## 2.4.0 Feature Release - 2016-01-13
+
+This release enhances Riak Time Series functionality.
+
+* [Encapsulate table description](https://github.com/basho/riak-python-client/pull/422)
+
 ## 2.3.0 Feature Release - 2015-12-14
 
 Release 2.3.0 features support for new
