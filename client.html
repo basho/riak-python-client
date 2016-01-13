@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Client &amp; Connections &mdash; Riak Python Client 2.3.0 documentation</title>
+  <title>Client &amp; Connections &mdash; Riak Python Client 2.4.0 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.3.0 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.4.0 documentation" href="index.html"/>
         <link rel="next" title="Buckets &amp; Bucket Types" href="bucket.html"/>
         <link rel="prev" title="Riak Python Client" href="index.html"/> 
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.3.0
+                2.4.0
               </div>
             
           
@@ -860,6 +860,27 @@ on sets and maps</li>
 <div class="section" id="timeseries-operations">
 <h2>Timeseries Operations<a class="headerlink" href="#timeseries-operations" title="Permalink to this headline">¶</a></h2>
 <dl class="method">
+<dt id="riak.client.RiakClient.ts_describe">
+<code class="descclassname">RiakClient.</code><code class="descname">ts_describe</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.RiakClient.ts_describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a time series table description from the Riak cluster.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This request is automatically retried <a class="reference internal" href="#riak.client.RiakClient.retries" title="riak.client.RiakClient.retries"><code class="xref py py-attr docutils literal"><span class="pre">retries</span></code></a>
+times if it fails due to network error.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>table</strong> (string or <code class="xref py py-class docutils literal"><span class="pre">Table</span></code>) &#8211; The timeseries table.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">TsObject</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="riak.client.RiakClient.ts_get">
 <code class="descclassname">RiakClient.</code><code class="descname">ts_get</code><span class="sig-paren">(</span><em>table</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.RiakClient.ts_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve timeseries value by key</p>
@@ -952,6 +973,47 @@ times if it fails due to network error.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">TsObject</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.client.RiakClient.ts_stream_keys">
+<code class="descclassname">RiakClient.</code><code class="descname">ts_stream_keys</code><span class="sig-paren">(</span><em>table</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.RiakClient.ts_stream_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all keys in a time series table via a stream. This is a
+generator method which should be iterated over.</p>
+<p>The caller should explicitly close the returned iterator,
+either using <code class="xref py py-func docutils literal"><span class="pre">contextlib.closing()</span></code> or calling <code class="docutils literal"><span class="pre">close()</span></code>
+explicitly. Consuming the entire iterator will also close the
+stream. If it does not, the associated connection might
+not be returned to the pool. Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+
+<span class="c"># Using contextlib.closing</span>
+<span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">ts_stream_keys</span><span class="p">(</span><span class="n">mytable</span><span class="p">))</span> <span class="k">as</span> <span class="n">keys</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">key_list</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">do_something</span><span class="p">(</span><span class="n">key_list</span><span class="p">)</span>
+
+<span class="c"># Explicit close()</span>
+<span class="n">stream</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">ts_stream_keys</span><span class="p">(</span><span class="n">mytable</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key_list</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+     <span class="n">do_something</span><span class="p">(</span><span class="n">key_list</span><span class="p">)</span>
+<span class="n">stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>table</strong> (<em>Table</em>) &#8211; the table from which to stream keys</li>
+<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">iterator</p>
 </td>
 </tr>
 </tbody>
@@ -1628,7 +1690,7 @@ idempotent and so should not be retried automatically.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.3.0',
+            VERSION:'2.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

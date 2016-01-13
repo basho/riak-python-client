@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Advanced Usage &amp; Internals &mdash; Riak Python Client 2.3.0 documentation</title>
+  <title>Advanced Usage &amp; Internals &mdash; Riak Python Client 2.4.0 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.3.0 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.4.0 documentation" href="index.html"/>
         <link rel="prev" title="Security" href="security.html"/> 
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                2.3.0
+                2.4.0
               </div>
             
           
@@ -503,7 +503,7 @@ Used internally.</p>
 <h2>Multiget<a class="headerlink" href="#multiget" title="Permalink to this headline">¶</a></h2>
 <dl class="data">
 <dt id="riak.client.multiget.POOL_SIZE">
-<code class="descclassname">riak.client.multiget.</code><code class="descname">POOL_SIZE</code><em class="property"> = 2</em><a class="headerlink" href="#riak.client.multiget.POOL_SIZE" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">riak.client.multiget.</code><code class="descname">POOL_SIZE</code><em class="property"> = 4</em><a class="headerlink" href="#riak.client.multiget.POOL_SIZE" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default size of the worker pool, either based on the number
 of CPUS or defaulting to 6</p>
 </dd></dl>
@@ -517,7 +517,7 @@ multiget pool.</p>
 
 <dl class="class">
 <dt id="riak.client.multiget.MultiGetPool">
-<em class="property">class </em><code class="descclassname">riak.client.multiget.</code><code class="descname">MultiGetPool</code><span class="sig-paren">(</span><em>size=2</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.multiget.MultiGetPool" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">riak.client.multiget.</code><code class="descname">MultiGetPool</code><span class="sig-paren">(</span><em>size=4</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.multiget.MultiGetPool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encapsulates a pool of fetcher threads. These threads can be used
 across many multi-get requests.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -994,6 +994,24 @@ when creating the transport object.</p>
 <dt id="riak.transports.transport.RiakTransport.stream_mapred">
 <code class="descname">stream_mapred</code><span class="sig-paren">(</span><em>inputs</em>, <em>query</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_mapred" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams the results of a MapReduce request through an iterator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.ts_delete">
+<code class="descname">ts_delete</code><span class="sig-paren">(</span><em>table</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a timeseries object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.ts_describe">
+<code class="descname">ts_describe</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a timeseries table description.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="riak.transports.transport.RiakTransport.ts_get">
+<code class="descname">ts_get</code><span class="sig-paren">(</span><em>table</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a timeseries object.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2262,7 +2280,7 @@ and use the results of get_version() as your package version:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.3.0',
+            VERSION:'2.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
