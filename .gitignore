@@ -1,13 +1,19 @@
 *.pyc
 .python-version
+__pycache__/
+
+.tox/
+
+.tox/
 
 docs/_build
 
 .*.swp
 .coverage
 
-build/
+py-build/
 dist/
+
 riak.egg-info/
 *.egg
 .eggs/

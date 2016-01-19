@@ -196,7 +196,7 @@ class RiakBucket(object):
     def get(self, key, r=None, pr=None, timeout=None, include_context=None,
             basic_quorum=None, notfound_ok=None):
         """
-        Retrieve an :class:`~riak.riak_object.RiakObject` or
+        Retrieve a :class:`~riak.riak_object.RiakObject` or
         :class:`~riak.datatypes.Datatype`, based on the presence and value
         of the :attr:`datatype <BucketType.datatype>` bucket property.
 
@@ -410,7 +410,9 @@ class RiakBucket(object):
         :type filename: string
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
-        binary_data = open(filename, "rb").read()
+        binary_data = None
+        with open(filename, 'rb') as f:
+            binary_data = f.read()
         mimetype, encoding = mimetypes.guess_type(filename)
         if encoding:
             binary_data = bytearray(binary_data, encoding)

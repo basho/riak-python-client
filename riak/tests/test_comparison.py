@@ -1,25 +1,8 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
+# -*- coding: utf-8 -*-
 import platform
 from riak.riak_object import RiakObject
 from riak.bucket import RiakBucket, BucketType
-from riak.tests.test_all import BaseTestCase
+from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -153,12 +136,14 @@ class RiakObjectComparisonTest(unittest.TestCase):
         self.assertIsNone(b, 'empty object key not allowed')
 
 
-class RiakClientComparisonTest(unittest.TestCase, BaseTestCase):
+class RiakClientComparisonTest(IntegrationTestBase, unittest.TestCase):
     def test_client_eq(self):
         self.protocol = 'http'
         a = self.create_client(host='host1', http_port=11)
         b = self.create_client(host='host1', http_port=11)
         self.assertEqual(a, b)
+        a.close()
+        b.close()
 
     def test_client_nq(self):
         self.protocol = 'http'
@@ -167,6 +152,9 @@ class RiakClientComparisonTest(unittest.TestCase, BaseTestCase):
         c = self.create_client(host='host1', http_port=12)
         self.assertNotEqual(a, b, 'matched with different hosts')
         self.assertNotEqual(a, c, 'matched with different ports')
+        a.close()
+        b.close()
+        c.close()
 
     def test_client_hash(self):
         self.protocol = 'http'
@@ -175,6 +163,9 @@ class RiakClientComparisonTest(unittest.TestCase, BaseTestCase):
         c = self.create_client(host='host2', http_port=11)
         self.assertEqual(hash(a), hash(b), 'same object has different hashes')
         self.assertNotEqual(hash(a), hash(c), 'different object has same hash')
+        a.close()
+        b.close()
+        c.close()
 
 if __name__ == '__main__':
     unittest.main()

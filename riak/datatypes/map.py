@@ -257,12 +257,15 @@ class Map(Mapping, Datatype):
         """
         Whether the map has staged local modifications.
         """
-        values_modified = [self._value[v].modified for v in self._value]
-        modified = (any(values_modified) or self._removes or self._updates)
-        if modified:
+        if self._removes:
             return True
-        else:
-            return False
+        for v in self._value:
+            if self._value[v].modified:
+                return True
+        for v in self._updates:
+            if self._updates[v].modified:
+                return True
+        return False
 
     def to_op(self):
         """

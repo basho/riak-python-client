@@ -86,11 +86,21 @@ class RiakHTTPSConnection(HTTPSConnection):
         :type timeout: int
         """
         if PY2:
+            # NB: it appears that pkey_file / cert_file are never set
+            # in riak/transports/http/connection.py#_connect() method
+            pkf = pkey_file
+            if pkf is None and credentials is not None:
+                pkf = credentials._pkey_file
+
+            cf = cert_file
+            if cf is None and credentials is not None:
+                cf = credentials._cert_file
+
             HTTPSConnection.__init__(self,
                                      host,
                                      port,
-                                     key_file=pkey_file,
-                                     cert_file=cert_file)
+                                     key_file=pkf,
+                                     cert_file=cf)
         else:
             super(RiakHTTPSConnection, self). \
                 __init__(host=host,
@@ -128,6 +138,8 @@ class RiakHTTPSConnection(HTTPSConnection):
         else:
             ssl_ctx = configure_ssl_context(self.credentials)
             host = "riak@" + self.host
+            if self.timeout is not None:
+                sock.settimeout(self.timeout)
             self.sock = ssl.SSLSocket(sock=sock,
                                       keyfile=self.credentials.pkey_file,
                                       certfile=self.credentials.cert_file,

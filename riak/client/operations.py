@@ -1,26 +1,9 @@
-"""
-Copyright 2012 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 from riak.client.transport import RiakClientTransport, \
     retryable, retryableHttpOnly
 from riak.client.multiget import multiget
 from riak.client.index_page import IndexPage
 from riak.datatypes import TYPES
+from riak.table import Table
 from riak.util import bytes_to_str
 from six import string_types, PY2
 
@@ -552,6 +535,146 @@ class RiakClientOperations(RiakClientTransport):
                              return_body=return_body,
                              if_none_match=if_none_match,
                              timeout=timeout)
+
+    @retryable
+    def ts_describe(self, transport, table):
+        """
+        ts_describe(table)
+
+        Retrieve a time series table description from the Riak cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        t = table
+        if isinstance(t, string_types):
+            t = Table(self, table)
+        return transport.ts_describe(t)
+
+    @retryable
+    def ts_get(self, transport, table, key):
+        """
+        ts_get(table, key)
+
+        Retrieve timeseries value by key
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param key: The timeseries value's key.
+        :type key: list
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        t = table
+        if isinstance(t, string_types):
+            t = Table(self, table)
+        return transport.ts_get(t, key)
+
+    @retryable
+    def ts_put(self, transport, tsobj):
+        """
+        ts_put(tsobj)
+
+        Stores time series data in the Riak cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param tsobj: the time series object to store
+        :type tsobj: RiakTsObject
+        :rtype: boolean
+        """
+        return transport.ts_put(tsobj)
+
+    @retryable
+    def ts_delete(self, transport, table, key):
+        """
+        ts_delete(table, key)
+
+        Delete timeseries value by key
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param key: The timeseries value's key.
+        :type key: list or dict
+        :rtype: boolean
+        """
+        t = table
+        if isinstance(t, string_types):
+            t = Table(self, table)
+        return transport.ts_delete(t, key)
+
+    @retryable
+    def ts_query(self, transport, table, query, interpolations=None):
+        """
+        ts_query(table, query, interpolations=None)
+
+        Queries time series data in the Riak cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :param query: The timeseries query.
+        :type query: string
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        t = table
+        if isinstance(t, string_types):
+            t = Table(self, table)
+        return transport.ts_query(t, query, interpolations)
+
+    def ts_stream_keys(self, table, timeout=None):
+        """
+        Lists all keys in a time series table via a stream. This is a
+        generator method which should be iterated over.
+
+        The caller should explicitly close the returned iterator,
+        either using :func:`contextlib.closing` or calling ``close()``
+        explicitly. Consuming the entire iterator will also close the
+        stream. If it does not, the associated connection might
+        not be returned to the pool. Example::
+
+            from contextlib import closing
+
+            # Using contextlib.closing
+            with closing(client.ts_stream_keys(mytable)) as keys:
+                for key_list in keys:
+                    do_something(key_list)
+
+            # Explicit close()
+            stream = client.ts_stream_keys(mytable)
+            for key_list in stream:
+                 do_something(key_list)
+            stream.close()
+
+        :param table: the table from which to stream keys
+        :type table: Table
+        :param timeout: a timeout value in milliseconds
+        :type timeout: int
+        :rtype: iterator
+        """
+        _validate_timeout(timeout)
+        resource = self._acquire()
+        transport = resource.object
+        stream = transport.ts_stream_keys(table, timeout)
+        stream.attach(resource)
+        try:
+            for keylist in stream:
+                if len(keylist) > 0:
+                    yield keylist
+        finally:
+            stream.close()
 
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,

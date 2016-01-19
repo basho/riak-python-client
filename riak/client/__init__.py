@@ -1,24 +1,3 @@
-"""
-Copyright 2011 Basho Technologies, Inc.
-Copyright 2010 Rusty Klophaus <rusty@basho.com>
-Copyright 2010 Justin Sheehy <justin@basho.com>
-Copyright 2009 Jay Baird <jay@mochimedia.com>
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 try:
     import simplejson as json
 except ImportError:
@@ -31,6 +10,7 @@ from riak.node import RiakNode
 from riak.bucket import RiakBucket, BucketType
 from riak.mapreduce import RiakMapReduceChain
 from riak.resolver import default_resolver
+from riak.table import Table
 from riak.transports.http import RiakHttpPool
 from riak.transports.pbc import RiakPbcPool
 from riak.security import SecurityCreds
@@ -140,6 +120,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                               'binary/octet-stream': binary_encoder_decoder}
         self._buckets = WeakValueDictionary()
         self._bucket_types = WeakValueDictionary()
+        self._tables = WeakValueDictionary()
 
     def _get_protocol(self):
         return self._protocol
@@ -277,12 +258,12 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         not always exist (unlike buckets), but this will always return
         a :class:`BucketType <riak.bucket.BucketType>` object.
 
-        :param name: the bucket name
+        :param name: the bucket-type name
         :type name: str
         :rtype: :class:`BucketType <riak.bucket.BucketType>`
         """
         if not isinstance(name, string_types):
-            raise TypeError('Bucket name must be a string')
+            raise TypeError('BucketType name must be a string')
 
         if name in self._bucket_types:
             return self._bucket_types[name]
@@ -290,6 +271,26 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             btype = BucketType(self, name)
             self._bucket_types[name] = btype
             return btype
+
+    def table(self, name):
+        """
+        Gets the table by the specified name. Tables do
+        not always exist (unlike buckets), but this will always return
+        a :class:`Table <riak.table.Table>` object.
+
+        :param name: the table name
+        :type name: str
+        :rtype: :class:`Table <riak.table.Table>`
+        """
+        if not isinstance(name, string_types):
+            raise TypeError('Table name must be a string')
+
+        if name in self._tables:
+            return self._tables[name]
+        else:
+            table = Table(self, name)
+            self._tables[name] = table
+            return table
 
     def close(self):
         """

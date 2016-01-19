@@ -1,5 +1,32 @@
 # Riak Python Client Release Notes
 
+## 2.4.0 Feature Release - 2016-01-13
+
+This release enhances Riak Time Series functionality.
+
+* [Encapsulate table description](https://github.com/basho/riak-python-client/pull/422)
+
+## 2.3.0 Feature Release - 2015-12-14
+
+Release 2.3.0 features support for new
+[time series](https://github.com/basho/riak-python-client/pull/416)
+functionality.
+
+This is release retires support for Python 2.6.x but adds support for
+Python 3.5.x.
+
+There are also many bugfixes and new enhancements:
+
+* [Protocol buffers are now integrated into the Python Client]
+  (https://github.com/basho/riak-python-client/pull/418)
+* [Support for Preflists and Write-Once bucket types]
+  (https://github.com/basho/riak-python-client/pull/414)
+* [Support Riak 2.1.1]
+  (https://github.com/basho/riak-python-client/pull/407)
+* [Native SSL support for Python 2.7.9+]
+  (https://github.com/basho/riak-python-client/pull/397)
+
+
 ## 2.2.0 Feature Release - 2014-12-18
 
 Release 2.2.0 features support for

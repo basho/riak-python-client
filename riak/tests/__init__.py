@@ -12,12 +12,14 @@ if USE_TEST_SERVER:
     test_server.start()
 
 try:
-    __import__('riak_pb')
+    __import__('riak.pb')
     HAVE_PROTO = True
 except ImportError:
     HAVE_PROTO = False
 
 HOST = os.environ.get('RIAK_TEST_HOST', '127.0.0.1')
+
+PROTOCOL = os.environ.get('RIAK_TEST_PROTOCOL', 'pbc')
 
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
 PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
@@ -30,15 +32,17 @@ HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 DUMMY_HTTP_PORT = int(os.environ.get('DUMMY_HTTP_PORT', '1023'))
 DUMMY_PB_PORT = int(os.environ.get('DUMMY_PB_PORT', '1022'))
 
-
-SKIP_SEARCH = int(os.environ.get('SKIP_SEARCH', '1'))
+RUN_SEARCH = int(os.environ.get('RUN_SEARCH', '0'))
 RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 
-SKIP_INDEXES = int(os.environ.get('SKIP_INDEXES', '1'))
+RUN_INDEXES = int(os.environ.get('RUN_INDEXES', '0'))
 
-SKIP_POOL = os.environ.get('SKIP_POOL')
-SKIP_RESOLVE = int(os.environ.get('SKIP_RESOLVE', '0'))
-SKIP_BTYPES = int(os.environ.get('SKIP_BTYPES', '0'))
+RUN_TIMESERIES = int(os.environ.get('RUN_TIMESERIES', '0'))
+
+RUN_POOL = int(os.environ.get('RUN_POOL', '0'))
+RUN_RESOLVE = int(os.environ.get('RUN_RESOLVE', '1'))
+RUN_BTYPES = int(os.environ.get('RUN_BTYPES', '1'))
+RUN_DATATYPES = int(os.environ.get('RUN_DATATYPES', '1'))
 
 RUN_SECURITY = int(os.environ.get('RUN_SECURITY', '0'))
 SECURITY_USER = os.environ.get('RIAK_TEST_SECURITY_USER', 'testuser')
@@ -60,7 +64,9 @@ SECURITY_CERT_USER = os.environ.get('RIAK_TEST_SECURITY_CERT_USER',
 SECURITY_CERT_PASSWD = os.environ.get('RIAK_TEST_SECURITY_CERT_PASSWD',
                                       'certpass')
 
-SECURITY_CIPHERS = 'DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:AES128-SHA256:AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA'
+SECURITY_CIPHERS = 'DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:' + \
+        'DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:AES128-SHA256:' + \
+        'AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA'
 
 SECURITY_CREDS = None
 if RUN_SECURITY:
@@ -68,4 +74,3 @@ if RUN_SECURITY:
                                    password=SECURITY_PASSWD,
                                    cacert_file=SECURITY_CACERT,
                                    ciphers=SECURITY_CIPHERS)
-SKIP_DATATYPES = int(os.environ.get('SKIP_DATATYPES', '0'))

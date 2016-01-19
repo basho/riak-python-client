@@ -1,27 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import platform
 from riak import RiakBucket, BucketType, RiakObject
 import riak.datatypes as datatypes
-from . import SKIP_DATATYPES
-from riak.tests import test_six
+from riak.tests import RUN_DATATYPES
+from riak.tests.base import IntegrationTestBase
+from riak.tests.comparison import Comparison
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -29,7 +12,7 @@ else:
     import unittest
 
 
-class DatatypeUnitTests(object):
+class DatatypeUnitTestBase(object):
     dtype = None
     bucket = RiakBucket(None, 'test', BucketType(None, 'datatypes'))
 
@@ -67,8 +50,7 @@ class DatatypeUnitTests(object):
         self.check_op_output(op)
 
 
-class FlagUnitTests(DatatypeUnitTests,
-                    unittest.TestCase):
+class FlagUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Flag
 
     def op(self, dtype):
@@ -87,8 +69,7 @@ class FlagUnitTests(DatatypeUnitTests,
         self.assertTrue(dtype.modified)
 
 
-class RegisterUnitTests(DatatypeUnitTests,
-                        unittest.TestCase):
+class RegisterUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Register
 
     def op(self, dtype):
@@ -98,8 +79,7 @@ class RegisterUnitTests(DatatypeUnitTests,
         self.assertEqual(('assign', 'foobarbaz'), op)
 
 
-class CounterUnitTests(DatatypeUnitTests,
-                       unittest.TestCase):
+class CounterUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Counter
 
     def op(self, dtype):
@@ -109,9 +89,7 @@ class CounterUnitTests(DatatypeUnitTests,
         self.assertEqual(('increment', 5), op)
 
 
-class SetUnitTests(DatatypeUnitTests,
-                   unittest.TestCase,
-                   test_six.Comparison):
+class SetUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
     dtype = datatypes.Set
 
     def op(self, dtype):
@@ -136,8 +114,7 @@ class SetUnitTests(DatatypeUnitTests,
         self.assertTrue(dtype.modified)
 
 
-class MapUnitTests(DatatypeUnitTests,
-                   unittest.TestCase):
+class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
     dtype = datatypes.Map
 
     def op(self, dtype):
@@ -145,6 +122,8 @@ class MapUnitTests(DatatypeUnitTests,
         dtype.registers['b'].assign('testing')
         dtype.flags['c'].enable()
         dtype.maps['d'][('e', 'set')].add('deep value')
+        dtype.maps['f'].counters['g']
+        dtype.maps['h'].maps['i'].flags['j']
 
     def check_op_output(self, op):
         self.assertIn(('update', ('a', 'counter'), ('increment', 2)), op)
@@ -153,6 +132,9 @@ class MapUnitTests(DatatypeUnitTests,
         self.assertIn(('update', ('d', 'map'), [('update', ('e', 'set'),
                                                  {'adds': ['deep value']})]),
                       op)
+        self.assertNotIn(('update', ('f', 'map'), None), op)
+        self.assertNotIn(('update', ('h', 'map'), [('update', ('i', 'map'),
+                                                    None)]), op)
 
     def test_removes_require_context(self):
         dtype = self.dtype(self.bucket, 'key')
@@ -170,8 +152,10 @@ class MapUnitTests(DatatypeUnitTests,
         self.assertTrue(dtype.modified)
 
 
-class DatatypeIntegrationTests(object):
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
+@unittest.skipUnless(RUN_DATATYPES, 'RUN_DATATYPES is 0')
+class DatatypeIntegrationTests(IntegrationTestBase,
+                               unittest.TestCase,
+                               Comparison):
     def test_dt_counter(self):
         btype = self.client.bucket_type('pytest-counters')
         bucket = btype.bucket(self.bucket_name)
@@ -188,7 +172,6 @@ class DatatypeIntegrationTests(object):
         mycount.reload()
         self.assertEqual(2, mycount.value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -211,7 +194,6 @@ class DatatypeIntegrationTests(object):
         self.assertIn('Brett', myset)
         self.assertNotIn('Sean', myset)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map(self):
         btype = self.client.bucket_type('pytest-maps')
         bucket = btype.bucket(self.bucket_name)
@@ -247,7 +229,6 @@ class DatatypeIntegrationTests(object):
         self.assertIn('f', mymap.sets)
         self.assertItemsEqual(['thing1', 'thing2'], mymap.sets['f'].value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_remove_without_context(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -259,7 +240,6 @@ class DatatypeIntegrationTests(object):
         with self.assertRaises(datatypes.ContextRequired):
             set.discard("Y")
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_remove_fetching_context(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -276,7 +256,6 @@ class DatatypeIntegrationTests(object):
         set2 = bucket.get(self.key_name)
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_add_twice(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -293,7 +272,6 @@ class DatatypeIntegrationTests(object):
         set2 = bucket.get(self.key_name)
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_add_wins_in_same_op(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -311,7 +289,6 @@ class DatatypeIntegrationTests(object):
         set2 = bucket.get(self.key_name)
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_add_wins_in_same_op_reversed(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -329,7 +306,6 @@ class DatatypeIntegrationTests(object):
         set2 = bucket.get(self.key_name)
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_remove_old_context(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -351,7 +327,6 @@ class DatatypeIntegrationTests(object):
         set2 = bucket.get(self.key_name)
         self.assertItemsEqual(['X', 'Y', 'Z'], set2.value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_remove_updated_context(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -372,7 +347,6 @@ class DatatypeIntegrationTests(object):
         set2 = bucket.get(self.key_name)
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map_remove_set_update_same_op(self):
         btype = self.client.bucket_type('pytest-maps')
         bucket = btype.bucket(self.bucket_name)
@@ -390,7 +364,6 @@ class DatatypeIntegrationTests(object):
         map2 = bucket.get(self.key_name)
         self.assertItemsEqual(["Z"], map2.sets['set'])
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map_remove_counter_increment_same_op(self):
         btype = self.client.bucket_type('pytest-maps')
         bucket = btype.bucket(self.bucket_name)
@@ -408,7 +381,6 @@ class DatatypeIntegrationTests(object):
         map2 = bucket.get(self.key_name)
         self.assertEqual(2, map2.counters['counter'].value)
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map_remove_map_update_same_op(self):
         btype = self.client.bucket_type('pytest-maps')
         bucket = btype.bucket(self.bucket_name)
@@ -426,7 +398,6 @@ class DatatypeIntegrationTests(object):
         map2 = bucket.get(self.key_name)
         self.assertItemsEqual(["Z"], map2.maps['map'].sets['set'])
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_set_return_body_true_default(self):
         btype = self.client.bucket_type('pytest-sets')
         bucket = btype.bucket(self.bucket_name)
@@ -444,7 +415,6 @@ class DatatypeIntegrationTests(object):
         myset.store()
         self.assertItemsEqual(myset.value, ['Y'])
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_dt_map_return_body_true_default(self):
         btype = self.client.bucket_type('pytest-maps')
         bucket = btype.bucket(self.bucket_name)
@@ -469,7 +439,6 @@ class DatatypeIntegrationTests(object):
 
         self.assertEqual(mymap.value, {})
 
-    @unittest.skipIf(SKIP_DATATYPES, 'SKIP_DATATYPES is set')
     def test_delete_datatype(self):
         ctype = self.client.bucket_type('pytest-counters')
         cbucket = ctype.bucket(self.bucket_name)

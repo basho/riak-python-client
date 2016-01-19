@@ -92,6 +92,42 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def ts_describe(self, table):
+        """
+        Retrieves a timeseries table description.
+        """
+        raise NotImplementedError
+
+    def ts_get(self, table, key):
+        """
+        Retrieves a timeseries object.
+        """
+        raise NotImplementedError
+
+    def ts_put(self, tsobj):
+        """
+        Stores a timeseries object.
+        """
+        raise NotImplementedError
+
+    def ts_delete(self, table, key):
+        """
+        Deletes a timeseries object.
+        """
+        raise NotImplementedError
+
+    def ts_query(self, table, query, interpolations=None):
+        """
+        Query timeseries data.
+        """
+        raise NotImplementedError
+
+    def ts_stream_keys(self, table, timeout=None):
+        """
+        Streams the list of keys for the table through an iterator.
+        """
+        raise NotImplementedError
+
     def get_buckets(self, bucket_type=None, timeout=None):
         """
         Gets the list of buckets as strings.

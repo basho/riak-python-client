@@ -209,7 +209,9 @@ if __name__ == '__main__':
     client = RiakClient(protocol='pbc')
     bkeys = [('default', 'multiget', str(key)) for key in range(10000)]
 
-    data = open(__file__).read()
+    data = None
+    with open(__file__) as f:
+        data = f.read()
 
     print("Benchmarking multiget:")
     print("      CPUs: {0}".format(cpu_count()))
