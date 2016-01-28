@@ -1,26 +1,9 @@
-"""
-Copyright 2013 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 from __future__ import print_function
 from collections import namedtuple
 from threading import Thread, Lock, Event
 from multiprocessing import cpu_count
 from six import PY2
+
 if PY2:
     from Queue import Queue
 else:
@@ -177,8 +160,8 @@ def multiget(client, keys, **options):
         :meth:`RiakBucket.get <riak.bucket.RiakBucket.get>`
     :type options: dict
     :rtype: list
-
     """
+
     outq = Queue()
 
     if 'pool' in options:
@@ -201,43 +184,3 @@ def multiget(client, keys, **options):
         outq.task_done()
 
     return results
-
-if __name__ == '__main__':
-    # Run a benchmark!
-    from riak import RiakClient
-    import riak.benchmark as benchmark
-    client = RiakClient(protocol='pbc')
-    bkeys = [('default', 'multiget', str(key)) for key in range(10000)]
-
-    data = None
-    with open(__file__) as f:
-        data = f.read()
-
-    print("Benchmarking multiget:")
-    print("      CPUs: {0}".format(cpu_count()))
-    print("   Threads: {0}".format(POOL_SIZE))
-    print("      Keys: {0}".format(len(bkeys)))
-    print()
-
-    with benchmark.measure() as b:
-        with b.report('populate'):
-            for _, bucket, key in bkeys:
-                client.bucket(bucket).new(key, encoded_data=data,
-                                          content_type='text/plain'
-                                          ).store()
-    for b in benchmark.measure_with_rehearsal():
-        client.protocol = 'http'
-        with b.report('http seq'):
-            for _, bucket, key in bkeys:
-                client.bucket(bucket).get(key)
-
-        with b.report('http multi'):
-            multiget(client, bkeys)
-
-        client.protocol = 'pbc'
-        with b.report('pbc seq'):
-            for _, bucket, key in bkeys:
-                client.bucket(bucket).get(key)
-
-        with b.report('pbc multi'):
-            multiget(client, bkeys)
