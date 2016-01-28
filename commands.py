@@ -266,9 +266,9 @@ class setup_security(Command, security_commands):
 
     _commands = [
         "add-user $USERNAME password=$PASSWORD",
-        "add-source $USERNAME 127.0.0.1/32 password",
+        "add-source $USERNAME 0.0.0.0/32 password",
         "add-user $CERTUSER password=$CERTPASS",
-        "add-source $CERTUSER 127.0.0.1/32 certificate"
+        "add-source $CERTUSER 0.0.0.0/32 certificate"
     ]
 
     _grants = {
@@ -392,9 +392,9 @@ class preconfigure(Command):
     * Update these lines in riak.conf
         * storage_backend = leveldb
         * search = on
-        * listener.protobuf.internal = 127.0.0.1:8087
-        * listener.http.internal = 127.0.0.1:8098
-        * listener.https.internal = 127.0.0.1:18098
+        * listener.protobuf.internal = 0.0.0.0:8087
+        * listener.http.internal = 0.0.0.0:8098
+        * listener.https.internal = 0.0.0.0:18098
         * ssl.certfile = $pwd/tests/resources/server.crt
         * ssl.keyfile = $pwd/tests/resources/server.key
         * ssl.cacertfile = $pwd/tests/resources/ca.crt
@@ -412,7 +412,7 @@ class preconfigure(Command):
 
     def initialize_options(self):
         self.riak_conf = None
-        self.host = "127.0.0.1"
+        self.host = "0.0.0.0"
         self.pb_port = "8087"
         self.http_port = "8098"
         self.https_port = "18098"
