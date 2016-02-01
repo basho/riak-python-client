@@ -7,8 +7,8 @@ from commands import preconfigure, configure, create_bucket_types, \
     setup_security, enable_security, disable_security, setup_timeseries, \
     build_messages
 
-install_requires = ['six >= 1.8.0']
-requires = ['six(>=1.8.0)']
+install_requires = ['six >= 1.8.0', 'erlastic >= 2.0.0']
+requires = ['six(>=1.8.0)', 'erlastic(>= 2.0.0)']
 if platform.python_version() < '2.7.9':
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")

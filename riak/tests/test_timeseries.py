@@ -39,7 +39,7 @@ class TimeseriesUnitTests(unittest.TestCase):
             [bd1, 3, 4.5, ts1, False]
         ]
         self.test_key = ['hash1', 'user2', ts0]
-        self.table = Table(None, 'test-table')
+        self.table = Table(None, table_name)
 
     def validate_keyreq(self, req):
         self.assertEqual(self.table.name, bytes_to_str(req.table))
