@@ -2,6 +2,24 @@ from __future__ import print_function
 import warnings
 from collections import Mapping
 from six import string_types, PY2
+import datetime
+
+epoch = datetime.datetime.utcfromtimestamp(0)
+
+
+def unix_time_millis(dt):
+    try:
+        return int(dt.total_seconds() * 1000.0)
+    except AttributeError:
+        # NB: python 2.6 must use this method
+        td = dt - epoch
+        return int(((td.microseconds +
+                    (td.seconds + td.days * 24 * 3600) * 10**6) /
+                    10**6) * 1000.0)
+
+
+def datetime_from_unix_time_millis(ut):
+    return datetime.datetime.utcfromtimestamp(ut / 1000.0)
 
 
 def quacks_like_dict(object):
@@ -51,7 +69,6 @@ class lazy_property(object):
     memoization of an object attribute. The property should represent
     immutable data, as it replaces itself on first access.
     '''
-
     def __init__(self, fget):
         self.fget = fget
         self.func_name = fget.__name__

@@ -9,7 +9,7 @@ from riak import RiakError
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.pbc.codec import RiakPbcCodec
-from riak.util import str_to_bytes, bytes_to_str
+from riak.util import str_to_bytes, bytes_to_str, unix_time_millis
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 from riak.pb.riak_ts_pb2 import TsColumnType
@@ -32,8 +32,8 @@ ts1 = ts0 + fiveMins
 class TimeseriesUnitTests(unittest.TestCase):
     def setUp(self):
         self.c = RiakPbcCodec()
-        self.ts0ms = self.c._unix_time_millis(ts0)
-        self.ts1ms = self.c._unix_time_millis(ts1)
+        self.ts0ms = unix_time_millis(ts0)
+        self.ts1ms = unix_time_millis(ts1)
         self.rows = [
             [bd0, 0, 1.2, ts0, True],
             [bd1, 3, 4.5, ts1, False]
@@ -193,13 +193,12 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             raise AssertionError("expected success")
         client.close()
 
-        codec = RiakPbcCodec()
-        cls.nowMsec = codec._unix_time_millis(cls.now)
+        cls.nowMsec = unix_time_millis(cls.now)
         cls.fiveMinsAgo = fiveMinsAgo
         cls.twentyMinsAgo = twentyMinsAgo
         cls.twentyFiveMinsAgo = twentyFiveMinsAgo
-        cls.tenMinsAgoMsec = codec._unix_time_millis(tenMinsAgo)
-        cls.twentyMinsAgoMsec = codec._unix_time_millis(twentyMinsAgo)
+        cls.tenMinsAgoMsec = unix_time_millis(tenMinsAgo)
+        cls.twentyMinsAgoMsec = unix_time_millis(twentyMinsAgo)
         cls.numCols = len(rows[0])
         cls.rows = rows
 

@@ -8,13 +8,12 @@ import datetime
 
 from riak import RiakError
 from riak.content import RiakContent
-from riak.util import decode_index_value, str_to_bytes, bytes_to_str
+from riak.util import decode_index_value, str_to_bytes, bytes_to_str, \
+    unix_time_millis, datetime_from_unix_time_millis
 from riak.multidict import MultiDict
 from riak.pb.riak_ts_pb2 import TsColumnType
 
 from six import string_types, PY2
-
-epoch = datetime.datetime.utcfromtimestamp(0)
 
 
 def _invert(d):
@@ -84,17 +83,10 @@ class RiakPbcCodec(object):
         super(RiakPbcCodec, self).__init__(**unused_args)
 
     def _unix_time_millis(self, dt):
-        td = dt - epoch
-        try:
-            return int(dt.total_seconds() * 1000.0)
-        except AttributeError:
-            # NB: python 2.6 must use this method
-            return int(((td.microseconds +
-                         (td.seconds + td.days * 24 * 3600) * 10**6) /
-                        10**6) * 1000.0)
+        return unix_time_millis(dt)
 
     def _datetime_from_unix_time_millis(self, ut):
-        return datetime.datetime.utcfromtimestamp(ut / 1000.0)
+        return datetime_from_unix_time_millis(ut)
 
     def _encode_quorum(self, rw):
         """
@@ -637,7 +629,7 @@ class RiakPbcCodec(object):
     def _encode_to_ts_cell(self, cell, ts_cell):
         if cell is not None:
             if isinstance(cell, datetime.datetime):
-                ts_cell.timestamp_value = self._unix_time_millis(cell)
+                ts_cell.timestamp_value = unix_time_millis(cell)
             elif isinstance(cell, bool):
                 ts_cell.boolean_value = cell
             elif isinstance(cell, string_types):
@@ -752,7 +744,7 @@ class RiakPbcCodec(object):
                 if col and col.type != TsColumnType.Value('TIMESTAMP'):
                     raise TypeError('expected TIMESTAMP column')
                 else:
-                    dt = self._datetime_from_unix_time_millis(
+                    dt = datetime_from_unix_time_millis(
                         cell.timestamp_value)
                     row.append(dt)
             elif cell.HasField('boolean_value'):

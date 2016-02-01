@@ -20,8 +20,8 @@ with benchmark.measure() as b:
     with b.report('populate'):
         for _, bucket, key in bkeys:
             client.bucket(bucket).new(key, encoded_data=data,
-                                        content_type='text/plain'
-                                        ).store()
+                                      content_type='text/plain'
+                                      ).store()
 for b in benchmark.measure_with_rehearsal():
     client.protocol = 'http'
     with b.report('http seq'):
