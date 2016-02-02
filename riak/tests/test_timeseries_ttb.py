@@ -4,15 +4,20 @@ import platform
 import random
 import string
 
+from erlastic import decode, encode
+from erlastic.types import Atom
+
 from riak.table import Table
 from riak.transports.ttb.codec import RiakTtbCodec
-from riak.util import str_to_bytes, bytes_to_str, unix_time_millis
+from riak.util import str_to_bytes, unix_time_millis
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
 
+udef_a = Atom('undefined')
+tsc_a = Atom('tscell')
 table_name = 'GeoCheckin'
 
 bd0 = '时间序列'
@@ -36,5 +41,12 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         self.table = Table(None, table_name)
 
     def test_encode_data_for_get(self):
-        req = self.c._encode_timeseries_keyreq(self.table, self.test_key)
-        self.assertIsNotNone(req)
+        keylist = [
+            (tsc_a, str_to_bytes('hash1'), udef_a, udef_a, udef_a, udef_a),
+            (tsc_a, str_to_bytes('user2'), udef_a, udef_a, udef_a, udef_a),
+            (tsc_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a)
+        ]
+        req = Atom('tsgetreq'), str_to_bytes(table_name), keylist, udef_a
+        req_test = encode(req)
+        req_encoded = self.c._encode_timeseries_keyreq(self.table, self.test_key)
+        self.assertEqual(req_test, req_encoded)
