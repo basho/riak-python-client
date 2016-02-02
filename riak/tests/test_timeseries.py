@@ -61,6 +61,11 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual('user2', bytes_to_str(req.key[1].varchar_value))
         self.assertEqual(self.ts0ms, req.key[2].timestamp_value)
 
+    def test_encode_decode_timestamp(self):
+        ts0ms = self.c._unix_time_millis(ts0)
+        ts0_d = self.c._datetime_from_unix_time_millis(ts0ms)
+        self.assertEqual(ts0, ts0_d)
+
     def test_encode_data_for_get(self):
         req = riak.pb.riak_ts_pb2.TsGetReq()
         self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
