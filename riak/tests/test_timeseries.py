@@ -25,21 +25,34 @@ bd0 = '时间序列'
 bd1 = 'временные ряды'
 
 fiveMins = datetime.timedelta(0, 300)
-ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
+# NB: last arg is microseconds, 987ms expressed
+ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0, 987000)
 ts1 = ts0 + fiveMins
 
 
 class TimeseriesUnitTests(unittest.TestCase):
-    def setUp(self):
-        self.c = RiakPbcCodec()
-        self.ts0ms = self.c._unix_time_millis(ts0)
-        self.ts1ms = self.c._unix_time_millis(ts1)
-        self.rows = [
+    @classmethod
+    def setUpClass(cls):
+        cls.c = RiakPbcCodec()
+
+        ex0ms = 1420113600987
+        cls.ts0ms = cls.c._unix_time_millis(ts0)
+        if cls.ts0ms != ex0ms:
+            raise AssertionError(
+                'expected {:d} to equal {:d}'.format(cls.ts0ms, ex0ms))
+
+        ex1ms = 1420113900987
+        cls.ts1ms = cls.c._unix_time_millis(ts1)
+        if cls.ts1ms != ex1ms:
+            raise AssertionError(
+                'expected {:d} to equal {:d}'.format(cls.ts1ms, ex1ms))
+
+        cls.rows = [
             [bd0, 0, 1.2, ts0, True],
             [bd1, 3, 4.5, ts1, False]
         ]
-        self.test_key = ['hash1', 'user2', ts0]
-        self.table = Table(None, 'test-table')
+        cls.test_key = ['hash1', 'user2', ts0]
+        cls.table = Table(None, 'test-table')
 
     def validate_keyreq(self, req):
         self.assertEqual(self.table.name, bytes_to_str(req.table))
@@ -171,7 +184,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTests, cls).setUpClass()
-        cls.now = datetime.datetime.utcfromtimestamp(144379690)
+        cls.now = datetime.datetime.utcfromtimestamp(144379690.987000)
         fiveMinsAgo = cls.now - fiveMins
         tenMinsAgo = fiveMinsAgo - fiveMins
         fifteenMinsAgo = tenMinsAgo - fiveMins
@@ -211,6 +224,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(row[0], 'hash1')
         self.assertEqual(row[1], 'user2')
         self.assertEqual(row[2], self.fiveMinsAgo)
+        self.assertEqual(row[2].microsecond, 987000)
         self.assertEqual(row[3], 'wind')
         self.assertIsNone(row[4])
 
