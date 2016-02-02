@@ -60,3 +60,28 @@ class RiakTtbCodec(object):
         req = tsgetreq_a, str_to_bytes(table.name), \
             [self._encode_to_ts_cell(k) for k in key_vals], udef_a
         return encode(req)
+
+    def _encode_timeseries_put(self, tsobj):
+        '''
+        Returns an Erlang-TTB encoded tuple with the appropriate data and
+        metadata from a TsObject.
+
+        :param tsobj: a TsObject
+        :type tsobj: TsObject
+        :rtype: term-to-binary encoded object
+        '''
+        if tsobj.columns:
+            raise NotImplementedError("columns are not implemented yet")
+
+        if tsobj.rows and isinstance(tsobj.rows, list):
+            req_rows = []
+            for row in tsobj.rows:
+                req_r = []
+                for cell in row:
+                    req_r.append(self._encode_to_ts_cell(cell))
+                req_rows.append(req_r)
+            req = tsputreq_a, str_to_bytes(tsobj.table.name), \
+                  udef_a, req_rows
+            return encode(req)
+        else:
+            raise RiakError("TsObject requires a list of rows")
