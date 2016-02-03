@@ -56,7 +56,7 @@ then
 fi
 
 # NB: 2.7.8 is special-cased
-for pyver in 2.7 3.3 3.4 3.5
+for pyver in 2.7 3.4 3.5
 do
     if ! pyenv versions | fgrep -v 'riak_2.7.8' | fgrep -q "riak_$pyver"
     then
@@ -78,7 +78,7 @@ then
     pyenv virtualenv 'riak_2.7.8' 'riak-py278'
 fi
 
-(cd $PROJDIR && pyenv local riak-py35 riak-py34 riak-py33 riak-py27 riak-py278)
+(cd $PROJDIR && pyenv local riak-py35 riak-py34 riak-py27 riak-py278)
 
 pyenv versions
 

@@ -27,7 +27,10 @@ bd1 = 'временные ряды'
 fiveMins = datetime.timedelta(0, 300)
 # NB: last arg is microseconds, 987ms expressed
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0, 987000)
+ex0ms = 1420113600987
+
 ts1 = ts0 + fiveMins
+ex1ms = 1420113900987
 
 
 class TimeseriesUnitTests(unittest.TestCase):
@@ -35,13 +38,11 @@ class TimeseriesUnitTests(unittest.TestCase):
     def setUpClass(cls):
         cls.c = RiakPbcCodec()
 
-        ex0ms = 1420113600987
         cls.ts0ms = cls.c._unix_time_millis(ts0)
         if cls.ts0ms != ex0ms:
             raise AssertionError(
                 'expected {:d} to equal {:d}'.format(cls.ts0ms, ex0ms))
 
-        ex1ms = 1420113900987
         cls.ts1ms = cls.c._unix_time_millis(ts1)
         if cls.ts1ms != ex1ms:
             raise AssertionError(
@@ -63,6 +64,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
     def test_encode_decode_timestamp(self):
         ts0ms = self.c._unix_time_millis(ts0)
+        self.assertEqual(ts0ms, ex0ms)
         ts0_d = self.c._datetime_from_unix_time_millis(ts0ms)
         self.assertEqual(ts0, ts0_d)
 
