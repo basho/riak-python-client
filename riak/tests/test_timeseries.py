@@ -3,6 +3,8 @@ import datetime
 import platform
 import random
 import string
+import sys
+
 import riak.pb.riak_ts_pb2
 
 from riak import RiakError
@@ -32,7 +34,10 @@ ex0ms = 1420113600987
 ts1 = ts0 + fiveMins
 ex1ms = 1420113900987
 
+ts_supported = sys.version_info < (3,) or sys.version_info >= (3,4,4)
 
+
+@unittest.skipUnless(ts_supported, "Timeseries not supported")
 class TimeseriesUnitTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -186,7 +191,8 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1[4], self.rows[1][4])
 
 
-@unittest.skipUnless(RUN_TIMESERIES, 'RUN_TIMESERIES is 0')
+@unittest.skipUnless(ts_supported and RUN_TIMESERIES,
+    'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
