@@ -1,7 +1,15 @@
 from __future__ import print_function
+
+import sys
 import warnings
+
 from collections import Mapping
 from six import string_types, PY2
+
+def is_timeseries_supported(v=None):
+    if v is None:
+        v = sys.version_info
+    return v < (3,) or v >= (3, 4, 4)
 
 
 def quacks_like_dict(object):

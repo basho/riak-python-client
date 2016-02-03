@@ -17,7 +17,15 @@ Install
 =======
 
 The recommended versions of Python for use with this client are Python
-`2.7.x`, `3.3.x`, `3.4.x` and `3.5.x`.
+`2.7.x`, `3.3.x`, `3.4.x` and `3.5.x`. The latest version from each series
+should be preferred.
+
+Riak TS (Timeseries)
+===================
+
+You must use version `2.7.11`, `3.4.4` or `3.5.1` (or greater within a version series).
+Otherwise you will be affected by `this Python bug <https://bugs.python.org/issue23517>`_.
+
 
 From Source
 -----------
