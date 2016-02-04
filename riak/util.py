@@ -6,6 +6,7 @@ import warnings
 from collections import Mapping
 from six import string_types, PY2
 
+
 def is_timeseries_supported(v=None):
     if v is None:
         v = sys.version_info
