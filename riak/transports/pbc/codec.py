@@ -1,10 +1,10 @@
+import datetime
+import logging
 import riak.pb
 import riak.pb.riak_pb2
 import riak.pb.riak_dt_pb2
 import riak.pb.riak_kv_pb2
 import riak.pb.riak_ts_pb2
-import logging
-import datetime
 
 from riak import RiakError
 from riak.content import RiakContent
@@ -85,13 +85,7 @@ class RiakPbcCodec(object):
 
     def _unix_time_millis(self, dt):
         td = dt - epoch
-        try:
-            return int(dt.total_seconds() * 1000.0)
-        except AttributeError:
-            # NB: python 2.6 must use this method
-            return int(((td.microseconds +
-                         (td.seconds + td.days * 24 * 3600) * 10**6) /
-                        10**6) * 1000.0)
+        return int(td.total_seconds() * 1000.0)
 
     def _datetime_from_unix_time_millis(self, ut):
         return datetime.datetime.utcfromtimestamp(ut / 1000.0)

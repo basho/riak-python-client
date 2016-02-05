@@ -1,5 +1,10 @@
 # Riak Python Client Release Notes
 
+## 2.4.1 Patch Release - 2016-02-03
+
+* [Riak TS: Millisecond precision](https://github.com/basho/riak-python-client/issues/430)
+* [Fix release process](https://github.com/basho/riak-python-client/issues/429)
+
 ## 2.4.0 Feature Release - 2016-01-13
 
 This release enhances Riak Time Series functionality.

@@ -3,13 +3,15 @@ import datetime
 import platform
 import random
 import string
+
 import riak.pb.riak_ts_pb2
 
 from riak import RiakError
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.pbc.codec import RiakPbcCodec
-from riak.util import str_to_bytes, bytes_to_str
+from riak.util import str_to_bytes, bytes_to_str, \
+    is_timeseries_supported
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 from riak.pb.riak_ts_pb2 import TsColumnType
@@ -25,21 +27,36 @@ bd0 = '时间序列'
 bd1 = 'временные ряды'
 
 fiveMins = datetime.timedelta(0, 300)
-ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
+# NB: last arg is microseconds, 987ms expressed
+ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0, 987000)
+ex0ms = 1420113600987
+
 ts1 = ts0 + fiveMins
+ex1ms = 1420113900987
 
 
+@unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported")
 class TimeseriesUnitTests(unittest.TestCase):
-    def setUp(self):
-        self.c = RiakPbcCodec()
-        self.ts0ms = self.c._unix_time_millis(ts0)
-        self.ts1ms = self.c._unix_time_millis(ts1)
-        self.rows = [
+    @classmethod
+    def setUpClass(cls):
+        cls.c = RiakPbcCodec()
+
+        cls.ts0ms = cls.c._unix_time_millis(ts0)
+        if cls.ts0ms != ex0ms:
+            raise AssertionError(
+                'expected {:d} to equal {:d}'.format(cls.ts0ms, ex0ms))
+
+        cls.ts1ms = cls.c._unix_time_millis(ts1)
+        if cls.ts1ms != ex1ms:
+            raise AssertionError(
+                'expected {:d} to equal {:d}'.format(cls.ts1ms, ex1ms))
+
+        cls.rows = [
             [bd0, 0, 1.2, ts0, True],
             [bd1, 3, 4.5, ts1, False]
         ]
-        self.test_key = ['hash1', 'user2', ts0]
-        self.table = Table(None, 'test-table')
+        cls.test_key = ['hash1', 'user2', ts0]
+        cls.table = Table(None, 'test-table')
 
     def validate_keyreq(self, req):
         self.assertEqual(self.table.name, bytes_to_str(req.table))
@@ -47,6 +64,12 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual('hash1', bytes_to_str(req.key[0].varchar_value))
         self.assertEqual('user2', bytes_to_str(req.key[1].varchar_value))
         self.assertEqual(self.ts0ms, req.key[2].timestamp_value)
+
+    def test_encode_decode_timestamp(self):
+        ts0ms = self.c._unix_time_millis(ts0)
+        self.assertEqual(ts0ms, ex0ms)
+        ts0_d = self.c._datetime_from_unix_time_millis(ts0ms)
+        self.assertEqual(ts0, ts0_d)
 
     def test_encode_data_for_get(self):
         req = riak.pb.riak_ts_pb2.TsGetReq()
@@ -166,12 +189,13 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1[4], self.rows[1][4])
 
 
-@unittest.skipUnless(RUN_TIMESERIES, 'RUN_TIMESERIES is 0')
+@unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
+                     'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTests, cls).setUpClass()
-        cls.now = datetime.datetime.utcfromtimestamp(144379690)
+        cls.now = datetime.datetime.utcfromtimestamp(144379690.987000)
         fiveMinsAgo = cls.now - fiveMins
         tenMinsAgo = fiveMinsAgo - fiveMins
         fifteenMinsAgo = tenMinsAgo - fiveMins
@@ -211,6 +235,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(row[0], 'hash1')
         self.assertEqual(row[1], 'user2')
         self.assertEqual(row[2], self.fiveMinsAgo)
+        self.assertEqual(row[2].microsecond, 987000)
         self.assertEqual(row[3], 'wind')
         self.assertIsNone(row[4])
 
