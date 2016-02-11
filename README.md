@@ -21,9 +21,9 @@ You must use version `2.7.11`, `3.4.4` or `3.5.1` (or greater within a version s
 From Source
 -----------
 
-``sh
+```sh
 python setup.py install
-``
+```
 
 There are additional dependencies on Python packages `setuptools` and `protobuf`.
 
@@ -34,33 +34,33 @@ Official packages are signed and published to [PyPI](https://pypi.python.org/pyp
 
 To install from [PyPI](https://pypi.python.org/pypi/riak) directly you can use `pip`. 
 
-``sh
+```sh
 pip install riak
-``
+```
 
 Testing
 =======
 
 To setup the default test configuration build a test Riak node (from a `riak` directory)
 
-``sh
+```sh
 make rel
-``
+```
 
 See [Basic Cluster Setup](http://docs.basho.com/riak/2.0.0/ops/building/basic-cluster-setup/) for more details.
 
 For all of the simple default values, set the `RIAK_DIR` environment variable to the root of your Riak installation. Then from the `riak-python-client` directory 
 
-``sh
+```sh
 make -C buildbot preconfigure
-``
+```
 
 Start your Riak node with `riak start` from the the Riak directory, then 
 
-``sh
+```sh
 make -C buildbot configure
 make -C buildbot test
-``
+```
 
 That will run the test suite twice: once with security enabled and once without.
 
