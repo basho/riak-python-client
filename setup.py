@@ -3,7 +3,7 @@
 import platform
 from setuptools import setup, find_packages
 from version import get_version
-from commands import preconfigure, configure, create_bucket_types, \
+from commands import preconfigure, configure, \
     setup_security, enable_security, disable_security, setup_timeseries, \
     build_messages
 
@@ -46,7 +46,6 @@ setup(
     cmdclass={
         'build_messages': build_messages,
         'setup_timeseries': setup_timeseries,
-        'create_bucket_types': create_bucket_types,
         'setup_security': setup_security,
         'preconfigure': preconfigure,
         'configure': configure,

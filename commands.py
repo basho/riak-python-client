@@ -12,7 +12,7 @@ from string import Template
 from subprocess import Popen, PIPE
 
 
-__all__ = ['create_bucket_types', 'build_messages',
+__all__ = ['build_messages',
            'setup_security', 'enable_security', 'disable_security',
            'setup_timeseries',
            'preconfigure', 'configure']
@@ -144,36 +144,6 @@ class bucket_type_commands:
         cmd = [self.riak_admin, "bucket-type"]
         cmd.extend(args)
         return cmd
-
-
-class create_bucket_types(bucket_type_commands, Command):
-    """
-    Creates bucket-types appropriate for testing. By default this will create:
-
-    * `pytest-maps` with ``{"datatype":"map"}``
-    * `pytest-sets` with ``{"datatype":"set"}``
-    * `pytest-counters` with ``{"datatype":"counter"}``
-    * `pytest-consistent` with ``{"consistent":true}``
-    * `pytest-write-once` with ``{"write_once": true}``
-    * `pytest-mr`
-    * `pytest` with ``{"allow_mult":false}``
-    """
-
-    description = "create bucket-types used in integration tests"
-
-    user_options = [
-        ('riak-admin=', None, 'path to the riak-admin script')
-    ]
-
-    _props = {
-        'pytest-maps': {'datatype': 'map'},
-        'pytest-sets': {'datatype': 'set'},
-        'pytest-counters': {'datatype': 'counter'},
-        'pytest-consistent': {'consistent': True},
-        'pytest-write-once': {'write_once': True},
-        'pytest-mr': {},
-        'pytest': {'allow_mult': False}
-    }
 
 
 class setup_timeseries(bucket_type_commands, Command):
@@ -477,13 +447,12 @@ class configure(Command):
     """
     Sets up security configuration.
 
-    * Run setup_security and create_bucket_types
+    * Run setup_security
     """
 
-    description = "create bucket types and security settings for testing"
+    description = "security settings for testing"
 
-    user_options = create_bucket_types.user_options + \
-        setup_security.user_options
+    user_options = setup_security.user_options
 
     def initialize_options(self):
         self.riak_admin = None
@@ -491,8 +460,6 @@ class configure(Command):
         self.password = None
 
     def finalize_options(self):
-        bucket = self.distribution.get_command_obj('create_bucket_types')
-        bucket.riak_admin = self.riak_admin
         security = self.distribution.get_command_obj('setup_security')
         security.riak_admin = self.riak_admin
         security.username = self.username
@@ -503,7 +470,7 @@ class configure(Command):
         for cmd_name in self.get_sub_commands():
             self.run_command(cmd_name)
 
-    sub_commands = [('create_bucket_types', None), ('setup_security', None)]
+    sub_commands = [('setup_security', None)]
 
 
 class ComparableMixin(object):
