@@ -137,7 +137,6 @@ class RiakHTTPSConnection(HTTPSConnection):
             self.credentials._check_revoked_cert(self.sock)
         else:
             ssl_ctx = configure_ssl_context(self.credentials)
-            host = "riak@" + self.host
             if self.timeout is not None:
                 sock.settimeout(self.timeout)
             self.sock = ssl.SSLSocket(sock=sock,
@@ -146,7 +145,7 @@ class RiakHTTPSConnection(HTTPSConnection):
                                       cert_reqs=ssl.CERT_REQUIRED,
                                       ca_certs=self.credentials.cacert_file,
                                       ciphers=self.credentials.ciphers,
-                                      server_hostname=host)
+                                      server_hostname=self.host)
             self.sock.context = ssl_ctx
 
 

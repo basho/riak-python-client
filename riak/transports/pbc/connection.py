@@ -84,7 +84,10 @@ class RiakPbcConnection(object):
         """
         req = riak.pb.riak_pb2.RpbAuthReq()
         req.user = str_to_bytes(self._client._credentials.username)
-        req.password = str_to_bytes(self._client._credentials.password)
+        password = self._client._credentials.password
+        if not password:
+            password = ''
+        req.password = str_to_bytes(password)
         msg_code, _ = self._non_connect_request(
             riak.pb.messages.MSG_CODE_AUTH_REQ,
             req,
@@ -130,7 +133,7 @@ class RiakPbcConnection(object):
             if credentials:
                 try:
                     ssl_ctx = configure_ssl_context(credentials)
-                    host = "riak@" + self._address[0]
+                    host = self._address[0]
                     ssl_socket = ssl.SSLSocket(sock=self._socket,
                                                keyfile=credentials.pkey_file,
                                                certfile=credentials.cert_file,
