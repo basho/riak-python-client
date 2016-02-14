@@ -1,6 +1,6 @@
 include docs/*
 include riak/erl_src/*
-include README.rst
+include README.md
 include LICENSE
 include RELEASE_NOTES.md
 include version.py
