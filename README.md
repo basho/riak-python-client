@@ -64,52 +64,6 @@ make -C buildbot test
 
 That will run the test suite twice: once with security enabled and once without.
 
-Testing Options
----------------
-
-If you wish to change the default options you can run the setup by hand. First configure the test node by adjusting the `riak.conf` settings, where `RIAK_DIR` is the path to the top your Riak installation
-
-```sh
-python setup.py preconfigure --riak-conf=$RIAK_DIR/etc/riak.conf
-```
-
-Optionally the hostname and port numbers can be changed, too, via these arguments:
-
-* `--host=` IP of host running Riak (default is `localhost`)
-* `--pb-port=` protocol buffers port number (default is `8087`)
-* `--http-port=` http port number (default is `8098`)
-* `--https-port=` https port number (default is `8099`)
-
-You may alternately add these lines to `setup.cfg`
-
-```ini
-[preconfigure]
-riak-conf=/Users/sean/dev/riak/rel/riak/etc/riak.conf
-host=localhost
-pb-port=8087
-http-port=8098
-https-port=8099
-```
-
-Next start the test node. Once it is running, a test configuration is installed which includes security test users and bucket types
-
-```sh
-python setup.py configure --riak-admin=$RIAK_DIR/bin/riak-admin
-```
-
-Optionally these configuration settings can be changed, too:
-
-* `--username=` test user account (default is `testuser`)
-* `--password=` password for test user account (default is `testpassword`)
-* `--certuser=` secruity test user account (default is `certuser`)
-* `--certpass=` password for security test user account (default is `certpass`)
-
-Similarly `setup.cfg` may be modified instead. To run the tests against a Riak server (with configured TCP port configuration) on localhost, execute
-
-```sh
-python setup.py test
-```
-
 Connections to Riak in Tests
 ----------------------------
 
@@ -175,19 +129,9 @@ To test [Secondary Indexes](http://docs.basho.com/riak/2.0.0/dev/using/2i/), the
 Testing Security (Riak 2+)
 --------------------------
 
+Ensure that the hostname `riak-test` resolves to your Riak host (most likely `localhost`). This is so the SSL host verification can succeed.
+
 By default [Security](http://docs.basho.com/riak/2.0.0beta1/ops/running/authz/) is not enabled on Riak. Once `security = on` is configured in the `riak.conf` file it can be enabled with `riak-admin`.
-
-If you have set up the test environment outlined in the Testing section you can go ahead and use this command to enable security
-
-```sh
-python setup.py enable_security --riak-admin=$RIAK_DIR/bin/riak-admin
-```
-
-Once you are done testing security you can also
-
-```sh
-python setup.py disable_security --riak-admin=$RIAK_DIR/bin/riak-admin
-```
 
 To run the tests
 
