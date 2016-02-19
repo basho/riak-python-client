@@ -701,7 +701,7 @@ class KVFileTests(IntegrationTestBase, unittest.TestCase):
     def test_store_binary_object_from_file_should_use_default_mimetype(self):
         bucket = self.client.bucket(self.bucket_name)
         filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                os.pardir, os.pardir, 'README.rst')
+                                os.pardir, os.pardir, 'README.md')
         obj = bucket.new_from_file(self.key_name, filepath)
         obj.store()
         obj = bucket.get(self.key_name)

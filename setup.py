@@ -3,9 +3,7 @@
 import platform
 from setuptools import setup, find_packages
 from version import get_version
-from commands import preconfigure, configure, create_bucket_types, \
-    setup_security, enable_security, disable_security, setup_timeseries, \
-    build_messages
+from commands import setup_timeseries, build_messages
 
 install_requires = ['six >= 1.8.0']
 requires = ['six(>=1.8.0)']
@@ -45,13 +43,7 @@ setup(
     url='https://github.com/basho/riak-python-client',
     cmdclass={
         'build_messages': build_messages,
-        'setup_timeseries': setup_timeseries,
-        'create_bucket_types': create_bucket_types,
-        'setup_security': setup_security,
-        'preconfigure': preconfigure,
-        'configure': configure,
-        'enable_security': enable_security,
-        'disable_security': disable_security
+        'setup_timeseries': setup_timeseries
     },
     classifiers=['License :: OSI Approved :: Apache Software License',
                  'Intended Audience :: Developers',
