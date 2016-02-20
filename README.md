@@ -8,6 +8,11 @@ Documentation
 
 Documentation for Riak is available [here](http://docs.basho.com/riak/latest).
 
+Repository Cloning
+==================
+
+*NOTE*: please clone this repository using the `--recursive` argument to `git clone` or follow the clone with `git submodule update --init`. This repository uses two submodules.
+
 Install
 =======
 
