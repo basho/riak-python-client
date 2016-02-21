@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Advanced Usage &amp; Internals &mdash; Riak Python Client 2.4.1 documentation</title>
+  <title>Advanced Usage &amp; Internals &mdash; Riak Python Client 2.4.2 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.4.1 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.4.2 documentation" href="index.html"/>
         <link rel="prev" title="Security" href="security.html"/> 
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                2.4.1
+                2.4.2
               </div>
             
           
@@ -1908,35 +1908,6 @@ immutable data, as it replaces itself on first access.</p>
 <div class="section" id="module-commands">
 <span id="distutils-commands"></span><h2>distutils commands<a class="headerlink" href="#module-commands" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="commands.create_bucket_types">
-<em class="property">class </em><code class="descclassname">commands.</code><code class="descname">create_bucket_types</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.create_bucket_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates bucket-types appropriate for testing. By default this will create:</p>
-<ul class="simple">
-<li><cite>pytest-maps</cite> with <code class="docutils literal"><span class="pre">{&quot;datatype&quot;:&quot;map&quot;}</span></code></li>
-<li><cite>pytest-sets</cite> with <code class="docutils literal"><span class="pre">{&quot;datatype&quot;:&quot;set&quot;}</span></code></li>
-<li><cite>pytest-counters</cite> with <code class="docutils literal"><span class="pre">{&quot;datatype&quot;:&quot;counter&quot;}</span></code></li>
-<li><cite>pytest-consistent</cite> with <code class="docutils literal"><span class="pre">{&quot;consistent&quot;:true}</span></code></li>
-<li><cite>pytest-write-once</cite> with <code class="docutils literal"><span class="pre">{&quot;write_once&quot;:</span> <span class="pre">true}</span></code></li>
-<li><cite>pytest-mr</cite></li>
-<li><cite>pytest</cite> with <code class="docutils literal"><span class="pre">{&quot;allow_mult&quot;:false}</span></code></li>
-</ul>
-<p>Create and initialize a new Command object.  Most importantly,
-invokes the &#8216;initialize_options()&#8217; method, which is the real
-initializer and depends on the actual command being
-instantiated.</p>
-<dl class="attribute">
-<dt id="commands.create_bucket_types.description">
-<code class="descname">description</code><em class="property"> = 'create bucket-types used in integration tests'</em><a class="headerlink" href="#commands.create_bucket_types.description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.create_bucket_types.user_options">
-<code class="descname">user_options</code><em class="property"> = [('riak-admin=', None, 'path to the riak-admin script')]</em><a class="headerlink" href="#commands.create_bucket_types.user_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="commands.build_messages">
 <em class="property">class </em><code class="descclassname">commands.</code><code class="descname">build_messages</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.build_messages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates message code mappings. Add to the build process using:</p>
@@ -1975,139 +1946,6 @@ instantiated.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="commands.setup_security">
-<em class="property">class </em><code class="descclassname">commands.</code><code class="descname">setup_security</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.setup_security" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up security for testing. By default this will create:</p>
-<ul>
-<li><p class="first">User <cite>testuser</cite> with password <cite>testpassword</cite></p>
-</li>
-<li><p class="first">User <cite>certuser</cite> with password <cite>certpass</cite></p>
-</li>
-<li><p class="first">Two security sources</p>
-</li>
-<li><dl class="first docutils">
-<dt>Permissions on</dt>
-<dd><ul class="first last simple">
-<li>riak_kv.get</li>
-<li>riak_kv.put</li>
-<li>riak_kv.delete</li>
-<li>riak_kv.index</li>
-<li>riak_kv.list_keys</li>
-<li>riak_kv.list_buckets</li>
-<li>riak_kv.mapreduce</li>
-<li>riak_core.get_bucket</li>
-<li>riak_core.set_bucket</li>
-<li>riak_core.get_bucket_type</li>
-<li>riak_core.set_bucket_type</li>
-<li>search.admin</li>
-<li>search.query</li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-<p>Create and initialize a new Command object.  Most importantly,
-invokes the &#8216;initialize_options()&#8217; method, which is the real
-initializer and depends on the actual command being
-instantiated.</p>
-<dl class="method">
-<dt id="commands.setup_security.finalize_options">
-<code class="descname">finalize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.setup_security.finalize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.setup_security.initialize_options">
-<code class="descname">initialize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.setup_security.initialize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.setup_security.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.setup_security.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.setup_security.description">
-<code class="descname">description</code><em class="property"> = 'create security settings used in integration tests'</em><a class="headerlink" href="#commands.setup_security.description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.setup_security.user_options">
-<code class="descname">user_options</code><em class="property"> = [('riak-admin=', None, 'path to the riak-admin script'), ('username=', None, 'test user account'), ('password=', None, 'password for test user account'), ('certuser=', None, 'certificate test user account'), ('certpass=', None, 'password for certificate test user account')]</em><a class="headerlink" href="#commands.setup_security.user_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="commands.enable_security">
-<em class="property">class </em><code class="descclassname">commands.</code><code class="descname">enable_security</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.enable_security" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actually turn on security.</p>
-<p>Create and initialize a new Command object.  Most importantly,
-invokes the &#8216;initialize_options()&#8217; method, which is the real
-initializer and depends on the actual command being
-instantiated.</p>
-<dl class="method">
-<dt id="commands.enable_security.finalize_options">
-<code class="descname">finalize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.enable_security.finalize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.enable_security.initialize_options">
-<code class="descname">initialize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.enable_security.initialize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.enable_security.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.enable_security.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.enable_security.description">
-<code class="descname">description</code><em class="property"> = 'turn on security within Riak'</em><a class="headerlink" href="#commands.enable_security.description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.enable_security.user_options">
-<code class="descname">user_options</code><em class="property"> = [('riak-admin=', None, 'path to the riak-admin script')]</em><a class="headerlink" href="#commands.enable_security.user_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="commands.disable_security">
-<em class="property">class </em><code class="descclassname">commands.</code><code class="descname">disable_security</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.disable_security" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actually turn off security.</p>
-<p>Create and initialize a new Command object.  Most importantly,
-invokes the &#8216;initialize_options()&#8217; method, which is the real
-initializer and depends on the actual command being
-instantiated.</p>
-<dl class="method">
-<dt id="commands.disable_security.finalize_options">
-<code class="descname">finalize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.disable_security.finalize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.disable_security.initialize_options">
-<code class="descname">initialize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.disable_security.initialize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.disable_security.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.disable_security.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.disable_security.description">
-<code class="descname">description</code><em class="property"> = 'turn off security within Riak'</em><a class="headerlink" href="#commands.disable_security.description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.disable_security.user_options">
-<code class="descname">user_options</code><em class="property"> = [('riak-admin=', None, 'path to the riak-admin script')]</em><a class="headerlink" href="#commands.disable_security.user_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="commands.setup_timeseries">
 <em class="property">class </em><code class="descclassname">commands.</code><code class="descname">setup_timeseries</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.setup_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates bucket-types appropriate for timeseries.</p>
@@ -2123,102 +1961,6 @@ instantiated.</p>
 <dl class="attribute">
 <dt id="commands.setup_timeseries.user_options">
 <code class="descname">user_options</code><em class="property"> = [('riak-admin=', None, 'path to the riak-admin script')]</em><a class="headerlink" href="#commands.setup_timeseries.user_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="commands.preconfigure">
-<em class="property">class </em><code class="descclassname">commands.</code><code class="descname">preconfigure</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.preconfigure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up security configuration.</p>
-<ul>
-<li><dl class="first docutils">
-<dt>Update these lines in riak.conf</dt>
-<dd><ul class="first last simple">
-<li>storage_backend = leveldb</li>
-<li>search = on</li>
-<li>listener.protobuf.internal = 127.0.0.1:8087</li>
-<li>listener.http.internal = 127.0.0.1:8098</li>
-<li>listener.https.internal = 127.0.0.1:18098</li>
-<li>ssl.certfile = $pwd/tests/resources/server.crt</li>
-<li>ssl.keyfile = $pwd/tests/resources/server.key</li>
-<li>ssl.cacertfile = $pwd/tests/resources/ca.crt</li>
-<li>check_crl = off</li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-<p>Create and initialize a new Command object.  Most importantly,
-invokes the &#8216;initialize_options()&#8217; method, which is the real
-initializer and depends on the actual command being
-instantiated.</p>
-<dl class="method">
-<dt id="commands.preconfigure.finalize_options">
-<code class="descname">finalize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.preconfigure.finalize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.preconfigure.initialize_options">
-<code class="descname">initialize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.preconfigure.initialize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.preconfigure.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.preconfigure.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.preconfigure.description">
-<code class="descname">description</code><em class="property"> = 'preconfigure security settings used in integration tests'</em><a class="headerlink" href="#commands.preconfigure.description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.preconfigure.user_options">
-<code class="descname">user_options</code><em class="property"> = [('riak-conf=', None, 'path to the riak.conf file'), ('host=', None, 'IP of host running Riak'), ('pb-port=', None, 'protocol buffers port number'), ('https-port=', None, 'https port number')]</em><a class="headerlink" href="#commands.preconfigure.user_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="commands.configure">
-<em class="property">class </em><code class="descclassname">commands.</code><code class="descname">configure</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.configure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up security configuration.</p>
-<ul class="simple">
-<li>Run setup_security and create_bucket_types</li>
-</ul>
-<p>Create and initialize a new Command object.  Most importantly,
-invokes the &#8216;initialize_options()&#8217; method, which is the real
-initializer and depends on the actual command being
-instantiated.</p>
-<dl class="method">
-<dt id="commands.configure.finalize_options">
-<code class="descname">finalize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.configure.finalize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.configure.initialize_options">
-<code class="descname">initialize_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.configure.initialize_options" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="commands.configure.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.configure.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.configure.description">
-<code class="descname">description</code><em class="property"> = 'create bucket types and security settings for testing'</em><a class="headerlink" href="#commands.configure.description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.configure.sub_commands">
-<code class="descname">sub_commands</code><em class="property"> = [('create_bucket_types', None), ('setup_security', None)]</em><a class="headerlink" href="#commands.configure.sub_commands" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="commands.configure.user_options">
-<code class="descname">user_options</code><em class="property"> = [('riak-admin=', None, 'path to the riak-admin script'), ('riak-admin=', None, 'path to the riak-admin script'), ('username=', None, 'test user account'), ('password=', None, 'password for test user account'), ('certuser=', None, 'certificate test user account'), ('certpass=', None, 'password for certificate test user account')]</em><a class="headerlink" href="#commands.configure.user_options" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2280,7 +2022,7 @@ and use the results of get_version() as your package version:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.4.1',
+            VERSION:'2.4.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
