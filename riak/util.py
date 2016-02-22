@@ -1,5 +1,8 @@
 from __future__ import print_function
+
+import sys
 import warnings
+
 from collections import Mapping
 from six import string_types, PY2
 import datetime
@@ -20,6 +23,12 @@ def unix_time_millis(dt):
 
 def datetime_from_unix_time_millis(ut):
     return datetime.datetime.utcfromtimestamp(ut / 1000.0)
+
+
+def is_timeseries_supported(v=None):
+    if v is None:
+        v = sys.version_info
+    return v < (3,) or v >= (3, 4, 4)
 
 
 def quacks_like_dict(object):

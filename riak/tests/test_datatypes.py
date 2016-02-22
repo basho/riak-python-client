@@ -157,7 +157,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
                                unittest.TestCase,
                                Comparison):
     def test_dt_counter(self):
-        btype = self.client.bucket_type('pytest-counters')
+        btype = self.client.bucket_type('counters')
         bucket = btype.bucket(self.bucket_name)
         mycount = datatypes.Counter(bucket, self.key_name)
         mycount.increment(5)
@@ -173,7 +173,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertEqual(2, mycount.value)
 
     def test_dt_set(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         myset = datatypes.Set(bucket, self.key_name)
         myset.add('Sean')
@@ -195,7 +195,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertNotIn('Sean', myset)
 
     def test_dt_map(self):
-        btype = self.client.bucket_type('pytest-maps')
+        btype = self.client.bucket_type('maps')
         bucket = btype.bucket(self.bucket_name)
         mymap = datatypes.Map(bucket, self.key_name)
 
@@ -230,7 +230,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(['thing1', 'thing2'], mymap.sets['f'].value)
 
     def test_dt_set_remove_without_context(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         set = datatypes.Set(bucket, self.key_name)
 
@@ -241,7 +241,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
             set.discard("Y")
 
     def test_dt_set_remove_fetching_context(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         set = datatypes.Set(bucket, self.key_name)
 
@@ -257,7 +257,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
     def test_dt_set_add_twice(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         set = datatypes.Set(bucket, self.key_name)
 
@@ -273,7 +273,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
     def test_dt_set_add_wins_in_same_op(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         set = datatypes.Set(bucket, self.key_name)
 
@@ -290,7 +290,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
     def test_dt_set_add_wins_in_same_op_reversed(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         set = datatypes.Set(bucket, self.key_name)
 
@@ -307,7 +307,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
     def test_dt_set_remove_old_context(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         set = datatypes.Set(bucket, self.key_name)
 
@@ -328,7 +328,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(['X', 'Y', 'Z'], set2.value)
 
     def test_dt_set_remove_updated_context(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         set = datatypes.Set(bucket, self.key_name)
 
@@ -348,7 +348,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(['X', 'Y'], set2.value)
 
     def test_dt_map_remove_set_update_same_op(self):
-        btype = self.client.bucket_type('pytest-maps')
+        btype = self.client.bucket_type('maps')
         bucket = btype.bucket(self.bucket_name)
         map = datatypes.Map(bucket, self.key_name)
 
@@ -365,7 +365,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(["Z"], map2.sets['set'])
 
     def test_dt_map_remove_counter_increment_same_op(self):
-        btype = self.client.bucket_type('pytest-maps')
+        btype = self.client.bucket_type('maps')
         bucket = btype.bucket(self.bucket_name)
         map = datatypes.Map(bucket, self.key_name)
 
@@ -382,7 +382,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertEqual(2, map2.counters['counter'].value)
 
     def test_dt_map_remove_map_update_same_op(self):
-        btype = self.client.bucket_type('pytest-maps')
+        btype = self.client.bucket_type('maps')
         bucket = btype.bucket(self.bucket_name)
         map = datatypes.Map(bucket, self.key_name)
 
@@ -399,7 +399,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(["Z"], map2.maps['map'].sets['set'])
 
     def test_dt_set_return_body_true_default(self):
-        btype = self.client.bucket_type('pytest-sets')
+        btype = self.client.bucket_type('sets')
         bucket = btype.bucket(self.bucket_name)
         myset = bucket.new(self.key_name)
         myset.add('X')
@@ -416,7 +416,7 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertItemsEqual(myset.value, ['Y'])
 
     def test_dt_map_return_body_true_default(self):
-        btype = self.client.bucket_type('pytest-maps')
+        btype = self.client.bucket_type('maps')
         bucket = btype.bucket(self.bucket_name)
         mymap = bucket.new(self.key_name)
         mymap.sets['a'].add('X')
@@ -440,19 +440,19 @@ class DatatypeIntegrationTests(IntegrationTestBase,
         self.assertEqual(mymap.value, {})
 
     def test_delete_datatype(self):
-        ctype = self.client.bucket_type('pytest-counters')
+        ctype = self.client.bucket_type('counters')
         cbucket = ctype.bucket(self.bucket_name)
         counter = cbucket.new(self.key_name)
         counter.increment(5)
         counter.store()
 
-        stype = self.client.bucket_type('pytest-sets')
+        stype = self.client.bucket_type('sets')
         sbucket = stype.bucket(self.bucket_name)
         set_ = sbucket.new(self.key_name)
         set_.add("Brett")
         set_.store()
 
-        mtype = self.client.bucket_type('pytest-maps')
+        mtype = self.client.bucket_type('maps')
         mbucket = mtype.bucket(self.bucket_name)
         map_ = mbucket.new(self.key_name)
         map_.sets['people'].add('Sean')

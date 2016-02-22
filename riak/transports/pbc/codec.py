@@ -1,10 +1,10 @@
+import datetime
+import logging
 import riak.pb
 import riak.pb.riak_pb2
 import riak.pb.riak_dt_pb2
 import riak.pb.riak_kv_pb2
 import riak.pb.riak_ts_pb2
-import logging
-import datetime
 
 from riak import RiakError
 from riak.content import RiakContent

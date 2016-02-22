@@ -44,7 +44,7 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
     def test_btype_get_props(self):
         defbtype = self.client.bucket_type("default")
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         with self.assertRaises(ValueError):
             defbtype.get_properties()
 
@@ -55,7 +55,7 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
     def test_btype_set_props(self):
         defbtype = self.client.bucket_type("default")
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         with self.assertRaises(ValueError):
             defbtype.set_properties({'allow_mult': True})
 
@@ -72,12 +72,12 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
             btype.set_properties(oldprops)
 
     def test_btype_set_props_immutable(self):
-        btype = self.client.bucket_type("pytest-maps")
+        btype = self.client.bucket_type("maps")
         with self.assertRaises(RiakError):
             btype.set_property('datatype', 'counter')
 
     def test_btype_list_buckets(self):
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
         obj = bucket.new(self.key_name)
         obj.data = [1, 2, 3]
@@ -91,7 +91,7 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertIn(bucket, buckets)
 
     def test_btype_list_keys(self):
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
 
         obj = bucket.new(self.key_name)
@@ -140,7 +140,7 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertItemsEqual(keys, oldapikeys)
 
     def test_multiget_bucket_types(self):
-        btype = self.client.bucket_type('pytest')
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
 
         for i in range(100):
@@ -155,8 +155,7 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
             self.assertEqual(btype, mobj.bucket.bucket_type)
 
     def test_write_once_bucket_type(self):
-        btype = self.client.bucket_type('pytest-write-once')
-        btype.set_property('write_once', True)
+        btype = self.client.bucket_type('write_once')
         bucket = btype.bucket(self.bucket_name)
 
         for i in range(100):

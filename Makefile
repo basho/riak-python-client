@@ -11,7 +11,15 @@ pb_compile: pb_clean
 	@protoc -Iriak_pb/src --python_out=riak/pb riak_pb/src/*.proto
 	@python setup.py build_messages
 
-release:
+release_sdist:
+ifeq ($(RELEASE_GPG_KEYNAME),)
+	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
+else
+	@echo "==> Python (sdist release)"
+	@python setup.py sdist upload -s -i $(RELEASE_GPG_KEYNAME)
+endif
+
+release: release_sdist
 ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 else

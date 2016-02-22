@@ -72,6 +72,7 @@ if USE_STDLIB_SSL:
             pkeyfile = certfile
         if certfile:
             ssl_ctx.load_cert_chain(certfile, pkeyfile)
+        # TODO https://bugs.python.org/issue8813
         if credentials.crl_file is not None:
             ssl_ctx.load_verify_locations(credentials.crl_file)
             ssl_ctx.verify_flags = ssl.VERIFY_CRL_CHECK_LEAF

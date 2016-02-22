@@ -4,8 +4,7 @@ import sys
 
 from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
     SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
-    SECURITY_CERT_USER, SECURITY_CERT_PASSWD, SECURITY_BAD_CERT, \
-    SECURITY_CIPHERS
+    SECURITY_CERT_USER, SECURITY_BAD_CERT, SECURITY_CIPHERS
 from riak.security import SecurityCreds
 from riak.tests.base import IntegrationTestBase
 
@@ -91,7 +90,6 @@ class SecurityTests(IntegrationTestBase, unittest.TestCase):
     @unittest.skipUnless(RUN_SECURITY, 'RUN_SECURITY is 0')
     def test_security_cert_authentication(self):
         creds = SecurityCreds(username=SECURITY_CERT_USER,
-                              password=SECURITY_CERT_PASSWD,
                               ciphers=SECURITY_CIPHERS,
                               cert_file=SECURITY_CERT,
                               pkey_file=SECURITY_KEY,
