@@ -10,7 +10,8 @@ from riak import RiakError
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.pbc.codec import RiakPbcCodec
-from riak.util import str_to_bytes, bytes_to_str, unix_time_millis
+from riak.util import str_to_bytes, bytes_to_str, \
+    unix_time_millis, datetime_from_unix_time_millis, \
     is_timeseries_supported
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
@@ -39,14 +40,13 @@ ex1ms = 1420113900987
 class TimeseriesUnitTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        self.ts0ms = unix_time_millis(ts0)
-        self.ts1ms = unix_time_millis(ts1)
-        cls.ts0ms = cls.c._unix_time_millis(ts0)
+        cls.c = RiakPbcCodec()
+        cls.ts0ms = unix_time_millis(ts0)
         if cls.ts0ms != ex0ms:
             raise AssertionError(
                 'expected {:d} to equal {:d}'.format(cls.ts0ms, ex0ms))
 
-        cls.ts1ms = cls.c._unix_time_millis(ts1)
+        cls.ts1ms = unix_time_millis(ts1)
         if cls.ts1ms != ex1ms:
             raise AssertionError(
                 'expected {:d} to equal {:d}'.format(cls.ts1ms, ex1ms))
@@ -56,7 +56,7 @@ class TimeseriesUnitTests(unittest.TestCase):
             [bd1, 3, 4.5, ts1, False]
         ]
         cls.test_key = ['hash1', 'user2', ts0]
-        self.table = Table(None, table_name)
+        cls.table = Table(None, table_name)
 
     def validate_keyreq(self, req):
         self.assertEqual(self.table.name, bytes_to_str(req.table))
@@ -66,9 +66,9 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(self.ts0ms, req.key[2].timestamp_value)
 
     def test_encode_decode_timestamp(self):
-        ts0ms = self.c._unix_time_millis(ts0)
+        ts0ms = unix_time_millis(ts0)
         self.assertEqual(ts0ms, ex0ms)
-        ts0_d = self.c._datetime_from_unix_time_millis(ts0ms)
+        ts0_d = datetime_from_unix_time_millis(ts0ms)
         self.assertEqual(ts0, ts0_d)
 
     def test_encode_data_for_get(self):

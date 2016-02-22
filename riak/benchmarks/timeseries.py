@@ -1,8 +1,16 @@
+import datetime
+import logging
+import random
+import sys
+
+import riak.benchmark as benchmark
+
 from multiprocessing import cpu_count
 from riak import RiakClient
-import riak.benchmark as benchmark
-import datetime
-import random
+
+# logger = logging.getLogger()
+# logger.level = logging.DEBUG
+# logger.addHandler(logging.StreamHandler(sys.stdout))
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 onesec = datetime.timedelta(0, 1)

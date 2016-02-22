@@ -1,7 +1,9 @@
+import logging
 import socket
 import struct
 import riak.pb.riak_pb2
 import riak.pb.messages
+import erlastic
 
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak import RiakError
@@ -21,17 +23,25 @@ class RiakPbcConnection(object):
     Connection-related methods for RiakPbcTransport.
     """
 
-    def _encode_msg(self, msg_code, msg=None):
+    def __init__(self):
+        self._ttb_enabled = False
+
+    def _encode_msg(self, msg_code, msg=None, is_ttb=False):
         if msg is None:
             return struct.pack("!iB", 1, msg_code)
-        msgstr = msg.SerializeToString()
-        slen = len(msgstr)
-        hdr = struct.pack("!iB", 1 + slen, msg_code)
-        return hdr + msgstr
 
-    def _request(self, msg_code, msg=None, expect=None):
-        self._send_msg(msg_code, msg)
-        return self._recv_msg(expect)
+        if is_ttb:
+            data = msg
+        else:
+            data = msg.SerializeToString()
+
+        datalen = len(data)
+        hdr = struct.pack("!iB", 1 + datalen, msg_code)
+        return hdr + data
+
+    def _request(self, msg_code, msg=None, expect=None, is_ttb=False):
+        self._send_msg(msg_code, msg, is_ttb)
+        return self._recv_msg(expect, is_ttb)
 
     def _non_connect_request(self, msg_code, msg=None, expect=None):
         """
@@ -41,16 +51,18 @@ class RiakPbcConnection(object):
         self._non_connect_send_msg(msg_code, msg)
         return self._recv_msg(expect)
 
-    def _non_connect_send_msg(self, msg_code, msg):
+    def _non_connect_send_msg(self, msg_code, msg, is_ttb=False):
         """
         Similar to self._send, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
         """
-        self._socket.sendall(self._encode_msg(msg_code, msg))
+        self._socket.sendall(self._encode_msg(msg_code, msg, is_ttb))
 
-    def _send_msg(self, msg_code, msg):
+    def _send_msg(self, msg_code, msg, is_ttb=False):
         self._connect()
-        self._non_connect_send_msg(msg_code, msg)
+        if is_ttb and not self._enable_ttb():
+            raise RiakError('could not switch to TTB encoding!')
+        self._non_connect_send_msg(msg_code, msg, is_ttb)
 
     def _init_security(self):
         """
@@ -74,6 +86,20 @@ class RiakPbcConnection(object):
             return True
         else:
             return False
+
+    def _enable_ttb(self):
+        if self._ttb_enabled:
+            return True
+        else:
+            logging.debug("pbc/connection enabling TTB")
+            msg_code, _ = self._non_connect_request(
+                riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_REQ)
+            if msg_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:
+                self._ttb_enabled = True
+                logging.debug("pbc/connection TTB IS ENABLED")
+                return True
+            else:
+                return False
 
     def _auth(self):
         """
@@ -154,23 +180,24 @@ class RiakPbcConnection(object):
                     # fail if *any* exceptions are thrown during SSL handshake
                     raise SecurityError(e)
 
-    def _recv_msg(self, expect=None):
+    def _recv_msg(self, expect=None, is_ttb=False):
         self._recv_pkt()
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
-            err = self._parse_msg(msg_code, self._inbuf[1:])
+            err = self._parse_msg(msg_code, self._inbuf[1:], is_ttb)
             if err is None:
                 raise RiakError('no error provided!')
             else:
                 raise RiakError(bytes_to_str(err.errmsg))
         elif msg_code in riak.pb.messages.MESSAGE_CLASSES:
-            msg = self._parse_msg(msg_code, self._inbuf[1:])
+            msg = self._parse_msg(msg_code, self._inbuf[1:], is_ttb)
         else:
             raise Exception("unknown msg code %s" % msg_code)
 
         if expect and msg_code != expect:
             raise RiakError("unexpected protocol buffer message code: %d, %r"
                             % (msg_code, msg))
+        logging.debug("pbc/connection received msg_code %d msg %s", msg_code, msg)
         return msg_code, msg
 
     def _recv_pkt(self):
@@ -218,18 +245,24 @@ class RiakPbcConnection(object):
             self._socket.close()
             del self._socket
 
-    def _parse_msg(self, code, packet):
-        try:
-            pbclass = riak.pb.messages.MESSAGE_CLASSES[code]
-        except KeyError:
-            pbclass = None
+    def _parse_msg(self, code, packet, is_ttb=False):
+        if is_ttb:
+            if code != riak.pb.messages.MSG_CODE_TS_GET_RESP and \
+               code != riak.pb.messages.MSG_CODE_TS_PUT_RESP:
+                raise RiakError("TTB can't parse code: %d" % code)
+            return erlastic.decode(packet)
+        else:
+            try:
+                pbclass = riak.pb.messages.MESSAGE_CLASSES[code]
+            except KeyError:
+                pbclass = None
 
-        if pbclass is None:
-            return None
+            if pbclass is None:
+                return None
 
-        pbo = pbclass()
-        pbo.ParseFromString(packet)
-        return pbo
+            pbo = pbclass()
+            pbo.ParseFromString(packet)
+            return pbo
 
     # These are set in the RiakPbcTransport initializer
     _address = None

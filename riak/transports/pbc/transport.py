@@ -1,3 +1,4 @@
+import logging
 import riak.pb.messages
 import riak.pb.riak_pb2
 import riak.pb.riak_kv_pb2
@@ -15,10 +16,13 @@ from riak.transports.pbc.stream import (RiakPbcKeyStream,
                                         RiakPbcIndexStream,
                                         RiakPbcTsKeyStream)
 from riak.transports.pbc.codec import RiakPbcCodec
+from riak.transports.ttb.codec import RiakTtbCodec
+
 from six import PY2, PY3
 
 
-class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
+class RiakPbcTransport(RiakTransport, RiakPbcConnection,
+    RiakPbcCodec, RiakTtbCodec):
     """
     The RiakPbcTransport object holds a connection to the protocol
     buffers interface on the riak server.
@@ -28,7 +32,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
                  node=None,
                  client=None,
                  timeout=None,
-                 *unused_options):
+                 **transport_options):
         """
         Construct a new RiakPbcTransport object.
         """
@@ -39,6 +43,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         self._address = (node.host, node.pb_port)
         self._timeout = timeout
         self._socket = None
+        self._use_ttb = transport_options.get('use_ttb', False)
 
     # FeatureDetection API
     def _server_version(self):
@@ -178,24 +183,39 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection, RiakPbcCodec):
         return self.ts_query(table, query)
 
     def ts_get(self, table, key):
-        req = riak.pb.riak_ts_pb2.TsGetReq()
-        self._encode_timeseries_keyreq(table, key, req)
+        ts_get_resp = None
+        if self._use_ttb:
+            encoded = self._encode_timeseries_keyreq_ttb(table, key)
+        else:
+            req = riak.pb.riak_ts_pb2.TsGetReq()
+            self._encode_timeseries_keyreq(table, key, req)
 
         msg_code, ts_get_resp = self._request(
             riak.pb.messages.MSG_CODE_TS_GET_REQ, req,
-            riak.pb.messages.MSG_CODE_TS_GET_RESP)
+            riak.pb.messages.MSG_CODE_TS_GET_RESP,
+            self._use_ttb)
 
         tsobj = TsObject(self._client, table, [], None)
-        self._decode_timeseries(ts_get_resp, tsobj)
+        if self._use_ttb:
+            self._decode_timeseries_ttb(ts_get_resp, tsobj)
+        else:
+            self._decode_timeseries(ts_get_resp, tsobj)
         return tsobj
 
     def ts_put(self, tsobj):
-        req = riak.pb.riak_ts_pb2.TsPutReq()
-        self._encode_timeseries_put(tsobj, req)
+        if self._use_ttb:
+            req = self._encode_timeseries_put_ttb(tsobj)
+        else:
+            req = riak.pb.riak_ts_pb2.TsPutReq()
+            self._encode_timeseries_put(tsobj, req)
+
+        logging.debug("pbc/transport ts_put _use_ttb: '%s'",
+            self._use_ttb)
 
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_TS_PUT_REQ, req,
-            riak.pb.messages.MSG_CODE_TS_PUT_RESP)
+            riak.pb.messages.MSG_CODE_TS_PUT_RESP,
+            self._use_ttb)
 
         if resp is not None:
             return True

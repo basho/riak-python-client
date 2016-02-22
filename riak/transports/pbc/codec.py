@@ -633,11 +633,11 @@ class RiakPbcCodec(object):
             elif isinstance(cell, bool):
                 ts_cell.boolean_value = cell
             elif isinstance(cell, string_types):
-                logging.debug("cell -> str: '%s'", cell)
+                # logging.debug("cell -> str: '%s'", cell)
                 ts_cell.varchar_value = str_to_bytes(cell)
             elif (isinstance(cell, int) or
                  (PY2 and isinstance(cell, long))):  # noqa
-                logging.debug("cell -> int/long: '%s'", cell)
+                # logging.debug("cell -> int/long: '%s'", cell)
                 ts_cell.sint64_value = cell
             elif isinstance(cell, float):
                 ts_cell.double_value = cell
@@ -692,10 +692,10 @@ class RiakPbcCodec(object):
     def _decode_timeseries(self, resp, tsobj):
         """
         Fills an TsObject with the appropriate data and
-        metadata from a TsQueryResp.
+        metadata from a TsGetResp / TsQueryResp.
 
         :param resp: the protobuf message from which to process data
-        :type resp: riak.pb.TsQueryRsp or riak.pb.riak_ts_pb2.TsGetResp
+        :type resp: riak.pb.riak_ts_pb2.TsQueryRsp or riak.pb.riak_ts_pb2.TsGetResp
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
