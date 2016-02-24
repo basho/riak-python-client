@@ -92,8 +92,12 @@ class RiakPbcConnection(object):
             return True
         else:
             logging.debug("pbc/connection enabling TTB")
+            req = riak.pb.riak_pb2.RpbToggleEncodingReq()
+            req.use_native = True
             msg_code, _ = self._non_connect_request(
-                riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_REQ)
+                riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_REQ,
+                req,
+                riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP)
             if msg_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:
                 self._ttb_enabled = True
                 logging.debug("pbc/connection TTB IS ENABLED")
