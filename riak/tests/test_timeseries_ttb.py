@@ -7,11 +7,15 @@ import string
 from erlastic import decode, encode
 from erlastic.types import Atom
 
+from riak.client import RiakClient
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.transports.ttb.codec import RiakTtbCodec
 from riak.util import str_to_bytes, \
-    unix_time_millis, datetime_from_unix_time_millis
+    unix_time_millis, datetime_from_unix_time_millis, \
+    is_timeseries_supported
+from riak.tests import RUN_TIMESERIES
+from riak.tests.base import IntegrationTestBase
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -35,6 +39,7 @@ ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
 ts1 = ts0 + fiveMins
 
 
+@unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported")
 class TimeseriesTtbUnitTests(unittest.TestCase):
     def setUp(self):
         self.c = RiakTtbCodec()
@@ -123,5 +128,39 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         req_test = encode(req)
 
         tsobj = TsObject(None, self.table, self.rows, None)
-        req_encoded = self.c._encode_timeseries_put(tsobj)
+        req_encoded = self.c._encode_timeseries_put_ttb(tsobj)
         self.assertEqual(req_test, req_encoded)
+
+
+@unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
+                     'Timeseries not supported or RUN_TIMESERIES is 0')
+class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(TimeseriesTtbTests, cls).setUpClass()
+
+    def test_store_data_ttb(self):
+        now = datetime.datetime.utcfromtimestamp(144379690.987000)
+        fiveMinsAgo = now - fiveMins
+        tenMinsAgo = fiveMinsAgo - fiveMins
+        fifteenMinsAgo = tenMinsAgo - fiveMins
+        twentyMinsAgo = fifteenMinsAgo - fiveMins
+        twentyFiveMinsAgo = twentyMinsAgo - fiveMins
+
+        client = RiakClient(protocol='pbc',
+                          host='riak-test',
+                          pb_port=10017,
+                          transport_options={'use_ttb': True})
+
+        table = client.table(table_name)
+        rows = [
+            ['hash1', 'user2', twentyFiveMinsAgo, 'typhoon', 90.3],
+            ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
+            ['hash1', 'user2', fifteenMinsAgo, 'rain', 79.0],
+            ['hash1', 'user2', fiveMinsAgo, 'wind', None],
+            ['hash1', 'user2', now, 'snow', 20.1]
+        ]
+        ts_obj = table.new(rows)
+        result = ts_obj.store()
+        self.assertTrue(result)
+        client.close()

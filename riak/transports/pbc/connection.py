@@ -254,7 +254,10 @@ class RiakPbcConnection(object):
             if code != riak.pb.messages.MSG_CODE_TS_GET_RESP and \
                code != riak.pb.messages.MSG_CODE_TS_PUT_RESP:
                 raise RiakError("TTB can't parse code: %d" % code)
-            return erlastic.decode(packet)
+            if len(packet) > 0:
+                return erlastic.decode(packet)
+            else:
+                return None
         else:
             try:
                 pbclass = riak.pb.messages.MESSAGE_CLASSES[code]
