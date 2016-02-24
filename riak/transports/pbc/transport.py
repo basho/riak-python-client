@@ -185,7 +185,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
     def ts_get(self, table, key):
         ts_get_resp = None
         if self._use_ttb:
-            encoded = self._encode_timeseries_keyreq_ttb(table, key)
+            req = self._encode_timeseries_keyreq_ttb(table, key)
         else:
             req = riak.pb.riak_ts_pb2.TsGetReq()
             self._encode_timeseries_keyreq(table, key, req)
@@ -209,8 +209,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
             req = riak.pb.riak_ts_pb2.TsPutReq()
             self._encode_timeseries_put(tsobj, req)
 
-        logging.debug("pbc/transport ts_put _use_ttb: '%s'",
-            self._use_ttb)
+        # logging.debug("pbc/transport ts_put _use_ttb: '%s'",
+        #    self._use_ttb)
 
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_TS_PUT_REQ, req,

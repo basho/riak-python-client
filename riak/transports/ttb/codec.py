@@ -1,5 +1,4 @@
 import datetime
-import logging
 
 from erlastic import decode, encode
 from erlastic.types import Atom
@@ -15,6 +14,7 @@ rpberrorresp_a = Atom('rpberrorresp')
 tsgetreq_a = Atom('tsgetreq')
 tsgetresp_a = Atom('tsgetresp')
 tsputreq_a = Atom('tsputreq')
+tsrow_a = Atom('tsrow')
 tscell_a = Atom('tscell')
 
 tscell_empty = (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
@@ -33,21 +33,16 @@ class RiakTtbCodec(object):
         else:
             if isinstance(cell, datetime.datetime):
                 ts = unix_time_millis(cell)
-                logging.debug("cell -> timestamp: '%s'", ts)
                 return (tscell_a, udef_a, udef_a, ts, udef_a, udef_a)
             elif isinstance(cell, bool):
-                logging.debug("cell -> bool: '%s'", cell)
                 return (tscell_a, udef_a, udef_a, udef_a, cell, udef_a)
             elif isinstance(cell, string_types):
-                logging.debug("cell -> str: '%s'", cell)
                 return (tscell_a, str_to_bytes(cell),
                         udef_a, udef_a, udef_a, udef_a)
             elif (isinstance(cell, int) or
                  (PY2 and isinstance(cell, long))):  # noqa
-                logging.debug("cell -> int/long: '%s'", cell)
                 return (tscell_a, udef_a, cell, udef_a, udef_a, udef_a)
             elif isinstance(cell, float):
-                logging.debug("cell -> float: '%s'", cell)
                 return (tscell_a, udef_a, udef_a, udef_a, udef_a, cell)
             else:
                 t = type(cell)
@@ -94,7 +89,7 @@ class RiakTtbCodec(object):
         Fills an TsObject with the appropriate data and
         metadata from a TTB-encoded TsGetResp / TsQueryResp.
 
-        :param resp_ttb: the protobuf message from which to process data
+        :param resp_ttb: the decoded TTB data
         :type resp_ttb: TTB-encoded tsqueryrsp or tsgetresp
         :param tsobj: a TsObject
         :type tsobj: TsObject
@@ -105,19 +100,18 @@ class RiakTtbCodec(object):
         #         col_type = col.type
         #         col = (col_name, col_type)
         #         tsobj.columns.append(col)
-        resp = decode(resp_ttb)
-        resp_a = resp[0]
+        resp_a = resp_ttb[0]
         if resp_a == tsgetresp_a:
-            resp_cols = resp[1]
-            resp_rows = resp[2]
+            resp_cols = resp_ttb[1]
+            resp_rows = resp_ttb[2]
             for row_ttb in resp_rows:
                 tsobj.rows.append(
-                    self._decode_timeseries_row(row_ttb, None)) # TODO cols
+                    self._decode_timeseries_row_ttb(row_ttb, None)) # TODO cols
         # elif resp_a == rpberrorresp_a:
         else:
             raise RiakError("Unknown TTB response type: {}".format(resp_a))
 
-    def _decode_timeseries_row(self, tsrow_ttb, tscols=None):
+    def _decode_timeseries_row_ttb(self, tsrow_ttb, tscols=None):
         """
         Decodes a TTB-encoded TsRow into a list
 
@@ -127,11 +121,9 @@ class RiakTtbCodec(object):
         :type tscols: list
         :rtype list
         """
-        row = []
-        for tsc_ttb in tsrow_ttb:
-            if tsc_ttb == tscell_empty:
-                row.append(None)
-            else:
+        if tsrow_ttb[0] == tsrow_a:
+            row = []
+            for tsc_ttb in tsrow_ttb[1]:
                 val = None
                 if tsc_ttb[0] == tscell_a:
                     if tsc_ttb[1] != udef_a:
@@ -149,5 +141,8 @@ class RiakTtbCodec(object):
                         row.append(None)
                 else:
                     raise RiakError(
-                        "Expected tscell atom, got: {}".format(tsc_ttb))
+                        "Expected tscell atom, got: {}".format(tsc_ttb[0]))
+        else:
+            raise RiakError(
+                "Expected tsrow atom, got: {}".format(tsrow_ttb[0]))
         return row

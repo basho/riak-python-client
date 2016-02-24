@@ -90,7 +90,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         rsp_ttb = encode(rsp_data)
 
         tsobj = TsObject(None, self.table, [], [])
-        self.c._decode_timeseries_ttb(rsp_ttb, tsobj)
+        self.c._decode_timeseries_ttb(decode(rsp_ttb), tsobj)
 
         for i in range(0, 1):
             dr = rows[i]

@@ -1,6 +1,9 @@
 from __future__ import print_function
+
 import os
 import gc
+import sys
+import traceback
 
 __all__ = ['measure', 'measure_with_rehearsal']
 
@@ -154,5 +157,7 @@ class BenchmarkReport(object):
         elif exc_type is KeyboardInterrupt:
             return False
         else:
-            print("EXCEPTION! %r" % ((exc_type, exc_val, exc_tb),))
-        return True
+            msg = "EXCEPTION! type: %r val: %r" % (exc_type, exc_val)
+            print(msg, file=sys.stderr)
+            traceback.print_tb(exc_tb)
+        return True if exc_type is None else False
