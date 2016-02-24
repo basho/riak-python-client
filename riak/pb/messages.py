@@ -77,6 +77,11 @@ MSG_CODE_TS_GET_REQ = 96
 MSG_CODE_TS_GET_RESP = 97
 MSG_CODE_TS_LIST_KEYS_REQ = 98
 MSG_CODE_TS_LIST_KEYS_RESP = 99
+MSG_CODE_TS_COVERAGE_REQ = 100
+MSG_CODE_TS_COVERAGE_RESP = 101
+MSG_CODE_TS_COVERAGE_ENTRY = 102
+MSG_CODE_TS_RANGE = 103
+MSG_CODE_TS_TTB_PUT_REQ = 104
 MSG_CODE_TOGGLE_ENCODING_REQ = 110
 MSG_CODE_TOGGLE_ENCODING_RESP = 111
 MSG_CODE_AUTH_REQ = 253
@@ -159,6 +164,11 @@ MESSAGE_CLASSES = {
     MSG_CODE_TS_GET_RESP: riak.pb.riak_ts_pb2.TsGetResp,
     MSG_CODE_TS_LIST_KEYS_REQ: riak.pb.riak_ts_pb2.TsListKeysReq,
     MSG_CODE_TS_LIST_KEYS_RESP: riak.pb.riak_ts_pb2.TsListKeysResp,
+    MSG_CODE_TS_COVERAGE_REQ: riak.pb.riak_ts_pb2.TsCoverageReq,
+    MSG_CODE_TS_COVERAGE_RESP: riak.pb.riak_ts_pb2.TsCoverageResp,
+    MSG_CODE_TS_COVERAGE_ENTRY: riak.pb.riak_ts_pb2.TsCoverageEntry,
+    MSG_CODE_TS_RANGE: riak.pb.riak_ts_pb2.TsRange,
+    MSG_CODE_TS_TTB_PUT_REQ: riak.pb.riak_ts_pb2.TsTtbPutReq,
     MSG_CODE_TOGGLE_ENCODING_REQ: riak.pb.riak_pb2.RpbToggleEncodingReq,
     MSG_CODE_TOGGLE_ENCODING_RESP: riak.pb.riak_pb2.RpbToggleEncodingResp,
     MSG_CODE_AUTH_REQ: riak.pb.riak_pb2.RpbAuthReq,
