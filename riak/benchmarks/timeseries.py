@@ -50,7 +50,7 @@ n = [
     {'host': h, 'pb_port': 10037},
     {'host': h, 'pb_port': 10047}
 ]
-client = RiakClient(nodes=n, protocol='pbc')
+client = RiakClient(nodes=n, protocol='pbc', transport_options={'use_ttb': True})
 table = client.table(tbl)
 
 with benchmark.measure() as b:

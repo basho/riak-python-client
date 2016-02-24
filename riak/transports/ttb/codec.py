@@ -27,7 +27,7 @@ class RiakTtbCodec(object):
     def __init__(self, **unused_args):
         super(RiakTtbCodec, self).__init__(**unused_args)
 
-    def _encode_to_ts_cell(self, cell):
+    def _encode_to_ts_cell_ttb(self, cell):
         if cell is None:
             return tscell_empty
         else:
@@ -61,10 +61,10 @@ class RiakTtbCodec(object):
         else:
             raise ValueError("key must be a list")
         req = tsgetreq_a, str_to_bytes(table.name), \
-            [self._encode_to_ts_cell(k) for k in key_vals], udef_a
+            [self._encode_to_ts_cell_ttb(k) for k in key_vals], udef_a
         return encode(req)
 
-    def _encode_timeseries_put(self, tsobj):
+    def _encode_timeseries_put_ttb(self, tsobj):
         '''
         Returns an Erlang-TTB encoded tuple with the appropriate data and
         metadata from a TsObject.
@@ -81,7 +81,7 @@ class RiakTtbCodec(object):
             for row in tsobj.rows:
                 req_r = []
                 for cell in row:
-                    req_r.append(self._encode_to_ts_cell(cell))
+                    req_r.append(self._encode_to_ts_cell_ttb(cell))
                 req_rows.append(req_r)
             req = tsputreq_a, str_to_bytes(tsobj.table.name), \
                   udef_a, req_rows
