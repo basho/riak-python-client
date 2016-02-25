@@ -28,6 +28,7 @@ tsgetresp_a = Atom('tsgetresp')
 tsputreq_a = Atom('tsputreq')
 
 udef_a = Atom('undefined')
+tsr_a = Atom('tsrow')
 tsc_a = Atom('tscell')
 table_name = 'GeoCheckin'
 
@@ -68,22 +69,22 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
     def test_decode_data_from_get(self):
         cols = []
-        r0 = [
+        r0 = (tsr_a, [
             (tsc_a, bd0, udef_a, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, 0, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, 1.2),
             (tsc_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, True, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
-        ]
-        r1 = [
+        ])
+        r1 = (tsr_a, [
             (tsc_a, bd1, udef_a, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, 3, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, 4.5),
             (tsc_a, udef_a, udef_a, unix_time_millis(ts1), udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, False, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
-        ]
+        ])
         rows = [r0, r1]
         # { tsgetresp, [cols], [rows] }
         rsp_data = tsgetresp_a, cols, rows # NB: Python tuple notation
@@ -93,7 +94,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         self.c._decode_timeseries_ttb(decode(rsp_ttb), tsobj)
 
         for i in range(0, 1):
-            dr = rows[i]
+            dr = rows[i][1]
             r = tsobj.rows[i]
             self.assertEqual(r[0], dr[0][1])
             self.assertEqual(r[1], dr[1][2])
@@ -107,22 +108,22 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
             self.assertEqual(r[5], None)
 
     def test_encode_data_for_put(self):
-        r0 = [
+        r0 = (tsr_a, [
             (tsc_a, bd0, udef_a, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, 0, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, 1.2),
             (tsc_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, True, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
-        ]
-        r1 = [
+        ])
+        r1 = (tsr_a, [
             (tsc_a, bd1, udef_a, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, 3, udef_a, udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, 4.5),
             (tsc_a, udef_a, udef_a, unix_time_millis(ts1), udef_a, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, False, udef_a),
             (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
-        ]
+        ])
         rows = [r0, r1]
         req = tsputreq_a, str_to_bytes(table_name), udef_a, rows
         req_test = encode(req)
@@ -139,7 +140,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
     def setUpClass(cls):
         super(TimeseriesTtbTests, cls).setUpClass()
 
-    def test_store_data_ttb(self):
+    def test_store_and_fetch_ttb(self):
         now = datetime.datetime.utcfromtimestamp(144379690.987000)
         fiveMinsAgo = now - fiveMins
         tenMinsAgo = fiveMinsAgo - fiveMins
@@ -163,4 +164,12 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         ts_obj = table.new(rows)
         result = ts_obj.store()
         self.assertTrue(result)
+
+        for r in rows:
+            k = r[0:3]
+            ts_obj = client.ts_get(table_name, k)
+            self.assertIsNotNone(ts_obj)
+            self.assertEqual(len(ts_obj.rows), 1)
+            self.assertEqual(len(ts_obj.rows[0]), 5)
+
         client.close()

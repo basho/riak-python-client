@@ -217,7 +217,8 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
             riak.pb.messages.MSG_CODE_TS_PUT_RESP,
             self._use_ttb)
 
-        if self._use_ttb and resp is None:
+        if self._use_ttb and resp is None and \
+            msg_code == riak.pb.messages.MSG_CODE_TS_PUT_RESP:
             return True
 
         if resp is not None:

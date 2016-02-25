@@ -77,7 +77,8 @@ class RiakTtbCodec(object):
                 req_r = []
                 for cell in row:
                     req_r.append(self._encode_to_ts_cell_ttb(cell))
-                req_rows.append(req_r)
+                req_t = (tsrow_a, req_r)
+                req_rows.append(req_t)
             req = tsputreq_a, str_to_bytes(tsobj.table.name), \
                   udef_a, req_rows
             return encode(req)

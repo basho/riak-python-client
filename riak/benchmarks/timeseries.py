@@ -50,7 +50,7 @@ n = [
     {'host': h, 'pb_port': 10037},
     {'host': h, 'pb_port': 10047}
 ]
-client = RiakClient(nodes=n, protocol='pbc', transport_options={'use_ttb': True})
+client = RiakClient(nodes=n, protocol='pbc', transport_options={'use_ttb': False})
 table = client.table(tbl)
 
 with benchmark.measure() as b:
@@ -69,7 +69,7 @@ with benchmark.measure() as b:
             if ts_obj is None:
                 raise AssertionError("expected obj")
             if len(ts_obj.rows) != 1:
-                raise AssertionError("expected one row")
+                raise AssertionError("expected one row, got: %d" % len(tsobj.rows))
             row = ts_obj.rows[0]
             if len(row) != 5:
                 raise AssertionError("expected row to have five items")
