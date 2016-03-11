@@ -29,7 +29,7 @@ from riak_pb.messages import (
     MSG_CODE_AUTH_RESP
 )
 from riak.util import bytes_to_str, str_to_bytes
-from riak.transports.pool import BadResource
+
 from six import PY2
 if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection
@@ -37,6 +37,8 @@ if not USE_STDLIB_SSL:
 else:
     import ssl
     from riak.transports.security import configure_ssl_context
+
+from riak.transports.pool import BadResource
 
 
 class RiakPbcConnection(object):
