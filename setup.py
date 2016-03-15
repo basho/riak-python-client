@@ -26,7 +26,7 @@ try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
 except(IOError, ImportError):
-    long_description = open('README.md').read()
+    long_description = open('README.md', encoding='UTF-8').read()
 
 setup(
     name='riak',
