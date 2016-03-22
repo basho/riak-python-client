@@ -120,6 +120,7 @@ Key-level Operations
 .. automethod:: RiakClient.put
 .. automethod:: RiakClient.delete
 .. automethod:: RiakClient.multiget
+.. automethod:: RiakClient.multiput
 .. automethod:: RiakClient.fetch_datatype
 .. automethod:: RiakClient.update_datatype
 

@@ -4,7 +4,7 @@ import platform
 import random
 import string
 
-import riak.pb.riak_ts_pb2
+import riak.pb.riak_pb2
 
 from riak import RiakError
 from riak.table import Table
@@ -14,7 +14,7 @@ from riak.util import str_to_bytes, bytes_to_str, \
     is_timeseries_supported
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
-from riak.pb.riak_ts_pb2 import TsColumnType
+from riak.pb.riak_pb2 import TsColumnType
 
 if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
@@ -72,18 +72,18 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(ts0, ts0_d)
 
     def test_encode_data_for_get(self):
-        req = riak.pb.riak_ts_pb2.TsGetReq()
+        req = riak.pb.riak_pb2.TsGetReq()
         self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
         self.validate_keyreq(req)
 
     def test_encode_data_for_delete(self):
-        req = riak.pb.riak_ts_pb2.TsDelReq()
+        req = riak.pb.riak_pb2.TsDelReq()
         self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
         self.validate_keyreq(req)
 
     def test_encode_data_for_put(self):
         tsobj = TsObject(None, self.table, self.rows, None)
-        ts_put_req = riak.pb.riak_ts_pb2.TsPutReq()
+        ts_put_req = riak.pb.riak_pb2.TsPutReq()
         self.c._encode_timeseries_put(tsobj, ts_put_req)
 
         # NB: expected, actual
@@ -107,13 +107,13 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
 
     def test_encode_data_for_listkeys(self):
-        req = riak.pb.riak_ts_pb2.TsListKeysReq()
+        req = riak.pb.riak_pb2.TsListKeysReq()
         self.c._encode_timeseries_listkeysreq(self.table, req, 1234)
         self.assertEqual(self.table.name, bytes_to_str(req.table))
         self.assertEqual(1234, req.timeout)
 
     def test_decode_data_from_query(self):
-        tqr = riak.pb.riak_ts_pb2.TsQueryResp()
+        tqr = riak.pb.riak_pb2.TsQueryResp()
 
         c0 = tqr.columns.add()
         c0.name = str_to_bytes('col_varchar')

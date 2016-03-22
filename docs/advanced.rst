@@ -40,7 +40,7 @@ Retry logic
 Multiget
 --------
 
-.. currentmodule:: riak.client.multiget
+.. currentmodule:: riak.client.multi
 
 .. autodata:: POOL_SIZE
 
@@ -50,9 +50,15 @@ Multiget
    :members:
    :private-members:
 
+.. autoclass:: MultiPutPool
+   :members:
+   :private-members:
+
 .. autodata:: RIAK_MULTIGET_POOL
+.. autodata:: RIAK_MULTIPUT_POOL
 
 .. autofunction:: multiget
+.. autofunction:: multiput
 
 ---------
 Datatypes

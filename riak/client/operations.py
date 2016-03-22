@@ -1,6 +1,7 @@
+import riak.client.multi
+
 from riak.client.transport import RiakClientTransport, \
     retryable, retryableHttpOnly
-from riak.client.multiget import multiget
 from riak.client.index_page import IndexPage
 from riak.datatypes import TYPES
 from riak.table import Table
@@ -976,7 +977,22 @@ class RiakClientOperations(RiakClientTransport):
         """
         if self._multiget_pool:
             params['pool'] = self._multiget_pool
-        return multiget(self, pairs, **params)
+        return riak.client.multi.multiget(self, pairs, **params)
+
+    def multiput(self, objs, **params):
+        """
+        Stores objects in parallel via threads.
+
+        :param objs: the objects to store
+        :type objs: list of `RiakObject <riak.riak_object.RiakObject>`
+        :param params: additional request flags, e.g. w, dw, pw
+        :type params: dict
+        :rtype: list of boolean or
+            :class:`RiakObjects <riak.riak_object.RiakObject>`,
+        """
+        if self._multiput_pool:
+            params['pool'] = self._multiput_pool
+        return riak.client.multi.multiput(self, objs, **params)
 
     @retryable
     def get_counter(self, transport, bucket, key, r=None, pr=None,

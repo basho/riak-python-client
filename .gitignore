@@ -11,6 +11,7 @@ docs/_build
 .*.swp
 .coverage
 
+build/
 py-build/
 dist/
 

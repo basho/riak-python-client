@@ -3,6 +3,8 @@ $(error RIAK_DIR is not set)
 endif
 
 unexport PYENV_VERSION
+unexport PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+unexport PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION
 
 PROJDIR = $(realpath $(CURDIR)/..)
 TOOLS_DIR = $(PROJDIR)/tools/devrel

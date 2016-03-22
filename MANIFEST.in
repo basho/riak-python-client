@@ -1,5 +1,6 @@
 include docs/*
 include riak/erl_src/*
+include src/*
 include README.md
 include LICENSE
 include RELNOTES.md

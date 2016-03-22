@@ -56,7 +56,8 @@ then
 fi
 
 # NB: 2.7.8 is special-cased
-for pyver in 2.7 3.3 3.4 3.5
+# for pyver in 2.7 3.3 3.4 3.5
+for pyver in 2.7
 do
     if ! pyenv versions | fgrep -v 'riak_2.7.8' | fgrep -q "riak_$pyver"
     then
@@ -71,34 +72,46 @@ do
     fi
 done
 
-if ! pyenv versions | fgrep -q 'riak_2.7.8'
-then
-    echo "[INFO] installing Python 2.7.8"
-    VERSION_ALIAS='riak_2.7.8' pyenv install '2.7.8'
-    pyenv virtualenv 'riak_2.7.8' 'riak-py278'
-fi
-
-(cd $PROJDIR && pyenv local riak-py35 riak-py34 riak-py33 riak-py27 riak-py278)
+# if ! pyenv versions | fgrep -q 'riak_2.7.8'
+# then
+#     echo "[INFO] installing Python 2.7.8"
+#     VERSION_ALIAS='riak_2.7.8' pyenv install '2.7.8'
+#     pyenv virtualenv 'riak_2.7.8' 'riak-py278'
+# fi
+# (cd $PROJDIR && pyenv local riak-py35 riak-py34 riak-py33 riak-py27 riak-py278)
+(cd $PROJDIR && pyenv local riak-py27)
 
 pyenv versions
 
-if [[ $(python --version) == Python\ 3.* ]]
-then
-    pip install --upgrade pip
-    for module in six tox python3-protobuf
-    do
+pip install --upgrade pip
+for module in six tox
+do
+    if ! pip show --quiet $module
+    then
+        pip install --ignore-installed $module
         if ! pip show --quiet $module
         then
-            pip install --ignore-installed $module
-            if ! pip show --quiet $module
-            then
-                echo "[ERROR] install of $module failed" 1>&2
-                exit 1
-            fi
+            echo "[ERROR] install of $module failed" 1>&2
+            exit 1
         fi
-    done
-    pyenv rehash
-else
-    echo "[ERROR] expected Python 3 to be 'python' at this point" 1>&2
-    exit 1
+    fi
+done
+pyenv rehash
+
+protobuf_module='protobuf'
+if [[ $(python --version) == Python\ 3.* ]]
+then
+    protobuf_module='python3-protobuf'
 fi
+
+if ! pip show --quiet $protobuf_module
+then
+    pip install --ignore-installed $protobuf_module
+    if ! pip show --quiet $protobuf_module
+    then
+        echo "[ERROR] install of $protobuf_module failed" 1>&2
+        exit 1
+    fi
+fi
+
+pyenv rehash

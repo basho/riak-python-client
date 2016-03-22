@@ -1,0 +1,10 @@
+# TODO:
+# must only run unit tests in Travis CI
+# riak requires sudo
+language: python
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+script: python setup.py test

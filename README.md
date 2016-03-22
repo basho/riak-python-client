@@ -21,7 +21,15 @@ The recommended versions of Python for use with this client are Python `2.7.x`, 
 Riak TS (Timeseries)
 ===================
 
-You must use version `2.7.11`, `3.4.4` or `3.5.1` (or greater within a version series). Otherwise you will be affected by [this Python bug](https://bugs.python.org/issue23517).
+You must use Python version `2.7.11`, `3.4.4` or `3.5.1` (or greater within a version series). Otherwise you will be affected by [this Python bug](https://bugs.python.org/issue23517).
+
+Installation
+============
+
+Performance Notes:
+
+* See [this section](#using-gevent) to use the `gevent` library.
+* See [this section](#using-cpp-protobuf) to use C++ protocol buffers.
 
 From Source
 -----------
@@ -143,6 +151,114 @@ To run the tests
 ```sh
 RUN_SECURITY=1 RIAK_TEST_HTTP_PORT=18098 python setup.py test
 ```
+
+Using CPP Protobuf
+==================
+
+NOTE: Python 2.7.X only. Python 3 support is not ready yet.
+
+Using the C++ PB implementation results in improved performance when compared with the pure Python implementation.
+
+* Set and export environment variables
+
+In the [protobuf v2.6.1 documentation](https://github.com/google/protobuf/tree/v2.6.1/python), it notes that the following environment variables *must* be set and exported *prior to* installation of either the protobuf library or libraries that depend on it:
+
+```sh
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION=2
+```
+
+If your Python application runs from `init` or within a web application container, you must ensure that these environment variables are set and exported prior to the Python interpreter starting up.
+
+* Install protobuf C++ library
+
+Note: ensure that the required environment variables are set and exported.
+
+If your distribution has a binary package of `libprotobuf` version `2.6.1` available, install that. If not, you must do the following:
+
+```sh
+git clone https://github.com/google/protobuf.git
+cd protobuf
+git co v2.6.1
+./autogen.sh
+./configure && make
+sudo make install
+sudo ldconfig
+
+# NOTE: the following should print a line containing libprotoc.so
+ldconfig -p -v | fgrep proto
+```
+
+Note: the above will install shared libraries to `/usr/local/lib`. Please ensure that this directory is searched by `ldconfig`. If not, add `/usr/local/lib` to `/etc/ld.so.conf` and re-run `sudo ldconfig`.
+
+Then, install the python library. Note that `--cpp_implementation` *must* be used:
+
+```sh
+cd python
+PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp \
+  PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION=2 \
+  python setup.py install --cpp_implementation
+```
+
+Confirm installation by running these commands:
+
+```sh
+$ protoc --version
+libprotoc 2.6.1
+$ pip list
+...
+...
+protobuf (2.6.1)
+...
+...
+```
+
+* Build `riak-python-client` from source
+
+Note: ensure that the required environment variables are set and exported.
+
+If you are using your system Python, you will probably have to run the `install` step with `sudo`:
+
+```sh
+git clone https://github.com/basho/riak-python-client.git
+cd riak-python-client
+
+# TODO: this step will be unnecessary after this feature ships
+git co features/lrb/protobuf-cpp
+
+# NB: confirm variables
+echo PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+echo PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION
+
+python setup.py build
+python setup.py install
+```
+
+Using gevent
+============
+
+The Riak Python client's performance can be greatly enhanced if the `gevent` library is loaded at the start of the python interpreter. One way to do so is follows:
+
+```sh
+pip install gevent
+python -m gevent.monkey ./script-using-riak-python-client
+```
+
+Another way is to run the following code very early in the initialization of the interpreter:
+
+```python
+import sys
+try:
+    from gevent import monkey
+    monkey.patch_all()
+    monkey.patch_socket(aggressive=True, dns=True)
+    monkey.patch_select(aggressive=True)
+except ImportError as e:
+    sys.stderr.write(str(e))
+    sys.stderr.write('\n')
+```
+
+Note that `gevent` may conflict with a web application framework or host. Please refer to your host's documentation.
 
 Contributors
 --------------------------

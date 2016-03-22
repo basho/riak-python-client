@@ -13,7 +13,6 @@ from riak.node import RiakNode
 from riak.riak_object import RiakObject
 from riak.mapreduce import RiakKeyFilter, RiakMapReduce, RiakLink
 
-
 __all__ = ['RiakBucket', 'Table', 'BucketType', 'RiakNode',
            'RiakObject', 'RiakClient', 'RiakMapReduce', 'RiakKeyFilter',
            'RiakLink', 'RiakError', 'ConflictError',
