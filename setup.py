@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import platform
 import six
+import sys
 
 from setuptools import setup, find_packages
 from version import get_version
@@ -10,7 +10,7 @@ from commands import setup_timeseries, build_messages
 install_requires = ['six >= 1.8.0', 'basho_erlastic >= 2.1.0']
 requires = ['six(>=1.8.0)', 'basho_erlastic(>= 2.1.0)']
 
-if platform.python_version_tuple() <= (2, 7, 9):
+if sys.version_info[0:3] <= (2, 7, 9):
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
 
