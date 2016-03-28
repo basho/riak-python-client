@@ -1,5 +1,4 @@
 import datetime
-import logging
 import riak.pb
 import riak.pb.riak_pb2
 import riak.pb.riak_dt_pb2
@@ -695,7 +694,8 @@ class RiakPbcCodec(object):
         metadata from a TsGetResp / TsQueryResp.
 
         :param resp: the protobuf message from which to process data
-        :type resp: riak.pb.riak_ts_pb2.TsQueryRsp or riak.pb.riak_ts_pb2.TsGetResp
+        :type resp: riak.pb.riak_ts_pb2.TsQueryRsp or
+                    riak.pb.riak_ts_pb2.TsGetResp
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """

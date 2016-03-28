@@ -1,4 +1,3 @@
-import logging
 import riak.pb.messages
 import riak.pb.riak_pb2
 import riak.pb.riak_kv_pb2
@@ -22,7 +21,7 @@ from six import PY2, PY3
 
 
 class RiakPbcTransport(RiakTransport, RiakPbcConnection,
-    RiakPbcCodec, RiakTtbCodec):
+                       RiakPbcCodec, RiakTtbCodec):
     """
     The RiakPbcTransport object holds a connection to the protocol
     buffers interface on the riak server.
@@ -217,8 +216,9 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
             riak.pb.messages.MSG_CODE_TS_PUT_RESP,
             self._use_ttb)
 
-        if self._use_ttb and resp is None and \
-            msg_code == riak.pb.messages.MSG_CODE_TS_PUT_RESP:
+        if self._use_ttb and \
+                resp is None and \
+                msg_code == riak.pb.messages.MSG_CODE_TS_PUT_RESP:
             return True
 
         if resp is not None:

@@ -1,6 +1,6 @@
 import datetime
 
-from erlastic import decode, encode
+from erlastic import encode
 from erlastic.types import Atom
 from six import text_type, binary_type, \
     string_types, PY2
@@ -20,6 +20,7 @@ tscell_a = Atom('tscell')
 
 tscell_empty = (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
 
+
 class RiakTtbCodec(object):
     '''
     Erlang term-to-binary Encoding and decoding methods for RiakTtbTransport
@@ -38,8 +39,8 @@ class RiakTtbCodec(object):
             elif isinstance(cell, bool):
                 return (tscell_a, udef_a, udef_a, udef_a, cell, udef_a)
             elif isinstance(cell, text_type) or \
-                 isinstance(cell, binary_type) or \
-                 isinstance(cell, string_types):
+                    isinstance(cell, binary_type) or \
+                    isinstance(cell, string_types):
                 return (tscell_a, cell,
                         udef_a, udef_a, udef_a, udef_a)
             elif (isinstance(cell, int) or
@@ -82,8 +83,7 @@ class RiakTtbCodec(object):
                     req_r.append(self._encode_to_ts_cell_ttb(cell))
                 req_t = (tsrow_a, req_r)
                 req_rows.append(req_t)
-            req = tsputreq_a, tsobj.table.name, \
-                  udef_a, req_rows
+            req = tsputreq_a, tsobj.table.name, udef_a, req_rows
             return encode(req)
         else:
             raise RiakError("TsObject requires a list of rows")
@@ -99,6 +99,8 @@ class RiakTtbCodec(object):
         :type tsobj: TsObject
         """
         # TODO TODO RTS-842 CLIENTS-814 GH-445
+        # TODO COLUMNS
+        # TODO TODO RTS-842 CLIENTS-814 GH-445
         # if tsobj.columns is not None:
         #     for col in resp.columns:
         #         col_name = bytes_to_str(col.name)
@@ -107,11 +109,12 @@ class RiakTtbCodec(object):
         #         tsobj.columns.append(col)
         resp_a = resp_ttb[0]
         if resp_a == tsgetresp_a:
-            resp_cols = resp_ttb[1]
+            # TODO resp_cols = resp_ttb[1]
             resp_rows = resp_ttb[2]
             for row_ttb in resp_rows:
                 tsobj.rows.append(
-                    self._decode_timeseries_row_ttb(row_ttb, None)) # TODO cols
+                    self._decode_timeseries_row_ttb(row_ttb, None))
+        # TODO
         # elif resp_a == rpberrorresp_a:
         else:
             raise RiakError("Unknown TTB response type: {}".format(resp_a))

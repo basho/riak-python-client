@@ -1,5 +1,4 @@
 import datetime
-import logging
 import random
 import sys
 
@@ -14,13 +13,15 @@ from riak import RiakClient
 
 # batch sizes 8, 16, 32, 64, 128, 256
 if len(sys.argv) != 3:
-    raise AssertionError('first arg is batch size, second arg is true / false for use_ttb')
+    raise AssertionError(
+            'first arg is batch size, second arg is true / false'
+            'for use_ttb')
 
 rowcount = 32768
 batchsz = int(sys.argv[1])
 if rowcount % batchsz != 0:
     raise AssertionError('rowcount must be divisible by batchsz')
-use_ttb =  sys.argv[2].lower() == 'true'
+use_ttb = sys.argv[2].lower() == 'true'
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 onesec = datetime.timedelta(0, 1)
@@ -56,7 +57,8 @@ n = [
     {'host': h, 'pb_port': 10047},
     {'host': h, 'pb_port': 10057}
 ]
-client = RiakClient(nodes=n, protocol='pbc', transport_options={'use_ttb': use_ttb})
+client = RiakClient(nodes=n, protocol='pbc',
+                    transport_options={'use_ttb': use_ttb})
 table = client.table(tbl)
 
 with benchmark.measure() as b:

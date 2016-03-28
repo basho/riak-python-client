@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-import random
 import six
-import string
 import unittest
 
 from erlastic import decode, encode
@@ -60,7 +58,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         req_test = encode(req)
 
         test_key = ['hash1', 'user2', ts0]
-        req_encoded = self.c._encode_timeseries_keyreq_ttb(self.table, test_key)
+        req_encoded = self.c._encode_timeseries_keyreq_ttb(
+                self.table, test_key)
         self.assertEqual(req_test, req_encoded)
 
     # def test_decode_riak_error(self):
@@ -87,7 +86,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         ])
         rows = [r0, r1]
         # { tsgetresp, [cols], [rows] }
-        rsp_data = tsgetresp_a, cols, rows # NB: Python tuple notation
+        rsp_data = tsgetresp_a, cols, rows  # NB: Python tuple notation
         rsp_ttb = encode(rsp_data)
 
         tsobj = TsObject(None, self.table, [], [])
@@ -96,7 +95,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         for i in range(0, 1):
             self.assertEqual(tsrow_a, rows[i][0])
             dr = rows[i][1]
-            r = tsobj.rows[i] # encoded
+            r = tsobj.rows[i]  # encoded
 
             # cells
             self.assertEqual(tscell_a, dr[0][0])
@@ -109,8 +108,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
             self.assertEqual(r[2], dr[2][5])
 
             self.assertEqual(tscell_a, dr[3][0])
-            self.assertEqual(r[3],
-                datetime_from_unix_time_millis(dr[3][3]))
+            dt = datetime_from_unix_time_millis(dr[3][3])
+            self.assertEqual(r[3], dt)
 
             self.assertEqual(tscell_a, dr[4][0])
             if i == 0:
@@ -170,10 +169,11 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         twentyMinsAgo = fifteenMinsAgo - fiveMins
         twentyFiveMinsAgo = twentyMinsAgo - fiveMins
 
+        opts = {'use_ttb': True}
         client = RiakClient(protocol='pbc',
-                          host='riak-test',
-                          pb_port=10017,
-                          transport_options={'use_ttb': True})
+                            host='riak-test',
+                            pb_port=10017,
+                            transport_options=opts)
 
         table = client.table(table_name)
         rows = [

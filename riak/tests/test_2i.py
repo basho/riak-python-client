@@ -6,7 +6,6 @@ from riak.tests import RUN_INDEXES
 from riak.tests.base import IntegrationTestBase
 
 
-
 class TwoITests(IntegrationTestBase, unittest.TestCase):
     def is_2i_supported(self):
         # Immediate test to see if 2i is even supported w/ the backend
