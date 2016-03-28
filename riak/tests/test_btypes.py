@@ -1,14 +1,10 @@
-import platform
+import unittest
+
 from riak import RiakError, RiakObject
 from riak.bucket import RiakBucket, BucketType
 from riak.tests import RUN_BTYPES
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 @unittest.skipUnless(RUN_BTYPES, "RUN_BTYPES is 0")

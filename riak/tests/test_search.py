@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-import platform
+
+import unittest
+
 from riak.tests import RUN_SEARCH, RUN_YZ
 from riak.tests.base import IntegrationTestBase
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 testrun_search_bucket = 'searchbucket'
 

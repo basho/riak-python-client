@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
-import platform
 import random
+import six
 import string
+import unittest
 
 from erlastic import decode, encode
 from erlastic.types import Atom
@@ -17,23 +18,26 @@ from riak.util import str_to_bytes, \
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
-
 rpberrorresp_a = Atom('rpberrorresp')
 tsgetreq_a = Atom('tsgetreq')
 tsgetresp_a = Atom('tsgetresp')
 tsputreq_a = Atom('tsputreq')
 
 udef_a = Atom('undefined')
-tsr_a = Atom('tsrow')
-tsc_a = Atom('tscell')
+tsrow_a = Atom('tsrow')
+tscell_a = Atom('tscell')
 table_name = 'GeoCheckin'
 
-bd0 = '时间序列'
-bd1 = 'временные ряды'
+str0 = 'ascii-0'
+str1 = 'ascii-1'
+
+if six.PY2:
+    # https://docs.python.org/2/library/functions.html#unicode
+    bd0 = unicode('时间序列', 'utf-8')
+    bd1 = unicode('временные ряды', 'utf-8')
+else:
+    bd0 = u'时间序列'
+    bd1 = u'временные ряды'
 
 fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
@@ -44,46 +48,42 @@ ts1 = ts0 + fiveMins
 class TimeseriesTtbUnitTests(unittest.TestCase):
     def setUp(self):
         self.c = RiakTtbCodec()
-        self.ts0ms = unix_time_millis(ts0)
-        self.ts1ms = unix_time_millis(ts1)
-        self.rows = [
-            [bd0, 0, 1.2, ts0, True, None],
-            [bd1, 3, 4.5, ts1, False, None]
-        ]
-        self.test_key = ['hash1', 'user2', ts0]
         self.table = Table(None, table_name)
 
     def test_encode_data_for_get(self):
         keylist = [
-            (tsc_a, str_to_bytes('hash1'), udef_a, udef_a, udef_a, udef_a),
-            (tsc_a, str_to_bytes('user2'), udef_a, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a)
+            (tscell_a, str_to_bytes('hash1'), udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, str_to_bytes('user2'), udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a)
         ]
         req = tsgetreq_a, str_to_bytes(table_name), keylist, udef_a
         req_test = encode(req)
 
-        req_encoded = self.c._encode_timeseries_keyreq_ttb(self.table, self.test_key)
+        test_key = ['hash1', 'user2', ts0]
+        req_encoded = self.c._encode_timeseries_keyreq_ttb(self.table, test_key)
         self.assertEqual(req_test, req_encoded)
 
     # def test_decode_riak_error(self):
 
     def test_decode_data_from_get(self):
         cols = []
-        r0 = (tsr_a, [
-            (tsc_a, bd0, udef_a, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, 0, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, 1.2),
-            (tsc_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, True, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
+        r0 = (tsrow_a, [
+            (tscell_a, bd0, udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, 0, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, 1.2),
+            (tscell_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, True, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, str1, udef_a, udef_a, udef_a, udef_a)
         ])
-        r1 = (tsr_a, [
-            (tsc_a, bd1, udef_a, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, 3, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, 4.5),
-            (tsc_a, udef_a, udef_a, unix_time_millis(ts1), udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, False, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
+        r1 = (tsrow_a, [
+            (tscell_a, bd1, udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, 3, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, 4.5),
+            (tscell_a, udef_a, udef_a, unix_time_millis(ts1), udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, False, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, str1, udef_a, udef_a, udef_a, udef_a)
         ])
         rows = [r0, r1]
         # { tsgetresp, [cols], [rows] }
@@ -94,41 +94,63 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         self.c._decode_timeseries_ttb(decode(rsp_ttb), tsobj)
 
         for i in range(0, 1):
+            self.assertEqual(tsrow_a, rows[i][0])
             dr = rows[i][1]
-            r = tsobj.rows[i]
-            self.assertEqual(r[0], dr[0][1])
+            r = tsobj.rows[i] # encoded
+
+            # cells
+            self.assertEqual(tscell_a, dr[0][0])
+            self.assertEqual(r[0], dr[0][1].encode('utf-8'))
+
+            self.assertEqual(tscell_a, dr[1][0])
             self.assertEqual(r[1], dr[1][2])
+
+            self.assertEqual(tscell_a, dr[2][0])
             self.assertEqual(r[2], dr[2][5])
+
+            self.assertEqual(tscell_a, dr[3][0])
             self.assertEqual(r[3],
                 datetime_from_unix_time_millis(dr[3][3]))
+
+            self.assertEqual(tscell_a, dr[4][0])
             if i == 0:
                 self.assertEqual(r[4], True)
             else:
                 self.assertEqual(r[4], False)
+
+            self.assertEqual(tscell_a, dr[5][0])
             self.assertEqual(r[5], None)
 
+            self.assertEqual(tscell_a, dr[6][0])
+            self.assertEqual(r[6], dr[6][1].encode('ascii'))
+
     def test_encode_data_for_put(self):
-        r0 = (tsr_a, [
-            (tsc_a, bd0, udef_a, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, 0, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, 1.2),
-            (tsc_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, True, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
+        r0 = (tsrow_a, [
+            (tscell_a, bd0, udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, 0, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, 1.2),
+            (tscell_a, udef_a, udef_a, unix_time_millis(ts0), udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, True, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
         ])
-        r1 = (tsr_a, [
-            (tsc_a, bd1, udef_a, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, 3, udef_a, udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, 4.5),
-            (tsc_a, udef_a, udef_a, unix_time_millis(ts1), udef_a, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, False, udef_a),
-            (tsc_a, udef_a, udef_a, udef_a, udef_a, udef_a)
+        r1 = (tsrow_a, [
+            (tscell_a, bd1, udef_a, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, 3, udef_a, udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, 4.5),
+            (tscell_a, udef_a, udef_a, unix_time_millis(ts1), udef_a, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, False, udef_a),
+            (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
         ])
         rows = [r0, r1]
         req = tsputreq_a, str_to_bytes(table_name), udef_a, rows
         req_test = encode(req)
 
-        tsobj = TsObject(None, self.table, self.rows, None)
+        rows_to_encode = [
+            [bd0, 0, 1.2, ts0, True, None],
+            [bd1, 3, 4.5, ts1, False, None]
+        ]
+
+        tsobj = TsObject(None, self.table, rows_to_encode, None)
         req_encoded = self.c._encode_timeseries_put_ttb(tsobj)
         self.assertEqual(req_test, req_encoded)
 

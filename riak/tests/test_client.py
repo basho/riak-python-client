@@ -1,4 +1,5 @@
-import platform
+import unittest
+
 from six import PY2
 from threading import Thread
 from riak.riak_object import RiakObject
@@ -9,11 +10,6 @@ if PY2:
     from Queue import Queue
 else:
     from queue import Queue
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class ClientTests(IntegrationTestBase, unittest.TestCase):

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
-import platform
 import random
 import string
+import unittest
 
 import riak.pb.riak_ts_pb2
 
@@ -16,11 +16,6 @@ from riak.util import str_to_bytes, bytes_to_str, \
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 from riak.pb.riak_ts_pb2 import TsColumnType
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 table_name = 'GeoCheckin'
 

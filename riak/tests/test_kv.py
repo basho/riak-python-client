@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import os
-import platform
-from six import string_types, PY2, PY3
-
 import copy
+import os
+import unittest
+
+from six import string_types, PY2, PY3
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
@@ -15,11 +15,6 @@ try:
     import simplejson as json
 except ImportError:
     import json
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 if PY2:
     import cPickle

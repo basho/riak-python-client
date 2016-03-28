@@ -2,11 +2,12 @@ import datetime
 
 from erlastic import decode, encode
 from erlastic.types import Atom
-from six import string_types, PY2
+from six import text_type, binary_type, \
+    string_types, PY2
 
 from riak import RiakError
-from riak.util import str_to_bytes, bytes_to_str, \
-    unix_time_millis, datetime_from_unix_time_millis
+from riak.util import unix_time_millis, \
+    datetime_from_unix_time_millis
 
 udef_a = Atom('undefined')
 
@@ -36,8 +37,10 @@ class RiakTtbCodec(object):
                 return (tscell_a, udef_a, udef_a, ts, udef_a, udef_a)
             elif isinstance(cell, bool):
                 return (tscell_a, udef_a, udef_a, udef_a, cell, udef_a)
-            elif isinstance(cell, string_types):
-                return (tscell_a, str_to_bytes(cell),
+            elif isinstance(cell, text_type) or \
+                 isinstance(cell, binary_type) or \
+                 isinstance(cell, string_types):
+                return (tscell_a, cell,
                         udef_a, udef_a, udef_a, udef_a)
             elif (isinstance(cell, int) or
                  (PY2 and isinstance(cell, long))):  # noqa
@@ -55,7 +58,7 @@ class RiakTtbCodec(object):
             key_vals = key
         else:
             raise ValueError("key must be a list")
-        req = tsgetreq_a, str_to_bytes(table.name), \
+        req = tsgetreq_a, table.name, \
             [self._encode_to_ts_cell_ttb(k) for k in key_vals], udef_a
         return encode(req)
 
@@ -79,7 +82,7 @@ class RiakTtbCodec(object):
                     req_r.append(self._encode_to_ts_cell_ttb(cell))
                 req_t = (tsrow_a, req_r)
                 req_rows.append(req_t)
-            req = tsputreq_a, str_to_bytes(tsobj.table.name), \
+            req = tsputreq_a, tsobj.table.name, \
                   udef_a, req_rows
             return encode(req)
         else:
@@ -95,6 +98,7 @@ class RiakTtbCodec(object):
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
+        # TODO TODO RTS-842 CLIENTS-814 GH-445
         # if tsobj.columns is not None:
         #     for col in resp.columns:
         #         col_name = bytes_to_str(col.name)
@@ -125,10 +129,9 @@ class RiakTtbCodec(object):
         if tsrow_ttb[0] == tsrow_a:
             row = []
             for tsc_ttb in tsrow_ttb[1]:
-                val = None
                 if tsc_ttb[0] == tscell_a:
                     if tsc_ttb[1] != udef_a:
-                        row.append(bytes_to_str(tsc_ttb[1]))
+                        row.append(tsc_ttb[1])
                     elif tsc_ttb[2] != udef_a:
                         row.append(tsc_ttb[2])
                     elif tsc_ttb[3] != udef_a:

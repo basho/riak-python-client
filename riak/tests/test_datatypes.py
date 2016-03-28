@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-import platform
-from riak import RiakBucket, BucketType, RiakObject
+import unittest
 import riak.datatypes as datatypes
+
+from riak import RiakBucket, BucketType, RiakObject
 from riak.tests import RUN_DATATYPES
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class DatatypeUnitTestBase(object):

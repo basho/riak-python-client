@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
-import platform
 import sys
+import unittest
 
 from riak.tests import RUN_SECURITY, SECURITY_USER, SECURITY_PASSWD, \
     SECURITY_CACERT, SECURITY_KEY, SECURITY_CERT, SECURITY_REVOKED, \
     SECURITY_CERT_USER, SECURITY_BAD_CERT, SECURITY_CIPHERS
 from riak.security import SecurityCreds
 from riak.tests.base import IntegrationTestBase
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class SecurityTests(IntegrationTestBase, unittest.TestCase):

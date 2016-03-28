@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
 import platform
+import six
+
 from setuptools import setup, find_packages
 from version import get_version
 from commands import setup_timeseries, build_messages
 
-install_requires = ['six >= 1.8.0', 'erlastic >= 2.0.0']
+install_requires = ['six >= 1.8.0', 'erlastic >= 2.1.0']
 requires = ['six(>=1.8.0)', 'erlastic(>= 2.0.0)']
 if platform.python_version() < '2.7.9':
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
 
-if platform.python_version() < '3.0':
+if six.PY2:
     install_requires.append('protobuf >=2.4.1, <2.7.0')
     requires.append('protobuf(>=2.4.1, <2.7.0)')
 else:
@@ -19,17 +21,12 @@ else:
     requires.append('python3_protobuf(>=2.4.1, <2.6.0)')
 
 
-tests_require = []
-if platform.python_version() < '2.7.0':
-    tests_require.append("unittest2")
-
 setup(
     name='riak',
     version=get_version(),
     packages=find_packages(),
     requires=requires,
     install_requires=install_requires,
-    tests_require=tests_require,
     package_data={'riak': ['erl_src/*']},
     description='Python client for Riak',
     zip_safe=True,

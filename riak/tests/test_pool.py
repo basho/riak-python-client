@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
+import unittest
+
 from six import PY2
-import platform
 from threading import Thread, currentThread
 from riak.transports.pool import Pool, BadResource
 from random import SystemRandom
 from time import sleep
 from riak.tests import RUN_POOL
 from riak.tests.comparison import Comparison
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 if PY2:
     from Queue import Queue

@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-import platform
+import unittest
+
 from riak.mapreduce import RiakKeyFilter
 from riak import key_filter
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class FilterTests(unittest.TestCase):

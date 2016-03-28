@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-import platform
+import unittest
+
 from riak import RiakError
 from riak.tests import RUN_INDEXES
 from riak.tests.base import IntegrationTestBase
 
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class TwoITests(IntegrationTestBase, unittest.TestCase):

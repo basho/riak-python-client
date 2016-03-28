@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-import platform
+import unittest
+
 from riak.tests import RUN_YZ
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 from riak.tests.yz_setup import yzSetUp, yzTearDown
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 def wait_for_yz_index(bucket, key, index=None):
