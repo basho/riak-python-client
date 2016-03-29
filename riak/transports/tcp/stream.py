@@ -3,7 +3,7 @@ import riak.pb.messages
 
 from riak.util import decode_index_value, bytes_to_str
 from riak.client.index_page import CONTINUATION
-from riak.transports.pbc.codec import RiakPbcCodec
+from riak.transports.tcp.codec import RiakPbcCodec
 from six import PY2
 
 

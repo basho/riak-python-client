@@ -12,7 +12,7 @@ from riak.mapreduce import RiakMapReduceChain
 from riak.resolver import default_resolver
 from riak.table import Table
 from riak.transports.http import RiakHttpPool
-from riak.transports.pbc import RiakPbcPool
+from riak.transports.tcp import RiakPbcPool
 from riak.security import SecurityCreds
 from riak.util import lazy_property, bytes_to_str, str_to_bytes
 from six import string_types, PY2

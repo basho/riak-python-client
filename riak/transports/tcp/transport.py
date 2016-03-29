@@ -8,13 +8,13 @@ from riak.transports.transport import RiakTransport
 from riak.riak_object import VClock
 from riak.ts_object import TsObject
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str
-from riak.transports.pbc.connection import RiakPbcConnection
-from riak.transports.pbc.stream import (RiakPbcKeyStream,
+from riak.transports.tcp.connection import RiakPbcConnection
+from riak.transports.tcp.stream import (RiakPbcKeyStream,
                                         RiakPbcMapredStream,
                                         RiakPbcBucketStream,
                                         RiakPbcIndexStream,
                                         RiakPbcTsKeyStream)
-from riak.transports.pbc.codec import RiakPbcCodec
+from riak.transports.tcp.codec import RiakPbcCodec
 from riak.transports.ttb.codec import RiakTtbCodec
 
 from six import PY2, PY3

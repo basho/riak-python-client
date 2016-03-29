@@ -132,10 +132,10 @@ HTTP Transport
    :members:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-Protocol Buffers Transport
+TCP Transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. currentmodule:: riak.transports.pbc
+.. currentmodule:: riak.transports.tcp
 
 .. autoclass:: RiakPbcTransport
    :members:

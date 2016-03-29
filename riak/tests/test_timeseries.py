@@ -9,7 +9,7 @@ import riak.pb.riak_ts_pb2
 from riak import RiakError
 from riak.table import Table
 from riak.ts_object import TsObject
-from riak.transports.pbc.codec import RiakPbcCodec
+from riak.transports.tcp.codec import RiakPbcCodec
 from riak.util import str_to_bytes, bytes_to_str, \
     unix_time_millis, datetime_from_unix_time_millis, \
     is_timeseries_supported
