@@ -2,26 +2,26 @@ import errno
 import socket
 
 from riak.transports.pool import Pool
-from riak.transports.tcp.transport import RiakPbcTransport
+from riak.transports.tcp.transport import TcpTransport
 
 
-class RiakPbcPool(Pool):
+class TcpPool(Pool):
     """
-    A resource pool of PBC transports.
+    A resource pool of TCP transports.
     """
     def __init__(self, client, **options):
-        super(RiakPbcPool, self).__init__()
+        super(TcpPool, self).__init__()
         self._client = client
         self._options = options
 
     def create_resource(self):
         node = self._client._choose_node()
-        return RiakPbcTransport(node=node,
-                                client=self._client,
-                                **self._options)
+        return TcpTransport(node=node,
+                            client=self._client,
+                            **self._options)
 
-    def destroy_resource(self, pbc):
-        pbc.close()
+    def destroy_resource(self, tcp):
+        tcp.close()
 
 # These are a specific set of socket errors
 # that could be raised on send/recv that indicate

@@ -5,17 +5,17 @@ import string
 import unittest
 
 import riak.pb.riak_ts_pb2
+from riak.pb.riak_ts_pb2 import TsColumnType
 
 from riak import RiakError
+from riak.codecs.pbuf import PbufCodec
 from riak.table import Table
+from riak.tests import RUN_TIMESERIES
+from riak.tests.base import IntegrationTestBase
 from riak.ts_object import TsObject
-from riak.transports.tcp.codec import RiakPbcCodec
 from riak.util import str_to_bytes, bytes_to_str, \
     unix_time_millis, datetime_from_unix_time_millis, \
     is_timeseries_supported
-from riak.tests import RUN_TIMESERIES
-from riak.tests.base import IntegrationTestBase
-from riak.pb.riak_ts_pb2 import TsColumnType
 
 table_name = 'GeoCheckin'
 
@@ -35,7 +35,7 @@ ex1ms = 1420113900987
 class TimeseriesUnitTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.c = RiakPbcCodec()
+        cls.c = PbufCodec()
         cls.ts0ms = unix_time_millis(ts0)
         if cls.ts0ms != ex0ms:
             raise AssertionError(
@@ -151,7 +151,7 @@ class TimeseriesUnitTests(unittest.TestCase):
         r1c4.boolean_value = self.rows[1][4]
 
         tsobj = TsObject(None, self.table, [], [])
-        c = RiakPbcCodec()
+        c = PbufCodec()
         c._decode_timeseries(tqr, tsobj)
 
         self.assertEqual(len(self.rows), len(tsobj.rows))

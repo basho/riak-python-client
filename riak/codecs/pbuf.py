@@ -71,15 +71,15 @@ DT_FETCH_TYPES = {
 }
 
 
-class RiakPbcCodec(object):
+class PbufCodec(object):
     """
-    Protobuffs Encoding and decoding methods for RiakPbcTransport.
+    Protobuffs Encoding and decoding methods for TcpTransport.
     """
 
     def __init__(self, **unused_args):
         if riak.pb is None:
-            raise NotImplementedError("this transport is not available")
-        super(RiakPbcCodec, self).__init__(**unused_args)
+            raise NotImplementedError("this codec is not available")
+        super(PbufCodec, self).__init__(**unused_args)
 
     def _unix_time_millis(self, dt):
         return unix_time_millis(dt)

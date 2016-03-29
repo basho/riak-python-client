@@ -21,13 +21,13 @@ tscell_a = Atom('tscell')
 tscell_empty = (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
 
 
-class RiakTtbCodec(object):
+class TtbCodec(object):
     '''
-    Erlang term-to-binary Encoding and decoding methods for RiakTtbTransport
+    Erlang term-to-binary Encoding and decoding methods for TcpTransport
     '''
 
     def __init__(self, **unused_args):
-        super(RiakTtbCodec, self).__init__(**unused_args)
+        super(TtbCodec, self).__init__(**unused_args)
 
     def _encode_to_ts_cell_ttb(self, cell):
         if cell is None:

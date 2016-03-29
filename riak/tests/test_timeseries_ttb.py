@@ -9,7 +9,7 @@ from erlastic.types import Atom
 from riak.client import RiakClient
 from riak.table import Table
 from riak.ts_object import TsObject
-from riak.transports.ttb.codec import RiakTtbCodec
+from riak.codecs.ttb import TtbCodec
 from riak.util import str_to_bytes, \
     unix_time_millis, datetime_from_unix_time_millis, \
     is_timeseries_supported
@@ -29,13 +29,8 @@ table_name = 'GeoCheckin'
 str0 = 'ascii-0'
 str1 = 'ascii-1'
 
-if six.PY2:
-    # https://docs.python.org/2/library/functions.html#unicode
-    bd0 = unicode('时间序列', 'utf-8')
-    bd1 = unicode('временные ряды', 'utf-8')
-else:
-    bd0 = u'时间序列'
-    bd1 = u'временные ряды'
+bd0 = six.text_type('时间序列')
+bd1 = six.text_type('временные ряды')
 
 fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
@@ -45,7 +40,7 @@ ts1 = ts0 + fiveMins
 @unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported")
 class TimeseriesTtbUnitTests(unittest.TestCase):
     def setUp(self):
-        self.c = RiakTtbCodec()
+        self.c = TtbCodec()
         self.table = Table(None, table_name)
 
     def test_encode_data_for_get(self):

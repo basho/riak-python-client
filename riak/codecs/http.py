@@ -1,26 +1,6 @@
-"""
-Copyright 2012 Basho Technologies, Inc.
-Copyright 2010 Rusty Klophaus <rusty@basho.com>
-Copyright 2010 Justin Sheehy <justin@basho.com>
-Copyright 2009 Jay Baird <jay@mochimedia.com>
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import re
 import csv
+
 from six import PY2, PY3
 from cgi import parse_header
 from email import message_from_string
@@ -32,6 +12,7 @@ from riak.riak_object import VClock
 from riak.multidict import MultiDict
 from riak.transports.http.search import XMLSearchResult
 from riak.util import decode_index_value, bytes_to_str
+
 if PY2:
     from urllib import unquote_plus
 else:
@@ -42,7 +23,7 @@ else:
 MAX_LINK_HEADER_SIZE = 8192 - 8
 
 
-class RiakHttpCodec(object):
+class HttpCodec(object):
     """
     Methods for HTTP transport that marshals and unmarshals HTTP
     messages.

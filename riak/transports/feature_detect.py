@@ -40,7 +40,7 @@ class FeatureDetection(object):
     should return the server's version as a string.
 
     :class:`FeatureDetection` is a parent class of
-    :class:`RiakTransport <riak.transports.transport.RiakTransport>`.
+    :class:`Transport <riak.transports.transport.Transport>`.
     """
 
     def _server_version(self):

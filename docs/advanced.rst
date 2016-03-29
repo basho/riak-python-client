@@ -93,7 +93,7 @@ Transports
 
 .. currentmodule:: riak.transports.transport
 
-.. autoclass:: RiakTransport
+.. autoclass:: Transport
    :members:
    :private-members:
 
@@ -124,20 +124,24 @@ HTTP Transport
 
 .. currentmodule:: riak.transports.http
 
-.. autoclass:: RiakHttpPool
+.. autoclass:: HttpPool
 
 .. autofunction:: is_retryable
 
-.. autoclass:: RiakHttpTransport
+.. autoclass:: HttpTransport
    :members:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 TCP Transport
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 .. currentmodule:: riak.transports.tcp
 
-.. autoclass:: RiakPbcTransport
+.. autoclass:: TcpPool
+
+.. autofunction:: is_retryable
+
+.. autoclass:: TcpTransport
    :members:
 
 ---------

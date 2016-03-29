@@ -4,27 +4,27 @@ import riak.pb.riak_kv_pb2
 import riak.pb.riak_ts_pb2
 
 from riak import RiakError
-from riak.transports.transport import RiakTransport
+from riak.codecs.pbuf import PbufCodec
+from riak.codecs.ttb import TtbCodec
+from riak.transports.transport import Transport
 from riak.riak_object import VClock
 from riak.ts_object import TsObject
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str
-from riak.transports.tcp.connection import RiakPbcConnection
-from riak.transports.tcp.stream import (RiakPbcKeyStream,
-                                        RiakPbcMapredStream,
-                                        RiakPbcBucketStream,
-                                        RiakPbcIndexStream,
-                                        RiakPbcTsKeyStream)
-from riak.transports.tcp.codec import RiakPbcCodec
-from riak.transports.ttb.codec import RiakTtbCodec
+from riak.transports.tcp.connection import TcpConnection
+from riak.transports.tcp.stream import (PbufKeyStream,
+                                        PbufMapredStream,
+                                        PbufBucketStream,
+                                        PbufIndexStream,
+                                        PbufTsKeyStream)
 
 from six import PY2, PY3
 
 
-class RiakPbcTransport(RiakTransport, RiakPbcConnection,
-                       RiakPbcCodec, RiakTtbCodec):
+class TcpTransport(Transport, TcpConnection,
+                   PbufCodec, TtbCodec):
     """
-    The RiakPbcTransport object holds a connection to the protocol
-    buffers interface on the riak server.
+    The TcpTransport object holds a connection to the TCP
+    socket on the Riak server.
     """
 
     def __init__(self,
@@ -32,10 +32,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
                  client=None,
                  timeout=None,
                  **transport_options):
-        """
-        Construct a new RiakPbcTransport object.
-        """
-        super(RiakPbcTransport, self).__init__()
+        super(TcpTransport, self).__init__()
 
         self._client = client
         self._node = node
@@ -269,7 +266,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
 
         self._send_msg(riak.pb.messages.MSG_CODE_TS_LIST_KEYS_REQ, req)
 
-        return RiakPbcTsKeyStream(self)
+        return PbufTsKeyStream(self)
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):
@@ -331,7 +328,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
 
         self._send_msg(riak.pb.messages.MSG_CODE_LIST_KEYS_REQ, req)
 
-        return RiakPbcKeyStream(self)
+        return PbufKeyStream(self)
 
     def get_buckets(self, bucket_type=None, timeout=None):
         """
@@ -367,7 +364,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
 
         self._send_msg(riak.pb.messages.MSG_CODE_LIST_BUCKETS_REQ, req)
 
-        return RiakPbcBucketStream(self)
+        return PbufBucketStream(self)
 
     def get_bucket_props(self, bucket):
         """
@@ -480,7 +477,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
 
         self._send_msg(riak.pb.messages.MSG_CODE_MAP_RED_REQ, req)
 
-        return RiakPbcMapredStream(self)
+        return PbufMapredStream(self)
 
     def get_index(self, bucket, index, startkey, endkey=None,
                   return_terms=None, max_results=None, continuation=None,
@@ -532,7 +529,7 @@ class RiakPbcTransport(RiakTransport, RiakPbcConnection,
 
         self._send_msg(riak.pb.messages.MSG_CODE_INDEX_REQ, req)
 
-        return RiakPbcIndexStream(self, index, return_terms)
+        return PbufIndexStream(self, index, return_terms)
 
     def create_search_index(self, index, schema=None, n_val=None,
                             timeout=None):

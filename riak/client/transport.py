@@ -32,7 +32,7 @@ class RiakClientTransport(object):
     # These will be set or redefined by the RiakClient initializer
     protocol = 'pbc'
     _http_pool = None
-    _pb_pool = None
+    _tcp_pool = None
     _locals = _client_locals()
 
     def _get_retry_count(self):
@@ -146,8 +146,8 @@ class RiakClientTransport(object):
             protocol = self.protocol
         if protocol == 'http':
             pool = self._http_pool
-        elif protocol == 'pbc':
-            pool = self._pb_pool
+        elif protocol == 'tcp' or protocol == 'pbc':
+            pool = self._tcp_pool
         else:
             raise ValueError("invalid protocol %s" % protocol)
         return pool

@@ -18,9 +18,9 @@ else:
     from riak.transports.security import configure_ssl_context
 
 
-class RiakPbcConnection(object):
+class TcpConnection(object):
     """
-    Connection-related methods for RiakPbcTransport.
+    Connection-related methods for TcpTransport.
     """
 
     def __init__(self):
@@ -91,7 +91,7 @@ class RiakPbcConnection(object):
         if self._ttb_enabled:
             return True
         else:
-            logging.debug("pbc/connection enabling TTB")
+            logging.debug("tcp/connection enabling TTB")
             req = riak.pb.riak_pb2.RpbToggleEncodingReq()
             req.use_native = True
             msg_code, _ = self._non_connect_request(
@@ -100,7 +100,7 @@ class RiakPbcConnection(object):
                 riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP)
             if msg_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:
                 self._ttb_enabled = True
-                logging.debug("pbc/connection TTB IS ENABLED")
+                logging.debug("tcp/connection TTB IS ENABLED")
                 return True
             else:
                 return False
@@ -201,7 +201,7 @@ class RiakPbcConnection(object):
         if expect and msg_code != expect:
             raise RiakError("unexpected protocol buffer message code: %d, %r"
                             % (msg_code, msg))
-        # logging.debug("pbc/connection received msg_code %d msg %s",
+        # logging.debug("tcp/connection received msg_code %d msg %s",
         # msg_code, msg)
         return msg_code, msg
 
@@ -272,6 +272,6 @@ class RiakPbcConnection(object):
             pbo.ParseFromString(packet)
             return pbo
 
-    # These are set in the RiakPbcTransport initializer
+    # These are set in the TcpTransport initializer
     _address = None
     _timeout = None
