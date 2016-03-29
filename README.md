@@ -4,7 +4,7 @@ Python Client for Riak
 Documentation
 =============
 
-[Documentation for the Riak Python Client Library](http://basho.github.io/riak-python-client/index.html) is available here. The documentation source is found in [`docs/` subdirectory](https://github.com/basho/riak-python-client/tree/master/docs) and can be built with [Sphinx](http://sphinx.pocoo.org/).
+[Documentation for the Riak Python Client Library](http://basho.github.io/riak-python-client/index.html) is available [here](http://basho.github.io/riak-python-client/index.html).
 
 Documentation for Riak is available [here](http://docs.basho.com/riak/latest).
 
@@ -52,7 +52,7 @@ To setup the default test configuration build a test Riak node (from a `riak` di
 make rel
 ```
 
-See [Basic Cluster Setup](http://docs.basho.com/riak/2.0.0/ops/building/basic-cluster-setup/) for more details.
+See [Basic Cluster Setup](http://docs.basho.com/riak/latest/ops/building/basic-cluster-setup/) for more details.
 
 For all of the simple default values, set the `RIAK_DIR` environment variable to the root of your Riak installation. Then from the `riak-python-client` directory 
 
@@ -129,14 +129,14 @@ To enable the timeseries tests, set the `RUN_TIMESERIES` environment variable to
 Testing Secondary Indexes
 -------------------------
 
-To test [Secondary Indexes](http://docs.basho.com/riak/2.0.0/dev/using/2i/), the `RUN_INDEXES` environment variable must be set to 1 (or 0 to skip them.)
+To test [Secondary Indexes](http://docs.basho.com/riak/latest/dev/using/2i/), the `RUN_INDEXES` environment variable must be set to 1 (or 0 to skip them.)
 
 Testing Security (Riak 2+)
 --------------------------
 
 Ensure that the hostname `riak-test` resolves to your Riak host (most likely `localhost`). This is so the SSL host verification can succeed.
 
-By default [Security](http://docs.basho.com/riak/2.0.0beta1/ops/running/authz/) is not enabled on Riak. Once `security = on` is configured in the `riak.conf` file it can be enabled with `riak-admin`.
+By default [Security](http://docs.basho.com/riak/latest/ops/running/authz/) is not enabled on Riak. Once `security = on` is configured in the `riak.conf` file it can be enabled with `riak-admin`.
 
 To run the tests
 

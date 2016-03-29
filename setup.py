@@ -21,6 +21,11 @@ else:
     install_requires.append('python3_protobuf >=2.4.1, <2.6.0')
     requires.append('python3_protobuf(>=2.4.1, <2.6.0)')
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
 
 setup(
     name='riak',
@@ -30,6 +35,7 @@ setup(
     install_requires=install_requires,
     package_data={'riak': ['erl_src/*']},
     description='Python client for Riak',
+    long_description=long_description,
     zip_safe=True,
     options={'easy_install': {'allow_hosts': 'pypi.python.org'}},
     include_package_data=True,
