@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import codecs
 import six
 import sys
 
@@ -24,8 +25,11 @@ else:
 try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
+    with codecs.open('README.rst', 'w', 'utf-8') as f:
+        f.write(long_description)
 except(IOError, ImportError):
-    long_description = open('README.md').read()
+    with open('README.md') as f:
+        long_description = f.read()
 
 setup(
     name='riak',

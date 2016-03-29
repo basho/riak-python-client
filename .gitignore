@@ -1,3 +1,5 @@
+README.rst
+
 *.pyc
 .python-version
 __pycache__/
@@ -11,6 +13,7 @@ docs/_build
 .*.swp
 .coverage
 
+riak-*/
 py-build/
 dist/
 
