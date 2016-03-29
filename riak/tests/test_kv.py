@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import os
+import sys
 import unittest
 
 from six import string_types, PY2, PY3
@@ -690,7 +691,9 @@ class KVFileTests(IntegrationTestBase, unittest.TestCase):
         obj.store()
         obj = bucket.get(self.key_name)
         self.assertNotEqual(obj.encoded_data, None)
+        is_win32 = sys.platform == 'win32'
         self.assertTrue(obj.content_type == 'text/x-python' or
+                        (is_win32 and obj.content_type == 'text/plain') or
                         obj.content_type == 'application/x-python-code')
 
     def test_store_binary_object_from_file_should_use_default_mimetype(self):
