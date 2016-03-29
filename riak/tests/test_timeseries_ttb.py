@@ -29,8 +29,8 @@ table_name = 'GeoCheckin'
 str0 = 'ascii-0'
 str1 = 'ascii-1'
 
-bd0 = six.text_type('时间序列')
-bd1 = six.text_type('временные ряды')
+bd0 = six.u('时间序列')
+bd1 = six.u('временные ряды')
 
 fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
