@@ -8,7 +8,6 @@ import riak.pb.messages
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
-from riak.util import str_to_bytes
 
 if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection

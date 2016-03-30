@@ -99,8 +99,8 @@ class PbufCodec(object):
         req.user = str_to_bytes(username)
         req.password = str_to_bytes(password)
         return Msg(riak.pb.messages.MSG_CODE_AUTH_REQ,
-                req.SerializeToString(),
-                riak.pb.messages.MSG_CODE_AUTH_RESP)
+                   req.SerializeToString(),
+                   riak.pb.messages.MSG_CODE_AUTH_RESP)
 
     def _encode_quorum(self, rw):
         """
