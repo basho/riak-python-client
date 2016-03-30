@@ -1,4 +1,5 @@
 import json
+
 import riak.pb.messages
 
 from riak.util import decode_index_value, bytes_to_str
@@ -28,7 +29,10 @@ class PbufStream(object):
             raise StopIteration
 
         try:
-            msg_code, resp = self.transport._recv_msg(expect=self._expect)
+            expected_code = self._expect
+            msg_code, data = self.transport._recv_msg(expect=expected_code)
+            self.transport._maybe_riak_error(msg_code, data)
+            resp = self.transport._parse_msg(expected_code, data, is_ttb=False)
         except:
             self.finished = True
             raise

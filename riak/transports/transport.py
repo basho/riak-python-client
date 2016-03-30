@@ -295,6 +295,7 @@ class Transport(FeatureDetection):
         """
         raise NotImplementedError
 
+    # TODO RTS-842 NUKE THIS
     def _search_mapred_emu(self, index, query):
         """
         Emulates a search request via MapReduce. Used in the case
@@ -320,6 +321,7 @@ class Transport(FeatureDetection):
             result['docs'].append({u'id': key})
         return result
 
+    # TODO RTS-842 NUKE THIS
     def _get_index_mapred_emu(self, bucket, index, startkey, endkey=None):
         """
         Emulates a secondary index request via MapReduce. Used in the
@@ -360,6 +362,5 @@ class Transport(FeatureDetection):
     def _check_bucket_types(self, bucket_type):
         if not self.bucket_types():
             raise NotImplementedError('Server does not support bucket-types')
-
         if bucket_type.is_default():
             raise ValueError('Cannot manipulate the default bucket-type')

@@ -7,6 +7,7 @@ import riak.pb.riak_ts_pb2
 
 from riak import RiakError
 from riak.content import RiakContent
+from riak.riak_object import VClock
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str, \
     unix_time_millis, datetime_from_unix_time_millis
 from riak.multidict import MultiDict
@@ -76,10 +77,15 @@ class PbufCodec(object):
     Protobuffs Encoding and decoding methods for TcpTransport.
     """
 
-    def __init__(self, **unused_args):
+    def __init__(self,
+            client_timeouts=False, quorum_controls=False,
+            tombstone_vclocks=False, bucket_types=False):
         if riak.pb is None:
             raise NotImplementedError("this codec is not available")
-        super(PbufCodec, self).__init__(**unused_args)
+        self._client_timeouts = client_timeouts
+        self._quorum_controls = quorum_controls
+        self._tombstone_vclocks = tombstone_vclocks
+        self._bucket_types = bucket_types
 
     def _unix_time_millis(self, dt):
         return unix_time_millis(dt)
@@ -305,7 +311,6 @@ class PbufCodec(object):
         :rtype dict
         """
         props = {}
-
         for prop in NORMAL_PROPS:
             if msg.HasField(prop):
                 props[prop] = getattr(msg, prop)
@@ -322,7 +327,6 @@ class PbufCodec(object):
                 props[prop] = self._decode_quorum(getattr(msg, prop))
         if msg.HasField('repl'):
             props['repl'] = REPL_TO_PY[msg.repl]
-
         return props
 
     def _decode_modfun(self, modfun):
@@ -411,7 +415,8 @@ class PbufCodec(object):
 
     def _encode_index_req(self, bucket, index, startkey, endkey=None,
                           return_terms=None, max_results=None,
-                          continuation=None, timeout=None, term_regex=None):
+                          continuation=None, timeout=None, term_regex=None,
+                          streaming=False):
         """
         Encodes a secondary index request into the protobuf message.
 
@@ -434,6 +439,8 @@ class PbufCodec(object):
         :type timeout: int
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
+        :param streaming: encode as streaming request
+        :type streaming: bool
         :rtype riak.pb.riak_kv_pb2.RpbIndexReq
         """
         req = riak.pb.riak_kv_pb2.RpbIndexReq(
@@ -460,7 +467,8 @@ class PbufCodec(object):
                 req.timeout = timeout
         if term_regex:
             req.term_regex = str_to_bytes(term_regex)
-        return req
+        req.stream = streaming
+        return req.SerializeToString()
 
     def _decode_search_index(self, index):
         """
@@ -480,7 +488,7 @@ class PbufCodec(object):
 
     def _add_bucket_type(self, req, bucket_type):
         if bucket_type and not bucket_type.is_default():
-            if not self.bucket_types():
+            if not self._bucket_types:
                 raise NotImplementedError(
                     'Server does not support bucket-types')
             req.type = str_to_bytes(bucket_type.name)
@@ -645,22 +653,30 @@ class PbufCodec(object):
                 raise RiakError("can't serialize type '{}', value '{}'"
                                 .format(t, cell))
 
-    def _encode_timeseries_keyreq(self, table, key, req):
+    def _encode_timeseries_keyreq(self, table, key, is_delete=False):
         key_vals = None
         if isinstance(key, list):
             key_vals = key
         else:
             raise ValueError("key must be a list")
 
+        if is_delete:
+            req = riak.pb.riak_ts_pb2.TsDelReq()
+        else:
+            req = riak.pb.riak_ts_pb2.TsGetReq()
+
         req.table = str_to_bytes(table.name)
         for cell in key_vals:
             ts_cell = req.key.add()
             self._encode_to_ts_cell(cell, ts_cell)
+        return req.SerializeToString()
 
-    def _encode_timeseries_listkeysreq(self, table, req, timeout=None):
+    def _encode_timeseries_listkeysreq(self, table, timeout=None):
+        req = riak.pb.riak_ts_pb2.TsListKeysReq()
         req.table = str_to_bytes(table.name)
-        if timeout:
+        if self._client_timeouts and timeout:
             req.timeout = timeout
+        return req.SerializeToString()
 
     def _encode_timeseries_put(self, tsobj, req):
         """
@@ -672,6 +688,7 @@ class PbufCodec(object):
         :param req: the protobuf message to fill
         :type req: riak.pb.riak_ts_pb2.TsPutReq
         """
+        req = riak.pb.riak_ts_pb2.TsPutReq()
         req.table = str_to_bytes(tsobj.table.name)
 
         if tsobj.columns:
@@ -687,6 +704,15 @@ class PbufCodec(object):
                     self._encode_to_ts_cell(cell, tsc)
         else:
             raise RiakError("TsObject requires a list of rows")
+        return req.SerializeToString()
+
+    def _encode_timeseries_query(self, table, query, interpolations=None):
+        req = riak.pb.riak_ts_pb2.TsQueryReq()
+        q = query
+        if '{table}' in q:
+            q = q.format(table=table.name)
+        req.query.base = str_to_bytes(q)
+        return req.SerializeToString()
 
     def _decode_timeseries(self, resp, tsobj):
         """
@@ -769,3 +795,311 @@ class PbufCodec(object):
                   'node': bytes_to_str(item.node),
                   'primary': item. primary}
         return result
+
+    def _encode_get(self, robj, r=None, pr=None, timeout=None,
+            basic_quorum=None, notfound_ok=None):
+        bucket = robj.bucket
+        req = riak.pb.riak_kv_pb2.RpbGetReq()
+        if r:
+            req.r = self._encode_quorum(r)
+        if self._quorum_controls:
+            if pr:
+                req.pr = self._encode_quorum(pr)
+            if basic_quorum is not None:
+                req.basic_quorum = basic_quorum
+            if notfound_ok is not None:
+                req.notfound_ok = notfound_ok
+        if self._client_timeouts and timeout:
+            req.timeout = timeout
+        if self._tombstone_vclocks:
+            req.deletedvclock = True
+        req.bucket = str_to_bytes(bucket.name)
+        self._add_bucket_type(req, bucket.bucket_type)
+        req.key = str_to_bytes(robj.key)
+        return req.SerializeToString()
+
+    def _encode_put(self, robj, w=None, dw=None, pw=None,
+            return_body=True, if_none_match=False, timeout=None):
+        bucket = robj.bucket
+        req = riak.pb.riak_kv_pb2.RpbPutReq()
+        if w:
+            req.w = self._encode_quorum(w)
+        if dw:
+            req.dw = self._encode_quorum(dw)
+        if self._quorum_controls and pw:
+            req.pw = self._encode_quorum(pw)
+        if return_body:
+            req.return_body = 1
+        if if_none_match:
+            req.if_none_match = 1
+        if self._client_timeouts and timeout:
+            req.timeout = timeout
+        req.bucket = str_to_bytes(bucket.name)
+        self._add_bucket_type(req, bucket.bucket_type)
+        if robj.key:
+            req.key = str_to_bytes(robj.key)
+        if robj.vclock:
+            req.vclock = robj.vclock.encode('binary')
+        self._encode_content(robj, req.content)
+        return req.SerializeToString()
+
+    def _decode_get(self, robj, resp):
+        if resp is not None:
+            if resp.HasField('vclock'):
+                robj.vclock = VClock(resp.vclock, 'binary')
+            # We should do this even if there are no contents, i.e.
+            # the object is tombstoned
+            self._decode_contents(resp.content, robj)
+        else:
+            # "not found" returns an empty message,
+            # so let's make sure to clear the siblings
+            robj.siblings = []
+        return robj
+
+    def _decode_put(self, robj, resp):
+        if resp is not None:
+            if resp.HasField('key'):
+                robj.key = bytes_to_str(resp.key)
+            if resp.HasField("vclock"):
+                robj.vclock = VClock(resp.vclock, 'binary')
+            if resp.content:
+                self._decode_contents(resp.content, robj)
+        elif not robj.key:
+            raise RiakError("missing response object")
+        return robj
+
+    def _encode_delete(self, robj, rw=None, r=None,
+            w=None, dw=None, pr=None, pw=None,
+            timeout=None):
+        req = riak.pb.riak_kv_pb2.RpbDelReq()
+        if rw:
+            req.rw = self._encode_quorum(rw)
+        if r:
+            req.r = self._encode_quorum(r)
+        if w:
+            req.w = self._encode_quorum(w)
+        if dw:
+            req.dw = self._encode_quorum(dw)
+
+        if self._quorum_controls:
+            if pr:
+                req.pr = self._encode_quorum(pr)
+            if pw:
+                req.pw = self._encode_quorum(pw)
+
+        if self._client_timeouts and timeout:
+            req.timeout = timeout
+
+        use_vclocks = (self._tombstone_vclocks and
+                       hasattr(robj, 'vclock') and robj.vclock)
+        if use_vclocks:
+            req.vclock = robj.vclock.encode('binary')
+
+        bucket = robj.bucket
+        req.bucket = str_to_bytes(bucket.name)
+        self._add_bucket_type(req, bucket.bucket_type)
+        req.key = str_to_bytes(robj.key)
+        return req.SerializeToString()
+
+    def _encode_stream_keys(self, bucket, timeout=None):
+        req = riak.pb.riak_kv_pb2.RpbListKeysReq()
+        req.bucket = str_to_bytes(bucket.name)
+        if self._client_timeouts and timeout:
+            req.timeout = timeout
+        self._add_bucket_type(req, bucket.bucket_type)
+        return req.SerializeToString()
+
+    def _decode_get_keys(self, stream):
+        keys = []
+        for keylist in stream:
+            for key in keylist:
+                keys.append(bytes_to_str(key))
+        return keys
+
+    def _decode_get_server_info(self, resp):
+        return {'node': bytes_to_str(resp.node),
+                'server_version': bytes_to_str(resp.server_version)}
+
+    def _decode_get_client_id(self, resp):
+        return bytes_to_str(resp.client_id)
+
+    def _encode_set_client_id(self, client_id):
+        req = riak.pb.riak_kv_pb2.RpbSetClientIdReq()
+        req.client_id = str_to_bytes(client_id)
+        return req.SerializeToString()
+
+    def _encode_get_buckets(self, bucket_type, timeout):
+        req = riak.pb.riak_kv_pb2.RpbListBucketsReq()
+        self._add_bucket_type(req, bucket_type)
+        if self._client_timeouts and timeout:
+            req.timeout = timeout
+        return req.SerializeToString()
+
+    def _encode_stream_buckets(self, bucket_type, timeout):
+        req = riak.pb.riak_kv_pb2.RpbListBucketsReq()
+        req.stream = True
+        self._add_bucket_type(req, bucket_type)
+        # Bucket streaming landed in the same release as timeouts, so
+        # we don't need to check the capability.
+        if timeout:
+            req.timeout = timeout
+        return req.SerializeToString()
+
+    def _encode_get_bucket_props(self, bucket):
+        req = riak.pb.riak_pb2.RpbGetBucketReq()
+        req.bucket = str_to_bytes(bucket.name)
+        self._add_bucket_type(req, bucket.bucket_type)
+        return req.SerializeToString()
+
+    def _encode_set_bucket_props(self, bucket, props):
+        req = riak.pb.riak_pb2.RpbSetBucketReq()
+        req.bucket = str_to_bytes(bucket.name)
+        self._add_bucket_type(req, bucket.bucket_type)
+        self._encode_bucket_props(props, req)
+        return req.SerializeToString()
+
+    def _encode_clear_bucket_props(self, bucket):
+        req = riak.pb.riak_pb2.RpbResetBucketReq()
+        req.bucket = str_to_bytes(bucket.name)
+        self._add_bucket_type(req, bucket.bucket_type)
+        return req.SerializeToString()
+
+    def _encode_get_bucket_type_props(self, bucket_type):
+        req = riak.pb.riak_pb2.RpbGetBucketTypeReq()
+        req.type = str_to_bytes(bucket_type.name)
+        return req.SerializeToString()
+
+    def _encode_set_bucket_type_props(self, bucket_type, props):
+        req = riak.pb.riak_pb2.RpbSetBucketTypeReq()
+        req.type = str_to_bytes(bucket_type.name)
+        self._encode_bucket_props(props, req)
+        return req.SerializeToString()
+
+    def _encode_stream_mapred(content):
+        req = riak.pb.riak_kv_pb2.RpbMapRedReq()
+        req.request = str_to_bytes(content)
+        req.content_type = str_to_bytes("application/json")
+        return req.SerializeToString()
+
+    def _encode_create_search_index(self, index, schema=None,
+            n_val=None, timeout=None):
+        index = str_to_bytes(index)
+        idx = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndex(name=index)
+        if schema:
+            idx.schema = str_to_bytes(schema)
+        if n_val:
+            idx.n_val = n_val
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexPutReq(index=idx)
+        if timeout is not None:
+            req.timeout = timeout
+        return req.SerializeToString()
+
+    def _encode_get_search_index(self, index):
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexGetReq(
+                name=str_to_bytes(index))
+        return req.SerializeToString()
+
+    def _encode_list_search_indexes(self):
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexGetReq()
+        return req.SerializeToString()
+
+    def _encode_delete_search_indexes(self):
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexDeleteReq(
+                name=str_to_bytes(index))
+        return req.SerializeToString()
+    
+    def _encode_create_search_schema(self, schema, content):
+        scma = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchema(
+                name=str_to_bytes(schema),
+                content=str_to_bytes(content))
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchemaPutReq(
+                schema=scma)
+        return req.SerializeToString()
+
+    def _encode_get_search_schema(self, schema):
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchemaGetReq(
+                name=str_to_bytes(schema))
+        return req.SerializeToString()
+
+    def _decode_get_search_schema(self, resp):
+        result = {}
+        result['name'] = bytes_to_str(resp.schema.name)
+        result['content'] = bytes_to_str(resp.schema.content)
+        return result
+
+    def _encode_search(self, index, query, **params):
+        req = riak.pb.riak_search_pb2.RpbSearchQueryReq(
+                index=str_to_bytes(index),
+                q=str_to_bytes(query))
+        self._encode_search_query(req, params)
+        return req.SerializeToString()
+
+    def _decode_search(resp):
+        result = {}
+        if resp.HasField('max_score'):
+            result['max_score'] = resp.max_score
+        if resp.HasField('num_found'):
+            result['num_found'] = resp.num_found
+        result['docs'] = [self._decode_search_doc(doc) for doc in resp.docs]
+        return result
+
+    def _encode_get_counter(self, bucket, key, **params):
+        req = riak.pb.riak_kv_pb2.RpbCounterGetReq()
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
+        if params.get('r') is not None:
+            req.r = self._encode_quorum(params['r'])
+        if params.get('pr') is not None:
+            req.pr = self._encode_quorum(params['pr'])
+        if params.get('basic_quorum') is not None:
+            req.basic_quorum = params['basic_quorum']
+        if params.get('notfound_ok') is not None:
+            req.notfound_ok = params['notfound_ok']
+        return req.SerializeToString()
+
+    def _encode_update_counter(self, bucket, key, value, **params):
+        req = riak.pb.riak_kv_pb2.RpbCounterUpdateReq()
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
+        req.amount = value
+        if params.get('w') is not None:
+            req.w = self._encode_quorum(params['w'])
+        if params.get('dw') is not None:
+            req.dw = self._encode_quorum(params['dw'])
+        if params.get('pw') is not None:
+            req.pw = self._encode_quorum(params['pw'])
+        if params.get('returnvalue') is not None:
+            req.returnvalue = params['returnvalue']
+        return req.SerializeToString()
+
+    def _encode_fetch_datatype(self, bucket, key, **options):
+        req = riak.pb.riak_dt_pb2.DtFetchReq()
+        req.type = str_to_bytes(bucket.bucket_type.name)
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
+        self._encode_dt_options(req, options)
+        return req.SerializeToString()
+
+    def _encode_update_datatype(self, datatype, **options):
+        op = datatype.to_op()
+        type_name = datatype.type_name
+        if not op:
+            raise ValueError("No operation to send on datatype {!r}".
+                             format(datatype))
+        req = riak.pb.riak_dt_pb2.DtUpdateReq()
+        req.bucket = str_to_bytes(datatype.bucket.name)
+        req.type = str_to_bytes(datatype.bucket.bucket_type.name)
+        if datatype.key:
+            req.key = str_to_bytes(datatype.key)
+        if datatype._context:
+            req.context = datatype._context
+        self._encode_dt_options(req, options)
+        self._encode_dt_op(type_name, req, op)
+        return req.SerializeToString()
+
+    def _encode_get_preflist(self, bucket, key):
+        req = riak.pb.riak_kv_pb2.RpbGetBucketKeyPreflistReq()
+        req.bucket = str_to_bytes(bucket.name)
+        req.key = str_to_bytes(key)
+        req.type = str_to_bytes(bucket.bucket_type.name)
+        return req.SerializeToString()
