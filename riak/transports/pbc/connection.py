@@ -15,6 +15,8 @@ else:
     import ssl
     from riak.transports.security import configure_ssl_context
 
+from riak.transports.pool import BadResource
+
 
 class RiakPbcConnection(object):
     """
@@ -155,7 +157,15 @@ class RiakPbcConnection(object):
                     raise SecurityError(e)
 
     def _recv_msg(self, expect=None):
-        self._recv_pkt()
+        try:
+            self._recv_pkt()
+        except socket.timeout, e:
+            # A timeout can leave the socket in an inconsistent state because
+            # it might still receive the data later and mix up with a
+            # subsequent request.
+            # https://github.com/basho/riak-python-client/issues/425
+            raise BadResource(e)
+
         msg_code, = struct.unpack("B", self._inbuf[:1])
         if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
             err = self._parse_msg(msg_code, self._inbuf[1:])
