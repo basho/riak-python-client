@@ -83,9 +83,10 @@ class TcpConnection(object):
             logging.debug("tcp/connection enabling TTB")
             req = riak.pb.riak_pb2.RpbToggleEncodingReq()
             req.use_native = True
+            data = req.SerializeToString()
             msg_code, _ = self._non_connect_send_recv(
                 riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_REQ,
-                req,
+                data,
                 riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP)
             if msg_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:
                 self._ttb_enabled = True
@@ -107,9 +108,10 @@ class TcpConnection(object):
         if not password:
             password = ''
         req.password = str_to_bytes(password)
+        data = req.SerializeToString()
         msg_code, _ = self._non_connect_send_recv(
             riak.pb.messages.MSG_CODE_AUTH_REQ,
-            req,
+            data,
             riak.pb.messages.MSG_CODE_AUTH_RESP)
         if msg_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
             return True
