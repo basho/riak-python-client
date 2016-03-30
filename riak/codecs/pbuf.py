@@ -493,28 +493,28 @@ class PbufCodec(object):
                     'Server does not support bucket-types')
             req.type = str_to_bytes(bucket_type.name)
 
-    def _encode_search_query(self, req, params):
-        if 'rows' in params:
-            req.rows = params['rows']
-        if 'start' in params:
-            req.start = params['start']
-        if 'sort' in params:
-            req.sort = str_to_bytes(params['sort'])
-        if 'filter' in params:
-            req.filter = str_to_bytes(params['filter'])
-        if 'df' in params:
-            req.df = str_to_bytes(params['df'])
-        if 'op' in params:
-            req.op = str_to_bytes(params['op'])
-        if 'q.op' in params:
-            req.op = params['q.op']
-        if 'fl' in params:
-            if isinstance(params['fl'], list):
-                req.fl.extend(params['fl'])
+    def _encode_search_query(self, req, **kwargs):
+        if 'rows' in kwargs:
+            req.rows = kwargs['rows']
+        if 'start' in kwargs:
+            req.start = kwargs['start']
+        if 'sort' in kwargs:
+            req.sort = str_to_bytes(kwargs['sort'])
+        if 'filter' in kwargs:
+            req.filter = str_to_bytes(kwargs['filter'])
+        if 'df' in kwargs:
+            req.df = str_to_bytes(kwargs['df'])
+        if 'op' in kwargs:
+            req.op = str_to_bytes(kwargs['op'])
+        if 'q.op' in kwargs:
+            req.op = kwargs['q.op']
+        if 'fl' in kwargs:
+            if isinstance(kwargs['fl'], list):
+                req.fl.extend(kwargs['fl'])
             else:
-                req.fl.append(params['fl'])
-        if 'presort' in params:
-            req.presort = params['presort']
+                req.fl.append(kwargs['fl'])
+        if 'presort' in kwargs:
+            req.presort = kwargs['presort']
 
     def _decode_search_doc(self, doc):
         resultdoc = MultiDict()
@@ -550,15 +550,15 @@ class PbufCodec(object):
         elif dtype == 'map':
             return self._decode_map_value(msg.map_value)
 
-    def _encode_dt_options(self, req, params):
+    def _encode_dt_options(self, req, **kwargs):
         for q in ['r', 'pr', 'w', 'dw', 'pw']:
-            if q in params and params[q] is not None:
-                setattr(req, q, self._encode_quorum(params[q]))
+            if q in kwargs and kwargs[q] is not None:
+                setattr(req, q, self._encode_quorum(kwargs[q]))
 
         for o in ['basic_quorum', 'notfound_ok', 'timeout', 'return_body',
                   'include_context']:
-            if o in params and params[o] is not None:
-                setattr(req, o, params[o])
+            if o in kwargs and kwargs[o] is not None:
+                setattr(req, o, kwargs[o])
 
     def _decode_map_value(self, entries):
         out = {}
@@ -678,7 +678,7 @@ class PbufCodec(object):
             req.timeout = timeout
         return req.SerializeToString()
 
-    def _encode_timeseries_put(self, tsobj, req):
+    def _encode_timeseries_put(self, tsobj):
         """
         Fills an TsPutReq message with the appropriate data and
         metadata from a TsObject.
@@ -975,7 +975,7 @@ class PbufCodec(object):
         self._encode_bucket_props(props, req)
         return req.SerializeToString()
 
-    def _encode_stream_mapred(content):
+    def _encode_stream_mapred(self, content):
         req = riak.pb.riak_kv_pb2.RpbMapRedReq()
         req.request = str_to_bytes(content)
         req.content_type = str_to_bytes("application/json")
@@ -1003,7 +1003,7 @@ class PbufCodec(object):
         req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexGetReq()
         return req.SerializeToString()
 
-    def _encode_delete_search_indexes(self):
+    def _encode_delete_search_index(self, index):
         req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexDeleteReq(
                 name=str_to_bytes(index))
         return req.SerializeToString()
@@ -1027,14 +1027,14 @@ class PbufCodec(object):
         result['content'] = bytes_to_str(resp.schema.content)
         return result
 
-    def _encode_search(self, index, query, **params):
+    def _encode_search(self, index, query, **kwargs):
         req = riak.pb.riak_search_pb2.RpbSearchQueryReq(
                 index=str_to_bytes(index),
                 q=str_to_bytes(query))
-        self._encode_search_query(req, params)
+        self._encode_search_query(req, **kwargs)
         return req.SerializeToString()
 
-    def _decode_search(resp):
+    def _decode_search(self, resp):
         result = {}
         if resp.HasField('max_score'):
             result['max_score'] = resp.max_score
@@ -1043,44 +1043,44 @@ class PbufCodec(object):
         result['docs'] = [self._decode_search_doc(doc) for doc in resp.docs]
         return result
 
-    def _encode_get_counter(self, bucket, key, **params):
+    def _encode_get_counter(self, bucket, key, **kwargs):
         req = riak.pb.riak_kv_pb2.RpbCounterGetReq()
         req.bucket = str_to_bytes(bucket.name)
         req.key = str_to_bytes(key)
-        if params.get('r') is not None:
-            req.r = self._encode_quorum(params['r'])
-        if params.get('pr') is not None:
-            req.pr = self._encode_quorum(params['pr'])
-        if params.get('basic_quorum') is not None:
-            req.basic_quorum = params['basic_quorum']
-        if params.get('notfound_ok') is not None:
-            req.notfound_ok = params['notfound_ok']
+        if kwargs.get('r') is not None:
+            req.r = self._encode_quorum(kwargs['r'])
+        if kwargs.get('pr') is not None:
+            req.pr = self._encode_quorum(kwargs['pr'])
+        if kwargs.get('basic_quorum') is not None:
+            req.basic_quorum = kwargs['basic_quorum']
+        if kwargs.get('notfound_ok') is not None:
+            req.notfound_ok = kwargs['notfound_ok']
         return req.SerializeToString()
 
-    def _encode_update_counter(self, bucket, key, value, **params):
+    def _encode_update_counter(self, bucket, key, value, **kwargs):
         req = riak.pb.riak_kv_pb2.RpbCounterUpdateReq()
         req.bucket = str_to_bytes(bucket.name)
         req.key = str_to_bytes(key)
         req.amount = value
-        if params.get('w') is not None:
-            req.w = self._encode_quorum(params['w'])
-        if params.get('dw') is not None:
-            req.dw = self._encode_quorum(params['dw'])
-        if params.get('pw') is not None:
-            req.pw = self._encode_quorum(params['pw'])
-        if params.get('returnvalue') is not None:
-            req.returnvalue = params['returnvalue']
+        if kwargs.get('w') is not None:
+            req.w = self._encode_quorum(kwargs['w'])
+        if kwargs.get('dw') is not None:
+            req.dw = self._encode_quorum(kwargs['dw'])
+        if kwargs.get('pw') is not None:
+            req.pw = self._encode_quorum(kwargs['pw'])
+        if kwargs.get('returnvalue') is not None:
+            req.returnvalue = kwargs['returnvalue']
         return req.SerializeToString()
 
-    def _encode_fetch_datatype(self, bucket, key, **options):
+    def _encode_fetch_datatype(self, bucket, key, **kwargs):
         req = riak.pb.riak_dt_pb2.DtFetchReq()
         req.type = str_to_bytes(bucket.bucket_type.name)
         req.bucket = str_to_bytes(bucket.name)
         req.key = str_to_bytes(key)
-        self._encode_dt_options(req, options)
+        self._encode_dt_options(req, **kwargs)
         return req.SerializeToString()
 
-    def _encode_update_datatype(self, datatype, **options):
+    def _encode_update_datatype(self, datatype, **kwargs):
         op = datatype.to_op()
         type_name = datatype.type_name
         if not op:
@@ -1093,9 +1093,18 @@ class PbufCodec(object):
             req.key = str_to_bytes(datatype.key)
         if datatype._context:
             req.context = datatype._context
-        self._encode_dt_options(req, options)
+        self._encode_dt_options(req, **kwargs)
         self._encode_dt_op(type_name, req, op)
         return req.SerializeToString()
+
+    def _decode_update_datatype(self, datatype, resp, **kwargs):
+        type_name = datatype.type_name
+        if resp.HasField('key'):
+            datatype.key = resp.key[:]
+        if resp.HasField('context'):
+            datatype._context = resp.context[:]
+        if kwargs.get('return_body'):
+            datatype._set_value(self._decode_dt_value(type_name, resp))
 
     def _encode_get_preflist(self, bucket, key):
         req = riak.pb.riak_kv_pb2.RpbGetBucketKeyPreflistReq()

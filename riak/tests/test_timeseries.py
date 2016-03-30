@@ -35,7 +35,6 @@ ex1ms = 1420113900987
 class TimeseriesUnitTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.c = PbufCodec()
         cls.ts0ms = unix_time_millis(ts0)
         if cls.ts0ms != ex0ms:
             raise AssertionError(
@@ -67,25 +66,33 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(ts0, ts0_d)
 
     def test_encode_data_for_get(self):
+        c = PbufCodec()
+        data = c._encode_timeseries_keyreq(
+                self.table, self.test_key, is_delete=False)
         req = riak.pb.riak_ts_pb2.TsGetReq()
-        self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
+        req.ParseFromString(data)
         self.validate_keyreq(req)
 
     def test_encode_data_for_delete(self):
+        c = PbufCodec()
+        data = c._encode_timeseries_keyreq(
+                self.table, self.test_key, is_delete=True)
         req = riak.pb.riak_ts_pb2.TsDelReq()
-        self.c._encode_timeseries_keyreq(self.table, self.test_key, req)
+        req.ParseFromString(data)
         self.validate_keyreq(req)
 
     def test_encode_data_for_put(self):
+        c = PbufCodec()
         tsobj = TsObject(None, self.table, self.rows, None)
-        ts_put_req = riak.pb.riak_ts_pb2.TsPutReq()
-        self.c._encode_timeseries_put(tsobj, ts_put_req)
+        data = c._encode_timeseries_put(tsobj)
+        req = riak.pb.riak_ts_pb2.TsPutReq()
+        req.ParseFromString(data)
 
         # NB: expected, actual
-        self.assertEqual(self.table.name, bytes_to_str(ts_put_req.table))
-        self.assertEqual(len(self.rows), len(ts_put_req.rows))
+        self.assertEqual(self.table.name, bytes_to_str(req.table))
+        self.assertEqual(len(self.rows), len(req.rows))
 
-        r0 = ts_put_req.rows[0]
+        r0 = req.rows[0]
         self.assertEqual(bytes_to_str(r0.cells[0].varchar_value),
                          self.rows[0][0])
         self.assertEqual(r0.cells[1].sint64_value, self.rows[0][1])
@@ -93,7 +100,7 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r0.cells[3].timestamp_value, self.ts0ms)
         self.assertEqual(r0.cells[4].boolean_value, self.rows[0][4])
 
-        r1 = ts_put_req.rows[1]
+        r1 = req.rows[1]
         self.assertEqual(bytes_to_str(r1.cells[0].varchar_value),
                          self.rows[1][0])
         self.assertEqual(r1.cells[1].sint64_value, self.rows[1][1])
@@ -102,8 +109,10 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
 
     def test_encode_data_for_listkeys(self):
+        c = PbufCodec(client_timeouts=True)
+        data = c._encode_timeseries_listkeysreq(self.table, 1234)
         req = riak.pb.riak_ts_pb2.TsListKeysReq()
-        self.c._encode_timeseries_listkeysreq(self.table, req, 1234)
+        req.ParseFromString(data)
         self.assertEqual(self.table.name, bytes_to_str(req.table))
         self.assertEqual(1234, req.timeout)
 

@@ -40,7 +40,6 @@ ts1 = ts0 + fiveMins
 @unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported")
 class TimeseriesTtbUnitTests(unittest.TestCase):
     def setUp(self):
-        self.c = TtbCodec()
         self.table = Table(None, table_name)
 
     def test_encode_data_for_get(self):
@@ -53,8 +52,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         req_test = encode(req)
 
         test_key = ['hash1', 'user2', ts0]
-        req_encoded = self.c._encode_timeseries_keyreq_ttb(
-                self.table, test_key)
+        c = TtbCodec()
+        req_encoded = c._encode_timeseries_keyreq(self.table, test_key)
         self.assertEqual(req_test, req_encoded)
 
     # def test_decode_riak_error(self):
@@ -85,7 +84,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         rsp_ttb = encode(rsp_data)
 
         tsobj = TsObject(None, self.table, [], [])
-        self.c._decode_timeseries_ttb(decode(rsp_ttb), tsobj)
+        c = TtbCodec()
+        c._decode_timeseries(decode(rsp_ttb), tsobj)
 
         for i in range(0, 1):
             self.assertEqual(tsrow_a, rows[i][0])
@@ -145,7 +145,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         ]
 
         tsobj = TsObject(None, self.table, rows_to_encode, None)
-        req_encoded = self.c._encode_timeseries_put_ttb(tsobj)
+        c = TtbCodec()
+        req_encoded = c._encode_timeseries_put(tsobj)
         self.assertEqual(req_test, req_encoded)
 
 

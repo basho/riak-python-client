@@ -28,7 +28,7 @@ class TcpTransport(Transport, TcpConnection):
                  node=None,
                  client=None,
                  timeout=None,
-                 **transport_options):
+                 **kwargs):
         super(TcpTransport, self).__init__()
 
         self._client = client
@@ -38,7 +38,7 @@ class TcpTransport(Transport, TcpConnection):
         self._socket = None
         self._pbuf_c = None
         self._ttb_c = None
-        self._use_ttb = transport_options.get('use_ttb', True)
+        self._use_ttb = kwargs.get('use_ttb', True)
 
     def _get_pbuf_codec(self):
         if not self._pbuf_c:
@@ -453,7 +453,7 @@ class TcpTransport(Transport, TcpConnection):
             riak.pb.messages.MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP)
         return codec._decode_get_search_schema(resp)
 
-    def search(self, index, query, **params):
+    def search(self, index, query, **kwargs):
         # TODO RTS-842 NUKE THIS
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
@@ -461,13 +461,13 @@ class TcpTransport(Transport, TcpConnection):
         if six.PY2 and isinstance(query, unicode):  # noqa
             query = query.encode('utf8')
         codec = self._get_codec(ttb_supported=False)
-        data = codec._encode_search(index, query, params)
+        data = codec._encode_search(index, query, **kwargs)
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_SEARCH_QUERY_REQ, data,
             riak.pb.messages.MSG_CODE_SEARCH_QUERY_RESP)
         return codec._decode_search(resp)
 
-    def get_counter(self, bucket, key, **params):
+    def get_counter(self, bucket, key, **kwargs):
         if not bucket.bucket_type.is_default():
             raise NotImplementedError("Counters are not "
                                       "supported with bucket-types, "
@@ -475,7 +475,7 @@ class TcpTransport(Transport, TcpConnection):
         if not self.counters():
             raise NotImplementedError("Counters are not supported")
         codec = self._get_codec(ttb_supported=False)
-        data = codec._encode_get_counter(bucket, key, params)
+        data = codec._encode_get_counter(bucket, key, **kwargs)
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_COUNTER_GET_REQ, data,
             riak.pb.messages.MSG_CODE_COUNTER_GET_RESP)
@@ -484,7 +484,7 @@ class TcpTransport(Transport, TcpConnection):
         else:
             return None
 
-    def update_counter(self, bucket, key, value, **params):
+    def update_counter(self, bucket, key, value, **kwargs):
         if not bucket.bucket_type.is_default():
             raise NotImplementedError("Counters are not "
                                       "supported with bucket-types, "
@@ -492,7 +492,7 @@ class TcpTransport(Transport, TcpConnection):
         if not self.counters():
             raise NotImplementedError("Counters are not supported")
         codec = self._get_codec(ttb_supported=False)
-        data = codec._encode_update_counter(bucket, key, value, params)
+        data = codec._encode_update_counter(bucket, key, value, **kwargs)
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_COUNTER_UPDATE_REQ, data,
             riak.pb.messages.MSG_CODE_COUNTER_UPDATE_RESP)
@@ -501,36 +501,31 @@ class TcpTransport(Transport, TcpConnection):
         else:
             return True
 
-    def fetch_datatype(self, bucket, key, **options):
+    def fetch_datatype(self, bucket, key, **kwargs):
         if bucket.bucket_type.is_default():
             raise NotImplementedError("Datatypes cannot be used in the default"
                                       " bucket-type.")
         if not self.datatypes():
             raise NotImplementedError("Datatypes are not supported.")
         codec = self._get_codec(ttb_supported=False)
-        data = codec._encode_fetch_datatype(bucket, key, options)
+        data = codec._encode_fetch_datatype(bucket, key, **kwargs)
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_DT_FETCH_REQ, data,
             riak.pb.messages.MSG_CODE_DT_FETCH_RESP)
         return codec._decode_dt_fetch(resp)
 
-    def update_datatype(self, datatype, **options):
+    def update_datatype(self, datatype, **kwargs):
         if datatype.bucket.bucket_type.is_default():
             raise NotImplementedError("Datatypes cannot be used in the default"
                                       " bucket-type.")
         if not self.datatypes():
             raise NotImplementedError("Datatypes are not supported.")
         codec = self._get_codec(ttb_supported=False)
-        data = codec._encode_update_datatype(datatype, options)
+        data = codec._encode_update_datatype(datatype, **kwargs)
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_DT_UPDATE_REQ, data,
             riak.pb.messages.MSG_CODE_DT_UPDATE_RESP)
-        if resp.HasField('key'):
-            datatype.key = resp.key[:]
-        if resp.HasField('context'):
-            datatype._context = resp.context[:]
-        if options.get('return_body'):
-            datatype._set_value(self._decode_dt_value(type_name, resp))
+        codec._decode_update_datatype(datatype, resp, **kwargs)
         return True
 
     def get_preflist(self, bucket, key):
