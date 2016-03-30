@@ -1,15 +1,13 @@
 import logging
 import socket
 import struct
+
 import riak.pb.riak_pb2
 import riak.pb.messages
-import erlastic
 
 from riak import RiakError
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak.util import str_to_bytes
-
-from six import PY2
 
 if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection
@@ -36,7 +34,7 @@ class TcpConnection(object):
         self._send_msg(msg_code, data)
         return self._recv_msg(expect)
 
-    def _non_connect_send_recv(self, msg_code, data=None):
+    def _non_connect_send_recv(self, msg_code, data=None, expect=None):
         """
         Similar to self._send_recv, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
@@ -197,7 +195,7 @@ class TcpConnection(object):
         toread = msglen
         while toread:
             nbytes = self._socket.recv_into(view, toread)
-            view = view[nbytes:] # slicing views is cheap
+            view = view[nbytes:]  # slicing views is cheap
             toread -= nbytes
             nread += nbytes
         if nread != msglen:

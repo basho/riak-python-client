@@ -1,4 +1,5 @@
 # TODO RTS-842 codecs should return msg codes too
+import erlastic
 import six
 import riak.pb.messages
 
@@ -113,7 +114,7 @@ class TcpTransport(Transport, TcpConnection):
         """
         codec = self._get_codec(ttb_supported=False)
         data = codec._encode_get(robj, r, pr,
-                timeout, basic_quorum, notfound_ok)
+                                 timeout, basic_quorum, notfound_ok)
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_GET_REQ, data,
             riak.pb.messages.MSG_CODE_GET_RESP)
@@ -123,7 +124,7 @@ class TcpTransport(Transport, TcpConnection):
             if_none_match=False, timeout=None):
         codec = self._get_codec(ttb_supported=False)
         data = codec._encode_put(robj, w, dw, pw, return_body,
-                if_none_match, timeout)
+                                 if_none_match, timeout)
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_PUT_REQ, data,
             riak.pb.messages.MSG_CODE_PUT_RESP)
@@ -189,7 +190,7 @@ class TcpTransport(Transport, TcpConnection):
         yields lists of keys.
         """
         codec = self._get_codec(ttb_supported=False)
-        data = codec._encode_timeseries_listkeysreq(table, t)
+        data = codec._encode_timeseries_listkeysreq(table, timeout)
         self._send_msg(riak.pb.messages.MSG_CODE_TS_LIST_KEYS_REQ, data)
         return PbufTsKeyStream(self)
 
@@ -346,8 +347,9 @@ class TcpTransport(Transport, TcpConnection):
 
         codec = self._get_codec(ttb_supported=False)
         data = codec._encode_index_req(bucket, index, startkey, endkey,
-                                     return_terms, max_results, continuation,
-                                     timeout, term_regex, streaming=False)
+                                       return_terms, max_results,
+                                       continuation, timeout, term_regex,
+                                       streaming=False)
 
         msg_code, resp = self._request(
             riak.pb.messages.MSG_CODE_INDEX_REQ, data,
@@ -378,8 +380,9 @@ class TcpTransport(Transport, TcpConnection):
                                       "supported")
         codec = self._get_codec(ttb_supported=False)
         data = codec._encode_index_req(bucket, index, startkey, endkey,
-                                     return_terms, max_results, continuation,
-                                     timeout, term_regex, streaming=True)
+                                       return_terms, max_results,
+                                       continuation, timeout,
+                                       term_regex, streaming=True)
         self._send_msg(riak.pb.messages.MSG_CODE_INDEX_REQ, data)
         return PbufIndexStream(self, index, return_terms)
 

@@ -78,8 +78,8 @@ class PbufCodec(object):
     """
 
     def __init__(self,
-            client_timeouts=False, quorum_controls=False,
-            tombstone_vclocks=False, bucket_types=False):
+                 client_timeouts=False, quorum_controls=False,
+                 tombstone_vclocks=False, bucket_types=False):
         if riak.pb is None:
             raise NotImplementedError("this codec is not available")
         self._client_timeouts = client_timeouts
@@ -797,7 +797,7 @@ class PbufCodec(object):
         return result
 
     def _encode_get(self, robj, r=None, pr=None, timeout=None,
-            basic_quorum=None, notfound_ok=None):
+                    basic_quorum=None, notfound_ok=None):
         bucket = robj.bucket
         req = riak.pb.riak_kv_pb2.RpbGetReq()
         if r:
@@ -819,7 +819,8 @@ class PbufCodec(object):
         return req.SerializeToString()
 
     def _encode_put(self, robj, w=None, dw=None, pw=None,
-            return_body=True, if_none_match=False, timeout=None):
+                    return_body=True, if_none_match=False,
+                    timeout=None):
         bucket = robj.bucket
         req = riak.pb.riak_kv_pb2.RpbPutReq()
         if w:
@@ -869,8 +870,8 @@ class PbufCodec(object):
         return robj
 
     def _encode_delete(self, robj, rw=None, r=None,
-            w=None, dw=None, pr=None, pw=None,
-            timeout=None):
+                       w=None, dw=None, pr=None, pw=None,
+                       timeout=None):
         req = riak.pb.riak_kv_pb2.RpbDelReq()
         if rw:
             req.rw = self._encode_quorum(rw)
@@ -982,7 +983,7 @@ class PbufCodec(object):
         return req.SerializeToString()
 
     def _encode_create_search_index(self, index, schema=None,
-            n_val=None, timeout=None):
+                                    n_val=None, timeout=None):
         index = str_to_bytes(index)
         idx = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndex(name=index)
         if schema:
@@ -1007,7 +1008,7 @@ class PbufCodec(object):
         req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexDeleteReq(
                 name=str_to_bytes(index))
         return req.SerializeToString()
-    
+
     def _encode_create_search_schema(self, schema, content):
         scma = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchema(
                 name=str_to_bytes(schema),
