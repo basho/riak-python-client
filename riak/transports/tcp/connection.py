@@ -185,16 +185,17 @@ class TcpConnection(object):
                     raise SecurityError(e)
 
     def _recv_msg(self, expect=None, is_ttb=False):
-        self._recv_pkt()
-        msg_code, = struct.unpack("B", self._inbuf[:1])
+        msgbuf = self._recv_pkt()
+        mv = memoryview(msgbuf)
+        msg_code, = struct.unpack("B", mv[0:1])
         if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
-            err = self._parse_msg(msg_code, self._inbuf[1:], is_ttb)
+            err = self._parse_msg(msg_code, mv[1:].tobytes(), is_ttb)
             if err is None:
                 raise RiakError('no error provided!')
             else:
                 raise RiakError(bytes_to_str(err.errmsg))
         elif msg_code in riak.pb.messages.MESSAGE_CLASSES:
-            msg = self._parse_msg(msg_code, self._inbuf[1:], is_ttb)
+            msg = self._parse_msg(msg_code, mv[1:].tobytes(), is_ttb)
         else:
             raise Exception("unknown msg code %s" % msg_code)
 
@@ -206,31 +207,30 @@ class TcpConnection(object):
         return msg_code, msg
 
     def _recv_pkt(self):
-        nmsglen = self._socket.recv(4)
-        while len(nmsglen) < 4:
-            x = self._socket.recv(4 - len(nmsglen))
-            if not x:
-                break
-            nmsglen += x
-        if len(nmsglen) != 4:
+        # TODO FUTURE re-use buffer
+        msglen_buf = bytearray(4)
+        recv_len = self._socket.recv_into(msglen_buf)
+        if recv_len != 4:
             raise RiakError(
                 "Socket returned short packet length %d - expected 4"
-                % len(nmsglen))
-        msglen, = struct.unpack('!i', nmsglen)
-        self._inbuf_len = msglen
-        if PY2:
-            self._inbuf = ''
-        else:
-            self._inbuf = bytes()
-        while len(self._inbuf) < msglen:
-            want_len = min(8192, msglen - len(self._inbuf))
-            recv_buf = self._socket.recv(want_len)
-            if not recv_buf:
-                break
-            self._inbuf += recv_buf
-        if len(self._inbuf) != self._inbuf_len:
+                % recv_len)
+        # NB: msg length is an unsigned int
+        msglen, = struct.unpack('!I', msglen_buf)
+        # TODO FUTURE re-use buffer
+        # http://stackoverflow.com/a/15964489
+        msgbuf = bytearray(msglen)
+        view = memoryview(msgbuf)
+        nread = 0
+        toread = msglen
+        while toread:
+            nbytes = self._socket.recv_into(view, toread)
+            view = view[nbytes:] # slicing views is cheap
+            toread -= nbytes
+            nread += nbytes
+        if nread != msglen:
             raise RiakError("Socket returned short packet %d - expected %d"
-                            % (len(self._inbuf), self._inbuf_len))
+                            % (nread, msglen))
+        return msgbuf
 
     def _connect(self):
         if not self._socket:
