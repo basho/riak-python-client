@@ -6,6 +6,7 @@ import riak.pb.riak_pb2
 import riak.pb.messages
 
 from riak import RiakError
+from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak.util import str_to_bytes
 
@@ -30,17 +31,21 @@ class TcpConnection(object):
         hdr = struct.pack("!iB", 1 + len(data), msg_code)
         return hdr + data
 
-    def _send_recv(self, msg_code, data=None, expect=None):
+    def _send_recv(self, msg_code, data=None):
         self._send_msg(msg_code, data)
-        return self._recv_msg(expect)
+        return self._recv_msg()
 
-    def _non_connect_send_recv(self, msg_code, data=None, expect=None):
+    def _non_connect_send_recv(self, msg_code, data=None):
         """
         Similar to self._send_recv, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
         """
         self._non_connect_send_msg(msg_code, data)
-        return self._recv_msg(expect)
+        return self._recv_msg()
+
+    def _non_connect_send_recv_msg(self, msg):
+        self._non_connect_send_msg(msg.msg_code, msg.data)
+        return self._recv_msg()
 
     def _non_connect_send_msg(self, msg_code, data):
         """
@@ -69,9 +74,9 @@ class TcpConnection(object):
         Exchange a STARTTLS message with Riak to initiate secure communications
         return True is Riak responds with a STARTTLS response, False otherwise
         """
-        msg_code, _ = self._non_connect_send_recv(
+        resp_code, _ = self._non_connect_send_recv(
             riak.pb.messages.MSG_CODE_START_TLS)
-        if msg_code == riak.pb.messages.MSG_CODE_START_TLS:
+        if resp_code == riak.pb.messages.MSG_CODE_START_TLS:
             return True
         else:
             return False
@@ -84,11 +89,10 @@ class TcpConnection(object):
             req = riak.pb.riak_pb2.RpbToggleEncodingReq()
             req.use_native = True
             data = req.SerializeToString()
-            msg_code, _ = self._non_connect_send_recv(
+            resp_code, _ = self._non_connect_send_recv(
                 riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_REQ,
-                data,
-                riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP)
-            if msg_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:
+                data)
+            if resp_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:
                 self._ttb_enabled = True
                 logging.debug("tcp/connection TTB IS ENABLED")
                 return True
@@ -102,18 +106,14 @@ class TcpConnection(object):
         Note: Riak will sleep for a short period of time upon a failed
               auth request/response to prevent denial of service attacks
         """
-        req = riak.pb.riak_pb2.RpbAuthReq()
-        req.user = str_to_bytes(self._client._credentials.username)
+        c = PbufCodec()
+        username = self._client._credentials.username
         password = self._client._credentials.password
         if not password:
             password = ''
-        req.password = str_to_bytes(password)
-        data = req.SerializeToString()
-        msg_code, _ = self._non_connect_send_recv(
-            riak.pb.messages.MSG_CODE_AUTH_REQ,
-            data,
-            riak.pb.messages.MSG_CODE_AUTH_RESP)
-        if msg_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
+        msg = c._encode_auth(username, password)
+        resp_code, _ = self._non_connect_send_recv_msg(msg)
+        if resp_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
             return True
         else:
             return False
@@ -174,7 +174,7 @@ class TcpConnection(object):
                     # fail if *any* exceptions are thrown during SSL handshake
                     raise SecurityError(e)
 
-    def _recv_msg(self, expect=None):
+    def _recv_msg(self):
         msgbuf = self._recv_pkt()
         mv = memoryview(msgbuf)
         msg_code, = struct.unpack("B", mv[0:1])

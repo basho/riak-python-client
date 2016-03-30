@@ -1,11 +1,12 @@
 import datetime
-import riak.pb
+import riak.pb.messages
 import riak.pb.riak_pb2
 import riak.pb.riak_dt_pb2
 import riak.pb.riak_kv_pb2
 import riak.pb.riak_ts_pb2
 
 from riak import RiakError
+from riak.codecs import Msg
 from riak.content import RiakContent
 from riak.riak_object import VClock
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str, \
@@ -92,6 +93,14 @@ class PbufCodec(object):
 
     def _datetime_from_unix_time_millis(self, ut):
         return datetime_from_unix_time_millis(ut)
+
+    def _encode_auth(self, username, password):
+        req = riak.pb.riak_pb2.RpbAuthReq()
+        req.user = str_to_bytes(username)
+        req.password = str_to_bytes(password)
+        return Msg(riak.pb.messages.MSG_CODE_AUTH_REQ,
+                req.SerializeToString(),
+                riak.pb.messages.MSG_CODE_AUTH_RESP)
 
     def _encode_quorum(self, rw):
         """

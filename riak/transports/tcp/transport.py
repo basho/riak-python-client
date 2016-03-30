@@ -71,8 +71,11 @@ class TcpTransport(Transport, TcpConnection):
         """
         Ping the remote server
         """
-        msg_code, _ = self._request(riak.pb.messages.MSG_CODE_PING_REQ)
-        if msg_code == riak.pb.messages.MSG_CODE_PING_RESP:
+        resp_code, _ = self._request(
+                riak.pb.messages.MSG_CODE_PING_REQ,
+                None,
+                riak.pb.messages.MSG_CODE_PING_RESP)
+        if resp_code == riak.pb.messages.MSG_CODE_PING_RESP:
             return True
         else:
             return False
@@ -575,24 +578,27 @@ class TcpTransport(Transport, TcpConnection):
         if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
             if data is None:
                 raise RiakError('no error provided!')
+            # TODO RTS-842 TTB-specific version
             err = self._parse_msg(msg_code, data, is_ttb)
             if err is None:
                 raise RiakError('no error provided!')
             else:
                 raise RiakError(bytes_to_str(err.errmsg))
 
+    def _maybe_incorrect_code(self, resp_code, expect=None):
+        if expect and resp_code != expect:
+            raise RiakError("unexpected message code: %d, expected %d"
+                            % (resp_code, expect))
+
     # TODO RTS-842 is_ttb
     def _request(self, msg_code, data=None, expect=None, is_ttb=False):
-        msg_code, data = self._send_recv(msg_code, data, expect)
-        self._maybe_riak_error(msg_code, data, is_ttb)
-        if msg_code in riak.pb.messages.MESSAGE_CLASSES:
-            msg = self._parse_msg(msg_code, data, is_ttb)
+        resp_code, data = self._send_recv(msg_code, data)
+        self._maybe_riak_error(resp_code, data, is_ttb)
+        self._maybe_incorrect_code(resp_code, expect)
+        if resp_code in riak.pb.messages.MESSAGE_CLASSES:
+            msg = self._parse_msg(resp_code, data, is_ttb)
         else:
-            raise Exception("unknown msg code %s" % msg_code)
-
-        if expect and msg_code != expect:
-            raise RiakError("unexpected protocol buffer message code: %d, %r"
-                            % (msg_code, msg))
-        # logging.debug("tcp/connection received msg_code %d msg %s",
-        # msg_code, msg)
-        return msg_code, msg
+            raise Exception("unknown msg code %s" % resp_code)
+        # logging.debug("tcp/connection received resp_code %d msg %s",
+        # resp_code, msg)
+        return resp_code, msg
