@@ -1,11 +1,13 @@
 import datetime
+import six
+
+import riak.pb.messages
 
 from erlastic import encode
 from erlastic.types import Atom
-from six import text_type, binary_type, \
-    string_types, PY2
 
 from riak import RiakError
+from riak.codecs import Msg
 from riak.util import unix_time_millis, \
     datetime_from_unix_time_millis
 
@@ -15,6 +17,7 @@ rpberrorresp_a = Atom('rpberrorresp')
 tsgetreq_a = Atom('tsgetreq')
 tsgetresp_a = Atom('tsgetresp')
 tsputreq_a = Atom('tsputreq')
+tsdelreq_a = Atom('tsdelreq')
 tsrow_a = Atom('tsrow')
 tscell_a = Atom('tscell')
 
@@ -38,13 +41,12 @@ class TtbCodec(object):
                 return (tscell_a, udef_a, udef_a, ts, udef_a, udef_a)
             elif isinstance(cell, bool):
                 return (tscell_a, udef_a, udef_a, udef_a, cell, udef_a)
-            elif isinstance(cell, text_type) or \
-                    isinstance(cell, binary_type) or \
-                    isinstance(cell, string_types):
+            elif isinstance(cell, six.text_type) or \
+                    isinstance(cell, six.binary_type) or \
+                    isinstance(cell, six.string_types):
                 return (tscell_a, cell,
                         udef_a, udef_a, udef_a, udef_a)
-            elif (isinstance(cell, int) or
-                 (PY2 and isinstance(cell, long))):  # noqa
+            elif (isinstance(cell, six.integer_types)):
                 return (tscell_a, udef_a, cell, udef_a, udef_a, udef_a)
             elif isinstance(cell, float):
                 return (tscell_a, udef_a, udef_a, udef_a, udef_a, cell)
@@ -53,15 +55,24 @@ class TtbCodec(object):
                 raise RiakError("can't serialize type '{}', value '{}'"
                                 .format(t, cell))
 
-    def _encode_timeseries_keyreq(self, table, key):
+    def _encode_timeseries_keyreq(self, table, key, is_delete=False):
         key_vals = None
         if isinstance(key, list):
             key_vals = key
         else:
             raise ValueError("key must be a list")
-        req = tsgetreq_a, table.name, \
+
+        mc = riak.pb.messages.MSG_CODE_TS_GET_REQ
+        rc = riak.pb.messages.MSG_CODE_TS_GET_RESP
+        req_atom = tsgetreq_a
+        if is_delete:
+            mc = riak.pb.messages.MSG_CODE_TS_DEL_REQ
+            rc = riak.pb.messages.MSG_CODE_TS_DEL_RESP
+            req_atom = tsdelreq_a
+
+        req = req_atom, table.name, \
             [self._encode_to_ts_cell(k) for k in key_vals], udef_a
-        return encode(req)
+        return Msg(mc, encode(req), rc)
 
     def _encode_timeseries_put(self, tsobj):
         '''
@@ -84,7 +95,9 @@ class TtbCodec(object):
                 req_t = (tsrow_a, req_r)
                 req_rows.append(req_t)
             req = tsputreq_a, tsobj.table.name, udef_a, req_rows
-            return encode(req)
+            mc = riak.pb.messages.MSG_CODE_TS_PUT_REQ
+            rc = riak.pb.messages.MSG_CODE_TS_PUT_RESP
+            return Msg(mc, encode(req), rc)
         else:
             raise RiakError("TsObject requires a list of rows")
 
@@ -107,6 +120,11 @@ class TtbCodec(object):
         #         col_type = col.type
         #         col = (col_name, col_type)
         #         tsobj.columns.append(col)
+        #
+        # TODO RTS-842 is this correct?
+        if resp_ttb is None:
+            return tsobj
+
         resp_a = resp_ttb[0]
         if resp_a == tsgetresp_a:
             # TODO resp_cols = resp_ttb[1]

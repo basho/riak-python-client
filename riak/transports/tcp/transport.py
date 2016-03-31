@@ -65,8 +65,6 @@ class TcpTransport(Transport, TcpConnection):
             codec = self._get_ttb_codec()
         elif msg_code == riak.pb.messages.MSG_CODE_TS_PUT_REQ:
             codec = self._get_ttb_codec()
-        elif msg_code == riak.pb.messages.MSG_CODE_TS_DEL_REQ:
-            codec = self._get_ttb_codec()
         else:
             codec = self._get_pbuf_codec()
         return codec
@@ -147,7 +145,8 @@ class TcpTransport(Transport, TcpConnection):
         msg_code = riak.pb.messages.MSG_CODE_TS_GET_REQ
         codec = self._get_codec(msg_code)
         msg = codec._encode_timeseries_keyreq(table, key)
-        resp_code, resp = self._request(msg)
+        # TODO RTS-842 is_ttb
+        resp_code, resp = self._request(msg, self._use_ttb)
         tsobj = TsObject(self._client, table, [], None)
         codec._decode_timeseries(resp, tsobj)
         return tsobj
@@ -158,6 +157,7 @@ class TcpTransport(Transport, TcpConnection):
         msg = codec._encode_timeseries_put(tsobj)
         # logging.debug("pbc/transport ts_put _use_ttb: '%s'",
         #    self._use_ttb)
+        # TODO RTS-842 use_ttb
         resp_code, resp = self._request(msg, self._use_ttb)
         if self._use_ttb and \
                 resp is None and \
@@ -184,7 +184,7 @@ class TcpTransport(Transport, TcpConnection):
         msg = codec._encode_timeseries_query(table, query, interpolations)
         resp_code, resp = self._request(msg)
         tsobj = TsObject(self._client, table, [], [])
-        self._decode_timeseries(resp, tsobj)
+        codec._decode_timeseries(resp, tsobj)
         return tsobj
 
     def ts_stream_keys(self, table, timeout=None):
@@ -196,7 +196,7 @@ class TcpTransport(Transport, TcpConnection):
         codec = self._get_codec(msg_code)
         msg = codec._encode_timeseries_listkeysreq(table, timeout)
         self._send_msg(msg.msg_code, msg.data)
-        return PbufTsKeyStream(self)
+        return PbufTsKeyStream(self, codec)
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None,
                timeout=None):

@@ -179,14 +179,14 @@ class TimeseriesUnitTests(unittest.TestCase):
         self.assertEqual(c[4][1], TsColumnType.Value('BOOLEAN'))
 
         r0 = tsobj.rows[0]
-        self.assertEqual(r0[0], self.rows[0][0])
+        self.assertEqual(bytes_to_str(r0[0]), self.rows[0][0])
         self.assertEqual(r0[1], self.rows[0][1])
         self.assertEqual(r0[2], self.rows[0][2])
         self.assertEqual(r0[3], ts0)
         self.assertEqual(r0[4], self.rows[0][4])
 
         r1 = tsobj.rows[1]
-        self.assertEqual(r1[0], self.rows[1][0])
+        self.assertEqual(bytes_to_str(r1[0]), self.rows[1][0])
         self.assertEqual(r1[1], self.rows[1][1])
         self.assertEqual(r1[2], self.rows[1][2])
         self.assertEqual(r1[3], ts1)
@@ -229,17 +229,30 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         cls.twentyMinsAgoMsec = unix_time_millis(twentyMinsAgo)
         cls.numCols = len(rows[0])
         cls.rows = rows
+        encoded_rows = [
+            [str_to_bytes('hash1'), str_to_bytes('user2'),
+             twentyFiveMinsAgo, str_to_bytes('typhoon'), 90.3],
+            [str_to_bytes('hash1'), str_to_bytes('user2'),
+             twentyMinsAgo, str_to_bytes('hurricane'), 82.3],
+            [str_to_bytes('hash1'), str_to_bytes('user2'),
+             fifteenMinsAgo, str_to_bytes('rain'), 79.0],
+            [str_to_bytes('hash1'), str_to_bytes('user2'),
+             fiveMinsAgo, str_to_bytes('wind'), None],
+            [str_to_bytes('hash1'), str_to_bytes('user2'),
+             cls.now, str_to_bytes('snow'), 20.1]
+        ]
+        cls.encoded_rows = encoded_rows
 
     def validate_data(self, ts_obj):
         if ts_obj.columns is not None:
             self.assertEqual(len(ts_obj.columns), self.numCols)
         self.assertEqual(len(ts_obj.rows), 1)
         row = ts_obj.rows[0]
-        self.assertEqual(row[0], 'hash1')
-        self.assertEqual(row[1], 'user2')
+        self.assertEqual(bytes_to_str(row[0]), 'hash1')
+        self.assertEqual(bytes_to_str(row[1]), 'user2')
         self.assertEqual(row[2], self.fiveMinsAgo)
         self.assertEqual(row[2].microsecond, 987000)
-        self.assertEqual(row[3], 'wind')
+        self.assertEqual(bytes_to_str(row[3]), 'wind')
         self.assertIsNone(row[4])
 
     def test_query_that_creates_table_using_interpolation(self):
@@ -359,7 +372,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 t2=self.nowMsec)
         ts_obj = self.client.ts_query('GeoCheckin', query)
         j = 0
-        for i, want in enumerate(self.rows):
+        for i, want in enumerate(self.encoded_rows):
             if want[2] == self.twentyFiveMinsAgo:
                 continue
             got = ts_obj.rows[j]
@@ -393,8 +406,8 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             for key in keylist:
                 self.assertIsInstance(key, list)
                 self.assertEqual(len(key), 3)
-                self.assertEqual('hash1', key[0])
-                self.assertEqual('user2', key[1])
+                self.assertEqual(bytes_to_str(key[0]), 'hash1')
+                self.assertEqual(bytes_to_str(key[1]), 'user2')
                 self.assertIsInstance(key[2], datetime.datetime)
         self.assertGreater(len(streamed_keys), 0)
 

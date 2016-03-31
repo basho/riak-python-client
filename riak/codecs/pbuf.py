@@ -660,12 +660,13 @@ class PbufCodec(object):
                 ts_cell.timestamp_value = unix_time_millis(cell)
             elif isinstance(cell, bool):
                 ts_cell.boolean_value = cell
-            elif isinstance(cell, six.string_types):
-                # logging.debug("cell -> str: '%s'", cell)
+            elif isinstance(cell, six.binary_type):
+                ts_cell.varchar_value = cell
+            elif isinstance(cell, six.text_type):
                 ts_cell.varchar_value = str_to_bytes(cell)
-            elif (isinstance(cell, int) or
-                 (six.PY2 and isinstance(cell, long))):  # noqa
-                # logging.debug("cell -> int/long: '%s'", cell)
+            elif isinstance(cell, six.string_types):
+                ts_cell.varchar_value = str_to_bytes(cell)
+            elif (isinstance(cell, six.integer_types)):
                 ts_cell.sint64_value = cell
             elif isinstance(cell, float):
                 ts_cell.double_value = cell
@@ -681,20 +682,18 @@ class PbufCodec(object):
         else:
             raise ValueError("key must be a list")
 
+        req = riak.pb.riak_ts_pb2.TsGetReq()
+        mc = riak.pb.messages.MSG_CODE_TS_GET_REQ
+        rc = riak.pb.messages.MSG_CODE_TS_GET_RESP
         if is_delete:
             req = riak.pb.riak_ts_pb2.TsDelReq()
-        else:
-            req = riak.pb.riak_ts_pb2.TsGetReq()
+            mc = riak.pb.messages.MSG_CODE_TS_DEL_REQ
+            rc = riak.pb.messages.MSG_CODE_TS_DEL_RESP
 
         req.table = str_to_bytes(table.name)
         for cell in key_vals:
             ts_cell = req.key.add()
             self._encode_to_ts_cell(cell, ts_cell)
-        mc = riak.pb.messages.MSG_CODE_TS_GET_REQ
-        rc = riak.pb.messages.MSG_CODE_TS_GET_RESP
-        if is_delete:
-            mc = riak.pb.messages.MSG_CODE_TS_DEL_REQ
-            rc = riak.pb.messages.MSG_CODE_TS_DEL_RESP
         return Msg(mc, req.SerializeToString(), rc)
 
     def _encode_timeseries_listkeysreq(self, table, timeout=None):
@@ -788,7 +787,8 @@ class PbufCodec(object):
                 if col and col.type != TsColumnType.Value('VARCHAR'):
                     raise TypeError('expected VARCHAR column')
                 else:
-                    row.append(bytes_to_str(cell.varchar_value))
+                    # TODO RTS-842 - keep as bytes?
+                    row.append(cell.varchar_value)
             elif cell.HasField('sint64_value'):
                 if col and col.type != TsColumnType.Value('SINT64'):
                     raise TypeError('expected SINT64 column')

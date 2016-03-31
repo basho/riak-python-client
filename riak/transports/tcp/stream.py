@@ -174,6 +174,10 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
 
     _expect = riak.pb.messages.MSG_CODE_TS_LIST_KEYS_RESP
 
+    def __init__(self, transport, codec):
+        super(PbufTsKeyStream, self).__init__(transport)
+        self._codec = codec
+
     def next(self):
         response = super(PbufTsKeyStream, self).next()
 
@@ -182,7 +186,7 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
 
         keys = []
         for tsrow in response.keys:
-            keys.append(self._decode_timeseries_row(tsrow))
+            keys.append(self._codec._decode_timeseries_row(tsrow))
 
         return keys
 

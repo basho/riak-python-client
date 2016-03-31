@@ -88,7 +88,7 @@ class TcpConnection(object):
             req = riak.pb.riak_pb2.RpbToggleEncodingReq()
             req.use_native = True
             data = req.SerializeToString()
-            resp_code, _ = self._non_connect_send_recv(
+            resp_code, _ = self._send_recv(
                 riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_REQ,
                 data)
             if resp_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:

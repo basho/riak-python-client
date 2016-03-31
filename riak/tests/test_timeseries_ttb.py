@@ -6,7 +6,6 @@ import unittest
 from erlastic import decode, encode
 from erlastic.types import Atom
 
-from riak.client import RiakClient
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.codecs.ttb import TtbCodec
@@ -53,8 +52,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
         test_key = ['hash1', 'user2', ts0]
         c = TtbCodec()
-        req_encoded = c._encode_timeseries_keyreq(self.table, test_key)
-        self.assertEqual(req_test, req_encoded)
+        msg = c._encode_timeseries_keyreq(self.table, test_key)
+        self.assertEqual(req_test, msg.data)
 
     # def test_decode_riak_error(self):
 
@@ -146,8 +145,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
         tsobj = TsObject(None, self.table, rows_to_encode, None)
         c = TtbCodec()
-        req_encoded = c._encode_timeseries_put(tsobj)
-        self.assertEqual(req_test, req_encoded)
+        msg = c._encode_timeseries_put(tsobj)
+        self.assertEqual(req_test, msg.data)
 
 
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
@@ -166,10 +165,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         twentyFiveMinsAgo = twentyMinsAgo - fiveMins
 
         opts = {'use_ttb': True}
-        client = RiakClient(protocol='pbc',
-                            host='riak-test',
-                            pb_port=10017,
-                            transport_options=opts)
+        client = self.create_client(transport_options=opts)
 
         table = client.table(table_name)
         rows = [
