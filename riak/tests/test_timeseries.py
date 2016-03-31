@@ -67,26 +67,26 @@ class TimeseriesUnitTests(unittest.TestCase):
 
     def test_encode_data_for_get(self):
         c = PbufCodec()
-        data = c._encode_timeseries_keyreq(
+        msg = c._encode_timeseries_keyreq(
                 self.table, self.test_key, is_delete=False)
         req = riak.pb.riak_ts_pb2.TsGetReq()
-        req.ParseFromString(data)
+        req.ParseFromString(msg.data)
         self.validate_keyreq(req)
 
     def test_encode_data_for_delete(self):
         c = PbufCodec()
-        data = c._encode_timeseries_keyreq(
+        msg = c._encode_timeseries_keyreq(
                 self.table, self.test_key, is_delete=True)
         req = riak.pb.riak_ts_pb2.TsDelReq()
-        req.ParseFromString(data)
+        req.ParseFromString(msg.data)
         self.validate_keyreq(req)
 
     def test_encode_data_for_put(self):
         c = PbufCodec()
         tsobj = TsObject(None, self.table, self.rows, None)
-        data = c._encode_timeseries_put(tsobj)
+        msg = c._encode_timeseries_put(tsobj)
         req = riak.pb.riak_ts_pb2.TsPutReq()
-        req.ParseFromString(data)
+        req.ParseFromString(msg.data)
 
         # NB: expected, actual
         self.assertEqual(self.table.name, bytes_to_str(req.table))
@@ -110,9 +110,9 @@ class TimeseriesUnitTests(unittest.TestCase):
 
     def test_encode_data_for_listkeys(self):
         c = PbufCodec(client_timeouts=True)
-        data = c._encode_timeseries_listkeysreq(self.table, 1234)
+        msg = c._encode_timeseries_listkeysreq(self.table, 1234)
         req = riak.pb.riak_ts_pb2.TsListKeysReq()
-        req.ParseFromString(data)
+        req.ParseFromString(msg.data)
         self.assertEqual(self.table.name, bytes_to_str(req.table))
         self.assertEqual(1234, req.timeout)
 

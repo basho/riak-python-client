@@ -26,7 +26,6 @@ compile:
 
 lint:
 	@pip install --upgrade pep8 flake8
-	@cd ..; pep8 --exclude=riak/pb riak *.py
 	@cd ..; flake8 --exclude=riak/pb riak *.py
 
 test: setup test_normal test_security
