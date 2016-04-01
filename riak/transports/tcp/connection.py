@@ -105,12 +105,12 @@ class TcpConnection(object):
         Note: Riak will sleep for a short period of time upon a failed
               auth request/response to prevent denial of service attacks
         """
-        c = PbufCodec()
+        codec = PbufCodec()
         username = self._client._credentials.username
         password = self._client._credentials.password
         if not password:
             password = ''
-        msg = c._encode_auth(username, password)
+        msg = codec.encode_auth(username, password)
         resp_code, _ = self._non_connect_send_recv_msg(msg)
         if resp_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
             return True

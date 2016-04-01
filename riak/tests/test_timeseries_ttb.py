@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 import six
 import unittest
 
 from erlastic import decode, encode
 from erlastic.types import Atom
 
+from riak import RiakError
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.codecs.ttb import TtbCodec
@@ -52,7 +54,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
         test_key = ['hash1', 'user2', ts0]
         c = TtbCodec()
-        msg = c._encode_timeseries_keyreq(self.table, test_key)
+        msg = c.encode_timeseries_keyreq(self.table, test_key)
         self.assertEqual(req_test, msg.data)
 
     # def test_decode_riak_error(self):
@@ -84,7 +86,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
         tsobj = TsObject(None, self.table, [], [])
         c = TtbCodec()
-        c._decode_timeseries(decode(rsp_ttb), tsobj)
+        c.decode_timeseries(decode(rsp_ttb), tsobj)
 
         for i in range(0, 1):
             self.assertEqual(tsrow_a, rows[i][0])
@@ -145,13 +147,15 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
         tsobj = TsObject(None, self.table, rows_to_encode, None)
         c = TtbCodec()
-        msg = c._encode_timeseries_put(tsobj)
+        msg = c.encode_timeseries_put(tsobj)
         self.assertEqual(req_test, msg.data)
 
 
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
                      'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
+    client_options = {'transport_options': {'use_ttb': True}}
+
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTtbTests, cls).setUpClass()
@@ -164,10 +168,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         twentyMinsAgo = fifteenMinsAgo - fiveMins
         twentyFiveMinsAgo = twentyMinsAgo - fiveMins
 
-        opts = {'use_ttb': True}
-        client = self.create_client(transport_options=opts)
-
-        table = client.table(table_name)
+        table = self.client.table(table_name)
         rows = [
             ['hash1', 'user2', twentyFiveMinsAgo, 'typhoon', 90.3],
             ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
@@ -181,9 +182,16 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
 
         for r in rows:
             k = r[0:3]
-            ts_obj = client.ts_get(table_name, k)
+            ts_obj = self.client.ts_get(table_name, k)
             self.assertIsNotNone(ts_obj)
             self.assertEqual(len(ts_obj.rows), 1)
             self.assertEqual(len(ts_obj.rows[0]), 5)
 
-        client.close()
+    def test_create_error_via_put(self):
+        table = Table(self.client, table_name)
+        ts_obj = table.new([])
+        with self.assertRaises(RiakError) as cm:
+            ts_obj.store()
+        logging.debug(
+                "[test_timeseries_ttb] saw exception: {}"
+                .format(cm.exception))

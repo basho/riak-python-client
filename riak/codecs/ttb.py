@@ -3,12 +3,12 @@ import six
 
 import riak.pb.messages
 
-from erlastic import encode
+from erlastic import encode, decode
 from erlastic.types import Atom
 
 from riak import RiakError
-from riak.codecs import Msg
-from riak.util import unix_time_millis, \
+from riak.codecs import Codec, Msg
+from riak.util import bytes_to_str, unix_time_millis, \
     datetime_from_unix_time_millis
 
 udef_a = Atom('undefined')
@@ -24,7 +24,7 @@ tscell_a = Atom('tscell')
 tscell_empty = (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
 
 
-class TtbCodec(object):
+class TtbCodec(Codec):
     '''
     Erlang term-to-binary Encoding and decoding methods for TcpTransport
     '''
@@ -32,7 +32,32 @@ class TtbCodec(object):
     def __init__(self, **unused_args):
         super(TtbCodec, self).__init__(**unused_args)
 
-    def _encode_to_ts_cell(self, cell):
+    def parse_msg(self, msg_code, data):
+        if msg_code != riak.pb.messages.MSG_CODE_TS_GET_RESP and \
+           msg_code != riak.pb.messages.MSG_CODE_TS_PUT_RESP and \
+           msg_code != riak.pb.messages.MSG_CODE_ERROR_RESP:
+            raise RiakError("TTB can't parse code: {}".format(msg_code))
+        if len(data) > 0:
+            return decode(data)
+        else:
+            return None
+
+    def process_err_ttb(self, err_ttb):
+        resp_a = err_ttb[0]
+        if resp_a == rpberrorresp_a:
+            errmsg = err_ttb[1]
+            raise RiakError(bytes_to_str(errmsg))
+        else:
+            raise RiakError(
+                    "Unknown TTB error type: {}".format(resp_a))
+
+    def maybe_riak_error(self, msg_code, data=None):
+        err_data = super(TtbCodec, self).maybe_riak_error(msg_code, data)
+        if err_data:
+            err_ttb = decode(err_data)
+            self.process_err_ttb(err_ttb)
+
+    def encode_to_ts_cell(self, cell):
         if cell is None:
             return tscell_empty
         else:
@@ -55,7 +80,7 @@ class TtbCodec(object):
                 raise RiakError("can't serialize type '{}', value '{}'"
                                 .format(t, cell))
 
-    def _encode_timeseries_keyreq(self, table, key, is_delete=False):
+    def encode_timeseries_keyreq(self, table, key, is_delete=False):
         key_vals = None
         if isinstance(key, list):
             key_vals = key
@@ -71,10 +96,19 @@ class TtbCodec(object):
             req_atom = tsdelreq_a
 
         req = req_atom, table.name, \
-            [self._encode_to_ts_cell(k) for k in key_vals], udef_a
+            [self.encode_to_ts_cell(k) for k in key_vals], udef_a
         return Msg(mc, encode(req), rc)
 
-    def _encode_timeseries_put(self, tsobj):
+    def validate_timeseries_put_resp(self, resp_code, resp):
+        if resp is None and \
+           resp_code == riak.pb.messages.MSG_CODE_TS_PUT_RESP:
+            return True
+        if resp is not None:
+            return True
+        else:
+            raise RiakError("missing response object")
+
+    def encode_timeseries_put(self, tsobj):
         '''
         Returns an Erlang-TTB encoded tuple with the appropriate data and
         metadata from a TsObject.
@@ -91,7 +125,7 @@ class TtbCodec(object):
             for row in tsobj.rows:
                 req_r = []
                 for cell in row:
-                    req_r.append(self._encode_to_ts_cell(cell))
+                    req_r.append(self.encode_to_ts_cell(cell))
                 req_t = (tsrow_a, req_r)
                 req_rows.append(req_t)
             req = tsputreq_a, tsobj.table.name, udef_a, req_rows
@@ -101,7 +135,7 @@ class TtbCodec(object):
         else:
             raise RiakError("TsObject requires a list of rows")
 
-    def _decode_timeseries(self, resp_ttb, tsobj):
+    def decode_timeseries(self, resp_ttb, tsobj):
         """
         Fills an TsObject with the appropriate data and
         metadata from a TTB-encoded TsGetResp / TsQueryResp.
@@ -126,18 +160,18 @@ class TtbCodec(object):
             return tsobj
 
         resp_a = resp_ttb[0]
-        if resp_a == tsgetresp_a:
+        if resp_a == rpberrorresp_a:
+            self.process_err_ttb(resp_ttb)
+        elif resp_a == tsgetresp_a:
             # TODO resp_cols = resp_ttb[1]
             resp_rows = resp_ttb[2]
             for row_ttb in resp_rows:
                 tsobj.rows.append(
-                    self._decode_timeseries_row(row_ttb, None))
-        # TODO
-        # elif resp_a == rpberrorresp_a:
+                    self.decode_timeseries_row(row_ttb, None))
         else:
             raise RiakError("Unknown TTB response type: {}".format(resp_a))
 
-    def _decode_timeseries_row(self, tsrow_ttb, tscols=None):
+    def decode_timeseries_row(self, tsrow_ttb, tscols=None):
         """
         Decodes a TTB-encoded TsRow into a list
 

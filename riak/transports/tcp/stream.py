@@ -16,9 +16,10 @@ class PbufStream(object):
 
     _expect = None
 
-    def __init__(self, transport):
+    def __init__(self, transport, codec):
         self.finished = False
         self.transport = transport
+        self.codec = codec
         self.resource = None
 
     def __iter__(self):
@@ -29,12 +30,11 @@ class PbufStream(object):
             raise StopIteration
 
         try:
-            # TODO RTS-842 - should be part of passed-in codec
             resp_code, data = self.transport._recv_msg()
-            self.transport._maybe_riak_error(resp_code, data)
+            self.codec.maybe_riak_error(resp_code, data)
             expect = self._expect
-            self.transport._maybe_incorrect_code(resp_code, expect)
-            resp = self.transport._parse_msg(expect, data, is_ttb=False)
+            self.codec.maybe_incorrect_code(resp_code, expect)
+            resp = self.codec.parse_msg(expect, data)
         except:
             self.finished = True
             raise
@@ -137,8 +137,8 @@ class PbufIndexStream(PbufStream):
 
     _expect = riak.pb.messages.MSG_CODE_INDEX_RESP
 
-    def __init__(self, transport, index, return_terms=False):
-        super(PbufIndexStream, self).__init__(transport)
+    def __init__(self, transport, codec, index, return_terms=False):
+        super(PbufIndexStream, self).__init__(transport, codec)
         self.index = index
         self.return_terms = return_terms
 
@@ -174,10 +174,6 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
 
     _expect = riak.pb.messages.MSG_CODE_TS_LIST_KEYS_RESP
 
-    def __init__(self, transport, codec):
-        super(PbufTsKeyStream, self).__init__(transport)
-        self._codec = codec
-
     def next(self):
         response = super(PbufTsKeyStream, self).next()
 
@@ -186,7 +182,7 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
 
         keys = []
         for tsrow in response.keys:
-            keys.append(self._codec._decode_timeseries_row(tsrow))
+            keys.append(self.codec.decode_timeseries_row(tsrow))
 
         return keys
 

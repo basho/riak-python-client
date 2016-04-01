@@ -67,7 +67,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
     def test_encode_data_for_get(self):
         c = PbufCodec()
-        msg = c._encode_timeseries_keyreq(
+        msg = c.encode_timeseries_keyreq(
                 self.table, self.test_key, is_delete=False)
         req = riak.pb.riak_ts_pb2.TsGetReq()
         req.ParseFromString(msg.data)
@@ -75,7 +75,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
     def test_encode_data_for_delete(self):
         c = PbufCodec()
-        msg = c._encode_timeseries_keyreq(
+        msg = c.encode_timeseries_keyreq(
                 self.table, self.test_key, is_delete=True)
         req = riak.pb.riak_ts_pb2.TsDelReq()
         req.ParseFromString(msg.data)
@@ -84,7 +84,7 @@ class TimeseriesUnitTests(unittest.TestCase):
     def test_encode_data_for_put(self):
         c = PbufCodec()
         tsobj = TsObject(None, self.table, self.rows, None)
-        msg = c._encode_timeseries_put(tsobj)
+        msg = c.encode_timeseries_put(tsobj)
         req = riak.pb.riak_ts_pb2.TsPutReq()
         req.ParseFromString(msg.data)
 
@@ -110,7 +110,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
     def test_encode_data_for_listkeys(self):
         c = PbufCodec(client_timeouts=True)
-        msg = c._encode_timeseries_listkeysreq(self.table, 1234)
+        msg = c.encode_timeseries_listkeysreq(self.table, 1234)
         req = riak.pb.riak_ts_pb2.TsListKeysReq()
         req.ParseFromString(msg.data)
         self.assertEqual(self.table.name, bytes_to_str(req.table))
@@ -161,7 +161,7 @@ class TimeseriesUnitTests(unittest.TestCase):
 
         tsobj = TsObject(None, self.table, [], [])
         c = PbufCodec()
-        c._decode_timeseries(tqr, tsobj)
+        c.decode_timeseries(tqr, tsobj)
 
         self.assertEqual(len(self.rows), len(tsobj.rows))
         self.assertEqual(len(tqr.columns), len(tsobj.columns))
@@ -196,6 +196,8 @@ class TimeseriesUnitTests(unittest.TestCase):
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
                      'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
+    client_options = {'transport_options': {'use_ttb': False}}
+
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTests, cls).setUpClass()
@@ -276,34 +278,34 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     def test_query_that_returns_table_description(self):
         fmt = 'DESCRIBE {table}'
         query = fmt.format(table=table_name)
-        ts_obj = self.client.ts_query('GeoCheckin', query)
+        ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
         self.assertEqual(len(ts_obj.columns), 5)
         self.assertEqual(len(ts_obj.rows), 5)
 
     def test_query_that_returns_table_description_using_interpolation(self):
         query = 'Describe {table}'
-        ts_obj = self.client.ts_query('GeoCheckin', query)
+        ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
         self.assertEqual(len(ts_obj.columns), 5)
         self.assertEqual(len(ts_obj.rows), 5)
 
     def test_query_description_via_table(self):
         query = 'describe {table}'
-        table = Table(self.client, 'GeoCheckin')
+        table = Table(self.client, table_name)
         ts_obj = table.query(query)
         self.assertIsNotNone(ts_obj)
         self.assertEqual(len(ts_obj.columns), 5)
         self.assertEqual(len(ts_obj.rows), 5)
 
     def test_get_description(self):
-        ts_obj = self.client.ts_describe('GeoCheckin')
+        ts_obj = self.client.ts_describe(table_name)
         self.assertIsNotNone(ts_obj)
         self.assertEqual(len(ts_obj.columns), 5)
         self.assertEqual(len(ts_obj.rows), 5)
 
     def test_get_description_via_table(self):
-        table = Table(self.client, 'GeoCheckin')
+        table = Table(self.client, table_name)
         ts_obj = table.describe()
         self.assertIsNotNone(ts_obj)
         self.assertEqual(len(ts_obj.columns), 5)
@@ -317,7 +319,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             user = 'user1'
         """
         query = fmt.format(table=table_name)
-        ts_obj = self.client.ts_query('GeoCheckin', query)
+        ts_obj = self.client.ts_query(table_name, query)
         self.assertEqual(len(ts_obj.columns), 0)
         self.assertEqual(len(ts_obj.rows), 0)
 
@@ -328,7 +330,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             geohash = 'hash1' and
             user = 'user1'
         """
-        ts_obj = self.client.ts_query('GeoCheckin', query)
+        ts_obj = self.client.ts_query(table_name, query)
         self.assertEqual(len(ts_obj.columns), 0)
         self.assertEqual(len(ts_obj.rows), 0)
 
@@ -343,7 +345,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 table=table_name,
                 t1=self.tenMinsAgoMsec,
                 t2=self.nowMsec)
-        ts_obj = self.client.ts_query('GeoCheckin', query)
+        ts_obj = self.client.ts_query(table_name, query)
         self.validate_data(ts_obj)
 
     def test_query_that_matches_some_data_using_interpolation(self):
@@ -356,7 +358,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         query = fmt.format(
                 t1=self.tenMinsAgoMsec,
                 t2=self.nowMsec)
-        ts_obj = self.client.ts_query('GeoCheckin', query)
+        ts_obj = self.client.ts_query(table_name, query)
         self.validate_data(ts_obj)
 
     def test_query_that_matches_more_data(self):
@@ -370,7 +372,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
                 table=table_name,
                 t1=self.twentyMinsAgoMsec,
                 t2=self.nowMsec)
-        ts_obj = self.client.ts_query('GeoCheckin', query)
+        ts_obj = self.client.ts_query(table_name, query)
         j = 0
         for i, want in enumerate(self.encoded_rows):
             if want[2] == self.twentyFiveMinsAgo:
@@ -382,23 +384,23 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
     def test_get_with_invalid_key(self):
         key = ['hash1', 'user2']
         with self.assertRaises(RiakError):
-            self.client.ts_get('GeoCheckin', key)
+            self.client.ts_get(table_name, key)
 
     def test_get_single_value(self):
         key = ['hash1', 'user2', self.fiveMinsAgo]
-        ts_obj = self.client.ts_get('GeoCheckin', key)
+        ts_obj = self.client.ts_get(table_name, key)
         self.assertIsNotNone(ts_obj)
         self.validate_data(ts_obj)
 
     def test_get_single_value_via_table(self):
         key = ['hash1', 'user2', self.fiveMinsAgo]
-        table = Table(self.client, 'GeoCheckin')
+        table = Table(self.client, table_name)
         ts_obj = table.get(key)
         self.assertIsNotNone(ts_obj)
         self.validate_data(ts_obj)
 
     def test_stream_keys(self):
-        table = Table(self.client, 'GeoCheckin')
+        table = Table(self.client, table_name)
         streamed_keys = []
         for keylist in table.stream_keys():
             self.assertNotEqual([], keylist)
@@ -413,7 +415,13 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
 
     def test_delete_single_value(self):
         key = ['hash1', 'user2', self.twentyFiveMinsAgo]
-        rslt = self.client.ts_delete('GeoCheckin', key)
+        rslt = self.client.ts_delete(table_name, key)
         self.assertTrue(rslt)
-        ts_obj = self.client.ts_get('GeoCheckin', key)
+        ts_obj = self.client.ts_get(table_name, key)
         self.assertEqual(len(ts_obj.rows), 0)
+
+    def test_create_error_via_put(self):
+        table = Table(self.client, table_name)
+        ts_obj = table.new([])
+        with self.assertRaises(RiakError):
+            ts_obj.store()

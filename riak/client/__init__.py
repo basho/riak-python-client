@@ -68,7 +68,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     PROTOCOLS = ['http', 'pbc']
 
     def __init__(self, protocol='pbc', transport_options={}, nodes=None,
-                 credentials=None, multiget_pool_size=None, **unused_args):
+                 credentials=None, multiget_pool_size=None, **kwargs):
         """
         Construct a new ``RiakClient`` object.
 
@@ -88,10 +88,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
            CPUs in the system
         :type multiget_pool_size: int
         """
-        unused_args = unused_args.copy()
+        kwargs = kwargs.copy()
 
         if nodes is None:
-            self.nodes = [self._create_node(unused_args), ]
+            self.nodes = [self._create_node(kwargs), ]
         else:
             self.nodes = [self._create_node(n) for n in nodes]
 
