@@ -23,6 +23,9 @@ tscell_a = Atom('tscell')
 
 tscell_empty = (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
 
+# TODO RTS-842
+MSG_CODE_TS_TTB = 104
+
 
 class TtbCodec(Codec):
     '''
@@ -33,29 +36,25 @@ class TtbCodec(Codec):
         super(TtbCodec, self).__init__(**unused_args)
 
     def parse_msg(self, msg_code, data):
-        if msg_code != riak.pb.messages.MSG_CODE_TS_GET_RESP and \
-           msg_code != riak.pb.messages.MSG_CODE_TS_PUT_RESP and \
-           msg_code != riak.pb.messages.MSG_CODE_ERROR_RESP:
+        if msg_code != MSG_CODE_TS_TTB and \
+           msg_code != riak.pb.messages.MSG_CODE_TS_GET_RESP and \
+           msg_code != riak.pb.messages.MSG_CODE_TS_PUT_RESP:
             raise RiakError("TTB can't parse code: {}".format(msg_code))
         if len(data) > 0:
-            return decode(data)
+            decoded = decode(data)
+            self.maybe_err_ttb(decoded)
+            return decoded
         else:
             return None
 
-    def process_err_ttb(self, err_ttb):
+    def maybe_err_ttb(self, err_ttb):
         resp_a = err_ttb[0]
         if resp_a == rpberrorresp_a:
             errmsg = err_ttb[1]
             raise RiakError(bytes_to_str(errmsg))
-        else:
-            raise RiakError(
-                    "Unknown TTB error type: {}".format(resp_a))
 
     def maybe_riak_error(self, msg_code, data=None):
-        err_data = super(TtbCodec, self).maybe_riak_error(msg_code, data)
-        if err_data:
-            err_ttb = decode(err_data)
-            self.process_err_ttb(err_ttb)
+        pass
 
     def encode_to_ts_cell(self, cell):
         if cell is None:
@@ -87,14 +86,13 @@ class TtbCodec(Codec):
         else:
             raise ValueError("key must be a list")
 
-        mc = riak.pb.messages.MSG_CODE_TS_GET_REQ
-        rc = riak.pb.messages.MSG_CODE_TS_GET_RESP
+        mc = MSG_CODE_TS_TTB
+        rc = MSG_CODE_TS_TTB
         req_atom = tsgetreq_a
         if is_delete:
-            mc = riak.pb.messages.MSG_CODE_TS_DEL_REQ
-            rc = riak.pb.messages.MSG_CODE_TS_DEL_RESP
             req_atom = tsdelreq_a
 
+        # TODO RTS-842 timeout is last
         req = req_atom, table.name, \
             [self.encode_to_ts_cell(k) for k in key_vals], udef_a
         return Msg(mc, encode(req), rc)
@@ -128,9 +126,9 @@ class TtbCodec(Codec):
                     req_r.append(self.encode_to_ts_cell(cell))
                 req_t = (tsrow_a, req_r)
                 req_rows.append(req_t)
-            req = tsputreq_a, tsobj.table.name, udef_a, req_rows
-            mc = riak.pb.messages.MSG_CODE_TS_PUT_REQ
-            rc = riak.pb.messages.MSG_CODE_TS_PUT_RESP
+            req = tsputreq_a, tsobj.table.name, [], req_rows
+            mc = MSG_CODE_TS_TTB
+            rc = MSG_CODE_TS_TTB
             return Msg(mc, encode(req), rc)
         else:
             raise RiakError("TsObject requires a list of rows")

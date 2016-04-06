@@ -4,7 +4,7 @@ import riak.pb.messages
 from riak import RiakError
 from riak.codecs import Codec, Msg
 from riak.codecs.pbuf import PbufCodec
-from riak.codecs.ttb import TtbCodec
+from riak.codecs.ttb import TtbCodec, MSG_CODE_TS_TTB
 from riak.transports.transport import Transport
 from riak.ts_object import TsObject
 
@@ -46,8 +46,6 @@ class TcpTransport(Transport, TcpConnection):
 
     def _get_ttb_codec(self):
         if self._use_ttb:
-            if not self._enable_ttb():
-                raise RiakError('could not switch to TTB encoding!')
             if not self._ttb_c:
                 self._ttb_c = TtbCodec()
             codec = self._ttb_c
@@ -56,7 +54,9 @@ class TcpTransport(Transport, TcpConnection):
         return codec
 
     def _get_codec(self, msg_code):
-        if msg_code == riak.pb.messages.MSG_CODE_TS_GET_REQ:
+        if msg_code == MSG_CODE_TS_TTB:
+            codec = self._get_ttb_codec()
+        elif msg_code == riak.pb.messages.MSG_CODE_TS_GET_REQ:
             codec = self._get_ttb_codec()
         elif msg_code == riak.pb.messages.MSG_CODE_TS_PUT_REQ:
             codec = self._get_ttb_codec()
@@ -138,7 +138,7 @@ class TcpTransport(Transport, TcpConnection):
         return self.ts_query(table, query)
 
     def ts_get(self, table, key):
-        msg_code = riak.pb.messages.MSG_CODE_TS_GET_REQ
+        msg_code = MSG_CODE_TS_TTB
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_keyreq(table, key)
         resp_code, resp = self._request(msg, codec)
@@ -147,7 +147,7 @@ class TcpTransport(Transport, TcpConnection):
         return tsobj
 
     def ts_put(self, tsobj):
-        msg_code = riak.pb.messages.MSG_CODE_TS_PUT_REQ
+        msg_code = MSG_CODE_TS_TTB
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_put(tsobj)
         resp_code, resp = self._request(msg, codec)
@@ -511,7 +511,6 @@ class TcpTransport(Transport, TcpConnection):
         resp_code, resp = self._request(msg, codec)
         return [codec.decode_preflist(item) for item in resp.preflist]
 
-    # TODO RTS-842 is_ttb
     def _request(self, msg, codec=None):
         if isinstance(msg, Msg):
             msg_code = msg.msg_code
@@ -526,10 +525,9 @@ class TcpTransport(Transport, TcpConnection):
         resp_code, data = self._send_recv(msg_code, data)
         codec.maybe_riak_error(resp_code, data)
         codec.maybe_incorrect_code(resp_code, expect)
-        if resp_code in riak.pb.messages.MESSAGE_CLASSES:
+        if resp_code == MSG_CODE_TS_TTB or \
+           resp_code in riak.pb.messages.MESSAGE_CLASSES:
             msg = codec.parse_msg(resp_code, data)
         else:
             raise Exception("unknown msg code %s" % resp_code)
-        # logging.debug("tcp/connection received resp_code %d msg %s",
-        # resp_code, msg)
         return resp_code, msg

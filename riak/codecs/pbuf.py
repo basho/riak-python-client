@@ -97,7 +97,8 @@ class PbufCodec(Codec):
         return pbo
 
     def maybe_riak_error(self, msg_code, data=None):
-        err_data = super(PbufCodec, self).maybe_riak_error(msg_code, data)
+        err_code = riak.pb.messages.MSG_CODE_ERROR_RESP
+        err_data = super(PbufCodec, self).maybe_riak_error(err_code, msg_code, data)
         if err_data:
             err = self.parse_msg(msg_code, err_data)
             raise RiakError(bytes_to_str(err.errmsg))

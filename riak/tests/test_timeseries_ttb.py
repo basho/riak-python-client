@@ -137,7 +137,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
             (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
         ])
         rows = [r0, r1]
-        req = tsputreq_a, str_to_bytes(table_name), udef_a, rows
+        req = tsputreq_a, str_to_bytes(table_name), [], rows
         req_test = encode(req)
 
         rows_to_encode = [

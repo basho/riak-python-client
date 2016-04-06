@@ -21,9 +21,6 @@ class TcpConnection(object):
     """
     Connection-related methods for TcpTransport.
     """
-    def __init__(self):
-        self._ttb_enabled = False
-
     def _encode_msg(self, msg_code, data=None):
         if data is None:
             return struct.pack("!iB", 1, msg_code)
@@ -79,24 +76,6 @@ class TcpConnection(object):
             return True
         else:
             return False
-
-    def _enable_ttb(self):
-        if self._ttb_enabled:
-            return True
-        else:
-            logging.debug("tcp/connection enabling TTB")
-            req = riak.pb.riak_pb2.RpbToggleEncodingReq()
-            req.use_native = True
-            data = req.SerializeToString()
-            resp_code, _ = self._send_recv(
-                riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_REQ,
-                data)
-            if resp_code == riak.pb.messages.MSG_CODE_TOGGLE_ENCODING_RESP:
-                self._ttb_enabled = True
-                logging.debug("tcp/connection TTB IS ENABLED")
-                return True
-            else:
-                return False
 
     def _auth(self):
         """

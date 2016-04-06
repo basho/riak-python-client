@@ -16,8 +16,8 @@ class Codec(object):
             raise RiakError("unexpected message code: %d, expected %d"
                             % (resp_code, expect))
 
-    def maybe_riak_error(self, msg_code, data=None):
-        if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
+    def maybe_riak_error(self, err_code, msg_code, data=None):
+        if msg_code == err_code:
             if data is None:
                 raise RiakError('no error provided!')
             return data
