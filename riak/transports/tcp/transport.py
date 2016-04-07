@@ -142,7 +142,7 @@ class TcpTransport(Transport, TcpConnection):
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_keyreq(table, key)
         resp_code, resp = self._request(msg, codec)
-        tsobj = TsObject(self._client, table, [], None)
+        tsobj = TsObject(self._client, table)
         codec.decode_timeseries(resp, tsobj)
         return tsobj
 
@@ -168,7 +168,7 @@ class TcpTransport(Transport, TcpConnection):
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_query(table, query, interpolations)
         resp_code, resp = self._request(msg, codec)
-        tsobj = TsObject(self._client, table, [], [])
+        tsobj = TsObject(self._client, table)
         codec.decode_timeseries(resp, tsobj)
         return tsobj
 

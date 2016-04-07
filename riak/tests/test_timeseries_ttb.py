@@ -61,7 +61,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
     # {tsgetresp,
     #   {
-    #     [<<"geohash">>, <<"user">>, <<"time">>, <<"weather">>, <<"temperature">>],
+    #     [<<"geohash">>, <<"user">>, <<"time">>,
+    #      <<"weather">>, <<"temperature">>],
     #     [varchar, varchar, timestamp, varchar, double]
     #   },
     #   [[<<"hash1">>, <<"user2">>, 144378190987, <<"typhoon">>, 90.3]]
@@ -71,48 +72,35 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
                     "boolean", "varchar", "varchar"]
         coltypes = [varchar_a, sint64_a, double_a, timestamp_a,
                     boolean_a, varchar_a, varchar_a]
-        r0 = (bd0, 0, 1.2, unix_time_millis(ts0), True, [], str1)
-        r1 = (bd1, 3, 4.5, unix_time_millis(ts1), False, [], str1)
+        r0 = (bd0, 0, 1.2, unix_time_millis(ts0), True,
+              [], str1, None)
+        r1 = (bd1, 3, 4.5, unix_time_millis(ts1), False,
+              [], str1, None)
         rows = [r0, r1]
         # { tsgetresp, { [colnames], [coltypes] }, [rows] }
         cols_t = colnames, coltypes
         rsp_data = tsgetresp_a, cols_t, rows
         rsp_ttb = encode(rsp_data)
 
-        tsobj = TsObject(None, self.table, [], [])
+        tsobj = TsObject(None, self.table, [])
         c = TtbCodec()
         c.decode_timeseries(decode(rsp_ttb), tsobj)
 
         for i in range(0, 1):
-            self.assertEqual(tsrow_a, rows[i][0])
-            dr = rows[i][1]
+            dr = rows[i]
             r = tsobj.rows[i]  # encoded
-
-            # cells
-            self.assertEqual(tscell_a, dr[0][0])
-            self.assertEqual(r[0], dr[0][1].encode('utf-8'))
-
-            self.assertEqual(tscell_a, dr[1][0])
-            self.assertEqual(r[1], dr[1][2])
-
-            self.assertEqual(tscell_a, dr[2][0])
-            self.assertEqual(r[2], dr[2][5])
-
-            self.assertEqual(tscell_a, dr[3][0])
-            dt = datetime_from_unix_time_millis(dr[3][3])
+            self.assertEqual(r[0], dr[0].encode('utf-8'))
+            self.assertEqual(r[1], dr[1])
+            self.assertEqual(r[2], dr[2])
+            dt = datetime_from_unix_time_millis(dr[3])
             self.assertEqual(r[3], dt)
-
-            self.assertEqual(tscell_a, dr[4][0])
             if i == 0:
                 self.assertEqual(r[4], True)
             else:
                 self.assertEqual(r[4], False)
-
-            self.assertEqual(tscell_a, dr[5][0])
-            self.assertEqual(r[5], None)
-
-            self.assertEqual(tscell_a, dr[6][0])
-            self.assertEqual(r[6], dr[6][1].encode('ascii'))
+            self.assertEqual(r[5], [])
+            self.assertEqual(r[6], dr[6].encode('ascii'))
+            self.assertEqual(r[7], None)
 
     def test_encode_data_for_put(self):
         r0 = (bd0, 0, 1.2, unix_time_millis(ts0), True, [])

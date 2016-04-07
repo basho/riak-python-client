@@ -8,6 +8,7 @@ from erlastic.types import Atom
 
 from riak import RiakError
 from riak.codecs import Codec, Msg
+from riak.ts_object import TsColumns
 from riak.util import bytes_to_str, unix_time_millis, \
     datetime_from_unix_time_millis
 
@@ -18,8 +19,7 @@ tsgetreq_a = Atom('tsgetreq')
 tsgetresp_a = Atom('tsgetresp')
 tsputreq_a = Atom('tsputreq')
 tsdelreq_a = Atom('tsdelreq')
-tsrow_a = Atom('tsrow')
-tscell_a = Atom('tscell')
+timestamp_a = Atom('timestamp')
 
 # TODO RTS-842
 MSG_CODE_TS_TTB = 104
@@ -139,17 +139,6 @@ class TtbCodec(Codec):
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
-        # TODO TODO RTS-842 CLIENTS-814 GH-445
-        # TODO COLUMNS
-        # TODO TODO RTS-842 CLIENTS-814 GH-445
-        # if tsobj.columns is not None:
-        #     for col in resp.columns:
-        #         col_name = bytes_to_str(col.name)
-        #         col_type = col.type
-        #         col = (col_name, col_type)
-        #         tsobj.columns.append(col)
-        #
-        # TODO RTS-842 is this correct?
         if resp_ttb is None:
             return tsobj
 
@@ -157,45 +146,42 @@ class TtbCodec(Codec):
         if resp_a == rpberrorresp_a:
             self.process_err_ttb(resp_ttb)
         elif resp_a == tsgetresp_a:
-            # TODO resp_cols = resp_ttb[1]
+            resp_cols = resp_ttb[1]
+            tsobj.columns = self.decode_timeseries_cols(resp_cols)
             resp_rows = resp_ttb[2]
-            for row_ttb in resp_rows:
+            tsobj.rows = []
+            for resp_row in resp_rows:
                 tsobj.rows.append(
-                    self.decode_timeseries_row(row_ttb, None))
+                    self.decode_timeseries_row(resp_row, resp_cols))
         else:
             raise RiakError("Unknown TTB response type: {}".format(resp_a))
 
-    def decode_timeseries_row(self, tsrow_ttb, tscols=None):
+    def decode_timeseries_cols(self, tscols):
+        cn, ct = tscols
+        cnames = [bytes_to_str(cname) for cname in cn]
+        ctypes = [str(ctype) for ctype in ct]
+        return TsColumns(cnames, ctypes)
+
+    def decode_timeseries_row(self, tsrow, tscols):
         """
         Decodes a TTB-encoded TsRow into a list
 
-        :param tsrow: the TTB-encoded TsRow to decode.
-        :type tsrow: TTB encoded row
-        :param tscols: the TTB-encoded TsColumn data to help decode.
+        :param tsrow: the TTB decoded TsRow to decode.
+        :type tsrow: TTB dncoded row
+        :param tscols: the TTB decoded TsColumn data to help decode rows.
         :type tscols: list
         :rtype list
         """
-        if tsrow_ttb[0] == tsrow_a:
-            row = []
-            for tsc_ttb in tsrow_ttb[1]:
-                if tsc_ttb[0] == tscell_a:
-                    if tsc_ttb[1] != udef_a:
-                        row.append(tsc_ttb[1])
-                    elif tsc_ttb[2] != udef_a:
-                        row.append(tsc_ttb[2])
-                    elif tsc_ttb[3] != udef_a:
-                        row.append(
-                            datetime_from_unix_time_millis(tsc_ttb[3]))
-                    elif tsc_ttb[4] != udef_a:
-                        row.append(tsc_ttb[4])
-                    elif tsc_ttb[5] != udef_a:
-                        row.append(tsc_ttb[5])
-                    else:
-                        row.append(None)
+        cn, ct = tscols
+        row = []
+        for i, cell in enumerate(tsrow):
+            if cell is None:
+                row.append(None)
+            elif cell is list and len(cell) == 0:
+                row.append(None)
+            else:
+                if ct[i] == timestamp_a:
+                    row.append(datetime_from_unix_time_millis(cell))
                 else:
-                    raise RiakError(
-                        "Expected tscell atom, got: {}".format(tsc_ttb[0]))
-        else:
-            raise RiakError(
-                "Expected tsrow atom, got: {}".format(tsrow_ttb[0]))
+                    row.append(cell)
         return row

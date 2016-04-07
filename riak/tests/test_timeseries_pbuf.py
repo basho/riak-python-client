@@ -32,7 +32,7 @@ ex1ms = 1420113900987
 
 
 @unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported")
-class TimeseriesUnitTests(unittest.TestCase):
+class TimeseriesPbufUnitTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.ts0ms = unix_time_millis(ts0)
@@ -159,24 +159,25 @@ class TimeseriesUnitTests(unittest.TestCase):
         r1c4 = r1.cells.add()
         r1c4.boolean_value = self.rows[1][4]
 
-        tsobj = TsObject(None, self.table, [], [])
+        tsobj = TsObject(None, self.table)
         c = PbufCodec()
         c.decode_timeseries(tqr, tsobj)
 
-        self.assertEqual(len(self.rows), len(tsobj.rows))
-        self.assertEqual(len(tqr.columns), len(tsobj.columns))
+        self.assertEqual(len(tsobj.rows), len(self.rows))
+        self.assertEqual(len(tsobj.columns.names), len(tqr.columns))
+        self.assertEqual(len(tsobj.columns.types), len(tqr.columns))
 
-        c = tsobj.columns
-        self.assertEqual(c[0][0], 'col_varchar')
-        self.assertEqual(c[0][1], TsColumnType.Value('VARCHAR'))
-        self.assertEqual(c[1][0], 'col_integer')
-        self.assertEqual(c[1][1], TsColumnType.Value('SINT64'))
-        self.assertEqual(c[2][0], 'col_double')
-        self.assertEqual(c[2][1], TsColumnType.Value('DOUBLE'))
-        self.assertEqual(c[3][0], 'col_timestamp')
-        self.assertEqual(c[3][1], TsColumnType.Value('TIMESTAMP'))
-        self.assertEqual(c[4][0], 'col_boolean')
-        self.assertEqual(c[4][1], TsColumnType.Value('BOOLEAN'))
+        cn, ct = tsobj.columns
+        self.assertEqual(cn[0], 'col_varchar')
+        self.assertEqual(ct[0], TsColumnType.Value('VARCHAR'))
+        self.assertEqual(cn[1], 'col_integer')
+        self.assertEqual(ct[1], TsColumnType.Value('SINT64'))
+        self.assertEqual(cn[2], 'col_double')
+        self.assertEqual(ct[2], TsColumnType.Value('DOUBLE'))
+        self.assertEqual(cn[3], 'col_timestamp')
+        self.assertEqual(ct[3], TsColumnType.Value('TIMESTAMP'))
+        self.assertEqual(cn[4], 'col_boolean')
+        self.assertEqual(ct[4], TsColumnType.Value('BOOLEAN'))
 
         r0 = tsobj.rows[0]
         self.assertEqual(bytes_to_str(r0[0]), self.rows[0][0])
@@ -195,12 +196,12 @@ class TimeseriesUnitTests(unittest.TestCase):
 
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
                      'Timeseries not supported or RUN_TIMESERIES is 0')
-class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
+class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
     client_options = {'transport_options': {'use_ttb': False}}
 
     @classmethod
     def setUpClass(cls):
-        super(TimeseriesTests, cls).setUpClass()
+        super(TimeseriesPbufTests, cls).setUpClass()
         cls.now = datetime.datetime.utcfromtimestamp(144379690.987000)
         fiveMinsAgo = cls.now - fiveMins
         tenMinsAgo = fiveMinsAgo - fiveMins
@@ -245,9 +246,15 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         ]
         cls.encoded_rows = encoded_rows
 
+    def validate_len(self, ts_obj, expected_len):
+        self.assertEqual(len(ts_obj.columns.names), expected_len)
+        self.assertEqual(len(ts_obj.columns.types), expected_len)
+        self.assertEqual(len(ts_obj.rows), expected_len)
+
     def validate_data(self, ts_obj):
         if ts_obj.columns is not None:
-            self.assertEqual(len(ts_obj.columns), self.numCols)
+            self.assertEqual(len(ts_obj.columns.names), self.numCols)
+            self.assertEqual(len(ts_obj.columns.types), self.numCols)
         self.assertEqual(len(ts_obj.rows), 1)
         row = ts_obj.rows[0]
         self.assertEqual(bytes_to_str(row[0]), 'hash1')
@@ -272,44 +279,38 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         """
         ts_obj = self.client.ts_query(table, query)
         self.assertIsNotNone(ts_obj)
-        self.assertEqual(len(ts_obj.columns), 0)
-        self.assertEqual(len(ts_obj.rows), 0)
+        self.validate_len(ts_obj, 0)
 
     def test_query_that_returns_table_description(self):
         fmt = 'DESCRIBE {table}'
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        self.assertEqual(len(ts_obj.columns), 5)
-        self.assertEqual(len(ts_obj.rows), 5)
+        self.validate_len(ts_obj, 5)
 
     def test_query_that_returns_table_description_using_interpolation(self):
         query = 'Describe {table}'
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        self.assertEqual(len(ts_obj.columns), 5)
-        self.assertEqual(len(ts_obj.rows), 5)
+        self.validate_len(ts_obj, 5)
 
     def test_query_description_via_table(self):
         query = 'describe {table}'
         table = Table(self.client, table_name)
         ts_obj = table.query(query)
         self.assertIsNotNone(ts_obj)
-        self.assertEqual(len(ts_obj.columns), 5)
-        self.assertEqual(len(ts_obj.rows), 5)
+        self.validate_len(ts_obj, 5)
 
     def test_get_description(self):
         ts_obj = self.client.ts_describe(table_name)
         self.assertIsNotNone(ts_obj)
-        self.assertEqual(len(ts_obj.columns), 5)
-        self.assertEqual(len(ts_obj.rows), 5)
+        self.validate_len(ts_obj, 5)
 
     def test_get_description_via_table(self):
         table = Table(self.client, table_name)
         ts_obj = table.describe()
         self.assertIsNotNone(ts_obj)
-        self.assertEqual(len(ts_obj.columns), 5)
-        self.assertEqual(len(ts_obj.rows), 5)
+        self.validate_len(ts_obj, 5)
 
     def test_query_that_returns_no_data(self):
         fmt = """
@@ -320,8 +321,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
         """
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
-        self.assertEqual(len(ts_obj.columns), 0)
-        self.assertEqual(len(ts_obj.rows), 0)
+        self.validate_len(ts_obj, 0)
 
     def test_query_that_returns_no_data_using_interpolation(self):
         query = """
@@ -331,8 +331,7 @@ class TimeseriesTests(IntegrationTestBase, unittest.TestCase):
             user = 'user1'
         """
         ts_obj = self.client.ts_query(table_name, query)
-        self.assertEqual(len(ts_obj.columns), 0)
-        self.assertEqual(len(ts_obj.rows), 0)
+        self.validate_len(ts_obj, 0)
 
     def test_query_that_matches_some_data(self):
         fmt = """

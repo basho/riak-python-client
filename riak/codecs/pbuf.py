@@ -11,6 +11,7 @@ from riak import RiakError
 from riak.codecs import Codec, Msg
 from riak.content import RiakContent
 from riak.riak_object import VClock
+from riak.ts_object import TsColumns
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str, \
     unix_time_millis, datetime_from_unix_time_millis
 from riak.multidict import MultiDict
@@ -98,7 +99,8 @@ class PbufCodec(Codec):
 
     def maybe_riak_error(self, msg_code, data=None):
         err_code = riak.pb.messages.MSG_CODE_ERROR_RESP
-        err_data = super(PbufCodec, self).maybe_riak_error(err_code, msg_code, data)
+        err_data = super(PbufCodec, self).maybe_riak_error(
+            err_code, msg_code, data)
         if err_data:
             err = self.parse_msg(msg_code, err_data)
             raise RiakError(bytes_to_str(err.errmsg))
@@ -782,16 +784,20 @@ class PbufCodec(Codec):
         :param tsobj: a TsObject
         :type tsobj: TsObject
         """
-        if tsobj.columns is not None:
+        if resp.columns is not None:
+            col_names = []
+            col_types = []
             for col in resp.columns:
-                col_name = bytes_to_str(col.name)
-                col_type = col.type
-                col = (col_name, col_type)
-                tsobj.columns.append(col)
+                col_names.append(bytes_to_str(col.name))
+                col_types.append(col.type)
+            tsobj.columns = TsColumns(col_names, col_types)
 
-        for row in resp.rows:
-            tsobj.rows.append(
-                self.decode_timeseries_row(row, resp.columns))
+        tsobj.rows = []
+        if resp.rows is not None:
+            for row in resp.rows:
+                tsobj.rows.append(
+                    self.decode_timeseries_row(
+                        row, resp.columns))
 
     def decode_timeseries_row(self, tsrow, tscols=None):
         """

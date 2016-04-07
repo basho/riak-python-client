@@ -1,5 +1,9 @@
+import collections
+
 from riak import RiakError
 from riak.table import Table
+
+TsColumns = collections.namedtuple('TsColumns', ['names', 'types'])
 
 
 class TsObject(object):
@@ -7,7 +11,7 @@ class TsObject(object):
     The TsObject holds information about Timeseries data, plus the data
     itself.
     """
-    def __init__(self, client, table, rows=[], columns=[]):
+    def __init__(self, client, table, rows=None, columns=None):
         """
         Construct a new TsObject.
 
@@ -17,8 +21,8 @@ class TsObject(object):
         :type table: :class:`Table` <riak.table.Table>
         :param rows: An list of lists with timeseries data
         :type rows: list
-        :param columns: An list of Column names and types. Optional.
-        :type columns: list
+        :param columns: A TsColumns tuple. Optional
+        :type columns: :class:`TsColumns` <riak.TsColumns>
         """
 
         if not isinstance(table, Table):
@@ -27,13 +31,17 @@ class TsObject(object):
         self.client = client
         self.table = table
 
-        self.rows = rows
-        if not isinstance(self.rows, list):
-            raise RiakError("TsObject requires a list of rows")
+        if rows is not None and not isinstance(rows, list):
+            raise RiakError("TsObject rows parameter must be a list.")
+        else:
+            self.rows = rows
 
-        self.columns = columns
-        if self.columns is not None and not isinstance(self.columns, list):
-            raise RiakError("TsObject columns must be a list")
+        if columns is not None and \
+           not isinstance(columns, TsColumns):
+            raise RiakError(
+                "TsObject columns parameter must be a TsColumns instance")
+        else:
+            self.columns = columns
 
     def store(self):
         """

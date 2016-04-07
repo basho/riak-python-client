@@ -1,5 +1,5 @@
 import collections
-import riak.pb.messages
+
 from riak import RiakError
 
 Msg = collections.namedtuple('Msg',
