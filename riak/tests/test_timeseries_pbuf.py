@@ -169,15 +169,15 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
 
         cn, ct = tsobj.columns
         self.assertEqual(cn[0], 'col_varchar')
-        self.assertEqual(ct[0], TsColumnType.Value('VARCHAR'))
+        self.assertEqual(ct[0], 'varchar')
         self.assertEqual(cn[1], 'col_integer')
-        self.assertEqual(ct[1], TsColumnType.Value('SINT64'))
+        self.assertEqual(ct[1], 'sint64')
         self.assertEqual(cn[2], 'col_double')
-        self.assertEqual(ct[2], TsColumnType.Value('DOUBLE'))
+        self.assertEqual(ct[2], 'double')
         self.assertEqual(cn[3], 'col_timestamp')
-        self.assertEqual(ct[3], TsColumnType.Value('TIMESTAMP'))
+        self.assertEqual(ct[3], 'timestamp')
         self.assertEqual(cn[4], 'col_boolean')
-        self.assertEqual(ct[4], TsColumnType.Value('BOOLEAN'))
+        self.assertEqual(ct[4], 'boolean')
 
         r0 = tsobj.rows[0]
         self.assertEqual(bytes_to_str(r0[0]), self.rows[0][0])

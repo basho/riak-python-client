@@ -10,12 +10,12 @@ import riak.pb.riak_ts_pb2
 from riak import RiakError
 from riak.codecs import Codec, Msg
 from riak.content import RiakContent
+from riak.pb.riak_ts_pb2 import TsColumnType
 from riak.riak_object import VClock
 from riak.ts_object import TsColumns
 from riak.util import decode_index_value, str_to_bytes, bytes_to_str, \
     unix_time_millis, datetime_from_unix_time_millis
 from riak.multidict import MultiDict
-from riak.pb.riak_ts_pb2 import TsColumnType
 
 
 def _invert(d):
@@ -789,7 +789,8 @@ class PbufCodec(Codec):
             col_types = []
             for col in resp.columns:
                 col_names.append(bytes_to_str(col.name))
-                col_types.append(col.type)
+                col_type = self.decode_timeseries_col_type(col.type)
+                col_types.append(col_type)
             tsobj.columns = TsColumns(col_names, col_types)
 
         tsobj.rows = []
@@ -798,6 +799,22 @@ class PbufCodec(Codec):
                 tsobj.rows.append(
                     self.decode_timeseries_row(
                         row, resp.columns))
+
+    def decode_timeseries_col_type(self, col_type):
+        # NB: these match the atom names for column types
+        if col_type == TsColumnType.Value('VARCHAR'):
+            return 'varchar'
+        elif col_type == TsColumnType.Value('SINT64'):
+            return 'sint64'
+        elif col_type == TsColumnType.Value('DOUBLE'):
+            return 'double'
+        elif col_type == TsColumnType.Value('TIMESTAMP'):
+            return 'timestamp'
+        elif col_type == TsColumnType.Value('BOOLEAN'):
+            return 'boolean'
+        else:
+            msg = 'could not decode column type: {}'.format(col_type)
+            raise RiakError(msg)
 
     def decode_timeseries_row(self, tsrow, tscols=None):
         """
@@ -818,7 +835,6 @@ class PbufCodec(Codec):
                 if col and col.type != TsColumnType.Value('VARCHAR'):
                     raise TypeError('expected VARCHAR column')
                 else:
-                    # TODO RTS-842 - keep as bytes?
                     row.append(cell.varchar_value)
             elif cell.HasField('sint64_value'):
                 if col and col.type != TsColumnType.Value('SINT64'):
