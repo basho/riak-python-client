@@ -21,8 +21,6 @@ tsdelreq_a = Atom('tsdelreq')
 tsrow_a = Atom('tsrow')
 tscell_a = Atom('tscell')
 
-tscell_empty = (tscell_a, udef_a, udef_a, udef_a, udef_a, udef_a)
-
 # TODO RTS-842
 MSG_CODE_TS_TTB = 104
 
@@ -58,22 +56,21 @@ class TtbCodec(Codec):
 
     def encode_to_ts_cell(self, cell):
         if cell is None:
-            return tscell_empty
+            return []
         else:
             if isinstance(cell, datetime.datetime):
                 ts = unix_time_millis(cell)
-                return (tscell_a, udef_a, udef_a, ts, udef_a, udef_a)
+                return ts
             elif isinstance(cell, bool):
-                return (tscell_a, udef_a, udef_a, udef_a, cell, udef_a)
+                return cell
             elif isinstance(cell, six.text_type) or \
                     isinstance(cell, six.binary_type) or \
                     isinstance(cell, six.string_types):
-                return (tscell_a, cell,
-                        udef_a, udef_a, udef_a, udef_a)
+                return cell
             elif (isinstance(cell, six.integer_types)):
-                return (tscell_a, udef_a, cell, udef_a, udef_a, udef_a)
+                return cell
             elif isinstance(cell, float):
-                return (tscell_a, udef_a, udef_a, udef_a, udef_a, cell)
+                return cell
             else:
                 t = type(cell)
                 raise RiakError("can't serialize type '{}', value '{}'"
@@ -116,7 +113,7 @@ class TtbCodec(Codec):
         :rtype: term-to-binary encoded object
         '''
         if tsobj.columns:
-            raise NotImplementedError("columns are not implemented yet")
+            raise NotImplementedError('columns are not used')
 
         if tsobj.rows and isinstance(tsobj.rows, list):
             req_rows = []
@@ -124,8 +121,7 @@ class TtbCodec(Codec):
                 req_r = []
                 for cell in row:
                     req_r.append(self.encode_to_ts_cell(cell))
-                req_t = (tsrow_a, req_r)
-                req_rows.append(req_t)
+                req_rows.append(tuple(req_r))
             req = tsputreq_a, tsobj.table.name, [], req_rows
             mc = MSG_CODE_TS_TTB
             rc = MSG_CODE_TS_TTB
