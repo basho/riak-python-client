@@ -129,7 +129,21 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
     def setUpClass(cls):
         super(TimeseriesTtbTests, cls).setUpClass()
 
-    def test_store_and_fetch_ttb(self):
+    def test_query_that_returns_table_description(self):
+        import sys
+        fmt = 'DESCRIBE {table}'
+        query = fmt.format(table=table_name)
+        ts_obj = self.client.ts_query(table_name, query)
+        self.assertIsNotNone(ts_obj)
+        ts_cols = ts_obj.columns
+        sys.stderr.write("\n\nts_cols: {}\n\n".format(ts_cols))
+        sys.stderr.write("\n\nrows: {}\n\n".format(ts_obj.rows))
+        self.assertEqual(len(ts_cols.names), 5)
+        self.assertEqual(len(ts_cols.types), 5)
+        row = ts_obj.rows[0]
+        self.assertEqual(len(row), 5)
+
+    def test_store_and_fetch(self):
         now = datetime.datetime.utcfromtimestamp(144379690.987000)
         fiveMinsAgo = now - fiveMins
         tenMinsAgo = fiveMinsAgo - fiveMins
@@ -149,12 +163,18 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         result = ts_obj.store()
         self.assertTrue(result)
 
-        for r in rows:
+        for i, r in enumerate(rows):
             k = r[0:3]
             ts_obj = self.client.ts_get(table_name, k)
             self.assertIsNotNone(ts_obj)
+            ts_cols = ts_obj.columns
+            self.assertEqual(len(ts_cols.names), 5)
+            self.assertEqual(len(ts_cols.types), 5)
             self.assertEqual(len(ts_obj.rows), 1)
-            self.assertEqual(len(ts_obj.rows[0]), 5)
+            row = ts_obj.rows[0]
+            exp = rows[i]
+            self.assertEqual(len(row), 5)
+            self.assertEqual(row, exp)
 
     def test_create_error_via_put(self):
         table = Table(self.client, table_name)

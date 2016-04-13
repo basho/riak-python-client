@@ -1,8 +1,6 @@
 import datetime
 import six
 
-import riak.pb.messages
-
 from erlastic import encode, decode
 from erlastic.types import Atom
 
@@ -17,6 +15,9 @@ udef_a = Atom('undefined')
 rpberrorresp_a = Atom('rpberrorresp')
 tsgetreq_a = Atom('tsgetreq')
 tsgetresp_a = Atom('tsgetresp')
+tsqueryreq_a = Atom('tsqueryreq')
+tsqueryresp_a = Atom('tsqueryresp')
+tsinterpolation_a = Atom('tsinterpolation')
 tsputreq_a = Atom('tsputreq')
 tsdelreq_a = Atom('tsdelreq')
 timestamp_a = Atom('timestamp')
@@ -34,9 +35,7 @@ class TtbCodec(Codec):
         super(TtbCodec, self).__init__(**unused_args)
 
     def parse_msg(self, msg_code, data):
-        if msg_code != MSG_CODE_TS_TTB and \
-           msg_code != riak.pb.messages.MSG_CODE_TS_GET_RESP and \
-           msg_code != riak.pb.messages.MSG_CODE_TS_PUT_RESP:
+        if msg_code != MSG_CODE_TS_TTB:
             raise RiakError("TTB can't parse code: {}".format(msg_code))
         if len(data) > 0:
             decoded = decode(data)
@@ -95,8 +94,7 @@ class TtbCodec(Codec):
         return Msg(mc, encode(req), rc)
 
     def validate_timeseries_put_resp(self, resp_code, resp):
-        if resp is None and \
-           resp_code == riak.pb.messages.MSG_CODE_TS_PUT_RESP:
+        if resp is None and resp_code == MSG_CODE_TS_TTB:
             return True
         if resp is not None:
             return True
@@ -129,6 +127,16 @@ class TtbCodec(Codec):
         else:
             raise RiakError("TsObject requires a list of rows")
 
+    def encode_timeseries_query(self, table, query, interpolations=None):
+        q = query
+        if '{table}' in q:
+            q = q.format(table=table.name)
+        tsi = tsinterpolation_a, q, []
+        req = tsqueryreq_a, tsi, False, []
+        mc = MSG_CODE_TS_TTB
+        rc = MSG_CODE_TS_TTB
+        return Msg(mc, encode(req), rc)
+
     def decode_timeseries(self, resp_ttb, tsobj):
         """
         Fills an TsObject with the appropriate data and
@@ -142,10 +150,13 @@ class TtbCodec(Codec):
         if resp_ttb is None:
             return tsobj
 
+        import sys
         resp_a = resp_ttb[0]
+        sys.stderr.write("resp_a: {}".format(resp_a))
         if resp_a == rpberrorresp_a:
             self.process_err_ttb(resp_ttb)
-        elif resp_a == tsgetresp_a:
+        elif resp_a == tsgetresp_a or \
+             resp_a == tsqueryresp_a:
             resp_cols = resp_ttb[1]
             tsobj.columns = self.decode_timeseries_cols(resp_cols)
             resp_rows = resp_ttb[2]
@@ -172,9 +183,11 @@ class TtbCodec(Codec):
         :type tscols: list
         :rtype list
         """
+        import sys
         cn, ct = tscols
         row = []
         for i, cell in enumerate(tsrow):
+            sys.stderr.write("\ncell: {}\n".format(cell))
             if cell is None:
                 row.append(None)
             elif cell is list and len(cell) == 0:

@@ -60,6 +60,8 @@ class TcpTransport(Transport, TcpConnection):
             codec = self._get_ttb_codec()
         elif msg_code == riak.pb.messages.MSG_CODE_TS_PUT_REQ:
             codec = self._get_ttb_codec()
+        elif msg_code == riak.pb.messages.MSG_CODE_TS_QUERY_REQ:
+            codec = self._get_ttb_codec()
         else:
             codec = self._get_pbuf_codec()
         return codec
