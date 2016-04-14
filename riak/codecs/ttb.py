@@ -19,6 +19,7 @@ tsqueryreq_a = Atom('tsqueryreq')
 tsqueryresp_a = Atom('tsqueryresp')
 tsinterpolation_a = Atom('tsinterpolation')
 tsputreq_a = Atom('tsputreq')
+tsputresp_a = Atom('tsputresp')
 tsdelreq_a = Atom('tsdelreq')
 timestamp_a = Atom('timestamp')
 
@@ -150,50 +151,52 @@ class TtbCodec(Codec):
         if resp_ttb is None:
             return tsobj
 
-        import sys
         resp_a = resp_ttb[0]
-        sys.stderr.write("resp_a: {}".format(resp_a))
         if resp_a == rpberrorresp_a:
             self.process_err_ttb(resp_ttb)
-        elif resp_a == tsgetresp_a or \
-             resp_a == tsqueryresp_a:
-            resp_cols = resp_ttb[1]
-            tsobj.columns = self.decode_timeseries_cols(resp_cols)
-            resp_rows = resp_ttb[2]
-            tsobj.rows = []
-            for resp_row in resp_rows:
-                tsobj.rows.append(
-                    self.decode_timeseries_row(resp_row, resp_cols))
+        elif resp_a == tsputresp_a:
+            return
+        elif resp_a == tsgetresp_a or resp_a == tsqueryresp_a:
+            resp_data = resp_ttb[1]
+            if len(resp_data) == 0:
+                return
+            elif len(resp_data) == 3:
+                resp_colnames = resp_data[0]
+                resp_coltypes = resp_data[1]
+                tsobj.columns = self.decode_timeseries_cols(resp_colnames, resp_coltypes)
+                resp_rows = resp_data[2]
+                tsobj.rows = []
+                for resp_row in resp_rows:
+                    tsobj.rows.append(
+                        self.decode_timeseries_row(resp_row, resp_coltypes))
+            else:
+                raise RiakError("Expected 3-tuple in response, got: {}".format(resp_data))
         else:
             raise RiakError("Unknown TTB response type: {}".format(resp_a))
 
-    def decode_timeseries_cols(self, tscols):
-        cn, ct = tscols
-        cnames = [bytes_to_str(cname) for cname in cn]
-        ctypes = [str(ctype) for ctype in ct]
+    def decode_timeseries_cols(self, cnames, ctypes):
+        cnames = [bytes_to_str(cname) for cname in cnames]
+        ctypes = [str(ctype) for ctype in ctypes]
         return TsColumns(cnames, ctypes)
 
-    def decode_timeseries_row(self, tsrow, tscols):
+    def decode_timeseries_row(self, tsrow, tsct):
         """
         Decodes a TTB-encoded TsRow into a list
 
         :param tsrow: the TTB decoded TsRow to decode.
         :type tsrow: TTB dncoded row
-        :param tscols: the TTB decoded TsColumn data to help decode rows.
-        :type tscols: list
+        :param tsct: the TTB decoded column types (atoms).
+        :type tsct: list
         :rtype list
         """
-        import sys
-        cn, ct = tscols
         row = []
         for i, cell in enumerate(tsrow):
-            sys.stderr.write("\ncell: {}\n".format(cell))
             if cell is None:
                 row.append(None)
-            elif cell is list and len(cell) == 0:
+            elif isinstance(cell, list) and len(cell) == 0:
                 row.append(None)
             else:
-                if ct[i] == timestamp_a:
+                if tsct[i] == timestamp_a:
                     row.append(datetime_from_unix_time_millis(cell))
                 else:
                     row.append(cell)

@@ -63,9 +63,9 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
     #   {
     #     [<<"geohash">>, <<"user">>, <<"time">>,
     #      <<"weather">>, <<"temperature">>],
-    #     [varchar, varchar, timestamp, varchar, double]
-    #   },
-    #   [[<<"hash1">>, <<"user2">>, 144378190987, <<"typhoon">>, 90.3]]
+    #     [varchar, varchar, timestamp, varchar, double],
+    #     [(<<"hash1">>, <<"user2">>, 144378190987, <<"typhoon">>, 90.3)]
+    #   }
     # }
     def test_decode_data_from_get(self):
         colnames = ["varchar", "sint64", "double", "timestamp",
@@ -77,12 +77,12 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         r1 = (bd1, 3, 4.5, unix_time_millis(ts1), False,
               [], str1, None)
         rows = [r0, r1]
-        # { tsgetresp, { [colnames], [coltypes] }, [rows] }
-        cols_t = colnames, coltypes
-        rsp_data = tsgetresp_a, cols_t, rows
+        # { tsgetresp, { [colnames], [coltypes], [rows] } }
+        data_t = colnames, coltypes, rows
+        rsp_data = tsgetresp_a, data_t
         rsp_ttb = encode(rsp_data)
 
-        tsobj = TsObject(None, self.table, [])
+        tsobj = TsObject(None, self.table)
         c = TtbCodec()
         c.decode_timeseries(decode(rsp_ttb), tsobj)
 
@@ -98,7 +98,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
                 self.assertEqual(r[4], True)
             else:
                 self.assertEqual(r[4], False)
-            self.assertEqual(r[5], [])
+            self.assertEqual(r[5], None)
             self.assertEqual(r[6], dr[6].encode('ascii'))
             self.assertEqual(r[7], None)
 
@@ -130,14 +130,11 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         super(TimeseriesTtbTests, cls).setUpClass()
 
     def test_query_that_returns_table_description(self):
-        import sys
         fmt = 'DESCRIBE {table}'
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
         ts_cols = ts_obj.columns
-        sys.stderr.write("\n\nts_cols: {}\n\n".format(ts_cols))
-        sys.stderr.write("\n\nrows: {}\n\n".format(ts_obj.rows))
         self.assertEqual(len(ts_cols.names), 5)
         self.assertEqual(len(ts_cols.types), 5)
         row = ts_obj.rows[0]
@@ -159,6 +156,19 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
             ['hash1', 'user2', fiveMinsAgo, 'wind', None],
             ['hash1', 'user2', now, 'snow', 20.1]
         ]
+        # NB: response data is binary
+        exp_rows = [
+            [six.b('hash1'), six.b('user2'), twentyFiveMinsAgo,
+                six.b('typhoon'), 90.3],
+            [six.b('hash1'), six.b('user2'), twentyMinsAgo,
+                six.b('hurricane'), 82.3],
+            [six.b('hash1'), six.b('user2'), fifteenMinsAgo,
+                six.b('rain'), 79.0],
+            [six.b('hash1'), six.b('user2'), fiveMinsAgo,
+                six.b('wind'), None],
+            [six.b('hash1'), six.b('user2'), now,
+                six.b('snow'), 20.1]
+        ]
         ts_obj = table.new(rows)
         result = ts_obj.store()
         self.assertTrue(result)
@@ -172,7 +182,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
             self.assertEqual(len(ts_cols.types), 5)
             self.assertEqual(len(ts_obj.rows), 1)
             row = ts_obj.rows[0]
-            exp = rows[i]
+            exp = exp_rows[i]
             self.assertEqual(len(row), 5)
             self.assertEqual(row, exp)
 

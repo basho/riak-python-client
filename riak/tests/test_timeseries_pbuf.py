@@ -416,8 +416,11 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
         key = ['hash1', 'user2', self.twentyFiveMinsAgo]
         rslt = self.client.ts_delete(table_name, key)
         self.assertTrue(rslt)
-        with self.assertRaises(RiakError):
-            self.client.ts_get(table_name, key)
+        ts_obj = self.client.ts_get(table_name, key)
+        self.assertIsNotNone(ts_obj)
+        self.assertEqual(len(ts_obj.rows), 0)
+        self.assertEqual(len(ts_obj.columns.names), 0)
+        self.assertEqual(len(ts_obj.columns.types), 0)
 
     def test_create_error_via_put(self):
         table = Table(self.client, table_name)
