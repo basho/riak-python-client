@@ -49,6 +49,7 @@ class TtbCodec(Codec):
         resp_a = err_ttb[0]
         if resp_a == rpberrorresp_a:
             errmsg = err_ttb[1]
+            # errcode = err_ttb[2]
             raise RiakError(bytes_to_str(errmsg))
 
     def maybe_riak_error(self, msg_code, data=None):
@@ -151,10 +152,10 @@ class TtbCodec(Codec):
         if resp_ttb is None:
             return tsobj
 
+        self.maybe_err_ttb(resp_ttb)
+
         resp_a = resp_ttb[0]
-        if resp_a == rpberrorresp_a:
-            self.process_err_ttb(resp_ttb)
-        elif resp_a == tsputresp_a:
+        if resp_a == tsputresp_a:
             return
         elif resp_a == tsgetresp_a or resp_a == tsqueryresp_a:
             resp_data = resp_ttb[1]
