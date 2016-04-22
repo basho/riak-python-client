@@ -1,27 +1,11 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import socket
 import select
+
 from six import PY2
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak.transports.pool import Pool
-from riak.transports.http.transport import RiakHttpTransport
+from riak.transports.http.transport import HttpTransport
+
 if USE_STDLIB_SSL:
     import ssl
     from riak.transports.security import configure_ssl_context
@@ -29,6 +13,7 @@ else:
     import OpenSSL.SSL
     from riak.transports.security import RiakWrappedSocket,\
         configure_pyopenssl_context
+
 if PY2:
     from httplib import HTTPConnection, \
         NotConnected, \
@@ -149,7 +134,7 @@ class RiakHTTPSConnection(HTTPSConnection):
             self.sock.context = ssl_ctx
 
 
-class RiakHttpPool(Pool):
+class HttpPool(Pool):
     """
     A pool of HTTP(S) transport connections.
     """
@@ -160,14 +145,14 @@ class RiakHttpPool(Pool):
         if self.client._credentials:
             self.connection_class = RiakHTTPSConnection
 
-        super(RiakHttpPool, self).__init__()
+        super(HttpPool, self).__init__()
 
     def create_resource(self):
         node = self.client._choose_node()
-        return RiakHttpTransport(node=node,
-                                 client=self.client,
-                                 connection_class=self.connection_class,
-                                 **self.options)
+        return HttpTransport(node=node,
+                             client=self.client,
+                             connection_class=self.connection_class,
+                             **self.options)
 
     def destroy_resource(self, transport):
         transport.close()

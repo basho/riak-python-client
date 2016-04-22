@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-import platform
+import unittest
 
 from six import PY2
 from riak.mapreduce import RiakMapReduce
@@ -11,11 +11,6 @@ from riak.tests.base import IntegrationTestBase
 from riak.tests.test_yokozuna import wait_for_yz_index
 from riak.tests import RUN_SECURITY
 from riak.tests.yz_setup import yzSetUp, yzTearDown
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 testrun_yz_mr = {'btype': 'mr',

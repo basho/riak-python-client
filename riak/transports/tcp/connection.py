@@ -1,13 +1,13 @@
 import socket
 import struct
+
 import riak.pb.riak_pb2
 import riak.pb.messages
 
-from riak.security import SecurityError, USE_STDLIB_SSL
 from riak import RiakError
-from riak.util import bytes_to_str, str_to_bytes
+from riak.codecs.pbuf import PbufCodec
+from riak.security import SecurityError, USE_STDLIB_SSL
 
-from six import PY2
 if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection
     from riak.transports.security import configure_pyopenssl_context
@@ -16,41 +16,42 @@ else:
     from riak.transports.security import configure_ssl_context
 
 
-class RiakPbcConnection(object):
+class TcpConnection(object):
     """
-    Connection-related methods for RiakPbcTransport.
+    Connection-related methods for TcpTransport.
     """
-
-    def _encode_msg(self, msg_code, msg=None):
-        if msg is None:
+    def _encode_msg(self, msg_code, data=None):
+        if data is None:
             return struct.pack("!iB", 1, msg_code)
-        msgstr = msg.SerializeToString()
-        slen = len(msgstr)
-        hdr = struct.pack("!iB", 1 + slen, msg_code)
-        return hdr + msgstr
+        hdr = struct.pack("!iB", 1 + len(data), msg_code)
+        return hdr + data
 
-    def _request(self, msg_code, msg=None, expect=None):
-        self._send_msg(msg_code, msg)
-        return self._recv_msg(expect)
+    def _send_recv(self, msg_code, data=None):
+        self._send_msg(msg_code, data)
+        return self._recv_msg()
 
-    def _non_connect_request(self, msg_code, msg=None, expect=None):
+    def _non_connect_send_recv(self, msg_code, data=None):
         """
-        Similar to self._request, but doesn't try to initiate a connection,
+        Similar to self._send_recv, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
         """
-        self._non_connect_send_msg(msg_code, msg)
-        return self._recv_msg(expect)
+        self._non_connect_send_msg(msg_code, data)
+        return self._recv_msg()
 
-    def _non_connect_send_msg(self, msg_code, msg):
+    def _non_connect_send_recv_msg(self, msg):
+        self._non_connect_send_msg(msg.msg_code, msg.data)
+        return self._recv_msg()
+
+    def _non_connect_send_msg(self, msg_code, data):
         """
         Similar to self._send, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
         """
-        self._socket.sendall(self._encode_msg(msg_code, msg))
+        self._socket.sendall(self._encode_msg(msg_code, data))
 
-    def _send_msg(self, msg_code, msg):
+    def _send_msg(self, msg_code, data):
         self._connect()
-        self._non_connect_send_msg(msg_code, msg)
+        self._non_connect_send_msg(msg_code, data)
 
     def _init_security(self):
         """
@@ -68,9 +69,9 @@ class RiakPbcConnection(object):
         Exchange a STARTTLS message with Riak to initiate secure communications
         return True is Riak responds with a STARTTLS response, False otherwise
         """
-        msg_code, _ = self._non_connect_request(
+        resp_code, _ = self._non_connect_send_recv(
             riak.pb.messages.MSG_CODE_START_TLS)
-        if msg_code == riak.pb.messages.MSG_CODE_START_TLS:
+        if resp_code == riak.pb.messages.MSG_CODE_START_TLS:
             return True
         else:
             return False
@@ -82,17 +83,14 @@ class RiakPbcConnection(object):
         Note: Riak will sleep for a short period of time upon a failed
               auth request/response to prevent denial of service attacks
         """
-        req = riak.pb.riak_pb2.RpbAuthReq()
-        req.user = str_to_bytes(self._client._credentials.username)
+        codec = PbufCodec()
+        username = self._client._credentials.username
         password = self._client._credentials.password
         if not password:
             password = ''
-        req.password = str_to_bytes(password)
-        msg_code, _ = self._non_connect_request(
-            riak.pb.messages.MSG_CODE_AUTH_REQ,
-            req,
-            riak.pb.messages.MSG_CODE_AUTH_RESP)
-        if msg_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
+        msg = codec.encode_auth(username, password)
+        resp_code, _ = self._non_connect_send_recv_msg(msg)
+        if resp_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
             return True
         else:
             return False
@@ -146,7 +144,6 @@ class RiakPbcConnection(object):
                     # ssl handshake successful
                     ssl_socket.do_handshake()
                     self._socket = ssl_socket
-
                     return True
                 except ssl.SSLError as e:
                     raise SecurityError(e)
@@ -154,51 +151,36 @@ class RiakPbcConnection(object):
                     # fail if *any* exceptions are thrown during SSL handshake
                     raise SecurityError(e)
 
-    def _recv_msg(self, expect=None):
-        self._recv_pkt()
-        msg_code, = struct.unpack("B", self._inbuf[:1])
-        if msg_code is riak.pb.messages.MSG_CODE_ERROR_RESP:
-            err = self._parse_msg(msg_code, self._inbuf[1:])
-            if err is None:
-                raise RiakError('no error provided!')
-            else:
-                raise RiakError(bytes_to_str(err.errmsg))
-        elif msg_code in riak.pb.messages.MESSAGE_CLASSES:
-            msg = self._parse_msg(msg_code, self._inbuf[1:])
-        else:
-            raise Exception("unknown msg code %s" % msg_code)
-
-        if expect and msg_code != expect:
-            raise RiakError("unexpected protocol buffer message code: %d, %r"
-                            % (msg_code, msg))
-        return msg_code, msg
+    def _recv_msg(self):
+        msgbuf = self._recv_pkt()
+        mv = memoryview(msgbuf)
+        msg_code, = struct.unpack("B", mv[0:1])
+        data = mv[1:].tobytes()
+        return (msg_code, data)
 
     def _recv_pkt(self):
-        nmsglen = self._socket.recv(4)
-        while len(nmsglen) < 4:
-            x = self._socket.recv(4 - len(nmsglen))
-            if not x:
-                break
-            nmsglen += x
-        if len(nmsglen) != 4:
-            raise RiakError(
-                "Socket returned short packet length %d - expected 4"
-                % len(nmsglen))
-        msglen, = struct.unpack('!i', nmsglen)
-        self._inbuf_len = msglen
-        if PY2:
-            self._inbuf = ''
-        else:
-            self._inbuf = bytes()
-        while len(self._inbuf) < msglen:
-            want_len = min(8192, msglen - len(self._inbuf))
-            recv_buf = self._socket.recv(want_len)
-            if not recv_buf:
-                break
-            self._inbuf += recv_buf
-        if len(self._inbuf) != self._inbuf_len:
+        # TODO FUTURE re-use buffer
+        msglen_buf = self._recv(4)
+        # NB: msg length is an unsigned int
+        msglen, = struct.unpack('!I', msglen_buf)
+        return self._recv(msglen)
+
+    def _recv(self, msglen):
+        # TODO FUTURE re-use buffer
+        # http://stackoverflow.com/a/15964489
+        msgbuf = bytearray(msglen)
+        view = memoryview(msgbuf)
+        nread = 0
+        toread = msglen
+        while toread:
+            nbytes = self._socket.recv_into(view, toread)
+            view = view[nbytes:]  # slicing views is cheap
+            toread -= nbytes
+            nread += nbytes
+        if nread != msglen:
             raise RiakError("Socket returned short packet %d - expected %d"
-                            % (len(self._inbuf), self._inbuf_len))
+                            % (nread, msglen))
+        return msgbuf
 
     def _connect(self):
         if not self._socket:
@@ -218,19 +200,6 @@ class RiakPbcConnection(object):
             self._socket.close()
             del self._socket
 
-    def _parse_msg(self, code, packet):
-        try:
-            pbclass = riak.pb.messages.MESSAGE_CLASSES[code]
-        except KeyError:
-            pbclass = None
-
-        if pbclass is None:
-            return None
-
-        pbo = pbclass()
-        pbo.ParseFromString(packet)
-        return pbo
-
-    # These are set in the RiakPbcTransport initializer
+    # These are set in the TcpTransport initializer
     _address = None
     _timeout = None

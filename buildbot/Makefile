@@ -26,7 +26,6 @@ compile:
 
 lint:
 	@pip install --upgrade pep8 flake8
-	@cd ..; pep8 --exclude=riak/pb riak *.py
 	@cd ..; flake8 --exclude=riak/pb riak *.py
 
 test: setup test_normal test_security
@@ -46,7 +45,7 @@ test_security:
 test_timeseries:
 	@echo "Testing Riak Python Client (timeseries)"
 	@$(RIAK_ADMIN) security disable
-	@RIAK_TEST_PROTOCOL='pbc' RUN_YZ=0 RUN_DATATYPES=0 RUN_INDEXES=1 RUN_TIMESERIES=1 ./tox_runner.sh ..
+	@RIAK_TEST_PROTOCOL='pbc' RIAK_TEST_PB_PORT=8087 RUN_YZ=0 RUN_DATATYPES=0 RUN_INDEXES=1 RUN_TIMESERIES=1 ./tox_runner.sh ..
 
 setup:
 	./tox_setup.sh

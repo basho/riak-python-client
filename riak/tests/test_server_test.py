@@ -1,7 +1,10 @@
-from riak.test_server import TestServer
+import sys
 import unittest
 
+from riak.test_server import TestServer
 
+
+@unittest.skipIf(sys.platform == 'win32', 'Windows is not supported')
 class TestServerTestCase(unittest.TestCase):
     def setUp(self):
         self.test_server = TestServer()

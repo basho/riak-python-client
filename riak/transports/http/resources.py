@@ -1,34 +1,18 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import re
+
 from six import PY2
 from riak import RiakError
 from riak.util import lazy_property, bytes_to_str
+
 if PY2:
     from urllib import quote_plus, urlencode
 else:
     from urllib.parse import quote_plus, urlencode
 
 
-class RiakHttpResources(object):
+class HttpResources(object):
     """
-    Methods for RiakHttpTransport related to URL generation, i.e.
+    Methods for HttpTransport related to URL generation, i.e.
     creating the proper paths.
     """
 
@@ -204,7 +188,7 @@ class RiakHttpResources(object):
         if self.riak_kv_wm_bucket_type is not None:
             return True
         else:
-            return super(RiakHttpResources, self).index_term_regex()
+            return super(HttpResources, self).index_term_regex()
 
     # Resource root paths
     @lazy_property

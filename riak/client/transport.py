@@ -1,23 +1,6 @@
-"""
-Copyright 2012 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
 from contextlib import contextmanager
 from riak.transports.pool import BadResource
-from riak.transports.pbc import is_retryable as is_pbc_retryable
+from riak.transports.tcp import is_retryable as is_pbc_retryable
 from riak.transports.http import is_retryable as is_http_retryable
 import threading
 from six import PY2
@@ -49,7 +32,7 @@ class RiakClientTransport(object):
     # These will be set or redefined by the RiakClient initializer
     protocol = 'pbc'
     _http_pool = None
-    _pb_pool = None
+    _tcp_pool = None
     _locals = _client_locals()
 
     def _get_retry_count(self):
@@ -163,8 +146,8 @@ class RiakClientTransport(object):
             protocol = self.protocol
         if protocol == 'http':
             pool = self._http_pool
-        elif protocol == 'pbc':
-            pool = self._pb_pool
+        elif protocol == 'tcp' or protocol == 'pbc':
+            pool = self._tcp_pool
         else:
             raise ValueError("invalid protocol %s" % protocol)
         return pool

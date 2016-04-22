@@ -1,11 +1,6 @@
-import platform
+import unittest
 
 from riak.util import is_timeseries_supported
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class UtilUnitTests(unittest.TestCase):

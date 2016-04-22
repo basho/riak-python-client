@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-import platform
-from riak.transports.feature_detect import FeatureDetection
+import unittest
 
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
+from riak.transports.feature_detect import FeatureDetection
 
 
 class IncompleteTransport(FeatureDetection):

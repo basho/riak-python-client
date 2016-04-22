@@ -5,6 +5,18 @@ import warnings
 
 from collections import Mapping
 from six import string_types, PY2
+import datetime
+
+epoch = datetime.datetime.utcfromtimestamp(0)
+
+
+def unix_time_millis(dt):
+    td = dt - epoch
+    return int(td.total_seconds() * 1000.0)
+
+
+def datetime_from_unix_time_millis(ut):
+    return datetime.datetime.utcfromtimestamp(ut / 1000.0)
 
 
 def is_timeseries_supported(v=None):
@@ -60,7 +72,6 @@ class lazy_property(object):
     memoization of an object attribute. The property should represent
     immutable data, as it replaces itself on first access.
     '''
-
     def __init__(self, fget):
         self.fget = fget
         self.func_name = fget.__name__

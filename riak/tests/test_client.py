@@ -1,4 +1,5 @@
-import platform
+import unittest
+
 from six import PY2
 from threading import Thread
 from riak.riak_object import RiakObject
@@ -9,11 +10,6 @@ if PY2:
     from Queue import Queue
 else:
     from queue import Queue
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class ClientTests(IntegrationTestBase, unittest.TestCase):
@@ -201,10 +197,10 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         # Do something to add to the connection pool
         self.test_multiget_bucket()
         if self.client.protocol == 'pbc':
-            self.assertGreater(len(self.client._pb_pool.resources), 1)
+            self.assertGreater(len(self.client._tcp_pool.resources), 1)
         else:
             self.assertGreater(len(self.client._http_pool.resources), 1)
         # Now close them all up
         self.client.close()
         self.assertEqual(len(self.client._http_pool.resources), 0)
-        self.assertEqual(len(self.client._pb_pool.resources), 0)
+        self.assertEqual(len(self.client._tcp_pool.resources), 0)

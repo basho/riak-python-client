@@ -1,32 +1,35 @@
 #!/usr/bin/env python
 
-import platform
+import codecs
+import six
+import sys
+
 from setuptools import setup, find_packages
 from version import get_version
 from commands import setup_timeseries, build_messages
 
-install_requires = ['six >= 1.8.0']
-requires = ['six(>=1.8.0)']
-if platform.python_version() < '2.7.9':
+install_requires = ['six >= 1.8.0', 'basho_erlastic >= 2.1.0']
+requires = ['six(>=1.8.0)', 'basho_erlastic(>= 2.1.0)']
+
+if sys.version_info[0:3] <= (2, 7, 9):
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
 
-if platform.python_version() < '3.0':
+if six.PY2:
     install_requires.append('protobuf >=2.4.1, <2.7.0')
     requires.append('protobuf(>=2.4.1, <2.7.0)')
 else:
     install_requires.append('python3_protobuf >=2.4.1, <2.6.0')
     requires.append('python3_protobuf(>=2.4.1, <2.6.0)')
 
-tests_require = []
-if platform.python_version() < '2.7.0':
-    tests_require.append("unittest2")
-
 try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
+    with codecs.open('README.rst', 'w', 'utf-8') as f:
+        f.write(long_description)
 except(IOError, ImportError):
-    long_description = open('README.md').read()
+    with open('README.md') as f:
+        long_description = f.read()
 
 setup(
     name='riak',
@@ -34,7 +37,6 @@ setup(
     packages=find_packages(),
     requires=requires,
     install_requires=install_requires,
-    tests_require=tests_require,
     package_data={'riak': ['erl_src/*']},
     description='Python client for Riak',
     long_description=long_description,
