@@ -164,14 +164,16 @@ class TtbCodec(Codec):
             elif len(resp_data) == 3:
                 resp_colnames = resp_data[0]
                 resp_coltypes = resp_data[1]
-                tsobj.columns = self.decode_timeseries_cols(resp_colnames, resp_coltypes)
+                tsobj.columns = self.decode_timeseries_cols(
+                        resp_colnames, resp_coltypes)
                 resp_rows = resp_data[2]
                 tsobj.rows = []
                 for resp_row in resp_rows:
                     tsobj.rows.append(
                         self.decode_timeseries_row(resp_row, resp_coltypes))
             else:
-                raise RiakError("Expected 3-tuple in response, got: {}".format(resp_data))
+                raise RiakError(
+                    "Expected 3-tuple in response, got: {}".format(resp_data))
         else:
             raise RiakError("Unknown TTB response type: {}".format(resp_a))
 
