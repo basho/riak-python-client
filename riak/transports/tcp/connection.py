@@ -6,6 +6,7 @@ import riak.pb.messages
 
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
+from riak.transports.pool import BadResource
 from riak.security import SecurityError, USE_STDLIB_SSL
 
 
@@ -15,8 +16,6 @@ if not USE_STDLIB_SSL:
 else:
     import ssl
     from riak.transports.security import configure_ssl_context
-
-from riak.transports.pool import BadResource
 
 
 class TcpConnection(object):
@@ -157,7 +156,7 @@ class TcpConnection(object):
     def _recv_msg(self):
         try:
             msgbuf = self._recv_pkt()
-        except socket.timeout, e:
+        except socket.timeout as e:
             # A timeout can leave the socket in an inconsistent state because
             # it might still receive the data later and mix up with a
             # subsequent request.
@@ -167,8 +166,6 @@ class TcpConnection(object):
         msg_code, = struct.unpack("B", mv[0:1])
         data = mv[1:].tobytes()
         return (msg_code, data)
-
-
 
     def _recv_pkt(self):
         # TODO FUTURE re-use buffer
