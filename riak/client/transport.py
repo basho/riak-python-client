@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from riak.transports.pool import BadResource
-from riak.transports.tcp import is_retryable as is_pbc_retryable
+from riak.transports.tcp import is_retryable as is_tcp_retryable
 from riak.transports.http import is_retryable as is_http_retryable
 import threading
 from six import PY2
@@ -162,7 +162,7 @@ def _is_retryable(error):
     :type error: Exception
     :rtype: boolean
     """
-    return is_pbc_retryable(error) or is_http_retryable(error)
+    return is_tcp_retryable(error) or is_http_retryable(error)
 
 
 def retryable(fn, protocol=None):

@@ -12,7 +12,14 @@ class BadResource(Exception):
     resource currently in-use is bad and should be removed from the
     pool.
     """
-    pass
+    def __init__(self, value=None):
+        self.value = value
+
+    def __str__(self):
+        if self.value is None:
+            return 'BadResource'
+        else:
+            return repr(self.value)
 
 
 class Resource(object):

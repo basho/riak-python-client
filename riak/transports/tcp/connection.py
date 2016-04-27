@@ -7,6 +7,7 @@ import riak.pb.messages
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
+from riak.transports.pool import BadResource
 
 if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection
@@ -174,6 +175,10 @@ class TcpConnection(object):
         toread = msglen
         while toread:
             nbytes = self._socket.recv_into(view, toread)
+            # https://docs.python.org/2/howto/sockets.html#using-a-socket
+            # https://github.com/basho/riak-python-client/issues/399
+            if nbytes == 0:
+                raise BadResource('recv_into returned zero bytes unexpectedly')
             view = view[nbytes:]  # slicing views is cheap
             toread -= nbytes
             nread += nbytes
@@ -190,7 +195,8 @@ class TcpConnection(object):
             else:
                 self._socket = socket.create_connection(self._address)
             if self._socket_keepalive:
-                self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                self._socket.setsockopt(
+                    socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
                 ka_opts = self._socket_keepalive_options or {}
                 for k, v in ka_opts.iteritems():
                     self._socket.setsockopt(socket.SOL_TCP, k, v)
@@ -202,6 +208,7 @@ class TcpConnection(object):
         Closes the underlying socket of the PB connection.
         """
         if self._socket:
+            self._socket.shutdown(socket.SHUT_RDWR)
             self._socket.close()
             del self._socket
 
