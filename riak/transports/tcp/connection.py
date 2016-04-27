@@ -8,12 +8,15 @@ from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
 
+
 if not USE_STDLIB_SSL:
     from OpenSSL.SSL import Connection
     from riak.transports.security import configure_pyopenssl_context
 else:
     import ssl
     from riak.transports.security import configure_ssl_context
+
+from riak.transports.pool import BadResource
 
 
 class TcpConnection(object):
@@ -152,11 +155,20 @@ class TcpConnection(object):
                     raise SecurityError(e)
 
     def _recv_msg(self):
-        msgbuf = self._recv_pkt()
+        try:
+            msgbuf = self._recv_pkt()
+        except socket.timeout, e:
+            # A timeout can leave the socket in an inconsistent state because
+            # it might still receive the data later and mix up with a
+            # subsequent request.
+            # https://github.com/basho/riak-python-client/issues/425
+            raise BadResource(e)
         mv = memoryview(msgbuf)
         msg_code, = struct.unpack("B", mv[0:1])
         data = mv[1:].tobytes()
         return (msg_code, data)
+
+
 
     def _recv_pkt(self):
         # TODO FUTURE re-use buffer
