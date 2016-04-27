@@ -1,3 +1,4 @@
+import errno
 import socket
 import struct
 
@@ -9,12 +10,12 @@ from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak.transports.pool import BadResource
 
-if not USE_STDLIB_SSL:
-    from OpenSSL.SSL import Connection
-    from riak.transports.security import configure_pyopenssl_context
-else:
+if USE_STDLIB_SSL:
     import ssl
     from riak.transports.security import configure_ssl_context
+else:
+    from OpenSSL.SSL import Connection
+    from riak.transports.security import configure_pyopenssl_context
 
 
 class TcpConnection(object):
@@ -208,7 +209,16 @@ class TcpConnection(object):
         Closes the underlying socket of the PB connection.
         """
         if self._socket:
-            self._socket.shutdown(socket.SHUT_RDWR)
+            if USE_STDLIB_SSL:
+                # NB: Python 2.7.8 and earlier does not have a compatible
+                # shutdown() method due to the SSL lib
+                try:
+                    self._socket.shutdown(socket.SHUT_RDWR)
+                except IOError as e:
+                    # NB: sometimes this is the exception if the initial
+                    # connection didn't succeed correctly
+                    if e.errno != errno.EBADF:
+                        raise
             self._socket.close()
             del self._socket
 
