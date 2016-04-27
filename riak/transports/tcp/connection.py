@@ -189,6 +189,11 @@ class TcpConnection(object):
                                                         self._timeout)
             else:
                 self._socket = socket.create_connection(self._address)
+            if self._socket_keepalive:
+                self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                ka_opts = self._socket_keepalive_options or {}
+                for k, v in ka_opts.iteritems():
+                    self._socket.setsockopt(socket.SOL_TCP, k, v)
             if self._client._credentials:
                 self._init_security()
 
@@ -203,3 +208,5 @@ class TcpConnection(object):
     # These are set in the TcpTransport initializer
     _address = None
     _timeout = None
+    _socket_keepalive = None
+    _socket_keepalive_options = None

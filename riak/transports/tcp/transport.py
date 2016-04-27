@@ -25,6 +25,8 @@ class TcpTransport(Transport, TcpConnection):
                  node=None,
                  client=None,
                  timeout=None,
+                 socket_keepalive=False,
+                 socket_keepalive_options=None,
                  **kwargs):
         super(TcpTransport, self).__init__()
 
@@ -33,6 +35,8 @@ class TcpTransport(Transport, TcpConnection):
         self._address = (node.host, node.pb_port)
         self._timeout = timeout
         self._socket = None
+        self._socket_keepalive = socket_keepalive
+        self._socket_keepalive_options = socket_keepalive_options
         self._pbuf_c = None
         self._ttb_c = None
         self._use_ttb = kwargs.get('use_ttb', True)
