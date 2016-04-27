@@ -149,6 +149,40 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
                 self.assertIsInstance(failure[3], Exception)
         client.close()
 
+    def test_multiput_errors(self):
+        """
+        Unrecoverable errors are captured along with the bucket/key
+        and not propagated.
+        """
+        client = self.create_client(http_port=DUMMY_HTTP_PORT,
+                                    pb_port=DUMMY_PB_PORT)
+        bucket = client.bucket(self.bucket_name)
+        k1 = self.randname()
+        k2 = self.randname()
+        o1 = RiakObject(client, bucket, k1)
+        o2 = RiakObject(client, bucket, k2)
+
+        if PY2:
+            o1.encoded_data = k1
+            o2.encoded_data = k2
+        else:
+            o1.data = k1
+            o2.data = k2
+
+        objs = [o1, o2]
+        for robj in objs:
+            robj.content_type = 'text/plain'
+
+        results = client.multiput(objs, return_body=True)
+        for failure in results:
+            self.assertIsInstance(failure, tuple)
+            self.assertIsInstance(failure[0], RiakObject)
+            if PY2:
+                self.assertIsInstance(failure[1], StandardError)  # noqa
+            else:
+                self.assertIsInstance(failure[1], Exception)
+        client.close()
+
     def test_multiget_notfounds(self):
         """
         Not founds work in multiget just the same as get.
@@ -187,6 +221,74 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
                 self.assertEqual(obj.key, obj.encoded_data)
             else:
                 self.assertEqual(obj.key, obj.data)
+        client.close()
+
+    def test_multiput_pool_size(self):
+        """
+        The pool size for multiputs can be configured at client initiation
+        time. Multiput still works as expected.
+        """
+        client = self.create_client(multiput_pool_size=2)
+        self.assertEqual(2, client._multiput_pool._size)
+
+        bucket = client.bucket(self.bucket_name)
+        k1 = self.randname()
+        k2 = self.randname()
+        o1 = RiakObject(client, bucket, k1)
+        o2 = RiakObject(client, bucket, k2)
+
+        if PY2:
+            o1.encoded_data = k1
+            o2.encoded_data = k2
+        else:
+            o1.data = k1
+            o2.data = k2
+
+        objs = [o1, o2]
+        for robj in objs:
+            robj.content_type = 'text/plain'
+
+        results = client.multiput(objs, return_body=True)
+        for obj in results:
+            self.assertIsInstance(obj, RiakObject)
+            self.assertTrue(obj.exists)
+            self.assertEqual(obj.content_type, 'text/plain')
+            if PY2:
+                self.assertEqual(obj.key, obj.encoded_data)
+            else:
+                self.assertEqual(obj.key, obj.data)
+        client.close()
+
+    def test_multiput_pool_options(self):
+        sz = 4
+        client = self.create_client(multiput_pool_size=sz)
+        self.assertEqual(sz, client._multiput_pool._size)
+
+        bucket = client.bucket(self.bucket_name)
+        k1 = self.randname()
+        k2 = self.randname()
+        o1 = RiakObject(client, bucket, k1)
+        o2 = RiakObject(client, bucket, k2)
+
+        if PY2:
+            o1.encoded_data = k1
+            o2.encoded_data = k2
+        else:
+            o1.data = k1
+            o2.data = k2
+
+        objs = [o1, o2]
+        for robj in objs:
+            robj.content_type = 'text/plain'
+
+        results = client.multiput(objs, return_body=False)
+        for obj in results:
+            if client.protocol == 'pbc':
+                self.assertIsInstance(obj, RiakObject)
+                self.assertFalse(obj.exists)
+                self.assertEqual(obj.content_type, 'text/plain')
+            else:
+                self.assertIsNone(obj)
         client.close()
 
     @unittest.skipUnless(RUN_POOL, 'RUN_POOL is 0')
