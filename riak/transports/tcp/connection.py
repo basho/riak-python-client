@@ -19,6 +19,12 @@ else:
 
 
 class TcpConnection(object):
+    # These are set in the TcpTransport initializer
+    _address = None
+    _timeout = None
+    _socket_keepalive = None
+    _socket_tcp_options = None
+
     """
     Connection-related methods for TcpTransport.
     """
@@ -222,9 +228,3 @@ class TcpConnection(object):
                         raise
             self._socket.close()
             del self._socket
-
-    # These are set in the TcpTransport initializer
-    _address = None
-    _timeout = None
-    _socket_keepalive = None
-    _socket_keepalive_options = None
