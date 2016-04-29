@@ -38,6 +38,8 @@ class TcpTransport(Transport, TcpConnection):
         self._pbuf_c = None
         self._ttb_c = None
         self._use_ttb = kwargs.get('use_ttb', True)
+        self._ts_convert_timestamp = \
+                kwargs.get('ts_convert_timestamp', False)
 
     def _get_pbuf_codec(self):
         if not self._pbuf_c:
@@ -147,7 +149,8 @@ class TcpTransport(Transport, TcpConnection):
         msg = codec.encode_timeseries_keyreq(table, key)
         resp_code, resp = self._request(msg, codec)
         tsobj = TsObject(self._client, table)
-        codec.decode_timeseries(resp, tsobj)
+        codec.decode_timeseries(resp, tsobj,
+                self._ts_convert_timestamp)
         return tsobj
 
     def ts_put(self, tsobj):
@@ -173,7 +176,8 @@ class TcpTransport(Transport, TcpConnection):
         msg = codec.encode_timeseries_query(table, query, interpolations)
         resp_code, resp = self._request(msg, codec)
         tsobj = TsObject(self._client, table)
-        codec.decode_timeseries(resp, tsobj)
+        codec.decode_timeseries(resp, tsobj,
+                self._ts_convert_timestamp)
         return tsobj
 
     def ts_stream_keys(self, table, timeout=None):
@@ -185,7 +189,7 @@ class TcpTransport(Transport, TcpConnection):
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_listkeysreq(table, timeout)
         self._send_msg(msg.msg_code, msg.data)
-        return PbufTsKeyStream(self, codec)
+        return PbufTsKeyStream(self, codec, self._ts_convert_timestamp)
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None,
                pr=None, pw=None, timeout=None):

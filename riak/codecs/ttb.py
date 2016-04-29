@@ -138,7 +138,8 @@ class TtbCodec(Codec):
         rc = MSG_CODE_TS_TTB_MSG
         return Msg(mc, encode(req), rc)
 
-    def decode_timeseries(self, resp_ttb, tsobj):
+    def decode_timeseries(self, resp_ttb, tsobj,
+            convert_timestamp=False):
         """
         Fills an TsObject with the appropriate data and
         metadata from a TTB-encoded TsGetResp / TsQueryResp.
@@ -147,6 +148,8 @@ class TtbCodec(Codec):
         :type resp_ttb: TTB-encoded tsqueryrsp or tsgetresp
         :param tsobj: a TsObject
         :type tsobj: TsObject
+        :param convert_timestamp: Convert timestamps to datetime objects
+        :type tsobj: boolean
         """
         if resp_ttb is None:
             return tsobj
@@ -169,7 +172,8 @@ class TtbCodec(Codec):
                 tsobj.rows = []
                 for resp_row in resp_rows:
                     tsobj.rows.append(
-                        self.decode_timeseries_row(resp_row, resp_coltypes))
+                        self.decode_timeseries_row(resp_row, resp_coltypes,
+                            convert_timestamp))
             else:
                 raise RiakError(
                     "Expected 3-tuple in response, got: {}".format(resp_data))
@@ -181,7 +185,7 @@ class TtbCodec(Codec):
         ctypes = [str(ctype) for ctype in ctypes]
         return TsColumns(cnames, ctypes)
 
-    def decode_timeseries_row(self, tsrow, tsct):
+    def decode_timeseries_row(self, tsrow, tsct, convert_timestamp=False):
         """
         Decodes a TTB-encoded TsRow into a list
 
@@ -189,6 +193,8 @@ class TtbCodec(Codec):
         :type tsrow: TTB dncoded row
         :param tsct: the TTB decoded column types (atoms).
         :type tsct: list
+        :param convert_timestamp: Convert timestamps to datetime objects
+        :type tsobj: boolean
         :rtype list
         """
         row = []
@@ -198,7 +204,7 @@ class TtbCodec(Codec):
             elif isinstance(cell, list) and len(cell) == 0:
                 row.append(None)
             else:
-                if tsct[i] == timestamp_a:
+                if convert_timestamp and tsct[i] == timestamp_a:
                     row.append(datetime_from_unix_time_millis(cell))
                 else:
                     row.append(cell)

@@ -92,8 +92,9 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
             self.assertEqual(r[0], dr[0].encode('utf-8'))
             self.assertEqual(r[1], dr[1])
             self.assertEqual(r[2], dr[2])
-            dt = datetime_from_unix_time_millis(dr[3])
-            self.assertEqual(r[3], dt)
+            # NB *not* decoding timestamps
+            # dt = datetime_from_unix_time_millis(dr[3])
+            self.assertEqual(r[3], dr[3])
             if i == 0:
                 self.assertEqual(r[4], True)
             else:
@@ -123,7 +124,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
                      'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
-    client_options = {'transport_options': {'use_ttb': True}}
+    client_options = {'transport_options':
+            {'use_ttb': True, 'ts_convert_timestamp': True}}
 
     @classmethod
     def setUpClass(cls):

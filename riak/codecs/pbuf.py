@@ -773,7 +773,8 @@ class PbufCodec(Codec):
         rc = riak.pb.messages.MSG_CODE_TS_QUERY_RESP
         return Msg(mc, req.SerializeToString(), rc)
 
-    def decode_timeseries(self, resp, tsobj):
+    def decode_timeseries(self, resp, tsobj,
+            convert_timestamp=False):
         """
         Fills an TsObject with the appropriate data and
         metadata from a TsGetResp / TsQueryResp.
@@ -783,6 +784,8 @@ class PbufCodec(Codec):
                     riak.pb.riak_ts_pb2.TsGetResp
         :param tsobj: a TsObject
         :type tsobj: TsObject
+        :param convert_timestamp: Convert timestamps to datetime objects
+        :type tsobj: boolean
         """
         if resp.columns is not None:
             col_names = []
@@ -798,7 +801,7 @@ class PbufCodec(Codec):
             for row in resp.rows:
                 tsobj.rows.append(
                     self.decode_timeseries_row(
-                        row, resp.columns))
+                        row, resp.columns, convert_timestamp))
 
     def decode_timeseries_col_type(self, col_type):
         # NB: these match the atom names for column types
@@ -816,7 +819,8 @@ class PbufCodec(Codec):
             msg = 'could not decode column type: {}'.format(col_type)
             raise RiakError(msg)
 
-    def decode_timeseries_row(self, tsrow, tscols=None):
+    def decode_timeseries_row(self, tsrow, tscols=None,
+            convert_timestamp=False):
         """
         Decodes a TsRow into a list
 
@@ -850,8 +854,10 @@ class PbufCodec(Codec):
                 if col and col.type != TsColumnType.Value('TIMESTAMP'):
                     raise TypeError('expected TIMESTAMP column')
                 else:
-                    dt = datetime_from_unix_time_millis(
-                        cell.timestamp_value)
+                    dt = cell.timestamp_value
+                    if convert_timestamp:
+                        dt = datetime_from_unix_time_millis(
+                            cell.timestamp_value)
                     row.append(dt)
             elif cell.HasField('boolean_value'):
                 if col and col.type != TsColumnType.Value('BOOLEAN'):
