@@ -45,16 +45,16 @@ class IntegrationTestBase(object):
         if hasattr(cls, 'client_options'):
             kwargs.update(cls.client_options)
 
-        if hasattr(cls, 'logging_enabled') and cls.logging_enabled:
-            cls.logger.debug("RiakClient(protocol='%s', host='%s', " +
-                             "pb_port='%d', http_port='%d', " +
-                             "credentials='%s', kwargs='%s')",
-                             protocol,
-                             host,
-                             pb_port,
-                             http_port,
-                             credentials,
-                             kwargs)
+        logger = logging.getLogger()
+        logger.debug("RiakClient(protocol='%s', host='%s', " +
+                            "pb_port='%d', http_port='%d', " +
+                            "credentials='%s', kwargs='%s')",
+                            protocol,
+                            host,
+                            pb_port,
+                            http_port,
+                            credentials,
+                            kwargs)
 
         return RiakClient(protocol=protocol,
                           host=host,
@@ -62,23 +62,6 @@ class IntegrationTestBase(object):
                           credentials=credentials,
                           pb_port=pb_port,
                           **kwargs)
-
-    @classmethod
-    def setUpClass(cls):
-        cls.logging_enabled = False
-        distutils_debug = os.environ.get('DISTUTILS_DEBUG', '0')
-        if distutils_debug == '1':
-            cls.logging_enabled = True
-            cls.logger = logging.getLogger()
-            cls.logger.level = logging.DEBUG
-            cls.logging_stream_handler = logging.StreamHandler(sys.stdout)
-            cls.logger.addHandler(cls.logging_stream_handler)
-
-    @classmethod
-    def tearDownClass(cls):
-        if hasattr(cls, 'logging_enabled') and cls.logging_enabled:
-            cls.logger.removeHandler(cls.logging_stream_handler)
-            cls.logging_enabled = False
 
     def setUp(self):
         self.bucket_name = self.randname()

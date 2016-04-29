@@ -6,6 +6,7 @@ from erlastic.types import Atom
 
 from riak import RiakError
 from riak.codecs import Codec, Msg
+from riak.pb.messages import MSG_CODE_TS_TTB_MSG
 from riak.ts_object import TsColumns
 from riak.util import bytes_to_str, unix_time_millis, \
     datetime_from_unix_time_millis
@@ -23,9 +24,6 @@ tsputresp_a = Atom('tsputresp')
 tsdelreq_a = Atom('tsdelreq')
 timestamp_a = Atom('timestamp')
 
-# TODO RTS-842
-MSG_CODE_TS_TTB = 104
-
 
 class TtbCodec(Codec):
     '''
@@ -36,7 +34,7 @@ class TtbCodec(Codec):
         super(TtbCodec, self).__init__(**unused_args)
 
     def parse_msg(self, msg_code, data):
-        if msg_code != MSG_CODE_TS_TTB:
+        if msg_code != MSG_CODE_TS_TTB_MSG:
             raise RiakError("TTB can't parse code: {}".format(msg_code))
         if len(data) > 0:
             decoded = decode(data)
@@ -61,6 +59,7 @@ class TtbCodec(Codec):
         else:
             if isinstance(cell, datetime.datetime):
                 ts = unix_time_millis(cell)
+                # logging.debug('encoded datetime %s as %s', cell, ts)
                 return ts
             elif isinstance(cell, bool):
                 return cell
@@ -84,19 +83,19 @@ class TtbCodec(Codec):
         else:
             raise ValueError("key must be a list")
 
-        mc = MSG_CODE_TS_TTB
-        rc = MSG_CODE_TS_TTB
+        mc = MSG_CODE_TS_TTB_MSG
+        rc = MSG_CODE_TS_TTB_MSG
         req_atom = tsgetreq_a
         if is_delete:
             req_atom = tsdelreq_a
 
-        # TODO RTS-842 timeout is last
+        # TODO FUTURE add timeout as last param
         req = req_atom, table.name, \
             [self.encode_to_ts_cell(k) for k in key_vals], udef_a
         return Msg(mc, encode(req), rc)
 
     def validate_timeseries_put_resp(self, resp_code, resp):
-        if resp is None and resp_code == MSG_CODE_TS_TTB:
+        if resp is None and resp_code == MSG_CODE_TS_TTB_MSG:
             return True
         if resp is not None:
             return True
@@ -123,8 +122,8 @@ class TtbCodec(Codec):
                     req_r.append(self.encode_to_ts_cell(cell))
                 req_rows.append(tuple(req_r))
             req = tsputreq_a, tsobj.table.name, [], req_rows
-            mc = MSG_CODE_TS_TTB
-            rc = MSG_CODE_TS_TTB
+            mc = MSG_CODE_TS_TTB_MSG
+            rc = MSG_CODE_TS_TTB_MSG
             return Msg(mc, encode(req), rc)
         else:
             raise RiakError("TsObject requires a list of rows")
@@ -135,8 +134,8 @@ class TtbCodec(Codec):
             q = q.format(table=table.name)
         tsi = tsinterpolation_a, q, []
         req = tsqueryreq_a, tsi, False, []
-        mc = MSG_CODE_TS_TTB
-        rc = MSG_CODE_TS_TTB
+        mc = MSG_CODE_TS_TTB_MSG
+        rc = MSG_CODE_TS_TTB_MSG
         return Msg(mc, encode(req), rc)
 
     def decode_timeseries(self, resp_ttb, tsobj):

@@ -295,7 +295,7 @@ class Transport(FeatureDetection):
         """
         raise NotImplementedError
 
-    # TODO RTS-842 NUKE THIS
+    # TODO FUTURE NUKE THIS MAPRED
     def _search_mapred_emu(self, index, query):
         """
         Emulates a search request via MapReduce. Used in the case
@@ -321,7 +321,7 @@ class Transport(FeatureDetection):
             result['docs'].append({u'id': key})
         return result
 
-    # TODO RTS-842 NUKE THIS
+    # TODO FUTURE NUKE THIS MAPRED
     def _get_index_mapred_emu(self, bucket, index, startkey, endkey=None):
         """
         Emulates a secondary index request via MapReduce. Used in the

@@ -38,7 +38,7 @@ bd0 = six.u('时间序列')
 bd1 = six.u('временные ряды')
 
 fiveMins = datetime.timedelta(0, 300)
-ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
+ts0 = datetime.datetime(2015, 1, 1, 12, 1, 2, 987000)
 ts1 = ts0 + fiveMins
 
 

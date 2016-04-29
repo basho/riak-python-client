@@ -1,28 +1,35 @@
 from __future__ import print_function
 
+import datetime
+import decimal
 import sys
 import warnings
 
 from collections import Mapping
 from six import string_types, PY2
-import datetime
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
 
 def unix_time_millis(dt):
     td = dt - epoch
-    return int(td.total_seconds() * 1000.0)
+    tdms = ((td.days * 24 * 3600) + td.seconds) * 1000
+    ms = td.microseconds // 1000
+    return tdms + ms
 
 
 def datetime_from_unix_time_millis(ut):
-    return datetime.datetime.utcfromtimestamp(ut / 1000.0)
+    if isinstance(ut, float):
+        raise ValueError('unix timestamp must not be a float, \
+                it must be total milliseconds since epoch as an integer')
+    utms = ut / 1000.0
+    return datetime.datetime.utcfromtimestamp(utms)
 
 
 def is_timeseries_supported(v=None):
     if v is None:
         v = sys.version_info
-    return v < (3,) or v >= (3, 4, 4)
+    return v < (3,) or v[:3] >= (3, 4, 4)
 
 
 def quacks_like_dict(object):
