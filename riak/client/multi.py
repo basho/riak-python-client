@@ -3,13 +3,12 @@ from collections import namedtuple
 from threading import Thread, Lock, Event
 from multiprocessing import cpu_count
 from six import PY2
-
 if PY2:
     from Queue import Queue
 else:
     from queue import Queue
 
-__all__ = ['multiget', 'MultiGetPool']
+__all__ = ['multiget', 'multiput', 'MultiGetPool', 'MultiPutPool']
 
 
 try:
@@ -21,18 +20,21 @@ except NotImplementedError:
     POOL_SIZE = 6
 
 #: A :class:`namedtuple` for tasks that are fed to workers in the
-#: multiget pool.
-Task = namedtuple('Task', ['client', 'outq', 'bucket_type', 'bucket', 'key',
-                           'options'])
+#: multi pool.
+Task = namedtuple(
+        'Task',
+        ['client', 'outq',
+         'bucket_type', 'bucket', 'key',
+         'object', 'options'])
 
 
-class MultiGetPool(object):
+class MultiPool(object):
     """
-    Encapsulates a pool of fetcher threads. These threads can be used
-    across many multi-get requests.
+    Encapsulates a pool of threads. These threads can be used
+    across many multi requests.
     """
 
-    def __init__(self, size=POOL_SIZE):
+    def __init__(self, size=POOL_SIZE, name='unknown'):
         """
         :param size: the desired size of the worker pool
         :type size: int
@@ -40,6 +42,7 @@ class MultiGetPool(object):
 
         self._inq = Queue()
         self._size = size
+        self._name = name
         self._started = Event()
         self._stop = Event()
         self._lock = Lock()
@@ -57,14 +60,14 @@ class MultiGetPool(object):
         if not self._stop.is_set():
             self._inq.put(task)
         else:
-            raise RuntimeError("Attempted to enqueue a fetch operation while "
-                               "multi-get pool was shutdown!")
+            raise RuntimeError("Attempted to enqueue an operation while "
+                               "multi pool was shutdown!")
 
     def start(self):
         """
         Starts the worker threads if they are not already started.
         This method is thread-safe and will be called automatically
-        when executing a MultiGet operation.
+        when executing an operation.
         """
         # Check whether we are already started, skip if we are.
         if not self._started.is_set():
@@ -73,8 +76,9 @@ class MultiGetPool(object):
                 # If we got the lock, go ahead and start the worker
                 # threads, set the started flag, and release the lock.
                 for i in range(self._size):
-                    name = "riak.client.multiget-worker-{0}".format(i)
-                    worker = Thread(target=self._fetcher, name=name)
+                    name = "riak.client.multi-worker-{0}-{1}".format(
+                            self._name, i)
+                    worker = Thread(target=self._worker_method, name=name)
                     worker.daemon = True
                     worker.start()
                     self._workers.append(worker)
@@ -105,7 +109,26 @@ class MultiGetPool(object):
         # shutting down.
         self.stop()
 
-    def _fetcher(self):
+    def _worker_method(self):
+        raise NotImplementedError
+
+    def _should_quit(self):
+        """
+        Worker threads should exit when the stop flag is set and the
+        input queue is empty. Once the stop flag is set, new enqueues
+        are disallowed, meaning that the workers can safely drain the
+        queue before exiting.
+
+        :rtype: bool
+        """
+        return self.stopped() and self._inq.empty()
+
+
+class MultiGetPool(MultiPool):
+    def __init__(self, size=POOL_SIZE):
+        super(MultiGetPool, self).__init__(size=size, name='get')
+
+    def _worker_method(self):
         """
         The body of the multi-get worker. Loops until
         :meth:`_should_quit` returns ``True``, taking tasks off the
@@ -121,24 +144,40 @@ class MultiGetPool(object):
             except KeyboardInterrupt:
                 raise
             except Exception as err:
-                task.outq.put((task.bucket_type, task.bucket, task.key, err), )
+                errdata = (task.bucket_type, task.bucket, task.key, err)
+                task.outq.put(errdata)
             finally:
                 self._inq.task_done()
 
-    def _should_quit(self):
+
+class MultiPutPool(MultiPool):
+    def __init__(self, size=POOL_SIZE):
+        super(MultiPutPool, self).__init__(size=size, name='put')
+
+    def _worker_method(self):
         """
-        Worker threads should exit when the stop flag is set and the
-        input queue is empty. Once the stop flag is set, new enqueues
-        are disallowed, meaning that the workers can safely drain the
-        queue before exiting.
-
-        :rtype: bool
+        The body of the multi-put worker. Loops until
+        :meth:`_should_quit` returns ``True``, taking tasks off the
+        input queue, storing the object, and putting the result on
+        the output queue.
         """
-        return self.stopped() and self._inq.empty()
+        while not self._should_quit():
+            task = self._inq.get()
+            try:
+                robj = task.object
+                rv = task.client.put(robj, **task.options)
+                task.outq.put(rv)
+            except KeyboardInterrupt:
+                raise
+            except Exception as err:
+                errdata = (task.object, err)
+                task.outq.put(errdata)
+            finally:
+                self._inq.task_done()
 
 
-#: The default pool is automatically created and stored in this constant.
 RIAK_MULTIGET_POOL = MultiGetPool()
+RIAK_MULTIPUT_POOL = MultiPutPool()
 
 
 def multiget(client, keys, **options):
@@ -160,8 +199,8 @@ def multiget(client, keys, **options):
         :meth:`RiakBucket.get <riak.bucket.RiakBucket.get>`
     :type options: dict
     :rtype: list
-    """
 
+    """
     outq = Queue()
 
     if 'pool' in options:
@@ -172,13 +211,58 @@ def multiget(client, keys, **options):
 
     pool.start()
     for bucket_type, bucket, key in keys:
-        task = Task(client, outq, bucket_type, bucket, key, options)
+        task = Task(client, outq, bucket_type, bucket, key, None, options)
         pool.enq(task)
 
     results = []
     for _ in range(len(keys)):
         if pool.stopped():
             raise RuntimeError("Multi-get operation interrupted by pool "
+                               "stopping!")
+        results.append(outq.get())
+        outq.task_done()
+
+    return results
+
+
+def multiput(client, objs, **options):
+    """Executes a parallel-store across multiple threads. Returns a list
+    containing booleans or :class:`~riak.riak_object.RiakObject`
+
+    If a ``pool`` option is included, the request will use the given worker
+    pool and not the default :data:`RIAK_MULTIPUT_POOL`. This option will
+    be passed by the client if the ``multiput_pool_size`` option was set on
+    client initialization.
+
+    :param client: the client to use
+    :type client: :class:`RiakClient <riak.client.RiakClient>`
+    :param objs: the Riak Objects to store in parallel
+    :type keys: list of `RiakObject <riak.riak_object.RiakObject>`
+    :param options: request options to
+        :meth:`RiakClient.put <riak.client.RiakClient.put>`
+    :type options: dict
+    :rtype: list
+    """
+    outq = Queue()
+
+    if 'pool' in options:
+        pool = options['pool']
+        del options['pool']
+    else:
+        pool = RIAK_MULTIPUT_POOL
+
+    pool.start()
+    for robj in objs:
+        bucket_type = robj.bucket.bucket_type
+        bucket = robj.bucket.name
+        key = robj.key
+        task = Task(client, outq, bucket_type, bucket, key, robj, options)
+        pool.enq(task)
+
+    results = []
+    for _ in range(len(objs)):
+        if pool.stopped():
+            raise RuntimeError("Multi-put operation interrupted by pool "
                                "stopping!")
         results.append(outq.get())
         outq.task_done()
