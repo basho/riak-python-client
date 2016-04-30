@@ -35,7 +35,12 @@ class TcpTransport(Transport, TcpConnection):
         self._socket = None
         self._pbuf_c = None
         self._ttb_c = None
-        self._use_ttb = kwargs.get('use_ttb', True)
+        self._socket_tcp_options = \
+            kwargs.get('socket_tcp_options', {})
+        self._socket_keepalive = \
+            kwargs.get('socket_keepalive', False)
+        self._use_ttb = \
+            kwargs.get('use_ttb', True)
 
     def _get_pbuf_codec(self):
         if not self._pbuf_c:
