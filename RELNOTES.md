@@ -1,5 +1,11 @@
 # Riak Python Client Release Notes
 
+## [2.5.0 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.0)
+
+* [Socket Enhancements](https://github.com/basho/riak-python-client/pull/453) - Resolves [#399](https://github.com/basho/riak-python-client/issues/399)
+* [Add multi-put](https://github.com/basho/riak-python-client/pull/452)
+* [Add support for term-to-binary encoding](https://github.com/basho/riak-python-client/pull/448)
+
 ## 2.4.2 Patch Release - 2016-02-20
 
 * [Fix SSL host name](https://github.com/basho/riak-python-client/pull/436)
