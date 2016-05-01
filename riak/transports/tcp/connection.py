@@ -160,7 +160,14 @@ class TcpConnection(object):
                     raise SecurityError(e)
 
     def _recv_msg(self):
-        msgbuf = self._recv_pkt()
+        try:
+            msgbuf = self._recv_pkt()
+        except socket.timeout as e:
+            # A timeout can leave the socket in an inconsistent state because
+            # it might still receive the data later and mix up with a
+            # subsequent request.
+            # https://github.com/basho/riak-python-client/issues/425
+            raise BadResource(e)
         mv = memoryview(msgbuf)
         msg_code, = struct.unpack("B", mv[0:1])
         data = mv[1:].tobytes()
