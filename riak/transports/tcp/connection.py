@@ -1,3 +1,4 @@
+import errno
 import socket
 import struct
 
@@ -7,16 +8,23 @@ import riak.pb.messages
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
+from riak.transports.pool import BadResource
 
-if not USE_STDLIB_SSL:
-    from OpenSSL.SSL import Connection
-    from riak.transports.security import configure_pyopenssl_context
-else:
+if USE_STDLIB_SSL:
     import ssl
     from riak.transports.security import configure_ssl_context
+else:
+    from OpenSSL.SSL import Connection
+    from riak.transports.security import configure_pyopenssl_context
 
 
 class TcpConnection(object):
+    # These are set in the TcpTransport initializer
+    _address = None
+    _timeout = None
+    _socket_keepalive = None
+    _socket_tcp_options = None
+
     """
     Connection-related methods for TcpTransport.
     """
@@ -152,7 +160,14 @@ class TcpConnection(object):
                     raise SecurityError(e)
 
     def _recv_msg(self):
-        msgbuf = self._recv_pkt()
+        try:
+            msgbuf = self._recv_pkt()
+        except socket.timeout as e:
+            # A timeout can leave the socket in an inconsistent state because
+            # it might still receive the data later and mix up with a
+            # subsequent request.
+            # https://github.com/basho/riak-python-client/issues/425
+            raise BadResource(e)
         mv = memoryview(msgbuf)
         msg_code, = struct.unpack("B", mv[0:1])
         data = mv[1:].tobytes()
@@ -174,6 +189,10 @@ class TcpConnection(object):
         toread = msglen
         while toread:
             nbytes = self._socket.recv_into(view, toread)
+            # https://docs.python.org/2/howto/sockets.html#using-a-socket
+            # https://github.com/basho/riak-python-client/issues/399
+            if nbytes == 0:
+                raise BadResource('recv_into returned zero bytes unexpectedly')
             view = view[nbytes:]  # slicing views is cheap
             toread -= nbytes
             nread += nbytes
@@ -189,6 +208,13 @@ class TcpConnection(object):
                                                         self._timeout)
             else:
                 self._socket = socket.create_connection(self._address)
+            if self._socket_tcp_options:
+                ka_opts = self._socket_tcp_options
+                for k, v in ka_opts.iteritems():
+                    self._socket.setsockopt(socket.SOL_TCP, k, v)
+            if self._socket_keepalive:
+                self._socket.setsockopt(
+                    socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             if self._client._credentials:
                 self._init_security()
 
@@ -197,9 +223,15 @@ class TcpConnection(object):
         Closes the underlying socket of the PB connection.
         """
         if self._socket:
+            if USE_STDLIB_SSL:
+                # NB: Python 2.7.8 and earlier does not have a compatible
+                # shutdown() method due to the SSL lib
+                try:
+                    self._socket.shutdown(socket.SHUT_RDWR)
+                except IOError as e:
+                    # NB: sometimes this is the exception if the initial
+                    # connection didn't succeed correctly
+                    if e.errno != errno.EBADF:
+                        raise
             self._socket.close()
             del self._socket
-
-    # These are set in the TcpTransport initializer
-    _address = None
-    _timeout = None

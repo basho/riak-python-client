@@ -3,6 +3,7 @@ import unittest
 from six import PY2
 from threading import Thread
 from riak.riak_object import RiakObject
+from riak.transports.tcp import TcpTransport
 from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, RUN_POOL
 from riak.tests.base import IntegrationTestBase
 
@@ -13,6 +14,17 @@ else:
 
 
 class ClientTests(IntegrationTestBase, unittest.TestCase):
+    def test_can_set_tcp_keepalive(self):
+        if self.protocol == 'pbc':
+            topts = {'socket_keepalive': True}
+            c = self.create_client(transport_options=topts)
+            for i, r in enumerate(c._tcp_pool.resources):
+                self.assertIsInstance(r, TcpTransport)
+                self.assertTrue(r._socket_keepalive)
+            c.close()
+        else:
+            pass
+
     def test_uses_client_id_if_given(self):
         if self.protocol == 'pbc':
             zero_client_id = "\0\0\0\0"

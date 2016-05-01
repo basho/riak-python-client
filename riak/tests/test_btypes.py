@@ -151,13 +151,18 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
             self.assertEqual(btype, mobj.bucket.bucket_type)
 
     def test_write_once_bucket_type(self):
-        btype = self.client.bucket_type('write_once')
-        bucket = btype.bucket(self.bucket_name)
-
-        for i in range(100):
-            obj = bucket.new(self.key_name + str(i))
-            obj.data = {'id': i}
-            obj.store()
+        bt = 'write_once'
+        skey = 'write_once-init'
+        btype = self.client.bucket_type(bt)
+        bucket = btype.bucket(bt)
+        sobj = bucket.get(skey)
+        if not sobj.exists:
+            for i in range(100):
+                o = bucket.new(self.key_name + str(i))
+                o.data = {'id': i}
+                o.store()
+            o = bucket.new(skey, data={'id': skey})
+            o.store()
 
         mget = bucket.multiget([self.key_name + str(i) for i in range(100)])
         for mobj in mget:

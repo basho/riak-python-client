@@ -178,6 +178,7 @@ Contributors
 * Mark Phillips
 * Mathias Meyer
 * Matt Heitzenroder
+* [Matt Lohier](https://github.com/aquam8)
 * Mikhail Sobolev
 * Reid Draper
 * Russell Brown
