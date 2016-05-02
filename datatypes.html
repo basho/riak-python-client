@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data Types &mdash; Riak Python Client 2.4.2 documentation</title>
+  <title>Data Types &mdash; Riak Python Client 2.5.0.post1 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.4.2 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.5.0.post1 documentation" href="index.html"/>
         <link rel="next" title="Query Methods" href="query.html"/>
         <link rel="prev" title="Values &amp; Objects" href="object.html"/> 
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.4.2
+                2.5.0
               </div>
             
           
@@ -87,7 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Data Types</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Types</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#sending-operations">Sending Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#context-and-observed-remove">Context and Observed-Remove</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#datatype-abstract-class">Datatype abstract class</a><ul>
@@ -127,7 +127,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -152,10 +152,10 @@
   <div class="section" id="data-types">
 <span id="datatypes"></span><h1>Data Types<a class="headerlink" href="#data-types" title="Permalink to this headline">¶</a></h1>
 <p>Traditionally all data stored in Riak was an opaque binary type. Then
-in version 1.4 came the introduction of a <a class="reference internal" href="client.html#legacy-counters"><span>counter</span></a>, the first Convergent Data Type supported in Riak.
+in version 1.4 came the introduction of a <a class="reference internal" href="client.html#legacy-counters"><span class="std std-ref">counter</span></a>, the first Convergent Data Type supported in Riak.
 In Riak 2.0, several additional Data Types were introduced. Riak
 &#8220;knows&#8221; about these data types, and conflicting writes to them will
-converge automatically without presenting <a class="reference internal" href="object.html#siblings"><span>sibling values</span></a> to the user.</p>
+converge automatically without presenting <a class="reference internal" href="object.html#siblings"><span class="std std-ref">sibling values</span></a> to the user.</p>
 <p>Here is the list of current Data Types:</p>
 <blockquote>
 <div><ul class="simple">
@@ -208,16 +208,16 @@ operations:</p>
 bucket must belong to a bucket-type that has a valid datatype
 property. If we have a bucket-type named &#8220;social-graph&#8221; that has the
 datatype <cite>&#8220;set&#8221;</cite>, we would fetch a <a class="reference internal" href="#riak.datatypes.Set" title="riak.datatypes.Set"><code class="xref py py-class docutils literal"><span class="pre">Set</span></code></a> like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">graph</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;social-graph&#39;</span><span class="p">)</span>
-<span class="n">graph</span><span class="o">.</span><span class="n">datatype</span>  <span class="c"># =&gt; &#39;set&#39;</span>
-<span class="n">myfollowers</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;followers&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;seancribbs&#39;</span><span class="p">)</span>
-<span class="c"># =&gt; a Set datatype</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">graph</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s1">&#39;social-graph&#39;</span><span class="p">)</span>
+<span class="n">graph</span><span class="o">.</span><span class="n">datatype</span>  <span class="c1"># =&gt; &#39;set&#39;</span>
+<span class="n">myfollowers</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;followers&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seancribbs&#39;</span><span class="p">)</span>
+<span class="c1"># =&gt; a Set datatype</span>
 </pre></div>
 </div>
 <p>Once we have a datatype, we can stage operations against it and then
 send those operations to Riak:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">myfollowers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;javajolt&#39;</span><span class="p">)</span>
-<span class="n">myfollowers</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="s">&#39;roach&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">myfollowers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;javajolt&#39;</span><span class="p">)</span>
+<span class="n">myfollowers</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="s1">&#39;roach&#39;</span><span class="p">)</span>
 <span class="n">myfollowers</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -239,7 +239,7 @@ context received from a read when you:</p>
 </div></blockquote>
 <p>The basic rule is &#8220;you cannot remove something you haven&#8217;t seen&#8221;, and
 the context tells Riak what you&#8217;ve actually seen, similar to the
-<a class="reference internal" href="object.html#vclock"><span>Vector clock</span></a> on <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>. The Python
+<a class="reference internal" href="object.html#vclock"><span class="std std-ref">Vector clock</span></a> on <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>. The Python
 client handles opaque contexts for you transparently as long as you
 fetch before performing one of these actions.</p>
 </div>
@@ -433,13 +433,13 @@ embedded within a <a class="reference internal" href="#riak.datatypes.Map" title
 <dd><p>A convergent datatype representing a Set with observed-remove
 semantics. Currently strings are the only supported value type.
 Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;barista&#39;</span><span class="p">)</span>
-<span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;roaster&#39;</span><span class="p">)</span>
-<span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;brewer&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;barista&#39;</span><span class="p">)</span>
+<span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;roaster&#39;</span><span class="p">)</span>
+<span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;brewer&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Likewise they can simply be removed:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">myset</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="s">&#39;barista&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">myset</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="s1">&#39;barista&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This datatype also implements the <a class="reference external" href="https://docs.python.org/2/library/collections.html">Set ABC</a>, meaning it
@@ -503,20 +503,20 @@ datatypes, represented by any concrete type in this module.</p>
 non-existing values directly via bracket syntax. If a key is not in the
 original value of the map when accessed, fetching the key will cause
 its associated value to be created.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="p">[(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;register&#39;</span><span class="p">)]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="p">[(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;register&#39;</span><span class="p">)]</span>
 </pre></div>
 </div>
 <p>Keys and their associated values may be deleted from the map as
 you would in a dict:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">del</span> <span class="nb">map</span><span class="p">[(</span><span class="s">&#39;emails&#39;</span><span class="p">,</span> <span class="s">&#39;set&#39;</span><span class="p">)]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">del</span> <span class="nb">map</span><span class="p">[(</span><span class="s1">&#39;emails&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">)]</span>
 </pre></div>
 </div>
 <p>Convenience accessors exist that partition the map&#8217;s keys by
 datatype and implement the <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>
 behavior as well as supporting deletion:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;emails&#39;</span><span class="p">]</span>
-<span class="nb">map</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
-<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s">&#39;likes&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s1">&#39;emails&#39;</span><span class="p">]</span>
+<span class="nb">map</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;likes&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -541,8 +541,8 @@ the nested types.</p>
 <dt id="riak.datatypes.Map.counters">
 <code class="descclassname">Map.</code><code class="descname">counters</code><a class="headerlink" href="#riak.datatypes.Map.counters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filters keys in the map to only those of counter types. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s">&#39;views&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
-<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s">&#39;points&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;views&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -551,8 +551,8 @@ the nested types.</p>
 <dt id="riak.datatypes.Map.flags">
 <code class="descclassname">Map.</code><code class="descname">flags</code><a class="headerlink" href="#riak.datatypes.Map.flags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filters keys in the map to only those of flag types. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s">&#39;confirmed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
-<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s">&#39;attending&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;confirmed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;attending&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -561,8 +561,8 @@ the nested types.</p>
 <dt id="riak.datatypes.Map.maps">
 <code class="descclassname">Map.</code><code class="descname">maps</code><a class="headerlink" href="#riak.datatypes.Map.maps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filters keys in the map to only those of map types. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">maps</span><span class="p">[</span><span class="s">&#39;emails&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;home&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;user@example.com&quot;</span><span class="p">)</span>
-<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">maps</span><span class="p">[</span><span class="s">&#39;spam&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="o">.</span><span class="n">maps</span><span class="p">[</span><span class="s1">&#39;emails&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;user@example.com&quot;</span><span class="p">)</span>
+<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">maps</span><span class="p">[</span><span class="s1">&#39;spam&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -571,8 +571,8 @@ the nested types.</p>
 <dt id="riak.datatypes.Map.registers">
 <code class="descclassname">Map.</code><code class="descname">registers</code><a class="headerlink" href="#riak.datatypes.Map.registers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filters keys in the map to only those of register types. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&quot;riak-user&quot;</span><span class="p">)</span>
-<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;access_key&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;riak-user&quot;</span><span class="p">)</span>
+<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;access_key&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -581,8 +581,8 @@ the nested types.</p>
 <dt id="riak.datatypes.Map.sets">
 <code class="descclassname">Map.</code><code class="descname">sets</code><a class="headerlink" href="#riak.datatypes.Map.sets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filters keys in the map to only those of set types. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nb">map</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;friends&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;brett&quot;</span><span class="p">)</span>
-<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;favorites&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s1">&#39;friends&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;brett&quot;</span><span class="p">)</span>
+<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s1">&#39;favorites&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -713,7 +713,7 @@ instances.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.4.2',
+            VERSION:'2.5.0.post1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Security &mdash; Riak Python Client 2.4.2 documentation</title>
+  <title>Security &mdash; Riak Python Client 2.5.0.post1 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.4.2 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.5.0.post1 documentation" href="index.html"/>
         <link rel="next" title="Advanced Usage &amp; Internals" href="advanced.html"/>
         <link rel="prev" title="Query Methods" href="query.html"/> 
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.4.2
+                2.5.0
               </div>
             
           
@@ -89,7 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Security</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Security</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#server-configuration">Server Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#client-configuration">Client Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authentication-types">Authentication Types</a><ul>
@@ -129,7 +129,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -193,18 +193,18 @@ may not support TLS 1.2, the recommended security protocol.</p>
 <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object with just a username,
 password and CA Certificate file. That would then need to be passed
 into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> initializer:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="n">SecurityCreds</span><span class="p">(</span><span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
-                      <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
-                      <span class="n">cacert_file</span><span class="o">=</span><span class="s">&#39;/path/to/ca.crt&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="n">SecurityCreds</span><span class="p">(</span><span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
+                      <span class="n">cacert_file</span><span class="o">=</span><span class="s1">&#39;/path/to/ca.crt&#39;</span><span class="p">)</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">RiakClient</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="n">creds</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal"><span class="pre">credentials</span></code> argument of a <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> constructor
 is a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object. If you specify a dictionary
 instead, it will be turned into this type:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
-         <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
-         <span class="s">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/ca.crt&#39;</span><span class="p">}</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/ca.crt&#39;</span><span class="p">}</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">RiakClient</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="n">creds</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -225,13 +225,13 @@ ensuring correct certificate validation.</p>
 <p>The most basic authentication would be <a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Trust-based-Authentication">Trust-based Authentication</a>
 which is done exclusively on the server side by adding the appropriate
 <code class="docutils literal"><span class="pre">trust</span></code> security source:</p>
-<div class="code bash highlight-python"><div class="highlight"><pre>riak-admin security add-source all 127.0.0.1/32 trust
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">security</span> <span class="n">add</span><span class="o">-</span><span class="n">source</span> <span class="nb">all</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="o">/</span><span class="mi">32</span> <span class="n">trust</span>
 </pre></div>
 </div>
 <p><a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#PAM-based-Authentication">PAM-based Authentication</a>
 is another server-side solution which can be added by a <code class="docutils literal"><span class="pre">pam</span></code>
 security source with the name of the service:</p>
-<div class="code bash highlight-python"><div class="highlight"><pre>riak-admin security add-source all 127.0.0.1/32 pam service=riak_pam
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">security</span> <span class="n">add</span><span class="o">-</span><span class="n">source</span> <span class="nb">all</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="o">/</span><span class="mi">32</span> <span class="n">pam</span> <span class="n">service</span><span class="o">=</span><span class="n">riak_pam</span>
 </pre></div>
 </div>
 <p>Even if you are using Trust authentication or the PAM module doesn&#8217;t
@@ -243,20 +243,20 @@ client&#8217;s perspective, these are equivalent to Password authentication.</p>
 <p>The next level of security would be simply a username and password for
 <a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Password-based-Authentication">Password-based Authentication</a>.
 The server needs to first have a user and a <code class="docutils literal"><span class="pre">password</span></code> security source:</p>
-<div class="code bash highlight-python"><div class="highlight"><pre>riak-admin security add-user riakuser password=captheorem4life
-riak-admin security add-source riakuser 127.0.0.1/32 password
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">security</span> <span class="n">add</span><span class="o">-</span><span class="n">user</span> <span class="n">riakuser</span> <span class="n">password</span><span class="o">=</span><span class="n">captheorem4life</span>
+<span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">security</span> <span class="n">add</span><span class="o">-</span><span class="n">source</span> <span class="n">riakuser</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="o">/</span><span class="mi">32</span> <span class="n">password</span>
 </pre></div>
 </div>
 <p>On the client, simply create a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object or dict
 with just a username and password. That would then need to be passed
 into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> initializer:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
-         <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
-         <span class="s">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/ca.crt&#39;</span><span class="p">}</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/ca.crt&#39;</span><span class="p">}</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">RiakClient</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="n">creds</span><span class="p">)</span>
-<span class="n">myBucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">)</span>
-<span class="n">val1</span> <span class="o">=</span> <span class="s">&quot;#SeanCribbsHoldingThings&quot;</span>
-<span class="n">key1</span> <span class="o">=</span> <span class="n">myBucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;hashtag&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">val1</span><span class="p">)</span>
+<span class="n">myBucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="n">val1</span> <span class="o">=</span> <span class="s2">&quot;#SeanCribbsHoldingThings&quot;</span>
+<span class="n">key1</span> <span class="o">=</span> <span class="n">myBucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;hashtag&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">val1</span><span class="p">)</span>
 <span class="n">key1</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -266,7 +266,7 @@ into the <a class="reference internal" href="client.html#riak.client.RiakClient"
 <p>If you are using the <strong>Protocol Buffers</strong> transport you could also add
 a layer of security by using <a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/security-sources/#Certificate-based-Authentication">Certificate-based Authentication</a>.
 This time the server requires a <code class="docutils literal"><span class="pre">certificate</span></code> security source:</p>
-<div class="highlight-python"><div class="highlight"><pre>riak-admin security add-source riakuser 127.0.0.1/32 certificate
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">security</span> <span class="n">add</span><span class="o">-</span><span class="n">source</span> <span class="n">riakuser</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="o">/</span><span class="mi">32</span> <span class="n">certificate</span>
 </pre></div>
 </div>
 <p>When the <code class="docutils literal"><span class="pre">certificate</span></code> source is used, the Riak username must match
@@ -274,11 +274,11 @@ the common name, aka <code class="docutils literal"><span class="pre">CN</span><
 certificate.  You can add a <code class="docutils literal"><span class="pre">certificate</span></code> source to any number of clients.</p>
 <p>The <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> must then include the include a client
 certificate file and a private key file, too:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
-         <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
-         <span class="s">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/ca.crt&#39;</span><span class="p">,</span>
-         <span class="s">&#39;cert_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/client.crt&#39;</span><span class="p">,</span>
-         <span class="s">&#39;pkey_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/client.key&#39;</span><span class="p">}</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/ca.crt&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;cert_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/client.crt&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;pkey_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/client.key&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -287,14 +287,14 @@ certificate file and a private key file, too:</p>
 authentication, although the password is ignored.</p>
 </div>
 <p>Optionally, the certificate or private key may be supplied as a string:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;/path/to/client.key&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/path/to/client.key&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">preloaded_pkey</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;/path/to/client.crt&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/path/to/client.crt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">preloaded_cert</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
-         <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
-         <span class="s">&#39;cert&#39;</span><span class="p">:</span> <span class="n">preloaded_cert</span><span class="p">,</span>
-         <span class="s">&#39;pkey&#39;</span><span class="p">:</span> <span class="n">prelocated_pkey</span><span class="p">}</span>
+<span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;cert&#39;</span><span class="p">:</span> <span class="n">preloaded_cert</span><span class="p">,</span>
+         <span class="s1">&#39;pkey&#39;</span><span class="p">:</span> <span class="n">prelocated_pkey</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -310,10 +310,10 @@ had improperly issued a certificate, or if a private-key is thought to
 have been compromised.  The most common reason for revocation is the user
 no longer being in sole possession of the private key (e.g., the token
 containing the private key has been lost or stolen):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
-         <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
-         <span class="s">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/ca.crt&#39;</span><span class="p">,</span>
-         <span class="s">&#39;crl_file&#39;</span><span class="p">:</span> <span class="s">&#39;/path/to/server.crl&#39;</span><span class="p">}</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/ca.crt&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;crl_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/server.crl&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -322,9 +322,9 @@ containing the private key has been lost or stolen):</p>
 <p>The last interesting setting on <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> is the
 <code class="docutils literal"><span class="pre">ciphers</span></code> option which is a colon-delimited list of supported
 ciphers for encryption:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;riakuser&#39;</span><span class="p">,</span>
-         <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;riakpass&#39;</span><span class="p">,</span>
-         <span class="s">&#39;ciphers&#39;</span><span class="p">:</span> <span class="s">&#39;ECDHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA&#39;</span><span class="p">}</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;ciphers&#39;</span><span class="p">:</span> <span class="s1">&#39;ECDHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>A more detailed discussion can be found at <a class="reference external" href="http://docs.basho.com/riak/2.0.0/ops/running/authz/#Security-Ciphers">Security Ciphers</a>.</p>
@@ -461,7 +461,7 @@ ciphers for encryption:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.4.2',
+            VERSION:'2.5.0.post1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

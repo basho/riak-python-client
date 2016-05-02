@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Buckets &amp; Bucket Types &mdash; Riak Python Client 2.4.2 documentation</title>
+  <title>Buckets &amp; Bucket Types &mdash; Riak Python Client 2.5.0.post1 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.4.2 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.5.0.post1 documentation" href="index.html"/>
         <link rel="next" title="Values &amp; Objects" href="object.html"/>
         <link rel="prev" title="Client &amp; Connections" href="client.html"/> 
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.4.2
+                2.5.0
               </div>
             
           
@@ -85,7 +85,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="client.html">Client &amp; Connections</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Buckets &amp; Bucket Types</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Buckets &amp; Bucket Types</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#bucket-objects">Bucket objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bucket-properties">Bucket properties</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#shortcuts-for-common-properties">Shortcuts for common properties</a></li>
@@ -132,7 +132,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -164,8 +164,8 @@ group buckets together. They allow for efficiently setting properties
 on a group of buckets at the same time.</p>
 <p>Unlike buckets, Bucket Types must be <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/bucket-types/#Managing-Bucket-Types-Through-the-Command-Line">explicitly created</a>
 and activated before being used:</p>
-<div class="highlight-python"><div class="highlight"><pre>riak-admin bucket-type create n_equals_1 &#39;{&quot;props&quot;:{&quot;n_val&quot;:1}}&#39;
-riak-admin bucket-type activate n_equals_1
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">create</span> <span class="n">n_equals_1</span> <span class="s1">&#39;{&quot;props&quot;:{&quot;n_val&quot;:1}}&#39;</span>
+<span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">activate</span> <span class="n">n_equals_1</span>
 </pre></div>
 </div>
 <p>Bucket Type creation and activation is only supported via the
@@ -174,21 +174,21 @@ include an API to perform these actions, but the Python client <em>can</em>
 <a class="reference internal" href="#riak.bucket.BucketType.get_properties" title="riak.bucket.BucketType.get_properties"><code class="xref py py-meth docutils literal"><span class="pre">retrieve</span></code></a> and <a class="reference internal" href="#riak.bucket.BucketType.set_properties" title="riak.bucket.BucketType.set_properties"><code class="xref py py-meth docutils literal"><span class="pre">set</span></code></a> bucket-type properties.</p>
 <p>If Bucket Types are not specified, the <em>default</em> bucket
 type is used.  These buckets should be created via the <a class="reference internal" href="client.html#riak.client.RiakClient.bucket" title="riak.client.RiakClient.bucket"><code class="xref py py-meth docutils literal"><span class="pre">bucket()</span></code></a> method on the client object, like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">riak</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">riak</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">riak</span><span class="o">.</span><span class="n">RiakClient</span><span class="p">()</span>
-<span class="n">mybucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;mybucket&#39;</span><span class="p">)</span>
+<span class="n">mybucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;mybucket&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Buckets with a user-specified Bucket Type can also be created via the same
 <a class="reference internal" href="client.html#riak.client.RiakClient.bucket" title="riak.client.RiakClient.bucket"><code class="xref py py-meth docutils literal"><span class="pre">bucket()</span></code></a> method with
 an additional parameter or explicitly via
 <a class="reference internal" href="client.html#riak.client.RiakClient.bucket_type" title="riak.client.RiakClient.bucket_type"><code class="xref py py-meth docutils literal"><span class="pre">bucket_type()</span></code></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">othertype</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;othertype&#39;</span><span class="p">)</span>
-<span class="n">otherbucket</span> <span class="o">=</span> <span class="n">othertype</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;otherbucket&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">othertype</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s1">&#39;othertype&#39;</span><span class="p">)</span>
+<span class="n">otherbucket</span> <span class="o">=</span> <span class="n">othertype</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;otherbucket&#39;</span><span class="p">)</span>
 
-<span class="c"># Alternate way to get a bucket within a bucket-type</span>
-<span class="n">mybucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;mybucket&#39;</span><span class="p">,</span> <span class="n">bucket_type</span><span class="o">=</span><span class="s">&#39;mybuckettype&#39;</span><span class="p">)</span>
+<span class="c1"># Alternate way to get a bucket within a bucket-type</span>
+<span class="n">mybucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;mybucket&#39;</span><span class="p">,</span> <span class="n">bucket_type</span><span class="o">=</span><span class="s1">&#39;mybuckettype&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>For more detailed discussion, see <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/bucket-types/">Using Bucket Types</a>.</p>
@@ -937,7 +937,7 @@ methods simplify interacting with that configuration.</p>
 bucket.</p>
 <div class="deprecated">
 <p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0)
-Use <a class="reference internal" href="query.html#yz-label"><span>Riak Search 2.0</span></a> instead.</p>
+Use <a class="reference internal" href="query.html#yz-label"><span class="std std-ref">Riak Search 2.0</span></a> instead.</p>
 </div>
 </dd></dl>
 
@@ -947,7 +947,7 @@ Use <a class="reference internal" href="query.html#yz-label"><span>Riak Search 2
 <dd><p>Enable search indexing for this bucket.</p>
 <div class="deprecated">
 <p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0)
-Use <a class="reference internal" href="query.html#yz-label"><span>Riak Search 2.0</span></a> instead.</p>
+Use <a class="reference internal" href="query.html#yz-label"><span class="std std-ref">Riak Search 2.0</span></a> instead.</p>
 </div>
 </dd></dl>
 
@@ -957,7 +957,7 @@ Use <a class="reference internal" href="query.html#yz-label"><span>Riak Search 2
 <dd><p>Disable search indexing for this bucket.</p>
 <div class="deprecated">
 <p><span class="versionmodified">Deprecated since version 2.1.0: </span>(Riak 2.0)
-Use <a class="reference internal" href="query.html#yz-label"><span>Riak Search 2.0</span></a> instead.</p>
+Use <a class="reference internal" href="query.html#yz-label"><span class="std std-ref">Riak Search 2.0</span></a> instead.</p>
 </div>
 </dd></dl>
 
@@ -965,7 +965,7 @@ Use <a class="reference internal" href="query.html#yz-label"><span>Riak Search 2
 <div class="section" id="legacy-counters">
 <h3>Legacy Counters<a class="headerlink" href="#legacy-counters" title="Permalink to this headline">¶</a></h3>
 <p>The <a class="reference internal" href="#riak.bucket.RiakBucket.get_counter" title="riak.bucket.RiakBucket.get_counter"><code class="xref py py-meth docutils literal"><span class="pre">get_counter()</span></code></a> and
-<a class="reference internal" href="#riak.bucket.RiakBucket.update_counter" title="riak.bucket.RiakBucket.update_counter"><code class="xref py py-meth docutils literal"><span class="pre">update_counter()</span></code></a>. See <a class="reference internal" href="client.html#legacy-counters"><span>Legacy Counters</span></a> for
+<a class="reference internal" href="#riak.bucket.RiakBucket.update_counter" title="riak.bucket.RiakBucket.update_counter"><code class="xref py py-meth docutils literal"><span class="pre">update_counter()</span></code></a>. See <a class="reference internal" href="client.html#legacy-counters"><span class="std std-ref">Legacy Counters</span></a> for
 more details.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
@@ -1063,7 +1063,7 @@ datatype.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.4.2',
+            VERSION:'2.5.0.post1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

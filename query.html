@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Query Methods &mdash; Riak Python Client 2.4.2 documentation</title>
+  <title>Query Methods &mdash; Riak Python Client 2.5.0.post1 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.4.2 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.5.0.post1 documentation" href="index.html"/>
         <link rel="next" title="Security" href="security.html"/>
         <link rel="prev" title="Data Types" href="datatypes.html"/> 
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.4.2
+                2.5.0
               </div>
             
           
@@ -88,7 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bucket.html">Buckets &amp; Bucket Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object.html">Values &amp; Objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Query Methods</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Query Methods</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#secondary-indexes">Secondary Indexes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#streaming-and-paginating-indexes">Streaming and Paginating Indexes</a></li>
 </ul>
@@ -137,7 +137,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -166,23 +166,23 @@ known buckets and keys, there are additional ways to get information
 out of Riak.</p>
 <div class="section" id="secondary-indexes">
 <h2>Secondary Indexes<a class="headerlink" href="#secondary-indexes" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="object.html#object-accessors"><span>Objects</span></a> can be <a class="reference internal" href="object.html#riak.riak_object.RiakObject.add_index" title="riak.riak_object.RiakObject.add_index"><code class="xref py py-meth docutils literal"><span class="pre">tagged</span></code></a> with <a class="reference internal" href="object.html#riak.riak_object.RiakObject.indexes" title="riak.riak_object.RiakObject.indexes"><code class="xref py py-attr docutils literal"><span class="pre">secondary</span> <span class="pre">index</span>
+<p><a class="reference internal" href="object.html#object-accessors"><span class="std std-ref">Objects</span></a> can be <a class="reference internal" href="object.html#riak.riak_object.RiakObject.add_index" title="riak.riak_object.RiakObject.add_index"><code class="xref py py-meth docutils literal"><span class="pre">tagged</span></code></a> with <a class="reference internal" href="object.html#riak.riak_object.RiakObject.indexes" title="riak.riak_object.RiakObject.indexes"><code class="xref py py-attr docutils literal"><span class="pre">secondary</span> <span class="pre">index</span>
 <span class="pre">entries</span></code></a>. Those entries can then
 be queried over <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_index" title="riak.bucket.RiakBucket.get_index"><code class="xref py py-meth docutils literal"><span class="pre">the</span> <span class="pre">bucket</span></code></a>
 for equality or across ranges.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&quot;index_test&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s2">&quot;index_test&quot;</span><span class="p">)</span>
 
-<span class="c"># Tag an object with indexes and save</span>
-<span class="n">sean</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;seancribbs&quot;</span><span class="p">)</span>
-<span class="n">sean</span><span class="o">.</span><span class="n">add_index</span><span class="p">(</span><span class="s">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s">&quot;Sean&quot;</span><span class="p">)</span>
-<span class="n">sean</span><span class="o">.</span><span class="n">add_index</span><span class="p">(</span><span class="s">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1979</span><span class="p">)</span>
+<span class="c1"># Tag an object with indexes and save</span>
+<span class="n">sean</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;seancribbs&quot;</span><span class="p">)</span>
+<span class="n">sean</span><span class="o">.</span><span class="n">add_index</span><span class="p">(</span><span class="s2">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s2">&quot;Sean&quot;</span><span class="p">)</span>
+<span class="n">sean</span><span class="o">.</span><span class="n">add_index</span><span class="p">(</span><span class="s2">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1979</span><span class="p">)</span>
 <span class="n">sean</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
 
-<span class="c"># Performs an equality query</span>
-<span class="n">seans</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s">&quot;Sean&quot;</span><span class="p">)</span>
+<span class="c1"># Performs an equality query</span>
+<span class="n">seans</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s2">&quot;Sean&quot;</span><span class="p">)</span>
 
-<span class="c"># Performs a range query</span>
-<span class="n">eighties</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1980</span><span class="p">,</span> <span class="mi">1989</span><span class="p">)</span>
+<span class="c1"># Performs a range query</span>
+<span class="n">eighties</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1980</span><span class="p">,</span> <span class="mi">1989</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Secondary indexes are also available via <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.index" title="riak.mapreduce.RiakMapReduce.index"><code class="xref py py-meth docutils literal"><span class="pre">MapReduce</span></code></a>.</p>
@@ -190,28 +190,28 @@ for equality or across ranges.:</p>
 <h3>Streaming and Paginating Indexes<a class="headerlink" href="#streaming-and-paginating-indexes" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes the number of results from such a query is too great to
 process in one payload, so you can also <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.stream_index" title="riak.bucket.RiakBucket.stream_index"><code class="xref py py-meth docutils literal"><span class="pre">stream</span> <span class="pre">the</span> <span class="pre">results</span></code></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">stream_index</span><span class="p">(</span><span class="s">&quot;bmonth_int&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="c"># keys is a list of matching keys</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">stream_index</span><span class="p">(</span><span class="s2">&quot;bmonth_int&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># keys is a list of matching keys</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Both the regular <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_index" title="riak.bucket.RiakBucket.get_index"><code class="xref py py-meth docutils literal"><span class="pre">get_index()</span></code></a> method and
 the <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.stream_index" title="riak.bucket.RiakBucket.stream_index"><code class="xref py py-meth docutils literal"><span class="pre">stream_index()</span></code></a> method allow you to
 return the index entry along with the matching key as tuples using the
 <code class="docutils literal"><span class="pre">return_terms</span></code> option:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1970</span><span class="p">,</span> <span class="mi">1990</span><span class="p">,</span> <span class="n">return_terms</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="c"># =&gt; [(1979, &#39;seancribbs&#39;)]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1970</span><span class="p">,</span> <span class="mi">1990</span><span class="p">,</span> <span class="n">return_terms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># =&gt; [(1979, &#39;seancribbs&#39;)]</span>
 </pre></div>
 </div>
 <p>You can also limit the number of results using the <code class="docutils literal"><span class="pre">max_results</span></code>
 option, which enables pagination:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s">&quot;S&quot;</span><span class="p">,</span> <span class="s">&quot;T&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Optionally you can use <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.paginate_index" title="riak.bucket.RiakBucket.paginate_index"><code class="xref py py-meth docutils literal"><span class="pre">paginate_index()</span></code></a>
 or <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.paginate_stream_index" title="riak.bucket.RiakBucket.paginate_stream_index"><code class="xref py py-meth docutils literal"><span class="pre">paginate_stream_index()</span></code></a> to create a
 generator of paged results:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">paginate_stream_index</span><span class="p">(</span><span class="s">&quot;maestro_bin&quot;</span><span class="p">,</span> <span class="s">&quot;Cribbs&quot;</span><span class="p">):</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">paginate_stream_index</span><span class="p">(</span><span class="s2">&quot;maestro_bin&quot;</span><span class="p">,</span> <span class="s2">&quot;Cribbs&quot;</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">page</span><span class="p">:</span>
         <span class="n">do_something</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
     <span class="n">page</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -222,14 +222,14 @@ generator of paged results:</p>
 list but also supports streaming and capturing the
 <a class="reference internal" href="#riak.client.index_page.IndexPage.continuation" title="riak.client.index_page.IndexPage.continuation"><code class="xref py py-attr docutils literal"><span class="pre">continuation</span></code></a>, which is a
 sort of pointer to the next page of results:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># Detect whether there are more results</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Detect whether there are more results</span>
 <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">has_next_page</span><span class="p">():</span>
 
-    <span class="c"># Fetch the next page of results manually</span>
-    <span class="n">more</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s">&quot;S&quot;</span><span class="p">,</span> <span class="s">&quot;T&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="c1"># Fetch the next page of results manually</span>
+    <span class="n">more</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
                             <span class="n">continuation</span><span class="o">=</span><span class="n">results</span><span class="o">.</span><span class="n">continuation</span><span class="p">)</span>
 
-    <span class="c"># Fetch the next page of results automatically</span>
+    <span class="c1"># Fetch the next page of results automatically</span>
     <span class="n">more</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">next_page</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -523,11 +523,11 @@ value which all entries must equal</li>
 methods are treated as filters to be added; <code class="docutils literal"><span class="pre">&amp;</span></code> and <code class="docutils literal"><span class="pre">|</span></code> create
 conjunctions and disjunctions, respectively. <code class="docutils literal"><span class="pre">+</span></code> concatenates filters.</p>
 <p>Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">f1</span> <span class="o">=</span> <span class="n">RiakKeyFilter</span><span class="p">()</span><span class="o">.</span><span class="n">starts_with</span><span class="p">(</span><span class="s">&#39;2005&#39;</span><span class="p">)</span>
-<span class="n">f2</span> <span class="o">=</span> <span class="n">RiakKeyFilter</span><span class="p">()</span><span class="o">.</span><span class="n">ends_with</span><span class="p">(</span><span class="s">&#39;-01&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">RiakKeyFilter</span><span class="p">()</span><span class="o">.</span><span class="n">starts_with</span><span class="p">(</span><span class="s1">&#39;2005&#39;</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">RiakKeyFilter</span><span class="p">()</span><span class="o">.</span><span class="n">ends_with</span><span class="p">(</span><span class="s1">&#39;-01&#39;</span><span class="p">)</span>
 <span class="n">f3</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">&amp;</span> <span class="n">f2</span>
-<span class="k">print</span><span class="p">(</span><span class="n">f3</span><span class="p">)</span>
-<span class="c"># =&gt; [[&#39;and&#39;, [[&#39;starts_with&#39;, &#39;2005&#39;]], [[&#39;ends_with&#39;, &#39;-01&#39;]]]]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f3</span><span class="p">)</span>
+<span class="c1"># =&gt; [[&#39;and&#39;, [[&#39;starts_with&#39;, &#39;2005&#39;]], [[&#39;ends_with&#39;, &#39;-01&#39;]]]]</span>
 </pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1005,41 +1005,41 @@ but we recommend in production that you define your own schema.</p>
 with a short section dedicated to the <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/search-schema/#The-Default-Schema">default schema</a>.</p>
 <p>Here is a brief example of creating a custom schema with
 <a class="reference internal" href="client.html#riak.client.RiakClient.create_search_schema" title="riak.client.RiakClient.create_search_schema"><code class="xref py py-meth docutils literal"><span class="pre">create_search_schema()</span></code></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">content</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
-<span class="s">&lt;schema name=&quot;test&quot; version=&quot;1.5&quot;&gt;</span>
-<span class="s">&lt;fields&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_id&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; required=&quot;true&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_ed&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_pn&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_fpn&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_vtag&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_rk&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_rb&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_rt&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">   &lt;field name=&quot;_yz_err&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot;</span>
-<span class="s">    multiValued=&quot;false&quot; /&gt;</span>
-<span class="s">&lt;/fields&gt;</span>
-<span class="s">&lt;uniqueKey&gt;_yz_id&lt;/uniqueKey&gt;</span>
-<span class="s">&lt;types&gt;</span>
-<span class="s">    &lt;fieldType name=&quot;_yz_str&quot; class=&quot;solr.StrField&quot;</span>
-<span class="s">     sortMissingLast=&quot;true&quot; /&gt;</span>
-<span class="s">&lt;/types&gt;</span>
-<span class="s">&lt;/schema&gt;&quot;&quot;&quot;</span>
-<span class="n">schema_name</span> <span class="o">=</span> <span class="s">&#39;jalapeno&#39;</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="s2">&lt;schema name=&quot;test&quot; version=&quot;1.5&quot;&gt;</span>
+<span class="s2">&lt;fields&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_id&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; required=&quot;true&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_ed&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_pn&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_fpn&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_vtag&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_rk&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_rb&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_rt&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot; stored=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">   &lt;field name=&quot;_yz_err&quot; type=&quot;_yz_str&quot; indexed=&quot;true&quot;</span>
+<span class="s2">    multiValued=&quot;false&quot; /&gt;</span>
+<span class="s2">&lt;/fields&gt;</span>
+<span class="s2">&lt;uniqueKey&gt;_yz_id&lt;/uniqueKey&gt;</span>
+<span class="s2">&lt;types&gt;</span>
+<span class="s2">    &lt;fieldType name=&quot;_yz_str&quot; class=&quot;solr.StrField&quot;</span>
+<span class="s2">     sortMissingLast=&quot;true&quot; /&gt;</span>
+<span class="s2">&lt;/types&gt;</span>
+<span class="s2">&lt;/schema&gt;&quot;&quot;&quot;</span>
+<span class="n">schema_name</span> <span class="o">=</span> <span class="s1">&#39;jalapeno&#39;</span>
 <span class="n">client</span><span class="o">.</span><span class="n">create_search_schema</span><span class="p">(</span><span class="n">schema_name</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If you would like to retrieve the current XML Solr schema,
 <a class="reference internal" href="client.html#riak.client.RiakClient.get_search_schema" title="riak.client.RiakClient.get_search_schema"><code class="xref py py-meth docutils literal"><span class="pre">get_search_schema()</span></code></a> is available:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">schema</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_schema</span><span class="p">(</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_schema</span><span class="p">(</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1050,27 +1050,27 @@ This index represents a collection of similar data that you use to perform
 queries. When creating an index with
 <a class="reference internal" href="client.html#riak.client.RiakClient.create_search_index" title="riak.client.RiakClient.create_search_index"><code class="xref py py-meth docutils literal"><span class="pre">create_search_index()</span></code></a>, you can optionally
 specify a schema. If you do not, the default schema will be used:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;nacho&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s1">&#39;nacho&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Likewise you can specify a schema, e.g. the index <code class="docutils literal"><span class="pre">&quot;nacho&quot;</span></code> is
 associated with the schema <code class="docutils literal"><span class="pre">&quot;jalapeno&quot;</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;nacho&#39;</span><span class="p">,</span> <span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s1">&#39;nacho&#39;</span><span class="p">,</span> <span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Just as easily you can delete an index with
 <a class="reference internal" href="client.html#riak.client.RiakClient.delete_search_index" title="riak.client.RiakClient.delete_search_index"><code class="xref py py-meth docutils literal"><span class="pre">delete_search_index()</span></code></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">delete_search_index</span><span class="p">(</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">delete_search_index</span><span class="p">(</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>A single index can be retrieved with
 <a class="reference internal" href="client.html#riak.client.RiakClient.get_search_index" title="riak.client.RiakClient.get_search_index"><code class="xref py py-meth docutils literal"><span class="pre">get_search_index()</span></code></a> or all of them
 with <a class="reference internal" href="client.html#riak.client.RiakClient.list_search_indexes" title="riak.client.RiakClient.list_search_indexes"><code class="xref py py-meth docutils literal"><span class="pre">list_search_indexes()</span></code></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">index</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_index</span><span class="p">(</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
-<span class="n">name</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
-<span class="n">schema</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s">&#39;schema&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_index</span><span class="p">(</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+<span class="n">schema</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s1">&#39;schema&#39;</span><span class="p">]</span>
 <span class="n">indexes</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_search_indexes</span><span class="p">()</span>
-<span class="n">first_nval</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;n_val&#39;</span><span class="p">]</span>
+<span class="n">first_nval</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;n_val&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1086,20 +1086,20 @@ This may change in the future to allow full unicode support.</p>
 <p>The last step to setting up Riak Search 2.0 is to link a Bucket Type
 to a Solr index.  This lets Riak know when to index values.  This can be
 done via the command line:</p>
-<div class="highlight-python"><div class="highlight"><pre>riak-admin bucket-type create spicy &#39;{&quot;props&quot;:{&quot;search_index&quot;:&quot;jalapeno&quot;}}&#39;
-riak-admin bucket-type activate spicy
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">create</span> <span class="n">spicy</span> <span class="s1">&#39;{&quot;props&quot;:{&quot;search_index&quot;:&quot;jalapeno&quot;}}&#39;</span>
+<span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">activate</span> <span class="n">spicy</span>
 </pre></div>
 </div>
 <p>Or simply create an empty Bucket Type:</p>
-<div class="highlight-python"><div class="highlight"><pre>riak-admin bucket-type create spicy &#39;{&quot;props&quot;:{}}&#39;
-riak-admin bucket-type activate spicy
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">create</span> <span class="n">spicy</span> <span class="s1">&#39;{&quot;props&quot;:</span><span class="si">{}</span><span class="s1">}&#39;</span>
+<span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">activate</span> <span class="n">spicy</span>
 </pre></div>
 </div>
 <p>Then change the bucket properties on the associated bucket or Bucket Type:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;peppers&#39;</span><span class="p">)</span>
-<span class="n">b</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
-<span class="n">btype</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;spicy&#39;</span><span class="p">)</span>
-<span class="n">btype</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;peppers&#39;</span><span class="p">)</span>
+<span class="n">b</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s1">&#39;search_index&#39;</span><span class="p">,</span> <span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
+<span class="n">btype</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s1">&#39;spicy&#39;</span><span class="p">)</span>
+<span class="n">btype</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s1">&#39;search_index&#39;</span><span class="p">,</span> <span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1110,76 +1110,76 @@ adding data is as simple as writing to Riak.  Solr is automatically updated.</p>
 <p>To query, on the other hand, is as easy as writing Solr queries.  This allows
 for the full use of existing Solr tools as well as its rich semantics.</p>
 <p>Here is a brief example of loading and querying data::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;peppers&#39;</span><span class="p">)</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;bell&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;bell&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                    <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;anaheim&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;anaheim&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
-                       <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">2500</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;chipotle&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;chipotle&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">3500</span><span class="p">,</span>
-                        <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;serrano&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;serrano&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
-                       <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">23000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;habanero&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;name_s&quot;</span><span class="p">:</span> <span class="s">&quot;habanero&quot;</span><span class="p">,</span> <span class="s">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">100000</span><span class="p">,</span>
-                        <span class="s">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">350000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;name_s:/c.*/&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s">&#39;jalapeno&#39;</span><span class="p">)</span>
-<span class="c"># Yields single document &#39;chipotle&#39;</span>
-<span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s">&#39;docs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;name_s&#39;</span><span class="p">])</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;scoville_high_i:[20000 TO 500000]&quot;</span><span class="p">)</span>
-<span class="c"># Yields two documents</span>
-<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="s">&#39;docs&#39;</span><span class="p">]:</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s">&#39;name_s&#39;</span><span class="p">])</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;name_s:*&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s">&#39;jalapeno&#39;</span><span class="p">,</span>
-                        <span class="n">sort</span><span class="o">=</span><span class="s">&quot;scoville_low_i desc&quot;</span><span class="p">)</span>
-<span class="c"># Yields all documents, sorted in descending order. We take the top one</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;The hottest pepper is {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s">&#39;docs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;name_s&#39;</span><span class="p">]))</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;peppers&#39;</span><span class="p">)</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;bell&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name_s&quot;</span><span class="p">:</span> <span class="s2">&quot;bell&quot;</span><span class="p">,</span> <span class="s2">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s2">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;anaheim&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name_s&quot;</span><span class="p">:</span> <span class="s2">&quot;anaheim&quot;</span><span class="p">,</span> <span class="s2">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+                       <span class="s2">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">2500</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;chipotle&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name_s&quot;</span><span class="p">:</span> <span class="s2">&quot;chipotle&quot;</span><span class="p">,</span> <span class="s2">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">3500</span><span class="p">,</span>
+                        <span class="s2">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;serrano&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name_s&quot;</span><span class="p">:</span> <span class="s2">&quot;serrano&quot;</span><span class="p">,</span> <span class="s2">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
+                       <span class="s2">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">23000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;habanero&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name_s&quot;</span><span class="p">:</span> <span class="s2">&quot;habanero&quot;</span><span class="p">,</span> <span class="s2">&quot;scoville_low_i&quot;</span><span class="p">:</span> <span class="mi">100000</span><span class="p">,</span>
+                        <span class="s2">&quot;scoville_high_i&quot;</span><span class="p">:</span> <span class="mi">350000</span><span class="p">})</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;name_s:/c.*/&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
+<span class="c1"># Yields single document &#39;chipotle&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;docs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name_s&#39;</span><span class="p">])</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;scoville_high_i:[20000 TO 500000]&quot;</span><span class="p">)</span>
+<span class="c1"># Yields two documents</span>
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;docs&#39;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;name_s&#39;</span><span class="p">])</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;name_s:*&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">,</span>
+                        <span class="n">sort</span><span class="o">=</span><span class="s2">&quot;scoville_low_i desc&quot;</span><span class="p">)</span>
+<span class="c1"># Yields all documents, sorted in descending order. We take the top one</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The hottest pepper is </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;docs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name_s&#39;</span><span class="p">]))</span>
 </pre></div>
 </div>
 <p>The results returned by <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.search" title="riak.bucket.RiakBucket.search"><code class="xref py py-meth docutils literal"><span class="pre">search()</span></code></a> is a dictionary
 with lots of search metadata like the number of results, the maxium
 <a class="reference external" href="https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/search/package-summary.html#scoring">Lucene Score</a>
 as well as the matching documents.</p>
-<p>When querying on <a class="reference internal" href="datatypes.html#datatypes"><span>Data Types</span></a> the datatype is the name of the field
+<p>When querying on <a class="reference internal" href="datatypes.html#datatypes"><span class="std std-ref">Data Types</span></a> the datatype is the name of the field
 used in Solr since they do not fit into the default schema, e.g.:</p>
-<div class="code highlight-python"><div class="highlight"><pre>riak-admin bucket-type create visitors &#39;{&quot;props&quot;:{&quot;datatype&quot;: &quot;counter}}&#39;
-riak-admin bucket-type activate visitors
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">create</span> <span class="n">visitors</span> <span class="s1">&#39;{&quot;props&quot;:{&quot;datatype&quot;: &quot;counter}}&#39;</span>
+<span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">bucket</span><span class="o">-</span><span class="nb">type</span> <span class="n">activate</span> <span class="n">visitors</span>
 </pre></div>
 </div>
-<div class="code python highlight-python"><div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;website&#39;</span><span class="p">)</span>
-<span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;visitors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;hits&#39;</span><span class="p">)</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;website&#39;</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s1">&#39;website&#39;</span><span class="p">)</span>
+<span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s1">&#39;visitors&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;hits&#39;</span><span class="p">)</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s1">&#39;search_index&#39;</span><span class="p">,</span> <span class="s1">&#39;website&#39;</span><span class="p">)</span>
 
-<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;bbc.co.uk&#39;</span><span class="p">)</span>
+<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;bbc.co.uk&#39;</span><span class="p">)</span>
 <span class="n">site</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
 <span class="n">site</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;cnn.com&#39;</span><span class="p">)</span>
+<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;cnn.com&#39;</span><span class="p">)</span>
 <span class="n">site</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">site</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
-<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;abc.net.au&#39;</span><span class="p">)</span>
+<span class="n">site</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;abc.net.au&#39;</span><span class="p">)</span>
 <span class="n">site</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
 <span class="n">site</span><span class="o">.</span><span class="n">store</span><span class="p">()</span>
 
-<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;counter:[10 TO *]&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s">&#39;website&#39;</span><span class="p">,</span>
-                        <span class="n">sort</span><span class="o">=</span><span class="s">&quot;counter desc&quot;</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;counter:[10 TO *]&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s1">&#39;website&#39;</span><span class="p">,</span>
+                        <span class="n">sort</span><span class="o">=</span><span class="s2">&quot;counter desc&quot;</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
-<span class="c"># Assume you have a bucket-type named &quot;profiles&quot; that has datatype</span>
-<span class="c"># &quot;map&quot;. Let&#39;s create and search an index containing maps.</span>
-<span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s">&#39;user-profiles&#39;</span><span class="p">)</span>
-<span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s">&#39;profiles&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s">&#39;USA&#39;</span><span class="p">)</span>
-<span class="n">bucket</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s">&#39;search_index&#39;</span><span class="p">,</span> <span class="s">&#39;user-profiles&#39;</span><span class="p">)</span>
+<span class="c1"># Assume you have a bucket-type named &quot;profiles&quot; that has datatype</span>
+<span class="c1"># &quot;map&quot;. Let&#39;s create and search an index containing maps.</span>
+<span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s1">&#39;user-profiles&#39;</span><span class="p">)</span>
+<span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s1">&#39;profiles&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;USA&#39;</span><span class="p">)</span>
+<span class="n">bucket</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s1">&#39;search_index&#39;</span><span class="p">,</span> <span class="s1">&#39;user-profiles&#39;</span><span class="p">)</span>
 
 <span class="n">brett</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
-<span class="n">brett</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;fname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="s">&quot;Brett&quot;</span><span class="p">)</span>
-<span class="n">brett</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s">&#39;lname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="s">&quot;Hazen&quot;</span><span class="p">)</span>
-<span class="n">brett</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;emails&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;spam@basho.com&#39;</span><span class="p">)</span>
-<span class="n">brett</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s">&#39;visits&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
-<span class="n">brett</span><span class="o">.</span><span class="n">maps</span><span class="p">[</span><span class="s">&#39;pages&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s">&#39;homepage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="s2">&quot;Brett&quot;</span><span class="p">)</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;lname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="s2">&quot;Hazen&quot;</span><span class="p">)</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s1">&#39;emails&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;spam@basho.com&#39;</span><span class="p">)</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;visits&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
+<span class="n">brett</span><span class="o">.</span><span class="n">maps</span><span class="p">[</span><span class="s1">&#39;pages&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;homepage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">increment</span><span class="p">()</span>
 <span class="n">brett</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
-<span class="c"># Note that the field name in the index/schema is the field name in</span>
-<span class="c"># the map joined with its type by an underscore. Deeply embedded</span>
-<span class="c"># fields are joined with their parent field names by an underscore.</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;lname_register:Hazen AND pages_map_homepage_counter:[1 TO *]&#39;</span><span class="p">,</span>
-                        <span class="n">index</span><span class="o">=</span><span class="s">&#39;user-profiles&#39;</span><span class="p">)</span>
+<span class="c1"># Note that the field name in the index/schema is the field name in</span>
+<span class="c1"># the map joined with its type by an underscore. Deeply embedded</span>
+<span class="c1"># fields are joined with their parent field names by an underscore.</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;lname_register:Hazen AND pages_map_homepage_counter:[1 TO *]&#39;</span><span class="p">,</span>
+                        <span class="n">index</span><span class="o">=</span><span class="s1">&#39;user-profiles&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Details on querying Riak Search 2.0 can be found at <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/using/search/#Querying">Querying</a>.</p>
@@ -1228,7 +1228,7 @@ riak-admin bucket-type activate visitors
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.4.2',
+            VERSION:'2.5.0.post1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

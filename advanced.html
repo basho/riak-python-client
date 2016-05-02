@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Advanced Usage &amp; Internals &mdash; Riak Python Client 2.4.2 documentation</title>
+  <title>Advanced Usage &amp; Internals &mdash; Riak Python Client 2.5.0.post1 documentation</title>
   
 
   
@@ -32,7 +32,7 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.4.2 documentation" href="index.html"/>
+    <link rel="top" title="Riak Python Client 2.5.0.post1 documentation" href="index.html"/>
         <link rel="prev" title="Security" href="security.html"/> 
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                2.4.2
+                2.5.0
               </div>
             
           
@@ -89,7 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="datatypes.html">Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="query.html">Query Methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Advanced Usage &amp; Internals</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced Usage &amp; Internals</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#connection-pool">Connection pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#retry-logic">Retry logic</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#multiget">Multiget</a></li>
@@ -102,7 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#transports">Transports</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#security-helpers">Security helpers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#http-transport">HTTP Transport</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#protocol-buffers-transport">Protocol Buffers Transport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tcp-transport">TCP Transport</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
@@ -140,7 +140,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -232,20 +232,20 @@ transaction method also allows filtering of the pool and supplying
 a default value to be used as the resource if no resources are
 free.</p>
 <p>Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">riak.Pool</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">BadResource</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">riak.Pool</span> <span class="k">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">BadResource</span>
 <span class="k">class</span> <span class="nc">ListPool</span><span class="p">(</span><span class="n">Pool</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">create_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">destroy_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c"># Lists don&#39;t need to be cleaned up</span>
+        <span class="c1"># Lists don&#39;t need to be cleaned up</span>
         <span class="k">pass</span>
 
 <span class="n">pool</span> <span class="o">=</span> <span class="n">ListPool</span><span class="p">()</span>
 <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource</span><span class="p">:</span>
     <span class="n">resource</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">pool</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">resource2</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">resource2</span><span class="p">))</span> <span class="c"># should be [1]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">resource2</span><span class="p">))</span> <span class="c1"># should be [1]</span>
 </pre></div>
 </div>
 <p>Creates a new Pool. This should be called manually if you
@@ -440,7 +440,7 @@ without retries.</p>
 <dd><p>Modifies the number of retries for the scope of the <code class="docutils literal"><span class="pre">with</span></code>
 statement (in the current thread).</p>
 <p>Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">retry_count</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">retry_count</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">client</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -504,15 +504,24 @@ Used internally.</p>
 <dl class="data">
 <dt id="riak.client.multiget.POOL_SIZE">
 <code class="descclassname">riak.client.multiget.</code><code class="descname">POOL_SIZE</code><em class="property"> = 4</em><a class="headerlink" href="#riak.client.multiget.POOL_SIZE" title="Permalink to this definition">¶</a></dt>
-<dd><p>The default size of the worker pool, either based on the number
-of CPUS or defaulting to 6</p>
+<dd><p>int(x=0) -&gt; int or long
+int(x, base=10) -&gt; int or long</p>
+<p>Convert a number or string to an integer, or return 0 if no arguments
+are given.  If x is floating point, the conversion truncates towards zero.
+If x is outside the integer range, the function returns a long instead.</p>
+<p>If x is not a number or if base is given, then x must be a string or
+Unicode object representing an integer literal in the given base.  The
+literal can be preceded by &#8216;+&#8217; or &#8216;-&#8216; and be surrounded by whitespace.
+The base defaults to 10.  Valid bases are 0 and 2-36.  Base 0 means to
+interpret the base from the string as an integer literal.
+&gt;&gt;&gt; int(&#8216;0b100&#8217;, base=0)
+4</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="riak.client.multiget.Task">
 <em class="property">class </em><code class="descclassname">riak.client.multiget.</code><code class="descname">Task</code><span class="sig-paren">(</span><em>client</em>, <em>outq</em>, <em>bucket_type</em>, <em>bucket</em>, <em>key</em>, <em>options</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.multiget.Task" title="Permalink to this definition">¶</a></dt>
-<dd><p>A <code class="xref py py-class docutils literal"><span class="pre">namedtuple</span></code> for tasks that are fed to workers in the
-multiget pool.</p>
+<dd><p>Create new instance of Task(client, outq, bucket_type, bucket, key, options)</p>
 </dd></dl>
 
 <dl class="class">
@@ -595,7 +604,8 @@ when executing a MultiGet operation.</p>
 <dl class="data">
 <dt id="riak.client.multiget.RIAK_MULTIGET_POOL">
 <code class="descclassname">riak.client.multiget.</code><code class="descname">RIAK_MULTIGET_POOL</code><em class="property"> = &lt;riak.client.multiget.MultiGetPool object&gt;</em><a class="headerlink" href="#riak.client.multiget.RIAK_MULTIGET_POOL" title="Permalink to this definition">¶</a></dt>
-<dd><p>The default pool is automatically created and stored in this constant.</p>
+<dd><p>Encapsulates a pool of fetcher threads. These threads can be used
+across many multi-get requests.</p>
 </dd></dl>
 
 <dl class="function">
@@ -776,277 +786,277 @@ for k, v in iterable:</p>
 <div class="section" id="transports">
 <h2>Transports<a class="headerlink" href="#transports" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="riak.transports.transport.RiakTransport">
-<em class="property">class </em><code class="descclassname">riak.transports.transport.</code><code class="descname">RiakTransport</code><a class="headerlink" href="#riak.transports.transport.RiakTransport" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport">
+<em class="property">class </em><code class="descclassname">riak.transports.transport.</code><code class="descname">Transport</code><a class="headerlink" href="#riak.transports.transport.Transport" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to encapsulate transport details and methods. All protocol
 transports are subclasses of this class.</p>
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport._get_index_mapred_emu">
-<code class="descname">_get_index_mapred_emu</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport._get_index_mapred_emu" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport._get_index_mapred_emu">
+<code class="descname">_get_index_mapred_emu</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport._get_index_mapred_emu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Emulates a secondary index request via MapReduce. Used in the
 case where the transport supports MapReduce but has no native
 secondary index query capability.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport._search_mapred_emu">
-<code class="descname">_search_mapred_emu</code><span class="sig-paren">(</span><em>index</em>, <em>query</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport._search_mapred_emu" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport._search_mapred_emu">
+<code class="descname">_search_mapred_emu</code><span class="sig-paren">(</span><em>index</em>, <em>query</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport._search_mapred_emu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Emulates a search request via MapReduce. Used in the case
 where the transport supports MapReduce but has no native
 search capability.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.clear_bucket_props">
-<code class="descname">clear_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.clear_bucket_props">
+<code class="descname">clear_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset bucket properties to their defaults</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.create_search_index">
-<code class="descname">create_search_index</code><span class="sig-paren">(</span><em>index</em>, <em>schema=None</em>, <em>n_val=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.create_search_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.create_search_index">
+<code class="descname">create_search_index</code><span class="sig-paren">(</span><em>index</em>, <em>schema=None</em>, <em>n_val=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.create_search_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a yokozuna search index.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.create_search_schema">
-<code class="descname">create_search_schema</code><span class="sig-paren">(</span><em>schema</em>, <em>content</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.create_search_schema" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.create_search_schema">
+<code class="descname">create_search_schema</code><span class="sig-paren">(</span><em>schema</em>, <em>content</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.create_search_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a yokozuna search schema.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><em>robj</em>, <em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.delete" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>robj</em>, <em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes an object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.delete_search_index">
-<code class="descname">delete_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.delete_search_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.delete_search_index">
+<code class="descname">delete_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.delete_search_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a yokozuna search index.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.fetch_datatype">
-<code class="descname">fetch_datatype</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em>, <em>timeout=None</em>, <em>include_context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.fetch_datatype" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.fetch_datatype">
+<code class="descname">fetch_datatype</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em>, <em>timeout=None</em>, <em>include_context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.fetch_datatype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches a Riak Datatype.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.fulltext_add">
-<code class="descname">fulltext_add</code><span class="sig-paren">(</span><em>index</em>, <em>*docs</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.fulltext_add" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.fulltext_add">
+<code class="descname">fulltext_add</code><span class="sig-paren">(</span><em>index</em>, <em>*docs</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.fulltext_add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds documents to the full-text index.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.fulltext_delete">
-<code class="descname">fulltext_delete</code><span class="sig-paren">(</span><em>index</em>, <em>docs=None</em>, <em>queries=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.fulltext_delete" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.fulltext_delete">
+<code class="descname">fulltext_delete</code><span class="sig-paren">(</span><em>index</em>, <em>docs=None</em>, <em>queries=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.fulltext_delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes documents from the full-text index.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches an object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_bucket_props">
-<code class="descname">get_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_bucket_props">
+<code class="descname">get_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches properties for the given bucket.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_bucket_type_props">
-<code class="descname">get_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_bucket_type_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_bucket_type_props">
+<code class="descname">get_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_bucket_type_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches properties for the given bucket-type.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_buckets">
-<code class="descname">get_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_buckets">
+<code class="descname">get_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_buckets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the list of buckets as strings.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_client_id">
-<code class="descname">get_client_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_client_id" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_client_id">
+<code class="descname">get_client_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_client_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the client id for the transport.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_counter">
-<code class="descname">get_counter</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_counter" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_counter">
+<code class="descname">get_counter</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em>, <em>r=None</em>, <em>pr=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_counter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the value of a counter.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_index">
-<code class="descname">get_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_index">
+<code class="descname">get_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a secondary index query.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_keys">
-<code class="descname">get_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_keys" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_keys">
+<code class="descname">get_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lists all keys within the given bucket.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_preflist">
-<code class="descname">get_preflist</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_preflist" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_preflist">
+<code class="descname">get_preflist</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_preflist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches the preflist for a bucket/key.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_search_index">
-<code class="descname">get_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_search_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_search_index">
+<code class="descname">get_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_search_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a yokozuna search index or None.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.get_search_schema">
-<code class="descname">get_search_schema</code><span class="sig-paren">(</span><em>schema</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.get_search_schema" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.get_search_schema">
+<code class="descname">get_search_schema</code><span class="sig-paren">(</span><em>schema</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.get_search_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a yokozuna search schema.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.list_search_indexes">
-<code class="descname">list_search_indexes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.list_search_indexes" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.list_search_indexes">
+<code class="descname">list_search_indexes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.list_search_indexes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lists all yokozuna search indexes.</p>
 </dd></dl>
 
 <dl class="classmethod">
-<dt id="riak.transports.transport.RiakTransport.make_fixed_client_id">
-<em class="property">classmethod </em><code class="descname">make_fixed_client_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.make_fixed_client_id" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.make_fixed_client_id">
+<em class="property">classmethod </em><code class="descname">make_fixed_client_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.make_fixed_client_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a unique identifier for the current machine/process/thread.</p>
 </dd></dl>
 
 <dl class="classmethod">
-<dt id="riak.transports.transport.RiakTransport.make_random_client_id">
-<em class="property">classmethod </em><code class="descname">make_random_client_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.make_random_client_id" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.make_random_client_id">
+<em class="property">classmethod </em><code class="descname">make_random_client_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.make_random_client_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a random client identifier</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.mapred">
-<code class="descname">mapred</code><span class="sig-paren">(</span><em>inputs</em>, <em>query</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.mapred" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.mapred">
+<code class="descname">mapred</code><span class="sig-paren">(</span><em>inputs</em>, <em>query</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.mapred" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sends a MapReduce request synchronously.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.ping">
-<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ping" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.ping">
+<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.ping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ping the remote server</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.put">
-<code class="descname">put</code><span class="sig-paren">(</span><em>robj</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=None</em>, <em>if_none_match=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.put" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>robj</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=None</em>, <em>if_none_match=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores an object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.search">
-<code class="descname">search</code><span class="sig-paren">(</span><em>index</em>, <em>query</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.search" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.search">
+<code class="descname">search</code><span class="sig-paren">(</span><em>index</em>, <em>query</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a search query.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.set_bucket_props">
-<code class="descname">set_bucket_props</code><span class="sig-paren">(</span><em>bucket</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.set_bucket_props">
+<code class="descname">set_bucket_props</code><span class="sig-paren">(</span><em>bucket</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets properties on the given bucket.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.set_bucket_type_props">
-<code class="descname">set_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.set_bucket_type_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.set_bucket_type_props">
+<code class="descname">set_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.set_bucket_type_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets properties on the given bucket-type.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.set_client_id">
-<code class="descname">set_client_id</code><span class="sig-paren">(</span><em>client_id</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.set_client_id" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.set_client_id">
+<code class="descname">set_client_id</code><span class="sig-paren">(</span><em>client_id</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.set_client_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the client id. This overrides the default, random client
 id, which is automatically generated when none is specified in
 when creating the transport object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.stream_buckets">
-<code class="descname">stream_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.stream_buckets">
+<code class="descname">stream_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.stream_buckets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams the list of buckets through an iterator</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.stream_index">
-<code class="descname">stream_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.stream_index">
+<code class="descname">stream_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.stream_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams a secondary index query.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.stream_keys">
-<code class="descname">stream_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_keys" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.stream_keys">
+<code class="descname">stream_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.stream_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams the list of keys for the bucket through an iterator.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.stream_mapred">
-<code class="descname">stream_mapred</code><span class="sig-paren">(</span><em>inputs</em>, <em>query</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.stream_mapred" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.stream_mapred">
+<code class="descname">stream_mapred</code><span class="sig-paren">(</span><em>inputs</em>, <em>query</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.stream_mapred" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams the results of a MapReduce request through an iterator.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.ts_delete">
-<code class="descname">ts_delete</code><span class="sig-paren">(</span><em>table</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_delete" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.ts_delete">
+<code class="descname">ts_delete</code><span class="sig-paren">(</span><em>table</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.ts_delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a timeseries object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.ts_describe">
-<code class="descname">ts_describe</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_describe" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.ts_describe">
+<code class="descname">ts_describe</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.ts_describe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves a timeseries table description.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.ts_get">
-<code class="descname">ts_get</code><span class="sig-paren">(</span><em>table</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_get" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.ts_get">
+<code class="descname">ts_get</code><span class="sig-paren">(</span><em>table</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.ts_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves a timeseries object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.ts_put">
-<code class="descname">ts_put</code><span class="sig-paren">(</span><em>tsobj</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_put" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.ts_put">
+<code class="descname">ts_put</code><span class="sig-paren">(</span><em>tsobj</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.ts_put" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores a timeseries object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.ts_query">
-<code class="descname">ts_query</code><span class="sig-paren">(</span><em>table</em>, <em>query</em>, <em>interpolations=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_query" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.ts_query">
+<code class="descname">ts_query</code><span class="sig-paren">(</span><em>table</em>, <em>query</em>, <em>interpolations=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.ts_query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query timeseries data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.ts_stream_keys">
-<code class="descname">ts_stream_keys</code><span class="sig-paren">(</span><em>table</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.ts_stream_keys" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.ts_stream_keys">
+<code class="descname">ts_stream_keys</code><span class="sig-paren">(</span><em>table</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.ts_stream_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams the list of keys for the table through an iterator.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.update_counter">
-<code class="descname">update_counter</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em>, <em>value</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>returnvalue=False</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.update_counter" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.update_counter">
+<code class="descname">update_counter</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em>, <em>value</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>returnvalue=False</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.update_counter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates a counter by the given value.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.transport.RiakTransport.update_datatype">
-<code class="descname">update_datatype</code><span class="sig-paren">(</span><em>datatype</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=None</em>, <em>timeout=None</em>, <em>include_context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.RiakTransport.update_datatype" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.update_datatype">
+<code class="descname">update_datatype</code><span class="sig-paren">(</span><em>datatype</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=None</em>, <em>timeout=None</em>, <em>include_context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.transport.Transport.update_datatype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates a Riak Datatype by sending local operations to the server.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="riak.transports.transport.RiakTransport.client_id">
-<code class="descname">client_id</code><a class="headerlink" href="#riak.transports.transport.RiakTransport.client_id" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.transport.Transport.client_id">
+<code class="descname">client_id</code><a class="headerlink" href="#riak.transports.transport.Transport.client_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>the client ID for this connection</p>
 </dd></dl>
 
@@ -1060,7 +1070,7 @@ specific server-side features. Subclasses must implement the
 <a class="reference internal" href="#riak.transports.feature_detect.FeatureDetection._server_version" title="riak.transports.feature_detect.FeatureDetection._server_version"><code class="xref py py-meth docutils literal"><span class="pre">_server_version()</span></code></a> method to use this functionality, which
 should return the server&#8217;s version as a string.</p>
 <p><a class="reference internal" href="#riak.transports.feature_detect.FeatureDetection" title="riak.transports.feature_detect.FeatureDetection"><code class="xref py py-class docutils literal"><span class="pre">FeatureDetection</span></code></a> is a parent class of
-<a class="reference internal" href="#riak.transports.transport.RiakTransport" title="riak.transports.transport.RiakTransport"><code class="xref py py-class docutils literal"><span class="pre">RiakTransport</span></code></a>.</p>
+<a class="reference internal" href="#riak.transports.transport.Transport" title="riak.transports.transport.Transport"><code class="xref py py-class docutils literal"><span class="pre">Transport</span></code></a>.</p>
 <dl class="method">
 <dt id="riak.transports.feature_detect.FeatureDetection._server_version">
 <code class="descname">_server_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.feature_detect.FeatureDetection._server_version" title="Permalink to this definition">¶</a></dt>
@@ -1362,8 +1372,8 @@ e.g. primary quorums, basic_quorum, notfound_ok</p>
 <div class="section" id="http-transport">
 <h3>HTTP Transport<a class="headerlink" href="#http-transport" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
-<dt id="riak.transports.http.RiakHttpPool">
-<em class="property">class </em><code class="descclassname">riak.transports.http.</code><code class="descname">RiakHttpPool</code><span class="sig-paren">(</span><em>client</em>, <em>**options</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpPool" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpPool">
+<em class="property">class </em><code class="descclassname">riak.transports.http.</code><code class="descname">HttpPool</code><span class="sig-paren">(</span><em>client</em>, <em>**options</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpPool" title="Permalink to this definition">¶</a></dt>
 <dd><p>A pool of HTTP(S) transport connections.</p>
 </dd></dl>
 
@@ -1384,20 +1394,20 @@ to close and the operation retried on another node.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="riak.transports.http.RiakHttpTransport">
-<em class="property">class </em><code class="descclassname">riak.transports.http.</code><code class="descname">RiakHttpTransport</code><span class="sig-paren">(</span><em>node=None</em>, <em>client=None</em>, <em>connection_class=&lt;class httplib.HTTPConnection&gt;</em>, <em>client_id=None</em>, <em>**options</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport" title="Permalink to this definition">¶</a></dt>
-<dd><p>The RiakHttpTransport object holds information necessary to
+<dt id="riak.transports.http.HttpTransport">
+<em class="property">class </em><code class="descclassname">riak.transports.http.</code><code class="descname">HttpTransport</code><span class="sig-paren">(</span><em>node=None</em>, <em>client=None</em>, <em>connection_class=&lt;class httplib.HTTPConnection&gt;</em>, <em>client_id=None</em>, <em>**options</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>The HttpTransport object holds information necessary to
 connect to Riak via HTTP.</p>
 <p>Construct a new HTTP connection to Riak.</p>
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.clear_bucket_props">
-<code class="descname">clear_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.clear_bucket_props">
+<code class="descname">clear_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>reset the properties on the bucket object given</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.create_search_index">
-<code class="descname">create_search_index</code><span class="sig-paren">(</span><em>index</em>, <em>schema=None</em>, <em>n_val=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.create_search_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.create_search_index">
+<code class="descname">create_search_index</code><span class="sig-paren">(</span><em>index</em>, <em>schema=None</em>, <em>n_val=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.create_search_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Solr search index for Yokozuna.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1417,8 +1427,8 @@ connect to Riak via HTTP.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.create_search_schema">
-<code class="descname">create_search_schema</code><span class="sig-paren">(</span><em>schema</em>, <em>content</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.create_search_schema" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.create_search_schema">
+<code class="descname">create_search_schema</code><span class="sig-paren">(</span><em>schema</em>, <em>content</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.create_search_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new Solr schema for Yokozuna.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1436,14 +1446,14 @@ connect to Riak via HTTP.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><em>robj</em>, <em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.delete" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>robj</em>, <em>rw=None</em>, <em>r=None</em>, <em>w=None</em>, <em>dw=None</em>, <em>pr=None</em>, <em>pw=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete an object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.delete_search_index">
-<code class="descname">delete_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.delete_search_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.delete_search_index">
+<code class="descname">delete_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.delete_search_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the specified Solr search index for Yokozuna.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1457,56 +1467,56 @@ connect to Riak via HTTP.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.fulltext_add">
-<code class="descname">fulltext_add</code><span class="sig-paren">(</span><em>index</em>, <em>docs</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.fulltext_add" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.fulltext_add">
+<code class="descname">fulltext_add</code><span class="sig-paren">(</span><em>index</em>, <em>docs</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.fulltext_add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds documents to the search index.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.fulltext_delete">
-<code class="descname">fulltext_delete</code><span class="sig-paren">(</span><em>index</em>, <em>docs=None</em>, <em>queries=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.fulltext_delete" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.fulltext_delete">
+<code class="descname">fulltext_delete</code><span class="sig-paren">(</span><em>index</em>, <em>docs=None</em>, <em>queries=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.fulltext_delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes documents from the full-text index.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a bucket/key from the server</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_bucket_props">
-<code class="descname">get_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_bucket_props">
+<code class="descname">get_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get properties for a bucket</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_bucket_type_props">
-<code class="descname">get_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_bucket_type_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_bucket_type_props">
+<code class="descname">get_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_bucket_type_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get properties for a bucket-type</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_buckets">
-<code class="descname">get_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_buckets">
+<code class="descname">get_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch a list of all buckets</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_index">
-<code class="descname">get_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_index">
+<code class="descname">get_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a secondary index query.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_keys">
-<code class="descname">get_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_keys" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_keys">
+<code class="descname">get_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch a list of keys for the bucket</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_preflist">
-<code class="descname">get_preflist</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_preflist" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_preflist">
+<code class="descname">get_preflist</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_preflist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the preflist for a bucket/key</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1526,15 +1536,15 @@ connect to Riak via HTTP.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_resources">
-<code class="descname">get_resources</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_resources" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_resources">
+<code class="descname">get_resources</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_resources" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a JSON mapping of server-side resource names to paths
 :rtype dict</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_search_index">
-<code class="descname">get_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_search_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_search_index">
+<code class="descname">get_search_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_search_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the specified Solr search index for Yokozuna.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1548,8 +1558,8 @@ connect to Riak via HTTP.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.get_search_schema">
-<code class="descname">get_search_schema</code><span class="sig-paren">(</span><em>schema</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.get_search_schema" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.get_search_schema">
+<code class="descname">get_search_schema</code><span class="sig-paren">(</span><em>schema</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.get_search_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch a Solr schema from Yokozuna.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1563,116 +1573,137 @@ connect to Riak via HTTP.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.list_search_indexes">
-<code class="descname">list_search_indexes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.list_search_indexes" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.list_search_indexes">
+<code class="descname">list_search_indexes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.list_search_indexes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of Solr search indexes from Yokozuna.</p>
 <p>:rtype list of dicts</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.mapred">
-<code class="descname">mapred</code><span class="sig-paren">(</span><em>inputs</em>, <em>query</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.mapred" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.mapred">
+<code class="descname">mapred</code><span class="sig-paren">(</span><em>inputs</em>, <em>query</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.mapred" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a MapReduce query.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.ping">
-<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.ping" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.ping">
+<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.ping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check server is alive over HTTP</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.put">
-<code class="descname">put</code><span class="sig-paren">(</span><em>robj</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=True</em>, <em>if_none_match=False</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.put" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>robj</em>, <em>w=None</em>, <em>dw=None</em>, <em>pw=None</em>, <em>return_body=True</em>, <em>if_none_match=False</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>Puts a (possibly new) object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.search">
-<code class="descname">search</code><span class="sig-paren">(</span><em>index</em>, <em>query</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.search" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.search">
+<code class="descname">search</code><span class="sig-paren">(</span><em>index</em>, <em>query</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a search query.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.set_bucket_props">
-<code class="descname">set_bucket_props</code><span class="sig-paren">(</span><em>bucket</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.set_bucket_props">
+<code class="descname">set_bucket_props</code><span class="sig-paren">(</span><em>bucket</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the properties on the bucket object given</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.set_bucket_type_props">
-<code class="descname">set_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.set_bucket_type_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.set_bucket_type_props">
+<code class="descname">set_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.set_bucket_type_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the properties on the bucket-type</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.stats">
-<code class="descname">stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.stats" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.stats">
+<code class="descname">stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets performance statistics and server information</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.stream_buckets">
-<code class="descname">stream_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.stream_buckets">
+<code class="descname">stream_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stream list of buckets through an iterator</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.http.RiakHttpTransport.stream_index">
-<code class="descname">stream_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.RiakHttpTransport.stream_index" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.http.HttpTransport.stream_index">
+<code class="descname">stream_index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>return_terms=None</em>, <em>max_results=None</em>, <em>continuation=None</em>, <em>timeout=None</em>, <em>term_regex=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.http.HttpTransport.stream_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams a secondary index query.</p>
 </dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="protocol-buffers-transport">
-<h3>Protocol Buffers Transport<a class="headerlink" href="#protocol-buffers-transport" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="tcp-transport">
+<h3>TCP Transport<a class="headerlink" href="#tcp-transport" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
-<dt id="riak.transports.pbc.RiakPbcTransport">
-<em class="property">class </em><code class="descclassname">riak.transports.pbc.</code><code class="descname">RiakPbcTransport</code><span class="sig-paren">(</span><em>node=None</em>, <em>client=None</em>, <em>timeout=None</em>, <em>*unused_options</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport" title="Permalink to this definition">¶</a></dt>
-<dd><p>The RiakPbcTransport object holds a connection to the protocol
-buffers interface on the riak server.</p>
-<p>Construct a new RiakPbcTransport object.</p>
+<dt id="riak.transports.tcp.TcpPool">
+<em class="property">class </em><code class="descclassname">riak.transports.tcp.</code><code class="descname">TcpPool</code><span class="sig-paren">(</span><em>client</em>, <em>**options</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpPool" title="Permalink to this definition">¶</a></dt>
+<dd><p>A resource pool of TCP transports.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riak.transports.tcp.is_retryable">
+<code class="descclassname">riak.transports.tcp.</code><code class="descname">is_retryable</code><span class="sig-paren">(</span><em>err</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.is_retryable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if the given exception is something that is
+network/socket-related and should thus cause the TCP connection to
+close and the operation retried on another node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="riak.transports.tcp.TcpTransport">
+<em class="property">class </em><code class="descclassname">riak.transports.tcp.</code><code class="descname">TcpTransport</code><span class="sig-paren">(</span><em>node=None</em>, <em>client=None</em>, <em>timeout=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>The TcpTransport object holds a connection to the TCP
+socket on the Riak server.</p>
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.clear_bucket_props">
-<code class="descname">clear_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.clear_bucket_props">
+<code class="descname">clear_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.clear_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear bucket properties, resetting them to their defaults</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>robj</em>, <em>r=None</em>, <em>pr=None</em>, <em>timeout=None</em>, <em>basic_quorum=None</em>, <em>notfound_ok=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize get request and deserialize response</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.get_bucket_props">
-<code class="descname">get_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.get_bucket_props">
+<code class="descname">get_bucket_props</code><span class="sig-paren">(</span><em>bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.get_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize bucket property request and deserialize response</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.get_bucket_type_props">
-<code class="descname">get_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_bucket_type_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.get_bucket_type_props">
+<code class="descname">get_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.get_bucket_type_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch bucket-type properties</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.get_buckets">
-<code class="descname">get_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.get_buckets">
+<code class="descname">get_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.get_buckets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize bucket listing request and deserialize response</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.get_keys">
-<code class="descname">get_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_keys" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.get_keys">
+<code class="descname">get_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.get_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lists all keys within a bucket.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.get_preflist">
-<code class="descname">get_preflist</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_preflist" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.get_preflist">
+<code class="descname">get_preflist</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.get_preflist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the preflist for a bucket/key</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1692,52 +1723,52 @@ buffers interface on the riak server.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.get_server_info">
-<code class="descname">get_server_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.get_server_info" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.get_server_info">
+<code class="descname">get_server_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.get_server_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get information about the server</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.ping">
-<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.ping" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.ping">
+<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.ping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ping the remote server</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.set_bucket_props">
-<code class="descname">set_bucket_props</code><span class="sig-paren">(</span><em>bucket</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.set_bucket_props">
+<code class="descname">set_bucket_props</code><span class="sig-paren">(</span><em>bucket</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.set_bucket_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize set bucket property request and deserialize response</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.set_bucket_type_props">
-<code class="descname">set_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.set_bucket_type_props" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.set_bucket_type_props">
+<code class="descname">set_bucket_type_props</code><span class="sig-paren">(</span><em>bucket_type</em>, <em>props</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.set_bucket_type_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set bucket-type properties</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.stream_buckets">
-<code class="descname">stream_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.stream_buckets">
+<code class="descname">stream_buckets</code><span class="sig-paren">(</span><em>bucket_type=None</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.stream_buckets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stream list of buckets through an iterator</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.stream_keys">
-<code class="descname">stream_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.stream_keys" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.stream_keys">
+<code class="descname">stream_keys</code><span class="sig-paren">(</span><em>bucket</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.stream_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams keys from a bucket, returning an iterator that yields
 lists of keys.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="riak.transports.pbc.RiakPbcTransport.ts_stream_keys">
-<code class="descname">ts_stream_keys</code><span class="sig-paren">(</span><em>table</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.ts_stream_keys" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.ts_stream_keys">
+<code class="descname">ts_stream_keys</code><span class="sig-paren">(</span><em>table</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.transports.tcp.TcpTransport.ts_stream_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Streams keys from a timeseries table, returning an iterator that
 yields lists of keys.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="riak.transports.pbc.RiakPbcTransport.client_id">
-<code class="descname">client_id</code><a class="headerlink" href="#riak.transports.pbc.RiakPbcTransport.client_id" title="Permalink to this definition">¶</a></dt>
+<dt id="riak.transports.tcp.TcpTransport.client_id">
+<code class="descname">client_id</code><a class="headerlink" href="#riak.transports.tcp.TcpTransport.client_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>the client ID for this connection</p>
 </dd></dl>
 
@@ -1810,11 +1841,11 @@ list of values.</p>
 <dt id="riak.benchmark.measure">
 <code class="descclassname">riak.benchmark.</code><code class="descname">measure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.benchmark.measure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs a benchmark once when used as a context manager. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">riak</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span> <span class="k">as</span> <span class="n">b</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;pow&quot;</span><span class="p">):</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">riak</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span> <span class="k">as</span> <span class="n">b</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s2">&quot;pow&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
             <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10000</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;factorial&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s2">&quot;factorial&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
             <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 </pre></div>
@@ -1826,11 +1857,11 @@ list of values.</p>
 <code class="descclassname">riak.benchmark.</code><code class="descname">measure_with_rehearsal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.benchmark.measure_with_rehearsal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs a benchmark when used as an iterator, injecting a garbage
 collection between iterations. Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">riak</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">measure_with_rehearsal</span><span class="p">():</span>
-    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;pow&quot;</span><span class="p">):</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">riak</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">measure_with_rehearsal</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s2">&quot;pow&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
             <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10000</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s">&quot;factorial&quot;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">b</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s2">&quot;factorial&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
             <span class="n">math</span><span class="o">.</span><span class="n">factorial</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 </pre></div>
@@ -1880,10 +1911,10 @@ of garbage collection</td>
 <code class="descclassname">riak.util.</code><code class="descname">deep_merge</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.util.deep_merge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merge two deep dicts non-destructively</p>
 <p>Uses a stack to avoid maximum recursion depth exceptions</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="s">&#39;d&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">2</span><span class="p">:</span> <span class="mi">7</span><span class="p">},</span> <span class="s">&#39;d&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;z&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}}</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">2</span><span class="p">:</span> <span class="mi">7</span><span class="p">},</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">deep_merge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span><span class="p">;</span> <span class="n">pprint</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span><span class="p">;</span> <span class="n">pprint</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 <span class="go">{&#39;a&#39;: 1, &#39;b&#39;: {1: 1, 2: 7}, &#39;c&#39;: 3, &#39;d&#39;: {&#39;z&#39;: [1, 2, 3]}}</span>
 </pre></div>
 </div>
@@ -1911,7 +1942,7 @@ immutable data, as it replaces itself on first access.</p>
 <dt id="commands.build_messages">
 <em class="property">class </em><code class="descclassname">commands.</code><code class="descname">build_messages</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#commands.build_messages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates message code mappings. Add to the build process using:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">setup</span><span class="p">(</span><span class="n">cmd_class</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;build_messages&#39;</span><span class="p">:</span> <span class="n">build_messages</span><span class="p">})</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span><span class="n">cmd_class</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;build_messages&#39;</span><span class="p">:</span> <span class="n">build_messages</span><span class="p">})</span>
 </pre></div>
 </div>
 <p>Create and initialize a new Command object.  Most importantly,
@@ -1972,7 +2003,7 @@ If in a git repository, it is the current git tag.
 Otherwise it is the one contained in the PKG-INFO file.</p>
 <p>To use this script, simply import it in your setup.py file
 and use the results of get_version() as your package version:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">version</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">version</span> <span class="k">import</span> <span class="o">*</span>
 
 <span class="n">setup</span><span class="p">(</span>
     <span class="n">version</span><span class="o">=</span><span class="n">get_version</span><span class="p">()</span>
@@ -2022,7 +2053,7 @@ and use the results of get_version() as your package version:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.4.2',
+            VERSION:'2.5.0.post1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
