@@ -322,7 +322,7 @@ class PbufCodec(Codec):
                     else:
                         setattr(msg.props, prop, value)
         if 'repl' in props:
-            msg.props.repl = REPL_TO_PY[props['repl']]
+            msg.props.repl = REPL_TO_PB[props['repl']]
 
         return msg
 
