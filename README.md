@@ -192,4 +192,5 @@ Contributors
 * Soren Hansen
 * Sreejith Kesavan
 * Timothée Peignier
+* [Vitaly Shestovskiy](https://github.com/lamp0chka)
 * William Kral
