@@ -14,6 +14,9 @@ pb_compile: pb_clean
 	@python setup.py build_messages
 
 release_sdist:
+ifeq ($(VERSION),)
+	$(error VERSION must be set to build a release and deploy this package)
+endif
 ifeq ($(PANDOC_VERSION),)
 	$(error The pandoc command is required to correctly convert README.md to rst format)
 endif
@@ -21,8 +24,16 @@ ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
 	@python -c 'import pypandoc'
+	@echo "==> Python tagging version $(VERSION)"
+	# NB: Python client version strings do NOT start with 'v'. Le Sigh.
+	# validate VERSION and allow pre-releases
+	@bash ./build/publish $(VERSION) validate
+	@git tag "$(VERSION)"
+	@git push --tags
+	@git push
 	@echo "==> Python (sdist release)"
 	@python setup.py sdist upload -s -i $(RELEASE_GPG_KEYNAME)
+	@bash ./build/publish $(VERSION)
 
 release: release_sdist
 ifeq ($(RELEASE_GPG_KEYNAME),)
