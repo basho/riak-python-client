@@ -1,5 +1,7 @@
+import logging
 import os
 import socket
+import sys
 
 from riak.test_server import TestServer
 from riak.security import SecurityCreds
@@ -26,6 +28,12 @@ def hostname_resolves(hostname):
         return 1
     except socket.error:
         return 0
+
+distutils_debug = os.environ.get('DISTUTILS_DEBUG', '0')
+if distutils_debug == '1':
+    logger = logging.getLogger()
+    logger.level = logging.DEBUG
+    logger.addHandler(logging.StreamHandler(sys.stdout))
 
 HOST = os.environ.get('RIAK_TEST_HOST', '127.0.0.1')
 

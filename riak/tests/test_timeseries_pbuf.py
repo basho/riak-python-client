@@ -161,7 +161,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
 
         tsobj = TsObject(None, self.table)
         c = PbufCodec()
-        c.decode_timeseries(tqr, tsobj)
+        c.decode_timeseries(tqr, tsobj, True)
 
         self.assertEqual(len(tsobj.rows), len(self.rows))
         self.assertEqual(len(tsobj.columns.names), len(tqr.columns))
@@ -197,7 +197,8 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
                      'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
-    client_options = {'transport_options': {'use_ttb': False}}
+    client_options = {'transport_options':
+                      {'use_ttb': False, 'ts_convert_timestamp': True}}
 
     @classmethod
     def setUpClass(cls):

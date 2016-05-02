@@ -1,10 +1,12 @@
 import six
+
 import riak.pb.messages
 
 from riak import RiakError
 from riak.codecs import Codec, Msg
 from riak.codecs.pbuf import PbufCodec
-from riak.codecs.ttb import TtbCodec, MSG_CODE_TS_TTB
+from riak.codecs.ttb import TtbCodec
+from riak.pb.messages import MSG_CODE_TS_TTB_MSG
 from riak.transports.transport import Transport
 from riak.ts_object import TsObject
 
@@ -39,6 +41,8 @@ class TcpTransport(Transport, TcpConnection):
             kwargs.get('socket_tcp_options', {})
         self._socket_keepalive = \
             kwargs.get('socket_keepalive', False)
+        self._ts_convert_timestamp = \
+            kwargs.get('ts_convert_timestamp', False)
         self._use_ttb = \
             kwargs.get('use_ttb', True)
 
@@ -59,7 +63,7 @@ class TcpTransport(Transport, TcpConnection):
         return codec
 
     def _get_codec(self, msg_code):
-        if msg_code == MSG_CODE_TS_TTB:
+        if msg_code == MSG_CODE_TS_TTB_MSG:
             codec = self._get_ttb_codec()
         elif msg_code == riak.pb.messages.MSG_CODE_TS_GET_REQ:
             codec = self._get_ttb_codec()
@@ -145,16 +149,17 @@ class TcpTransport(Transport, TcpConnection):
         return self.ts_query(table, query)
 
     def ts_get(self, table, key):
-        msg_code = MSG_CODE_TS_TTB
+        msg_code = MSG_CODE_TS_TTB_MSG
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_keyreq(table, key)
         resp_code, resp = self._request(msg, codec)
         tsobj = TsObject(self._client, table)
-        codec.decode_timeseries(resp, tsobj)
+        codec.decode_timeseries(resp, tsobj,
+                                self._ts_convert_timestamp)
         return tsobj
 
     def ts_put(self, tsobj):
-        msg_code = MSG_CODE_TS_TTB
+        msg_code = MSG_CODE_TS_TTB_MSG
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_put(tsobj)
         resp_code, resp = self._request(msg, codec)
@@ -176,7 +181,8 @@ class TcpTransport(Transport, TcpConnection):
         msg = codec.encode_timeseries_query(table, query, interpolations)
         resp_code, resp = self._request(msg, codec)
         tsobj = TsObject(self._client, table)
-        codec.decode_timeseries(resp, tsobj)
+        codec.decode_timeseries(resp, tsobj,
+                                self._ts_convert_timestamp)
         return tsobj
 
     def ts_stream_keys(self, table, timeout=None):
@@ -188,7 +194,7 @@ class TcpTransport(Transport, TcpConnection):
         codec = self._get_codec(msg_code)
         msg = codec.encode_timeseries_listkeysreq(table, timeout)
         self._send_msg(msg.msg_code, msg.data)
-        return PbufTsKeyStream(self, codec)
+        return PbufTsKeyStream(self, codec, self._ts_convert_timestamp)
 
     def delete(self, robj, rw=None, r=None, w=None, dw=None,
                pr=None, pw=None, timeout=None):
@@ -332,7 +338,7 @@ class TcpTransport(Transport, TcpConnection):
     def get_index(self, bucket, index, startkey, endkey=None,
                   return_terms=None, max_results=None, continuation=None,
                   timeout=None, term_regex=None):
-        # TODO RTS-842 NUKE THIS
+        # TODO FUTURE NUKE THIS MAPRED
         if not self.pb_indexes():
             return self._get_index_mapred_emu(bucket, index, startkey, endkey)
 
@@ -433,10 +439,9 @@ class TcpTransport(Transport, TcpConnection):
         return codec.decode_get_search_schema(resp)
 
     def search(self, index, query, **kwargs):
-        # TODO RTS-842 NUKE THIS
+        # TODO FUTURE NUKE THIS MAPRED
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
-        # TODO RTS-842 six.u() instead?
         if six.PY2 and isinstance(query, unicode):  # noqa
             query = query.encode('utf8')
         msg_code = riak.pb.messages.MSG_CODE_SEARCH_QUERY_REQ
@@ -532,7 +537,7 @@ class TcpTransport(Transport, TcpConnection):
         resp_code, data = self._send_recv(msg_code, data)
         codec.maybe_riak_error(resp_code, data)
         codec.maybe_incorrect_code(resp_code, expect)
-        if resp_code == MSG_CODE_TS_TTB or \
+        if resp_code == MSG_CODE_TS_TTB_MSG or \
            resp_code in riak.pb.messages.MESSAGE_CLASSES:
             msg = codec.parse_msg(resp_code, data)
         else:

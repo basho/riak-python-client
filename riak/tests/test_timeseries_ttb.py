@@ -12,8 +12,7 @@ from riak.table import Table
 from riak.ts_object import TsObject
 from riak.codecs.ttb import TtbCodec
 from riak.util import str_to_bytes, \
-    unix_time_millis, datetime_from_unix_time_millis, \
-    is_timeseries_supported
+    unix_time_millis, is_timeseries_supported
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 
@@ -38,7 +37,7 @@ bd0 = six.u('时间序列')
 bd1 = six.u('временные ряды')
 
 fiveMins = datetime.timedelta(0, 300)
-ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0)
+ts0 = datetime.datetime(2015, 1, 1, 12, 1, 2, 987000)
 ts1 = ts0 + fiveMins
 
 
@@ -92,8 +91,9 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
             self.assertEqual(r[0], dr[0].encode('utf-8'))
             self.assertEqual(r[1], dr[1])
             self.assertEqual(r[2], dr[2])
-            dt = datetime_from_unix_time_millis(dr[3])
-            self.assertEqual(r[3], dt)
+            # NB *not* decoding timestamps
+            # dt = datetime_from_unix_time_millis(dr[3])
+            self.assertEqual(r[3], dr[3])
             if i == 0:
                 self.assertEqual(r[4], True)
             else:
@@ -123,7 +123,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
                      'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
-    client_options = {'transport_options': {'use_ttb': True}}
+    client_options = {'transport_options':
+                      {'use_ttb': True, 'ts_convert_timestamp': True}}
 
     @classmethod
     def setUpClass(cls):
