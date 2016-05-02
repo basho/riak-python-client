@@ -28,9 +28,8 @@ endif
 	# NB: Python client version strings do NOT start with 'v'. Le Sigh.
 	# validate VERSION and allow pre-releases
 	@bash ./build/publish $(VERSION) validate
-	@git tag "$(VERSION)"
+	@git tag --sign -a "$(VERSION)" -m "riak-python-client $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
 	@git push --tags
-	@git push
 	@echo "==> Python (sdist release)"
 	@python setup.py sdist upload -s -i $(RELEASE_GPG_KEYNAME)
 	@bash ./build/publish $(VERSION)
