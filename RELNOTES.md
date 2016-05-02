@@ -4,7 +4,7 @@
 
 * [Socket Enhancements](https://github.com/basho/riak-python-client/pull/453) - Resolves [#399](https://github.com/basho/riak-python-client/issues/399)
 * [Add multi-put](https://github.com/basho/riak-python-client/pull/452)
-* [Add support for term-to-binary encoding](https://github.com/basho/riak-python-client/pull/448)
+* [Add support for term-to-binary encoding](https://github.com/basho/riak-python-client/pull/448) *Note:* This requires at least version `1.3.0` of Riak TS.
 
 ## 2.4.2 Patch Release - 2016-02-20
 
