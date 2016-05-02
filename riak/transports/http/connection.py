@@ -31,7 +31,10 @@ class HttpConnection(object):
 
         try:
             self._connection.request(method, uri, body, headers)
-            response = self._connection.getresponse()
+            try:
+                response = self._connection.getresponse(buffering=True)
+            except TypeError:
+                response = self._connection.getresponse()
 
             if stream:
                 # The caller is responsible for fully reading the
