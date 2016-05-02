@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-import platform
+import unittest
+
 from riak.riak_object import RiakObject
 from riak.bucket import RiakBucket, BucketType
 from riak.tests.base import IntegrationTestBase
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 
 class BucketTypeRichComparisonTest(unittest.TestCase):

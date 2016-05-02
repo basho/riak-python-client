@@ -1,24 +1,3 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-Copyright 2010 Rusty Klophaus <rusty@basho.com>
-Copyright 2010 Justin Sheehy <justin@basho.com>
-Copyright 2009 Jay Baird <jay@mochimedia.com>
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 try:
     import simplejson as json
 except ImportError:
@@ -26,28 +5,30 @@ except ImportError:
 
 from six import PY2
 from xml.dom.minidom import Document
-from riak.transports.transport import RiakTransport
-from riak.transports.http.resources import RiakHttpResources
-from riak.transports.http.connection import RiakHttpConnection
-from riak.transports.http.codec import RiakHttpCodec
-from riak.transports.http.stream import (
-    RiakHttpKeyStream,
-    RiakHttpMapReduceStream,
-    RiakHttpBucketStream,
-    RiakHttpIndexStream)
+
 from riak import RiakError
+from riak.codecs.http import HttpCodec
+from riak.transports.transport import Transport
+from riak.transports.http.resources import HttpResources
+from riak.transports.http.connection import HttpConnection
+from riak.transports.http.stream import (
+    HttpKeyStream,
+    HttpMapReduceStream,
+    HttpBucketStream,
+    HttpIndexStream)
 from riak.security import SecurityError
 from riak.util import decode_index_value, bytes_to_str, str_to_long
+
 if PY2:
     from httplib import HTTPConnection
 else:
     from http.client import HTTPConnection
 
 
-class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
-                        RiakTransport):
+class HttpTransport(Transport,
+                    HttpConnection, HttpResources, HttpCodec):
     """
-    The RiakHttpTransport object holds information necessary to
+    The HttpTransport object holds information necessary to
     connect to Riak via HTTP.
     """
 
@@ -59,7 +40,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         """
         Construct a new HTTP connection to Riak.
         """
-        super(RiakHttpTransport, self).__init__()
+        super(HttpTransport, self).__init__()
 
         self._client = client
         self._node = node
@@ -219,7 +200,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
-            return RiakHttpKeyStream(response)
+            return HttpKeyStream(response)
         else:
             raise RiakError('Error listing keys.')
 
@@ -252,7 +233,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
-            return RiakHttpBucketStream(response)
+            return HttpBucketStream(response)
         else:
             raise RiakError('Error listing buckets.')
 
@@ -371,7 +352,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
                                                   content, stream=True)
 
         if status == 200:
-            return RiakHttpMapReduceStream(response)
+            return HttpMapReduceStream(response)
         else:
             raise RiakError(
                 'Error running MapReduce operation. Headers: %s Body: %s' %
@@ -441,7 +422,7 @@ class RiakHttpTransport(RiakHttpConnection, RiakHttpResources, RiakHttpCodec,
         status, headers, response = self._request('GET', url, stream=True)
 
         if status == 200:
-            return RiakHttpIndexStream(response, index, return_terms)
+            return HttpIndexStream(response, index, return_terms)
         else:
             raise RiakError('Error streaming secondary index.')
 

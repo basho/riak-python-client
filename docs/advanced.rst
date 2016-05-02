@@ -36,11 +36,11 @@ Retry logic
 
 .. autofunction:: retryableHttpOnly
 
---------
-Multiget
---------
+-------------------
+Multiget / Multiput
+-------------------
 
-.. currentmodule:: riak.client.multiget
+.. currentmodule:: riak.client.multi
 
 .. autodata:: POOL_SIZE
 
@@ -50,9 +50,15 @@ Multiget
    :members:
    :private-members:
 
+.. autoclass:: MultiPutPool
+   :members:
+   :private-members:
+
 .. autodata:: RIAK_MULTIGET_POOL
+.. autodata:: RIAK_MULTIPUT_POOL
 
 .. autofunction:: multiget
+.. autofunction:: multiput
 
 ---------
 Datatypes
@@ -93,7 +99,7 @@ Transports
 
 .. currentmodule:: riak.transports.transport
 
-.. autoclass:: RiakTransport
+.. autoclass:: Transport
    :members:
    :private-members:
 
@@ -125,20 +131,24 @@ HTTP Transport
 
 .. currentmodule:: riak.transports.http
 
-.. autoclass:: RiakHttpPool
+.. autoclass:: HttpPool
 
 .. autofunction:: is_retryable
 
-.. autoclass:: RiakHttpTransport
+.. autoclass:: HttpTransport
    :members:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Protocol Buffers Transport
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+TCP Transport
+^^^^^^^^^^^^^
 
-.. currentmodule:: riak.transports.pbc
+.. currentmodule:: riak.transports.tcp
 
-.. autoclass:: RiakPbcTransport
+.. autoclass:: TcpPool
+
+.. autofunction:: is_retryable
+
+.. autoclass:: TcpTransport
    :members:
 
 ---------

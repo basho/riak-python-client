@@ -1,33 +1,17 @@
-"""
-Copyright 2015 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
+import base64
 
 from six import PY2
-import base64
 from riak.util import str_to_bytes
+
 if PY2:
     from httplib import NotConnected, HTTPConnection
 else:
     from http.client import NotConnected, HTTPConnection
 
 
-class RiakHttpConnection(object):
+class HttpConnection(object):
     """
-    Connection and low-level request methods for RiakHttpTransport.
+    Connection and low-level request methods for HttpTransport.
     """
 
     def _request(self, method, uri, headers={}, body='', stream=False):
@@ -47,7 +31,10 @@ class RiakHttpConnection(object):
 
         try:
             self._connection.request(method, uri, body, headers)
-            response = self._connection.getresponse()
+            try:
+                response = self._connection.getresponse(buffering=True)
+            except TypeError:
+                response = self._connection.getresponse()
 
             if stream:
                 # The caller is responsible for fully reading the
@@ -93,7 +80,7 @@ class RiakHttpConnection(object):
         except NotConnected:
             pass
 
-    # These are set by the RiakHttpTransport initializer
+    # These are set by the HttpTransport initializer
     _connection_class = HTTPConnection
     _node = None
 

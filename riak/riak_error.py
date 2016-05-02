@@ -21,8 +21,12 @@ class RiakError(Exception):
     """
     Base class for exceptions generated in the Riak API.
     """
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, *args, **kwargs):
+        super(RiakError, self).__init__(*args, **kwargs)
+        if len(args) > 0:
+            self.value = args[0]
+        else:
+            self.value = 'unknown'
 
     def __str__(self):
         return repr(self.value)
@@ -34,5 +38,5 @@ class ConflictError(RiakError):
     :class:`~riak.riak_object.RiakObject` that has more than one
     sibling.
     """
-    def __init__(self, message="Object in conflict"):
+    def __init__(self, message='Object in conflict'):
         super(ConflictError, self).__init__(message)

@@ -1,23 +1,25 @@
 import json
+
 import riak.pb.messages
 
 from riak.util import decode_index_value, bytes_to_str
 from riak.client.index_page import CONTINUATION
-from riak.transports.pbc.codec import RiakPbcCodec
+from riak.codecs.ttb import TtbCodec
 from six import PY2
 
 
-class RiakPbcStream(object):
+class PbufStream(object):
     """
-    Used internally by RiakPbcTransport to implement streaming
+    Used internally by TcpTransport to implement streaming
     operations. Implements the iterator interface.
     """
 
     _expect = None
 
-    def __init__(self, transport):
+    def __init__(self, transport, codec):
         self.finished = False
         self.transport = transport
+        self.codec = codec
         self.resource = None
 
     def __iter__(self):
@@ -28,7 +30,11 @@ class RiakPbcStream(object):
             raise StopIteration
 
         try:
-            msg_code, resp = self.transport._recv_msg(expect=self._expect)
+            resp_code, data = self.transport._recv_msg()
+            self.codec.maybe_riak_error(resp_code, data)
+            expect = self._expect
+            self.codec.maybe_incorrect_code(resp_code, expect)
+            resp = self.codec.parse_msg(expect, data)
         except:
             self.finished = True
             raise
@@ -62,15 +68,15 @@ class RiakPbcStream(object):
         self.resource.release()
 
 
-class RiakPbcKeyStream(RiakPbcStream):
+class PbufKeyStream(PbufStream):
     """
-    Used internally by RiakPbcTransport to implement key-list streams.
+    Used internally by TcpTransport to implement key-list streams.
     """
 
     _expect = riak.pb.messages.MSG_CODE_LIST_KEYS_RESP
 
     def next(self):
-        response = super(RiakPbcKeyStream, self).next()
+        response = super(PbufKeyStream, self).next()
 
         if response.done and len(response.keys) is 0:
             raise StopIteration
@@ -82,16 +88,16 @@ class RiakPbcKeyStream(RiakPbcStream):
         return self.next()
 
 
-class RiakPbcMapredStream(RiakPbcStream):
+class PbufMapredStream(PbufStream):
     """
-    Used internally by RiakPbcTransport to implement MapReduce
+    Used internally by TcpTransport to implement MapReduce
     streams.
     """
 
     _expect = riak.pb.messages.MSG_CODE_MAP_RED_RESP
 
     def next(self):
-        response = super(RiakPbcMapredStream, self).next()
+        response = super(PbufMapredStream, self).next()
 
         if response.done and not response.HasField('response'):
             raise StopIteration
@@ -103,15 +109,15 @@ class RiakPbcMapredStream(RiakPbcStream):
         return self.next()
 
 
-class RiakPbcBucketStream(RiakPbcStream):
+class PbufBucketStream(PbufStream):
     """
-    Used internally by RiakPbcTransport to implement key-list streams.
+    Used internally by TcpTransport to implement key-list streams.
     """
 
     _expect = riak.pb.messages.MSG_CODE_LIST_BUCKETS_RESP
 
     def next(self):
-        response = super(RiakPbcBucketStream, self).next()
+        response = super(PbufBucketStream, self).next()
 
         if response.done and len(response.buckets) is 0:
             raise StopIteration
@@ -123,21 +129,21 @@ class RiakPbcBucketStream(RiakPbcStream):
         return self.next()
 
 
-class RiakPbcIndexStream(RiakPbcStream):
+class PbufIndexStream(PbufStream):
     """
-    Used internally by RiakPbcTransport to implement Secondary Index
+    Used internally by TcpTransport to implement Secondary Index
     streams.
     """
 
     _expect = riak.pb.messages.MSG_CODE_INDEX_RESP
 
-    def __init__(self, transport, index, return_terms=False):
-        super(RiakPbcIndexStream, self).__init__(transport)
+    def __init__(self, transport, codec, index, return_terms=False):
+        super(PbufIndexStream, self).__init__(transport, codec)
         self.index = index
         self.return_terms = return_terms
 
     def next(self):
-        response = super(RiakPbcIndexStream, self).next()
+        response = super(PbufIndexStream, self).next()
 
         if response.done and not (response.keys or
                                   response.results or
@@ -161,22 +167,27 @@ class RiakPbcIndexStream(RiakPbcStream):
         return self.next()
 
 
-class RiakPbcTsKeyStream(RiakPbcStream, RiakPbcCodec):
+class PbufTsKeyStream(PbufStream, TtbCodec):
     """
-    Used internally by RiakPbcTransport to implement key-list streams.
+    Used internally by TcpTransport to implement TS key-list streams.
     """
 
     _expect = riak.pb.messages.MSG_CODE_TS_LIST_KEYS_RESP
 
+    def __init__(self, transport, codec, convert_timestamp=False):
+        super(PbufTsKeyStream, self).__init__(transport, codec)
+        self._convert_timestamp = convert_timestamp
+
     def next(self):
-        response = super(RiakPbcTsKeyStream, self).next()
+        response = super(PbufTsKeyStream, self).next()
 
         if response.done and len(response.keys) is 0:
             raise StopIteration
 
         keys = []
         for tsrow in response.keys:
-            keys.append(self._decode_timeseries_row(tsrow))
+            keys.append(self.codec.decode_timeseries_row(tsrow,
+                        convert_timestamp=self._convert_timestamp))
 
         return keys
 

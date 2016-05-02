@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
-import os
 import random
-import sys
 
 from riak.client import RiakClient
 from riak.tests import HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
 
 
 class IntegrationTestBase(object):
-
     host = None
     pb_port = None
     http_port = None
@@ -28,7 +25,7 @@ class IntegrationTestBase(object):
 
     @classmethod
     def create_client(cls, host=None, http_port=None, pb_port=None,
-                      protocol=None, credentials=None, **client_args):
+                      protocol=None, credentials=None, **kwargs):
         host = host or HOST
         http_port = http_port or HTTP_PORT
         pb_port = pb_port or PB_PORT
@@ -43,39 +40,20 @@ class IntegrationTestBase(object):
 
         credentials = credentials or SECURITY_CREDS
 
-        if hasattr(cls, 'logging_enabled') and cls.logging_enabled:
-            cls.logger.debug("RiakClient(protocol='%s', host='%s', " +
-                             "pb_port='%d', http_port='%d', " +
-                             "credentials='%s', client_args='%s')",
-                             protocol,
-                             host,
-                             pb_port,
-                             http_port,
-                             credentials,
-                             client_args)
+        if hasattr(cls, 'client_options'):
+            kwargs.update(cls.client_options)
+
+        logger = logging.getLogger()
+        logger.debug("RiakClient(protocol='%s', host='%s', pb_port='%d', "
+                     "http_port='%d', credentials='%s', kwargs='%s')",
+                     protocol, host, pb_port, http_port, credentials, kwargs)
 
         return RiakClient(protocol=protocol,
                           host=host,
                           http_port=http_port,
                           credentials=credentials,
-                          pb_port=pb_port, **client_args)
-
-    @classmethod
-    def setUpClass(cls):
-        cls.logging_enabled = False
-        distutils_debug = os.environ.get('DISTUTILS_DEBUG', '0')
-        if distutils_debug == '1':
-            cls.logging_enabled = True
-            cls.logger = logging.getLogger()
-            cls.logger.level = logging.DEBUG
-            cls.logging_stream_handler = logging.StreamHandler(sys.stdout)
-            cls.logger.addHandler(cls.logging_stream_handler)
-
-    @classmethod
-    def tearDownClass(cls):
-        if hasattr(cls, 'logging_enabled') and cls.logging_enabled:
-            cls.logger.removeHandler(cls.logging_stream_handler)
-            cls.logging_enabled = False
+                          pb_port=pb_port,
+                          **kwargs)
 
     def setUp(self):
         self.bucket_name = self.randname()

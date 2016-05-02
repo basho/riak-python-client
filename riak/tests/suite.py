@@ -1,10 +1,5 @@
 import os.path
-import platform
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
+import unittest
 
 
 def additional_tests():

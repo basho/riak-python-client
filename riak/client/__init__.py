@@ -11,12 +11,12 @@ from riak.bucket import RiakBucket, BucketType
 from riak.mapreduce import RiakMapReduceChain
 from riak.resolver import default_resolver
 from riak.table import Table
-from riak.transports.http import RiakHttpPool
-from riak.transports.pbc import RiakPbcPool
+from riak.transports.http import HttpPool
+from riak.transports.tcp import TcpPool
 from riak.security import SecurityCreds
 from riak.util import lazy_property, bytes_to_str, str_to_bytes
 from six import string_types, PY2
-from riak.client.multiget import MultiGetPool
+from riak.client.multi import MultiGetPool, MultiPutPool
 
 
 def default_encoder(obj):
@@ -67,8 +67,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     #: The supported protocols
     PROTOCOLS = ['http', 'pbc']
 
-    def __init__(self, protocol='pbc', transport_options={}, nodes=None,
-                 credentials=None, multiget_pool_size=None, **unused_args):
+    def __init__(self, protocol='pbc', transport_options={},
+                 nodes=None, credentials=None,
+                 multiget_pool_size=None, multiput_pool_size=None,
+                 **kwargs):
         """
         Construct a new ``RiakClient`` object.
 
@@ -87,20 +89,25 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
            :meth:`multiget` operations. Defaults to a factor of the number of
            CPUs in the system
         :type multiget_pool_size: int
+        :param multiput_pool_size: the number of threads to use in
+           :meth:`multiput` operations. Defaults to a factor of the number of
+           CPUs in the system
+        :type multiput_pool_size: int
         """
-        unused_args = unused_args.copy()
+        kwargs = kwargs.copy()
 
         if nodes is None:
-            self.nodes = [self._create_node(unused_args), ]
+            self.nodes = [self._create_node(kwargs), ]
         else:
             self.nodes = [self._create_node(n) for n in nodes]
 
         self._multiget_pool_size = multiget_pool_size
+        self._multiput_pool_size = multiput_pool_size
         self.protocol = protocol or 'pbc'
         self._resolver = None
         self._credentials = self._create_credentials(credentials)
-        self._http_pool = RiakHttpPool(self, **transport_options)
-        self._pb_pool = RiakPbcPool(self, **transport_options)
+        self._http_pool = HttpPool(self, **transport_options)
+        self._tcp_pool = TcpPool(self, **transport_options)
 
         if PY2:
             self._encoders = {'application/json': default_encoder,
@@ -167,7 +174,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def _set_client_id(self, client_id):
         for http in self._http_pool:
             http.client_id = client_id
-        for pb in self._pb_pool:
+        for pb in self._tcp_pool:
             pb.client_id = client_id
 
     client_id = property(_get_client_id, _set_client_id,
@@ -298,8 +305,8 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         if self._http_pool is not None:
             self._http_pool.clear()
-        if self._pb_pool is not None:
-            self._pb_pool.clear()
+        if self._tcp_pool is not None:
+            self._tcp_pool.clear()
 
     def _create_node(self, n):
         if isinstance(n, RiakNode):
@@ -355,6 +362,13 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def _multiget_pool(self):
         if self._multiget_pool_size:
             return MultiGetPool(self._multiget_pool_size)
+        else:
+            return None
+
+    @lazy_property
+    def _multiput_pool(self):
+        if self._multiput_pool_size:
+            return MultiPutPool(self._multiput_pool_size)
         else:
             return None
 

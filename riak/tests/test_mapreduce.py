@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-import platform
+import unittest
 
 from six import PY2
 from riak.mapreduce import RiakMapReduce
@@ -12,13 +12,8 @@ from riak.tests.test_yokozuna import wait_for_yz_index
 from riak.tests import RUN_SECURITY
 from riak.tests.yz_setup import yzSetUp, yzTearDown
 
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
-
-testrun_yz_mr = {'btype': 'pytest-mr',
+testrun_yz_mr = {'btype': 'mr',
                  'bucket': 'mrbucket',
                  'index': 'mrbucket'}
 
@@ -116,16 +111,16 @@ class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_erlang_map_reduce_bucket_type(self):
         # Create the object...
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 2).store()
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add(self.bucket_name, "foo", bucket_type="pytest") \
-            .add(self.bucket_name, "bar", bucket_type="pytest") \
-            .add(self.bucket_name, "baz", bucket_type="pytest") \
+            .add(self.bucket_name, "foo", bucket_type='no_siblings') \
+            .add(self.bucket_name, "bar", bucket_type='no_siblings') \
+            .add(self.bucket_name, "baz", bucket_type='no_siblings') \
             .map(["riak_kv_mapreduce", "map_object_value"]) \
             .reduce(["riak_kv_mapreduce", "reduce_set_union"]) \
             .run()
@@ -159,7 +154,7 @@ class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_erlang_source_map_reduce_bucket_type(self):
         # Create the object...
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 3).store()
@@ -168,9 +163,9 @@ class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
         # Run the map...
         try:
             result = self.client \
-                .add(self.bucket_name, "foo", bucket_type="pytest") \
-                .add(self.bucket_name, "bar", bucket_type="pytest") \
-                .add(self.bucket_name, "baz", bucket_type="pytest") \
+                .add(self.bucket_name, "foo", bucket_type='no_siblings') \
+                .add(self.bucket_name, "bar", bucket_type='no_siblings') \
+                .add(self.bucket_name, "baz", bucket_type='no_siblings') \
                 .map("""fun(Object, _KD, _A) ->
             Value = riak_object:get_value(Object),
             [Value]
@@ -255,12 +250,12 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_javascript_named_map_bucket_type(self):
         # Create the object...
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         # Run the map...
         result = self.client \
-            .add(self.bucket_name, "foo", bucket_type="pytest") \
+            .add(self.bucket_name, "foo", bucket_type='no_siblings') \
             .map("Riak.mapValuesJson") \
             .run()
         self.assertEqual(result, [2])
@@ -283,16 +278,16 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_javascript_source_map_reduce_bucket_type(self):
         # Create the object...
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 3).store()
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add(self.bucket_name, "foo", bucket_type="pytest") \
-            .add(self.bucket_name, "bar", bucket_type="pytest") \
-            .add(self.bucket_name, "baz", bucket_type="pytest") \
+            .add(self.bucket_name, "foo", bucket_type='no_siblings') \
+            .add(self.bucket_name, "bar", bucket_type='no_siblings') \
+            .add(self.bucket_name, "baz", bucket_type='no_siblings') \
             .map("function (v) { return [1]; }") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -316,16 +311,16 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_javascript_named_map_reduce_bucket_type(self):
         # Create the object...
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         bucket.new("bar", 3).store()
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add(self.bucket_name, "foo", bucket_type="pytest") \
-            .add(self.bucket_name, "bar", bucket_type="pytest") \
-            .add(self.bucket_name, "baz", bucket_type="pytest") \
+            .add(self.bucket_name, "foo", bucket_type='no_siblings') \
+            .add(self.bucket_name, "bar", bucket_type='no_siblings') \
+            .add(self.bucket_name, "baz", bucket_type='no_siblings') \
             .map("Riak.mapValuesJson") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -347,14 +342,14 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_javascript_bucket_map_reduceP_bucket_type(self):
         # Create the object...
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket("bucket_%s" % self.randint())
         bucket.new("foo", 2).store()
         bucket.new("bar", 3).store()
         bucket.new("baz", 4).store()
         # Run the map...
         result = self.client \
-            .add(bucket.name, bucket_type="pytest") \
+            .add(bucket.name, bucket_type='no_siblings') \
             .map("Riak.mapValuesJson") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -378,16 +373,16 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_javascript_arg_map_reduce_bucket_type(self):
         # Create the object...
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket(self.bucket_name)
         bucket.new("foo", 2).store()
         # Run the map...
         result = self.client \
-            .add(self.bucket_name, "foo", 5, bucket_type="pytest") \
-            .add(self.bucket_name, "foo", 10, bucket_type="pytest") \
-            .add(self.bucket_name, "foo", 15, bucket_type="pytest") \
-            .add(self.bucket_name, "foo", -15, bucket_type="pytest") \
-            .add(self.bucket_name, "foo", -5, bucket_type="pytest") \
+            .add(self.bucket_name, "foo", 5, bucket_type='no_siblings') \
+            .add(self.bucket_name, "foo", 10, bucket_type='no_siblings') \
+            .add(self.bucket_name, "foo", 15, bucket_type='no_siblings') \
+            .add(self.bucket_name, "foo", -15, bucket_type='no_siblings') \
+            .add(self.bucket_name, "foo", -5, bucket_type='no_siblings') \
             .map("function(v, arg) { return [arg]; }") \
             .reduce("Riak.reduceSum") \
             .run()
@@ -409,14 +404,14 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(result, ["yahoo-20090613"])
 
     def test_key_filters_bucket_type(self):
-        btype = self.client.bucket_type("pytest")
+        btype = self.client.bucket_type('no_siblings')
         bucket = btype.bucket("kftest")
         bucket.new("basho-20101215", 1).store()
         bucket.new("google-20110103", 2).store()
         bucket.new("yahoo-20090613", 3).store()
 
         result = self.client \
-            .add("kftest", bucket_type="pytest") \
+            .add("kftest", bucket_type='no_siblings') \
             .add_key_filters([["tokenize", "-", 2]]) \
             .add_key_filter("ends_with", "0613") \
             .map("function (v, keydata) { return [v.key]; }") \

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-import os
-import platform
-from six import string_types, PY2, PY3
-
 import copy
+import os
+import sys
+import unittest
+
+from six import string_types, PY2, PY3
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
@@ -15,11 +16,6 @@ try:
     import simplejson as json
 except ImportError:
     import json
-
-if platform.python_version() < '2.7':
-    unittest = __import__('unittest2')
-else:
-    import unittest
 
 if PY2:
     import cPickle
@@ -184,17 +180,29 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
     def test_generate_key(self):
         # Ensure that Riak generates a random key when
         # the key passed to bucket.new() is None.
-        bucket = self.client.bucket('random_key_bucket')
-        existing_keys = bucket.get_keys()
+        bucket = self.client.bucket(self.bucket_name)
         o = bucket.new(None, data={})
         self.assertIsNone(o.key)
         o.store()
         self.assertIsNotNone(o.key)
         self.assertNotIn('/', o.key)
-        self.assertNotIn(o.key, existing_keys)
-        self.assertEqual(len(bucket.get_keys()), len(existing_keys) + 1)
+        existing_keys = bucket.get_keys()
+        self.assertEqual(len(existing_keys), 1)
+
+    def maybe_store_keys(self):
+        skey = 'rkb-init'
+        bucket = self.client.bucket('random_key_bucket')
+        sobj = bucket.get(skey)
+        if sobj.exists:
+            return
+        for key in range(1, 1000):
+            o = bucket.new(None, data={})
+            o.store()
+        o = bucket.new(skey, data={})
+        o.store()
 
     def test_stream_keys(self):
+        self.maybe_store_keys()
         bucket = self.client.bucket('random_key_bucket')
         regular_keys = bucket.get_keys()
         self.assertNotEqual(len(regular_keys), 0)
@@ -207,10 +215,8 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertEqual(sorted(regular_keys), sorted(streamed_keys))
 
     def test_stream_keys_timeout(self):
+        self.maybe_store_keys()
         bucket = self.client.bucket('random_key_bucket')
-        for key in range(1, 1000):
-            o = bucket.new(None, data={})
-            o.store()
         streamed_keys = []
         with self.assertRaises(RiakError):
             for keylist in self.client.stream_keys(bucket, timeout=1):
@@ -220,6 +226,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
                 streamed_keys += keylist
 
     def test_stream_keys_abort(self):
+        self.maybe_store_keys()
         bucket = self.client.bucket('random_key_bucket')
         regular_keys = bucket.get_keys()
         self.assertNotEqual(len(regular_keys), 0)
@@ -695,13 +702,15 @@ class KVFileTests(IntegrationTestBase, unittest.TestCase):
         obj.store()
         obj = bucket.get(self.key_name)
         self.assertNotEqual(obj.encoded_data, None)
+        is_win32 = sys.platform == 'win32'
         self.assertTrue(obj.content_type == 'text/x-python' or
+                        (is_win32 and obj.content_type == 'text/plain') or
                         obj.content_type == 'application/x-python-code')
 
     def test_store_binary_object_from_file_should_use_default_mimetype(self):
         bucket = self.client.bucket(self.bucket_name)
         filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                os.pardir, os.pardir, 'README.rst')
+                                os.pardir, os.pardir, 'README.md')
         obj = bucket.new_from_file(self.key_name, filepath)
         obj.store()
         obj = bucket.get(self.key_name)

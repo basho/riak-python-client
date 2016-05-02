@@ -1,23 +1,6 @@
-"""
-Copyright 2012 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import json
 import re
+
 from cgi import parse_header
 from email import message_from_string
 from riak.util import decode_index_value
@@ -26,7 +9,7 @@ from riak import RiakError
 from six import PY2
 
 
-class RiakHttpStream(object):
+class HttpStream(object):
     """
     Base class for HTTP streaming iterators.
     """
@@ -66,7 +49,7 @@ class RiakHttpStream(object):
         self.resource.release()
 
 
-class RiakHttpJsonStream(RiakHttpStream):
+class HttpJsonStream(HttpStream):
     _json_field = None
 
     def next(self):
@@ -92,26 +75,26 @@ class RiakHttpJsonStream(RiakHttpStream):
         return self.next()
 
 
-class RiakHttpKeyStream(RiakHttpJsonStream):
+class HttpKeyStream(HttpJsonStream):
     """
     Streaming iterator for list-keys over HTTP
     """
     _json_field = u'keys'
 
 
-class RiakHttpBucketStream(RiakHttpJsonStream):
+class HttpBucketStream(HttpJsonStream):
     """
     Streaming iterator for list-buckets over HTTP
     """
     _json_field = u'buckets'
 
 
-class RiakHttpMultipartStream(RiakHttpStream):
+class HttpMultipartStream(HttpStream):
     """
     Streaming iterator for multipart messages over HTTP
     """
     def __init__(self, response):
-        super(RiakHttpMultipartStream, self).__init__(response)
+        super(HttpMultipartStream, self).__init__(response)
         ctypehdr = response.getheader('content-type')
         _, params = parse_header(ctypehdr)
         self.boundary_re = re.compile('\r?\n--%s(?:--)?\r?\n' %
@@ -154,13 +137,13 @@ class RiakHttpMultipartStream(RiakHttpStream):
             self._read()
 
 
-class RiakHttpMapReduceStream(RiakHttpMultipartStream):
+class HttpMapReduceStream(HttpMultipartStream):
     """
     Streaming iterator for MapReduce over HTTP
     """
 
     def next(self):
-        message = super(RiakHttpMapReduceStream, self).next()
+        message = super(HttpMapReduceStream, self).next()
         payload = json.loads(message.get_payload())
         return payload['phase'], payload['data']
 
@@ -169,18 +152,18 @@ class RiakHttpMapReduceStream(RiakHttpMultipartStream):
         return self.next()
 
 
-class RiakHttpIndexStream(RiakHttpMultipartStream):
+class HttpIndexStream(HttpMultipartStream):
     """
     Streaming iterator for secondary indexes over HTTP
     """
 
     def __init__(self, response, index, return_terms):
-        super(RiakHttpIndexStream, self).__init__(response)
+        super(HttpIndexStream, self).__init__(response)
         self.index = index
         self.return_terms = return_terms
 
     def next(self):
-        message = super(RiakHttpIndexStream, self).next()
+        message = super(HttpIndexStream, self).next()
         payload = json.loads(message.get_payload())
         if u'error' in payload:
             raise RiakError(payload[u'error'])

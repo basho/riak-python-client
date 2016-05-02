@@ -1,33 +1,15 @@
-"""
-Copyright 2010 Rusty Klophaus <rusty@basho.com>
-Copyright 2010 Justin Sheehy <justin@basho.com>
-Copyright 2009 Jay Baird <jay@mochimedia.com>
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
 import base64
 import random
 import threading
 import os
 import json
 import platform
+
 from six import PY2
 from riak.transports.feature_detect import FeatureDetection
 
 
-class RiakTransport(FeatureDetection):
+class Transport(FeatureDetection):
     """
     Class to encapsulate transport details and methods. All protocol
     transports are subclasses of this class.
@@ -92,9 +74,27 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    def ts_describe(self, table):
+        """
+        Retrieves a timeseries table description.
+        """
+        raise NotImplementedError
+
+    def ts_get(self, table, key):
+        """
+        Retrieves a timeseries object.
+        """
+        raise NotImplementedError
+
     def ts_put(self, tsobj):
         """
         Stores a timeseries object.
+        """
+        raise NotImplementedError
+
+    def ts_delete(self, table, key):
+        """
+        Deletes a timeseries object.
         """
         raise NotImplementedError
 
@@ -295,6 +295,7 @@ class RiakTransport(FeatureDetection):
         """
         raise NotImplementedError
 
+    # TODO FUTURE NUKE THIS MAPRED
     def _search_mapred_emu(self, index, query):
         """
         Emulates a search request via MapReduce. Used in the case
@@ -320,6 +321,7 @@ class RiakTransport(FeatureDetection):
             result['docs'].append({u'id': key})
         return result
 
+    # TODO FUTURE NUKE THIS MAPRED
     def _get_index_mapred_emu(self, bucket, index, startkey, endkey=None):
         """
         Emulates a secondary index request via MapReduce. Used in the
@@ -360,6 +362,5 @@ class RiakTransport(FeatureDetection):
     def _check_bucket_types(self, bucket_type):
         if not self.bucket_types():
             raise NotImplementedError('Server does not support bucket-types')
-
         if bucket_type.is_default():
             raise ValueError('Cannot manipulate the default bucket-type')

@@ -1,4 +1,8 @@
+import logging
 import os
+import socket
+import sys
+
 from riak.test_server import TestServer
 from riak.security import SecurityCreds
 
@@ -17,15 +21,29 @@ try:
 except ImportError:
     HAVE_PROTO = False
 
+
+def hostname_resolves(hostname):
+    try:
+        socket.gethostbyname(hostname)
+        return 1
+    except socket.error:
+        return 0
+
+distutils_debug = os.environ.get('DISTUTILS_DEBUG', '0')
+if distutils_debug == '1':
+    logger = logging.getLogger()
+    logger.level = logging.DEBUG
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+
 HOST = os.environ.get('RIAK_TEST_HOST', '127.0.0.1')
 
 PROTOCOL = os.environ.get('RIAK_TEST_PROTOCOL', 'pbc')
 
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
-PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
+PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '10017'))
 
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
-HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
+HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '10018'))
 
 # these ports are used to simulate errors, there shouldn't
 # be anything listening on either port.
@@ -45,24 +63,33 @@ RUN_BTYPES = int(os.environ.get('RUN_BTYPES', '1'))
 RUN_DATATYPES = int(os.environ.get('RUN_DATATYPES', '1'))
 
 RUN_SECURITY = int(os.environ.get('RUN_SECURITY', '0'))
-SECURITY_USER = os.environ.get('RIAK_TEST_SECURITY_USER', 'testuser')
-SECURITY_PASSWD = os.environ.get('RIAK_TEST_SECURITY_PASSWD', 'testpassword')
+if RUN_SECURITY:
+    h = 'riak-test'
+    if hostname_resolves(h):
+        HOST = PB_HOST = HTTP_HOST = h
+    else:
+        raise AssertionError(
+                'RUN_SECURITY requires that the host name' +
+                ' "riak-test" resolves to the IP address of a Riak node' +
+                ' with security enabled.')
+
+SECURITY_USER = os.environ.get('RIAK_TEST_SECURITY_USER', 'riakpass')
+SECURITY_PASSWD = os.environ.get('RIAK_TEST_SECURITY_PASSWD', 'Test1234')
+
 SECURITY_CACERT = os.environ.get('RIAK_TEST_SECURITY_CACERT',
-                                 'riak/tests/resources/ca.crt')
+                                 'tools/test-ca/certs/cacert.pem')
 SECURITY_REVOKED = os.environ.get('RIAK_TEST_SECURITY_REVOKED',
-                                  'riak/tests/resources/server.crl')
+                                  'tools/test-ca/crl/crl.pem')
 SECURITY_BAD_CERT = os.environ.get('RIAK_TEST_SECURITY_BAD_CERT',
-                                   'riak/tests/resources/bad_ca.crt')
+                                   'tools/test-ca/certs/badcert.pem')
 # Certificate-based Authentication only supported by PBC
-# N.B., username and password must both still be supplied
-SECURITY_KEY = os.environ.get('RIAK_TEST_SECURITY_KEY',
-                              'riak/tests/resources/client.key')
+SECURITY_KEY = os.environ.get(
+        'RIAK_TEST_SECURITY_KEY',
+        'tools/test-ca/private/riakuser-client-cert-key.pem')
 SECURITY_CERT = os.environ.get('RIAK_TEST_SECURITY_CERT',
-                               'riak/tests/resources/client.crt')
+                               'tools/test-ca/certs/riakuser-client-cert.pem')
 SECURITY_CERT_USER = os.environ.get('RIAK_TEST_SECURITY_CERT_USER',
-                                    'certuser')
-SECURITY_CERT_PASSWD = os.environ.get('RIAK_TEST_SECURITY_CERT_PASSWD',
-                                      'certpass')
+                                    'riakuser')
 
 SECURITY_CIPHERS = 'DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:' + \
         'DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:AES128-SHA256:' + \

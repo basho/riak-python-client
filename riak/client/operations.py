@@ -1,6 +1,7 @@
+import riak.client.multi
+
 from riak.client.transport import RiakClientTransport, \
     retryable, retryableHttpOnly
-from riak.client.multiget import multiget
 from riak.client.index_page import IndexPage
 from riak.datatypes import TYPES
 from riak.table import Table
@@ -537,6 +538,25 @@ class RiakClientOperations(RiakClientTransport):
                              timeout=timeout)
 
     @retryable
+    def ts_describe(self, transport, table):
+        """
+        ts_describe(table)
+
+        Retrieve a time series table description from the Riak cluster.
+
+        .. note:: This request is automatically retried :attr:`retries`
+           times if it fails due to network error.
+
+        :param table: The timeseries table.
+        :type table: string or :class:`Table <riak.table.Table>`
+        :rtype: :class:`TsObject <riak.ts_object.TsObject>`
+        """
+        t = table
+        if isinstance(t, string_types):
+            t = Table(self, table)
+        return transport.ts_describe(t)
+
+    @retryable
     def ts_get(self, transport, table, key):
         """
         ts_get(table, key)
@@ -957,7 +977,22 @@ class RiakClientOperations(RiakClientTransport):
         """
         if self._multiget_pool:
             params['pool'] = self._multiget_pool
-        return multiget(self, pairs, **params)
+        return riak.client.multi.multiget(self, pairs, **params)
+
+    def multiput(self, objs, **params):
+        """
+        Stores objects in parallel via threads.
+
+        :param objs: the objects to store
+        :type objs: list of `RiakObject <riak.riak_object.RiakObject>`
+        :param params: additional request flags, e.g. w, dw, pw
+        :type params: dict
+        :rtype: list of boolean or
+            :class:`RiakObjects <riak.riak_object.RiakObject>`,
+        """
+        if self._multiput_pool:
+            params['pool'] = self._multiput_pool
+        return riak.client.multi.multiput(self, objs, **params)
 
     @retryable
     def get_counter(self, transport, bucket, key, r=None, pr=None,
