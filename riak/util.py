@@ -19,8 +19,9 @@ def unix_time_millis(dt):
 
 def datetime_from_unix_time_millis(ut):
     if isinstance(ut, float):
-        raise ValueError('unix timestamp must not be a float, \
-                it must be total milliseconds since epoch as an integer')
+        raise ValueError('unix timestamp must not be a float, '
+                         'it must be total milliseconds since '
+                         'epoch as an integer')
     utms = ut / 1000.0
     return datetime.datetime.utcfromtimestamp(utms)
 
