@@ -1,4 +1,4 @@
-.PHONY: pb_clean pb_compile pb_build release release_sdist
+.PHONY: pb_clean pb_compile pb_build release release_sdist release_bdist
 
 PANDOC_VERSION := $(shell pandoc --version)
 
@@ -34,7 +34,7 @@ endif
 	@python setup.py sdist upload -s -i $(RELEASE_GPG_KEYNAME)
 	@bash ./build/publish $(VERSION)
 
-release: release_sdist
+release_bdist:
 ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
@@ -46,3 +46,5 @@ endif
 	@python3.4 setup.py build --build-base=py-build/3.4 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.5 (release)"
 	@python3.5 setup.py build --build-base=py-build/3.5 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
+
+release: release_sdist release_bdist
