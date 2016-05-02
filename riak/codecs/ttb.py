@@ -139,7 +139,7 @@ class TtbCodec(Codec):
         return Msg(mc, encode(req), rc)
 
     def decode_timeseries(self, resp_ttb, tsobj,
-            convert_timestamp=False):
+                          convert_timestamp=False):
         """
         Fills an TsObject with the appropriate data and
         metadata from a TTB-encoded TsGetResp / TsQueryResp.
@@ -173,7 +173,7 @@ class TtbCodec(Codec):
                 for resp_row in resp_rows:
                     tsobj.rows.append(
                         self.decode_timeseries_row(resp_row, resp_coltypes,
-                            convert_timestamp))
+                                                   convert_timestamp))
             else:
                 raise RiakError(
                     "Expected 3-tuple in response, got: {}".format(resp_data))

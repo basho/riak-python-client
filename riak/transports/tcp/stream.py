@@ -187,7 +187,7 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
         keys = []
         for tsrow in response.keys:
             keys.append(self.codec.decode_timeseries_row(tsrow,
-                convert_timestamp=self._convert_timestamp))
+                        convert_timestamp=self._convert_timestamp))
 
         return keys
 

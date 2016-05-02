@@ -198,7 +198,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
                      'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
     client_options = {'transport_options':
-            {'use_ttb': False, 'ts_convert_timestamp': True}}
+                      {'use_ttb': False, 'ts_convert_timestamp': True}}
 
     @classmethod
     def setUpClass(cls):

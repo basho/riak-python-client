@@ -774,7 +774,7 @@ class PbufCodec(Codec):
         return Msg(mc, req.SerializeToString(), rc)
 
     def decode_timeseries(self, resp, tsobj,
-            convert_timestamp=False):
+                          convert_timestamp=False):
         """
         Fills an TsObject with the appropriate data and
         metadata from a TsGetResp / TsQueryResp.
@@ -820,7 +820,7 @@ class PbufCodec(Codec):
             raise RiakError(msg)
 
     def decode_timeseries_row(self, tsrow, tscols=None,
-            convert_timestamp=False):
+                              convert_timestamp=False):
         """
         Decodes a TsRow into a list
 

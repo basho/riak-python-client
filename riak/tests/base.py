@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-import os
 import random
-import sys
 
 from riak.client import RiakClient
 from riak.tests import HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
@@ -46,15 +44,9 @@ class IntegrationTestBase(object):
             kwargs.update(cls.client_options)
 
         logger = logging.getLogger()
-        logger.debug("RiakClient(protocol='%s', host='%s', " +
-                            "pb_port='%d', http_port='%d', " +
-                            "credentials='%s', kwargs='%s')",
-                            protocol,
-                            host,
-                            pb_port,
-                            http_port,
-                            credentials,
-                            kwargs)
+        logger.debug("RiakClient(protocol='%s', host='%s', pb_port='%d', "
+                     "http_port='%d', credentials='%s', kwargs='%s')",
+                     protocol, host, pb_port, http_port, credentials, kwargs)
 
         return RiakClient(protocol=protocol,
                           host=host,

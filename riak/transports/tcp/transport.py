@@ -155,7 +155,7 @@ class TcpTransport(Transport, TcpConnection):
         resp_code, resp = self._request(msg, codec)
         tsobj = TsObject(self._client, table)
         codec.decode_timeseries(resp, tsobj,
-                self._ts_convert_timestamp)
+                                self._ts_convert_timestamp)
         return tsobj
 
     def ts_put(self, tsobj):
@@ -182,7 +182,7 @@ class TcpTransport(Transport, TcpConnection):
         resp_code, resp = self._request(msg, codec)
         tsobj = TsObject(self._client, table)
         codec.decode_timeseries(resp, tsobj,
-                self._ts_convert_timestamp)
+                                self._ts_convert_timestamp)
         return tsobj
 
     def ts_stream_keys(self, table, timeout=None):

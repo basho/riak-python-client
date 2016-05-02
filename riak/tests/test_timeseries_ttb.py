@@ -12,8 +12,7 @@ from riak.table import Table
 from riak.ts_object import TsObject
 from riak.codecs.ttb import TtbCodec
 from riak.util import str_to_bytes, \
-    unix_time_millis, datetime_from_unix_time_millis, \
-    is_timeseries_supported
+    unix_time_millis, is_timeseries_supported
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 
@@ -125,7 +124,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
                      'Timeseries not supported or RUN_TIMESERIES is 0')
 class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
     client_options = {'transport_options':
-            {'use_ttb': True, 'ts_convert_timestamp': True}}
+                      {'use_ttb': True, 'ts_convert_timestamp': True}}
 
     @classmethod
     def setUpClass(cls):
