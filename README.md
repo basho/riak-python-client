@@ -157,6 +157,7 @@ Contributors
 * Daniel Lindsley
 * Daniel Néri
 * Daniel Reverri
+* [David Basden](https://github.com/dbasden)
 * David Koblas
 * Dmitry Rozhkov
 * Eric Florenzano
