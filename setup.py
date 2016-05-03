@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import codecs
-import six
 import sys
 
 from setuptools import setup, find_packages
@@ -15,7 +14,7 @@ if sys.version_info[0:3] <= (2, 7, 9):
     install_requires.append("pyOpenSSL >= 0.14")
     requires.append("pyOpenSSL(>=0.14)")
 
-if six.PY2:
+if sys.version_info[0:3] <= (3, 0, 0):
     install_requires.append('protobuf >=2.4.1, <2.7.0')
     requires.append('protobuf(>=2.4.1, <2.7.0)')
 else:
