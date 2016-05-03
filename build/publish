@@ -151,13 +151,14 @@ trap onexit EXIT
 
 declare -r version_string="${1:-unknown}"
 
-if [[ ! $version_string =~ ^[0-9].[0-9].[0-9](-[a-z]+[0-9]+)?$ ]]
+# https://www.python.org/dev/peps/pep-0440/
+if [[ ! $version_string =~ ^[0-9].[0-9].[0-9]([abcr]+[0-9]+)?$ ]]
 then
-    errexit 'first argument must be valid version string in X.Y.Z format'
+    errexit 'first argument must be valid version string in X.Y.Z, X.Y.ZaN, X.Y.ZbN or X.Y.ZrcN format'
 fi
 
 is_prerelease='false'
-if [[ $version_string =~ ^[0-9].[0-9].[0-9]-[a-z]+[0-9]+$ ]]
+if [[ $version_string =~ ^[0-9].[0-9].[0-9][abcr]+[0-9]+$ ]]
 then
     pinfo "publishing pre-release version: $version_string"
     is_prerelease='true'
