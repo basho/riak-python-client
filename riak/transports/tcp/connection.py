@@ -1,4 +1,4 @@
-import errno
+import logging
 import socket
 import struct
 
@@ -19,12 +19,6 @@ else:
 
 
 class TcpConnection(object):
-    # These are set in the TcpTransport initializer
-    _address = None
-    _timeout = None
-    _socket_keepalive = None
-    _socket_tcp_options = None
-
     """
     Connection-related methods for TcpTransport.
     """
@@ -228,10 +222,10 @@ class TcpConnection(object):
                 # shutdown() method due to the SSL lib
                 try:
                     self._socket.shutdown(socket.SHUT_RDWR)
-                except IOError as e:
-                    # NB: sometimes this is the exception if the initial
-                    # connection didn't succeed correctly
-                    if e.errno != errno.EBADF:
-                        raise
+                except EnvironmentError:
+                    # NB: sometimes these exceptions are raised if the initial
+                    # connection didn't succeed correctly, or if shutdown() is
+                    # called after the connection dies
+                    logging.exception('Exception occurred while shutting down socket.')
             self._socket.close()
             del self._socket
