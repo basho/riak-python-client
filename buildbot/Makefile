@@ -18,9 +18,6 @@ preconfigure:
 configure:
 	$(TOOLS_DIR)/riak-cluster-config $(RIAK_ADMIN) 8098 true true
 
-configure_timeseries:
-	@../setup.py setup_timeseries --riak-admin=$(RIAK_ADMIN)
-
 compile:
 	@echo NO-OP
 
