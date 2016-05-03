@@ -50,9 +50,6 @@ class TtbCodec(Codec):
             # errcode = err_ttb[2]
             raise RiakError(bytes_to_str(errmsg))
 
-    def maybe_riak_error(self, msg_code, data=None):
-        pass
-
     def encode_to_ts_cell(self, cell):
         if cell is None:
             return []
@@ -133,7 +130,7 @@ class TtbCodec(Codec):
         if '{table}' in q:
             q = q.format(table=table.name)
         tsi = tsinterpolation_a, q, []
-        req = tsqueryreq_a, tsi, False, []
+        req = tsqueryreq_a, tsi, False, udef_a
         mc = MSG_CODE_TS_TTB_MSG
         rc = MSG_CODE_TS_TTB_MSG
         return Msg(mc, encode(req), rc)

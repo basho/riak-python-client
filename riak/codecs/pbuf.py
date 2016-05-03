@@ -9,6 +9,7 @@ import riak.pb.riak_ts_pb2
 
 from riak import RiakError
 from riak.codecs import Codec, Msg
+from riak.codecs.util import parse_pbuf_msg
 from riak.content import RiakContent
 from riak.pb.riak_ts_pb2 import TsColumnType
 from riak.riak_object import VClock
@@ -90,20 +91,7 @@ class PbufCodec(Codec):
         self._bucket_types = bucket_types
 
     def parse_msg(self, msg_code, data):
-        pbclass = riak.pb.messages.MESSAGE_CLASSES.get(msg_code, None)
-        if pbclass is None:
-            return None
-        pbo = pbclass()
-        pbo.ParseFromString(data)
-        return pbo
-
-    def maybe_riak_error(self, msg_code, data=None):
-        err_code = riak.pb.messages.MSG_CODE_ERROR_RESP
-        err_data = super(PbufCodec, self).maybe_riak_error(
-            err_code, msg_code, data)
-        if err_data:
-            err = self.parse_msg(msg_code, err_data)
-            raise RiakError(bytes_to_str(err.errmsg))
+        return parse_pbuf_msg(msg_code, data)
 
     def encode_auth(self, username, password):
         req = riak.pb.riak_pb2.RpbAuthReq()
