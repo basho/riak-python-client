@@ -157,6 +157,7 @@ Contributors
 * Daniel Lindsley
 * Daniel Néri
 * Daniel Reverri
+* [Dan Root](https://github.com/daroot)
 * [David Basden](https://github.com/dbasden)
 * David Koblas
 * Dmitry Rozhkov

@@ -8,6 +8,7 @@ docs/_build
 .coverage
 riak-*/
 py-build/
+build/
 dist/
 riak.egg-info/
 *.egg
