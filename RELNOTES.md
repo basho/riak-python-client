@@ -4,8 +4,9 @@
 
 * [Ensure `six` is not required during installation](https://github.com/basho/riak-python-client/pull/459)
 
-## [2.5.0 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.0)
+## [2.5.0 Release - Deprecated](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.0)
 
+* *NOTE*: due to the `basho-erlastic` dependency, this version will not install correctly. Please use `2.5.1`.
 * [Socket Enhancements](https://github.com/basho/riak-python-client/pull/453) - Resolves [#399](https://github.com/basho/riak-python-client/issues/399)
 * [Add multi-put](https://github.com/basho/riak-python-client/pull/452)
 * [Add support for term-to-binary encoding](https://github.com/basho/riak-python-client/pull/448) *Note:* This requires at least version `1.3.0` of Riak TS.
