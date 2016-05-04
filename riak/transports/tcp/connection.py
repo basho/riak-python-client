@@ -226,7 +226,7 @@ class TcpConnection(object):
                     # NB: sometimes these exceptions are raised if the initial
                     # connection didn't succeed correctly, or if shutdown() is
                     # called after the connection dies
-                    logging.exception('Exception occurred while shutting '
-                                      'down socket.')
+                    logging.debug('Exception occurred while shutting '
+                                  'down socket.', exc_info=True)
             self._socket.close()
             del self._socket
