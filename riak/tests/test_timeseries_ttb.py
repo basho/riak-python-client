@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import random
-import string
 import logging
 import six
 import unittest
@@ -133,9 +131,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         super(TimeseriesTtbTests, cls).setUpClass()
 
     def test_query_that_creates_table_using_interpolation(self):
-        table = ''.join(
-            [random.choice(string.ascii_letters + string.digits)
-                for n in range(32)])
+        table = self.randname()
         query = """CREATE TABLE test-{table} (
             geohash varchar not null,
             user varchar not null,
