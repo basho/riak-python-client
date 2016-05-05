@@ -181,7 +181,7 @@ class TtbCodec(Codec):
                 raise RiakError(
                     "Expected 3-tuple in response, got: {}".format(resp_data))
         else:
-            raise RiakError("Unknown TTB response type: {}".format(resp_ttb))
+            raise RiakError("Unknown TTB response type: {}".format(resp_a))
 
     def decode_timeseries_cols(self, cnames, ctypes):
         cnames = [bytes_to_str(cname) for cname in cnames]
