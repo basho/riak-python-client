@@ -535,6 +535,7 @@ class TcpTransport(Transport, TcpConnection):
             raise ValueError('expected a Codec argument')
 
         resp_code, data = self._send_recv(msg_code, data)
+        # NB: decodes errors with msg code 0
         codec.maybe_riak_error(resp_code, data)
         codec.maybe_incorrect_code(resp_code, expect)
         if resp_code == MSG_CODE_TS_TTB_MSG or \

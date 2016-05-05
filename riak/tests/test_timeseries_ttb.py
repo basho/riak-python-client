@@ -11,7 +11,7 @@ from riak import RiakError
 from riak.table import Table
 from riak.ts_object import TsObject
 from riak.codecs.ttb import TtbCodec
-from riak.util import str_to_bytes, \
+from riak.util import str_to_bytes, bytes_to_str, \
     unix_time_millis, is_timeseries_supported
 from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
@@ -141,7 +141,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         row = ts_obj.rows[0]
         self.assertEqual(len(row), 5)
 
-    def test_store_and_fetch(self):
+    def test_store_and_fetch_and_query(self):
         now = datetime.datetime.utcfromtimestamp(144379690.987000)
         fiveMinsAgo = now - fiveMins
         tenMinsAgo = fiveMinsAgo - fiveMins
@@ -186,6 +186,29 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
             exp = exp_rows[i]
             self.assertEqual(len(row), 5)
             self.assertEqual(row, exp)
+
+        fmt = """
+        select * from {table} where
+            time > {t1} and time < {t2} and
+            geohash = 'hash1' and
+            user = 'user2'
+        """
+        query = fmt.format(
+                table=table_name,
+                t1=unix_time_millis(tenMinsAgo),
+                t2=unix_time_millis(now))
+        ts_obj = self.client.ts_query(table_name, query)
+        if ts_obj.columns is not None:
+            self.assertEqual(len(ts_obj.columns.names), 5)
+            self.assertEqual(len(ts_obj.columns.types), 5)
+        self.assertEqual(len(ts_obj.rows), 1)
+        row = ts_obj.rows[0]
+        self.assertEqual(bytes_to_str(row[0]), 'hash1')
+        self.assertEqual(bytes_to_str(row[1]), 'user2')
+        self.assertEqual(row[2], fiveMinsAgo)
+        self.assertEqual(row[2].microsecond, 987000)
+        self.assertEqual(bytes_to_str(row[3]), 'wind')
+        self.assertIsNone(row[4])
 
     def test_create_error_via_put(self):
         table = Table(self.client, table_name)
