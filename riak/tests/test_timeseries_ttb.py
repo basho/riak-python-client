@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
+import random
+import string
 import logging
 import six
 import unittest
@@ -129,6 +131,24 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTtbTests, cls).setUpClass()
+
+    def test_query_that_creates_table_using_interpolation(self):
+        table = ''.join(
+            [random.choice(string.ascii_letters + string.digits)
+                for n in range(32)])
+        query = """CREATE TABLE test-{table} (
+            geohash varchar not null,
+            user varchar not null,
+            time timestamp not null,
+            weather varchar not null,
+            temperature double,
+            PRIMARY KEY((geohash, user, quantum(time, 15, m)),
+                geohash, user, time))
+        """
+        ts_obj = self.client.ts_query(table, query)
+        self.assertIsNotNone(ts_obj)
+        self.assertFalse(hasattr(ts_obj, 'ts_cols'))
+        self.assertIsNone(ts_obj.rows)
 
     def test_query_that_returns_table_description(self):
         fmt = 'DESCRIBE {table}'

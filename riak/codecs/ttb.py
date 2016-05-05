@@ -154,7 +154,10 @@ class TtbCodec(Codec):
         self.maybe_err_ttb(resp_ttb)
 
         resp_a = resp_ttb[0]
-        if resp_a == tsputresp_a:
+
+        if resp_ttb == tsqueryresp_a:
+            return tsobj
+        elif resp_a == tsputresp_a:
             return
         elif resp_a == tsgetresp_a or resp_a == tsqueryresp_a:
             resp_data = resp_ttb[1]
@@ -175,7 +178,7 @@ class TtbCodec(Codec):
                 raise RiakError(
                     "Expected 3-tuple in response, got: {}".format(resp_data))
         else:
-            raise RiakError("Unknown TTB response type: {}".format(resp_a))
+            raise RiakError("Unknown TTB response type: {}".format(resp_ttb))
 
     def decode_timeseries_cols(self, cnames, ctypes):
         cnames = [bytes_to_str(cname) for cname in cnames]
