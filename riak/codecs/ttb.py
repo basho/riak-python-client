@@ -153,6 +153,12 @@ class TtbCodec(Codec):
 
         self.maybe_err_ttb(resp_ttb)
 
+        # NB: some queries return a BARE 'tsqueryresp' atom
+        # catch that here:
+        if resp_ttb == tsqueryresp_a:
+            return tsobj
+
+        # The response atom is the first element in the response tuple
         resp_a = resp_ttb[0]
         if resp_a == tsputresp_a:
             return
