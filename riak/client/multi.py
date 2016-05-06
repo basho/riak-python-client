@@ -3,6 +3,10 @@ from collections import namedtuple
 from threading import Thread, Lock, Event
 from multiprocessing import cpu_count
 from six import PY2
+
+from riak.riak_object import RiakObject
+from riak.ts_object import TsObject
+
 if PY2:
     from Queue import Queue
 else:
@@ -20,12 +24,16 @@ except NotImplementedError:
     POOL_SIZE = 6
 
 #: A :class:`namedtuple` for tasks that are fed to workers in the
-#: multi pool.
-Task = namedtuple(
-        'Task',
-        ['client', 'outq',
-         'bucket_type', 'bucket', 'key',
-         'object', 'options'])
+#: multi get pool.
+Task = namedtuple('Task',
+                  ['client', 'outq', 'bucket_type', 'bucket', 'key',
+                   'object', 'options'])
+
+
+#: A :class:`namedtuple` for tasks that are fed to workers in the
+#: multi put pool.
+PutTask = namedtuple('PutTask',
+                     ['client', 'outq', 'object', 'options'])
 
 
 class MultiPool(object):
@@ -55,7 +63,7 @@ class MultiPool(object):
         stopping.
 
         :param task: the Task object
-        :type task: Task
+        :type task: Task or PutTask
         """
         if not self._stop.is_set():
             self._inq.put(task)
@@ -164,8 +172,13 @@ class MultiPutPool(MultiPool):
         while not self._should_quit():
             task = self._inq.get()
             try:
-                robj = task.object
-                rv = task.client.put(robj, **task.options)
+                obj = task.object
+                if isinstance(obj, RiakObject):
+                    rv = task.client.put(obj, **task.options)
+                elif isinstance(obj, TsObject):
+                    rv = task.client.ts_put(obj, **task.options)
+                else:
+                    raise ValueError('unknown obj type: %s'.format(type(obj)))
                 task.outq.put(rv)
             except KeyboardInterrupt:
                 raise
@@ -236,8 +249,9 @@ def multiput(client, objs, **options):
 
     :param client: the client to use
     :type client: :class:`RiakClient <riak.client.RiakClient>`
-    :param objs: the Riak Objects to store in parallel
-    :type keys: list of `RiakObject <riak.riak_object.RiakObject>`
+    :param objs: the objects to store in parallel
+    :type objs: list of `RiakObject <riak.riak_object.RiakObject>` or
+                `TsObject <riak.ts_object.TsObject>`
     :param options: request options to
         :meth:`RiakClient.put <riak.client.RiakClient.put>`
     :type options: dict
@@ -252,11 +266,8 @@ def multiput(client, objs, **options):
         pool = RIAK_MULTIPUT_POOL
 
     pool.start()
-    for robj in objs:
-        bucket_type = robj.bucket.bucket_type
-        bucket = robj.bucket.name
-        key = robj.key
-        task = Task(client, outq, bucket_type, bucket, key, robj, options)
+    for obj in objs:
+        task = PutTask(client, outq, obj, options)
         pool.enq(task)
 
     results = []
