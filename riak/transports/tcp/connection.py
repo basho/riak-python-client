@@ -202,7 +202,6 @@ class TcpConnection(object):
                                                         self._timeout)
             else:
                 self._socket = socket.create_connection(self._address)
-            # logging.debug('[TcpConnection] new connection created')
             if self._socket_tcp_options:
                 ka_opts = self._socket_tcp_options
                 for k, v in ka_opts.iteritems():
