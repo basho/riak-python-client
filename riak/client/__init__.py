@@ -4,6 +4,7 @@ except ImportError:
     import json
 
 import random
+
 from weakref import WeakValueDictionary
 from riak.client.operations import RiakClientOperations
 from riak.node import RiakNode
