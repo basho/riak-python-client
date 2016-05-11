@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import random
-import string
 import unittest
 
 import riak.pb.riak_ts_pb2
@@ -265,10 +263,19 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(bytes_to_str(row[3]), 'wind')
         self.assertIsNone(row[4])
 
+    def test_insert_data_via_sql(self):
+        query = """
+            INSERT INTO GeoCheckin_Wide
+            (geohash, user, time, weather, temperature, uv_index, observed)
+                VALUES
+            ('hash3', 'user3', 1460203200000, 'tornado', 43.5, 128, True);
+        """
+        ts_obj = self.client.ts_query('GeoCheckin_Wide', query)
+        self.assertIsNotNone(ts_obj)
+        self.validate_len(ts_obj, 0)
+
     def test_query_that_creates_table_using_interpolation(self):
-        table = ''.join(
-            [random.choice(string.ascii_letters + string.digits)
-                for n in range(32)])
+        table = self.randname()
         query = """CREATE TABLE test-{table} (
             geohash varchar not null,
             user varchar not null,
