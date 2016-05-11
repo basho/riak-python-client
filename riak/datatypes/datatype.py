@@ -129,6 +129,9 @@ class Datatype(object):
         Deletes the datatype from Riak. See :meth:`RiakClient.delete()
         <riak.client.RiakClient.delete>` for options.
         """
+        if not self.bucket:
+            raise ValueError('bucket property not assigned')
+
         self.clear()
         self._context = None
         self._set_value(self._default_value())

@@ -132,6 +132,14 @@ class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
         self.assertNotIn(('update', ('h', 'map'), [('update', ('i', 'map'),
                                                     None)]), op)
 
+    def test_delete_netsed_datatypes(self):
+        dtype = self.dtype(self.bucket, 'key')
+        with self.assertRaises(ValueError):
+            dtype.maps['q'].delete()
+            dtype.registers['q'].delete()
+            dtype.flags['q'].delete()
+            dtype.sets['q'].delete()
+
     def test_removes_require_context(self):
         dtype = self.dtype(self.bucket, 'key')
         with self.assertRaises(datatypes.ContextRequired):
