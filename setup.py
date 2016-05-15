@@ -27,7 +27,7 @@ try:
     with codecs.open('README.rst', 'w', 'utf-8') as f:
         f.write(long_description)
 except(IOError, ImportError):
-    with open('README.md') as f:
+    with codecs.open('README.md', 'r', 'utf-8') as f:
         long_description = f.read()
 
 setup(
