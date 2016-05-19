@@ -254,7 +254,7 @@ class SecurityCreds:
                 if not isinstance(key_file, list):
                     key_file = [key_file]
                 for filename in key_file:
-                    with open(filename, 'r') as f:
+                    with open(filename, 'rb') as f:
                         cert_list.append(loader(OpenSSL.SSL.FILETYPE_PEM,
                                                 f.read()))
                 # If it is not a list, just store the first element
