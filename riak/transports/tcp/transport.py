@@ -78,7 +78,16 @@ class TcpTransport(Transport, TcpConnection):
     # FeatureDetection API
     def _server_version(self):
         server_info = self.get_server_info()
-        return server_info['server_version']
+        ver = server_info['server_version']
+        (maj, min, patch) = [int(v) for v in ver.split('.')]
+        if maj == 0:
+            import datetime
+            now = datetime.datetime.now()
+            if now.year == 2016:
+                # GH-471 As of 20160509 Riak TS OSS 1.3.0 returns '0.8.0' as
+                # the version string.
+                return '2.1.1'
+        return ver
 
     def ping(self):
         """
