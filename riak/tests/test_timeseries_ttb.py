@@ -130,6 +130,17 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
     def setUpClass(cls):
         super(TimeseriesTtbTests, cls).setUpClass()
 
+    def test_insert_data_via_sql(self):
+        query = """
+            INSERT INTO GeoCheckin_Wide
+            (geohash, user, time, weather, temperature, uv_index, observed)
+                VALUES
+            ('hash3', 'user3', 1460203200000, 'tornado', 43.5, 128, True);
+        """
+        ts_obj = self.client.ts_query('GeoCheckin_Wide', query)
+        self.assertIsNotNone(ts_obj)
+        self.validate_len(ts_obj, 0)
+
     def test_query_that_creates_table_using_interpolation(self):
         table = self.randname()
         query = """CREATE TABLE test-{table} (

@@ -21,14 +21,16 @@ else:
     install_requires.append('python3_protobuf >=2.4.1, <2.6.0')
     requires.append('python3_protobuf(>=2.4.1, <2.6.0)')
 
+with codecs.open('README.md', 'r', 'utf-8') as f:
+    readme_md = f.read()
+
 try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
     with codecs.open('README.rst', 'w', 'utf-8') as f:
         f.write(long_description)
 except(IOError, ImportError):
-    with open('README.md') as f:
-        long_description = f.read()
+    long_description = readme_md
 
 setup(
     name='riak',
