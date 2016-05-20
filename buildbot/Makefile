@@ -3,6 +3,19 @@ $(error RIAK_DIR is not set)
 endif
 
 unexport PYENV_VERSION
+unexport LANG
+unexport LC_ADDRESS
+unexport LC_COLLATE
+unexport LC_CTYPE
+unexport LC_IDENTIFICATION
+unexport LC_MEASUREMENT
+unexport LC_MESSAGES
+unexport LC_MONETARY
+unexport LC_NAME
+unexport LC_NUMERIC
+unexport LC_PAPER
+unexport LC_TELEPHONE
+unexport LC_TIME
 
 PROJDIR = $(realpath $(CURDIR)/..)
 TOOLS_DIR = $(PROJDIR)/tools/devrel

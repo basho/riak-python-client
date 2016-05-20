@@ -196,3 +196,4 @@ Contributors
 * Timothée Peignier
 * [Vitaly Shestovskiy](https://github.com/lamp0chka)
 * William Kral
+* [Yasser Souri](https://github.com/yassersouri)

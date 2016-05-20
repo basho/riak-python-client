@@ -80,7 +80,8 @@ def get_version():
 
     else:
         # Extract the version from the PKG-INFO file.
-        with open(join(d, 'PKG-INFO')) as f:
+        import codecs
+        with codecs.open(join(d, 'PKG-INFO'), 'r', 'utf-8') as f:
             version = version_re.search(f.read()).group(1)
 
     return version
