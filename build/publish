@@ -168,11 +168,6 @@ fi
 
 declare -r current_branch="$(git rev-parse --abbrev-ref HEAD)"
 
-if [[ $debug == 'false' && $is_prerelease == 'false' && $current_branch != 'master' ]]
-then
-    errexit 'publish must be run on master branch'
-fi
-
 declare -r github_api_key_file="$HOME/.ghapi"
 if [[ ! -s $github_api_key_file ]]
 then
