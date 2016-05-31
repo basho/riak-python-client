@@ -186,7 +186,8 @@ class TcpConnection(object):
             # https://docs.python.org/2/howto/sockets.html#using-a-socket
             # https://github.com/basho/riak-python-client/issues/399
             if nbytes == 0:
-                raise BadResource('recv_into returned zero bytes unexpectedly')
+                ex = RiakError('recv_into returned zero bytes unexpectedly')
+                raise BadResource(ex)
             view = view[nbytes:]  # slicing views is cheap
             toread -= nbytes
             nread += nbytes
