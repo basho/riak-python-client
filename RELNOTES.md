@@ -1,5 +1,9 @@
 # Riak Python Client Release Notes
 
+## [2.5.3 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.3)
+
+ * [Bug fix for raising `BadResource`](https://github.com/basho/riak-python-client/pull/481)
+
 ## [2.5.2 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.2)
 
 * *NOTE*: for Riak TS data, automatic conversion from epoch values *to* Python `datetime` objects has been removed. If you would like to have automatic conversion, use `RiakClient(transport_options={'ts_convert_timestamp': True})`
