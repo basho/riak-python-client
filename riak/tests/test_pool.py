@@ -3,11 +3,13 @@ import unittest
 
 from six import PY2
 from threading import Thread, currentThread
-from riak.transports.pool import Pool, BadResource
 from random import SystemRandom
 from time import sleep
+
+from riak import RiakError
 from riak.tests import RUN_POOL
 from riak.tests.comparison import Comparison
+from riak.transports.pool import Pool, BadResource
 
 if PY2:
     from Queue import Queue
@@ -35,6 +37,21 @@ class EmptyListPool(Pool):
 
 @unittest.skipUnless(RUN_POOL, 'RUN_POOL is 0')
 class PoolTest(unittest.TestCase, Comparison):
+
+    def test_can_raise_bad_resource(self):
+        ex_msg = 'exception-message!'
+        with self.assertRaises(BadResource) as cm:
+            raise BadResource(ex_msg)
+        ex = cm.exception
+        self.assertEqual(ex.args[0], ex_msg)
+
+    def test_bad_resource_inner_exception(self):
+        ex_msg = 'exception-message!'
+        ex = RiakError(ex_msg)
+        with self.assertRaises(BadResource) as cm:
+            raise BadResource(ex)
+        br_ex = cm.exception
+        self.assertEqual(br_ex.args[0], ex)
 
     def test_yields_new_object_when_empty(self):
         """
