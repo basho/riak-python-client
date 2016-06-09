@@ -45,7 +45,7 @@ Python 3.5.x.
 
 There are also many bugfixes and new enhancements:
 
-* [Protocol buffers are now integrated into the Python Client]
+* [The `riak_pb` module is now integrated into the Python Client]
   (https://github.com/basho/riak-python-client/pull/418)
 * [Support for Preflists and Write-Once bucket types]
   (https://github.com/basho/riak-python-client/pull/414)
