@@ -6,10 +6,9 @@ import unittest
 from six import PY2
 from riak.mapreduce import RiakMapReduce
 from riak import key_filter, RiakError
-from riak.tests import RUN_YZ
+from riak.tests import RUN_MAPREDUCE, RUN_SECURITY, RUN_YZ
 from riak.tests.base import IntegrationTestBase
 from riak.tests.test_yokozuna import wait_for_yz_index
-from riak.tests import RUN_SECURITY
 from riak.tests.yz_setup import yzSetUp, yzTearDown
 
 
@@ -26,6 +25,7 @@ def tearDownModule():
     yzTearDown(testrun_yz_mr)
 
 
+@unittest.skipUnless(RUN_MAPREDUCE, 'RUN_MAPREDUCE is 0')
 class LinkTests(IntegrationTestBase, unittest.TestCase):
     def test_store_and_get_links(self):
         # Create the object...
@@ -92,6 +92,7 @@ class LinkTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(len(results), 1)
 
 
+@unittest.skipUnless(RUN_MAPREDUCE, 'RUN_MAPREDUCE is 0')
 class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
     def test_erlang_map_reduce(self):
         # Create the object...
@@ -198,6 +199,7 @@ class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
             mr.add_key_filter("tokenize", "-", 1)
 
 
+@unittest.skipUnless(RUN_MAPREDUCE, 'RUN_MAPREDUCE is 0')
 class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
 
     def test_javascript_source_map(self):
@@ -559,6 +561,7 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(result, [100])
 
 
+@unittest.skipUnless(RUN_MAPREDUCE, 'RUN_MAPREDUCE is 0')
 class MapReduceAliasTests(IntegrationTestBase, unittest.TestCase):
     """This tests the map reduce aliases"""
 
@@ -754,6 +757,7 @@ class MapReduceAliasTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(sorted(result), [1, 2])
 
 
+@unittest.skipUnless(RUN_MAPREDUCE, 'RUN_MAPREDUCE is 0')
 class MapReduceStreamTests(IntegrationTestBase, unittest.TestCase):
     def test_stream_results(self):
         bucket = self.client.bucket(self.bucket_name)

@@ -74,5 +74,7 @@ class UtilUnitTests(unittest.TestCase):
         self.assertEqual(True, is_timeseries_supported(v))
         v = (3, 4, 5)
         self.assertEqual(True, is_timeseries_supported(v))
+        v = (3, 5, 0)
+        self.assertEqual(False, is_timeseries_supported(v))
         v = (3, 5, 1)
         self.assertEqual(True, is_timeseries_supported(v))

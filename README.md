@@ -1,6 +1,11 @@
 Python Client for Riak
 ======================
 
+Build Status
+============
+
+[![Build Status](https://travis-ci.org/basho/riak-python-client.svg?branch=master)](https://travis-ci.org/basho/riak-python-client)
+
 Documentation
 =============
 

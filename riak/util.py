@@ -29,7 +29,7 @@ def datetime_from_unix_time_millis(ut):
 def is_timeseries_supported(v=None):
     if v is None:
         v = sys.version_info
-    return v < (3,) or v[:3] >= (3, 4, 4)
+    return v < (3,) or (v[:3] >= (3, 4, 4) and v[:3] != (3, 5, 0))
 
 
 def quacks_like_dict(object):
