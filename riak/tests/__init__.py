@@ -50,17 +50,17 @@ HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '10018'))
 DUMMY_HTTP_PORT = int(os.environ.get('DUMMY_HTTP_PORT', '1023'))
 DUMMY_PB_PORT = int(os.environ.get('DUMMY_PB_PORT', '1022'))
 
-RUN_SEARCH = int(os.environ.get('RUN_SEARCH', '0'))
-RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
-
+RUN_BTYPES = int(os.environ.get('RUN_BTYPES', '0'))
+RUN_DATATYPES = int(os.environ.get('RUN_DATATYPES', '0'))
+RUN_CLIENT = int(os.environ.get('RUN_CLIENT', '0'))
 RUN_INDEXES = int(os.environ.get('RUN_INDEXES', '0'))
-
-RUN_TIMESERIES = int(os.environ.get('RUN_TIMESERIES', '0'))
-
+RUN_KV = int(os.environ.get('RUN_KV', '0'))
+RUN_MAPREDUCE = int(os.environ.get('RUN_MAPREDUCE', '0'))
 RUN_POOL = int(os.environ.get('RUN_POOL', '0'))
-RUN_RESOLVE = int(os.environ.get('RUN_RESOLVE', '1'))
-RUN_BTYPES = int(os.environ.get('RUN_BTYPES', '1'))
-RUN_DATATYPES = int(os.environ.get('RUN_DATATYPES', '1'))
+RUN_RESOLVE = int(os.environ.get('RUN_RESOLVE', '0'))
+RUN_SEARCH = int(os.environ.get('RUN_SEARCH', '0'))
+RUN_TIMESERIES = int(os.environ.get('RUN_TIMESERIES', '0'))
+RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 
 RUN_SECURITY = int(os.environ.get('RUN_SECURITY', '0'))
 if RUN_SECURITY:

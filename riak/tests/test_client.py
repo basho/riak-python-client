@@ -4,7 +4,8 @@ from six import PY2
 from threading import Thread
 from riak.riak_object import RiakObject
 from riak.transports.tcp import TcpTransport
-from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, RUN_POOL
+from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
+        RUN_POOL, RUN_CLIENT
 from riak.tests.base import IntegrationTestBase
 
 if PY2:
@@ -13,6 +14,7 @@ else:
     from queue import Queue
 
 
+@unittest.skipUnless(RUN_CLIENT, 'RUN_CLIENT is 0')
 class ClientTests(IntegrationTestBase, unittest.TestCase):
     def test_can_set_tcp_keepalive(self):
         if self.protocol == 'pbc':

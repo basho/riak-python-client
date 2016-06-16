@@ -8,7 +8,7 @@ from six import string_types, PY2, PY3
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
-from riak.tests import RUN_RESOLVE
+from riak.tests import RUN_KV, RUN_RESOLVE
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
@@ -32,12 +32,16 @@ testrun_props_bucket = 'propsbucket'
 
 
 def setUpModule():
+    if not RUN_KV:
+        return
     c = IntegrationTestBase.create_client()
     c.bucket(testrun_sibs_bucket).allow_mult = True
     c.close()
 
 
 def tearDownModule():
+    if not RUN_KV:
+        return
     c = IntegrationTestBase.create_client()
     c.bucket(testrun_sibs_bucket).clear_properties()
     c.bucket(testrun_props_bucket).clear_properties()
@@ -68,6 +72,7 @@ class NotJsonSerializable(object):
         return True
 
 
+@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
 class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
     def test_no_returnbody(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -641,6 +646,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         return vals
 
 
+@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
 class BucketPropsTest(IntegrationTestBase, unittest.TestCase):
     def test_rw_settings(self):
         bucket = self.client.bucket(testrun_props_bucket)
@@ -694,6 +700,7 @@ class BucketPropsTest(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(bucket.n_val, 3)
 
 
+@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
 class KVFileTests(IntegrationTestBase, unittest.TestCase):
     def test_store_binary_object_from_file(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -724,6 +731,7 @@ class KVFileTests(IntegrationTestBase, unittest.TestCase):
         self.assertFalse(obj.exists)
 
 
+@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
 class CounterTests(IntegrationTestBase, unittest.TestCase):
     def test_counter_requires_allow_mult(self):
         bucket = self.client.bucket(self.bucket_name)

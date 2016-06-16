@@ -1,0 +1,12 @@
+language: python
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.5-dev" # 3.5 development branch
+install:
+	- pip install --upgrade flake8
+script:
+	- python setup.py test
+	- flake8 --exclude=riak/pb riak *.py
