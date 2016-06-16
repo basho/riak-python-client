@@ -417,7 +417,6 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
         # Make sure the object has five siblings...
         obj = bucket.get(self.key_name)
-        obj.reload()
         self.assertEqual(len(obj.siblings), 5)
 
         # When the object is in conflict, using the shortcut methods
@@ -433,9 +432,9 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         # Resolve the conflict, and then do a get...
         resolved_sibling = obj.siblings[3]
         obj.siblings = [resolved_sibling]
+        self.assertEqual(len(obj.siblings), 1)
         obj.store()
 
-        obj.reload()
         self.assertEqual(len(obj.siblings), 1)
         self.assertEqual(obj.data, resolved_sibling.data)
 
