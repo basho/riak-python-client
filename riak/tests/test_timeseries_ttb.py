@@ -168,6 +168,30 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         row = ts_obj.rows[0]
         self.assertEqual(len(row), 5)
 
+    def test_store_and_fetch_gh_483(self):
+        now = datetime.datetime(2015, 1, 1, 12, 0, 0)
+        table = self.client.table(table_name)
+        rows = [
+            ['hash1', 'user2', now, 'frazzle', 12.3]
+        ]
+
+        ts_obj = table.new(rows)
+        result = ts_obj.store()
+        self.assertTrue(result)
+
+        k = ['hash1', 'user2', now]
+        ts_obj = self.client.ts_get(table_name, k)
+        self.assertIsNotNone(ts_obj)
+        ts_cols = ts_obj.columns
+        self.assertEqual(len(ts_cols.names), 5)
+        self.assertEqual(len(ts_cols.types), 5)
+        self.assertEqual(len(ts_obj.rows), 1)
+
+        row = ts_obj.rows[0]
+        self.assertEqual(len(row), 5)
+        exp = rows[0]
+        self.assertEqual(row, exp)
+
     def test_store_and_fetch_and_query(self):
         now = datetime.datetime.utcfromtimestamp(144379690.987000)
         fiveMinsAgo = now - fiveMins
