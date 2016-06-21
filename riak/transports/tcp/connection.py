@@ -163,7 +163,12 @@ class TcpConnection(object):
             # https://github.com/basho/riak-python-client/issues/425
             raise BadResource(e)
         mv = memoryview(msgbuf)
-        msg_code, = struct.unpack("B", mv[0:1])
+        try:
+            msg_code, = struct.unpack("B", mv[0:1])
+        except struct.error:
+            # NB: Python 2.7.3 requires this
+            # http://bugs.python.org/issue10212
+            msg_code, = struct.unpack("B", mv[0:1].tobytes())
         data = mv[1:].tobytes()
         return (msg_code, data)
 
@@ -171,7 +176,12 @@ class TcpConnection(object):
         # TODO FUTURE re-use buffer
         msglen_buf = self._recv(4)
         # NB: msg length is an unsigned int
-        msglen, = struct.unpack('!I', msglen_buf)
+        try:
+            msglen, = struct.unpack('!I', msglen_buf)
+        except struct.error:
+            # NB: Python 2.7.3 requires this
+            # http://bugs.python.org/issue10212
+            msglen, = struct.unpack('!I', bytes(msglen_buf))
         return self._recv(msglen)
 
     def _recv(self, msglen):

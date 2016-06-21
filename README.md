@@ -21,7 +21,7 @@ Repository Cloning
 Install
 =======
 
-The recommended versions of Python for use with this client are Python `2.7.x`, `3.3.x`, `3.4.x` and `3.5.x`. The latest version from each series should be preferred.
+The recommended versions of Python for use with this client are Python `2.7.8` (or greater, `2.7.11` as of `2016-06-21`), `3.3.x`, `3.4.x` and `3.5.x`. The latest version from each series should be preferred. Older versions of the Python `2.7.X` and `3.X` series should be used with caution as they are not covered by integration tests.
 
 Riak TS (Timeseries)
 ===================
