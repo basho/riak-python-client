@@ -190,7 +190,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         row = ts_obj.rows[0]
         self.assertEqual(len(row), 5)
         exp = [six.b('hash1'), six.b('user2'), now,
-                six.b('frazzle'), 12.3]
+               six.b('frazzle'), 12.3]
         self.assertEqual(row, exp)
 
     def test_store_and_fetch_and_query(self):
