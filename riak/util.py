@@ -15,6 +15,7 @@ except ImportError:
     from riak.tz import utc
     epoch_tz = datetime.datetime.fromtimestamp(0, tz=utc)
 
+
 def unix_time_millis(dt):
     if dt.tzinfo:
         td = dt - epoch_tz

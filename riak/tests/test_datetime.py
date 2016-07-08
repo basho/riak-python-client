@@ -3,8 +3,7 @@ import datetime
 import unittest
 
 from riak.util import epoch, epoch_tz, \
-        unix_time_millis, \
-        datetime_from_unix_time_millis
+        unix_time_millis
 
 # NB: without tzinfo, this is UTC
 ts0 = datetime.datetime(2015, 1, 1, 12, 1, 2, 987000)
@@ -15,6 +14,7 @@ ts0_ts_pst = 1420142462987
 class DatetimeUnitTests(unittest.TestCase):
     def test_get_unix_time_without_tzinfo(self):
         self.assertIsNone(epoch.tzinfo)
+        self.assertIsNotNone(epoch_tz.tzinfo)
         self.assertIsNone(ts0.tzinfo)
         utm = unix_time_millis(ts0)
         self.assertEqual(utm, ts0_ts)
