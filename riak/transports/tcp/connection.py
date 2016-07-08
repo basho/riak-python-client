@@ -19,6 +19,9 @@ else:
 
 
 class TcpConnection(object):
+    def __init__(self):
+        self.bytes_required = False
+
     """
     Connection-related methods for TcpTransport.
     """
@@ -163,7 +166,16 @@ class TcpConnection(object):
             # https://github.com/basho/riak-python-client/issues/425
             raise BadResource(e)
         mv = memoryview(msgbuf)
-        msg_code, = struct.unpack("B", mv[0:1])
+        mcb = mv[0:1]
+        if self.bytes_required:
+            mcb = mcb.tobytes()
+        try:
+            msg_code, = struct.unpack("B", mcb)
+        except struct.error:
+            # NB: Python 2.7.3 requires this
+            # http://bugs.python.org/issue10212
+            msg_code, = struct.unpack("B", mv[0:1].tobytes())
+            self.bytes_required = True
         data = mv[1:].tobytes()
         return (msg_code, data)
 
@@ -171,7 +183,15 @@ class TcpConnection(object):
         # TODO FUTURE re-use buffer
         msglen_buf = self._recv(4)
         # NB: msg length is an unsigned int
-        msglen, = struct.unpack('!I', msglen_buf)
+        if self.bytes_required:
+            msglen_buf = bytes(msglen_buf)
+        try:
+            msglen, = struct.unpack('!I', msglen_buf)
+        except struct.error:
+            # NB: Python 2.7.3 requires this
+            # http://bugs.python.org/issue10212
+            msglen, = struct.unpack('!I', bytes(msglen_buf))
+            self.bytes_required = True
         return self._recv(msglen)
 
     def _recv(self, msglen):
