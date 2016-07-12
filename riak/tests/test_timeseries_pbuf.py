@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import six
 import unittest
 
 import riak.pb.riak_ts_pb2
@@ -457,5 +458,6 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
 
         row = ts_obj.rows[0]
         self.assertEqual(len(row), 5)
-        exp = rows[0]
+        exp = [six.b('hash1'), six.b('user2'), now,
+               six.b('frazzle'), 12.3]
         self.assertEqual(row, exp)

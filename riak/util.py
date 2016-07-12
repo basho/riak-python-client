@@ -8,10 +8,19 @@ from collections import Mapping
 from six import string_types, PY2
 
 epoch = datetime.datetime.utcfromtimestamp(0)
+try:
+    import pytz
+    epoch_tz = pytz.utc.localize(epoch)
+except ImportError:
+    from riak.tz import utc
+    epoch_tz = datetime.datetime.fromtimestamp(0, tz=utc)
 
 
 def unix_time_millis(dt):
-    td = dt - epoch
+    if dt.tzinfo:
+        td = dt - epoch_tz
+    else:
+        td = dt - epoch
     tdms = ((td.days * 24 * 3600) + td.seconds) * 1000
     ms = td.microseconds // 1000
     return tdms + ms
