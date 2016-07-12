@@ -1,5 +1,10 @@
 # Riak Python Client Release Notes
 
+## [2.5.4 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.4)
+
+ * [When converting `datetime` objects to send to Riak TS, `tzinfo` will be used if present](https://github.com/basho/riak-python-client/pull/486)
+ * [Workaround for incorrect version returned by Riak TS OSS](https://github.com/basho/riak-python-client/pull/472)
+
 ## [2.5.3 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.3)
 
  * [Bug fix for raising `BadResource`](https://github.com/basho/riak-python-client/pull/481)
