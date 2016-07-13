@@ -7,6 +7,8 @@ from six import PY2
 from riak.riak_object import RiakObject
 from riak.ts_object import TsObject
 
+import atexit
+
 if PY2:
     from Queue import Queue
 else:
@@ -102,9 +104,11 @@ class MultiPool(object):
         """
         Signals the worker threads to exit and waits on them.
         """
-        self._stop.set()
-        for worker in self._workers:
-            worker.join()
+
+        if not self.stopped():
+            self._stop.set()
+            for worker in self._workers:
+                worker.join()
 
     def stopped(self):
         """
@@ -192,6 +196,15 @@ class MultiPutPool(MultiPool):
 RIAK_MULTIGET_POOL = MultiGetPool()
 RIAK_MULTIPUT_POOL = MultiPutPool()
 
+
+def stop_pools():
+    """Stop worker pools at exit."""
+
+    RIAK_MULTIGET_POOL.stop()
+    RIAK_MULTIPUT_POOL.stop()
+
+
+atexit.register(stop_pools)
 
 def multiget(client, keys, **options):
     """Executes a parallel-fetch across multiple threads. Returns a list
