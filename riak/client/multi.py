@@ -206,6 +206,7 @@ def stop_pools():
 
 atexit.register(stop_pools)
 
+
 def multiget(client, keys, **options):
     """Executes a parallel-fetch across multiple threads. Returns a list
     containing :class:`~riak.riak_object.RiakObject` or
