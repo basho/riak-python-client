@@ -7,10 +7,12 @@ from six import PY2
 from riak.riak_object import RiakObject
 from riak.ts_object import TsObject
 
+import atexit
+
 if PY2:
-    from Queue import Queue
+    from Queue import Queue, Empty
 else:
-    from queue import Queue
+    from queue import Queue, Empty
 
 __all__ = ['multiget', 'multiput', 'MultiGetPool', 'MultiPutPool']
 
@@ -102,9 +104,10 @@ class MultiPool(object):
         """
         Signals the worker threads to exit and waits on them.
         """
-        self._stop.set()
-        for worker in self._workers:
-            worker.join()
+        if not self.stopped():
+            self._stop.set()
+            for worker in self._workers:
+                worker.join()
 
     def stopped(self):
         """
@@ -144,7 +147,11 @@ class MultiGetPool(MultiPool):
         output queue.
         """
         while not self._should_quit():
-            task = self._inq.get()
+            try:
+                task = self._inq.get(block=True, timeout=0.25)
+            except Empty:
+                continue
+
             try:
                 btype = task.client.bucket_type(task.bucket_type)
                 obj = btype.bucket(task.bucket).get(task.key, **task.options)
@@ -170,7 +177,11 @@ class MultiPutPool(MultiPool):
         the output queue.
         """
         while not self._should_quit():
-            task = self._inq.get()
+            try:
+                task = self._inq.get(block=True, timeout=0.25)
+            except Empty:
+                continue
+
             try:
                 obj = task.object
                 if isinstance(obj, RiakObject):
@@ -191,6 +202,15 @@ class MultiPutPool(MultiPool):
 
 RIAK_MULTIGET_POOL = MultiGetPool()
 RIAK_MULTIPUT_POOL = MultiPutPool()
+
+
+def stop_pools():
+    """Stop worker pools at exit."""
+    RIAK_MULTIGET_POOL.stop()
+    RIAK_MULTIPUT_POOL.stop()
+
+
+atexit.register(stop_pools)
 
 
 def multiget(client, keys, **options):

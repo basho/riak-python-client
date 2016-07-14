@@ -164,6 +164,7 @@ Contributors
 * Daniel Reverri
 * [Dan Root](https://github.com/daroot)
 * [David Basden](https://github.com/dbasden)
+* [David Delassus](https://github.com/linkdd)
 * David Koblas
 * Dmitry Rozhkov
 * Eric Florenzano

@@ -130,6 +130,12 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._bucket_types = WeakValueDictionary()
         self._tables = WeakValueDictionary()
 
+    def __del__(self):
+        if self._multiget_pool:
+            self._multiget_pool.stop()
+        if self._multiput_pool:
+            self._multiput_pool.stop()
+
     def _get_protocol(self):
         return self._protocol
 
