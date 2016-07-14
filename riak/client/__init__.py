@@ -133,7 +133,6 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def __del__(self):
         if self._multiget_pool:
             self._multiget_pool.stop()
-
         if self._multiput_pool:
             self._multiput_pool.stop()
 
