@@ -1,5 +1,9 @@
 # Riak Python Client Release Notes
 
+## [2.5.5 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.5)
+
+ * [Stop all pools when client shuts down](https://github.com/basho/riak-python-client/pull/488)
+
 ## [2.5.4 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.4)
 
  * [When converting `datetime` objects to send to Riak TS, `tzinfo` will be used if present](https://github.com/basho/riak-python-client/pull/486)
