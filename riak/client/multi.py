@@ -7,8 +7,6 @@ from six import PY2
 from riak.riak_object import RiakObject
 from riak.ts_object import TsObject
 
-import atexit
-
 if PY2:
     from Queue import Queue, Empty
 else:
@@ -89,7 +87,7 @@ class MultiPool(object):
                     name = "riak.client.multi-worker-{0}-{1}".format(
                             self._name, i)
                     worker = Thread(target=self._worker_method, name=name)
-                    worker.daemon = True
+                    worker.daemon = False
                     worker.start()
                     self._workers.append(worker)
                 self._started.set()
@@ -149,6 +147,11 @@ class MultiGetPool(MultiPool):
         while not self._should_quit():
             try:
                 task = self._inq.get(block=True, timeout=0.25)
+            except TypeError:
+                if self._should_quit():
+                    break
+                else:
+                    raise
             except Empty:
                 continue
 
@@ -179,6 +182,11 @@ class MultiPutPool(MultiPool):
         while not self._should_quit():
             try:
                 task = self._inq.get(block=True, timeout=0.25)
+            except TypeError:
+                if self._should_quit():
+                    break
+                else:
+                    raise
             except Empty:
                 continue
 
@@ -200,19 +208,6 @@ class MultiPutPool(MultiPool):
                 self._inq.task_done()
 
 
-RIAK_MULTIGET_POOL = MultiGetPool()
-RIAK_MULTIPUT_POOL = MultiPutPool()
-
-
-def stop_pools():
-    """Stop worker pools at exit."""
-    RIAK_MULTIGET_POOL.stop()
-    RIAK_MULTIPUT_POOL.stop()
-
-
-atexit.register(stop_pools)
-
-
 def multiget(client, keys, **options):
     """Executes a parallel-fetch across multiple threads. Returns a list
     containing :class:`~riak.riak_object.RiakObject` or
@@ -220,9 +215,9 @@ def multiget(client, keys, **options):
     bucket-type, bucket, key, and the exception raised.
 
     If a ``pool`` option is included, the request will use the given worker
-    pool and not the default :data:`RIAK_MULTIGET_POOL`. This option will
-    be passed by the client if the ``multiget_pool_size`` option was set on
-    client initialization.
+    pool and not a transient :class:`~riak.client.multi.MultiGetPool`. This
+    option will be passed by the client if the ``multiget_pool_size``
+    option was set on client initialization.
 
     :param client: the client to use
     :type client: :class:`~riak.client.RiakClient`
@@ -234,26 +229,33 @@ def multiget(client, keys, **options):
     :rtype: list
 
     """
+    transient_pool = False
     outq = Queue()
 
     if 'pool' in options:
         pool = options['pool']
         del options['pool']
     else:
-        pool = RIAK_MULTIGET_POOL
+        pool = MultiGetPool()
+        transient_pool = True
 
-    pool.start()
-    for bucket_type, bucket, key in keys:
-        task = Task(client, outq, bucket_type, bucket, key, None, options)
-        pool.enq(task)
+    try:
+        pool.start()
+        for bucket_type, bucket, key in keys:
+            task = Task(client, outq, bucket_type, bucket, key, None, options)
+            pool.enq(task)
 
-    results = []
-    for _ in range(len(keys)):
-        if pool.stopped():
-            raise RuntimeError("Multi-get operation interrupted by pool "
-                               "stopping!")
-        results.append(outq.get())
-        outq.task_done()
+        results = []
+        for _ in range(len(keys)):
+            if pool.stopped():
+                raise RuntimeError(
+                        'Multi-get operation interrupted by pool '
+                        'stopping!')
+            results.append(outq.get())
+            outq.task_done()
+    finally:
+        if transient_pool:
+            pool.stop()
 
     return results
 
@@ -263,9 +265,9 @@ def multiput(client, objs, **options):
     containing booleans or :class:`~riak.riak_object.RiakObject`
 
     If a ``pool`` option is included, the request will use the given worker
-    pool and not the default :data:`RIAK_MULTIPUT_POOL`. This option will
-    be passed by the client if the ``multiput_pool_size`` option was set on
-    client initialization.
+    pool and not a transient :class:`~riak.client.multi.MultiPutPool`. This
+    option will be passed by the client if the ``multiput_pool_size``
+    option was set on client initialization.
 
     :param client: the client to use
     :type client: :class:`RiakClient <riak.client.RiakClient>`
@@ -277,25 +279,32 @@ def multiput(client, objs, **options):
     :type options: dict
     :rtype: list
     """
+    transient_pool = False
     outq = Queue()
 
     if 'pool' in options:
         pool = options['pool']
         del options['pool']
     else:
-        pool = RIAK_MULTIPUT_POOL
+        pool = MultiPutPool()
+        transient_pool = True
 
-    pool.start()
-    for obj in objs:
-        task = PutTask(client, outq, obj, options)
-        pool.enq(task)
+    try:
+        pool.start()
+        for obj in objs:
+            task = PutTask(client, outq, obj, options)
+            pool.enq(task)
 
-    results = []
-    for _ in range(len(objs)):
-        if pool.stopped():
-            raise RuntimeError("Multi-put operation interrupted by pool "
-                               "stopping!")
-        results.append(outq.get())
-        outq.task_done()
+        results = []
+        for _ in range(len(objs)):
+            if pool.stopped():
+                raise RuntimeError(
+                        'Multi-put operation interrupted by pool '
+                        'stopping!')
+            results.append(outq.get())
+            outq.task_done()
+    finally:
+        if transient_pool:
+            pool.stop()
 
     return results
