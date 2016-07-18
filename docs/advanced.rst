@@ -36,23 +36,28 @@ Retry logic
 
 .. autofunction:: retryableHttpOnly
 
---------
-Multiget
---------
+-------------------
+Multiget / Multiput
+-------------------
 
-.. currentmodule:: riak.client.multiget
+.. currentmodule:: riak.client.multi
 
 .. autodata:: POOL_SIZE
 
 .. autoclass:: Task
+.. autoclass:: PutTask
 
 .. autoclass:: MultiGetPool
    :members:
    :private-members:
 
-.. autodata:: RIAK_MULTIGET_POOL
-
 .. autofunction:: multiget
+
+.. autoclass:: MultiPutPool
+   :members:
+   :private-members:
+
+.. autofunction:: multiput
 
 ---------
 Datatypes
