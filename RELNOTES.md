@@ -3,6 +3,7 @@
 ## [2.5.5 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.5)
 
  * [Stop all pools when client shuts down](https://github.com/basho/riak-python-client/pull/488)
+ * [Calling `close` on client closes pools, remove global multi pools](https://github.com/basho/riak-python-client/pull/490). *NOTE*: if you use the multi get or put features of the client, you *MUST* call `close()` on your `RiakClient` instance to correctly clean up the thread pools used for these multi-operations.
 
 ## [2.5.4 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.4)
 

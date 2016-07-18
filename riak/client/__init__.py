@@ -109,6 +109,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._credentials = self._create_credentials(credentials)
         self._http_pool = HttpPool(self, **transport_options)
         self._tcp_pool = TcpPool(self, **transport_options)
+        self._closed = False
 
         if PY2:
             self._encoders = {'application/json': default_encoder,
@@ -131,10 +132,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._tables = WeakValueDictionary()
 
     def __del__(self):
-        if self._multiget_pool:
-            self._multiget_pool.stop()
-        if self._multiput_pool:
-            self._multiput_pool.stop()
+        self.close()
 
     def _get_protocol(self):
         return self._protocol
@@ -310,10 +308,19 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         Iterate through all of the connections and close each one.
         """
-        if self._http_pool is not None:
-            self._http_pool.clear()
-        if self._tcp_pool is not None:
-            self._tcp_pool.clear()
+        if not self._closed:
+            self._closed = True
+            self._stop_multi_pools()
+            if self._http_pool is not None:
+                self._http_pool.clear()
+            if self._tcp_pool is not None:
+                self._tcp_pool.clear()
+
+    def _stop_multi_pools(self):
+        if self._multiget_pool:
+            self._multiget_pool.stop()
+        if self._multiput_pool:
+            self._multiput_pool.stop()
 
     def _create_node(self, n):
         if isinstance(n, RiakNode):
