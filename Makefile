@@ -48,7 +48,7 @@ endif
 	@git tag --sign -a "$(VERSION)" -m "riak-python-client $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
 	@git push --tags
 	@echo "==> Python (sdist release)"
-	@python setup.py sdist upload -s -i $(RELEASE_GPG_KEYNAME)
+	@python setup.py sdist upload --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@bash ./build/publish $(VERSION)
 
 release: release_sdist
@@ -56,10 +56,10 @@ ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
 	@echo "==> Python 2.7 (release)"
-	@python2.7 setup.py build --build-base=py-build/2.7 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
+	@python2.7 setup.py build --build-base=py-build/2.7 bdist_egg upload --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.3 (release)"
-	@python3.3 setup.py build --build-base=py-build/3.3 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
+	@python3.3 setup.py build --build-base=py-build/3.3 bdist_egg upload --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.4 (release)"
-	@python3.4 setup.py build --build-base=py-build/3.4 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
+	@python3.4 setup.py build --build-base=py-build/3.4 bdist_egg upload --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.5 (release)"
-	@python3.5 setup.py build --build-base=py-build/3.5 bdist_egg upload -s -i $(RELEASE_GPG_KEYNAME)
+	@python3.5 setup.py build --build-base=py-build/3.5 bdist_egg upload --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
