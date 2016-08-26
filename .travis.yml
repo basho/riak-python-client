@@ -1,12 +1,15 @@
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev" # 3.5 development branch
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+- 3.5-dev
 install:
-  - pip install --upgrade flake8
+- pip install --upgrade flake8
 script:
-  - python setup.py test
-  - flake8 --exclude=riak/pb riak *.py
+- python setup.py test
+- flake8 --exclude=riak/pb riak *.py
+notifications:
+  slack:
+    secure: M2DFhniND+ZJAXmN0LgUWrqUPkvxL+kompUww/lj0n0jTrPFEUWDJ+VAhQzg/1Aw7h/Wx0w19/DMwn5oc1KTHI3uY+9eGZHt5ohM0AANuRD8pIjWKa8OU4/kt2yxUPadUFsF+id5gmugxVfOkNnKQkvEy6Nj7WxWqeuN+N+RGgU=
