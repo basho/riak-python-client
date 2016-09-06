@@ -1,4 +1,3 @@
-import collections
 import six
 
 from .datatype import Datatype
