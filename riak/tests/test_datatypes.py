@@ -97,17 +97,27 @@ class SetUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
     def check_op_output(self, op):
         self.assertIn('adds', op)
         self.assertItemsEqual(op['adds'], ['bar', 'foo'])
-        self.assertIn('removes', op)
-        self.assertIn('foo', op['removes'])
 
     def test_removes_require_context(self):
         dtype = self.dtype(self.bucket, 'key')
         with self.assertRaises(datatypes.ContextRequired):
             dtype.discard('foo')
-
         dtype._context = 'blah'
         dtype.discard('foo')
         self.assertTrue(dtype.modified)
+
+
+class HllUnitTests(DatatypeUnitTestBase, unittest.TestCase):
+    dtype = datatypes.Hll
+
+    def op(self, dtype):
+        dtype._context = 'hll_context'
+        dtype.add('foo')
+        dtype.add('bar')
+
+    def check_op_output(self, op):
+        self.assertIn('adds', op)
+        self.assertItemsEqual(op['adds'], ['bar', 'foo'])
 
 
 class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
