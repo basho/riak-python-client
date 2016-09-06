@@ -107,7 +107,7 @@ class SetUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
         self.assertTrue(dtype.modified)
 
 
-class HllUnitTests(DatatypeUnitTestBase, unittest.TestCase):
+class HllUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
     dtype = datatypes.Hll
 
     def op(self, dtype):

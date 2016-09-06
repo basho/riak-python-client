@@ -15,6 +15,7 @@ unexport LC_TELEPHONE
 unexport LC_TIME
 
 PANDOC_VERSION := $(shell pandoc --version)
+PROTOC_VERSION := $(shell protoc --version)
 
 clean: pb_clean
 
@@ -23,6 +24,12 @@ pb_clean:
 	@rm -rf riak/pb/*_pb2.py riak/pb/*.pyc riak/pb/__pycache__ __pycache__ py-build
 
 pb_compile: pb_clean
+ifeq ($(PROTOC_VERSION),)
+	$(error The protoc command is required to parse proto files)
+endif
+ifneq ($(PROTOC_VERSION),libprotoc 2.5.0)
+	$(error protoc must be version 2.5.0)
+endif
 	@echo "==> Python (compile)"
 	@protoc -Iriak_pb/src --python_out=riak/pb riak_pb/src/*.proto
 	@python setup.py build_messages
