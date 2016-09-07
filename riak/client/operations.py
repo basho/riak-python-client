@@ -1233,7 +1233,9 @@ def _validate_bucket_props(props):
     if 'hll_precision' in props:
         precision = props['hll_precision']
         if precision < 4 or precision > 16:
-            raise ValueError('hll_precision must be between 4 and 16, inclusive')
+            raise ValueError(
+                'hll_precision must be between 4 and 16, inclusive')
+
 
 def _validate_timeout(timeout):
     """
