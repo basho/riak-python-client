@@ -57,5 +57,11 @@ test_timeseries:
 	@$(RIAK_ADMIN) security disable
 	@RIAK_TEST_PROTOCOL='pbc' RIAK_TEST_PB_PORT=8087 RUN_CLIENT=1 RUN_KV=1 RUN_INDEXES=1 RUN_TIMESERIES=1 ./tox_runner.sh ..
 
+test_hll:
+	@echo "Testing Riak Python Client (HLL datatype)"
+	@$(RIAK_ADMIN) security disable
+	@RIAK_TEST_PROTOCOL='pbc' RIAK_TEST_PB_PORT=8087 RUN_DATATYPES=1 RUN_DATATYPE_HLL=1 ./tox_runner.sh ..
+	@RIAK_TEST_PROTOCOL='http' RIAK_TEST_HTTP_PORT=8098 RUN_DATATYPES=1 RUN_DATATYPE_HLL=1 ./tox_runner.sh ..
+
 setup:
 	./tox_setup.sh
