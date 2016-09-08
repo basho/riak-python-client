@@ -1,3 +1,5 @@
+import six
+
 import riak.client.multi
 
 from riak.client.transport import RiakClientTransport, \
@@ -6,7 +8,6 @@ from riak.client.index_page import IndexPage
 from riak.datatypes import TYPES
 from riak.table import Table
 from riak.util import bytes_to_str
-from six import string_types, PY2
 
 
 class RiakClientOperations(RiakClientTransport):
@@ -156,8 +157,7 @@ class RiakClientOperations(RiakClientTransport):
         :type term_regex: string
         :rtype: :class:`~riak.client.index_page.IndexPage`
         """
-        if timeout != 'infinity':
-            _validate_timeout(timeout)
+        _validate_timeout(timeout, infinity_ok=True)
 
         page = IndexPage(self, bucket, index, startkey, endkey,
                          return_terms, max_results, term_regex)
@@ -266,8 +266,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`~riak.client.index_page.IndexPage`
 
         """
-        if timeout != 'infinity':
-            _validate_timeout(timeout)
+        _validate_timeout(timeout, infinity_ok=True)
 
         page = IndexPage(self, bucket, index, startkey, endkey,
                          return_terms, max_results, term_regex)
@@ -497,7 +496,7 @@ class RiakClientOperations(RiakClientTransport):
         try:
             for keylist in stream:
                 if len(keylist) > 0:
-                    if PY2:
+                    if six.PY2:
                         yield keylist
                     else:
                         yield [bytes_to_str(item) for item in keylist]
@@ -554,7 +553,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, string_types):
+        if isinstance(t, six.six.string_types):
             t = Table(self, table)
         return transport.ts_describe(t)
 
@@ -575,7 +574,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, string_types):
+        if isinstance(t, six.six.string_types):
             t = Table(self, table)
         return transport.ts_get(t, key)
 
@@ -612,7 +611,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: boolean
         """
         t = table
-        if isinstance(t, string_types):
+        if isinstance(t, six.string_types):
             t = Table(self, table)
         return transport.ts_delete(t, key)
 
@@ -633,7 +632,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, string_types):
+        if isinstance(t, six.string_types):
             t = Table(self, table)
         return transport.ts_query(t, query, interpolations)
 
@@ -705,7 +704,7 @@ class RiakClientOperations(RiakClientTransport):
         :type notfound_ok: bool
         """
         _validate_timeout(timeout)
-        if not isinstance(robj.key, string_types):
+        if not isinstance(robj.key, six.string_types):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
@@ -1057,11 +1056,7 @@ class RiakClientOperations(RiakClientTransport):
         :param returnvalue: whether to return the updated value of the counter
         :type returnvalue: bool
         """
-        if PY2:
-            valid_types = (int, long)  # noqa
-        else:
-            valid_types = (int,)
-        if type(value) not in valid_types:
+        if not isinstance(value, six.integer_types):
             raise TypeError("Counter update amount must be an integer")
         if value == 0:
             raise ValueError("Cannot increment counter by 0")
@@ -1237,11 +1232,22 @@ def _validate_bucket_props(props):
                 'hll_precision must be between 4 and 16, inclusive')
 
 
-def _validate_timeout(timeout):
+def _validate_timeout(timeout, infinity_ok=False):
     """
     Raises an exception if the given timeout is an invalid value.
     """
-    if not (timeout is None or
-            ((type(timeout) == int or
-             (PY2 and type(timeout) == long)) and timeout > 0)):  # noqa
-        raise ValueError("timeout must be a positive integer")
+    if timeout is None:
+        return
+
+    if timeout == 'infinity':
+        if infinity_ok:
+            return
+        else:
+            raise ValueError(
+                'timeout must be a positive integer '
+                '("infinity" is not valid)')
+
+    if isinstance(timeout, six.integer_types) and timeout > 0:
+        return
+
+    raise ValueError('timeout must be a positive integer')
