@@ -551,7 +551,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, six.six.string_types):
+        if isinstance(t, six.string_types):
             t = Table(self, table)
         return transport.ts_describe(t)
 
@@ -572,7 +572,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, six.six.string_types):
+        if isinstance(t, six.string_types):
             t = Table(self, table)
         return transport.ts_get(t, key)
 
