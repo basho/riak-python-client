@@ -54,7 +54,7 @@ class Datatype(object):
         which is unique for each datatype.
 
         **NB**: Do not use this property to mutate data, as it will not
-        have any effect. Use the methods of the individual type to effect
+        have any effect. Use the methods of the individual type to affect
         changes. This value is guaranteed to be independent of any internal
         data representation.
         """
