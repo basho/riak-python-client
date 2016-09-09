@@ -381,6 +381,7 @@ class RiakClientOperations(RiakClientTransport):
         :param props: the properties to set
         :type props: dict
         """
+        _validate_bucket_props(props)
         return transport.set_bucket_props(bucket, props)
 
     @retryable
@@ -429,6 +430,7 @@ class RiakClientOperations(RiakClientTransport):
         :param props: the properties to set
         :type props: dict
         """
+        _validate_bucket_props(props)
         return transport.set_bucket_type_props(bucket_type, props)
 
     @retryable
@@ -1220,6 +1222,14 @@ class RiakClientOperations(RiakClientTransport):
                                         notfound_ok=notfound_ok,
                                         timeout=timeout,
                                         include_context=include_context)
+
+
+def _validate_bucket_props(props):
+    if 'hll_precision' in props:
+        precision = props['hll_precision']
+        if precision < 4 or precision > 16:
+            raise ValueError(
+                'hll_precision must be between 4 and 16, inclusive')
 
 
 def _validate_timeout(timeout, infinity_ok=False):

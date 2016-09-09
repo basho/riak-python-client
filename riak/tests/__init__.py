@@ -52,6 +52,7 @@ DUMMY_PB_PORT = int(os.environ.get('DUMMY_PB_PORT', '1022'))
 
 RUN_BTYPES = int(os.environ.get('RUN_BTYPES', '0'))
 RUN_DATATYPES = int(os.environ.get('RUN_DATATYPES', '0'))
+RUN_DATATYPE_HLL = int(os.environ.get('RUN_DATATYPE_HLL', '0'))
 RUN_CLIENT = int(os.environ.get('RUN_CLIENT', '0'))
 RUN_INDEXES = int(os.environ.get('RUN_INDEXES', '0'))
 RUN_KV = int(os.environ.get('RUN_KV', '0'))

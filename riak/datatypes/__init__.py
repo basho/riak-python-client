@@ -24,7 +24,8 @@ from .register import Register
 from .set import Set
 from .map import Map
 from .errors import ContextRequired
+from .hll import Hll
 
 
-__all__ = ['Datatype', 'Flag', 'Counter', 'Register', 'Set', 'Map', 'TYPES',
-           'ContextRequired']
+__all__ = ['Datatype', 'TYPES', 'ContextRequired',
+           'Flag', 'Counter', 'Register', 'Set', 'Map', 'Hll']

@@ -259,7 +259,6 @@ class HttpCodec(object):
     def _decode_datatype(self, dtype, value):
         if not dtype == 'map':
             return value
-
         map = {}
         for key in value:
             field = self._map_key_to_pair(key)
@@ -281,13 +280,17 @@ class HttpCodec(object):
         elif dtype == 'flag':
             return op
         elif dtype == 'set':
-            # self._encode_set_op(msg, op)
             set_op = {}
             if 'adds' in op:
                 set_op['add_all'] = op['adds']
             if 'removes' in op:
                 set_op['remove_all'] = op['removes']
             return set_op
+        elif dtype == 'hll':
+            hll_op = {}
+            if 'adds' in op:
+                hll_op['add_all'] = op['adds']
+            return hll_op
         elif dtype == 'map':
             map_op = {}
             for fop in op:

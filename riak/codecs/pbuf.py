@@ -50,7 +50,7 @@ QUORUM_TO_PY = _invert(QUORUM_TO_PB)
 NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
                 'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
                 'notfound_ok', 'search', 'backend', 'search_index', 'datatype',
-                'write_once']
+                'write_once', 'hll_precision']
 COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
 MODFUN_PROPS = ['chash_keyfun', 'linkfun']
 QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
@@ -71,7 +71,8 @@ MAP_FIELD_TYPES = {
 DT_FETCH_TYPES = {
     riak.pb.riak_dt_pb2.DtFetchResp.COUNTER: 'counter',
     riak.pb.riak_dt_pb2.DtFetchResp.SET: 'set',
-    riak.pb.riak_dt_pb2.DtFetchResp.MAP: 'map'
+    riak.pb.riak_dt_pb2.DtFetchResp.MAP: 'map',
+    riak.pb.riak_dt_pb2.DtFetchResp.HLL: 'hll'
 }
 
 
@@ -577,6 +578,8 @@ class PbufCodec(Codec):
             return msg.counter_value
         elif dtype == 'set':
             return self.decode_set_value(msg.set_value)
+        elif dtype == 'hll':
+            return self.decode_hll_value(msg.hll_value)
         elif dtype == 'map':
             return self.decode_map_value(msg.map_value)
 
@@ -605,17 +608,26 @@ class PbufCodec(Codec):
                 value = entry.flag_value
             elif dtype == 'map':
                 value = self.decode_map_value(entry.map_value)
+            else:
+                raise ValueError(
+                    'Map may not contain datatype: {}'
+                    .format(dtype))
             out[(name, dtype)] = value
         return out
 
     def decode_set_value(self, set_value):
         return [bytes_to_str(string[:]) for string in set_value]
 
+    def decode_hll_value(self, hll_value):
+        return int(hll_value)
+
     def encode_dt_op(self, dtype, req, op):
         if dtype == 'counter':
             req.op.counter_op.increment = op[1]
         elif dtype == 'set':
             self.encode_set_op(req.op, op)
+        elif dtype == 'hll':
+            self.encode_hll_op(req.op, op)
         elif dtype == 'map':
             self.encode_map_op(req.op.map_op, op)
         else:
@@ -627,6 +639,10 @@ class PbufCodec(Codec):
             msg.set_op.adds.extend(str_to_bytes(op['adds']))
         if 'removes' in op:
             msg.set_op.removes.extend(str_to_bytes(op['removes']))
+
+    def encode_hll_op(self, msg, op):
+        if 'adds' in op:
+            msg.hll_op.adds.extend(str_to_bytes(op['adds']))
 
     def encode_map_op(self, msg, ops):
         for op in ops:
@@ -662,6 +678,10 @@ class PbufCodec(Codec):
                 msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.ENABLE
             else:
                 msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.DISABLE
+        else:
+            raise ValueError(
+                'Map may not contain datatype: {}'
+                .format(dtype))
 
     def encode_to_ts_cell(self, cell, ts_cell):
         if cell is not None:

@@ -696,12 +696,11 @@ class HttpTransport(Transport,
             self.check_http_code(status, [200, 204])
 
     def fetch_datatype(self, bucket, key, **options):
-        if bucket.bucket_type.is_default():
-            raise NotImplementedError("Datatypes cannot be used in the default"
-                                      " bucket-type.")
-
         if not self.datatypes():
             raise NotImplementedError("Datatypes are not supported.")
+        if bucket.bucket_type.is_default():
+            raise NotImplementedError(
+                'Datatypes cannot be used in the default bucket-type.')
 
         url = self.datatypes_path(bucket.bucket_type.name, bucket.name, key,
                                   **options)
@@ -717,12 +716,11 @@ class HttpTransport(Transport,
                     response.get('context'))
 
     def update_datatype(self, datatype, **options):
-        if datatype.bucket.bucket_type.is_default():
-            raise NotImplementedError("Datatypes cannot be used in the default"
-                                      " bucket-type.")
-
         if not self.datatypes():
-            raise NotImplementedError("Datatypes are not supported.")
+            raise NotImplementedError('Datatypes are not supported.')
+        if datatype.bucket.bucket_type.is_default():
+            raise NotImplementedError(
+                'Datatypes cannot be used in the default bucket-type.')
 
         op = datatype.to_op()
         context = datatype.context
@@ -731,7 +729,7 @@ class HttpTransport(Transport,
             raise ValueError("No operation to send on datatype {!r}".
                              format(datatype))
 
-        if type_name not in ('counter', 'set', 'map'):
+        if type_name not in ('counter', 'set', 'hll', 'map'):
             raise TypeError("Cannot send operation on datatype {!r}".
                             format(type_name))
 

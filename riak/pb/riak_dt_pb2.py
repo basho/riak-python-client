@@ -14,7 +14,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='riak_dt.proto',
   package='',
-  serialized_pb='\n\rriak_dt.proto\"\x85\x01\n\x08MapField\x12\x0c\n\x04name\x18\x01 \x02(\x0c\x12$\n\x04type\x18\x02 \x02(\x0e\x32\x16.MapField.MapFieldType\"E\n\x0cMapFieldType\x12\x0b\n\x07\x43OUNTER\x10\x01\x12\x07\n\x03SET\x10\x02\x12\x0c\n\x08REGISTER\x10\x03\x12\x08\n\x04\x46LAG\x10\x04\x12\x07\n\x03MAP\x10\x05\"\x98\x01\n\x08MapEntry\x12\x18\n\x05\x66ield\x18\x01 \x02(\x0b\x32\t.MapField\x12\x15\n\rcounter_value\x18\x02 \x01(\x12\x12\x11\n\tset_value\x18\x03 \x03(\x0c\x12\x16\n\x0eregister_value\x18\x04 \x01(\x0c\x12\x12\n\nflag_value\x18\x05 \x01(\x08\x12\x1c\n\tmap_value\x18\x06 \x03(\x0b\x32\t.MapEntry\"\xcf\x01\n\nDtFetchReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0c\n\x04type\x18\x03 \x02(\x0c\x12\t\n\x01r\x18\x04 \x01(\r\x12\n\n\x02pr\x18\x05 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x06 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x07 \x01(\x08\x12\x0f\n\x07timeout\x18\x08 \x01(\r\x12\x15\n\rsloppy_quorum\x18\t \x01(\x08\x12\r\n\x05n_val\x18\n \x01(\r\x12\x1d\n\x0finclude_context\x18\x0b \x01(\x08:\x04true\"Q\n\x07\x44tValue\x12\x15\n\rcounter_value\x18\x01 \x01(\x12\x12\x11\n\tset_value\x18\x02 \x03(\x0c\x12\x1c\n\tmap_value\x18\x03 \x03(\x0b\x32\t.MapEntry\"\x87\x01\n\x0b\x44tFetchResp\x12\x0f\n\x07\x63ontext\x18\x01 \x01(\x0c\x12#\n\x04type\x18\x02 \x02(\x0e\x32\x15.DtFetchResp.DataType\x12\x17\n\x05value\x18\x03 \x01(\x0b\x32\x08.DtValue\")\n\x08\x44\x61taType\x12\x0b\n\x07\x43OUNTER\x10\x01\x12\x07\n\x03SET\x10\x02\x12\x07\n\x03MAP\x10\x03\"\x1e\n\tCounterOp\x12\x11\n\tincrement\x18\x01 \x01(\x12\"&\n\x05SetOp\x12\x0c\n\x04\x61\x64\x64s\x18\x01 \x03(\x0c\x12\x0f\n\x07removes\x18\x02 \x03(\x0c\"\xd1\x01\n\tMapUpdate\x12\x18\n\x05\x66ield\x18\x01 \x02(\x0b\x32\t.MapField\x12\x1e\n\ncounter_op\x18\x02 \x01(\x0b\x32\n.CounterOp\x12\x16\n\x06set_op\x18\x03 \x01(\x0b\x32\x06.SetOp\x12\x13\n\x0bregister_op\x18\x04 \x01(\x0c\x12\"\n\x07\x66lag_op\x18\x05 \x01(\x0e\x32\x11.MapUpdate.FlagOp\x12\x16\n\x06map_op\x18\x06 \x01(\x0b\x32\x06.MapOp\"!\n\x06\x46lagOp\x12\n\n\x06\x45NABLE\x10\x01\x12\x0b\n\x07\x44ISABLE\x10\x02\"@\n\x05MapOp\x12\x1a\n\x07removes\x18\x01 \x03(\x0b\x32\t.MapField\x12\x1b\n\x07updates\x18\x02 \x03(\x0b\x32\n.MapUpdate\"V\n\x04\x44tOp\x12\x1e\n\ncounter_op\x18\x01 \x01(\x0b\x32\n.CounterOp\x12\x16\n\x06set_op\x18\x02 \x01(\x0b\x32\x06.SetOp\x12\x16\n\x06map_op\x18\x03 \x01(\x0b\x32\x06.MapOp\"\xf1\x01\n\x0b\x44tUpdateReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0c\n\x04type\x18\x03 \x02(\x0c\x12\x0f\n\x07\x63ontext\x18\x04 \x01(\x0c\x12\x11\n\x02op\x18\x05 \x02(\x0b\x32\x05.DtOp\x12\t\n\x01w\x18\x06 \x01(\r\x12\n\n\x02\x64w\x18\x07 \x01(\r\x12\n\n\x02pw\x18\x08 \x01(\r\x12\x1a\n\x0breturn_body\x18\t \x01(\x08:\x05\x66\x61lse\x12\x0f\n\x07timeout\x18\n \x01(\r\x12\x15\n\rsloppy_quorum\x18\x0b \x01(\x08\x12\r\n\x05n_val\x18\x0c \x01(\r\x12\x1d\n\x0finclude_context\x18\r \x01(\x08:\x04true\"t\n\x0c\x44tUpdateResp\x12\x0b\n\x03key\x18\x01 \x01(\x0c\x12\x0f\n\x07\x63ontext\x18\x02 \x01(\x0c\x12\x15\n\rcounter_value\x18\x03 \x01(\x12\x12\x11\n\tset_value\x18\x04 \x03(\x0c\x12\x1c\n\tmap_value\x18\x05 \x03(\x0b\x32\t.MapEntryB#\n\x17\x63om.basho.riak.protobufB\x08RiakDtPB')
+  serialized_pb='\n\rriak_dt.proto\"\x85\x01\n\x08MapField\x12\x0c\n\x04name\x18\x01 \x02(\x0c\x12$\n\x04type\x18\x02 \x02(\x0e\x32\x16.MapField.MapFieldType\"E\n\x0cMapFieldType\x12\x0b\n\x07\x43OUNTER\x10\x01\x12\x07\n\x03SET\x10\x02\x12\x0c\n\x08REGISTER\x10\x03\x12\x08\n\x04\x46LAG\x10\x04\x12\x07\n\x03MAP\x10\x05\"\x98\x01\n\x08MapEntry\x12\x18\n\x05\x66ield\x18\x01 \x02(\x0b\x32\t.MapField\x12\x15\n\rcounter_value\x18\x02 \x01(\x12\x12\x11\n\tset_value\x18\x03 \x03(\x0c\x12\x16\n\x0eregister_value\x18\x04 \x01(\x0c\x12\x12\n\nflag_value\x18\x05 \x01(\x08\x12\x1c\n\tmap_value\x18\x06 \x03(\x0b\x32\t.MapEntry\"\xcf\x01\n\nDtFetchReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x02(\x0c\x12\x0c\n\x04type\x18\x03 \x02(\x0c\x12\t\n\x01r\x18\x04 \x01(\r\x12\n\n\x02pr\x18\x05 \x01(\r\x12\x14\n\x0c\x62\x61sic_quorum\x18\x06 \x01(\x08\x12\x13\n\x0bnotfound_ok\x18\x07 \x01(\x08\x12\x0f\n\x07timeout\x18\x08 \x01(\r\x12\x15\n\rsloppy_quorum\x18\t \x01(\x08\x12\r\n\x05n_val\x18\n \x01(\r\x12\x1d\n\x0finclude_context\x18\x0b \x01(\x08:\x04true\"d\n\x07\x44tValue\x12\x15\n\rcounter_value\x18\x01 \x01(\x12\x12\x11\n\tset_value\x18\x02 \x03(\x0c\x12\x1c\n\tmap_value\x18\x03 \x03(\x0b\x32\t.MapEntry\x12\x11\n\thll_value\x18\x04 \x01(\x04\"\x90\x01\n\x0b\x44tFetchResp\x12\x0f\n\x07\x63ontext\x18\x01 \x01(\x0c\x12#\n\x04type\x18\x02 \x02(\x0e\x32\x15.DtFetchResp.DataType\x12\x17\n\x05value\x18\x03 \x01(\x0b\x32\x08.DtValue\"2\n\x08\x44\x61taType\x12\x0b\n\x07\x43OUNTER\x10\x01\x12\x07\n\x03SET\x10\x02\x12\x07\n\x03MAP\x10\x03\x12\x07\n\x03HLL\x10\x04\"\x1e\n\tCounterOp\x12\x11\n\tincrement\x18\x01 \x01(\x12\"&\n\x05SetOp\x12\x0c\n\x04\x61\x64\x64s\x18\x01 \x03(\x0c\x12\x0f\n\x07removes\x18\x02 \x03(\x0c\"\x15\n\x05HllOp\x12\x0c\n\x04\x61\x64\x64s\x18\x01 \x03(\x0c\"\xd1\x01\n\tMapUpdate\x12\x18\n\x05\x66ield\x18\x01 \x02(\x0b\x32\t.MapField\x12\x1e\n\ncounter_op\x18\x02 \x01(\x0b\x32\n.CounterOp\x12\x16\n\x06set_op\x18\x03 \x01(\x0b\x32\x06.SetOp\x12\x13\n\x0bregister_op\x18\x04 \x01(\x0c\x12\"\n\x07\x66lag_op\x18\x05 \x01(\x0e\x32\x11.MapUpdate.FlagOp\x12\x16\n\x06map_op\x18\x06 \x01(\x0b\x32\x06.MapOp\"!\n\x06\x46lagOp\x12\n\n\x06\x45NABLE\x10\x01\x12\x0b\n\x07\x44ISABLE\x10\x02\"@\n\x05MapOp\x12\x1a\n\x07removes\x18\x01 \x03(\x0b\x32\t.MapField\x12\x1b\n\x07updates\x18\x02 \x03(\x0b\x32\n.MapUpdate\"n\n\x04\x44tOp\x12\x1e\n\ncounter_op\x18\x01 \x01(\x0b\x32\n.CounterOp\x12\x16\n\x06set_op\x18\x02 \x01(\x0b\x32\x06.SetOp\x12\x16\n\x06map_op\x18\x03 \x01(\x0b\x32\x06.MapOp\x12\x16\n\x06hll_op\x18\x04 \x01(\x0b\x32\x06.HllOp\"\xf1\x01\n\x0b\x44tUpdateReq\x12\x0e\n\x06\x62ucket\x18\x01 \x02(\x0c\x12\x0b\n\x03key\x18\x02 \x01(\x0c\x12\x0c\n\x04type\x18\x03 \x02(\x0c\x12\x0f\n\x07\x63ontext\x18\x04 \x01(\x0c\x12\x11\n\x02op\x18\x05 \x02(\x0b\x32\x05.DtOp\x12\t\n\x01w\x18\x06 \x01(\r\x12\n\n\x02\x64w\x18\x07 \x01(\r\x12\n\n\x02pw\x18\x08 \x01(\r\x12\x1a\n\x0breturn_body\x18\t \x01(\x08:\x05\x66\x61lse\x12\x0f\n\x07timeout\x18\n \x01(\r\x12\x15\n\rsloppy_quorum\x18\x0b \x01(\x08\x12\r\n\x05n_val\x18\x0c \x01(\r\x12\x1d\n\x0finclude_context\x18\r \x01(\x08:\x04true\"\x87\x01\n\x0c\x44tUpdateResp\x12\x0b\n\x03key\x18\x01 \x01(\x0c\x12\x0f\n\x07\x63ontext\x18\x02 \x01(\x0c\x12\x15\n\rcounter_value\x18\x03 \x01(\x12\x12\x11\n\tset_value\x18\x04 \x03(\x0c\x12\x1c\n\tmap_value\x18\x05 \x03(\x0b\x32\t.MapEntry\x12\x11\n\thll_value\x18\x06 \x01(\x04\x42#\n\x17\x63om.basho.riak.protobufB\x08RiakDtPB')
 
 
 
@@ -69,11 +69,15 @@ _DTFETCHRESP_DATATYPE = _descriptor.EnumDescriptor(
       name='MAP', index=2, number=3,
       options=None,
       type=None),
+    _descriptor.EnumValueDescriptor(
+      name='HLL', index=3, number=4,
+      options=None,
+      type=None),
   ],
   containing_type=None,
   options=None,
-  serialized_start=696,
-  serialized_end=737,
+  serialized_start=715,
+  serialized_end=765,
 )
 
 _MAPUPDATE_FLAGOP = _descriptor.EnumDescriptor(
@@ -93,8 +97,8 @@ _MAPUPDATE_FLAGOP = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=988,
-  serialized_end=1021,
+  serialized_start=1039,
+  serialized_end=1072,
 )
 
 
@@ -323,6 +327,13 @@ _DTVALUE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='hll_value', full_name='DtValue.hll_value', index=3,
+      number=4, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -333,7 +344,7 @@ _DTVALUE = _descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=518,
-  serialized_end=599,
+  serialized_end=618,
 )
 
 
@@ -375,8 +386,8 @@ _DTFETCHRESP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=602,
-  serialized_end=737,
+  serialized_start=621,
+  serialized_end=765,
 )
 
 
@@ -403,8 +414,8 @@ _COUNTEROP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=739,
-  serialized_end=769,
+  serialized_start=767,
+  serialized_end=797,
 )
 
 
@@ -438,8 +449,36 @@ _SETOP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=771,
-  serialized_end=809,
+  serialized_start=799,
+  serialized_end=837,
+)
+
+
+_HLLOP = _descriptor.Descriptor(
+  name='HllOp',
+  full_name='HllOp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='adds', full_name='HllOp.adds', index=0,
+      number=1, type=12, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=839,
+  serialized_end=860,
 )
 
 
@@ -502,8 +541,8 @@ _MAPUPDATE = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=812,
-  serialized_end=1021,
+  serialized_start=863,
+  serialized_end=1072,
 )
 
 
@@ -537,8 +576,8 @@ _MAPOP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1023,
-  serialized_end=1087,
+  serialized_start=1074,
+  serialized_end=1138,
 )
 
 
@@ -570,6 +609,13 @@ _DTOP = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='hll_op', full_name='DtOp.hll_op', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -579,8 +625,8 @@ _DTOP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1089,
-  serialized_end=1175,
+  serialized_start=1140,
+  serialized_end=1250,
 )
 
 
@@ -691,8 +737,8 @@ _DTUPDATEREQ = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1178,
-  serialized_end=1419,
+  serialized_start=1253,
+  serialized_end=1494,
 )
 
 
@@ -738,6 +784,13 @@ _DTUPDATERESP = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='hll_value', full_name='DtUpdateResp.hll_value', index=5,
+      number=6, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -747,8 +800,8 @@ _DTUPDATERESP = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1421,
-  serialized_end=1537,
+  serialized_start=1497,
+  serialized_end=1632,
 )
 
 _MAPFIELD.fields_by_name['type'].enum_type = _MAPFIELD_MAPFIELDTYPE
@@ -770,6 +823,7 @@ _MAPOP.fields_by_name['updates'].message_type = _MAPUPDATE
 _DTOP.fields_by_name['counter_op'].message_type = _COUNTEROP
 _DTOP.fields_by_name['set_op'].message_type = _SETOP
 _DTOP.fields_by_name['map_op'].message_type = _MAPOP
+_DTOP.fields_by_name['hll_op'].message_type = _HLLOP
 _DTUPDATEREQ.fields_by_name['op'].message_type = _DTOP
 _DTUPDATERESP.fields_by_name['map_value'].message_type = _MAPENTRY
 DESCRIPTOR.message_types_by_name['MapField'] = _MAPFIELD
@@ -779,6 +833,7 @@ DESCRIPTOR.message_types_by_name['DtValue'] = _DTVALUE
 DESCRIPTOR.message_types_by_name['DtFetchResp'] = _DTFETCHRESP
 DESCRIPTOR.message_types_by_name['CounterOp'] = _COUNTEROP
 DESCRIPTOR.message_types_by_name['SetOp'] = _SETOP
+DESCRIPTOR.message_types_by_name['HllOp'] = _HLLOP
 DESCRIPTOR.message_types_by_name['MapUpdate'] = _MAPUPDATE
 DESCRIPTOR.message_types_by_name['MapOp'] = _MAPOP
 DESCRIPTOR.message_types_by_name['DtOp'] = _DTOP
@@ -826,6 +881,12 @@ class SetOp(_message.Message):
   DESCRIPTOR = _SETOP
 
   # @@protoc_insertion_point(class_scope:SetOp)
+
+@add_metaclass(_reflection.GeneratedProtocolMessageType)
+class HllOp(_message.Message):
+  DESCRIPTOR = _HLLOP
+
+  # @@protoc_insertion_point(class_scope:HllOp)
 
 @add_metaclass(_reflection.GeneratedProtocolMessageType)
 class MapUpdate(_message.Message):
