@@ -97,6 +97,8 @@ class SetUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
     def check_op_output(self, op):
         self.assertIn('adds', op)
         self.assertItemsEqual(op['adds'], ['bar', 'foo'])
+        self.assertIn('removes', op)
+        self.assertIn('foo', op['removes'])
 
     def test_removes_require_context(self):
         dtype = self.dtype(self.bucket, 'key')
