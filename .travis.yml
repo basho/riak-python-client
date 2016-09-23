@@ -1,43 +1,35 @@
 sudo: required
-
 dist: trusty
-
 language: python
-
 python:
-  - '2.7'
-  - '3.3'
-  - '3.4'
-  - '3.5'
-  - 'nightly'
-
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+- nightly
 install:
-  - pip install --upgrade flake8
-
+- pip install --upgrade flake8
 before_script:
-  - sudo ./tools/travis-ci/riak-install
-  - sudo ./tools/devrel/riak-cluster-config "$(which riak-admin)" 8098 false false
-
+- sudo ./tools/travis-ci/riak-install
+- sudo ./tools/devrel/riak-cluster-config "$(which riak-admin)" 8098 false false
 env:
   matrix:
-    - RIAK_TEST_PROTOCOL=pbc
-    - RIAK_TEST_PROTOCOL=http
+  - RIAK_TEST_PROTOCOL=pbc
+  - RIAK_TEST_PROTOCOL=http
   global:
-    - RIAK_TEST_PB_PORT=8087
-    - RIAK_TEST_HTTP_PORT=8098
-    - RUN_BTYPES=1
-    - RUN_CLIENT=1
-    - RUN_MAPREDUCE=1
-    - RUN_KV=1
-    - RUN_RESOLVE=1
-    - RUN_YZ=1
-    - RUN_DATATYPES=1
-    - RUN_INDEXES=1
-
+  - RIAK_TEST_PB_PORT=8087
+  - RIAK_TEST_HTTP_PORT=8098
+  - RUN_BTYPES=1
+  - RUN_CLIENT=1
+  - RUN_MAPREDUCE=1
+  - RUN_KV=1
+  - RUN_RESOLVE=1
+  - RUN_YZ=1
+  - RUN_DATATYPES=1
+  - RUN_INDEXES=1
 script:
-  - flake8 --exclude=riak/pb riak *.py
-  - python setup.py test
-
+- flake8 --exclude=riak/pb riak *.py
+- python setup.py test
 notifications:
   slack:
-    secure: CQHpKSbvzvGOKfQ8GdYdK0Huaz0y2xLbwhUWNH/xkrxO/OuqvYvZn7SlJRCLIYobj+zSiwsQRrz9G19gXGZMaDCwtdVVgEnddzm15bLjsUsrWU0FgRufJuATre+AVFByngvhAmdDIvcxVVhobIYo+F6m/8/OWRGhnQvvWOVtnMA=
+    secure: kU1XcvTAliCWKuYpMWEMbD4qkbmlnWGLAIKbBQjtIh5ZRzISgjdUFzGcC31eHoQFv12LQdp5KAFj0Y1FyEvLxi0W8VeWKpsBGc06ntuECaN9MNHRBzKKclrTMGTfpBWZ5IO17XSUu2lKaNz6GDGRkiZA+sxYAVPfZSXY3u86IuY=
