@@ -155,7 +155,10 @@ class BucketTypeTests(IntegrationTestBase, unittest.TestCase, Comparison):
         skey = 'write_once-init'
         btype = self.client.bucket_type(bt)
         bucket = btype.bucket(bt)
-        sobj = bucket.get(skey)
+        try:
+            sobj = bucket.get(skey)
+        except RiakError as e:
+            raise unittest.SkipTest(e)
         if not sobj.exists:
             for i in range(100):
                 o = bucket.new(self.key_name + str(i))
