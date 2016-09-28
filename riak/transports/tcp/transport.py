@@ -526,6 +526,8 @@ class TcpTransport(Transport, TcpConnection):
         :type key: string
         :rtype: list of dicts
         """
+        if not self.preflists():
+            raise NotImplementedError("fetching preflists is not supported.")
         msg_code = riak.pb.messages.MSG_CODE_GET_BUCKET_KEY_PREFLIST_REQ
         codec = self._get_codec(msg_code)
         msg = codec.encode_get_preflist(bucket, key)
