@@ -164,7 +164,7 @@ class RiakContent(object):
         self.indexes.difference_update(to_rem)
         return self.add_index(field, value)
 
-    def add_link(self, obj, tag=None):
+    def add_link(self, obj, tag=None, unique=False):
         """
         add_link(obj, tag=None)
 
@@ -176,12 +176,26 @@ class RiakContent(object):
         :param tag: Optional link tag. Defaults to bucket name. It is ignored
             if ``obj`` is a 3 item link tuple.
         :type tag: string
+        :param unique: Optional unique flag. If true, the link will only be
+            added if it is not already present.
+        :type tag: string
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         if isinstance(obj, tuple):
             newlink = obj
         else:
             newlink = (obj.bucket.name, obj.key, tag)
+
+        if unique is True:
+            # ensure link is not already present in self.links
+            link_found = False
+            for l in self.links:
+                if l[0] == newlink[0] and l[1] == newlink[1]:
+                    link_found = True
+                    break
+            if link_found:
+                # don't add the link
+                return self._robject
 
         self.links.append(newlink)
         return self._robject
