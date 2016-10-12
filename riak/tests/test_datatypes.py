@@ -3,7 +3,7 @@ import unittest
 import riak.datatypes as datatypes
 
 from riak import RiakError, RiakBucket, BucketType, RiakObject
-from riak.tests import RUN_DATATYPES, RUN_DATATYPE_HLL
+from riak.tests import RUN_DATATYPES
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
@@ -160,27 +160,39 @@ class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
         self.assertTrue(dtype.modified)
 
 
-@unittest.skipUnless(RUN_DATATYPE_HLL, 'RUN_DATATYPE_HLL is 0')
+@unittest.skipUnless(RUN_DATATYPES, 'RUN_DATATYPES is 0')
 class HllDatatypeIntegrationTests(IntegrationTestBase,
                                   unittest.TestCase):
     def test_fetch_bucket_type_props(self):
-        btype = self.client.bucket_type('hlls')
-        props = btype.get_properties()
+        try:
+            btype = self.client.bucket_type('hlls')
+            props = btype.get_properties()
+        except RiakError as e:
+            raise unittest.SkipTest(e)
         self.assertEqual(14, props['hll_precision'])
 
     def test_set_same_hll_precision(self):
-        btype = self.client.bucket_type('hlls')
-        btype.set_property('hll_precision', 14)
-        props = btype.get_properties()
-        self.assertEqual(14, props['hll_precision'])
+        try:
+            btype = self.client.bucket_type('hlls')
+            btype.set_property('hll_precision', 14)
+            props = btype.get_properties()
+            self.assertEqual(14, props['hll_precision'])
+        except RiakError as e:
+            raise unittest.SkipTest(e)
 
     def test_set_larger_hll_precision(self):
-        btype = self.client.bucket_type('hlls')
+        try:
+            btype = self.client.bucket_type('hlls')
+        except RiakError as e:
+            raise unittest.SkipTest(e)
         with self.assertRaises(RiakError):
             btype.set_property('hll_precision', 15)
 
     def test_set_invalid_hll_precision(self):
-        btype = self.client.bucket_type('hlls')
+        try:
+            btype = self.client.bucket_type('hlls')
+        except RiakError as e:
+            raise unittest.SkipTest(e)
         with self.assertRaises(ValueError):
             btype.set_property('hll_precision', 3)
         with self.assertRaises(ValueError):
@@ -189,8 +201,11 @@ class HllDatatypeIntegrationTests(IntegrationTestBase,
             btype.set_property('hll_precision', 0)
 
     def test_dt_hll(self):
-        btype = self.client.bucket_type('hlls')
-        props = btype.get_properties()
+        try:
+            btype = self.client.bucket_type('hlls')
+            props = btype.get_properties()
+        except RiakError as e:
+            raise unittest.SkipTest(e)
         self.assertEqual(14, props['hll_precision'])
         bucket = btype.bucket(self.bucket_name)
         myhll = datatypes.Hll(bucket, self.key_name)

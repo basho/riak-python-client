@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+have_tox='false'
+if hash tox 2>/dev/null
+then
+    echo '[INFO] tox command present, will use that to run tests'
+    have_tox='true'
+fi
+
+have_py2='false'
+if hash python2 2>/dev/null
+then
+    have_py2='true'
+fi
+
+have_py3='false'
+if hash python3 2>/dev/null
+then
+    have_py3='true'
+fi
+
+have_riak_admin='false'
+if hash riak-admin 2>/dev/null
+then
+    have_riak_admin='true'
+    $riak_admin='riak-admin'
+else
+    set +o nounset
+
+    if [[ -x $RIAK_ADMIN ]]
+    then
+        have_riak_admin='true'
+        riak_admin="$RIAK_ADMIN"
+    elif [[ -x $RIAK_DIR/bin/riak-admin ]]
+    then
+        have_riak_admin='true'
+        riak_admin="$RIAK_DIR/bin/riak-admin"
+    fi
+
+    set -o nounset
+fi
+
+function lint
+{
+    if ! hash flake8 2>/dev/null
+    then
+        pip install --upgrade flake8
+    fi
+    flake8 --exclude=riak/pb riak *.py
+}
+
+function run_tests
+{
+    if [[ $have_tox == 'true' ]]
+    then
+        tox
+    else
+        if [[ $have_py2 == 'true' ]]
+        then
+            python2 setup.py test
+        fi
+        if [[ $have_py3 == 'true' ]]
+        then
+            python3 setup.py test
+        fi
+    fi
+}
+
+function run_tests_each_protocol
+{
+    for protocol in pbc http
+    do
+        export RIAK_TEST_PROTOCOL="$protocol"
+        run_tests
+    done
+}
+
+function export_test_environment_vars
+{
+    local riak_test_host="${RIAK_TEST_HOST:-localhost}"
+    local -i riak_test_pb_port="${RIAK_TEST_PB_PORT:-8087}"
+    local -i riak_test_http_port="${RIAK_TEST_HTTP_PORT:-8098}"
+    export RUN_BTYPES=1
+    export RUN_CLIENT=1
+    export RUN_MAPREDUCE=1
+    export RUN_KV=1
+    export RUN_RESOLVE=1
+    export RUN_YZ=1
+    export RUN_DATATYPES=1
+    export RUN_INDEXES=1
+    export RIAK_TEST_HOST="$riak_test_host"
+    export RIAK_TEST_PB_PORT="$riak_test_pb_port"
+    export RIAK_TEST_HTTP_PORT="$riak_test_http_port"
+}
+
+function security_test
+{
+    if [[ $have_riak_admin == 'true' ]]
+    then
+        export_test_environment_vars
+        export RUN_SECURITY=1
+        $riak_admin security enable
+        run_tests_each_protocol
+    else
+        echo '[ERROR] riak-admin must be in PATH, RIAK_ADMIN var set to path, or RIAK_DIR set.' 1>&2
+        exit 1
+    fi
+}
+
+function integration_test
+{
+    export_test_environment_vars
+    run_tests_each_protocol
+}
+
+arg="${1:-lint}"
+case "$arg" in
+    'lint')
+        lint;;
+    'unit-test')
+        run_tests;;
+    'integration-test')
+        integration_test;;
+    'security-test')
+        security_test;;
+    *)
+        echo "[ERROR] unknown argument: '$arg'" 1>&2
+        exit 1;;
+esac
