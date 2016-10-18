@@ -136,7 +136,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         btype = client.bucket_type(table_name)
         bucket = btype.bucket(table_name)
         try:
-            sobj = bucket.get(skey)
+            bucket.get(skey)
         except (RiakError, NotImplementedError) as e:
             raise unittest.SkipTest(e)
         finally:

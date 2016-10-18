@@ -169,7 +169,7 @@ class HllDatatypeIntegrationTests(IntegrationTestBase,
         client = cls.create_client()
         try:
             btype = client.bucket_type('hlls')
-            props = btype.get_properties()
+            btype.get_properties()
         except RiakError as e:
             raise unittest.SkipTest(e)
         finally:
