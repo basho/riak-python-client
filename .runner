@@ -85,12 +85,13 @@ function export_test_environment_vars
     local -i riak_test_http_port="${RIAK_TEST_HTTP_PORT:-8098}"
     export RUN_BTYPES=1
     export RUN_CLIENT=1
-    export RUN_MAPREDUCE=1
-    export RUN_KV=1
-    export RUN_RESOLVE=1
-    export RUN_YZ=1
     export RUN_DATATYPES=1
     export RUN_INDEXES=1
+    export RUN_KV=1
+    export RUN_MAPREDUCE=1
+    export RUN_RESOLVE=1
+    export RUN_TIMESERIES=1
+    export RUN_YZ=1
     export RIAK_TEST_HOST="$riak_test_host"
     export RIAK_TEST_PB_PORT="$riak_test_pb_port"
     export RIAK_TEST_HTTP_PORT="$riak_test_http_port"
