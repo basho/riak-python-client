@@ -1,35 +1,28 @@
-Python Client for Riak
-======================
+# Python Client for Riak
 
-Build Status
-============
+## Build Status
 
 [![Build Status](https://travis-ci.org/basho/riak-python-client.svg?branch=master)](https://travis-ci.org/basho/riak-python-client)
 
-Documentation
-=============
+## Documentation
 
 [Documentation for the Riak Python Client Library](http://basho.github.io/riak-python-client/index.html) is available [here](http://basho.github.io/riak-python-client/index.html).
 
 Documentation for Riak is available [here](http://docs.basho.com/riak/latest).
 
-Repository Cloning
-==================
+## Repository Cloning
 
 *NOTE*: please clone this repository using the `--recursive` argument to `git clone` or follow the clone with `git submodule update --init`. This repository uses two submodules.
 
-Install
-=======
+# Installation
 
 The recommended versions of Python for use with this client are Python `2.7.8` (or greater, `2.7.11` as of `2016-06-21`), `3.3.x`, `3.4.x` and `3.5.x`. The latest version from each series should be preferred. Older versions of the Python `2.7.X` and `3.X` series should be used with caution as they are not covered by integration tests.
 
-Riak TS (Timeseries)
-===================
+## Riak TS (Timeseries)
 
 You must use version `2.7.11`, `3.4.4` or `3.5.1` (or greater within a version series). Otherwise you will be affected by [this Python bug](https://bugs.python.org/issue23517).
 
-From Source
------------
+## From Source
 
 ```sh
 python setup.py install
@@ -37,8 +30,7 @@ python setup.py install
 
 There are additional dependencies on Python packages `setuptools` and `protobuf`.
 
-From PyPI
----------
+## From PyPI
 
 Official packages are signed and published to [PyPI](https://pypi.python.org/pypi/riak).
 
@@ -75,7 +67,7 @@ make rel
 
 [Source build documentation](http://docs.basho.com/riak/kv/latest/setup/installing/source/).
 
-When building a from source, the protocol buffers port will be `8087` and HTTP will be `8098`.
+When building from source, the protocol buffers port will be `8087` and HTTP will be `8098`.
 
 ### Package
 
