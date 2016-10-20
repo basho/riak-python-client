@@ -9,11 +9,11 @@ from erlastic.types import Atom
 
 from riak import RiakError
 from riak.table import Table
+from riak.tests import RUN_TIMESERIES
 from riak.ts_object import TsObject
 from riak.codecs.ttb import TtbCodec
 from riak.util import str_to_bytes, bytes_to_str, \
     unix_time_millis, is_timeseries_supported
-from riak.tests import RUN_TIMESERIES
 from riak.tests.base import IntegrationTestBase
 
 rpberrorresp_a = Atom('rpberrorresp')
@@ -41,7 +41,8 @@ ts0 = datetime.datetime(2015, 1, 1, 12, 1, 2, 987000)
 ts1 = ts0 + fiveMins
 
 
-@unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported")
+@unittest.skipUnless(is_timeseries_supported(),
+                     'Timeseries not supported by this Python version')
 class TimeseriesTtbUnitTests(unittest.TestCase):
     def setUp(self):
         self.table = Table(None, table_name)
@@ -121,7 +122,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
 
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
-                     'Timeseries not supported or RUN_TIMESERIES is 0')
+                     'Timeseries not supported by this Python version'
+                     ' or RUN_TIMESERIES is 0')
 class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
     client_options = {'transport_options':
                       {'use_ttb': True, 'ts_convert_timestamp': True}}
@@ -129,6 +131,26 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTtbTests, cls).setUpClass()
+        client = cls.create_client()
+        skey = 'test-key'
+        btype = client.bucket_type(table_name)
+        bucket = btype.bucket(table_name)
+        try:
+            bucket.get(skey)
+        except (RiakError, NotImplementedError) as e:
+            raise unittest.SkipTest(e)
+        finally:
+            client.close()
+
+    def validate_len(self, ts_obj, elen):
+        if isinstance(elen, tuple):
+            self.assertIn(len(ts_obj.columns.names), elen)
+            self.assertIn(len(ts_obj.columns.types), elen)
+            self.assertIn(len(ts_obj.rows), elen)
+        else:
+            self.assertEqual(len(ts_obj.columns.names), elen)
+            self.assertEqual(len(ts_obj.columns.types), elen)
+            self.assertEqual(len(ts_obj.rows), elen)
 
     def test_insert_data_via_sql(self):
         query = """
@@ -162,11 +184,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        ts_cols = ts_obj.columns
-        self.assertEqual(len(ts_cols.names), 5)
-        self.assertEqual(len(ts_cols.types), 5)
-        row = ts_obj.rows[0]
-        self.assertEqual(len(row), 5)
+        self.validate_len(ts_obj, (5, 7))
 
     def test_store_and_fetch_gh_483(self):
         now = datetime.datetime(2015, 1, 1, 12, 0, 0)

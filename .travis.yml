@@ -8,10 +8,10 @@ python:
   - '3.5'
   - nightly
 install:
-  - pip install --upgrade flake8
+  - pip install --upgrade pip setuptools flake8
 before_script:
   - sudo ./tools/travis-ci/riak-install -d "$RIAK_DOWNLOAD_URL"
-  - sudo ./tools/devrel/riak-cluster-config "$(which riak-admin)" 8098 false false
+  - sudo ./tools/setup-riak
 env:
   matrix:
     - RIAK_TEST_PROTOCOL=pbc  RIAK_DOWNLOAD_URL=http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.7/ubuntu/trusty/riak_2.0.7-1_amd64.deb

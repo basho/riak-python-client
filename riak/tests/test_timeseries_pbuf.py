@@ -30,7 +30,8 @@ ts1 = ts0 + fiveMins
 ex1ms = 1420113900987
 
 
-@unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported")
+@unittest.skipUnless(is_timeseries_supported(),
+                     'Timeseries not supported by this Python version')
 class TimeseriesPbufUnitTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -194,7 +195,8 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
 
 
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
-                     'Timeseries not supported or RUN_TIMESERIES is 0')
+                     'Timeseries not supported by this Python version'
+                     ' or RUN_TIMESERIES is 0')
 class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
     client_options = {'transport_options':
                       {'use_ttb': False, 'ts_convert_timestamp': True}}
@@ -218,11 +220,15 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
             ['hash1', 'user2', fiveMinsAgo, 'wind', None],
             ['hash1', 'user2', cls.now, 'snow', 20.1]
         ]
-        ts_obj = table.new(rows)
-        result = ts_obj.store()
+        try:
+            ts_obj = table.new(rows)
+            result = ts_obj.store()
+        except (RiakError, NotImplementedError) as e:
+            raise unittest.SkipTest(e)
+        finally:
+            client.close()
         if result is not True:
             raise AssertionError("expected success")
-        client.close()
 
         cls.nowMsec = unix_time_millis(cls.now)
         cls.fiveMinsAgo = fiveMinsAgo
@@ -246,10 +252,15 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
         ]
         cls.encoded_rows = encoded_rows
 
-    def validate_len(self, ts_obj, expected_len):
-        self.assertEqual(len(ts_obj.columns.names), expected_len)
-        self.assertEqual(len(ts_obj.columns.types), expected_len)
-        self.assertEqual(len(ts_obj.rows), expected_len)
+    def validate_len(self, ts_obj, elen):
+        if isinstance(elen, tuple):
+            self.assertIn(len(ts_obj.columns.names), elen)
+            self.assertIn(len(ts_obj.columns.types), elen)
+            self.assertIn(len(ts_obj.rows), elen)
+        else:
+            self.assertEqual(len(ts_obj.columns.names), elen)
+            self.assertEqual(len(ts_obj.columns.types), elen)
+            self.assertEqual(len(ts_obj.rows), elen)
 
     def validate_data(self, ts_obj):
         if ts_obj.columns is not None:
@@ -295,31 +306,31 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, 5)
+        self.validate_len(ts_obj, (5, 7))
 
     def test_query_that_returns_table_description_using_interpolation(self):
         query = 'Describe {table}'
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, 5)
+        self.validate_len(ts_obj, (5, 7))
 
     def test_query_description_via_table(self):
         query = 'describe {table}'
         table = Table(self.client, table_name)
         ts_obj = table.query(query)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, 5)
+        self.validate_len(ts_obj, (5, 7))
 
     def test_get_description(self):
         ts_obj = self.client.ts_describe(table_name)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, 5)
+        self.validate_len(ts_obj, (5, 7))
 
     def test_get_description_via_table(self):
         table = Table(self.client, table_name)
         ts_obj = table.describe()
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, 5)
+        self.validate_len(ts_obj, (5, 7))
 
     def test_query_that_returns_no_data(self):
         fmt = """

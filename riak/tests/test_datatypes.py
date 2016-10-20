@@ -3,7 +3,7 @@ import unittest
 import riak.datatypes as datatypes
 
 from riak import RiakError, RiakBucket, BucketType, RiakObject
-from riak.tests import RUN_DATATYPES, RUN_DATATYPE_HLL
+from riak.tests import RUN_DATATYPES
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
@@ -160,9 +160,21 @@ class MapUnitTests(DatatypeUnitTestBase, unittest.TestCase):
         self.assertTrue(dtype.modified)
 
 
-@unittest.skipUnless(RUN_DATATYPE_HLL, 'RUN_DATATYPE_HLL is 0')
+@unittest.skipUnless(RUN_DATATYPES, 'RUN_DATATYPES is 0')
 class HllDatatypeIntegrationTests(IntegrationTestBase,
                                   unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(HllDatatypeIntegrationTests, cls).setUpClass()
+        client = cls.create_client()
+        try:
+            btype = client.bucket_type('hlls')
+            btype.get_properties()
+        except RiakError as e:
+            raise unittest.SkipTest(e)
+        finally:
+            client.close()
+
     def test_fetch_bucket_type_props(self):
         btype = self.client.bucket_type('hlls')
         props = btype.get_properties()
