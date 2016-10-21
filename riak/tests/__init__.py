@@ -40,10 +40,10 @@ HOST = os.environ.get('RIAK_TEST_HOST', '127.0.0.1')
 PROTOCOL = os.environ.get('RIAK_TEST_PROTOCOL', 'pbc')
 
 PB_HOST = os.environ.get('RIAK_TEST_PB_HOST', HOST)
-PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '10017'))
+PB_PORT = int(os.environ.get('RIAK_TEST_PB_PORT', '8087'))
 
 HTTP_HOST = os.environ.get('RIAK_TEST_HTTP_HOST', HOST)
-HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '10018'))
+HTTP_PORT = int(os.environ.get('RIAK_TEST_HTTP_PORT', '8098'))
 
 # these ports are used to simulate errors, there shouldn't
 # be anything listening on either port.

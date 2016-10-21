@@ -7,11 +7,14 @@ python:
   - '3.4'
   - '3.5'
   - nightly
+addons:
+  hosts:
+    - riak-test
 install:
   - pip install --upgrade pip setuptools flake8
 before_script:
   - sudo ./tools/travis-ci/riak-install -d "$RIAK_DOWNLOAD_URL"
-  - sudo ./tools/setup-riak
+  - sudo ./tools/setup-riak -s
 env:
   matrix:
     - RIAK_TEST_PROTOCOL=pbc  RIAK_DOWNLOAD_URL=http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.7/ubuntu/trusty/riak_2.0.7-1_amd64.deb
@@ -29,9 +32,9 @@ env:
     - RUN_YZ=1
     - RUN_DATATYPES=1
     - RUN_INDEXES=1
+    - RUN_SECURITY=0
 script:
-  - flake8 --exclude=riak/pb riak *.py
-  - python setup.py test
+  - ./.travis.sh
 notifications:
   slack:
     secure: kU1XcvTAliCWKuYpMWEMbD4qkbmlnWGLAIKbBQjtIh5ZRzISgjdUFzGcC31eHoQFv12LQdp5KAFj0Y1FyEvLxi0W8VeWKpsBGc06ntuECaN9MNHRBzKKclrTMGTfpBWZ5IO17XSUu2lKaNz6GDGRkiZA+sxYAVPfZSXY3u86IuY=
