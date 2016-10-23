@@ -54,6 +54,8 @@ function lint
 
 function run_tests
 {
+    local protocol="${1:-pbc}"
+    export RIAK_TEST_PROTOCOL="$protocol"
     if [[ $have_tox == 'true' ]]
     then
         tox
@@ -73,16 +75,22 @@ function run_tests_each_protocol
 {
     for protocol in pbc http
     do
-        export RIAK_TEST_PROTOCOL="$protocol"
-        run_tests
+        run_tests "$protocol"
     done
 }
 
-function export_test_environment_vars
+function export_host_environment_vars
 {
     local riak_test_host="${RIAK_TEST_HOST:-localhost}"
     local -i riak_test_pb_port="${RIAK_TEST_PB_PORT:-8087}"
     local -i riak_test_http_port="${RIAK_TEST_HTTP_PORT:-8098}"
+    export RIAK_TEST_HOST="$riak_test_host"
+    export RIAK_TEST_PB_PORT="$riak_test_pb_port"
+    export RIAK_TEST_HTTP_PORT="$riak_test_http_port"
+}
+
+function export_test_environment_vars
+{
     export RUN_BTYPES=1
     export RUN_CLIENT=1
     export RUN_DATATYPES=1
@@ -92,19 +100,30 @@ function export_test_environment_vars
     export RUN_RESOLVE=1
     export RUN_TIMESERIES=1
     export RUN_YZ=1
-    export RIAK_TEST_HOST="$riak_test_host"
-    export RIAK_TEST_PB_PORT="$riak_test_pb_port"
-    export RIAK_TEST_HTTP_PORT="$riak_test_http_port"
+}
+
+function unexport_test_environment_vars
+{
+    export RUN_BTYPES=0
+    export RUN_CLIENT=0
+    export RUN_DATATYPES=0
+    export RUN_INDEXES=0
+    export RUN_KV=0
+    export RUN_MAPREDUCE=0
+    export RUN_RESOLVE=0
+    export RUN_TIMESERIES=0
+    export RUN_YZ=0
 }
 
 function security_test
 {
     if [[ $have_riak_admin == 'true' ]]
     then
-        export_test_environment_vars
+        export_host_environment_vars
+        unexport_test_environment_vars
         export RUN_SECURITY=1
         $riak_admin security enable
-        run_tests_each_protocol
+        run_tests 'pbc'
     else
         echo '[ERROR] riak-admin must be in PATH, RIAK_ADMIN var set to path, or RIAK_DIR set.' 1>&2
         exit 1
@@ -113,6 +132,7 @@ function security_test
 
 function integration_test
 {
+    export_host_environment_vars
     export_test_environment_vars
     run_tests_each_protocol
 }
