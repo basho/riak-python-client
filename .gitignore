@@ -16,4 +16,4 @@ riak.egg-info/
 #*#
 *~
 .idea/
-.pyenv/
+envs/

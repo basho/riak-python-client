@@ -313,14 +313,18 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             self._stop_multi_pools()
             if self._http_pool is not None:
                 self._http_pool.clear()
+                self._http_pool = None
             if self._tcp_pool is not None:
                 self._tcp_pool.clear()
+                self._tcp_pool = None
 
     def _stop_multi_pools(self):
         if self._multiget_pool:
             self._multiget_pool.stop()
+            self._multiget_pool = None
         if self._multiput_pool:
             self._multiput_pool.stop()
+            self._multiput_pool = None
 
     def _create_node(self, n):
         if isinstance(n, RiakNode):

@@ -306,31 +306,31 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, (5, 7))
+        self.validate_len(ts_obj, (5, 8))
 
     def test_query_that_returns_table_description_using_interpolation(self):
         query = 'Describe {table}'
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, (5, 7))
+        self.validate_len(ts_obj, (5, 8))
 
     def test_query_description_via_table(self):
         query = 'describe {table}'
         table = Table(self.client, table_name)
         ts_obj = table.query(query)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, (5, 7))
+        self.validate_len(ts_obj, (5, 8))
 
     def test_get_description(self):
         ts_obj = self.client.ts_describe(table_name)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, (5, 7))
+        self.validate_len(ts_obj, (5, 8))
 
     def test_get_description_via_table(self):
         table = Table(self.client, table_name)
         ts_obj = table.describe()
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, (5, 7))
+        self.validate_len(ts_obj, (5, 8))
 
     def test_query_that_returns_no_data(self):
         fmt = """

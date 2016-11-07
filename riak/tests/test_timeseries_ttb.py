@@ -184,7 +184,7 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
-        self.validate_len(ts_obj, (5, 7))
+        self.validate_len(ts_obj, (5, 8))
 
     def test_store_and_fetch_gh_483(self):
         now = datetime.datetime(2015, 1, 1, 12, 0, 0)

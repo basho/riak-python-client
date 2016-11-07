@@ -105,5 +105,6 @@ help:
 	@echo ' unit-test        - Run unit tests                           '
 	@echo ' integration-test - Run integration tests                    '
 	@echo ' security-test    - Run integration tests (security enabled) '
+	@echo ' timeseries-test  - Run timeseries integration tests         '
 	@echo ' ------------------------------------------------------------'
 	@echo ''
