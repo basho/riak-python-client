@@ -73,7 +73,6 @@ class HttpTransport(Transport,
     def _server_version(self):
         stats = self.stats()
         if stats is not None:
-            import re
             s = stats['riak_kv_version']
             if s.startswith('riak_ts-'):
                 return stats['riak_pb_version']
