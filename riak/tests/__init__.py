@@ -62,6 +62,9 @@ RUN_SEARCH = int(os.environ.get('RUN_SEARCH', '0'))
 RUN_TIMESERIES = int(os.environ.get('RUN_TIMESERIES', '0'))
 RUN_YZ = int(os.environ.get('RUN_YZ', '0'))
 
+if PROTOCOL != 'pbc':
+    RUN_TIMESERIES = 0
+
 RUN_SECURITY = int(os.environ.get('RUN_SECURITY', '0'))
 if RUN_SECURITY:
     h = 'riak-test'

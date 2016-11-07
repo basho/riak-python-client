@@ -92,6 +92,10 @@ integration-test:
 security-test:
 	@./.runner security-test
 
+.PHONY: timeseries-test
+timeseries-test:
+	@./.runner timeseries-test
+
 .PHONY: test
 test: integration-test
 
