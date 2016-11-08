@@ -120,6 +120,12 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
                                                   'val4', timeout=bad):
                     pass
 
+    def test_close_stops_operation_requests(self):
+        c = self.create_client()
+        c.ping()
+        c.close()
+        self.assertRaises(RuntimeError, c.ping)
+
     def test_multiget_bucket(self):
         """
         Multiget operations can be invoked on buckets.

@@ -150,6 +150,9 @@ class RiakClientTransport(object):
             pool = self._tcp_pool
         else:
             raise ValueError("invalid protocol %s" % protocol)
+        if pool is None or self._closed:
+            # NB: GH-500, this can happen if client is closed
+            raise RuntimeError("Client is closed.")
         return pool
 
 

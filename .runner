@@ -137,6 +137,13 @@ function integration_test
     run_tests_each_protocol
 }
 
+function timeseries_test
+{
+    unexport_test_environment_vars
+    export RUN_TIMESERIES=1
+    run_tests_each_protocol
+}
+
 arg="${1:-lint}"
 case "$arg" in
     'lint')
@@ -147,6 +154,8 @@ case "$arg" in
         integration_test;;
     'security-test')
         security_test;;
+    'timeseries-test')
+        timeseries_test;;
     *)
         echo "[ERROR] unknown argument: '$arg'" 1>&2
         exit 1;;

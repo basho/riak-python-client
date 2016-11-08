@@ -73,7 +73,11 @@ class HttpTransport(Transport,
     def _server_version(self):
         stats = self.stats()
         if stats is not None:
-            return stats['riak_kv_version']
+            s = stats['riak_kv_version']
+            if s.startswith('riak_ts-'):
+                return stats['riak_pb_version']
+            else:
+                return s
         # If stats is disabled, we can't assume the Riak version
         # is >= 1.1. However, we can assume the new URL scheme is
         # at least version 1.0

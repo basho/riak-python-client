@@ -92,6 +92,10 @@ integration-test:
 security-test:
 	@./.runner security-test
 
+.PHONY: timeseries-test
+timeseries-test:
+	@./.runner timeseries-test
+
 .PHONY: test
 test: integration-test
 
@@ -105,5 +109,6 @@ help:
 	@echo ' unit-test        - Run unit tests                           '
 	@echo ' integration-test - Run integration tests                    '
 	@echo ' security-test    - Run integration tests (security enabled) '
+	@echo ' timeseries-test  - Run timeseries integration tests         '
 	@echo ' ------------------------------------------------------------'
 	@echo ''
