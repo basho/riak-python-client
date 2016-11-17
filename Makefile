@@ -57,8 +57,6 @@ ifeq ($(RELEASE_GPG_KEYNAME),)
 endif
 	@python -c 'import pypandoc'
 	@echo "==> Python tagging version $(VERSION)"
-	# NB: Python client version strings do NOT start with 'v'. Le Sigh.
-	# validate VERSION and allow pre-releases
 	@./build/publish $(VERSION) validate
 	@git tag --sign -a "$(VERSION)" -m "riak-python-client $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
 	@git push --tags
