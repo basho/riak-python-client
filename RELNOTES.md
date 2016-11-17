@@ -1,52 +1,54 @@
 # Riak Python Client Release Notes
 
-## [2.5.5 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.5)
+## [`2.6.0` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.6.0)
+
+## [`2.5.5` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.5)
 
  * [Stop all pools when client shuts down](https://github.com/basho/riak-python-client/pull/488)
  * [Calling `close` on client closes pools, remove global multi pools](https://github.com/basho/riak-python-client/pull/490). *NOTE*: if you use the multi get or put features of the client, you *MUST* call `close()` on your `RiakClient` instance to correctly clean up the thread pools used for these multi-operations.
 
-## [2.5.4 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.4)
+## [`2.5.4` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.4)
 
  * [When converting `datetime` objects to send to Riak TS, `tzinfo` will be used if present](https://github.com/basho/riak-python-client/pull/486)
  * [Workaround for incorrect version returned by Riak TS OSS](https://github.com/basho/riak-python-client/pull/472)
 
-## [2.5.3 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.3)
+## [`2.5.3` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.3)
 
  * [Bug fix for raising `BadResource`](https://github.com/basho/riak-python-client/pull/481)
 
-## [2.5.2 Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.2)
+## [`2.5.2` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.2)
 
 * *NOTE*: for Riak TS data, automatic conversion from epoch values *to* Python `datetime` objects has been removed. If you would like to have automatic conversion, use `RiakClient(transport_options={'ts_convert_timestamp': True})`
 * Miscellaneous fixes for term-to-binary encoding of messages for Riak TS.
 * [Ensure `six` is not required during installation](https://github.com/basho/riak-python-client/pull/459)
 
-## [2.5.0 Release - Deprecated](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.0)
+## [`2.5.0` Release - Deprecated](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.0)
 
-* *NOTE*: due to the `basho-erlastic` dependency, this version will not install correctly. Please use `2.5.2`.
+* *NOTE*: due to the `basho-erlastic` dependency, this version will not install correctly. Please use ``2.5.2``.
 * *NOTE*: for Riak TS data, automatic conversion from epoch values *to* Python `datetime` objects has been removed. If you would like to have automatic conversion, use `RiakClient(transport_options={'ts_convert_timestamp': True})`
 * [Socket Enhancements](https://github.com/basho/riak-python-client/pull/453) - Resolves [#399](https://github.com/basho/riak-python-client/issues/399)
 * [Add multi-put](https://github.com/basho/riak-python-client/pull/452)
-* [Add support for term-to-binary encoding](https://github.com/basho/riak-python-client/pull/448) *Note:* This requires at least version `1.3.0` of Riak TS.
+* [Add support for term-to-binary encoding](https://github.com/basho/riak-python-client/pull/448) *Note:* This requires at least version ``1.3.0`` of Riak TS.
 
-## 2.4.2 Patch Release - 2016-02-20
+## `2.4.2` Patch Release - 2016-02-20
 
 * [Fix SSL host name](https://github.com/basho/riak-python-client/pull/436)
 * [Use `riak-client-tools`](https://github.com/basho/riak-python-client/issues/434)
 
-## 2.4.1 Patch Release - 2016-02-03
+## `2.4.1` Patch Release - 2016-02-03
 
 * [Riak TS: Millisecond precision](https://github.com/basho/riak-python-client/issues/430)
 * [Fix release process](https://github.com/basho/riak-python-client/issues/429)
 
-## 2.4.0 Feature Release - 2016-01-13
+## `2.4.0` Feature Release - 2016-01-13
 
 This release enhances Riak Time Series functionality.
 
 * [Encapsulate table description](https://github.com/basho/riak-python-client/pull/422)
 
-## 2.3.0 Feature Release - 2015-12-14
+## `2.3.0` Feature Release - 2015-12-14
 
-Release 2.3.0 features support for new
+Release `2.3.0` features support for new
 [time series](https://github.com/basho/riak-python-client/pull/416)
 functionality.
 
@@ -59,15 +61,15 @@ There are also many bugfixes and new enhancements:
   (https://github.com/basho/riak-python-client/pull/418)
 * [Support for Preflists and Write-Once bucket types]
   (https://github.com/basho/riak-python-client/pull/414)
-* [Support Riak 2.1.1]
+* [Support Riak `2.1.1`]
   (https://github.com/basho/riak-python-client/pull/407)
-* [Native SSL support for Python 2.7.9+]
+* [Native SSL support for Python `2.7.9`+]
   (https://github.com/basho/riak-python-client/pull/397)
 
 
-## 2.2.0 Feature Release - 2014-12-18
+## `2.2.0` Feature Release - 2014-12-18
 
-Release 2.2.0 features support for
+Release `2.2.0` features support for
 [Python 3](https://github.com/basho/riak-python-client/pull/379),
 specifically 3.3 and 3.4.  This version uses the native SSL security instead
 of [pyOpenSSL](http://pypi.python.org/pypi/pyOpenSSL) which is required
@@ -92,9 +94,9 @@ notably:
   (https://github.com/basho/riak-python-client/pull/388)
 
 
-## 2.1.0 Feature Release - 2014-09-03
+## `2.1.0` Feature Release - 2014-09-03
 
-Release 2.1.0 features support for Riak 2.0 capabilities including:
+Release `2.1.0` features support for Riak 2.0 capabilities including:
 
 * Bucket Types
 * Riak Data Types (CRDTs)
@@ -119,9 +121,9 @@ notably:
 * The additional request options `basic_quorum` and `notfound_ok` are
   now supported.
 
-## 2.0.3 Patch Release - 2014-03-06
+## `2.0.3` Patch Release - 2014-03-06
 
-Release 2.0.3 includes support for 1.4.4's 2I regexp feature and fixes
+Release `2.0.3` includes support for 1.4.4's 2I regexp feature and fixes
 a few bugs:
 
 * Docs generation now uses the version from the top-level package.
@@ -129,17 +131,17 @@ a few bugs:
 * More errors will be caught and propagated properly from multiget
   requests, preventing deadlocks on the caller side.
 
-## 2.0.2 Patch release - 2013-11-18
+## `2.0.2` Patch release - 2013-11-18
 
-Release 2.0.2 includes support for the 1.4.1+ "timeout" option on
+Release `2.0.2` includes support for the 1.4.1+ "timeout" option on
 secondary index queries.
 
-## 2.0.1 Patch release - 2013-08-28
+## `2.0.1` Patch release - 2013-08-28
 
-Release 2.0.1 includes a minor compatibility fix for Python 2.6 and an
+Release `2.0.1` includes a minor compatibility fix for Python 2.6 and an
 updated README.
 
-## 2.0.0 Feature Release - 2013-07-30
+## `2.0.0` Feature Release - 2013-07-30
 
 Release 2.0 is the culmination of many months of rearchitecting the
 client. Highlights:
@@ -182,9 +184,9 @@ Other bugfixes:
 * Enabling and disabling search indexing on a bucket now uses the
   `search` bucket property.
 
-## 1.5.2 Patch Release - 2013-01-31
+## `1.5.2` Patch Release - 2013-01-31
 
-Release 1.5.2 fixes some bugs and adds HTTPS/SSL support.
+Release `1.5.2` fixes some bugs and adds HTTPS/SSL support.
 
 * Added support for HTTPS.
 * Fixed writing of the `app.config` for the `TestServer`.
@@ -195,24 +197,24 @@ Release 1.5.2 fixes some bugs and adds HTTPS/SSL support.
 * Prevent fetching the `protobuf` package from Google Code.
 * Prefer `simplejson` over `json` when present.
 
-## 1.5.1 Patch Release - 2012-10-24
+## `1.5.1` Patch Release - 2012-10-24
 
-Release 1.5.1 fixes one bug and some documentation errors.
+Release `1.5.1` fixes one bug and some documentation errors.
 
 * Fix bug where `http_status` is used instead of `http_code`.
 * Fix documentation of `RiakMapReduce.index` method.
 * Fix documentation of `RiakClient.__init__` method.
 
-## 1.5.0 Feature Release - 2012-08-29
+## `1.5.0` Feature Release - 2012-08-29
 
-Release 1.5.0 is a feature release that supports Riak 1.2.
+Release `1.5.0` is a feature release that supports Riak 1.2.
 
 Noteworthy features:
 
 * Riak 1.2 features are now supported, including Search and 2I queries
   over Protocol Buffers transport. The Protocol Buffers message
   definitions now exist as a separate package, available on
-  [PyPi](http://pypi.python.org/pypi/riak_pb/1.2.0).
+  [PyPi](http://pypi.python.org/pypi/riak_pb/`1.2.0`).
 
   **NOTE:** The return value of search queries over HTTP and MapReduce
   were changed to be compatible with the results returned from the
@@ -231,7 +233,7 @@ Noteworthy bugfixes:
 * Various fixes were made to the TestServer and it will throw an
   exception when it fails to start.
 
-## 1.4.1 Patch Release - 2012-06-19
+## `1.4.1` Patch Release - 2012-06-19
 
 Noteworthy features:
 
@@ -241,16 +243,16 @@ Noteworthy bugfixes:
 
 * Map Reduce queries now use "application/json" as the Content-Type
 
-## 1.4.0 Feature Release - 2012-03-30
+## `1.4.0` Feature Release - 2012-03-30
 
-Release 1.4.0 is a feature release comprising over 117 individual
+Release `1.4.0` is a feature release comprising over 117 individual
 commits.
 
 Noteworthy features:
 
 * Python 2.6 and 2.7 are supported. On 2.6, the unittest2 package is
   required to run the test suite.
-* Google's official protobuf package (2.4.1 or later) is now a
+* Google's official protobuf package (`2.4.1` or later) is now a
   dependency. The package from downloads.basho.com/support is no
   longer necessary.
 * Travis-CI is enabled on the client. Go to
@@ -284,11 +286,11 @@ Noteworthy bugfixes:
   be handled properly when no results are returned.
 
 There are lots of other great fixes from our wonderful
-community. [Check them out!](https://github.com/basho/riak-python-client/compare/1.3.0...1.4.0)
+community. [Check them out!](https://github.com/basho/riak-python-client/compare/`1.3.0`...1.4.0)
 
-## 1.3.0 Feature Release - 2011-08-04
+## `1.3.0` Feature Release - 2011-08-04
 
-Release 1.3.0 is a feature release bringing a slew of updates.
+Release `1.3.0` is a feature release bringing a slew of updates.
 
 Noteworthy features:
 
@@ -314,9 +316,9 @@ Fixes:
        pool. (Reid Draper)
 * #42: Reset protocol buffer connection up on connection error (Brett Hoerner)
 
-## 1.2.2 Patch Release - 2011-06-22
+## `1.2.2` Patch Release - 2011-06-22
 
-Release 1.2.2 is a minor patch release.
+Release `1.2.2` is a minor patch release.
 
 Noteworthy fixes and improvements:
 
