@@ -66,7 +66,7 @@ endif
 	@$(PROJDIR)/build/publish $(VERSION)
 
 .PHONY: release
-release: # release_sdist
+release: release_sdist
 ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
