@@ -26,16 +26,6 @@ fi
 
 (cd $PYENV_ROOT && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
 
-declare -r pyenv_virtualenv_dir="$PYENV_ROOT/plugins/pyenv-virtualenv"
-if [[ ! -d $pyenv_virtualenv_dir ]]
-then
-    git clone 'https://github.com/yyuu/pyenv-virtualenv.git' $pyenv_virtualenv_dir
-else
-    (cd $pyenv_virtualenv_dir && git fetch --all)
-fi
-
-(cd $pyenv_virtualenv_dir && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)))
-
 declare -r pyenv_alias_dir="$PYENV_ROOT/plugins/pyenv-alias"
 if [[ ! -d $pyenv_alias_dir ]]
 then
@@ -56,7 +46,6 @@ if [[ $(type -t pyenv) != 'function' ]]
 then
     echo "[INFO] init pyenv"
     eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
 fi
 
 do_pip_upgrades='false'
@@ -76,7 +65,6 @@ do
 
         echo "[INFO] installing Python $pyver_latest"
         VERSION_ALIAS="$riak_py_alias" pyenv install "$pyver_latest"
-        pyenv virtualenv "$riak_py_alias" "riak-py$pymaj$pymin"
     fi
 done
 
@@ -87,11 +75,10 @@ then
 
     echo "[INFO] installing Python 2.7.8"
     VERSION_ALIAS='riak_2.7.8' pyenv install '2.7.8'
-    pyenv virtualenv 'riak_2.7.8' 'riak-py278'
 fi
 
 pushd $PROJDIR
-pyenv local riak-py35 riak-py34 riak-py33 riak-py27 riak-py278
+pyenv local 'riak_3.5' 'riak_3.4' 'riak_3.3' 'riak_2.7' 'riak_2.7.8'
 
 pyenv rehash
 
