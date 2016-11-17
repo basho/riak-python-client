@@ -1,6 +1,10 @@
 # Riak Python Client Release Notes
 
+## [`2.6.1` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.6.0)
+ * NOTE: Due to pypi upload errors, `2.6.1` takes the place of `2.6.0`.
+
 ## [`2.6.0` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.6.0)
+ * NOTE: Due to pypi upload errors, `2.6.1` takes the place of `2.6.0`.
 
 ## [`2.5.5` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.5.5)
 

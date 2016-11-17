@@ -55,6 +55,9 @@ endif
 ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
+ifeq ("$(wildcard $(PROJDIR)/.python-version)","")
+	$(error expected $(PROJDIR)/.python-version to exist. Run $(PROJDIR)/build/pyenv-setup)
+endif
 	@python -c 'import pypandoc'
 	@echo "==> Python tagging version $(VERSION)"
 	@$(PROJDIR)/build/publish $(VERSION) validate
@@ -69,6 +72,9 @@ endif
 release: release_sdist
 ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
+endif
+ifeq ("$(wildcard $(PROJDIR)/.python-version)","")
+	$(error expected $(PROJDIR)/.python-version to exist. Run $(PROJDIR)/build/pyenv-setup)
 endif
 	@echo "==> pypi repository: $(PYPI_REPOSITORY)"
 	@echo "==> Python 2.7 (bdist_egg)"
