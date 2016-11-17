@@ -29,6 +29,7 @@ def hostname_resolves(hostname):
     except socket.error:
         return 0
 
+
 distutils_debug = os.environ.get('DISTUTILS_DEBUG', '0')
 if distutils_debug == '1':
     logger = logging.getLogger()

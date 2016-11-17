@@ -349,5 +349,6 @@ class PoolTest(unittest.TestCase, Comparison):
         for th in threads:
             th.join()
 
+
 if __name__ == '__main__':
     unittest.main()

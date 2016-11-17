@@ -19,6 +19,7 @@ def wait_for_yz_index(bucket, key, index=None):
     while len(bucket.search('_yz_rk:' + key, index=index)['docs']) == 0:
         pass
 
+
 # YZ index on bucket of the same name
 testrun_yz = {'btype': None, 'bucket': 'yzbucket', 'index': 'yzbucket'}
 # YZ index on bucket of a different name

@@ -65,6 +65,7 @@ def check_output(*popenargs, **kwargs):
         raise CalledProcessError(retcode, cmd, output=output)
     return output
 
+
 try:
     import simplejson as json
 except ImportError:

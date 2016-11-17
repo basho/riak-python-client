@@ -163,5 +163,6 @@ class RiakClientComparisonTest(IntegrationTestBase, unittest.TestCase):
         b.close()
         c.close()
 
+
 if __name__ == '__main__':
     unittest.main()

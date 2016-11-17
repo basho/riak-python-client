@@ -23,6 +23,7 @@ class TcpPool(Pool):
     def destroy_resource(self, tcp):
         tcp.close()
 
+
 # These are a specific set of socket errors
 # that could be raised on send/recv that indicate
 # that the socket is closed or reset, and is not

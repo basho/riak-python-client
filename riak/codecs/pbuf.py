@@ -26,6 +26,7 @@ def _invert(d):
         out[value] = key
     return out
 
+
 REPL_TO_PY = {
     riak.pb.riak_pb2.RpbBucketProps.FALSE: False,
     riak.pb.riak_pb2.RpbBucketProps.TRUE: True,
