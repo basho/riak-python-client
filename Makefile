@@ -16,14 +16,12 @@ PANDOC_VERSION := $(shell pandoc --version)
 PROTOC_VERSION := $(shell protoc --version)
 
 PROJDIR   = $(realpath $(CURDIR))
-TOOLS_DIR = $(PROJDIR)/tools/devrel
-CA_DIR    = $(PROJDIR)/tools/test-ca
 
 PYPI_REPOSITORY ?= pypi
 
 .PHONY: lint
 lint:
-	./.runner lint
+	$(PROJDIR)/.runner lint
 
 .PHONY: pb_clean
 pb_clean:
@@ -59,14 +57,16 @@ ifeq ($(RELEASE_GPG_KEYNAME),)
 endif
 	@python -c 'import pypandoc'
 	@echo "==> Python tagging version $(VERSION)"
-	@./build/publish $(VERSION) validate
+	@$(PROJDIR)/build/publish $(VERSION) validate
+	@git tag --sign -a "$(VERSION)" -m "riak-python-client $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
+	@git push --tags
 	@echo "==> pypi repository: $(PYPI_REPOSITORY)"
 	@echo "==> Python (sdist)"
 	@python setup.py sdist upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
-	@./build/publish $(VERSION)
+	@$(PROJDIR)/build/publish $(VERSION)
 
 .PHONY: release
-release: release_sdist
+release: # release_sdist
 ifeq ($(RELEASE_GPG_KEYNAME),)
 	$(error RELEASE_GPG_KEYNAME must be set to build a release and deploy this package)
 endif
@@ -82,19 +82,19 @@ endif
 
 .PHONY: unit-test
 unit-test:
-	@./.runner unit-test
+	@$(PROJDIR)/runner unit-test
 
 .PHONY: integration-test
 integration-test:
-	@./.runner integration-test
+	@$(PROJDIR)/runner integration-test
 
 .PHONY: security-test
 security-test:
-	@./.runner security-test
+	@$(PROJDIR)/runner security-test
 
 .PHONY: timeseries-test
 timeseries-test:
-	@./.runner timeseries-test
+	@$(PROJDIR)/runner timeseries-test
 
 .PHONY: test
 test: integration-test
