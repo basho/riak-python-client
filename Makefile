@@ -72,7 +72,7 @@ ifeq ($(RELEASE_GPG_KEYNAME),)
 endif
 	@echo "==> pypi repository: $(PYPI_REPOSITORY)"
 	@echo "==> Python 2.7 (bdist_egg)"
-	# @python2.7 setup.py build --build-base=py-build/2.7 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
+	@python2.7 setup.py build --build-base=py-build/2.7 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.3 (bdist_egg)"
 	@python3.3 setup.py build --build-base=py-build/3.3 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.4 (bdist_egg)"
