@@ -85,7 +85,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         o = bucket.new(self.key_name, "Ain't no body")
         o.store()
         stored_object = bucket.get(self.key_name, head_only=True)
-        self.assertEqual(stored_object.data, '')
+        self.assertFalse(stored_object.data)
 
     def test_many_link_headers_should_work_fine(self):
         bucket = self.client.bucket(self.bucket_name)
