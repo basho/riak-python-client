@@ -194,7 +194,7 @@ class RiakBucket(object):
         return obj
 
     def get(self, key, r=None, pr=None, timeout=None, include_context=None,
-            basic_quorum=None, notfound_ok=None):
+            basic_quorum=None, notfound_ok=None, head_only=False):
         """
         Retrieve a :class:`~riak.riak_object.RiakObject` or
         :class:`~riak.datatypes.Datatype`, based on the presence and value
@@ -216,6 +216,9 @@ class RiakBucket(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param head_only: whether to fetch without value, so only metadata
+           (only available on PB transport)
+        :type head_only: bool
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>` or
            :class:`~riak.datatypes.Datatype`
 
@@ -231,7 +234,8 @@ class RiakBucket(object):
             obj = RiakObject(self._client, self, key)
             return obj.reload(r=r, pr=pr, timeout=timeout,
                               basic_quorum=basic_quorum,
-                              notfound_ok=notfound_ok)
+                              notfound_ok=notfound_ok,
+                              head_only=head_only)
 
     def multiget(self, keys, r=None, pr=None, timeout=None,
                  basic_quorum=None, notfound_ok=None):

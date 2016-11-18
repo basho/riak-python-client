@@ -680,7 +680,7 @@ class RiakClientOperations(RiakClientTransport):
 
     @retryable
     def get(self, transport, robj, r=None, pr=None, timeout=None,
-            basic_quorum=None, notfound_ok=None):
+            basic_quorum=None, notfound_ok=None, head_only=False):
         """
         get(robj, r=None, pr=None, timeout=None)
 
@@ -702,6 +702,9 @@ class RiakClientOperations(RiakClientTransport):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param head_only: whether to fetch without value, so only metadata
+           (only available on PB transport)
+        :type head_only: bool
         """
         _validate_timeout(timeout)
         if not isinstance(robj.key, six.string_types):
@@ -710,7 +713,8 @@ class RiakClientOperations(RiakClientTransport):
 
         return transport.get(robj, r=r, pr=pr, timeout=timeout,
                              basic_quorum=basic_quorum,
-                             notfound_ok=notfound_ok)
+                             notfound_ok=notfound_ok,
+                             head_only=head_only)
 
     @retryable
     def delete(self, transport, robj, rw=None, r=None, w=None, dw=None,

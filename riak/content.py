@@ -90,6 +90,8 @@ class RiakContent(object):
                             format(self.content_type))
 
     def _deserialize(self, value):
+        if not value:
+            return value
         decoder = self._robject.bucket.get_decoder(self.content_type)
         if decoder:
             return decoder(value)
