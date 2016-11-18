@@ -8,7 +8,7 @@ from six import string_types, PY2, PY3
 from time import sleep
 from riak import ConflictError, RiakBucket, RiakError
 from riak.resolver import default_resolver, last_written_resolver
-from riak.tests import RUN_KV, RUN_RESOLVE
+from riak.tests import RUN_KV, RUN_RESOLVE, PROTOCOL
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
@@ -78,6 +78,19 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         bucket = self.client.bucket(self.bucket_name)
         o = bucket.new(self.key_name, "bar").store(return_body=False)
         self.assertEqual(o.vclock, None)
+
+    @unittest.skipUnless(PROTOCOL == 'pbc', 'Only available on pbc')
+    def test_get_no_returnbody(self):
+        bucket = self.client.bucket(self.bucket_name)
+        o = bucket.new(self.key_name, "Ain't no body")
+        o.store()
+
+        stored_object = bucket.get(self.key_name, head_only=True)
+        self.assertFalse(stored_object.data)
+
+        list_of_objects = bucket.multiget([self.key_name], head_only=True)
+        for stored_object in list_of_objects:
+            self.assertFalse(stored_object.data)
 
     def test_many_link_headers_should_work_fine(self):
         bucket = self.client.bucket(self.bucket_name)

@@ -269,7 +269,7 @@ class RiakObject(object):
         return self
 
     def reload(self, r=None, pr=None, timeout=None, basic_quorum=None,
-               notfound_ok=None):
+               notfound_ok=None, head_only=False):
         """
         Reload the object from Riak. When this operation completes, the
         object could contain new metadata and a new value, if the object
@@ -293,10 +293,13 @@ class RiakObject(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param head_only: whether to fetch without value, so only metadata
+           (only available on PB transport)
+        :type head_only: bool
         :rtype: :class:`RiakObject`
         """
 
-        self.client.get(self, r=r, pr=pr, timeout=timeout)
+        self.client.get(self, r=r, pr=pr, timeout=timeout, head_only=head_only)
         return self
 
     def delete(self, r=None, w=None, dw=None, pr=None, pw=None,

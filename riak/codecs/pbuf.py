@@ -895,7 +895,8 @@ class PbufCodec(Codec):
         return result
 
     def encode_get(self, robj, r=None, pr=None, timeout=None,
-                   basic_quorum=None, notfound_ok=None):
+                   basic_quorum=None, notfound_ok=None,
+                   head_only=False):
         bucket = robj.bucket
         req = riak.pb.riak_kv_pb2.RpbGetReq()
         if r:
@@ -914,6 +915,7 @@ class PbufCodec(Codec):
         req.bucket = str_to_bytes(bucket.name)
         self._add_bucket_type(req, bucket.bucket_type)
         req.key = str_to_bytes(robj.key)
+        req.head = head_only
         mc = riak.pb.messages.MSG_CODE_GET_REQ
         rc = riak.pb.messages.MSG_CODE_GET_RESP
         return Msg(mc, req.SerializeToString(), rc)
