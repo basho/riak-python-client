@@ -238,7 +238,8 @@ class RiakBucket(object):
                               head_only=head_only)
 
     def multiget(self, keys, r=None, pr=None, timeout=None,
-                 basic_quorum=None, notfound_ok=None):
+                 basic_quorum=None, notfound_ok=None,
+                 head_only=False):
         """
         Retrieves a list of keys belonging to this bucket in parallel.
 
@@ -255,6 +256,9 @@ class RiakBucket(object):
         :type basic_quorum: bool
         :param notfound_ok: whether to treat not-found responses as successful
         :type notfound_ok: bool
+        :param head_only: whether to fetch without value, so only metadata
+           (only available on PB transport)
+        :type head_only: bool
         :rtype: list of :class:`RiakObjects <riak.riak_object.RiakObject>`,
             :class:`Datatypes <riak.datatypes.Datatype>`, or tuples of
             bucket_type, bucket, key, and the exception raised on fetch
@@ -262,7 +266,8 @@ class RiakBucket(object):
         bkeys = [(self.bucket_type.name, self.name, key) for key in keys]
         return self._client.multiget(bkeys, r=r, pr=pr, timeout=timeout,
                                      basic_quorum=basic_quorum,
-                                     notfound_ok=notfound_ok)
+                                     notfound_ok=notfound_ok,
+                                     head_only=head_only)
 
     def _get_resolver(self):
         if callable(self._resolver):
