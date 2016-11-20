@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import threading
+import sys
 
 from riak.exceptions import BadResource
 from contextlib import contextmanager
@@ -34,6 +35,7 @@ class Resource(object):
         """
         Releases this resource back to the pool it came from.
         """
+        sys.stderr.write('Resource.release: {}\n'.format(self))
         self.pool.release(self)
 
 
@@ -111,6 +113,7 @@ class Pool(object):
                     resource = Resource(default, self)
                 else:
                     resource = Resource(self.create_resource(), self)
+                    sys.stderr.write('created resource: {}\n'.format(resource))
                 self.resources.append(resource)
             resource.claimed = True
         return resource
@@ -126,6 +129,7 @@ class Pool(object):
         :param resource: Resource
         """
         with self.releaser:
+            sys.stderr.write('Pool.release: {}\n'.format(self))
             resource.claimed = False
             self.releaser.notify_all()
 
@@ -148,10 +152,13 @@ class Pool(object):
         resource = self.acquire(_filter=_filter, default=default)
         try:
             yield resource.object
+            sys.stderr.write('Pool.transaction after yield statement: {}\n'.format(resource.object))
         except BadResource:
+            sys.stderr.write('Pool.transaction handling BadResource\n')
             self.delete_resource(resource)
             raise
         finally:
+            sys.stderr.write('Pool.transaction finally statement\n')
             self.release(resource)
 
     def delete_resource(self, resource):
@@ -163,6 +170,7 @@ class Pool(object):
         :param resource: the resource to remove
         :type resource: Resource
         """
+        sys.stderr.write('deleting resource: {}\n'.format(resource))
         with self.lock:
             self.resources.remove(resource)
         self.destroy_resource(resource.object)

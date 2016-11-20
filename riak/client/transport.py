@@ -2,8 +2,11 @@ from contextlib import contextmanager
 from riak.exceptions import BadResource, ConnectionClosed
 from riak.transports.tcp import is_retryable as is_tcp_retryable
 from riak.transports.http import is_retryable as is_http_retryable
-import threading
 from six import PY2
+
+import threading
+import sys
+
 if PY2:
     from httplib import HTTPException
 else:
@@ -121,6 +124,7 @@ class RiakClientTransport(object):
                     try:
                         return fn(transport)
                     except (IOError, HTTPException, ConnectionClosed) as e:
+                        # TODO FIXME delete resource
                         if _is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
@@ -131,9 +135,8 @@ class RiakClientTransport(object):
                                 raise BadResource(e)
                         else:
                             raise
-                    # NB: no exceptions if made it here
-                    break
             except BadResource as e:
+                # TODO FIXME delete resource
                 first_try = False
                 if current_try < retry_count:
                     current_try += 1
