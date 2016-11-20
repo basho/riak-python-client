@@ -8,7 +8,7 @@ import riak.pb.messages
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
-from riak.transports.pool import BadResource
+from riak.exceptions import BadResource, ConnectionClosed
 
 if USE_STDLIB_SSL:
     import ssl
@@ -206,8 +206,10 @@ class TcpConnection(object):
             # https://docs.python.org/2/howto/sockets.html#using-a-socket
             # https://github.com/basho/riak-python-client/issues/399
             if nbytes == 0:
-                ex = RiakError('recv_into returned zero bytes unexpectedly')
-                raise BadResource(ex)
+                ex = RiakError(
+                        'recv_into returned zero bytes unexpectedly, '
+                        'expected {}'.format(toread))
+                raise ConnectionClosed(ex)
             view = view[nbytes:]  # slicing views is cheap
             toread -= nbytes
             nread += nbytes

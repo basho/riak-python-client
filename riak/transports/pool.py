@@ -2,17 +2,8 @@ from __future__ import print_function
 
 import threading
 
+from riak.exceptions import BadResource
 from contextlib import contextmanager
-
-
-# This file is a rough port of the Innertube Ruby library
-class BadResource(Exception):
-    """
-    Users of a :class:`Pool` should raise this error when the pool
-    resource currently in-use is bad and should be removed from the
-    pool.
-    """
-    pass
 
 
 class Resource(object):
@@ -60,7 +51,8 @@ class Pool(object):
 
     Example::
 
-        from riak.Pool import Pool, BadResource
+        from riak.Pool import Pool
+        from riak.exceptions import BadResource
         class ListPool(Pool):
             def create_resource(self):
                 return []

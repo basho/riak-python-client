@@ -10,15 +10,22 @@ understanding how it works and development purposes.
 Connection pool
 ---------------
 
-.. currentmodule:: riak.transports.pool
-
-.. autoexception:: BadResource
 .. autoclass:: Resource
    :members:
+
 .. autoclass:: Pool
    :members:
 
 .. autoclass:: PoolIterator
+
+---------------
+Exceptions
+---------------
+
+.. currentmodule:: riak.exceptions
+
+.. autoexception:: BadResource
+.. autoexception:: ConnectionClosed
 
 -----------
 Retry logic

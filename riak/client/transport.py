@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from riak.transports.pool import BadResource
+from riak.exceptions import BadResource, ConnectionClosed
 from riak.transports.tcp import is_retryable as is_tcp_retryable
 from riak.transports.http import is_retryable as is_http_retryable
 import threading
@@ -112,22 +112,31 @@ class RiakClientTransport(object):
         def _skip_bad_nodes(transport):
             return transport._node not in skip_nodes
 
-        retry_count = self.retries
-
-        for retry in range(retry_count):
+        retry_count = self.retries - 1
+        first_try = True
+        current_try = 0
+        while True:
             try:
                 with pool.transaction(_filter=_skip_bad_nodes) as transport:
                     try:
                         return fn(transport)
-                    except (IOError, HTTPException) as e:
+                    except (IOError, HTTPException, ConnectionClosed) as e:
                         if _is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
-                            raise BadResource(e)
+                            if first_try:
+                                first_try = False
+                                continue
+                            else:
+                                raise BadResource(e)
                         else:
                             raise
+                    # NB: no exceptions if made it here
+                    break
             except BadResource as e:
-                if retry < (retry_count - 1):
+                first_try = False
+                if current_try < retry_count:
+                    current_try += 1
                     continue
                 else:
                     # Re-raise the inner exception
@@ -168,6 +177,7 @@ def _is_retryable(error):
     return is_tcp_retryable(error) or is_http_retryable(error)
 
 
+# http://thecodeship.com/patterns/guide-to-python-function-decorators/
 def retryable(fn, protocol=None):
     """
     Wraps a client operation that can be retried according to the set
