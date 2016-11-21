@@ -5,7 +5,6 @@ from riak.transports.http import is_retryable as is_http_retryable
 from six import PY2
 
 import threading
-import sys
 
 if PY2:
     from httplib import HTTPException
@@ -120,11 +119,14 @@ class RiakClientTransport(object):
         current_try = 0
         while True:
             try:
-                with pool.transaction(_filter=_skip_bad_nodes) as transport:
+                with pool.transaction(
+                        _filter=_skip_bad_nodes,
+                        yield_resource=True) as resource:
+                    transport = resource.object
                     try:
                         return fn(transport)
                     except (IOError, HTTPException, ConnectionClosed) as e:
-                        # TODO FIXME delete resource
+                        resource.errored = True
                         if _is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
@@ -136,9 +138,9 @@ class RiakClientTransport(object):
                         else:
                             raise
             except BadResource as e:
-                # TODO FIXME delete resource
                 first_try = False
                 if current_try < retry_count:
+                    resource.errored = True
                     current_try += 1
                     continue
                 else:

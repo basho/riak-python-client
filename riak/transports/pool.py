@@ -22,14 +22,17 @@ class Resource(object):
         :type obj: object
         """
 
-        self.object = obj
         """The wrapped pool resource."""
+        self.object = obj
 
-        self.claimed = False
         """Whether the resource is currently in use."""
+        self.claimed = False
 
-        self.pool = pool
         """The pool that this resource belongs to."""
+        self.pool = pool
+
+        """True if this Resource errored."""
+        self.errored = False
 
     def release(self):
         """
@@ -134,7 +137,7 @@ class Pool(object):
             self.releaser.notify_all()
 
     @contextmanager
-    def transaction(self, _filter=None, default=None):
+    def transaction(self, _filter=None, default=None, yield_resource=False):
         """
         transaction(_filter=None, default=None)
 
@@ -148,11 +151,21 @@ class Pool(object):
         :type _filter: callable
         :param default: a value that will be used instead of calling
             :meth:`create_resource` if a new resource needs to be created
+        :param yield_resource: set to True to yield the Resource object
+            itself
+        :type yield_resource: boolean
         """
         resource = self.acquire(_filter=_filter, default=default)
         try:
-            yield resource.object
-            sys.stderr.write('Pool.transaction after yield statement: {}\n'.format(resource.object))
+            if yield_resource:
+                yield resource
+            else:
+                yield resource.object
+            sys.stderr.write(
+                'Pool.transaction after yield statement: {}\n'
+                .format(resource.object))
+            if resource.errored:
+                self.delete_resource(resource)
         except BadResource:
             sys.stderr.write('Pool.transaction handling BadResource\n')
             self.delete_resource(resource)
