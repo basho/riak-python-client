@@ -132,7 +132,7 @@ class Pool(object):
         :param resource: Resource
         """
         with self.releaser:
-            sys.stderr.write('Pool.release: {}\n'.format(self))
+            sys.stderr.write('Pool.release: {}\n'.format(resource))
             resource.claimed = False
             self.releaser.notify_all()
 
@@ -163,7 +163,7 @@ class Pool(object):
                 yield resource.object
             sys.stderr.write(
                 'Pool.transaction after yield statement: {}\n'
-                .format(resource.object))
+                .format(resource))
             if resource.errored:
                 self.delete_resource(resource)
         except BadResource:
