@@ -1,7 +1,6 @@
 import logging
 import socket
 import struct
-import sys
 
 import riak.pb.riak_pb2
 import riak.pb.messages
@@ -157,7 +156,7 @@ class TcpConnection(object):
                     # fail if *any* exceptions are thrown during SSL handshake
                     raise SecurityError(e)
 
-    def _recv_msg(self):
+    def _recv_msg(self, stream=False):
         try:
             msgbuf = self._recv_pkt()
         except socket.timeout as e:
@@ -165,8 +164,6 @@ class TcpConnection(object):
             # it might still receive the data later and mix up with a
             # subsequent request.
             # https://github.com/basho/riak-python-client/issues/425
-            sys.stderr.write(
-                'socket recv timed out reading first four bytes\n')
             raise BadResource(e)
         mv = memoryview(msgbuf)
         mcb = mv[0:1]
@@ -210,8 +207,7 @@ class TcpConnection(object):
             # https://github.com/basho/riak-python-client/issues/399
             if nbytes == 0:
                 msg = 'socket recv returned zero bytes unexpectedly, ' \
-                    'expected {}'.format(toread)
-                sys.stderr.write(msg)
+                      'expected {}'.format(toread)
                 ex = RiakError(msg)
                 raise ConnectionClosed(ex)
             view = view[nbytes:]  # slicing views is cheap

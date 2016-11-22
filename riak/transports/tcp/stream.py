@@ -30,7 +30,7 @@ class PbufStream(object):
             raise StopIteration
 
         try:
-            resp_code, data = self.transport._recv_msg()
+            resp_code, data = self.transport._recv_msg(stream=True)
             self.codec.maybe_riak_error(resp_code, data)
             expect = self._expect
             self.codec.maybe_incorrect_code(resp_code, expect)
