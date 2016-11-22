@@ -117,11 +117,11 @@ class RiakClientTransport(object):
                 # NB: *only* re-try if connection closed happened
                 # at the start of the streaming op
                 if first_try and not e.mid_stream:
-                    first_try = False
                     continue
                 else:
                     raise
             finally:
+                first_try = False
                 streaming_op.close()
 
     def _with_retries(self, pool, fn):
@@ -155,14 +155,12 @@ class RiakClientTransport(object):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
                             if first_try:
-                                first_try = False
                                 continue
                             else:
                                 raise BadResource(e)
                         else:
                             raise
             except BadResource as e:
-                first_try = False
                 if current_try < retry_count:
                     resource.errored = True
                     current_try += 1
@@ -170,6 +168,8 @@ class RiakClientTransport(object):
                 else:
                     # Re-raise the inner exception
                     raise e.args[0]
+            finally:
+                first_try = False
 
     def _choose_pool(self, protocol=None):
         """
