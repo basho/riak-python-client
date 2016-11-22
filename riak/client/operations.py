@@ -87,24 +87,21 @@ class RiakClientOperations(RiakClientTransport):
 
         """
         _validate_timeout(timeout)
+
         if bucket_type:
             bucketfn = self._bucket_type_bucket_builder
         else:
             bucketfn = self._default_type_bucket_builder
 
-        resource = self._acquire()
-        transport = resource.object
-        stream = transport.stream_buckets(bucket_type=bucket_type,
-                                          timeout=timeout)
-        stream.attach(resource)
-        try:
-            for bucket_list in stream:
-                bucket_list = [bucketfn(bytes_to_str(name), bucket_type)
-                               for name in bucket_list]
-                if len(bucket_list) > 0:
-                    yield bucket_list
-        finally:
-            stream.close()
+        def make_op(transport):
+            return transport.stream_buckets(
+                    bucket_type=bucket_type, timeout=timeout)
+
+        for bucket_list in self._stream_with_retry(make_op):
+            bucket_list = [bucketfn(bytes_to_str(name), bucket_type)
+                           for name in bucket_list]
+            if len(bucket_list) > 0:
+                yield bucket_list
 
     @retryable
     def ping(self, transport):
@@ -489,19 +486,16 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: iterator
         """
         _validate_timeout(timeout)
-        resource = self._acquire()
-        transport = resource.object
-        stream = transport.stream_keys(bucket, timeout=timeout)
-        stream.attach(resource)
-        try:
-            for keylist in stream:
-                if len(keylist) > 0:
-                    if six.PY2:
-                        yield keylist
-                    else:
-                        yield [bytes_to_str(item) for item in keylist]
-        finally:
-            stream.close()
+
+        def make_op(transport):
+            return transport.stream_keys(bucket, timeout=timeout)
+
+        for keylist in self._stream_with_retry(make_op):
+            if len(keylist) > 0:
+                if six.PY2:
+                    yield keylist
+                else:
+                    yield [bytes_to_str(item) for item in keylist]
 
     @retryable
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
@@ -799,15 +793,12 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: iterator
         """
         _validate_timeout(timeout)
-        resource = self._acquire()
-        transport = resource.object
-        stream = transport.stream_mapred(inputs, query, timeout)
-        stream.attach(resource)
-        try:
-            for phase, data in stream:
-                yield phase, data
-        finally:
-            stream.close()
+
+        def make_op(transport):
+            return transport.stream_mapred(inputs, query, timeout)
+
+        for phase, data in self._stream_with_retry(make_op):
+            yield phase, data
 
     @retryable
     def create_search_index(self, transport, index, schema=None, n_val=None,

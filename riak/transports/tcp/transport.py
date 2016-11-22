@@ -1,5 +1,4 @@
 import six
-import sys
 
 import riak.pb.messages
 
@@ -7,8 +6,8 @@ from riak import RiakError
 from riak.codecs import Codec, Msg
 from riak.codecs.pbuf import PbufCodec
 from riak.codecs.ttb import TtbCodec
-from riak.exceptions import BadResource
 from riak.pb.messages import MSG_CODE_TS_TTB_MSG
+from riak.transports.pool import BadResource
 from riak.transports.transport import Transport
 from riak.ts_object import TsObject
 
@@ -98,9 +97,7 @@ class TcpTransport(Transport, TcpConnection):
         msg_code = riak.pb.messages.MSG_CODE_PING_REQ
         codec = self._get_codec(msg_code)
         msg = codec.encode_ping()
-        sys.stderr.write('sending ping request\n')
         resp_code, _ = self._request(msg, codec)
-        sys.stderr.write('ping response: {}\n'.format(resp_code))
         if resp_code == riak.pb.messages.MSG_CODE_PING_RESP:
             return True
         else:

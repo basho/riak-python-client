@@ -7,10 +7,9 @@ from random import SystemRandom
 from time import sleep
 
 from riak import RiakError
-from riak.exceptions import BadResource
 from riak.tests import RUN_POOL
 from riak.tests.comparison import Comparison
-from riak.transports.pool import Pool
+from riak.transports.pool import Pool, BadResource
 
 if PY2:
     from Queue import Queue

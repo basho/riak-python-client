@@ -1,8 +1,7 @@
 import errno
 import socket
 
-from riak.exceptions import ConnectionClosed
-from riak.transports.pool import Pool
+from riak.transports.pool import Pool, ConnectionClosed
 from riak.transports.tcp.transport import TcpTransport
 
 
@@ -50,7 +49,11 @@ def is_retryable(err):
     :rtype: boolean
     """
     if isinstance(err, ConnectionClosed):
-        return True
+        # NB: only retryable if we're not mid-streaming
+        if err.mid_stream:
+            return False
+        else:
+            return True
     elif isinstance(err, socket.error):
         code = err.args[0]
         return code in CONN_CLOSED_ERRORS

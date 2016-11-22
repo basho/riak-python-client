@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from riak.exceptions import BadResource, ConnectionClosed
+from riak.transports.pool import BadResource, ConnectionClosed
 from riak.transports.tcp import is_retryable as is_tcp_retryable
 from riak.transports.http import is_retryable as is_http_retryable
 from six import PY2
@@ -86,7 +86,8 @@ class RiakClientTransport(object):
         _transport()
 
         Yields a single transport to the caller from the default pool,
-        without retries.
+        without retries. NB: no need to re-try as this method is only
+        used by CRDT operations that should never be re-tried.
         """
         pool = self._choose_pool()
         with pool.transaction() as transport:
@@ -99,6 +100,29 @@ class RiakClientTransport(object):
         Acquires a connection from the default pool.
         """
         return self._choose_pool().acquire()
+
+    def _stream_with_retry(self, make_op):
+        first_try = True
+        while True:
+            resource = self._acquire()
+            transport = resource.object
+            streaming_op = make_op(transport)
+            streaming_op.attach(resource)
+            try:
+                for item in streaming_op:
+                    yield item
+                break
+            except BadResource as e:
+                resource.errored = True
+                # NB: *only* re-try if connection closed happened
+                # at the start of the streaming op
+                if first_try and not e.mid_stream:
+                    first_try = False
+                    continue
+                else:
+                    raise
+            finally:
+                streaming_op.close()
 
     def _with_retries(self, pool, fn):
         """

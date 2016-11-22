@@ -8,7 +8,7 @@ import riak.pb.messages
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
-from riak.exceptions import BadResource, ConnectionClosed
+from riak.transports.pool import BadResource, ConnectionClosed
 
 if USE_STDLIB_SSL:
     import ssl
@@ -52,7 +52,10 @@ class TcpConnection(object):
         Similar to self._send, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
         """
-        self._socket.sendall(self._encode_msg(msg_code, data))
+        try:
+            self._socket.sendall(self._encode_msg(msg_code, data))
+        except BrokenPipeError as e:
+            raise ConnectionClosed(e)
 
     def _send_msg(self, msg_code, data):
         self._connect()
@@ -156,15 +159,22 @@ class TcpConnection(object):
                     # fail if *any* exceptions are thrown during SSL handshake
                     raise SecurityError(e)
 
-    def _recv_msg(self, stream=False):
+    def _recv_msg(self, mid_stream=False):
+        """
+        :param mid_stream: are we receiving in a streaming operation?
+        :type mid_stream: boolean
+        """
         try:
             msgbuf = self._recv_pkt()
+        except BadResource as e:
+            e.mid_stream = mid_stream
+            raise
         except socket.timeout as e:
             # A timeout can leave the socket in an inconsistent state because
             # it might still receive the data later and mix up with a
             # subsequent request.
             # https://github.com/basho/riak-python-client/issues/425
-            raise BadResource(e)
+            raise BadResource(e, mid_stream)
         mv = memoryview(msgbuf)
         mcb = mv[0:1]
         if self.bytes_required:

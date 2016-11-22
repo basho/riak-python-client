@@ -2,8 +2,34 @@ from __future__ import print_function
 
 import threading
 
-from riak.exceptions import BadResource
 from contextlib import contextmanager
+
+
+class BadResource(Exception):
+    """
+    Users of a :class:`Pool` should raise this error when the pool
+    resource currently in-use is bad and should be removed from the
+    pool.
+
+    :param mid_stream: did this exception happen mid-streaming op?
+    :type mid_stream: boolean
+    """
+    def __init__(self, ex, mid_stream=False):
+        super(BadResource, self).__init__(ex)
+        self.mid_stream = mid_stream
+
+
+class ConnectionClosed(BadResource):
+    """
+    Users of a :class:`Pool` should raise this error when the pool
+    resource currently in-use has been closed and should be removed
+    from the pool.
+
+    :param mid_stream: did this exception happen mid-streaming op?
+    :type mid_stream: boolean
+    """
+    def __init__(self, ex, mid_stream=False):
+        super(ConnectionClosed, self).__init__(ex, mid_stream)
 
 
 class Resource(object):
@@ -37,7 +63,10 @@ class Resource(object):
         """
         Releases this resource back to the pool it came from.
         """
-        self.pool.release(self)
+        if self.errored:
+            self.pool.delete_resource(self)
+        else:
+            self.pool.release(self)
 
 
 class Pool(object):
@@ -54,8 +83,7 @@ class Pool(object):
 
     Example::
 
-        from riak.Pool import Pool
-        from riak.exceptions import BadResource
+        from riak.transports.pool import Pool
         class ListPool(Pool):
             def create_resource(self):
                 return []
@@ -69,7 +97,6 @@ class Pool(object):
             resource.append(1)
         with pool.transaction() as resource2:
             print(repr(resource2)) # should be [1]
-
     """
 
     def __init__(self):
