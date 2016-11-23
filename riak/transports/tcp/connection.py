@@ -1,3 +1,4 @@
+import errno
 import logging
 import socket
 import struct
@@ -54,8 +55,11 @@ class TcpConnection(object):
         """
         try:
             self._socket.sendall(self._encode_msg(msg_code, data))
-        except BrokenPipeError as e:
-            raise ConnectionClosed(e)
+        except (IOError, socket.error) as e:
+            if e.errno == errno.EPIPE:
+                raise ConnectionClosed(e)
+            else:
+                raise
 
     def _send_msg(self, msg_code, data):
         self._connect()
