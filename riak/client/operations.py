@@ -263,6 +263,8 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`~riak.client.index_page.IndexPage`
 
         """
+        # TODO FUTURE: implement "retry on connection closed"
+        # as in stream_mapred
         _validate_timeout(timeout, infinity_ok=True)
 
         page = IndexPage(self, bucket, index, startkey, endkey,
@@ -335,6 +337,8 @@ class RiakClientOperations(RiakClientTransport):
           :class:`~riak.client.index_page.IndexPage`
 
         """
+        # TODO FUTURE: implement "retry on connection closed"
+        # as in stream_mapred
         page = self.stream_index(bucket, index, startkey,
                                  endkey=endkey,
                                  max_results=max_results,
