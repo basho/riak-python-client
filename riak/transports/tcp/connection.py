@@ -1,9 +1,7 @@
 import logging
 import socket
 import struct
-
 import six
-
 import riak.pb.riak_pb2
 import riak.pb.messages
 

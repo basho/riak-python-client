@@ -1,7 +1,7 @@
 import re
 import csv
+import six
 
-from six import PY2, PY3
 from cgi import parse_header
 from email import message_from_string
 from email.utils import parsedate_tz, mktime_tz
@@ -13,7 +13,7 @@ from riak.multidict import MultiDict
 from riak.transports.http.search import XMLSearchResult
 from riak.util import decode_index_value, bytes_to_str
 
-if PY2:
+if six.PY2:
     from urllib import unquote_plus
 else:
     from urllib.parse import unquote_plus
@@ -63,7 +63,7 @@ class HttpCodec(object):
         elif status == 300:
             ctype, params = parse_header(headers['content-type'])
             if ctype == 'multipart/mixed':
-                if PY3:
+                if six.PY3:
                     data = bytes_to_str(data)
                 boundary = re.compile('\r?\n--%s(?:--)?\r?\n' %
                                       re.escape(params['boundary']))
@@ -225,7 +225,7 @@ class HttpCodec(object):
                     # Riak Search 1.0 Legacy assumptions about format
                     resdoc[u'id'] = doc[u'id']
                     if u'fields' in doc:
-                        for k, v in doc[u'fields'].iteritems():
+                        for k, v in six.iteritems(doc[u'fields']):
                             resdoc[k] = v
                 docs.append(resdoc)
             result['docs'] = docs
