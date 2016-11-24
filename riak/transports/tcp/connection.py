@@ -2,6 +2,8 @@ import logging
 import socket
 import struct
 
+import six
+
 import riak.pb.riak_pb2
 import riak.pb.messages
 
@@ -225,7 +227,7 @@ class TcpConnection(object):
                 self._socket = socket.create_connection(self._address)
             if self._socket_tcp_options:
                 ka_opts = self._socket_tcp_options
-                for k, v in ka_opts.iteritems():
+                for k, v in six.iteritems(ka_opts):
                     self._socket.setsockopt(socket.SOL_TCP, k, v)
             if self._socket_keepalive:
                 self._socket.setsockopt(
