@@ -142,6 +142,7 @@ Contributors
 * Soren Hansen
 * Sreejith Kesavan
 * Timothée Peignier
+* [Tin Tvrtković](https://github.com/Tinche)
 * [Vitaly Shestovskiy](https://github.com/lamp0chka)
 * William Kral
 * [Yasser Souri](https://github.com/yassersouri)
