@@ -5,14 +5,31 @@ import threading
 from contextlib import contextmanager
 
 
-# This file is a rough port of the Innertube Ruby library
 class BadResource(Exception):
     """
     Users of a :class:`Pool` should raise this error when the pool
     resource currently in-use is bad and should be removed from the
     pool.
+
+    :param mid_stream: did this exception happen mid-streaming op?
+    :type mid_stream: boolean
     """
-    pass
+    def __init__(self, ex, mid_stream=False):
+        super(BadResource, self).__init__(ex)
+        self.mid_stream = mid_stream
+
+
+class ConnectionClosed(BadResource):
+    """
+    Users of a :class:`Pool` should raise this error when the pool
+    resource currently in-use has been closed and should be removed
+    from the pool.
+
+    :param mid_stream: did this exception happen mid-streaming op?
+    :type mid_stream: boolean
+    """
+    def __init__(self, ex, mid_stream=False):
+        super(ConnectionClosed, self).__init__(ex, mid_stream)
 
 
 class Resource(object):
@@ -30,20 +47,26 @@ class Resource(object):
         :type obj: object
         """
 
-        self.object = obj
         """The wrapped pool resource."""
+        self.object = obj
 
-        self.claimed = False
         """Whether the resource is currently in use."""
+        self.claimed = False
 
-        self.pool = pool
         """The pool that this resource belongs to."""
+        self.pool = pool
+
+        """True if this Resource errored."""
+        self.errored = False
 
     def release(self):
         """
         Releases this resource back to the pool it came from.
         """
-        self.pool.release(self)
+        if self.errored:
+            self.pool.delete_resource(self)
+        else:
+            self.pool.release(self)
 
 
 class Pool(object):
@@ -60,7 +83,7 @@ class Pool(object):
 
     Example::
 
-        from riak.Pool import Pool, BadResource
+        from riak.transports.pool import Pool
         class ListPool(Pool):
             def create_resource(self):
                 return []
@@ -74,7 +97,6 @@ class Pool(object):
             resource.append(1)
         with pool.transaction() as resource2:
             print(repr(resource2)) # should be [1]
-
     """
 
     def __init__(self):
@@ -138,7 +160,7 @@ class Pool(object):
             self.releaser.notify_all()
 
     @contextmanager
-    def transaction(self, _filter=None, default=None):
+    def transaction(self, _filter=None, default=None, yield_resource=False):
         """
         transaction(_filter=None, default=None)
 
@@ -152,10 +174,18 @@ class Pool(object):
         :type _filter: callable
         :param default: a value that will be used instead of calling
             :meth:`create_resource` if a new resource needs to be created
+        :param yield_resource: set to True to yield the Resource object
+            itself
+        :type yield_resource: boolean
         """
         resource = self.acquire(_filter=_filter, default=default)
         try:
-            yield resource.object
+            if yield_resource:
+                yield resource
+            else:
+                yield resource.object
+            if resource.errored:
+                self.delete_resource(resource)
         except BadResource:
             self.delete_resource(resource)
             raise

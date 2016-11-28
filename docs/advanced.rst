@@ -12,13 +12,16 @@ Connection pool
 
 .. currentmodule:: riak.transports.pool
 
-.. autoexception:: BadResource
 .. autoclass:: Resource
    :members:
+
 .. autoclass:: Pool
    :members:
 
 .. autoclass:: PoolIterator
+
+.. autoexception:: BadResource
+.. autoexception:: ConnectionClosed
 
 -----------
 Retry logic

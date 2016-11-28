@@ -88,19 +88,19 @@ endif
 
 .PHONY: unit-test
 unit-test:
-	@$(PROJDIR)/runner unit-test
+	@$(PROJDIR)/.runner unit-test
 
 .PHONY: integration-test
 integration-test:
-	@$(PROJDIR)/runner integration-test
+	@$(PROJDIR)/.runner integration-test
 
 .PHONY: security-test
 security-test:
-	@$(PROJDIR)/runner security-test
+	@$(PROJDIR)/.runner security-test
 
 .PHONY: timeseries-test
 timeseries-test:
-	@$(PROJDIR)/runner timeseries-test
+	@$(PROJDIR)/.runner timeseries-test
 
 .PHONY: test
 test: integration-test

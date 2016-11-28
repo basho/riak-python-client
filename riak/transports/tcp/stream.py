@@ -21,6 +21,7 @@ class PbufStream(object):
         self.transport = transport
         self.codec = codec
         self.resource = None
+        self._mid_stream = False
 
     def __iter__(self):
         return self
@@ -30,7 +31,8 @@ class PbufStream(object):
             raise StopIteration
 
         try:
-            resp_code, data = self.transport._recv_msg()
+            resp_code, data = self.transport._recv_msg(
+                    mid_stream=self._mid_stream)
             self.codec.maybe_riak_error(resp_code, data)
             expect = self._expect
             self.codec.maybe_incorrect_code(resp_code, expect)
@@ -38,6 +40,8 @@ class PbufStream(object):
         except:
             self.finished = True
             raise
+        finally:
+            self._mid_stream = True
 
         if self._is_done(resp):
             self.finished = True

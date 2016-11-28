@@ -1,3 +1,4 @@
+import errno
 import logging
 import socket
 import struct
@@ -8,7 +9,7 @@ import riak.pb.messages
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
 from riak.security import SecurityError, USE_STDLIB_SSL
-from riak.transports.pool import BadResource
+from riak.transports.pool import BadResource, ConnectionClosed
 
 if USE_STDLIB_SSL:
     import ssl
@@ -52,7 +53,13 @@ class TcpConnection(object):
         Similar to self._send, but doesn't try to initiate a connection,
         thus preventing an infinite loop.
         """
-        self._socket.sendall(self._encode_msg(msg_code, data))
+        try:
+            self._socket.sendall(self._encode_msg(msg_code, data))
+        except (IOError, socket.error) as e:
+            if e.errno == errno.EPIPE:
+                raise ConnectionClosed(e)
+            else:
+                raise
 
     def _send_msg(self, msg_code, data):
         self._connect()
@@ -156,15 +163,22 @@ class TcpConnection(object):
                     # fail if *any* exceptions are thrown during SSL handshake
                     raise SecurityError(e)
 
-    def _recv_msg(self):
+    def _recv_msg(self, mid_stream=False):
+        """
+        :param mid_stream: are we receiving in a streaming operation?
+        :type mid_stream: boolean
+        """
         try:
             msgbuf = self._recv_pkt()
+        except BadResource as e:
+            e.mid_stream = mid_stream
+            raise
         except socket.timeout as e:
             # A timeout can leave the socket in an inconsistent state because
             # it might still receive the data later and mix up with a
             # subsequent request.
             # https://github.com/basho/riak-python-client/issues/425
-            raise BadResource(e)
+            raise BadResource(e, mid_stream)
         mv = memoryview(msgbuf)
         mcb = mv[0:1]
         if self.bytes_required:
@@ -206,8 +220,10 @@ class TcpConnection(object):
             # https://docs.python.org/2/howto/sockets.html#using-a-socket
             # https://github.com/basho/riak-python-client/issues/399
             if nbytes == 0:
-                ex = RiakError('recv_into returned zero bytes unexpectedly')
-                raise BadResource(ex)
+                msg = 'socket recv returned zero bytes unexpectedly, ' \
+                      'expected {}'.format(toread)
+                ex = RiakError(msg)
+                raise ConnectionClosed(ex)
             view = view[nbytes:]  # slicing views is cheap
             toread -= nbytes
             nread += nbytes

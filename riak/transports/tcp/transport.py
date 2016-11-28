@@ -7,6 +7,7 @@ from riak.codecs import Codec, Msg
 from riak.codecs.pbuf import PbufCodec
 from riak.codecs.ttb import TtbCodec
 from riak.pb.messages import MSG_CODE_TS_TTB_MSG
+from riak.transports.pool import BadResource
 from riak.transports.transport import Transport
 from riak.ts_object import TsObject
 
@@ -553,5 +554,7 @@ class TcpTransport(Transport, TcpConnection):
            resp_code in riak.pb.messages.MESSAGE_CLASSES:
             msg = codec.parse_msg(resp_code, data)
         else:
-            raise Exception("unknown msg code %s" % resp_code)
+            # NB: raise a BadResource to ensure this connection is
+            # closed and not re-used
+            raise BadResource('unknown msg code {}'.format(resp_code))
         return resp_code, msg

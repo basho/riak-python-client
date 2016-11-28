@@ -1,9 +1,11 @@
 from contextlib import contextmanager
-from riak.transports.pool import BadResource
+from riak.transports.pool import BadResource, ConnectionClosed
 from riak.transports.tcp import is_retryable as is_tcp_retryable
 from riak.transports.http import is_retryable as is_http_retryable
-import threading
 from six import PY2
+
+import threading
+
 if PY2:
     from httplib import HTTPException
 else:
@@ -84,7 +86,8 @@ class RiakClientTransport(object):
         _transport()
 
         Yields a single transport to the caller from the default pool,
-        without retries.
+        without retries. NB: no need to re-try as this method is only
+        used by CRDT operations that should never be re-tried.
         """
         pool = self._choose_pool()
         with pool.transaction() as transport:
@@ -97,6 +100,29 @@ class RiakClientTransport(object):
         Acquires a connection from the default pool.
         """
         return self._choose_pool().acquire()
+
+    def _stream_with_retry(self, make_op):
+        first_try = True
+        while True:
+            resource = self._acquire()
+            transport = resource.object
+            streaming_op = make_op(transport)
+            streaming_op.attach(resource)
+            try:
+                for item in streaming_op:
+                    yield item
+                break
+            except BadResource as e:
+                resource.errored = True
+                # NB: *only* re-try if connection closed happened
+                # at the start of the streaming op
+                if first_try and not e.mid_stream:
+                    continue
+                else:
+                    raise
+            finally:
+                first_try = False
+                streaming_op.close()
 
     def _with_retries(self, pool, fn):
         """
@@ -112,26 +138,38 @@ class RiakClientTransport(object):
         def _skip_bad_nodes(transport):
             return transport._node not in skip_nodes
 
-        retry_count = self.retries
-
-        for retry in range(retry_count):
+        retry_count = self.retries - 1
+        first_try = True
+        current_try = 0
+        while True:
             try:
-                with pool.transaction(_filter=_skip_bad_nodes) as transport:
+                with pool.transaction(
+                        _filter=_skip_bad_nodes,
+                        yield_resource=True) as resource:
+                    transport = resource.object
                     try:
                         return fn(transport)
-                    except (IOError, HTTPException) as e:
+                    except (IOError, HTTPException, ConnectionClosed) as e:
+                        resource.errored = True
                         if _is_retryable(e):
                             transport._node.error_rate.incr(1)
                             skip_nodes.append(transport._node)
-                            raise BadResource(e)
+                            if first_try:
+                                continue
+                            else:
+                                raise BadResource(e)
                         else:
                             raise
             except BadResource as e:
-                if retry < (retry_count - 1):
+                if current_try < retry_count:
+                    resource.errored = True
+                    current_try += 1
                     continue
                 else:
                     # Re-raise the inner exception
                     raise e.args[0]
+            finally:
+                first_try = False
 
     def _choose_pool(self, protocol=None):
         """
@@ -168,6 +206,7 @@ def _is_retryable(error):
     return is_tcp_retryable(error) or is_http_retryable(error)
 
 
+# http://thecodeship.com/patterns/guide-to-python-function-decorators/
 def retryable(fn, protocol=None):
     """
     Wraps a client operation that can be retried according to the set
