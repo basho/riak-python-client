@@ -106,9 +106,9 @@ class RiakClientTransport(object):
         while True:
             resource = self._acquire()
             transport = resource.object
-            streaming_op = make_op(transport)
-            streaming_op.attach(resource)
             try:
+                streaming_op = make_op(transport)
+                streaming_op.attach(resource)
                 for item in streaming_op:
                     yield item
                 break
