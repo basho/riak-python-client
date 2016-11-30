@@ -106,6 +106,7 @@ class RiakClientTransport(object):
         while True:
             resource = self._acquire()
             transport = resource.object
+            streaming_op = None
             try:
                 streaming_op = make_op(transport)
                 streaming_op.attach(resource)
@@ -122,7 +123,8 @@ class RiakClientTransport(object):
                     raise
             finally:
                 first_try = False
-                streaming_op.close()
+                if streaming_op:
+                    streaming_op.close()
 
     def _with_retries(self, pool, fn):
         """
