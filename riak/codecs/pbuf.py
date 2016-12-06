@@ -824,6 +824,8 @@ class PbufCodec(Codec):
             return 'timestamp'
         elif col_type == TsColumnType.Value('BOOLEAN'):
             return 'boolean'
+        elif col_type == TsColumnType.Value('BLOB'):
+            return 'blob'
         else:
             msg = 'could not decode column type: {}'.format(col_type)
             raise RiakError(msg)
@@ -845,8 +847,9 @@ class PbufCodec(Codec):
             if tscols is not None:
                 col = tscols[i]
             if cell.HasField('varchar_value'):
-                if col and col.type != TsColumnType.Value('VARCHAR'):
-                    raise TypeError('expected VARCHAR column')
+                if col and not (col.type == TsColumnType.Value('VARCHAR') or
+                                col.type == TsColumnType.Value('BLOB')):
+                    raise TypeError('expected VARCHAR or BLOB column')
                 else:
                     row.append(cell.varchar_value)
             elif cell.HasField('sint64_value'):
