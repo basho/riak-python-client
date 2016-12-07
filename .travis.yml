@@ -13,6 +13,7 @@ addons:
 install:
   - pip install --upgrade pip setuptools flake8
 before_script:
+  - jdk_switcher use oraclejdk8
   - sudo ./tools/travis-ci/riak-install -d "$RIAK_DOWNLOAD_URL"
   - sudo ./tools/setup-riak -s
 env:
