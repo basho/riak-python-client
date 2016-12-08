@@ -36,6 +36,8 @@ str1 = 'ascii-1'
 bd0 = six.u('时间序列')
 bd1 = six.u('временные ряды')
 
+blob0 = b'\x00\x01\x02\x03\x04\x05\x06\x07'
+
 fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 1, 2, 987000)
 ts1 = ts0 + fiveMins
@@ -62,20 +64,20 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
     # {tsgetresp,
     #   {
     #     [<<"geohash">>, <<"user">>, <<"time">>,
-    #      <<"weather">>, <<"temperature">>],
-    #     [varchar, varchar, timestamp, varchar, double],
-    #     [(<<"hash1">>, <<"user2">>, 144378190987, <<"typhoon">>, 90.3)]
+    #      <<"weather">>, <<"temperature">>, <<"blob">>],
+    #     [varchar, varchar, timestamp, varchar, double, blob],
+    #     [(<<"hash1">>, <<"user2">>, 144378190987, <<"typhoon">>, 90.3, <<0,1,2,3,4,5,6,7>>)]
     #   }
     # }
     def test_decode_data_from_get(self):
         colnames = ["varchar", "sint64", "double", "timestamp",
-                    "boolean", "varchar", "varchar"]
+                    "boolean", "varchar", "varchar", "blob"]
         coltypes = [varchar_a, sint64_a, double_a, timestamp_a,
                     boolean_a, varchar_a, varchar_a]
         r0 = (bd0, 0, 1.2, unix_time_millis(ts0), True,
-              [], str1, None)
+              [], str1, None, None)
         r1 = (bd1, 3, 4.5, unix_time_millis(ts1), False,
-              [], str1, None)
+              [], str1, None, blob0)
         rows = [r0, r1]
         # { tsgetresp, { [colnames], [coltypes], [rows] } }
         data_t = colnames, coltypes, rows
@@ -102,6 +104,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
             self.assertEqual(r[5], None)
             self.assertEqual(r[6], dr[6].encode('ascii'))
             self.assertEqual(r[7], None)
+            self.assertEqual(r[8], dr[8])
 
     def test_encode_data_for_put(self):
         r0 = (bd0, 0, 1.2, unix_time_millis(ts0), True, [])

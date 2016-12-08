@@ -21,6 +21,8 @@ table_name = 'GeoCheckin'
 bd0 = '时间序列'
 bd1 = 'временные ряды'
 
+blob0 = b'\x00\x01\x02\x03\x04\x05\x06\x07'
+
 fiveMins = datetime.timedelta(0, 300)
 # NB: last arg is microseconds, 987ms expressed
 ts0 = datetime.datetime(2015, 1, 1, 12, 0, 0, 987000)
@@ -46,8 +48,8 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
                 'expected {:d} to equal {:d}'.format(cls.ts1ms, ex1ms))
 
         cls.rows = [
-            [bd0, 0, 1.2, ts0, True, bd0],
-            [bd1, 3, 4.5, ts1, False, bd1]
+            [bd0, 0, 1.2, ts0, True, None],
+            [bd1, 3, 4.5, ts1, False, blob0]
         ]
         cls.test_key = ['hash1', 'user2', ts0]
         cls.table = Table(None, table_name)
@@ -99,8 +101,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         self.assertEqual(r0.cells[2].double_value, self.rows[0][2])
         self.assertEqual(r0.cells[3].timestamp_value, self.ts0ms)
         self.assertEqual(r0.cells[4].boolean_value, self.rows[0][4])
-        self.assertEqual(bytes_to_str(r0.cells[5].varchar_value),
-                         self.rows[0][5])
+        self.assertEqual(r0.cells[5].varchar_value, self.rows[0][5])
 
         r1 = req.rows[1]
         self.assertEqual(bytes_to_str(r1.cells[0].varchar_value),
@@ -109,8 +110,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[2].double_value, self.rows[1][2])
         self.assertEqual(r1.cells[3].timestamp_value, self.ts1ms)
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
-        self.assertEqual(bytes_to_str(r1.cells[5].varchar_value),
-                         self.rows[1][5])
+        self.assertEqual(r1.cells[5].varchar_value, self.rows[1][5])
 
     def test_encode_data_for_listkeys(self):
         c = PbufCodec(client_timeouts=True)
@@ -154,7 +154,6 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         r0c4 = r0.cells.add()
         r0c4.boolean_value = self.rows[0][4]
         r0c5 = r0.cells.add()
-        r0c5.varchar_value = str_to_bytes(self.rows[0][5])
 
         r1 = tqr.rows.add()
         r1c0 = r1.cells.add()
@@ -168,7 +167,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         r1c4 = r1.cells.add()
         r1c4.boolean_value = self.rows[1][4]
         r1c5 = r1.cells.add()
-        r1c5.varchar_value = str_to_bytes(self.rows[1][5])
+        r1c5.varchar_value = self.rows[1][5]
 
         tsobj = TsObject(None, self.table)
         c = PbufCodec()
@@ -198,7 +197,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         self.assertEqual(r0[2], self.rows[0][2])
         self.assertEqual(r0[3], ts0)
         self.assertEqual(r0[4], self.rows[0][4])
-        self.assertEqual(bytes_to_str(r0[5]), self.rows[0][5])
+        self.assertEqual(r0[5], self.rows[0][5])
 
         r1 = tsobj.rows[1]
         self.assertEqual(bytes_to_str(r1[0]), self.rows[1][0])
@@ -206,7 +205,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         self.assertEqual(r1[2], self.rows[1][2])
         self.assertEqual(r1[3], ts1)
         self.assertEqual(r1[4], self.rows[1][4])
-        self.assertEqual(bytes_to_str(r1[5]), self.rows[1][5])
+        self.assertEqual(r1[5], self.rows[1][5])
 
 
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
