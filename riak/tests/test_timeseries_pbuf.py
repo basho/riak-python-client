@@ -110,7 +110,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         self.assertEqual(r1.cells[2].double_value, self.rows[1][2])
         self.assertEqual(r1.cells[3].timestamp_value, self.ts1ms)
         self.assertEqual(r1.cells[4].boolean_value, self.rows[1][4])
-        self.assertTrue(r1.cells[5].HasField('varchar_value'))
+        self.assertEqual(r1.cells[5].varchar_value, self.rows[1][5])
 
     def test_encode_data_for_listkeys(self):
         c = PbufCodec(client_timeouts=True)
