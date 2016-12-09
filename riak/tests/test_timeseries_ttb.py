@@ -66,7 +66,8 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
     #     [<<"geohash">>, <<"user">>, <<"time">>,
     #      <<"weather">>, <<"temperature">>, <<"blob">>],
     #     [varchar, varchar, timestamp, varchar, double, blob],
-    #     [(<<"hash1">>, <<"user2">>, 144378190987, <<"typhoon">>, 90.3, <<0,1,2,3,4,5,6,7>>)]
+    #     [(<<"hash1">>, <<"user2">>, 144378190987, <<"typhoon">>,
+    #         90.3, <<0,1,2,3,4,5,6,7>>)]
     #   }
     # }
     def test_decode_data_from_get(self):

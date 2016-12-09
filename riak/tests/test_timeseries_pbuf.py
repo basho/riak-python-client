@@ -153,7 +153,7 @@ class TimeseriesPbufUnitTests(unittest.TestCase):
         r0c3.timestamp_value = self.ts0ms
         r0c4 = r0.cells.add()
         r0c4.boolean_value = self.rows[0][4]
-        r0c5 = r0.cells.add()
+        r0.cells.add()
 
         r1 = tqr.rows.add()
         r1c0 = r1.cells.add()
