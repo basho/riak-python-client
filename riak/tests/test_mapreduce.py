@@ -151,7 +151,9 @@ class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
             else:
                 print("test_erlang_source_map_reduce {}".format(e.value))
         if strfun_allowed:
-            self.assertEqual(result, ['2', '3', '4'])
+            self.assertIn('2', result)
+            self.assertIn('3', result)
+            self.assertIn('4', result)
 
     def test_erlang_source_map_reduce_bucket_type(self):
         # Create the object...
@@ -175,7 +177,9 @@ class ErlangMapReduceTests(IntegrationTestBase, unittest.TestCase):
             if e.value.startswith('May have tried'):
                 strfun_allowed = False
         if strfun_allowed:
-            self.assertEqual(result, ['2', '3', '4'])
+            self.assertIn('2', result)
+            self.assertIn('3', result)
+            self.assertIn('4', result)
 
     def test_client_exceptional_paths(self):
         bucket = self.client.bucket(self.bucket_name)
