@@ -142,6 +142,7 @@ Contributors
 * Soren Hansen
 * Sreejith Kesavan
 * Timothée Peignier
+* [`tobixx`](https://github.com/tobixx)
 * [Tin Tvrtković](https://github.com/Tinche)
 * [Vitaly Shestovskiy](https://github.com/lamp0chka)
 * William Kral
