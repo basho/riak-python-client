@@ -1,5 +1,9 @@
 # Riak Python Client Release Notes
 
+## [`2.7.0` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.7.0)
+ * Riak TS 1.5 support
+ * Support for `head` parameter
+
 ## [`2.6.1` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.6.0)
  * NOTE: Due to pypi upload errors, `2.6.1` takes the place of `2.6.0`.
 
