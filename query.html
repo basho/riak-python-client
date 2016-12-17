@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Query Methods &mdash; Riak Python Client 2.5.2 documentation</title>
+  <title>Query Methods &mdash; Riak Python Client 2.7.0 documentation</title>
   
 
   
@@ -32,7 +32,10 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.5.2 documentation" href="index.html"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Riak Python Client 2.7.0 documentation" href="index.html"/>
         <link rel="next" title="Security" href="security.html"/>
         <link rel="prev" title="Data Types" href="datatypes.html"/> 
 
@@ -62,7 +65,7 @@
             
             
               <div class="version">
-                2.5.2
+                2.7.0
               </div>
             
           
@@ -149,7 +152,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/query.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/query.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -166,9 +169,9 @@ known buckets and keys, there are additional ways to get information
 out of Riak.</p>
 <div class="section" id="secondary-indexes">
 <h2>Secondary Indexes<a class="headerlink" href="#secondary-indexes" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="object.html#object-accessors"><span class="std std-ref">Objects</span></a> can be <a class="reference internal" href="object.html#riak.riak_object.RiakObject.add_index" title="riak.riak_object.RiakObject.add_index"><code class="xref py py-meth docutils literal"><span class="pre">tagged</span></code></a> with <a class="reference internal" href="object.html#riak.riak_object.RiakObject.indexes" title="riak.riak_object.RiakObject.indexes"><code class="xref py py-attr docutils literal"><span class="pre">secondary</span> <span class="pre">index</span>
-<span class="pre">entries</span></code></a>. Those entries can then
-be queried over <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_index" title="riak.bucket.RiakBucket.get_index"><code class="xref py py-meth docutils literal"><span class="pre">the</span> <span class="pre">bucket</span></code></a>
+<p><a class="reference internal" href="object.html#object-accessors"><span class="std std-ref">Objects</span></a> can be <code class="xref py py-meth docutils literal"><span class="pre">tagged</span></code> with <code class="xref py py-attr docutils literal"><span class="pre">secondary</span> <span class="pre">index</span>
+<span class="pre">entries</span></code>. Those entries can then
+be queried over <code class="xref py py-meth docutils literal"><span class="pre">the</span> <span class="pre">bucket</span></code>
 for equality or across ranges.:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s2">&quot;index_test&quot;</span><span class="p">)</span>
 
@@ -185,18 +188,18 @@ for equality or across ranges.:</p>
 <span class="n">eighties</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1980</span><span class="p">,</span> <span class="mi">1989</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Secondary indexes are also available via <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.index" title="riak.mapreduce.RiakMapReduce.index"><code class="xref py py-meth docutils literal"><span class="pre">MapReduce</span></code></a>.</p>
+<p>Secondary indexes are also available via <code class="xref py py-meth docutils literal"><span class="pre">MapReduce</span></code>.</p>
 <div class="section" id="streaming-and-paginating-indexes">
 <h3>Streaming and Paginating Indexes<a class="headerlink" href="#streaming-and-paginating-indexes" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes the number of results from such a query is too great to
-process in one payload, so you can also <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.stream_index" title="riak.bucket.RiakBucket.stream_index"><code class="xref py py-meth docutils literal"><span class="pre">stream</span> <span class="pre">the</span> <span class="pre">results</span></code></a>:</p>
+process in one payload, so you can also <code class="xref py py-meth docutils literal"><span class="pre">stream</span> <span class="pre">the</span> <span class="pre">results</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">stream_index</span><span class="p">(</span><span class="s2">&quot;bmonth_int&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
     <span class="c1"># keys is a list of matching keys</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Both the regular <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get_index" title="riak.bucket.RiakBucket.get_index"><code class="xref py py-meth docutils literal"><span class="pre">get_index()</span></code></a> method and
-the <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.stream_index" title="riak.bucket.RiakBucket.stream_index"><code class="xref py py-meth docutils literal"><span class="pre">stream_index()</span></code></a> method allow you to
+<p>Both the regular <code class="xref py py-meth docutils literal"><span class="pre">get_index()</span></code> method and
+the <code class="xref py py-meth docutils literal"><span class="pre">stream_index()</span></code> method allow you to
 return the index entry along with the matching key as tuples using the
 <code class="docutils literal"><span class="pre">return_terms</span></code> option:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;byear_int&quot;</span><span class="p">,</span> <span class="mi">1970</span><span class="p">,</span> <span class="mi">1990</span><span class="p">,</span> <span class="n">return_terms</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -208,8 +211,8 @@ option, which enables pagination:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="s2">&quot;fname_bin&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Optionally you can use <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.paginate_index" title="riak.bucket.RiakBucket.paginate_index"><code class="xref py py-meth docutils literal"><span class="pre">paginate_index()</span></code></a>
-or <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.paginate_stream_index" title="riak.bucket.RiakBucket.paginate_stream_index"><code class="xref py py-meth docutils literal"><span class="pre">paginate_stream_index()</span></code></a> to create a
+<p>Optionally you can use <code class="xref py py-meth docutils literal"><span class="pre">paginate_index()</span></code>
+or <code class="xref py py-meth docutils literal"><span class="pre">paginate_stream_index()</span></code> to create a
 generator of paged results:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">bucket</span><span class="o">.</span><span class="n">paginate_stream_index</span><span class="p">(</span><span class="s2">&quot;maestro_bin&quot;</span><span class="p">,</span> <span class="s2">&quot;Cribbs&quot;</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">page</span><span class="p">:</span>
@@ -218,9 +221,9 @@ generator of paged results:</p>
 </pre></div>
 </div>
 <p>All of these features are implemented using the
-<a class="reference internal" href="#riak.client.index_page.IndexPage" title="riak.client.index_page.IndexPage"><code class="xref py py-class docutils literal"><span class="pre">IndexPage</span></code></a> class, which emulates a
+<code class="xref py py-class docutils literal"><span class="pre">IndexPage</span></code> class, which emulates a
 list but also supports streaming and capturing the
-<a class="reference internal" href="#riak.client.index_page.IndexPage.continuation" title="riak.client.index_page.IndexPage.continuation"><code class="xref py py-attr docutils literal"><span class="pre">continuation</span></code></a>, which is a
+<code class="xref py py-attr docutils literal"><span class="pre">continuation</span></code>, which is a
 sort of pointer to the next page of results:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Detect whether there are more results</span>
 <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">has_next_page</span><span class="p">():</span>
@@ -233,313 +236,31 @@ sort of pointer to the next page of results:</p>
     <span class="n">more</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">next_page</span><span class="p">()</span>
 </pre></div>
 </div>
-<dl class="class">
-<dt id="riak.client.index_page.IndexPage">
-<em class="property">class </em><code class="descclassname">riak.client.index_page.</code><code class="descname">IndexPage</code><span class="sig-paren">(</span><em>client</em>, <em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey</em>, <em>return_terms</em>, <em>max_results</em>, <em>term_regex</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.index_page.IndexPage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encapsulates a single page of results from a secondary index
-query, with the ability to iterate over results (if not streamed),
-capture the page marker (continuation), and automatically fetch
-the next page.</p>
-<p>While users will interact with this object, it will be created
-automatically by the client and does not need to be instantiated
-elsewhere.</p>
-<dl class="attribute">
-<dt id="riak.client.index_page.IndexPage.continuation">
-<code class="descname">continuation</code><em class="property"> = None</em><a class="headerlink" href="#riak.client.index_page.IndexPage.continuation" title="Permalink to this definition">¶</a></dt>
-<dd><p>The opaque page marker that is used when fetching the next chunk
-of results. The user can simply call <a class="reference internal" href="#riak.client.index_page.IndexPage.next_page" title="riak.client.index_page.IndexPage.next_page"><code class="xref py py-meth docutils literal"><span class="pre">next_page()</span></code></a> to do so,
-or pass this to the <a class="reference internal" href="client.html#riak.client.RiakClient.get_index" title="riak.client.RiakClient.get_index"><code class="xref py py-meth docutils literal"><span class="pre">get_index()</span></code></a>
-method using the <code class="docutils literal"><span class="pre">continuation</span></code> option.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.client.index_page.IndexPage.has_next_page">
-<code class="descname">has_next_page</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.index_page.IndexPage.has_next_page" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether there is another page available, i.e. the response
-included a continuation.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.client.index_page.IndexPage.next_page">
-<code class="descname">next_page</code><span class="sig-paren">(</span><em>timeout=None</em>, <em>stream=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.index_page.IndexPage.next_page" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches the next page using the same parameters as the
-original query.</p>
-<p>Note that if streaming was used before, it will be used again
-unless overridden.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>stream</strong> (<em>boolean</em>) &#8211; whether to enable streaming. <cite>True</cite> enables,
-<cite>False</cite> disables, <cite>None</cite> uses previous value.</li>
-<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds, or &#8216;infinity&#8217;</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.client.index_page.IndexPage.__eq__">
-<code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.index_page.IndexPage.__eq__" title="Permalink to this definition">¶</a></dt>
-<dd><p>An IndexPage can pretend to be equal to a list when it has
-captured results by simply comparing the internal results to
-the passed list. Otherwise the other object needs to be an
-equivalent IndexPage.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.client.index_page.IndexPage.__iter__">
-<code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.index_page.IndexPage.__iter__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Emulates the iterator interface. When streaming, this means
-delegating to the stream, otherwise iterating over the
-existing result set.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.client.index_page.IndexPage.__getitem__">
-<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.client.index_page.IndexPage.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches an item by index from the captured results.</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 </div>
 <div class="section" id="mapreduce">
 <h2>MapReduce<a class="headerlink" href="#mapreduce" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a> allows you to construct query-processing jobs that
+<p><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code> allows you to construct query-processing jobs that
 are performed mostly in-parallel around the Riak cluster. You can
 think of it as a pipeline, where inputs are fed in one end, they pass
 through a number of <code class="docutils literal"><span class="pre">map</span></code> and <code class="docutils literal"><span class="pre">reduce</span></code> phases, and then are
 returned to the client.</p>
 <div class="section" id="constructing-the-query">
 <h3>Constructing the query<a class="headerlink" href="#constructing-the-query" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="riak.mapreduce.RiakMapReduce">
-<em class="property">class </em><code class="descclassname">riak.mapreduce.</code><code class="descname">RiakMapReduce</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce" title="Permalink to this definition">¶</a></dt>
-<dd><p>The RiakMapReduce object allows you to build up and run a
-map/reduce operation on Riak. Most methods return the object on
-which it was called, modified with new information, so you can
-chain calls together to build the job.</p>
-<p>Construct a Map/Reduce object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>client</strong> (<a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a>) &#8211; the client that will perform the query</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="inputs">
 <h3>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h3>
 <p>The first step is to identify the inputs that should be processed.
 They can be:</p>
 <ol class="arabic simple">
-<li>An entire <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.add_bucket" title="riak.mapreduce.RiakMapReduce.add_bucket"><code class="xref py py-meth docutils literal"><span class="pre">bucket</span></code></a></li>
-<li>An entire bucket, with the <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.add_key_filters" title="riak.mapreduce.RiakMapReduce.add_key_filters"><code class="xref py py-meth docutils literal"><span class="pre">keys</span> <span class="pre">filtered</span> <span class="pre">by</span> <span class="pre">criteria</span></code></a></li>
-<li>A <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.add" title="riak.mapreduce.RiakMapReduce.add"><code class="xref py py-meth docutils literal"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">bucket/key</span> <span class="pre">pairs</span></code></a> or bucket/key/data triples</li>
-<li>A <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.search" title="riak.mapreduce.RiakMapReduce.search"><code class="xref py py-meth docutils literal"><span class="pre">fulltext</span> <span class="pre">search</span> <span class="pre">query</span></code></a></li>
-<li>A <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.index" title="riak.mapreduce.RiakMapReduce.index"><code class="xref py py-meth docutils literal"><span class="pre">secondary-index</span> <span class="pre">query</span></code></a></li>
+<li>An entire <code class="xref py py-meth docutils literal"><span class="pre">bucket</span></code></li>
+<li>An entire bucket, with the <code class="xref py py-meth docutils literal"><span class="pre">keys</span> <span class="pre">filtered</span> <span class="pre">by</span> <span class="pre">criteria</span></code></li>
+<li>A <code class="xref py py-meth docutils literal"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">bucket/key</span> <span class="pre">pairs</span></code> or bucket/key/data triples</li>
+<li>A <code class="xref py py-meth docutils literal"><span class="pre">fulltext</span> <span class="pre">search</span> <span class="pre">query</span></code></li>
+<li>A <code class="xref py py-meth docutils literal"><span class="pre">secondary-index</span> <span class="pre">query</span></code></li>
 </ol>
 <p>Adding inputs always returns the <code class="docutils literal"><span class="pre">RiakMapReduce</span></code> object so that you
 can chain the construction of the query job.</p>
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.add_bucket">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">add_bucket</code><span class="sig-paren">(</span><em>bucket</em>, <em>bucket_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add_bucket" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds all keys in a bucket to the inputs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bucket</strong> (<em>string</em>) &#8211; the bucket</li>
-<li><strong>bucket_type</strong> (<em>string, None</em>) &#8211; Optional name of a bucket type</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.add_key_filters">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">add_key_filters</code><span class="sig-paren">(</span><em>key_filters</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add_key_filters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds key filters to the inputs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key_filters</strong> (<em>list</em>) &#8211; a list of filters</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.add_key_filter">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">add_key_filter</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add_key_filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a single key filter to the inputs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>list</em>) &#8211; a filter</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.add">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">add</code><span class="sig-paren">(</span><em>arg1</em>, <em>arg2=None</em>, <em>arg3=None</em>, <em>bucket_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add inputs to a map/reduce operation. This method takes three
-different forms, depending on the provided inputs. You can
-specify either a RiakObject, a string bucket name, or a bucket,
-key, and additional arg.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>arg1</strong> (<em>RiakObject, string</em>) &#8211; the object or bucket to add</li>
-<li><strong>arg2</strong> (<em>string, list, None</em>) &#8211; a key or list of keys to add (if a bucket is
-given in arg1)</li>
-<li><strong>arg3</strong> (<em>string, list, dict, None</em>) &#8211; key data for this input (must be convertible to JSON)</li>
-<li><strong>bucket_type</strong> (<em>string, None</em>) &#8211; Optional name of a bucket type</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.add_object">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">add_object</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a RiakObject to the inputs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><em>RiakObject</em></a>) &#8211; the object to add</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.add_bucket_key_data">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">add_bucket_key_data</code><span class="sig-paren">(</span><em>bucket</em>, <em>key</em>, <em>data</em>, <em>bucket_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.add_bucket_key_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a bucket/key/keydata triple to the inputs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bucket</strong> (<em>string</em>) &#8211; the bucket</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; the key or list of keys</li>
-<li><strong>data</strong> (<em>string, list, dict, None</em>) &#8211; the key-specific data</li>
-<li><strong>bucket_type</strong> (<em>string, None</em>) &#8211; Optional name of a bucket type</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.search">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">search</code><span class="sig-paren">(</span><em>index</em>, <em>query</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.search" title="Permalink to this definition">¶</a></dt>
-<dd><p>Begin a map/reduce operation using a Search. This command will
-return an error unless executed against a Riak Search cluster.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>index</strong> (<em>string</em>) &#8211; The Solr index used in the search</li>
-<li><strong>query</strong> (<em>string</em>) &#8211; The search query</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.index">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">index</code><span class="sig-paren">(</span><em>bucket</em>, <em>index</em>, <em>startkey</em>, <em>endkey=None</em>, <em>bucket_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Begin a map/reduce operation using a Secondary Index
-query.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bucket</strong> (<em>string</em>) &#8211; The bucket over which to perform the query</li>
-<li><strong>index</strong> (<em>string</em>) &#8211; The index to use for query</li>
-<li><strong>startkey</strong> (<em>string, integer</em>) &#8211; The start key of index range, or the
-value which all entries must equal</li>
-<li><strong>endkey</strong> (<em>string, integer, None</em>) &#8211; The end key of index range (if doing a range query)</li>
-<li><strong>bucket_type</strong> (<em>string, None</em>) &#8211; Optional name of a bucket type</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="riak.mapreduce.RiakKeyFilter">
-<em class="property">class </em><code class="descclassname">riak.mapreduce.</code><code class="descname">RiakKeyFilter</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakKeyFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>A helper class for building up lists of key filters. Unknown
-methods are treated as filters to be added; <code class="docutils literal"><span class="pre">&amp;</span></code> and <code class="docutils literal"><span class="pre">|</span></code> create
-conjunctions and disjunctions, respectively. <code class="docutils literal"><span class="pre">+</span></code> concatenates filters.</p>
-<p>Example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">RiakKeyFilter</span><span class="p">()</span><span class="o">.</span><span class="n">starts_with</span><span class="p">(</span><span class="s1">&#39;2005&#39;</span><span class="p">)</span>
-<span class="n">f2</span> <span class="o">=</span> <span class="n">RiakKeyFilter</span><span class="p">()</span><span class="o">.</span><span class="n">ends_with</span><span class="p">(</span><span class="s1">&#39;-01&#39;</span><span class="p">)</span>
-<span class="n">f3</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">&amp;</span> <span class="n">f2</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f3</span><span class="p">)</span>
-<span class="c1"># =&gt; [[&#39;and&#39;, [[&#39;starts_with&#39;, &#39;2005&#39;]], [[&#39;ends_with&#39;, &#39;-01&#39;]]]]</span>
-</pre></div>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>list</em>) &#8211; a list of arguments to be treated as a filter.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="phases">
 <h3>Phases<a class="headerlink" href="#phases" title="Permalink to this headline">¶</a></h3>
@@ -547,318 +268,15 @@ conjunctions and disjunctions, respectively. <code class="docutils literal"><spa
 phases load and process individual keys, returning one or more
 results, while <code class="docutils literal"><span class="pre">reduce</span></code> phases operate over collections of results
 from previous phases. <code class="docutils literal"><span class="pre">link</span></code> phases are a special type of <code class="docutils literal"><span class="pre">map</span></code>
-phase that extract matching <a class="reference internal" href="object.html#riak.riak_object.RiakObject.links" title="riak.riak_object.RiakObject.links"><code class="xref py py-attr docutils literal"><span class="pre">links</span></code></a>
+phase that extract matching <code class="xref py py-attr docutils literal"><span class="pre">links</span></code>
 from the object, usually so they can be used in a subsequent <code class="docutils literal"><span class="pre">map</span></code>
 phase.</p>
 <p>Any number of phases can return results directly to the client by
 passing <code class="docutils literal"><span class="pre">keep=True</span></code>.</p>
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.map">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">map</code><span class="sig-paren">(</span><em>function</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a map phase to the map/reduce operation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>function</strong> (<em>string, list</em>) &#8211; Either a named Javascript function (ie:
-&#8216;Riak.mapValues&#8217;), or an anonymous javascript function (ie:
-&#8216;function(...) ... &#8216; or an array [&#8216;erlang_module&#8217;,
-&#8216;function&#8217;].</li>
-<li><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce</code><span class="sig-paren">(</span><em>function</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a reduce phase to the map/reduce operation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>function</strong> (<em>string, list</em>) &#8211; Either a named Javascript function (ie.
-&#8216;Riak.reduceSum&#8217;), or an anonymous javascript function(ie:
-&#8216;function(...) { ... }&#8217; or an array [&#8216;erlang_module&#8217;,
-&#8216;function&#8217;].</li>
-<li><strong>options</strong> &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.link">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">link</code><span class="sig-paren">(</span><em>bucket='_'</em>, <em>tag='_'</em>, <em>keep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.link" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a link phase to the map/reduce operation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bucket</strong> (<em>string</em>) &#8211; Bucket name (default &#8216;_&#8217;, which means all
-buckets)</li>
-<li><strong>tag</strong> (<em>string</em>) &#8211; Tag (default &#8216;_&#8217;, which means any tag)</li>
-<li><strong>keep</strong> (<em>boolean</em>) &#8211; Flag whether to keep results from this stage in
-the map/reduce. (default False, unless this is the last step
-in the phase)</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="riak.mapreduce.RiakMapReducePhase">
-<em class="property">class </em><code class="descclassname">riak.mapreduce.</code><code class="descname">RiakMapReducePhase</code><span class="sig-paren">(</span><em>type</em>, <em>function</em>, <em>language</em>, <em>keep</em>, <em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReducePhase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The RiakMapReducePhase holds information about a Map or Reduce
-phase in a RiakMapReduce operation.</p>
-<p>Normally you won&#8217;t need to use this object directly, but instead
-call methods on RiakMapReduce objects to add instances to the
-query.</p>
-<p>Construct a RiakMapReducePhase object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>type</strong> (<em>string</em>) &#8211; the phase type - &#8216;map&#8217;, &#8216;reduce&#8217;, &#8216;link&#8217;</li>
-<li><strong>function</strong> (<em>string, list</em>) &#8211; the function to execute</li>
-<li><strong>language</strong> (<em>string</em>) &#8211; &#8216;javascript&#8217; or &#8216;erlang&#8217;</li>
-<li><strong>keep</strong> (<em>boolean</em>) &#8211; whether to return the output of this phase in the results.</li>
-<li><strong>arg</strong> (<em>string, dict, list</em>) &#8211; Additional static value to pass into the map or
-reduce function.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="riak.mapreduce.RiakLinkPhase">
-<em class="property">class </em><code class="descclassname">riak.mapreduce.</code><code class="descname">RiakLinkPhase</code><span class="sig-paren">(</span><em>bucket</em>, <em>tag</em>, <em>keep</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakLinkPhase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The RiakLinkPhase object holds information about a Link phase in a
-map/reduce operation.</p>
-<p>Normally you won&#8217;t need to use this object directly, but instead
-call <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.link" title="riak.mapreduce.RiakMapReduce.link"><code class="xref py py-meth docutils literal"><span class="pre">RiakMapReduce.link()</span></code></a> on RiakMapReduce objects to add
-instances to the query.</p>
-<p>Construct a RiakLinkPhase object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>bucket</strong> (<em>string</em>) &#8211; <ul>
-<li>The bucket name</li>
-</ul>
-</li>
-<li><strong>tag</strong> (<em>string</em>) &#8211; The tag</li>
-<li><strong>keep</strong> (<em>boolean</em>) &#8211; whether to return results of this phase.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <div class="section" id="phase-shortcuts">
 <h4>Phase shortcuts<a class="headerlink" href="#phase-shortcuts" title="Permalink to this headline">¶</a></h4>
 <p>A number of commonly-used phases are also available as shortcut
 methods:</p>
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.map_values">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">map_values</code><span class="sig-paren">(</span><em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.map_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.mapValues</span></code> to the query
-as a map phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.map_values_json">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">map_values_json</code><span class="sig-paren">(</span><em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.map_values_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.mapValuesJson</span></code> to the
-query as a map phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce_sum">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce_sum</code><span class="sig-paren">(</span><em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_sum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.reduceSum</span></code> to the query
-as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce_min">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce_min</code><span class="sig-paren">(</span><em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_min" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.reduceMin</span></code> to the query
-as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce_max">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce_max</code><span class="sig-paren">(</span><em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.reduceMax</span></code> to the query
-as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce_sort">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce_sort</code><span class="sig-paren">(</span><em>js_cmp=None</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.reduceSort</span></code> to the query
-as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>js_cmp</strong> (<em>string</em>) &#8211; A Javascript comparator function as specified by
-Array.sort()</li>
-<li><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce_numeric_sort">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce_numeric_sort</code><span class="sig-paren">(</span><em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_numeric_sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.reduceNumericSort</span></code> to the
-query as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce_limit">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce_limit</code><span class="sig-paren">(</span><em>limit</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_limit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.reduceLimit</span></code> to the query
-as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>limit</strong> (<em>integer</em>) &#8211; the maximum number of results to return</li>
-<li><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.reduce_slice">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">reduce_slice</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.reduce_slice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.reduceSlice</span></code> to the
-query as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>start</strong> (<em>integer</em>) &#8211; the beginning of the slice</li>
-<li><strong>end</strong> (<em>integer</em>) &#8211; the end of the slice</li>
-<li><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.filter_not_found">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">filter_not_found</code><span class="sig-paren">(</span><em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.filter_not_found" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Javascript built-in <code class="docutils literal"><span class="pre">Riak.filterNotFound</span></code> to the query
-as a reduce phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> (<em>dict</em>) &#8211; phase options, containing &#8216;language&#8217;, &#8216;keep&#8217;
-flag, and/or &#8216;arg&#8217;.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 </div>
 <div class="section" id="execution">
@@ -866,117 +284,12 @@ flag, and/or &#8216;arg&#8217;.</td>
 <p>Query results can either be executed in one round-trip, or streamed
 back to the client. The format of results will depend on the structure
 of the <code class="docutils literal"><span class="pre">map</span></code> and <code class="docutils literal"><span class="pre">reduce</span></code> phases the query contains.</p>
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.run">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">run</code><span class="sig-paren">(</span><em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the map/reduce operation synchronously. Returns a list of
-results, or a list of links if the last phase is a link phase.
-Shortcut for <a class="reference internal" href="client.html#riak.client.RiakClient.mapred" title="riak.client.RiakClient.mapred"><code class="xref py py-meth docutils literal"><span class="pre">riak.client.RiakClient.mapred()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>integer, None</em>) &#8211; Timeout in milliseconds</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.mapreduce.RiakMapReduce.stream">
-<code class="descclassname">RiakMapReduce.</code><code class="descname">stream</code><span class="sig-paren">(</span><em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.mapreduce.RiakMapReduce.stream" title="Permalink to this definition">¶</a></dt>
-<dd><p>Streams the MapReduce query (returns an iterator). Shortcut
-for <a class="reference internal" href="client.html#riak.client.RiakClient.stream_mapred" title="riak.client.RiakClient.stream_mapred"><code class="xref py py-meth docutils literal"><span class="pre">riak.client.RiakClient.stream_mapred()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>integer</em>) &#8211; Timeout in milliseconds</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">iterator that yields (phase_num, data) tuples</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="shortcut-constructors">
 <h3>Shortcut constructors<a class="headerlink" href="#shortcut-constructors" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a> contains some shortcut methods
+<p><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code> contains some shortcut methods
 that make it more convenient to begin constructing
-<a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a> queries.</p>
-<dl class="method">
-<dt id="riak.riak_object.RiakObject.add">
-<code class="descclassname">RiakObject.</code><code class="descname">add</code><span class="sig-paren">(</span><em>arg1</em>, <em>arg2=None</em>, <em>arg3=None</em>, <em>bucket_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation.
-A shortcut for <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.add" title="riak.mapreduce.RiakMapReduce.add"><code class="xref py py-meth docutils literal"><span class="pre">add()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>arg1</strong> (<em>RiakObject, string</em>) &#8211; the object or bucket to add</li>
-<li><strong>arg2</strong> (<em>string, list, None</em>) &#8211; a key or list of keys to add (if a bucket is
-given in arg1)</li>
-<li><strong>arg3</strong> (<em>string, list, dict, None</em>) &#8211; key data for this input (must be convertible to JSON)</li>
-<li><strong>bucket_type</strong> (<em>string, None</em>) &#8211; Optional name of a bucket type</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.riak_object.RiakObject.link">
-<code class="descclassname">RiakObject.</code><code class="descname">link</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.link" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation.
-A shortcut for <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.link" title="riak.mapreduce.RiakMapReduce.link"><code class="xref py py-meth docutils literal"><span class="pre">link()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.riak_object.RiakObject.map">
-<code class="descclassname">RiakObject.</code><code class="descname">map</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation.
-A shortcut for <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.map" title="riak.mapreduce.RiakMapReduce.map"><code class="xref py py-meth docutils literal"><span class="pre">map()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.riak_object.RiakObject.reduce">
-<code class="descclassname">RiakObject.</code><code class="descname">reduce</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.riak_object.RiakObject.reduce" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start assembling a Map/Reduce operation.
-A shortcut for <a class="reference internal" href="#riak.mapreduce.RiakMapReduce.reduce" title="riak.mapreduce.RiakMapReduce.reduce"><code class="xref py py-meth docutils literal"><span class="pre">reduce()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#riak.mapreduce.RiakMapReduce" title="riak.mapreduce.RiakMapReduce"><code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<code class="xref py py-class docutils literal"><span class="pre">RiakMapReduce</span></code> queries.</p>
 </div>
 </div>
 <div class="section" id="riak-search-2-0-yokozuna">
@@ -1004,7 +317,7 @@ but we recommend in production that you define your own schema.</p>
 <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/search-schema">Search Schema</a>,
 with a short section dedicated to the <a class="reference external" href="http://docs.basho.com/riak/2.0.0/dev/advanced/search-schema/#The-Default-Schema">default schema</a>.</p>
 <p>Here is a brief example of creating a custom schema with
-<a class="reference internal" href="client.html#riak.client.RiakClient.create_search_schema" title="riak.client.RiakClient.create_search_schema"><code class="xref py py-meth docutils literal"><span class="pre">create_search_schema()</span></code></a>:</p>
+<code class="xref py py-meth docutils literal"><span class="pre">create_search_schema()</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
 <span class="s2">&lt;schema name=&quot;test&quot; version=&quot;1.5&quot;&gt;</span>
 <span class="s2">&lt;fields&gt;</span>
@@ -1038,7 +351,7 @@ with a short section dedicated to the <a class="reference external" href="http:/
 </pre></div>
 </div>
 <p>If you would like to retrieve the current XML Solr schema,
-<a class="reference internal" href="client.html#riak.client.RiakClient.get_search_schema" title="riak.client.RiakClient.get_search_schema"><code class="xref py py-meth docutils literal"><span class="pre">get_search_schema()</span></code></a> is available:</p>
+<code class="xref py py-meth docutils literal"><span class="pre">get_search_schema()</span></code> is available:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_schema</span><span class="p">(</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1048,7 +361,7 @@ with a short section dedicated to the <a class="reference external" href="http:/
 <p>Once a schema has been created, then a Solr index must also be created.
 This index represents a collection of similar data that you use to perform
 queries. When creating an index with
-<a class="reference internal" href="client.html#riak.client.RiakClient.create_search_index" title="riak.client.RiakClient.create_search_index"><code class="xref py py-meth docutils literal"><span class="pre">create_search_index()</span></code></a>, you can optionally
+<code class="xref py py-meth docutils literal"><span class="pre">create_search_index()</span></code>, you can optionally
 specify a schema. If you do not, the default schema will be used:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">create_search_index</span><span class="p">(</span><span class="s1">&#39;nacho&#39;</span><span class="p">)</span>
 </pre></div>
@@ -1059,13 +372,13 @@ associated with the schema <code class="docutils literal"><span class="pre">&quo
 </pre></div>
 </div>
 <p>Just as easily you can delete an index with
-<a class="reference internal" href="client.html#riak.client.RiakClient.delete_search_index" title="riak.client.RiakClient.delete_search_index"><code class="xref py py-meth docutils literal"><span class="pre">delete_search_index()</span></code></a>:</p>
+<code class="xref py py-meth docutils literal"><span class="pre">delete_search_index()</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">delete_search_index</span><span class="p">(</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>A single index can be retrieved with
-<a class="reference internal" href="client.html#riak.client.RiakClient.get_search_index" title="riak.client.RiakClient.get_search_index"><code class="xref py py-meth docutils literal"><span class="pre">get_search_index()</span></code></a> or all of them
-with <a class="reference internal" href="client.html#riak.client.RiakClient.list_search_indexes" title="riak.client.RiakClient.list_search_indexes"><code class="xref py py-meth docutils literal"><span class="pre">list_search_indexes()</span></code></a>:</p>
+<code class="xref py py-meth docutils literal"><span class="pre">get_search_index()</span></code> or all of them
+with <code class="xref py py-meth docutils literal"><span class="pre">list_search_indexes()</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_search_index</span><span class="p">(</span><span class="s1">&#39;jalapeno&#39;</span><span class="p">)</span>
 <span class="n">name</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
 <span class="n">schema</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s1">&#39;schema&#39;</span><span class="p">]</span>
@@ -1134,7 +447,7 @@ for the full use of existing Solr tools as well as its rich semantics.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The hottest pepper is </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;docs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name_s&#39;</span><span class="p">]))</span>
 </pre></div>
 </div>
-<p>The results returned by <a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.search" title="riak.bucket.RiakBucket.search"><code class="xref py py-meth docutils literal"><span class="pre">search()</span></code></a> is a dictionary
+<p>The results returned by <code class="xref py py-meth docutils literal"><span class="pre">search()</span></code> is a dictionary
 with lots of search metadata like the number of results, the maxium
 <a class="reference external" href="https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/search/package-summary.html#scoring">Lucene Score</a>
 as well as the matching documents.</p>
@@ -1228,7 +541,7 @@ used in Solr since they do not fit into the default schema, e.g.:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.5.2',
+            VERSION:'2.7.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

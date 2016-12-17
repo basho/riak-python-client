@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Security &mdash; Riak Python Client 2.5.2 documentation</title>
+  <title>Security &mdash; Riak Python Client 2.7.0 documentation</title>
   
 
   
@@ -32,7 +32,10 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.5.2 documentation" href="index.html"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Riak Python Client 2.7.0 documentation" href="index.html"/>
         <link rel="next" title="Advanced Usage &amp; Internals" href="advanced.html"/>
         <link rel="prev" title="Query Methods" href="query.html"/> 
 
@@ -62,7 +65,7 @@
             
             
               <div class="version">
-                2.5.2
+                2.7.0
               </div>
             
           
@@ -141,7 +144,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/security.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/security.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -190,17 +193,17 @@ for secure transport in the Riak client. Earlier versions
 may not support TLS 1.2, the recommended security protocol.</p>
 </div>
 <p>On the client, simply create a
-<a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object with just a username,
+<code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code> object with just a username,
 password and CA Certificate file. That would then need to be passed
-into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> initializer:</p>
+into the <code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code> initializer:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="n">SecurityCreds</span><span class="p">(</span><span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
                       <span class="n">cacert_file</span><span class="o">=</span><span class="s1">&#39;/path/to/ca.crt&#39;</span><span class="p">)</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">RiakClient</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="n">creds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">credentials</span></code> argument of a <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> constructor
-is a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object. If you specify a dictionary
+<p>The <code class="docutils literal"><span class="pre">credentials</span></code> argument of a <code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code> constructor
+is a <code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code> object. If you specify a dictionary
 instead, it will be turned into this type:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
          <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
@@ -211,7 +214,7 @@ instead, it will be turned into this type:</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">A Certifying Authority (CA) Certificate must always be
-supplied to <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> by specifying the path to
+supplied to <code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code> by specifying the path to
 a CA certificate file via the <code class="docutils literal"><span class="pre">cacert_file</span></code> argument or by
 setting the <code class="docutils literal"><span class="pre">cacert</span></code> argument to an <a class="reference external" href="http://pythonhosted.org/pyOpenSSL/api/crypto.html#x509-objects">OpenSSL.crypto.X509</a>
 object. This mitigates MITM (man-in-the-middle) attacks by
@@ -247,9 +250,9 @@ The server needs to first have a user and a <code class="docutils literal"><span
 <span class="n">riak</span><span class="o">-</span><span class="n">admin</span> <span class="n">security</span> <span class="n">add</span><span class="o">-</span><span class="n">source</span> <span class="n">riakuser</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="o">/</span><span class="mi">32</span> <span class="n">password</span>
 </pre></div>
 </div>
-<p>On the client, simply create a <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> object or dict
+<p>On the client, simply create a <code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code> object or dict
 with just a username and password. That would then need to be passed
-into the <a class="reference internal" href="client.html#riak.client.RiakClient" title="riak.client.RiakClient"><code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code></a> initializer:</p>
+into the <code class="xref py py-class docutils literal"><span class="pre">RiakClient</span></code> initializer:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
          <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
          <span class="s1">&#39;cacert_file&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/ca.crt&#39;</span><span class="p">}</span>
@@ -272,7 +275,7 @@ This time the server requires a <code class="docutils literal"><span class="pre"
 <p>When the <code class="docutils literal"><span class="pre">certificate</span></code> source is used, the Riak username must match
 the common name, aka <code class="docutils literal"><span class="pre">CN</span></code>, that you specified when you generated your
 certificate.  You can add a <code class="docutils literal"><span class="pre">certificate</span></code> source to any number of clients.</p>
-<p>The <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> must then include the include a client
+<p>The <code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code> must then include the include a client
 certificate file and a private key file, too:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
          <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;riakpass&#39;</span><span class="p">,</span>
@@ -319,7 +322,7 @@ containing the private key has been lost or stolen):</p>
 </div>
 <div class="section" id="cipher-options">
 <h3>Cipher options<a class="headerlink" href="#cipher-options" title="Permalink to this headline">¶</a></h3>
-<p>The last interesting setting on <a class="reference internal" href="#riak.security.SecurityCreds" title="riak.security.SecurityCreds"><code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code></a> is the
+<p>The last interesting setting on <code class="xref py py-class docutils literal"><span class="pre">SecurityCreds</span></code> is the
 <code class="docutils literal"><span class="pre">ciphers</span></code> option which is a colon-delimited list of supported
 ciphers for encryption:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">creds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;riakuser&#39;</span><span class="p">,</span>
@@ -332,91 +335,6 @@ ciphers for encryption:</p>
 </div>
 <div class="section" id="securitycreds-object">
 <h2>SecurityCreds object<a class="headerlink" href="#securitycreds-object" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="riak.security.SecurityCreds">
-<em class="property">class </em><code class="descclassname">riak.security.</code><code class="descname">SecurityCreds</code><span class="sig-paren">(</span><em>username=None</em>, <em>password=None</em>, <em>pkey_file=None</em>, <em>pkey=None</em>, <em>cert_file=None</em>, <em>cert=None</em>, <em>cacert_file=None</em>, <em>cacert=None</em>, <em>crl_file=None</em>, <em>crl=None</em>, <em>ciphers=None</em>, <em>ssl_version=5</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.security.SecurityCreds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Container class for security-related settings</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>username</strong> (<em>str</em>) &#8211; Riak Security username</li>
-<li><strong>password</strong> (<em>str</em>) &#8211; Riak Security password</li>
-<li><strong>pkey_file</strong> (<em>str</em>) &#8211; Full path to security key file</li>
-<li><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.PKey</span></code>) &#8211; Loaded security key file</li>
-<li><strong>cert_file</strong> (<em>str</em>) &#8211; Full path to certificate file</li>
-<li><strong>cert</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></code>) &#8211; Loaded client certificate</li>
-<li><strong>cacert_file</strong> (<em>str</em>) &#8211; Full path to CA certificate file</li>
-<li><strong>cacert</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></code>) &#8211; Loaded CA certificate</li>
-<li><strong>crl_file</strong> (<em>str</em>) &#8211; Full path to revoked certificates file</li>
-<li><strong>crl</strong> (<code class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.CRL</span></code>) &#8211; Loaded revoked certificates list</li>
-<li><strong>ciphers</strong> (<em>str</em>) &#8211; List of supported SSL ciphers</li>
-<li><strong>ssl_version</strong> (<em>int</em>) &#8211; OpenSSL security version</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="riak.security.SecurityCreds.username">
-<code class="descname">username</code><a class="headerlink" href="#riak.security.SecurityCreds.username" title="Permalink to this definition">¶</a></dt>
-<dd><p>Riak Username</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.security.SecurityCreds.password">
-<code class="descname">password</code><a class="headerlink" href="#riak.security.SecurityCreds.password" title="Permalink to this definition">¶</a></dt>
-<dd><p>Riak Password</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.security.SecurityCreds.ciphers">
-<code class="descname">ciphers</code><a class="headerlink" href="#riak.security.SecurityCreds.ciphers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Colon-delimited list of supported ciphers</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.security.SecurityCreds.ssl_version">
-<code class="descname">ssl_version</code><a class="headerlink" href="#riak.security.SecurityCreds.ssl_version" title="Permalink to this definition">¶</a></dt>
-<dd><p>SSL/TLS Protocol to use</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">an int constant from OpenSSL, like
-<code class="xref py py-data docutils literal"><span class="pre">OpenSSL.SSL.TLSv1_2_METHOD</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 </div>
 
@@ -461,7 +379,7 @@ ciphers for encryption:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.5.2',
+            VERSION:'2.7.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

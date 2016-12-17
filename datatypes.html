@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data Types &mdash; Riak Python Client 2.5.2 documentation</title>
+  <title>Data Types &mdash; Riak Python Client 2.7.0 documentation</title>
   
 
   
@@ -32,7 +32,10 @@
   
 
   
-    <link rel="top" title="Riak Python Client 2.5.2 documentation" href="index.html"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Riak Python Client 2.7.0 documentation" href="index.html"/>
         <link rel="next" title="Query Methods" href="query.html"/>
         <link rel="prev" title="Values &amp; Objects" href="object.html"/> 
 
@@ -62,7 +65,7 @@
             
             
               <div class="version">
-                2.5.2
+                2.7.0
               </div>
             
           
@@ -139,7 +142,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/datatypes.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/datatypes.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -159,28 +162,28 @@ converge automatically without presenting <a class="reference internal" href="ob
 <p>Here is the list of current Data Types:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="#riak.datatypes.Counter" title="riak.datatypes.Counter"><code class="xref py py-class docutils literal"><span class="pre">Counter</span></code></a> increments or decrements
+<li><code class="xref py py-class docutils literal"><span class="pre">Counter</span></code> increments or decrements
 integer values</li>
-<li><a class="reference internal" href="#riak.datatypes.Set" title="riak.datatypes.Set"><code class="xref py py-class docutils literal"><span class="pre">Set</span></code></a> allows you to store multiple
+<li><code class="xref py py-class docutils literal"><span class="pre">Set</span></code> allows you to store multiple
 distinct opaque binary values against a key</li>
-<li><a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a> is a nested, recursive
+<li><code class="xref py py-class docutils literal"><span class="pre">Map</span></code> is a nested, recursive
 struct, or associative array. Think of it as a container for
 composing ad hoc data structures from multiple Data Types.
 Inside a map you may store sets, counters, flags,
 registers, and even other maps</li>
-<li><a class="reference internal" href="#riak.datatypes.Register" title="riak.datatypes.Register"><code class="xref py py-class docutils literal"><span class="pre">Register</span></code></a> stores binaries
+<li><code class="xref py py-class docutils literal"><span class="pre">Register</span></code> stores binaries
 accoring to last-write-wins logic within
-<a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a></li>
-<li><a class="reference internal" href="#riak.datatypes.Flag" title="riak.datatypes.Flag"><code class="xref py py-class docutils literal"><span class="pre">Flag</span></code></a> is similar to a boolean
-and also must be within <a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a></li>
+<code class="xref py py-class docutils literal"><span class="pre">Map</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">Flag</span></code> is similar to a boolean
+and also must be within <code class="xref py py-class docutils literal"><span class="pre">Map</span></code></li>
 </ul>
 </div></blockquote>
 <p>All Data Types must be stored in buckets bearing a
-<a class="reference internal" href="bucket.html#riak.bucket.BucketType" title="riak.bucket.BucketType"><code class="xref py py-class docutils literal"><span class="pre">BucketType</span></code></a> that sets the
+<code class="xref py py-class docutils literal"><span class="pre">BucketType</span></code> that sets the
 <a class="reference internal" href="bucket.html#riak.bucket.BucketType.datatype" title="riak.bucket.BucketType.datatype"><code class="xref py py-attr docutils literal"><span class="pre">datatype</span></code></a> property to one of
 <code class="docutils literal"><span class="pre">&quot;counter&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;set&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;map&quot;</span></code>. Note that the bucket must have
 the <code class="docutils literal"><span class="pre">allow_mult</span></code> property set to <code class="docutils literal"><span class="pre">true</span></code>.</p>
-<p>These Data Types are stored just like <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObjects</span></code></a>, so size constraints that apply to
+<p>These Data Types are stored just like <code class="xref py py-class docutils literal"><span class="pre">RiakObjects</span></code>, so size constraints that apply to
 normal Riak values apply to Riak Data Types too.</p>
 <p>An in-depth discussion of Data Types, also known as CRDTs,
 can be found at <a class="reference external" href="http://docs.basho.com/riak/2.0.0/theory/concepts/crdts/">Data Types</a>.</p>
@@ -195,19 +198,19 @@ tell Riak what operations to perform on the Data Type. Here are some example
 operations:</p>
 <blockquote>
 <div><ul class="simple">
-<li>increment a <a class="reference internal" href="#riak.datatypes.Counter" title="riak.datatypes.Counter"><code class="xref py py-class docutils literal"><span class="pre">Counter</span></code></a> by <code class="docutils literal"><span class="pre">10</span></code></li>
-<li>add <code class="docutils literal"><span class="pre">'joe'</span></code> to a <a class="reference internal" href="#riak.datatypes.Set" title="riak.datatypes.Set"><code class="xref py py-class docutils literal"><span class="pre">Set</span></code></a></li>
-<li>remove the <a class="reference internal" href="#riak.datatypes.Set" title="riak.datatypes.Set"><code class="xref py py-class docutils literal"><span class="pre">Set</span></code></a> field called <code class="docutils literal"><span class="pre">'friends'</span></code> from a <a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a></li>
-<li>enable the prepay <a class="reference internal" href="#riak.datatypes.Flag" title="riak.datatypes.Flag"><code class="xref py py-class docutils literal"><span class="pre">Flag</span></code></a> in a <a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a></li>
+<li>increment a <code class="xref py py-class docutils literal"><span class="pre">Counter</span></code> by <code class="docutils literal"><span class="pre">10</span></code></li>
+<li>add <code class="docutils literal"><span class="pre">'joe'</span></code> to a <code class="xref py py-class docutils literal"><span class="pre">Set</span></code></li>
+<li>remove the <code class="xref py py-class docutils literal"><span class="pre">Set</span></code> field called <code class="docutils literal"><span class="pre">'friends'</span></code> from a <code class="xref py py-class docutils literal"><span class="pre">Map</span></code></li>
+<li>enable the prepay <code class="xref py py-class docutils literal"><span class="pre">Flag</span></code> in a <code class="xref py py-class docutils literal"><span class="pre">Map</span></code></li>
 </ul>
 </div></blockquote>
 <p>Datatypes can be fetched and created just like
-<a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a> instances, using
-<a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.get" title="riak.bucket.RiakBucket.get"><code class="xref py py-meth docutils literal"><span class="pre">RiakBucket.get</span></code></a> and
-<a class="reference internal" href="bucket.html#riak.bucket.RiakBucket.new" title="riak.bucket.RiakBucket.new"><code class="xref py py-meth docutils literal"><span class="pre">RiakBucket.new</span></code></a>, except that the
+<code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code> instances, using
+<code class="xref py py-meth docutils literal"><span class="pre">RiakBucket.get</span></code> and
+<code class="xref py py-meth docutils literal"><span class="pre">RiakBucket.new</span></code>, except that the
 bucket must belong to a bucket-type that has a valid datatype
 property. If we have a bucket-type named &#8220;social-graph&#8221; that has the
-datatype <cite>&#8220;set&#8221;</cite>, we would fetch a <a class="reference internal" href="#riak.datatypes.Set" title="riak.datatypes.Set"><code class="xref py py-class docutils literal"><span class="pre">Set</span></code></a> like so:</p>
+datatype <cite>&#8220;set&#8221;</cite>, we would fetch a <code class="xref py py-class docutils literal"><span class="pre">Set</span></code> like so:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">graph</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket_type</span><span class="p">(</span><span class="s1">&#39;social-graph&#39;</span><span class="p">)</span>
 <span class="n">graph</span><span class="o">.</span><span class="n">datatype</span>  <span class="c1"># =&gt; &#39;set&#39;</span>
 <span class="n">myfollowers</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s1">&#39;followers&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seancribbs&#39;</span><span class="p">)</span>
@@ -222,7 +225,7 @@ send those operations to Riak:</p>
 </pre></div>
 </div>
 <p>While this looks in code very similar to manipulating
-<a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a> instances, only mutations are
+<code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code> instances, only mutations are
 enqueued locally, not the new value.</p>
 </div>
 <div class="section" id="context-and-observed-remove">
@@ -231,157 +234,32 @@ enqueued locally, not the new value.</p>
 context received from a read when you:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="#riak.datatypes.Flag.disable" title="riak.datatypes.Flag.disable"><code class="xref py py-meth docutils literal"><span class="pre">disable</span></code></a> a <a class="reference internal" href="#riak.datatypes.Flag" title="riak.datatypes.Flag"><code class="xref py py-class docutils literal"><span class="pre">Flag</span></code></a>
+<li><code class="xref py py-meth docutils literal"><span class="pre">disable</span></code> a <code class="xref py py-class docutils literal"><span class="pre">Flag</span></code>
 (set it to <code class="docutils literal"><span class="pre">false</span></code>)</li>
-<li>remove a field from a <a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a></li>
-<li><a class="reference internal" href="#riak.datatypes.Set.discard" title="riak.datatypes.Set.discard"><code class="xref py py-meth docutils literal"><span class="pre">remove</span></code></a> an element from a <a class="reference internal" href="#riak.datatypes.Set" title="riak.datatypes.Set"><code class="xref py py-class docutils literal"><span class="pre">Set</span></code></a></li>
+<li>remove a field from a <code class="xref py py-class docutils literal"><span class="pre">Map</span></code></li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">remove</span></code> an element from a <code class="xref py py-class docutils literal"><span class="pre">Set</span></code></li>
 </ul>
 </div></blockquote>
 <p>The basic rule is &#8220;you cannot remove something you haven&#8217;t seen&#8221;, and
 the context tells Riak what you&#8217;ve actually seen, similar to the
-<a class="reference internal" href="object.html#vclock"><span class="std std-ref">Vector clock</span></a> on <a class="reference internal" href="object.html#riak.riak_object.RiakObject" title="riak.riak_object.RiakObject"><code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code></a>. The Python
+<a class="reference internal" href="object.html#vclock"><span class="std std-ref">Vector clock</span></a> on <code class="xref py py-class docutils literal"><span class="pre">RiakObject</span></code>. The Python
 client handles opaque contexts for you transparently as long as you
 fetch before performing one of these actions.</p>
 </div>
 <div class="section" id="datatype-abstract-class">
 <h2>Datatype abstract class<a class="headerlink" href="#datatype-abstract-class" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="riak.datatypes.Datatype">
-<em class="property">class </em><code class="descclassname">riak.datatypes.</code><code class="descname">Datatype</code><span class="sig-paren">(</span><em>bucket=None</em>, <em>key=None</em>, <em>value=None</em>, <em>context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Datatype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base class for all convergent datatype wrappers. You will not use
-this class directly, but it does define some methods are common to
-all datatype wrappers.</p>
-<dl class="attribute">
-<dt id="riak.datatypes.Datatype.value">
-<code class="descname">value</code><a class="headerlink" href="#riak.datatypes.Datatype.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>The pure, immutable value of this datatype, as a Python value,
-which is unique for each datatype.</p>
-<p><strong>NB</strong>: Do not use this property to mutate data, as it will not
-have any effect. Use the methods of the individual type to effect
-changes. This value is guaranteed to be independent of any internal
-data representation.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.datatypes.Datatype.context">
-<code class="descname">context</code><a class="headerlink" href="#riak.datatypes.Datatype.context" title="Permalink to this definition">¶</a></dt>
-<dd><p>The opaque context for this type, if it was previously fetched.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.datatypes.Datatype.modified">
-<code class="descname">modified</code><a class="headerlink" href="#riak.datatypes.Datatype.modified" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether this datatype has staged local modifications.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 <div class="section" id="persistence-methods">
 <h3>Persistence methods<a class="headerlink" href="#persistence-methods" title="Permalink to this headline">¶</a></h3>
-<dl class="method">
-<dt id="riak.datatypes.Datatype.reload">
-<code class="descclassname">Datatype.</code><code class="descname">reload</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Datatype.reload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reloads the datatype from Riak.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>r</strong> (<em>integer, string, None</em>) &#8211; the read quorum</li>
-<li><strong>pr</strong> (<em>integer, string, None</em>) &#8211; the primary read quorum</li>
-<li><strong>basic_quorum</strong> (<em>bool</em>) &#8211; whether to use the &#8220;basic quorum&#8221; policy
-for not-founds</li>
-<li><strong>notfound_ok</strong> (<em>bool</em>) &#8211; whether to treat not-found responses as successful</li>
-<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</li>
-<li><strong>include_context</strong> (<em>bool</em>) &#8211; whether to return the opaque context
-as well as the value, which is useful for removal operations
-on sets and maps</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><code class="xref py py-class docutils literal"><span class="pre">Datatype</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Datatype.update">
-<code class="descclassname">Datatype.</code><code class="descname">update</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Datatype.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends locally staged mutations to Riak.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>w</strong> (<em>integer</em>) &#8211; W-value, wait for this many partitions to respond
-before returning to client.</li>
-<li><strong>dw</strong> (<em>integer</em>) &#8211; DW-value, wait for this many partitions to
-confirm the write before returning to client.</li>
-<li><strong>pw</strong> (<em>integer</em>) &#8211; PW-value, require this many primary partitions to
-be available before performing the put</li>
-<li><strong>return_body</strong> (<em>bool</em>) &#8211; if the newly stored object should be
-retrieved, defaults to True</li>
-<li><strong>include_context</strong> (<em>bool</em>) &#8211; whether to return the new opaque
-context when <cite>return_body</cite> is <cite>True</cite></li>
-<li><strong>timeout</strong> (<em>int</em>) &#8211; a timeout value in milliseconds</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">a subclass of <a class="reference internal" href="#riak.datatypes.Datatype" title="riak.datatypes.Datatype"><code class="xref py py-class docutils literal"><span class="pre">Datatype</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="function">
 <dt id="riak.datatypes.Datatype.store">
 <code class="descclassname">Datatype.</code><code class="descname">store</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Datatype.store" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is an alias for <a class="reference internal" href="#riak.datatypes.Datatype.update" title="riak.datatypes.Datatype.update"><code class="xref py py-meth docutils literal"><span class="pre">update()</span></code></a>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Datatype.delete">
-<code class="descclassname">Datatype.</code><code class="descname">delete</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Datatype.delete" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes the datatype from Riak. See <a class="reference internal" href="client.html#riak.client.RiakClient.delete" title="riak.client.RiakClient.delete"><code class="xref py py-meth docutils literal"><span class="pre">RiakClient.delete()</span></code></a> for options.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Datatype.clear">
-<code class="descclassname">Datatype.</code><code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Datatype.clear" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes all locally staged mutations.</p>
+<dd><p>This is an alias for <code class="xref py py-meth docutils literal"><span class="pre">update()</span></code>.</p>
 </dd></dl>
 
 </div>
 </div>
 <div class="section" id="counter">
 <h2>Counter<a class="headerlink" href="#counter" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="riak.datatypes.Counter">
-<em class="property">class </em><code class="descclassname">riak.datatypes.</code><code class="descname">Counter</code><span class="sig-paren">(</span><em>bucket=None</em>, <em>key=None</em>, <em>value=None</em>, <em>context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>A convergent datatype that represents a counter which can be
-incremented or decremented. This type can stand on its own or be
-embedded within a <a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a>.</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="riak.datatypes.Counter.value">
 <code class="descclassname">Counter.</code><code class="descname">value</code><a class="headerlink" href="#riak.datatypes.Counter.value" title="Permalink to this definition">¶</a></dt>
@@ -396,56 +274,9 @@ embedded within a <a class="reference internal" href="#riak.datatypes.Map" title
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="riak.datatypes.Counter.increment">
-<code class="descclassname">Counter.</code><code class="descname">increment</code><span class="sig-paren">(</span><em>amount=1</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Counter.increment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Increments the counter by one or the given amount.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>amount</strong> (<em>int</em>) &#8211; the amount to increment the counter</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Counter.decrement">
-<code class="descclassname">Counter.</code><code class="descname">decrement</code><span class="sig-paren">(</span><em>amount=1</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Counter.decrement" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decrements the counter by one or the given amount.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>amount</strong> (<em>int</em>) &#8211; the amount to decrement the counter</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="set">
 <h2>Set<a class="headerlink" href="#set" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="riak.datatypes.Set">
-<em class="property">class </em><code class="descclassname">riak.datatypes.</code><code class="descname">Set</code><span class="sig-paren">(</span><em>bucket=None</em>, <em>key=None</em>, <em>value=None</em>, <em>context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Set" title="Permalink to this definition">¶</a></dt>
-<dd><p>A convergent datatype representing a Set with observed-remove
-semantics. Currently strings are the only supported value type.
-Example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;barista&#39;</span><span class="p">)</span>
-<span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;roaster&#39;</span><span class="p">)</span>
-<span class="n">myset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;brewer&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Likewise they can simply be removed:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">myset</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="s1">&#39;barista&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This datatype also implements the <a class="reference external" href="https://docs.python.org/2/library/collections.html">Set ABC</a>, meaning it
-supports <code class="docutils literal"><span class="pre">len()</span></code>, <code class="docutils literal"><span class="pre">in</span></code>, and iteration.</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="riak.datatypes.Set.value">
 <code class="descclassname">Set.</code><code class="descname">value</code><a class="headerlink" href="#riak.datatypes.Set.value" title="Permalink to this definition">¶</a></dt>
@@ -460,83 +291,9 @@ supports <code class="docutils literal"><span class="pre">len()</span></code>, <
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="riak.datatypes.Set.add">
-<code class="descclassname">Set.</code><code class="descname">add</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Set.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds an element to the set.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>element</strong> (<em>str</em>) &#8211; the element to add</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Set.discard">
-<code class="descclassname">Set.</code><code class="descname">discard</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Set.discard" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes an element from the set.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>element</strong> (<em>str</em>) &#8211; the element to remove</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="map">
 <h2>Map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="riak.datatypes.Map">
-<em class="property">class </em><code class="descclassname">riak.datatypes.</code><code class="descname">Map</code><span class="sig-paren">(</span><em>bucket=None</em>, <em>key=None</em>, <em>value=None</em>, <em>context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Map" title="Permalink to this definition">¶</a></dt>
-<dd><p>A convergent datatype that acts as a key-value datastructure. Keys
-are pairs of <code class="docutils literal"><span class="pre">(name,</span> <span class="pre">datatype)</span></code> where <code class="docutils literal"><span class="pre">name</span></code> is a string and
-<code class="docutils literal"><span class="pre">datatype</span></code> is the datatype name. Values are other convergent
-datatypes, represented by any concrete type in this module.</p>
-<p>You cannot set values in the map directly (it does not implement
-<code class="docutils literal"><span class="pre">__setitem__</span></code>), but you may add new empty values or access
-non-existing values directly via bracket syntax. If a key is not in the
-original value of the map when accessed, fetching the key will cause
-its associated value to be created.:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="p">[(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;register&#39;</span><span class="p">)]</span>
-</pre></div>
-</div>
-<p>Keys and their associated values may be deleted from the map as
-you would in a dict:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">del</span> <span class="nb">map</span><span class="p">[(</span><span class="s1">&#39;emails&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">)]</span>
-</pre></div>
-</div>
-<p>Convenience accessors exist that partition the map&#8217;s keys by
-datatype and implement the <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>
-behavior as well as supporting deletion:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">map</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s1">&#39;emails&#39;</span><span class="p">]</span>
-<span class="nb">map</span><span class="o">.</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-<span class="k">del</span> <span class="nb">map</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="s1">&#39;likes&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.datatypes.Map.value">
-<code class="descclassname">Map.</code><code class="descname">value</code><a class="headerlink" href="#riak.datatypes.Map.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a copy of the original map&#8217;s value. Nested values are
-pure Python values as returned by <a class="reference internal" href="#riak.datatypes.Datatype.value" title="riak.datatypes.Datatype.value"><code class="xref py py-attr docutils literal"><span class="pre">Datatype.value</span></code></a> from
-the nested types.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="riak.datatypes.Map.counters">
 <code class="descclassname">Map.</code><code class="descname">counters</code><a class="headerlink" href="#riak.datatypes.Map.counters" title="Permalink to this definition">¶</a></dt>
@@ -591,58 +348,14 @@ the nested types.</p>
 <div class="section" id="map-only-datatypes">
 <h2>Map-only datatypes<a class="headerlink" href="#map-only-datatypes" title="Permalink to this headline">¶</a></h2>
 <p>Two of the new Data Types may only be embedded in
-<a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a> objects (in addition to
-<a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a> itself):</p>
+<code class="xref py py-class docutils literal"><span class="pre">Map</span></code> objects (in addition to
+<code class="xref py py-class docutils literal"><span class="pre">Map</span></code> itself):</p>
 </div>
 <div class="section" id="register">
 <h2>Register<a class="headerlink" href="#register" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="riak.datatypes.Register">
-<em class="property">class </em><code class="descclassname">riak.datatypes.</code><code class="descname">Register</code><span class="sig-paren">(</span><em>bucket=None</em>, <em>key=None</em>, <em>value=None</em>, <em>context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Register" title="Permalink to this definition">¶</a></dt>
-<dd><p>A convergent datatype that represents an opaque string that is set
-with last-write-wins semantics, and may only be embedded in
-<a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a> instances.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="riak.datatypes.Register.value">
-<code class="descclassname">Register.</code><code class="descname">value</code><a class="headerlink" href="#riak.datatypes.Register.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a copy of the original value of the register.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Register.assign">
-<code class="descclassname">Register.</code><code class="descname">assign</code><span class="sig-paren">(</span><em>new_value</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Register.assign" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assigns a new value to the register.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_value</strong> (<em>str</em>) &#8211; the new value for the register</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="flag">
 <h2>Flag<a class="headerlink" href="#flag" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="riak.datatypes.Flag">
-<em class="property">class </em><code class="descclassname">riak.datatypes.</code><code class="descname">Flag</code><span class="sig-paren">(</span><em>bucket=None</em>, <em>key=None</em>, <em>value=None</em>, <em>context=None</em><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Flag" title="Permalink to this definition">¶</a></dt>
-<dd><p>A convergent datatype that represents a boolean value that can be
-enabled or disabled, and may only be embedded in <a class="reference internal" href="#riak.datatypes.Map" title="riak.datatypes.Map"><code class="xref py py-class docutils literal"><span class="pre">Map</span></code></a>
-instances.</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="riak.datatypes.Flag.value">
 <code class="descclassname">Flag.</code><code class="descname">value</code><a class="headerlink" href="#riak.datatypes.Flag.value" title="Permalink to this definition">¶</a></dt>
@@ -655,18 +368,6 @@ instances.</p>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Flag.enable">
-<code class="descclassname">Flag.</code><code class="descname">enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Flag.enable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turns the flag on, effectively setting its value to <code class="docutils literal"><span class="pre">True</span></code>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="riak.datatypes.Flag.disable">
-<code class="descclassname">Flag.</code><code class="descname">disable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#riak.datatypes.Flag.disable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turns the flag off, effectively setting its value to <code class="docutils literal"><span class="pre">False</span></code>.</p>
 </dd></dl>
 
 </div>
@@ -713,7 +414,7 @@ instances.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'2.5.2',
+            VERSION:'2.7.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
