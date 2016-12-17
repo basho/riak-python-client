@@ -15,13 +15,21 @@ unexport LC_TIME
 PANDOC_VERSION := $(shell pandoc --version)
 PROTOC_VERSION := $(shell protoc --version)
 
-PROJDIR   = $(realpath $(CURDIR))
+PROJDIR  := $(realpath $(CURDIR))
+DOCSRC   := $(PROJDIR)/docsrc
+DOCTREES := $(DOCSRC)/doctrees
+DOCSDIR  := $(PROJDIR)/docs
 
 PYPI_REPOSITORY ?= pypi
 
 .PHONY: lint
 lint:
 	$(PROJDIR)/.runner lint
+
+.PHONY: docs
+docs:
+	sphinx-build -b html -d $(DOCTREES) $(DOCSRC) $(DOCSDIR)
+	@echo "The HTML pages are in $(DOCSDIR)"
 
 .PHONY: pb_clean
 pb_clean:
