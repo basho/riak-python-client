@@ -436,15 +436,24 @@ class TimeseriesPbufTests(IntegrationTestBase, unittest.TestCase):
         table = Table(self.client, table_name)
         streamed_keys = []
         for keylist in table.stream_keys():
-            self.assertNotEqual([], keylist)
-            streamed_keys += keylist
-            for key in keylist:
-                self.assertIsInstance(key, list)
-                self.assertEqual(len(key), 3)
-                self.assertEqual(bytes_to_str(key[0]), 'hash1')
-                self.assertEqual(bytes_to_str(key[1]), 'user2')
-                self.assertIsInstance(key[2], datetime.datetime)
+            self.validate_keylist(streamed_keys, keylist)
         self.assertGreater(len(streamed_keys), 0)
+
+    def test_stream_keys_from_string_table(self):
+        streamed_keys = []
+        for keylist in self.client.ts_stream_keys(table_name):
+            self.validate_keylist(streamed_keys, keylist)
+        self.assertGreater(len(streamed_keys), 0)
+
+    def validate_keylist(self, streamed_keys, keylist):
+        self.assertNotEqual([], keylist)
+        streamed_keys += keylist
+        for key in keylist:
+            self.assertIsInstance(key, list)
+            self.assertEqual(len(key), 3)
+            self.assertEqual(bytes_to_str(key[0]), 'hash1')
+            self.assertEqual(bytes_to_str(key[1]), 'user2')
+            self.assertIsInstance(key[2], datetime.datetime)
 
     def test_delete_single_value(self):
         key = ['hash1', 'user2', self.twentyFiveMinsAgo]

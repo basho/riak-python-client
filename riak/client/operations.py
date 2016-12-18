@@ -659,15 +659,18 @@ class RiakClientOperations(RiakClientTransport):
             stream.close()
 
         :param table: the table from which to stream keys
-        :type table: Table
+        :type table: string or :class:`Table <riak.table.Table>`
         :param timeout: a timeout value in milliseconds
         :type timeout: int
         :rtype: iterator
         """
+        t = table
+        if isinstance(t, six.string_types):
+            t = Table(self, table)
         _validate_timeout(timeout)
         resource = self._acquire()
         transport = resource.object
-        stream = transport.ts_stream_keys(table, timeout)
+        stream = transport.ts_stream_keys(t, timeout)
         stream.attach(resource)
         try:
             for keylist in stream:
