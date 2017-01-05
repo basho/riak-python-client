@@ -12,24 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Copyright 2014 Basho Technologies, Inc.
-
-This file is provided to you under the Apache License,
-Version 2.0 (the "License"); you may not use this file
-except in compliance with the License.  You may obtain
-a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-"""
-
 import ssl
 import warnings
 from riak import RiakError
@@ -96,6 +78,8 @@ class SecurityError(RiakError):
 
 class SecurityCreds:
     def __init__(self,
+                 tls=True,
+                 start_tls=True,
                  username=None,
                  password=None,
                  pkey_file=None,
@@ -111,6 +95,10 @@ class SecurityCreds:
         """
         Container class for security-related settings
 
+        :param tls: Use TLS encryption
+        :type tls: bool
+        :param start_tls: Send RpbStartTls message
+        :type start_tls: bool
         :param username: Riak Security username
         :type username: str
         :param password: Riak Security password
@@ -136,6 +124,8 @@ class SecurityCreds:
         :param ssl_version: OpenSSL security version
         :type ssl_version: int
         """
+        self._tls = tls
+        self._start_tls = start_tls
         self._username = username
         self._password = password
         self._pkey_file = pkey_file
@@ -148,6 +138,24 @@ class SecurityCreds:
         self._crl = crl
         self._ciphers = ciphers
         self._ssl_version = ssl_version
+
+    @property
+    def tls(self):
+        """
+        Use TLS encryption
+
+        :rtype: bool
+        """
+        return self._tls
+
+    @property
+    def start_tls(self):
+        """
+        Send RpbStartTls to set up TLS session
+
+        :rtype: bool
+        """
+        return self._start_tls
 
     @property
     def username(self):

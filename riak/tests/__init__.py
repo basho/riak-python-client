@@ -44,8 +44,8 @@ def hostname_resolves(hostname):
         return 0
 
 
-distutils_debug = os.environ.get('DISTUTILS_DEBUG', '0')
-if distutils_debug == '1':
+distutils_debug = int(os.environ.get('DISTUTILS_DEBUG', '0'))
+if distutils_debug == 1:
     logger = logging.getLogger()
     logger.level = logging.DEBUG
     logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -113,9 +113,18 @@ SECURITY_CIPHERS = 'DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:' + \
         'DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:AES128-SHA256:' + \
         'AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA'
 
+SECURITY_TLS = os.environ.get('SECURITY_TLS', 'True') == 'True'
+SECURITY_START_TLS = os.environ.get('SECURITY_START_TLS', 'True') == 'True'
+
 SECURITY_CREDS = None
 if RUN_SECURITY:
-    SECURITY_CREDS = SecurityCreds(username=SECURITY_USER,
+    SECURITY_CREDS = SecurityCreds(tls=SECURITY_TLS,
+                                   start_tls=SECURITY_START_TLS,
+                                   username=SECURITY_USER,
                                    password=SECURITY_PASSWD,
                                    cacert_file=SECURITY_CACERT,
                                    ciphers=SECURITY_CIPHERS)
+
+if distutils_debug == 1:
+    logger.debug('SECURITY_TLS: %s', SECURITY_TLS)
+    logger.debug('SECURITY_START_TLS: %s', SECURITY_START_TLS)

@@ -83,26 +83,31 @@ class TcpConnection(object):
         """
         Initialize a secure connection to the server.
         """
-        if not self._starttls():
-            raise SecurityError("Could not start TLS connection")
-        # _ssh_handshake() will throw an exception upon failure
-        self._ssl_handshake()
-        if not self._auth():
-            raise SecurityError("Could not authorize connection")
+        if self._client._credentials:
+            if not self._start_tls():
+                raise SecurityError("Could not start TLS connection")
+            # _ssh_handshake() will throw an exception upon failure
+            self._ssl_handshake()
+            if not self._start_auth():
+                raise SecurityError("Could not authorize connection")
 
-    def _starttls(self):
+    def _start_tls(self):
         """
-        Exchange a STARTTLS message with Riak to initiate secure communications
-        return True is Riak responds with a STARTTLS response, False otherwise
+        If required, exchange a STARTTLS message with Riak to initiate secure
+        communications return True is Riak responds with a STARTTLS response,
+        False otherwise
         """
-        resp_code, _ = self._non_connect_send_recv(
-            riak.pb.messages.MSG_CODE_START_TLS)
-        if resp_code == riak.pb.messages.MSG_CODE_START_TLS:
-            return True
+        if self._client._credentials.start_tls:
+            resp_code, _ = self._non_connect_send_recv(
+                riak.pb.messages.MSG_CODE_START_TLS)
+            if resp_code == riak.pb.messages.MSG_CODE_START_TLS:
+                return True
+            else:
+                return False
         else:
-            return False
+            return True
 
-    def _auth(self):
+    def _start_auth(self):
         """
         Perform an authorization request against Riak
         returns True upon success, False otherwise
@@ -126,10 +131,11 @@ class TcpConnection(object):
             """
             Perform an SSL handshake w/ the server.
             Precondition: a successful STARTTLS exchange has
-                         taken place with Riak
+                          taken place with Riak, or connecting
+                          to TLS port
             returns True upon success, otherwise an exception is raised
             """
-            if self._client._credentials:
+            if self._client._credentials.tls:
                 try:
                     ssl_ctx = configure_pyopenssl_context(self.
                                                           _client._credentials)
@@ -150,11 +156,12 @@ class TcpConnection(object):
             """
             Perform an SSL handshake w/ the server.
             Precondition: a successful STARTTLS exchange has
-                         taken place with Riak
+                          taken place with Riak, or connecting
+                          to TLS port
             returns True upon success, otherwise an exception is raised
             """
             credentials = self._client._credentials
-            if credentials:
+            if credentials.tls:
                 try:
                     ssl_ctx = configure_ssl_context(credentials)
                     host = self._address[0]
@@ -260,8 +267,7 @@ class TcpConnection(object):
             if self._socket_keepalive:
                 self._socket.setsockopt(
                     socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-            if self._client._credentials:
-                self._init_security()
+            self._init_security()
 
     def close(self):
         """
