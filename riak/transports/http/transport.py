@@ -747,7 +747,7 @@ class HttpTransport(Transport,
             raise ValueError("No operation to send on datatype {!r}".
                              format(datatype))
 
-        if type_name not in ('counter', 'set', 'hll', 'map'):
+        if type_name not in ('counter', 'set', 'gset', 'hll', 'map'):
             raise TypeError("Cannot send operation on datatype {!r}".
                             format(type_name))
 

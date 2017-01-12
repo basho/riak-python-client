@@ -22,6 +22,9 @@ DOCSDIR  := $(PROJDIR)/docs
 
 PYPI_REPOSITORY ?= pypi
 
+.PHONY: all
+all: lint test
+
 .PHONY: lint
 lint:
 	$(PROJDIR)/.runner lint

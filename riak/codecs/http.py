@@ -293,6 +293,11 @@ class HttpCodec(object):
             return dict([op])
         elif dtype == 'flag':
             return op
+        elif dtype == 'gset':
+            gset_op = {}
+            if 'adds' in op:
+                gset_op['add_all'] = op['adds']
+            return gset_op
         elif dtype == 'set':
             set_op = {}
             if 'adds' in op:

@@ -123,6 +123,19 @@ class SetUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
         self.assertTrue(dtype.modified)
 
 
+class GSetUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
+    dtype = datatypes.GSet
+
+    def op(self, dtype):
+        dtype._context = "foo"
+        dtype.add('foo')
+        dtype.add('bar')
+
+    def check_op_output(self, op):
+        self.assertIn('adds', op)
+        self.assertItemsEqual(op['adds'], ['bar', 'foo'])
+
+
 class HllUnitTests(DatatypeUnitTestBase, unittest.TestCase, Comparison):
     dtype = datatypes.Hll
 
@@ -233,6 +246,60 @@ class HllDatatypeIntegrationTests(IntegrationTestBase,
 
         otherhll = bucket.get(self.key_name)
         self.assertEqual(5, otherhll.value)
+
+
+@unittest.skipUnless(RUN_DATATYPES, 'RUN_DATATYPES is 0')
+class GSetDatatypeIntegrationTests(IntegrationTestBase,
+                                   unittest.TestCase,
+                                   Comparison):
+    @classmethod
+    def setUpClass(cls):
+        super(GSetDatatypeIntegrationTests, cls).setUpClass()
+        client = cls.create_client()
+        try:
+            btype = client.bucket_type('gsets')
+            btype.get_properties()
+        except RiakError as e:
+            raise unittest.SkipTest(e)
+        finally:
+            client.close()
+
+    def test_dt_gset(self):
+        btype = self.client.bucket_type('gsets')
+        bucket = btype.bucket(self.bucket_name)
+        mygset = datatypes.GSet(bucket, self.key_name)
+        mygset.add('Sean')
+        mygset.add('Brett')
+        mygset.store()
+
+        otherset = bucket.get(self.key_name)
+
+        self.assertIn('Sean', otherset)
+        self.assertIn('Brett', otherset)
+
+        otherset.add('Russell')
+        otherset.store(return_body=True)
+
+        mygset.reload()
+        self.assertIn('Russell', mygset)
+        self.assertIn('Brett', mygset)
+        self.assertIn('Sean', mygset)
+
+    def test_dt_gset_add_twice(self):
+        btype = self.client.bucket_type('gsets')
+        bucket = btype.bucket(self.bucket_name)
+        gset = datatypes.GSet(bucket, self.key_name)
+
+        gset.add('X')
+        gset.add('Y')
+        gset.store()
+
+        gset.reload()
+        gset.add('X')
+        gset.store()
+
+        set2 = bucket.get(self.key_name)
+        self.assertItemsEqual(['X', 'Y'], set2.value)
 
 
 @unittest.skipUnless(RUN_DATATYPES, 'RUN_DATATYPES is 0')

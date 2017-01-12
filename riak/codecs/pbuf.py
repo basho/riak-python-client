@@ -86,6 +86,7 @@ MAP_FIELD_TYPES = {
 DT_FETCH_TYPES = {
     riak.pb.riak_dt_pb2.DtFetchResp.COUNTER: 'counter',
     riak.pb.riak_dt_pb2.DtFetchResp.SET: 'set',
+    riak.pb.riak_dt_pb2.DtFetchResp.GSET: 'gset',
     riak.pb.riak_dt_pb2.DtFetchResp.MAP: 'map',
     riak.pb.riak_dt_pb2.DtFetchResp.HLL: 'hll'
 }
@@ -593,6 +594,8 @@ class PbufCodec(Codec):
             return msg.counter_value
         elif dtype == 'set':
             return self.decode_set_value(msg.set_value)
+        elif dtype == 'gset':
+            return self.decode_set_value(msg.gset_value)
         elif dtype == 'hll':
             return self.decode_hll_value(msg.hll_value)
         elif dtype == 'map':
@@ -641,6 +644,8 @@ class PbufCodec(Codec):
             req.op.counter_op.increment = op[1]
         elif dtype == 'set':
             self.encode_set_op(req.op, op)
+        elif dtype == 'gset':
+            self.encode_gset_op(req.op, op)
         elif dtype == 'hll':
             self.encode_hll_op(req.op, op)
         elif dtype == 'map':
@@ -654,6 +659,10 @@ class PbufCodec(Codec):
             msg.set_op.adds.extend(str_to_bytes(op['adds']))
         if 'removes' in op:
             msg.set_op.removes.extend(str_to_bytes(op['removes']))
+
+    def encode_gset_op(self, msg, op):
+        if 'adds' in op:
+            msg.gset_op.adds.extend(str_to_bytes(op['adds']))
 
     def encode_hll_op(self, msg, op):
         if 'adds' in op:

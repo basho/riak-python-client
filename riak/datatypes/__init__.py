@@ -18,10 +18,12 @@ from .counter import Counter
 from .flag import Flag
 from .register import Register
 from .set import Set
+from .gset import GSet
 from .map import Map
 from .errors import ContextRequired
 from .hll import Hll
 
 
 __all__ = ['Datatype', 'TYPES', 'ContextRequired',
-           'Flag', 'Counter', 'Register', 'Set', 'Map', 'Hll']
+           'Flag', 'Counter', 'Register',
+           'Set', 'GSet', 'Map', 'Hll']
