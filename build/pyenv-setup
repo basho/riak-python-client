@@ -51,7 +51,7 @@ fi
 do_pip_upgrades='false'
 
 # NB: 2.7.8 is special-cased
-for pyver in 2.7 3.3 3.4 3.5
+for pyver in 2.7 3.3 3.4 3.5 3.6
 do
     riak_py_alias="riak_$pyver"
     if ! pyenv versions | fgrep -v 'riak_2.7.8' | fgrep -q "$riak_py_alias"
@@ -78,7 +78,7 @@ then
 fi
 
 pushd $PROJDIR
-pyenv local 'riak_3.5' 'riak_3.4' 'riak_3.3' 'riak_2.7' 'riak_2.7.8'
+pyenv local 'riak_3.6' 'riak_3.5' 'riak_3.4' 'riak_3.3' 'riak_2.7' 'riak_2.7.8'
 
 pyenv rehash
 
