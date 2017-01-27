@@ -19,7 +19,7 @@ import unittest
 
 from six import PY2
 from riak.mapreduce import RiakMapReduce
-from riak import key_filter, RiakError
+from riak import key_filter, RiakClient, RiakError, ListError
 from riak.tests import RUN_MAPREDUCE, RUN_SECURITY, RUN_YZ
 from riak.tests.base import IntegrationTestBase
 from riak.tests.test_yokozuna import wait_for_yz_index
@@ -37,6 +37,13 @@ def setUpModule():
 
 def tearDownModule():
     yzTearDown(testrun_yz_mr)
+
+
+class MapReduceUnitTests(unittest.TestCase):
+    def test_mapred_bucket_exception(self):
+        c = RiakClient()
+        with self.assertRaises(ListError):
+            c.add('bucket')
 
 
 @unittest.skipUnless(RUN_MAPREDUCE, 'RUN_MAPREDUCE is 0')

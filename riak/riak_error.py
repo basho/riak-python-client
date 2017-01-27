@@ -36,3 +36,14 @@ class ConflictError(RiakError):
     """
     def __init__(self, message='Object in conflict'):
         super(ConflictError, self).__init__(message)
+
+
+class ListError(RiakError):
+    """
+    Raised when a list operation is attempted and
+    riak.disable_list_exceptions is false.
+    """
+    def __init__(self, message='Bucket and key list operations '
+                               'are expensive and should not be '
+                               'used in production.'):
+        super(ListError, self).__init__(message)

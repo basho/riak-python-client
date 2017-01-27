@@ -15,6 +15,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import random
+import riak
 
 from riak.client import RiakClient
 from riak.tests import HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
@@ -70,9 +71,11 @@ class IntegrationTestBase(object):
                           **kwargs)
 
     def setUp(self):
+        riak.disable_list_exceptions = True
         self.bucket_name = self.randname()
         self.key_name = self.randname()
         self.client = self.create_client()
 
     def tearDown(self):
+        riak.disable_list_exceptions = False
         self.client.close()

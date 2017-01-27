@@ -19,7 +19,7 @@ Riak objects, run Javascript (and Erlang) based Map/Reduce
 operations, and run Linkwalking operations.
 """
 
-from riak.riak_error import RiakError, ConflictError
+from riak.riak_error import RiakError, ConflictError, ListError
 from riak.client import RiakClient
 from riak.bucket import RiakBucket, BucketType
 from riak.table import Table
@@ -30,11 +30,17 @@ from riak.mapreduce import RiakKeyFilter, RiakMapReduce, RiakLink
 
 __all__ = ['RiakBucket', 'Table', 'BucketType', 'RiakNode',
            'RiakObject', 'RiakClient', 'RiakMapReduce', 'RiakKeyFilter',
-           'RiakLink', 'RiakError', 'ConflictError',
-           'ONE', 'ALL', 'QUORUM', 'key_filter']
+           'RiakLink', 'RiakError', 'ConflictError', 'ListError',
+           'ONE', 'ALL', 'QUORUM', 'key_filter',
+           'disable_list_exceptions']
 
 ONE = "one"
 ALL = "all"
 QUORUM = "quorum"
 
 key_filter = RiakKeyFilter()
+
+"""
+Set to true to allow listing operations
+"""
+disable_list_exceptions = False
