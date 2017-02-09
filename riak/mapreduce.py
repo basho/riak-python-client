@@ -17,9 +17,9 @@
 
 from __future__ import print_function
 from collections import Iterable, namedtuple
-from riak import RiakError
 from six import string_types, PY2
-from riak.bucket import RiakBucket
+
+import riak
 
 
 #: Links are just bucket/key/tag tuples, this class provides a
@@ -128,8 +128,10 @@ class RiakMapReduce(object):
         :type bucket_type: string, None
         :rtype: :class:`RiakMapReduce`
         """
+        if not riak.disable_list_exceptions:
+            raise riak.ListError()
         self._input_mode = 'bucket'
-        if isinstance(bucket, RiakBucket):
+        if isinstance(bucket, riak.RiakBucket):
             if bucket.bucket_type.is_default():
                 self._inputs = {'bucket': bucket.name}
             else:
@@ -308,14 +310,15 @@ class RiakMapReduce(object):
 
         try:
             result = self._client.mapred(self._inputs, query, timeout)
-        except RiakError as e:
+        except riak.RiakError as e:
             if 'worker_startup_failed' in e.value:
                 for phase in self._phases:
                     if phase._language == 'erlang':
                         if type(phase._function) is str:
-                            raise RiakError('May have tried erlang strfun '
-                                            'when not allowed\n'
-                                            'original error: ' + e.value)
+                            raise riak.RiakError(
+                                    'May have tried erlang strfun '
+                                    'when not allowed\n'
+                                    'original error: ' + e.value)
             raise e
 
         # If the last phase is NOT a link phase, then return the result.

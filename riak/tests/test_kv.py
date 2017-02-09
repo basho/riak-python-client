@@ -20,7 +20,8 @@ import unittest
 
 from six import string_types, PY2, PY3
 from time import sleep
-from riak import ConflictError, RiakBucket, RiakError
+from riak import ConflictError, RiakError, ListError
+from riak import RiakClient, RiakBucket, BucketType
 from riak.resolver import default_resolver, last_written_resolver
 from riak.tests import RUN_KV, RUN_RESOLVE, PROTOCOL
 from riak.tests.base import IntegrationTestBase
@@ -63,7 +64,6 @@ def tearDownModule():
 
 
 class NotJsonSerializable(object):
-
     def __init__(self, *args, **kwargs):
         self.args = list(args)
         self.kwargs = kwargs
@@ -84,6 +84,36 @@ class NotJsonSerializable(object):
             if value1_args[i] != value2_args[i]:
                 return False
         return True
+
+
+class KVUnitTests(unittest.TestCase):
+    def test_list_keys_exception(self):
+        c = RiakClient()
+        bt = BucketType(c, 'test')
+        b = RiakBucket(c, 'test', bt)
+        with self.assertRaises(ListError):
+            b.get_keys()
+
+    def test_stream_buckets_exception(self):
+        c = RiakClient()
+        with self.assertRaises(ListError):
+            bs = []
+            for bl in c.stream_buckets():
+                bs.extend(bl)
+
+    def test_stream_keys_exception(self):
+        c = RiakClient()
+        with self.assertRaises(ListError):
+            ks = []
+            for kl in c.stream_keys('test'):
+                ks.extend(kl)
+
+    def test_ts_stream_keys_exception(self):
+        c = RiakClient()
+        with self.assertRaises(ListError):
+            ks = []
+            for kl in c.ts_stream_keys('test'):
+                ks.extend(kl)
 
 
 @unittest.skipUnless(RUN_KV, 'RUN_KV is 0')

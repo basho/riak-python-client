@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import six
-
 import riak.client.multi
 
+from riak import ListError
 from riak.client.transport import RiakClientTransport, \
-    retryable, retryableHttpOnly
+        retryable, retryableHttpOnly
 from riak.client.index_page import IndexPage
 from riak.datatypes import TYPES
 from riak.table import Table
@@ -55,7 +55,11 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: list of :class:`RiakBucket <riak.bucket.RiakBucket>`
                 instances
         """
+        if not riak.disable_list_exceptions:
+            raise ListError()
+
         _validate_timeout(timeout)
+
         if bucket_type:
             bucketfn = self._bucket_type_bucket_builder
         else:
@@ -100,6 +104,9 @@ class RiakClientOperations(RiakClientTransport):
              <riak.bucket.RiakBucket>` instances
 
         """
+        if not riak.disable_list_exceptions:
+            raise ListError()
+
         _validate_timeout(timeout)
 
         if bucket_type:
@@ -467,7 +474,11 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :rtype: list
         """
+        if not riak.disable_list_exceptions:
+            raise ListError()
+
         _validate_timeout(timeout)
+
         return transport.get_keys(bucket, timeout=timeout)
 
     def stream_keys(self, bucket, timeout=None):
@@ -503,6 +514,9 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :rtype: iterator
         """
+        if not riak.disable_list_exceptions:
+            raise ListError()
+
         _validate_timeout(timeout)
 
         def make_op(transport):
@@ -678,10 +692,15 @@ class RiakClientOperations(RiakClientTransport):
         :type timeout: int
         :rtype: iterator
         """
+        if not riak.disable_list_exceptions:
+            raise ListError()
+
         t = table
         if isinstance(t, six.string_types):
             t = Table(self, table)
+
         _validate_timeout(timeout)
+
         resource = self._acquire()
         transport = resource.object
         stream = transport.ts_stream_keys(t, timeout)

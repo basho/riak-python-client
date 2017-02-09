@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import riak
 
 from riak import RiakError
 from riak.tests import RUN_YZ
@@ -21,6 +22,7 @@ from riak.tests.base import IntegrationTestBase
 
 def yzSetUp(*yzdata):
     if RUN_YZ:
+        riak.disable_list_exceptions = True
         c = IntegrationTestBase.create_client()
         for yz in yzdata:
             logging.debug("yzSetUp: %s", yz)
@@ -43,6 +45,7 @@ def yzSetUp(*yzdata):
 
 def yzTearDown(c, *yzdata):
     if RUN_YZ:
+        riak.disable_list_exceptions = True
         c = IntegrationTestBase.create_client()
         for yz in yzdata:
             logging.debug("yzTearDown: %s", yz)
@@ -57,3 +60,4 @@ def yzTearDown(c, *yzdata):
                 for key in keys:
                     b.delete(key)
         c.close()
+        riak.disable_list_exceptions = False
