@@ -275,8 +275,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             raise TypeError('bucket_type must be a string '
                             'or riak.bucket.BucketType')
 
-        return self._buckets.setdefault((bucket_type, name),
-                                        RiakBucket(self, name, bucket_type))
+        b = RiakBucket(self, name, bucket_type)
+        return self._setdefault_handle_none(
+                self._buckets, (bucket_type, name), b)
 
     def bucket_type(self, name):
         """
@@ -291,12 +292,9 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         if not isinstance(name, string_types):
             raise TypeError('BucketType name must be a string')
 
-        if name in self._bucket_types:
-            return self._bucket_types[name]
-        else:
-            btype = BucketType(self, name)
-            self._bucket_types[name] = btype
-            return btype
+        btype = BucketType(self, name)
+        return self._setdefault_handle_none(
+                self._bucket_types, name, btype)
 
     def table(self, name):
         """
@@ -389,6 +387,16 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return min(nodes, key=_error_rate)
         else:
             return random.choice(good)
+
+    def _setdefault_handle_none(self, wvdict, key, value):
+        # TODO FIXME FUTURE
+        # This is a workaround for Python issue 19542
+        # http://bugs.python.org/issue19542
+        rv = wvdict.setdefault(key, value)
+        if rv is None:
+            return value
+        else:
+            return rv
 
     @lazy_property
     def _multiget_pool(self):
