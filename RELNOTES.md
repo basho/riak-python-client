@@ -1,6 +1,6 @@
 # Riak Python Client Release Notes
 
-## [`2.8.0` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-2.8.0)
+## [`3.0.0` Release](https://github.com/basho/riak-python-client/issues?q=milestone%3Ariak-python-client-3.0.0)
 
 * [Running expensive operations *now raise exceptions*](https://github.com/basho/riak-python-client/pull/518). You can disable these exceptions for development purposes but should not do so in production.
 
