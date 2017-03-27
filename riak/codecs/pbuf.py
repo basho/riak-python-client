@@ -556,9 +556,9 @@ class PbufCodec(Codec):
             req.op = kwargs['q.op']
         if 'fl' in kwargs:
             if isinstance(kwargs['fl'], list):
-                req.fl.extend(kwargs['fl'])
+                req.fl.extend([str_to_bytes(fl) for fl in kwargs['fl']])
             else:
-                req.fl.append(kwargs['fl'])
+                req.fl.append(str_to_bytes(kwargs['fl']))
         if 'presort' in kwargs:
             req.presort = kwargs['presort']
 
