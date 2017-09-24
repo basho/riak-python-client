@@ -382,5 +382,5 @@ class RpbYokozunaSchemaGetResp(_message.Message):
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), '\n\027com.basho.riak.protobufB\016RiakYokozunaPB')
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b'\n\027com.basho.riak.protobufB\016RiakYokozunaPB')
 # @@protoc_insertion_point(module_scope)
