@@ -229,6 +229,8 @@ class HttpCodec(object):
         if u'response' in json:
             result['num_found'] = json[u'response'][u'numFound']
             result['max_score'] = float(json[u'response'][u'maxScore'])
+            if 'facet_counts' in json:
+                result['facet_counts'] = json[u'facet_counts']
             docs = []
             for doc in json[u'response'][u'docs']:
                 resdoc = {}
