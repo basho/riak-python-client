@@ -21,8 +21,7 @@ from riak.codecs.util import parse_pbuf_msg
 from riak.util import bytes_to_str
 
 Msg = collections.namedtuple('Msg',
-                             ['msg_code', 'data', 'resp_code'],
-                             verbose=False)
+                             ['msg_code', 'data', 'resp_code'])
 
 
 class Codec(object):
