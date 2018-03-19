@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit
 
-flake8 --ignore E722,E741 --exclude=riak/pb riak *.py
+flake8 --ignore E123,E126,E226,E722,E741 --exclude=riak/pb riak *.py
 
 sudo riak-admin security disable
 
