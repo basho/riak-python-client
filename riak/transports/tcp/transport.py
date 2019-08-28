@@ -93,7 +93,7 @@ class TcpTransport(Transport, TcpConnection):
     # FeatureDetection API
     def _server_version(self):
         server_info = self.get_server_info()
-        ver = server_info['server_version']
+        ver = server_info['server_version'].split('-')[0]
         (maj, min, patch) = [int(v) for v in ver.split('.')]
         if maj == 0:
             import datetime
