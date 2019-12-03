@@ -285,15 +285,21 @@ def mkpath(*segments, **query):
     pathstring = re.sub('/+', '/', pathstring)
 
     # Add the query string if it exists
-    _query = {}
+    _query = []
     for key in query:
         if query[key] in [False, True]:
-            _query[key] = str(query[key]).lower()
+            _query.append((key, str(query[key]).lower()))
+        elif isinstance(query[key], (list, tuple)):
+            for item in query[key]:
+                if PY2 and isinstance(item, unicode):  # noqa
+                    _query.append((key, item.encode('utf-8')))
+                else:
+                    _query.append((key, item))
         elif query[key] is not None:
             if PY2 and isinstance(query[key], unicode):  # noqa
-                _query[key] = query[key].encode('utf-8')
+                _query.append((key, query[key].encode('utf-8')))
             else:
-                _query[key] = query[key]
+                _query.append((key, query[key]))
 
     if len(_query) > 0:
         pathstring += "?" + urlencode(_query)
