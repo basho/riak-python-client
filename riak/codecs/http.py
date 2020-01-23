@@ -226,6 +226,8 @@ class HttpCodec(object):
         same return value
         """
         result = {}
+        if 'facets' in json:
+            result['facets'] = json[u'facets']
         if 'facet_counts' in json:
             result['facet_counts'] = json[u'facet_counts']
         if 'grouped' in json:
