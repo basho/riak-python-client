@@ -115,12 +115,11 @@ class lazy_property(object):
 
 
 def decode_index_value(index, value):
-    if "_int" in bytes_to_str(index):
+    if bytes_to_str(index).endswith("_int"):
         return str_to_long(value)
-    elif PY2:
+    if PY2:
         return str(value)
-    else:
-        return bytes_to_str(value)
+    return bytes_to_str(value)
 
 
 def bytes_to_str(value, encoding='utf-8'):
