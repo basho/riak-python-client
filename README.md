@@ -14,7 +14,7 @@ Documentation for Riak is available [here](http://docs.basho.com/riak/latest).
 
 *NOTE*: please clone this repository using the `--recursive` argument to `git clone` or follow the clone with `git submodule update --init`. This repository uses two submodules.
 
-# Installation
+# Installation process
 
 The recommended versions of Python for use with this client are Python `2.7.8` (or greater, `2.7.11` as of `2016-06-21`), `3.3.x`, `3.4.x` and `3.5.x`. The latest version from each series should be preferred. Older versions of the Python `2.7.X` and `3.X` series should be used with caution as they are not covered by integration tests.
 
