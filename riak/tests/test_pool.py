@@ -115,7 +115,7 @@ class PoolTest(unittest.TestCase, Comparison):
             with pool.transaction():
                 with pool.transaction():
                     raise RuntimeError
-        except:
+        except Exception:
             self.assertEqual(2, len(pool.resources))
             for e in pool.resources:
                 self.assertFalse(e.claimed)

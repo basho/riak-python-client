@@ -358,7 +358,7 @@ class RiakMapReduce(object):
         num_phases = len(self._phases)
 
         # If there are no phases, return the keys as links
-        if num_phases is 0:
+        if num_phases == 0:
             link_results_flag = True
         else:
             link_results_flag = False

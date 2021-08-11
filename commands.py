@@ -398,7 +398,7 @@ class build_messages(Command):
             # class RpbCounterGetResp(_message.Message):
             contents = re.sub(
                 r'class\s+(\S+)\((\S+)\):\s*\n'
-                '\s+__metaclass__\s+=\s+(\S+)\s*\n',
+                r'\s+__metaclass__\s+=\s+(\S+)\s*\n',
                 r'@add_metaclass(\3)\nclass \1(\2):\n', contents)
 
             with open(im, 'w', buffering=1) as pbfile:

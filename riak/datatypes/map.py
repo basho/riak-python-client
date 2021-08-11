@@ -282,7 +282,7 @@ class Map(Mapping, Datatype):
         for key in value:
             try:
                 self._check_key(key)
-            except:
+            except Exception:
                 return False
         return True
 
