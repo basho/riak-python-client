@@ -26,7 +26,7 @@ have_riak_admin='false'
 if hash riak-admin 2>/dev/null
 then
     have_riak_admin='true'
-    $riak_admin='riak-admin'
+    riak_admin='riak-admin'
 else
     set +o nounset
 
