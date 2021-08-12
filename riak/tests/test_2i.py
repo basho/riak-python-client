@@ -17,9 +17,6 @@ import unittest
 from riak import RiakError
 from riak.tests import RUN_INDEXES
 from riak.tests.base import IntegrationTestBase
-import faulthandler
-import signal
-faulthandler.register(signal.SIGUSR1)
 
 
 class TwoITests(IntegrationTestBase, unittest.TestCase):
