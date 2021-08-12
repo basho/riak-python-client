@@ -5,7 +5,7 @@ import sys
 
 from setuptools import setup, find_packages
 from version import get_version
-from subprocess import setup_timeseries, build_messages
+from commands import setup_timeseries, build_messages
 
 install_requires = ['six >= 1.8.0', 'basho_erlastic >= 2.1.1']
 requires = ['six(>=1.8.0)', 'basho_erlastic(>= 2.1.1)']
