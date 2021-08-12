@@ -309,7 +309,7 @@ class build_messages(Command):
                        self._load_and_generate, [])
 
     def _load_and_generate(self):
-        self._format_python2_or_3()
+        self._update_pb_pathnames()
         self._load()
         self._generate()
 
@@ -369,10 +369,9 @@ class build_messages(Command):
             pair = (self._linesep + '    ').join(pair.split(' '))
         return pair
 
-    def _format_python2_or_3(self):
+    def _update_pb_pathnames(self):
         """
-        Change the PB files to use full pathnames for Python 3.x
-        and modify the metaclasses to be version agnostic
+        Change the PB files to use full pathnames
         """
         pb_files = set()
         with open(self.source, 'r', buffering=1) as csvfile:
@@ -383,23 +382,10 @@ class build_messages(Command):
 
         for im in sorted(pb_files):
             with open(im, 'r', buffering=1) as pbfile:
-                contents = 'from six import *\n' + pbfile.read()
+                contents = pbfile.read()
                 contents = re.sub(r'riak_pb2',
                                   r'riak.pb.riak_pb2',
                                   contents)
-            # Look for this pattern in the protoc-generated file:
-            #
-            # class RpbCounterGetResp(_message.Message):
-            #    __metaclass__ = _reflection.GeneratedProtocolMessageType
-            #
-            # and convert it to:
-            #
-            # @add_metaclass(_reflection.GeneratedProtocolMessageType)
-            # class RpbCounterGetResp(_message.Message):
-            contents = re.sub(
-                r'class\s+(\S+)\((\S+)\):\s*\n'
-                r'\s+__metaclass__\s+=\s+(\S+)\s*\n',
-                r'@add_metaclass(\3)\nclass \1(\2):\n', contents)
 
             with open(im, 'w', buffering=1) as pbfile:
                 pbfile.write(contents)

@@ -87,14 +87,18 @@ ifeq ("$(wildcard $(PROJDIR)/.python-version)","")
 	$(error expected $(PROJDIR)/.python-version to exist. Run $(PROJDIR)/build/pyenv-setup)
 endif
 	@echo "==> pypi repository: $(PYPI_REPOSITORY)"
-	@echo "==> Python 2.7 (bdist_egg)"
-	@python2.7 setup.py build --build-base=py-build/2.7 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.3 (bdist_egg)"
 	@python3.3 setup.py build --build-base=py-build/3.3 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.4 (bdist_egg)"
 	@python3.4 setup.py build --build-base=py-build/3.4 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 	@echo "==> Python 3.5 (bdist_egg)"
 	@python3.5 setup.py build --build-base=py-build/3.5 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
+	@echo "==> Python 3.6 (bdist_egg)"
+	@python3.5 setup.py build --build-base=py-build/3.6 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
+	@echo "==> Python 3.7 (bdist_egg)"
+	@python3.5 setup.py build --build-base=py-build/3.7 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
+	@echo "==> Python 3.8 (bdist_egg)"
+	@python3.5 setup.py build --build-base=py-build/3.8 bdist_egg upload --repository $(PYPI_REPOSITORY) --show-response --sign --identity $(RELEASE_GPG_KEYNAME)
 
 .PHONY: unit-test
 unit-test:
