@@ -126,7 +126,7 @@ class PoolTest(unittest.TestCase, Comparison):
             resource.append(2)
         try:
             with pool.transaction():
-                raise BadResource
+                raise BadResource("bad resource")
         except BadResource:
             self.assertEqual(0, len(pool.resources))
             with pool.transaction() as goodie:
