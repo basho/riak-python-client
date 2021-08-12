@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import datetime
-import six
 
 from erlastic import encode, decode
 from erlastic.types import Atom
@@ -74,11 +73,11 @@ class TtbCodec(Codec):
                 return ts
             elif isinstance(cell, bool):
                 return cell
-            elif isinstance(cell, six.text_type) or \
-                    isinstance(cell, six.binary_type) or \
-                    isinstance(cell, six.string_types):
+            elif isinstance(cell, str) or \
+                    isinstance(cell, bytes) or \
+                    isinstance(cell, str):
                 return cell
-            elif (isinstance(cell, six.integer_types)):
+            elif (isinstance(cell, int)):
                 return cell
             elif isinstance(cell, float):
                 return cell

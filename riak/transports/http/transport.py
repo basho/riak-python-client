@@ -17,7 +17,6 @@ try:
 except ImportError:
     import json
 
-from six import PY2
 from xml.dom.minidom import Document
 
 from riak import RiakError
@@ -33,10 +32,7 @@ from riak.transports.http.stream import (
 from riak.security import SecurityError
 from riak.util import decode_index_value, bytes_to_str, str_to_long
 
-if PY2:
-    from http.client import HTTPConnection
-else:
-    from http.client import HTTPConnection
+from http.client import HTTPConnection
 
 
 class HttpTransport(Transport,
@@ -154,10 +150,7 @@ class HttpTransport(Transport,
                                bucket_type=bucket_type,
                                **params)
         headers = self._build_put_headers(robj, if_none_match=if_none_match)
-        if PY2:
-            content = bytearray(robj.encoded_data)
-        else:
-            content = robj.encoded_data
+        content = robj.encoded_data
 
         if robj.key is None:
             expect = [201]

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import datetime
-import six
 
 import riak.pb.messages
 import riak.pb.riak_pb2
@@ -252,10 +251,7 @@ class PbufCodec(Codec):
             pair.value = str_to_bytes(str(value))
 
         # Python 2.x data is stored in a string
-        if six.PY2:
-            rpb_content.value = str(robj.encoded_data)
-        else:
-            rpb_content.value = robj.encoded_data
+        rpb_content.value = robj.encoded_data
 
     def decode_link(self, link):
         """
@@ -306,7 +302,7 @@ class PbufCodec(Codec):
         """
         for prop in NORMAL_PROPS:
             if prop in props and props[prop] is not None:
-                if isinstance(props[prop], six.string_types):
+                if isinstance(props[prop], str):
                     setattr(msg.props, prop, str_to_bytes(props[prop]))
                 else:
                     setattr(msg.props, prop, props[prop])
@@ -321,7 +317,7 @@ class PbufCodec(Codec):
             if prop in props and props[prop] not in (None, 'default'):
                 value = self.encode_quorum(props[prop])
                 if value is not None:
-                    if isinstance(value, six.string_types):
+                    if isinstance(value, str):
                         setattr(msg.props, prop, str_to_bytes(value))
                     else:
                         setattr(msg.props, prop, value)
@@ -508,13 +504,12 @@ class PbufCodec(Codec):
                        for pair in resp.results]
         else:
             results = resp.keys[:]
-            if six.PY3:
-                results = [bytes_to_str(key) for key in resp.keys]
+            results = [bytes_to_str(key) for key in resp.keys]
 
         if max_results is not None and resp.HasField('continuation'):
-            return (results, bytes_to_str(resp.continuation))
+            return results, bytes_to_str(resp.continuation)
         else:
-            return (results, None)
+            return results, None
 
     def decode_search_index(self, index):
         """
@@ -524,8 +519,7 @@ class PbufCodec(Codec):
         :type index: riak.pb.riak_yokozuna_pb2.RpbYokozunaIndex
         :rtype dict
         """
-        result = {}
-        result['name'] = bytes_to_str(index.name)
+        result = {'name': bytes_to_str(index.name)}
         if index.HasField('schema'):
             result['schema'] = bytes_to_str(index.schema)
         if index.HasField('n_val'):
@@ -565,12 +559,8 @@ class PbufCodec(Codec):
     def decode_search_doc(self, doc):
         resultdoc = MultiDict()
         for pair in doc.fields:
-            if six.PY2:
-                ukey = str(pair.key, 'utf-8')    # noqa
-                uval = str(pair.value, 'utf-8')  # noqa
-            else:
-                ukey = bytes_to_str(pair.key)
-                uval = bytes_to_str(pair.value)
+            ukey = bytes_to_str(pair.key)
+            uval = bytes_to_str(pair.value)
             resultdoc.add(ukey, uval)
         return resultdoc.mixed()
 
@@ -704,13 +694,13 @@ class PbufCodec(Codec):
                 ts_cell.timestamp_value = unix_time_millis(cell)
             elif isinstance(cell, bool):
                 ts_cell.boolean_value = cell
-            elif isinstance(cell, six.binary_type):
+            elif isinstance(cell, bytes):
                 ts_cell.varchar_value = cell
-            elif isinstance(cell, six.text_type):
+            elif isinstance(cell, str):
                 ts_cell.varchar_value = str_to_bytes(cell)
-            elif isinstance(cell, six.string_types):
+            elif isinstance(cell, str):
                 ts_cell.varchar_value = str_to_bytes(cell)
-            elif (isinstance(cell, six.integer_types)):
+            elif (isinstance(cell, int)):
                 ts_cell.sint64_value = cell
             elif isinstance(cell, float):
                 ts_cell.double_value = cell

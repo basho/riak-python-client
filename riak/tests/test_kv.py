@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2010-present Basho Technologies, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +17,6 @@ import os
 import sys
 import unittest
 
-from six import string_types, PY2, PY3
 from time import sleep
 from riak import ConflictError, RiakError, ListError
 from riak import RiakClient, RiakBucket, BucketType
@@ -28,18 +26,13 @@ from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
 
 try:
-    import simplejson as json
+    import simplejson as json # todo: remove this, supports < p3.3
 except ImportError:
     import json
 
-if PY2:
-    import pickle
-    test_pickle_dumps = pickle.dumps
-    test_pickle_loads = pickle.loads
-else:
-    import pickle
-    test_pickle_dumps = pickle.dumps
-    test_pickle_loads = pickle.loads
+import pickle
+test_pickle_dumps = pickle.dumps
+test_pickle_loads = pickle.loads
 
 
 testrun_sibs_bucket = 'sibsbucket'
@@ -163,34 +156,13 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
         # unicode objects are fine, as long as they don't
         # contain any non-ASCII chars
-        if PY2:
-            self.client.bucket(str(self.bucket_name))  # noqa
-        else:
-            self.client.bucket(self.bucket_name)
-        if PY2:
-            self.assertRaises(TypeError, self.client.bucket, 'búcket')
-            self.assertRaises(TypeError, self.client.bucket, 'búcket')
-        else:
-            self.client.bucket(u'búcket')
-            self.client.bucket('búcket')
+        self.client.bucket(self.bucket_name)
+        self.client.bucket('búcket')
 
         bucket.get('foo')
-        if PY2:
-            self.assertRaises(TypeError, bucket.get, 'føø')
-            self.assertRaises(TypeError, bucket.get, 'føø')
+        bucket.get('føø')
 
-            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
-            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
-            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
-            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
-        else:
-            bucket.get(u'føø')
-            bucket.get('føø')
-
-            bucket.new(u'foo', 'éå')
-            bucket.new(u'foo', 'éå')
-            bucket.new('foo', u'éå')
-            bucket.new('foo', u'éå')
+        bucket.new(u'foo', 'éå')
 
         obj2 = bucket.new('baz', rand, 'application/json')
         obj2.charset = 'UTF-8'
@@ -225,16 +197,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
             with self.assert_raises_regex(TypeError, 'must be a string'):
                 RiakBucket(self.client, bad, None)
 
-        # Unicode bucket names are not supported in Python 2.x,
-        # if they can't be encoded to ASCII. This should be changed in a
-        # future  release.
-        if PY2:
-            with self.assert_raises_regex(TypeError,
-                                          'Unicode bucket names '
-                                          'are not supported'):
-                self.client.bucket('føø')
-        else:
-            self.client.bucket(u'føø')
+        self.client.bucket('føø')
 
         # This is fine, since it's already ASCII
         self.client.bucket('ASCII')
@@ -272,7 +235,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         for keylist in bucket.stream_keys():
             self.assertNotEqual([], keylist)
             for key in keylist:
-                self.assertIsInstance(key, string_types)
+                self.assertIsInstance(key, str)
             streamed_keys += keylist
         self.assertEqual(sorted(regular_keys), sorted(streamed_keys))
 
@@ -284,7 +247,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
             for keylist in self.client.stream_keys(bucket, timeout=1):
                 self.assertNotEqual([], keylist)
                 for key in keylist:
-                    self.assertIsInstance(key, string_types)
+                    self.assertIsInstance(key, str)
                 streamed_keys += keylist
 
     def test_stream_keys_abort(self):
@@ -319,10 +282,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         bucket = self.client.bucket(self.bucket_name)
         # Store as binary, retrieve as binary, then compare...
         rand = str(self.randint())
-        if PY2:
-            rand = bytes(rand)
-        else:
-            rand = bytes(rand, 'utf-8')
+        rand = bytes(rand, 'utf-8')
         obj = bucket.new(self.key_name, encoded_data=rand,
                          content_type='text/plain')
         obj.store()
@@ -342,10 +302,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
         # this should *not* raise an error
         empty = ""
-        if PY2:
-            empty = bytes(empty)
-        else:
-            empty = bytes(empty, 'utf-8')
+        empty = bytes(empty, 'utf-8')
         obj = bucket.new('foo2', encoded_data=empty, content_type='text/plain')
         obj.store()
         obj = bucket.get('foo2')
@@ -378,9 +335,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         # Bypass the content_type encoders
         bucket = self.client.bucket(self.bucket_name)
         data = "some funny data"
-        if PY3:
-            # Python 3.x needs to store binaries
-            data = data.encode()
+        data = data.encode()
         obj = bucket.new(self.key_name,
                          encoded_data=data,
                          content_type='application/x-frobnicator')
@@ -605,17 +560,11 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         # for binary objects
         o = bucket.get(self.randname())
         self.assertEqual(o.exists, False)
-        if PY2:
-            o.encoded_data = "1234567890"
-        else:
-            o.encoded_data = "1234567890".encode()
+        o.encoded_data = "1234567890".encode()
         o.content_type = 'application/octet-stream'
 
         o = o.store()
-        if PY2:
-            self.assertEqual(o.encoded_data, "1234567890")
-        else:
-            self.assertEqual(o.encoded_data, "1234567890".encode())
+        self.assertEqual(o.encoded_data, "1234567890".encode())
         self.assertEqual(o.content_type, "application/octet-stream")
         o.delete()
 

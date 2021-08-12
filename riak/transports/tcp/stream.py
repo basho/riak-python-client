@@ -19,7 +19,6 @@ import riak.pb.messages
 from riak.util import decode_index_value, bytes_to_str
 from riak.client.index_page import CONTINUATION
 from riak.codecs.ttb import TtbCodec
-from six import PY2
 
 
 class PbufStream(object):
@@ -173,10 +172,7 @@ class PbufIndexStream(PbufStream):
                      bytes_to_str(r.value))
                     for r in response.results]
         elif response.keys:
-            if PY2:
-                return response.keys[:]
-            else:
-                return [bytes_to_str(key) for key in response.keys]
+            return [bytes_to_str(key) for key in response.keys]
         elif response.continuation:
             return CONTINUATION(bytes_to_str(response.continuation))
 

@@ -14,7 +14,6 @@
 
 import re
 import csv
-import six
 
 from cgi import parse_header
 from email import message_from_string
@@ -27,10 +26,7 @@ from riak.multidict import MultiDict
 from riak.transports.http.search import XMLSearchResult
 from riak.util import decode_index_value, bytes_to_str
 
-if six.PY2:
-    from urllib.parse import unquote_plus
-else:
-    from urllib.parse import unquote_plus
+from urllib.parse import unquote_plus
 
 
 # subtract length of "Link: " header string and newline
@@ -77,8 +73,7 @@ class HttpCodec(object):
         elif status == 300:
             ctype, params = parse_header(headers['content-type'])
             if ctype == 'multipart/mixed':
-                if six.PY3:
-                    data = bytes_to_str(data)
+                data = bytes_to_str(data)
                 boundary = re.compile('\r?\n--%s(?:--)?\r?\n' %
                                       re.escape(params['boundary']))
                 parts = [message_from_string(p)
@@ -245,7 +240,7 @@ class HttpCodec(object):
                     # Riak Search 1.0 Legacy assumptions about format
                     resdoc['id'] = doc['id']
                     if 'fields' in doc:
-                        for k, v in six.iteritems(doc['fields']):
+                        for k, v in doc['fields'].items:
                             resdoc[k] = v
                 docs.append(resdoc)
             result['docs'] = docs

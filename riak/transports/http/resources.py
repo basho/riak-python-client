@@ -14,14 +14,10 @@
 
 import re
 
-from six import PY2
 from riak import RiakError
 from riak.util import lazy_property, bytes_to_str
 
-if PY2:
-    from urllib.parse import quote_plus, urlencode
-else:
-    from urllib.parse import quote_plus, urlencode
+from urllib.parse import quote_plus, urlencode
 
 
 class HttpResources(object):
@@ -290,10 +286,7 @@ def mkpath(*segments, **query):
         if query[key] in [False, True]:
             _query[key] = str(query[key]).lower()
         elif query[key] is not None:
-            if PY2 and isinstance(query[key], str):  # noqa
-                _query[key] = query[key].encode('utf-8')
-            else:
-                _query[key] = query[key]
+            _query[key] = query[key]
 
     if len(_query) > 0:
         pathstring += "?" + urlencode(_query)

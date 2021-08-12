@@ -30,7 +30,6 @@ from riak.transports.http import HttpPool
 from riak.transports.tcp import TcpPool
 from riak.security import SecurityCreds
 from riak.util import lazy_property, bytes_to_str, str_to_bytes
-from six import string_types, PY2
 from riak.client.multi import MultiGetPool, MultiPutPool
 
 
@@ -124,23 +123,14 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         self._http_pool = HttpPool(self, **transport_options)
         self._tcp_pool = TcpPool(self, **transport_options)
         self._closed = False
-
-        if PY2:
-            self._encoders = {'application/json': default_encoder,
-                              'text/json': default_encoder,
-                              'text/plain': str}
-            self._decoders = {'application/json': json.loads,
-                              'text/json': json.loads,
-                              'text/plain': str}
-        else:
-            self._encoders = {'application/json': binary_json_encoder,
-                              'text/json': binary_json_encoder,
-                              'text/plain': str_to_bytes,
-                              'binary/octet-stream': binary_encoder_decoder}
-            self._decoders = {'application/json': binary_json_decoder,
-                              'text/json': binary_json_decoder,
-                              'text/plain': bytes_to_str,
-                              'binary/octet-stream': binary_encoder_decoder}
+        self._encoders = {'application/json': binary_json_encoder,
+                          'text/json': binary_json_encoder,
+                          'text/plain': str_to_bytes,
+                          'binary/octet-stream': binary_encoder_decoder}
+        self._decoders = {'application/json': binary_json_decoder,
+                          'text/json': binary_json_decoder,
+                          'text/plain': bytes_to_str,
+                          'binary/octet-stream': binary_encoder_decoder}
         self._buckets = WeakValueDictionary()
         self._bucket_types = WeakValueDictionary()
         self._tables = WeakValueDictionary()
@@ -266,10 +256,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :rtype: :class:`RiakBucket <riak.bucket.RiakBucket>`
 
         """
-        if not isinstance(name, string_types):
+        if not isinstance(name, str):
             raise TypeError('Bucket name must be a string')
 
-        if isinstance(bucket_type, string_types):
+        if isinstance(bucket_type, str):
             bucket_type = self.bucket_type(bucket_type)
         elif not isinstance(bucket_type, BucketType):
             raise TypeError('bucket_type must be a string '
@@ -289,7 +279,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :type name: str
         :rtype: :class:`BucketType <riak.bucket.BucketType>`
         """
-        if not isinstance(name, string_types):
+        if not isinstance(name, str):
             raise TypeError('BucketType name must be a string')
 
         btype = BucketType(self, name)
@@ -306,7 +296,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :type name: str
         :rtype: :class:`Table <riak.table.Table>`
         """
-        if not isinstance(name, string_types):
+        if not isinstance(name, str):
             raise TypeError('Table name must be a string')
 
         if name in self._tables:

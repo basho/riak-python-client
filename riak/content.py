@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from riak import RiakError
-from six import string_types
 
 
 class RiakContent(object):
@@ -79,7 +78,7 @@ class RiakContent(object):
         encoder = self._robject.bucket.get_encoder(self.content_type)
         if encoder:
             return encoder(value)
-        elif isinstance(value, string_types):
+        elif isinstance(value, str):
             return value.encode()
         else:
             raise TypeError('No encoder for non-string data '

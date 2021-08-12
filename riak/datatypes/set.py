@@ -15,7 +15,6 @@
 import collections
 
 from .datatype import Datatype
-from six import string_types
 from riak.datatypes import TYPES
 
 __all__ = ['Set']
@@ -119,13 +118,13 @@ class Set(collections.Set, Datatype):
         if not isinstance(new_value, collections.Iterable):
             return False
         for element in new_value:
-            if not isinstance(element, string_types):
+            if not isinstance(element, str):
                 return False
         return True
 
 
 def _check_element(element):
-    if not isinstance(element, string_types):
+    if not isinstance(element, str):
         raise TypeError("Set elements can only be strings")
 
 

@@ -17,7 +17,6 @@
 
 
 from collections import Iterable, namedtuple
-from six import string_types, PY2
 
 import riak
 
@@ -104,7 +103,7 @@ class RiakMapReduce(object):
             raise ValueError('Already added a query, can\'t add an object.')
         else:
             if isinstance(key, Iterable) and \
-                    not isinstance(key, string_types):
+                    not isinstance(key, str):
                 if bucket_type is not None:
                     for k in key:
                         self._inputs.append([bucket, k, data, bucket_type])
@@ -554,12 +553,6 @@ class RiakMapReducePhase(object):
           reduce function.
         :type arg: string, dict, list
         """
-        try:
-            if isinstance(function, string_types) and PY2:
-                function = function.encode('ascii')
-        except UnicodeError:
-            raise TypeError('Unicode encoded functions are not supported.')
-
         self._type = type
         self._language = language
         self._function = function
@@ -581,7 +574,7 @@ class RiakMapReducePhase(object):
             if isinstance(self._function, list):
                 stepdef['bucket'] = self._function[0]
                 stepdef['key'] = self._function[1]
-            elif isinstance(self._function, string_types):
+            elif isinstance(self._function, str):
                 if ("{" in self._function):
                     stepdef['source'] = self._function
                 else:
@@ -592,7 +585,7 @@ class RiakMapReducePhase(object):
             stepdef['function'] = self._function[1]
 
         elif (self._language == 'erlang' and
-              isinstance(self._function, string_types)):
+              isinstance(self._function, str)):
             stepdef['source'] = self._function
 
         return {self._type: stepdef}

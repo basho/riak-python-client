@@ -16,14 +16,10 @@ from contextlib import contextmanager
 from riak.transports.pool import BadResource, ConnectionClosed
 from riak.transports.tcp import is_retryable as is_tcp_retryable
 from riak.transports.http import is_retryable as is_http_retryable
-from six import PY2
 
 import threading
 
-if PY2:
-    from http.client import HTTPException
-else:
-    from http.client import HTTPException
+from http.client import HTTPException
 
 #: The default (global) number of times to retry requests that are
 #: retryable. This can be modified locally, per-thread, via the

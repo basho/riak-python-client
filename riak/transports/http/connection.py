@@ -14,13 +14,9 @@
 
 import base64
 
-from six import PY2
 from riak.util import str_to_bytes
 
-if PY2:
-    from http.client import NotConnected, HTTPConnection
-else:
-    from http.client import NotConnected, HTTPConnection
+from http.client import NotConnected, HTTPConnection
 
 
 class HttpConnection(object):

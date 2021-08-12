@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from six import string_types, PY2
 import mimetypes
 from riak.util import lazy_property
 from riak.datatypes import TYPES
@@ -51,14 +50,8 @@ class RiakBucket(object):
         :type bucket_type: :class:`BucketType`
         """
 
-        if not isinstance(name, string_types):
+        if not isinstance(name, str):
             raise TypeError('Bucket name must be a string')
-
-        if PY2:
-            try:
-                name = name.encode('ascii')
-            except UnicodeError:
-                raise TypeError('Unicode bucket names are not supported.')
 
         if not isinstance(bucket_type, BucketType):
             raise TypeError('Parent bucket type must be a BucketType instance')
@@ -175,13 +168,6 @@ class RiakBucket(object):
         from riak import RiakObject
         if self.bucket_type.datatype:
             return TYPES[self.bucket_type.datatype](bucket=self, key=key)
-
-        if PY2:
-            try:
-                if isinstance(data, string_types):
-                    data = data.encode('ascii')
-            except UnicodeError:
-                raise TypeError('Unicode data values are not supported.')
 
         obj = RiakObject(self._client, self, key)
         obj.content_type = content_type
@@ -427,12 +413,7 @@ class RiakBucket(object):
             binary_data = bytearray(binary_data)
         if not mimetype:
             mimetype = 'application/octet-stream'
-        if PY2:
-            return self.new(key, encoded_data=binary_data,
-                            content_type=mimetype)
-        else:
-            return self.new(key, encoded_data=bytes(binary_data),
-                            content_type=mimetype)
+        return self.new(key, encoded_data=bytes(binary_data), content_type=mimetype)
 
     def search_enabled(self):
         """

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
 
 from .datatype import Datatype
 from riak.datatypes import TYPES
@@ -67,7 +66,7 @@ class Hll(Datatype):
         :param element: the element to add
         :type element: str
         """
-        if not isinstance(element, six.string_types):
+        if not isinstance(element, str):
             raise TypeError("Hll elements can only be strings")
         self._adds.add(element)
 
@@ -75,7 +74,7 @@ class Hll(Datatype):
         return int(new_value)
 
     def _check_type(self, new_value):
-        return isinstance(new_value, six.integer_types)
+        return isinstance(new_value, int)
 
 
 TYPES['hll'] = Hll

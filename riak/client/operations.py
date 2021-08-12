@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
 import riak.client.multi
 
 from riak import ListError
@@ -524,10 +523,7 @@ class RiakClientOperations(RiakClientTransport):
 
         for keylist in self._stream_with_retry(make_op):
             if len(keylist) > 0:
-                if six.PY2:
-                    yield keylist
-                else:
-                    yield [bytes_to_str(item) for item in keylist]
+                yield [bytes_to_str(item) for item in keylist]
 
     @retryable
     def put(self, transport, robj, w=None, dw=None, pw=None, return_body=None,
@@ -579,7 +575,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, six.string_types):
+        if isinstance(t, str):
             t = Table(self, table)
         return transport.ts_describe(t)
 
@@ -600,7 +596,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, six.string_types):
+        if isinstance(t, str):
             t = Table(self, table)
         return transport.ts_get(t, key)
 
@@ -637,7 +633,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: boolean
         """
         t = table
-        if isinstance(t, six.string_types):
+        if isinstance(t, str):
             t = Table(self, table)
         return transport.ts_delete(t, key)
 
@@ -658,7 +654,7 @@ class RiakClientOperations(RiakClientTransport):
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
         t = table
-        if isinstance(t, six.string_types):
+        if isinstance(t, str):
             t = Table(self, table)
         return transport.ts_query(t, query, interpolations)
 
@@ -696,7 +692,7 @@ class RiakClientOperations(RiakClientTransport):
             raise ListError()
 
         t = table
-        if isinstance(t, six.string_types):
+        if isinstance(t, str):
             t = Table(self, table)
 
         _validate_timeout(timeout)
@@ -741,7 +737,7 @@ class RiakClientOperations(RiakClientTransport):
         :type head_only: bool
         """
         _validate_timeout(timeout)
-        if not isinstance(robj.key, six.string_types):
+        if not isinstance(robj.key, str):
             raise TypeError(
                 'key must be a string, instead got {0}'.format(repr(robj.key)))
 
@@ -1091,7 +1087,7 @@ class RiakClientOperations(RiakClientTransport):
         :param returnvalue: whether to return the updated value of the counter
         :type returnvalue: bool
         """
-        if not isinstance(value, six.integer_types):
+        if not isinstance(value, int):
             raise TypeError("Counter update amount must be an integer")
         if value == 0:
             raise ValueError("Cannot increment counter by 0")
@@ -1282,7 +1278,7 @@ def _validate_timeout(timeout, infinity_ok=False):
                 'timeout must be a positive integer '
                 '("infinity" is not valid)')
 
-    if isinstance(timeout, six.integer_types) and timeout > 0:
+    if isinstance(timeout, int) and timeout > 0:
         return
 
     raise ValueError('timeout must be a positive integer')

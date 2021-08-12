@@ -19,7 +19,6 @@ import sys
 import warnings
 
 from collections import Mapping
-from six import string_types, PY2
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 try:
@@ -117,14 +116,12 @@ class lazy_property(object):
 def decode_index_value(index, value):
     if "_int" in bytes_to_str(index):
         return str_to_long(value)
-    elif PY2:
-        return str(value)
     else:
         return bytes_to_str(value)
 
 
 def bytes_to_str(value, encoding='utf-8'):
-    if isinstance(value, string_types) or value is None:
+    if isinstance(value, str) or value is None:
         return value
     elif isinstance(value, list):
         return [bytes_to_str(elem) for elem in value]
@@ -133,7 +130,7 @@ def bytes_to_str(value, encoding='utf-8'):
 
 
 def str_to_bytes(value, encoding='utf-8'):
-    if PY2 or value is None:
+    if value is None:
         return value
     elif isinstance(value, list):
         return [str_to_bytes(elem) for elem in value]
@@ -144,7 +141,5 @@ def str_to_bytes(value, encoding='utf-8'):
 def str_to_long(value, base=10):
     if value is None:
         return None
-    elif PY2:
-        return int(value, base)  # noqa
     else:
         return int(value, base)

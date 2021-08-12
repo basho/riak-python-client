@@ -14,7 +14,6 @@
 
 import unittest
 
-from six import PY2
 from threading import Thread
 from riak.riak_object import RiakObject
 from riak.transports.tcp import TcpTransport
@@ -22,10 +21,7 @@ from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
         RUN_POOL, RUN_CLIENT
 from riak.tests.base import IntegrationTestBase
 
-if PY2:
-    from queue import Queue
-else:
-    from queue import Queue
+from queue import Queue
 
 
 @unittest.skipUnless(RUN_CLIENT, 'RUN_CLIENT is 0')
@@ -146,22 +142,14 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         """
         keys = [self.key_name, self.randname(), self.randname()]
         for key in keys:
-            if PY2:
-                self.client.bucket(self.bucket_name)\
-                    .new(key, encoded_data=key, content_type="text/plain")\
-                    .store()
-            else:
-                self.client.bucket(self.bucket_name)\
-                    .new(key, data=key,
-                         content_type="text/plain").store()
+            self.client.bucket(self.bucket_name)\
+                .new(key, data=key,
+                     content_type="text/plain").store()
         results = self.client.bucket(self.bucket_name).multiget(keys)
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
             self.assertTrue(obj.exists)
-            if PY2:
-                self.assertEqual(obj.key, obj.encoded_data)
-            else:
-                self.assertEqual(obj.key, obj.data)
+            self.assertEqual(obj.key, obj.data)
 
     def test_multiget_errors(self):
         """
@@ -177,10 +165,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
             self.assertEqual(failure[0], 'default')
             self.assertEqual(failure[1], self.bucket_name)
             self.assertIn(failure[2], keys)
-            if PY2:
-                self.assertIsInstance(failure[3], Exception)  # noqa
-            else:
-                self.assertIsInstance(failure[3], Exception)
+            self.assertIsInstance(failure[3], Exception)
         client.close()
 
     def test_multiput_errors(self):
@@ -195,13 +180,8 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         k2 = self.randname()
         o1 = RiakObject(client, bucket, k1)
         o2 = RiakObject(client, bucket, k2)
-
-        if PY2:
-            o1.encoded_data = k1
-            o2.encoded_data = k2
-        else:
-            o1.data = k1
-            o2.data = k2
+        o1.data = k1
+        o2.data = k2
 
         objs = [o1, o2]
         for robj in objs:
@@ -211,10 +191,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         for failure in results:
             self.assertIsInstance(failure, tuple)
             self.assertIsInstance(failure[0], RiakObject)
-            if PY2:
-                self.assertIsInstance(failure[1], Exception)  # noqa
-            else:
-                self.assertIsInstance(failure[1], Exception)
+            self.assertIsInstance(failure[1], Exception)
         client.close()
 
     def test_multiget_notfounds(self):
@@ -238,23 +215,15 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
 
         keys = [self.key_name, self.randname(), self.randname()]
         for key in keys:
-            if PY2:
-                client.bucket(self.bucket_name)\
-                    .new(key, encoded_data=key, content_type="text/plain")\
-                    .store()
-            else:
-                client.bucket(self.bucket_name)\
-                    .new(key, data=key, content_type="text/plain")\
-                    .store()
+            client.bucket(self.bucket_name)\
+                .new(key, data=key, content_type="text/plain")\
+                .store()
 
         results = client.bucket(self.bucket_name).multiget(keys)
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
             self.assertTrue(obj.exists)
-            if PY2:
-                self.assertEqual(obj.key, obj.encoded_data)
-            else:
-                self.assertEqual(obj.key, obj.data)
+            self.assertEqual(obj.key, obj.data)
         client.close()
 
     def test_multiput_pool_size(self):
@@ -271,12 +240,8 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         o1 = RiakObject(client, bucket, k1)
         o2 = RiakObject(client, bucket, k2)
 
-        if PY2:
-            o1.encoded_data = k1
-            o2.encoded_data = k2
-        else:
-            o1.data = k1
-            o2.data = k2
+        o1.data = k1
+        o2.data = k2
 
         objs = [o1, o2]
         for robj in objs:
@@ -287,10 +252,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
             self.assertIsInstance(obj, RiakObject)
             self.assertTrue(obj.exists)
             self.assertEqual(obj.content_type, 'text/plain')
-            if PY2:
-                self.assertEqual(obj.key, obj.encoded_data)
-            else:
-                self.assertEqual(obj.key, obj.data)
+            self.assertEqual(obj.key, obj.data)
         client.close()
 
     def test_multiput_pool_options(self):
@@ -304,12 +266,8 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         o1 = RiakObject(client, bucket, k1)
         o2 = RiakObject(client, bucket, k2)
 
-        if PY2:
-            o1.encoded_data = k1
-            o2.encoded_data = k2
-        else:
-            o1.data = k1
-            o2.data = k2
+        o1.data = k1
+        o2.data = k2
 
         objs = [o1, o2]
         for robj in objs:

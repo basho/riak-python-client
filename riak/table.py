@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from six import string_types, PY2
-
 
 class Table(object):
     """
@@ -30,14 +28,8 @@ class Table(object):
         :param name: The table's name
         :type name: string
         """
-        if not isinstance(name, string_types):
+        if not isinstance(name, str):
             raise TypeError('Table name must be a string')
-
-        if PY2:
-            try:
-                name = name.encode('ascii')
-            except UnicodeError:
-                raise TypeError('Unicode table names are not supported.')
 
         self._client = client
         self.name = name

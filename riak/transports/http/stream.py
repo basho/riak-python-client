@@ -20,7 +20,6 @@ from email import message_from_string
 from riak.util import decode_index_value
 from riak.client.index_page import CONTINUATION
 from riak import RiakError
-from six import PY2
 
 
 class HttpStream(object):
@@ -41,14 +40,9 @@ class HttpStream(object):
 
     def _read(self):
         chunk = self.response.read(self.BLOCK_SIZE)
-        if PY2:
-            if chunk == '':
-                self.response_done = True
-            self.buffer += chunk
-        else:
-            if chunk == b'':
-                self.response_done = True
-            self.buffer += chunk.decode('utf-8')
+        if chunk == b'':
+            self.response_done = True
+        self.buffer += chunk.decode('utf-8')
 
     def __next__(self):
         raise NotImplementedError

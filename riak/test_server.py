@@ -24,7 +24,6 @@ import time
 import stat
 from subprocess import Popen, PIPE
 from riak.util import deep_merge
-from six import string_types
 
 try:
     bytes
@@ -52,7 +51,7 @@ class Atom(object):
 def erlang_config(hash, depth=1):
     def printable(item):
         k, v = item
-        if isinstance(v, string_types):
+        if isinstance(v, str):
             p = '"%s"' % v
         elif isinstance(v, dict):
             p = erlang_config(v, depth + 1)

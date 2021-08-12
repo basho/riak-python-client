@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
-
 import riak.pb.messages
 
 from riak import RiakError
@@ -466,8 +464,6 @@ class TcpTransport(Transport, TcpConnection):
         # TODO FUTURE NUKE THIS MAPRED
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
-        if six.PY2 and isinstance(query, str):  # noqa
-            query = query.encode('utf8')
         msg_code = riak.pb.messages.MSG_CODE_SEARCH_QUERY_REQ
         codec = self._get_codec(msg_code)
         msg = codec.encode_search(index, query, **kwargs)

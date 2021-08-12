@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
-
 from riak.datatypes.datatype import Datatype
 from riak.datatypes import TYPES
 
@@ -70,7 +68,7 @@ class Counter(Datatype):
         self._increment -= amount
 
     def _check_type(self, new_value):
-        return isinstance(new_value, six.integer_types)
+        return isinstance(new_value, int)
 
 
 TYPES['counter'] = Counter

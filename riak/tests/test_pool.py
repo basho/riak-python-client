@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# -*- coding: utf-8 -*-
 import unittest
 
-from six import PY2
 from threading import Thread, currentThread
 from random import SystemRandom
 from time import sleep
@@ -25,10 +23,7 @@ from riak.tests import RUN_POOL
 from riak.tests.comparison import Comparison
 from riak.transports.pool import Pool, BadResource
 
-if PY2:
-    from queue import Queue
-else:
-    from queue import Queue
+from queue import Queue
 
 
 class SimplePool(Pool):

@@ -19,7 +19,6 @@ import os
 import json
 import platform
 
-from six import PY2
 from riak.transports.feature_detect import FeatureDetection
 
 
@@ -43,13 +42,9 @@ class Transport(FeatureDetection):
         """
         Returns a random client identifier
         """
-        if PY2:
-            return ('py_%s' %
-                    base64.b64encode(str(random.randint(1, 0x40000000))))
-        else:
-            return ('py_%s' %
-                    base64.b64encode(bytes(str(random.randint(1, 0x40000000)),
-                                     'ascii')))
+        return ('py_%s' %
+                base64.b64encode(bytes(str(random.randint(1, 0x40000000)),
+                                       'ascii')))
 
     @classmethod
     def make_fixed_client_id(self):
