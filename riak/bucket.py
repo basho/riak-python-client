@@ -19,7 +19,6 @@ import mimetypes
 
 from riak.datatypes import TYPES
 from riak.util import lazy_property
-from six import PY2, string_types
 
 
 def bucket_property(name, doc=None):

@@ -15,8 +15,6 @@
 import collections
 import warnings
 
-from six import PY2, PY3
-
 
 class Comparison(object):
     """

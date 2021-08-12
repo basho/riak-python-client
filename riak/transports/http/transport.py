@@ -32,7 +32,6 @@ from riak.transports.http.stream import (
 )
 from riak.transports.transport import Transport
 from riak.util import bytes_to_str, decode_index_value, str_to_long
-from six import PY2
 
 from http.client import HTTPConnection
 
@@ -387,7 +386,8 @@ class HttpTransport(Transport, HttpConnection, HttpResources, HttpCodec):
                   "continuation": continuation, "timeout": timeout,
                   "term_regex": term_regex}
         bucket_type = self._get_bucket_type(bucket.bucket_type)
-        url = self.index_path(bucket.name, index, startkey, endkey, bucket_type=bucket_type, **params)
+        url = self.index_path(bucket.name, index, startkey, endkey, bucket_type=bucket_type,
+                              **params)
         status, headers, body = self._request("GET", url)
         self.check_http_code(status, [200])
         json_data = json.loads(bytes_to_str(body))

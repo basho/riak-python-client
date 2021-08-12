@@ -31,10 +31,9 @@ from riak.resolver import default_resolver, last_written_resolver
 from riak.tests import PROTOCOL, RUN_KV, RUN_RESOLVE
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
-from six import PY2, PY3, string_types
 
 try:
-    import simplejson as json # todo: remove this, supports < p3.3
+    import simplejson as json       # todo: remove this, supports < p3.3
 except ImportError:
     import json
 

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import riak.client.multi
-import six
 
 from riak import ListError
 from riak.client.index_page import IndexPage
@@ -119,7 +118,7 @@ class RiakClientOperations(RiakClientTransport):
 
         def make_op(transport):
             return transport.stream_buckets(
-                    bucket_type=bucket_type, timeout=timeout)
+                bucket_type=bucket_type, timeout=timeout)
 
         for bucket_list in self._stream_with_retry(make_op):
             bucket_list = [bucketfn(bytes_to_str(name), bucket_type)

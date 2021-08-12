@@ -20,8 +20,6 @@ from email import message_from_string
 from email.utils import mktime_tz, parsedate_tz
 from xml.etree import ElementTree
 
-import six
-
 from riak import RiakError
 from riak.content import RiakContent
 from riak.multidict import MultiDict
@@ -157,8 +155,7 @@ class HttpCodec(object):
         newform = '</(buckets)/([^/]+)/keys/([^/]+)>; ?riaktag=\"([^\"]+)\"'
         for linkHeader in linkHeaders.strip().split(","):
             linkHeader = linkHeader.strip()
-            matches = (re.match(oldform, linkHeader) or
-                       re.match(newform, linkHeader))
+            matches = (re.match(oldform, linkHeader) or re.match(newform, linkHeader))
             if matches is not None:
                 link = (unquote_plus(matches.group(2)),
                         unquote_plus(matches.group(3)),

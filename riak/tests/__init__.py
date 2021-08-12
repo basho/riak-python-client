@@ -87,9 +87,8 @@ if RUN_SECURITY:
         HOST = PB_HOST = HTTP_HOST = h
     else:
         raise AssertionError(
-                "RUN_SECURITY requires that the host name 'riak-test' resolves to the IP address" +
-                " of a Riak node with security enabled.",
-            )
+            "RUN_SECURITY requires that the host name 'riak-test' resolves to the IP address" +
+            " of a Riak node with security enabled.")
 
 SECURITY_USER = os.environ.get("RIAK_TEST_SECURITY_USER", "riakpass")
 SECURITY_PASSWD = os.environ.get("RIAK_TEST_SECURITY_PASSWD", "Test1234")
@@ -101,9 +100,8 @@ SECURITY_REVOKED = os.environ.get("RIAK_TEST_SECURITY_REVOKED",
 SECURITY_BAD_CERT = os.environ.get("RIAK_TEST_SECURITY_BAD_CERT",
                                    "tools/test-ca/certs/badcert.pem")
 # Certificate-based Authentication only supported by PBC
-SECURITY_KEY = os.environ.get(
-        "RIAK_TEST_SECURITY_KEY",
-        "tools/test-ca/private/riakuser-client-cert-key.pem")
+SECURITY_KEY = os.environ.get("RIAK_TEST_SECURITY_KEY",
+                              "tools/test-ca/private/riakuser-client-cert-key.pem")
 SECURITY_CERT = os.environ.get("RIAK_TEST_SECURITY_CERT",
                                "tools/test-ca/certs/riakuser-client-cert.pem")
 SECURITY_CERT_USER = os.environ.get("RIAK_TEST_SECURITY_CERT_USER",

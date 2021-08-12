@@ -109,10 +109,6 @@ class Benchmark(object):
         self.count -= 1
         return self
 
-    def __next__(self):
-        # Python 3.x Version
-        return next(self)
-
     def report(self, name):
         """
         Returns a report for the current step of the benchmark.

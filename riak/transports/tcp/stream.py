@@ -18,7 +18,7 @@ import riak.pb.messages
 
 from riak.client.index_page import CONTINUATION
 from riak.codecs.ttb import TtbCodec
-from riak.util import bytes_to_str, decode_index_value 
+from riak.util import bytes_to_str, decode_index_value
 
 
 class PbufStream(object):

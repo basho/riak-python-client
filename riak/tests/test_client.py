@@ -24,7 +24,6 @@ from riak.tests import (
 )
 from riak.tests.base import IntegrationTestBase
 from riak.transports.tcp import TcpTransport
-from six import PY2
 
 from queue import Queue
 

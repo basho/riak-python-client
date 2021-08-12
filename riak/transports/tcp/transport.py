@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import riak.pb.messages
-import six
 
 from riak import RiakError
 from riak.codecs import Codec, Msg

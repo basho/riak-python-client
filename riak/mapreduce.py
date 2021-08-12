@@ -17,10 +17,7 @@
 
 
 from collections import Iterable, namedtuple
-
 import riak
-
-from six import PY2, string_types
 
 
 #: Links are just bucket/key/tag tuples, this class provides a
@@ -585,8 +582,7 @@ class RiakMapReducePhase(object):
             stepdef["module"] = self._function[0]
             stepdef["function"] = self._function[1]
 
-        elif (self._language == "erlang" and
-              isinstance(self._function, str)):
+        elif (self._language == "erlang" and isinstance(self._function, str)):
             stepdef["source"] = self._function
 
         return {self._type: stepdef}

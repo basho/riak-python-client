@@ -16,9 +16,7 @@ import base64
 
 from riak import ConflictError
 from riak.content import RiakContent
-import base64
 from riak.mapreduce import RiakMapReduce
-from six import PY2, string_types
 
 
 def content_property(name, doc=None):

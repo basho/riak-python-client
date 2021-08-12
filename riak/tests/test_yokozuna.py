@@ -32,14 +32,21 @@ def wait_for_yz_index(bucket, key, index=None):
     while len(bucket.search("_yz_rk:" + key, index=index)["docs"]) == 0:
         pass
 
+
 # YZ index on bucket of the same name
-testrun_yz = {"btype": None, "bucket": "yzbucket", "index": "yzbucket"}
+testrun_yz = {
+    "btype": None,
+    "bucket": "yzbucket",
+    "index": "yzbucket"
+}
+
 # YZ index on bucket of a different name
 testrun_yz_index = {
     "btype": None,
     "bucket": "yzindexbucket",
     "index": "yzindex",
 }
+
 
 def setUpModule():
     yzSetUp(testrun_yz, testrun_yz_index)
@@ -178,7 +185,7 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         results = bucket.search("age_i:[30 TO 33]")
         self.assertEqual(2, len(results["docs"]))
         # phrase
-        results = bucket.search("name_s:"bryan fink"")
+        results = bucket.search('name_s:"bryan fink"')
         self.assertEqual(1, len(results["docs"]))
         # wildcard
         results = bucket.search("name_s:*ryan*")

@@ -14,7 +14,7 @@
 
 import datetime
 
-from erlastic import decode, encode 
+from erlastic import decode, encode
 from erlastic.types import Atom
 from riak import RiakError
 from riak.codecs import Codec, Msg
@@ -185,7 +185,7 @@ class TtbCodec(Codec):
                 resp_colnames = resp_data[0]
                 resp_coltypes = resp_data[1]
                 tsobj.columns = self.decode_timeseries_cols(
-                        resp_colnames, resp_coltypes)
+                    resp_colnames, resp_coltypes)
                 resp_rows = resp_data[2]
                 tsobj.rows = []
                 for resp_row in resp_rows:

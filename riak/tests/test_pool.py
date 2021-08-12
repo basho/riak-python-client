@@ -22,7 +22,6 @@ from riak import RiakError
 from riak.tests import RUN_POOL
 from riak.tests.comparison import Comparison
 from riak.transports.pool import BadResource, Pool
-from six import PY2
 
 from queue import Queue
 

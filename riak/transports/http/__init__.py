@@ -18,7 +18,6 @@ import socket
 from riak.security import SecurityError, USE_STDLIB_SSL
 from riak.transports.http.transport import HttpTransport
 from riak.transports.pool import Pool
-from six import PY2
 
 if USE_STDLIB_SSL:
     import ssl

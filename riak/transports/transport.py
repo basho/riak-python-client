@@ -20,7 +20,6 @@ import random
 import threading
 
 from riak.transports.feature_detect import FeatureDetection
-from six import PY2
 
 
 class Transport(FeatureDetection):

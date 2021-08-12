@@ -48,9 +48,6 @@ class HttpStream(object):
     def __next__(self):
         raise NotImplementedError
 
-    def __next__(self):
-        raise NotImplementedError
-
     def attach(self, resource):
         self.resource = resource
 

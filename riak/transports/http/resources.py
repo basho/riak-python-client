@@ -16,7 +16,6 @@ import re
 
 from riak import RiakError
 from riak.util import bytes_to_str, lazy_property
-from six import PY2
 
 from urllib.parse import quote_plus, urlencode
 

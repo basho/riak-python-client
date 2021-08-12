@@ -15,7 +15,6 @@
 import base64
 
 from riak.util import str_to_bytes
-from six import PY2
 
 from http.client import NotConnected, HTTPConnection
 
