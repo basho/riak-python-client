@@ -407,13 +407,9 @@ class RiakBucket(object):
         with open(filename, 'rb') as f:
             binary_data = f.read()
         mimetype, encoding = mimetypes.guess_type(filename)
-        if encoding:
-            binary_data = bytearray(binary_data, encoding)
-        else:
-            binary_data = bytearray(binary_data)
         if not mimetype:
             mimetype = 'application/octet-stream'
-        return self.new(key, encoded_data=bytes(binary_data), content_type=mimetype)
+        return self.new(key, encoded_data=binary_data, content_type=mimetype)
 
     def search_enabled(self):
         """
