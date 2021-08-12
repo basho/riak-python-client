@@ -15,10 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from six import string_types, PY2
 import mimetypes
-from riak.util import lazy_property
+
 from riak.datatypes import TYPES
+from riak.util import lazy_property
+from six import PY2, string_types
 
 
 def bucket_property(name, doc=None):
@@ -52,16 +53,16 @@ class RiakBucket(object):
         """
 
         if not isinstance(name, string_types):
-            raise TypeError('Bucket name must be a string')
+            raise TypeError("Bucket name must be a string")
 
         if PY2:
             try:
-                name = name.encode('ascii')
+                name = name.encode("ascii")
             except UnicodeError:
-                raise TypeError('Unicode bucket names are not supported.')
+                raise TypeError("Unicode bucket names are not supported.")
 
         if not isinstance(bucket_type, BucketType):
-            raise TypeError('Parent bucket type must be a BucketType instance')
+            raise TypeError("Parent bucket type must be a BucketType instance")
 
         self._client = client
         self.name = name
@@ -141,7 +142,7 @@ class RiakBucket(object):
         self._decoders[content_type] = decoder
         return self
 
-    def new(self, key=None, data=None, content_type='application/json',
+    def new(self, key=None, data=None, content_type="application/json",
             encoded_data=None):
         """A shortcut for manually instantiating a new
         :class:`~riak.riak_object.RiakObject` or a new
@@ -179,9 +180,9 @@ class RiakBucket(object):
         if PY2:
             try:
                 if isinstance(data, string_types):
-                    data = data.encode('ascii')
+                    data = data.encode("ascii")
             except UnicodeError:
-                raise TypeError('Unicode data values are not supported.')
+                raise TypeError("Unicode data values are not supported.")
 
         obj = RiakObject(self._client, self, key)
         obj.content_type = content_type
@@ -200,9 +201,9 @@ class RiakBucket(object):
 
         :param key: Name of the key.
         :type key: string
-        :param r: R-Value of the request (defaults to bucket's R)
+        :param r: R-Value of the request (defaults to bucket"s R)
         :type r: integer
-        :param pr: PR-Value of the request (defaults to bucket's PR)
+        :param pr: PR-Value of the request (defaults to bucket"s PR)
         :type pr: integer
         :param timeout: a timeout value in milliseconds
         :type timeout: int
@@ -223,17 +224,26 @@ class RiakBucket(object):
         """
         from riak import RiakObject
         if self.bucket_type.datatype:
-            return self._client.fetch_datatype(self, key, r=r, pr=pr,
-                                               timeout=timeout,
-                                               include_context=include_context,
-                                               basic_quorum=basic_quorum,
-                                               notfound_ok=notfound_ok)
+            return self._client.fetch_datatype(
+                self,
+                key,
+                r=r,
+                pr=pr,
+                timeout=timeout,
+                include_context=include_context,
+                basic_quorum=basic_quorum,
+                notfound_ok=notfound_ok,
+            )
         else:
             obj = RiakObject(self._client, self, key)
-            return obj.reload(r=r, pr=pr, timeout=timeout,
-                              basic_quorum=basic_quorum,
-                              notfound_ok=notfound_ok,
-                              head_only=head_only)
+            return obj.reload(
+                r=r,
+                pr=pr,
+                timeout=timeout,
+                basic_quorum=basic_quorum,
+                notfound_ok=notfound_ok,
+                head_only=head_only,
+            )
 
     def multiget(self, keys, r=None, pr=None, timeout=None,
                  basic_quorum=None, notfound_ok=None,
@@ -284,9 +294,9 @@ class RiakBucket(object):
     resolver = property(_get_resolver, _set_resolver,
                         doc="""The sibling-resolution function for this
                            bucket. If the resolver is not set, the
-                           client's resolver will be used.""")
+                           client"s resolver will be used.""")
 
-    n_val = bucket_property('n_val', doc="""
+    n_val = bucket_property("n_val", doc="""
     N-value for this bucket, which is the number of replicas
     that will be written of each object in the bucket.
 
@@ -296,48 +306,48 @@ class RiakBucket(object):
         you are doing.
     """)
 
-    allow_mult = bucket_property('allow_mult', doc="""
+    allow_mult = bucket_property("allow_mult", doc="""
     If set to True, then writes with conflicting data will be stored
     and returned to the client.
 
     :type bool: boolean
     """)
 
-    r = bucket_property('r', doc="""
-    The default 'read' quorum for this bucket (how many replicas must
+    r = bucket_property("r", doc="""
+    The default "read" quorum for this bucket (how many replicas must
     reply for a successful read). This should be an integer less than
-    the 'n_val' property, or a string of 'one', 'quorum', 'all', or
-    'default'""")
+    the "n_val" property, or a string of "one", "quorum", "all", or
+    "default""")
 
-    pr = bucket_property('pr', doc="""
-    The default 'primary read' quorum for this bucket (how many
+    pr = bucket_property("pr", doc="""
+    The default "primary read" quorum for this bucket (how many
     primary replicas are required for a successful read). This should
-    be an integer less than the 'n_val' property, or a string of
-    'one', 'quorum', 'all', or 'default'""")
+    be an integer less than the "n_val" property, or a string of
+    "one", "quorum", "all", or "default""")
 
-    rw = bucket_property('rw', doc="""
-    The default 'read' and 'write' quorum for this bucket (equivalent
-    to 'r' and 'w' but for deletes). This should be an integer less
-    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
-    or 'default'""")
+    rw = bucket_property("rw", doc="""
+    The default "read" and "write" quorum for this bucket (equivalent
+    to "r" and "w" but for deletes). This should be an integer less
+    than the "n_val" property, or a string of "one", "quorum", "all",
+    or "default""")
 
-    w = bucket_property('w', doc="""
-    The default 'write' quorum for this bucket (how many replicas must
+    w = bucket_property("w", doc="""
+    The default "write" quorum for this bucket (how many replicas must
     acknowledge receipt of a write). This should be an integer less
-    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
-    or 'default'""")
+    than the "n_val" property, or a string of "one", "quorum", "all",
+    or "default""")
 
-    dw = bucket_property('dw', doc="""
-    The default 'durable write' quorum for this bucket (how many
+    dw = bucket_property("dw", doc="""
+    The default "durable write" quorum for this bucket (how many
     replicas must commit the write). This should be an integer less
-    than the 'n_val' property, or a string of 'one', 'quorum', 'all',
-    or 'default'""")
+    than the "n_val" property, or a string of "one", "quorum", "all",
+    or "default""")
 
-    pw = bucket_property('pw', doc="""
-    The default 'primary write' quorum for this bucket (how many
+    pw = bucket_property("pw", doc="""
+    The default "primary write" quorum for this bucket (how many
     primary replicas are required for a successful write). This should
-    be an integer less than the 'n_val' property, or a string of
-    'one', 'quorum', 'all', or 'default'""")
+    be an integer less than the "n_val" property, or a string of
+    "one", "quorum", "all", or "default""")
 
     def set_property(self, key, value):
         """
@@ -418,7 +428,7 @@ class RiakBucket(object):
         :rtype: :class:`RiakObject <riak.riak_object.RiakObject>`
         """
         binary_data = None
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             binary_data = f.read()
         mimetype, encoding = mimetypes.guess_type(filename)
         if encoding:
@@ -426,7 +436,7 @@ class RiakBucket(object):
         else:
             binary_data = bytearray(binary_data)
         if not mimetype:
-            mimetype = 'application/octet-stream'
+            mimetype = "application/octet-stream"
         if PY2:
             return self.new(key, encoded_data=binary_data,
                             content_type=mimetype)
@@ -442,7 +452,7 @@ class RiakBucket(object):
         .. deprecated:: 2.1.0 (Riak 2.0)
            Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
-        return self.get_properties().get('search', False)
+        return self.get_properties().get("search", False)
 
     def enable_search(self):
         """
@@ -452,7 +462,7 @@ class RiakBucket(object):
            Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         if not self.search_enabled():
-            self.set_property('search', True)
+            self.set_property("search", True)
         return True
 
     def disable_search(self):
@@ -463,7 +473,7 @@ class RiakBucket(object):
            Use :ref:`Riak Search 2.0 <yz-label>` instead.
         """
         if self.search_enabled():
-            self.set_property('search', False)
+            self.set_property("search", False)
         return True
 
     def search(self, query, index=None, **params):
@@ -474,7 +484,7 @@ class RiakBucket(object):
 
         :param query: the search query
         :type query: string
-        :param index: the index to search over. Defaults to the bucket's name.
+        :param index: the index to search over. Defaults to the bucket"s name.
         :type index: string or None
         :param params: additional query flags
         :type params: dict
@@ -607,9 +617,9 @@ class RiakBucket(object):
 
     def __str__(self):
         if self.bucket_type.is_default():
-            return '<RiakBucket {0!r}>'.format(self.name)
+            return "<RiakBucket {0!r}>".format(self.name)
         else:
-            return '<RiakBucket {0!r}/{1!r}>'.format(self.bucket_type.name,
+            return "<RiakBucket {0!r}/{1!r}>".format(self.bucket_type.name,
                                                      self.name)
 
     __repr__ = __str__
@@ -628,7 +638,7 @@ class BucketType(object):
         :param client: A :class:`RiakClient <riak.client.RiakClient>`
                instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
-        :param name: The bucket-type's name
+        :param name: The bucket-type"s name
         :type name: string
         """
         self._client = client
@@ -641,7 +651,7 @@ class BucketType(object):
         :rtype: bool
 
         """
-        return self.name == 'default'
+        return self.name == "default"
 
     def get_property(self, key):
         """
@@ -738,7 +748,7 @@ class BucketType(object):
         if self.is_default():
             return None
         else:
-            return self.get_properties().get('datatype')
+            return self.get_properties().get("datatype")
 
     def __str__(self):
         return "<BucketType {0!r}>".format(self.name)

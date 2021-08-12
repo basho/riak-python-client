@@ -3,40 +3,40 @@
 set -o errexit
 set -o nounset
 
-have_tox='false'
+have_tox="false"
 if hash tox 2>/dev/null
 then
-    echo '[INFO] tox command present, will use that to run tests'
-    have_tox='true'
+    echo "[INFO] tox command present, will use that to run tests"
+    have_tox="true"
 fi
 
-have_py2='false'
+have_py2="false"
 if hash python2 2>/dev/null
 then
-    have_py2='true'
+    have_py2="true"
 fi
 
-have_py3='false'
+have_py3="false"
 if hash python3 2>/dev/null
 then
-    have_py3='true'
+    have_py3="true"
 fi
 
-have_riak_admin='false'
+have_riak_admin="false"
 if hash riak-admin 2>/dev/null
 then
-    have_riak_admin='true'
-    riak_admin='riak-admin'
+    have_riak_admin="true"
+    riak_admin="riak-admin"
 else
     set +o nounset
 
     if [[ -x $RIAK_ADMIN ]]
     then
-        have_riak_admin='true'
+        have_riak_admin="true"
         riak_admin="$RIAK_ADMIN"
     elif [[ -x $RIAK_DIR/bin/riak-admin ]]
     then
-        have_riak_admin='true'
+        have_riak_admin="true"
         riak_admin="$RIAK_DIR/bin/riak-admin"
     fi
 
@@ -56,15 +56,15 @@ function run_tests
 {
     local protocol="${1:-pbc}"
     export RIAK_TEST_PROTOCOL="$protocol"
-    if [[ $have_tox == 'true' ]]
+    if [[ $have_tox == "true" ]]
     then
         tox
     else
-        if [[ $have_py2 == 'true' ]]
+        if [[ $have_py2 == "true" ]]
         then
             python2 setup.py test
         fi
-        if [[ $have_py3 == 'true' ]]
+        if [[ $have_py3 == "true" ]]
         then
             python3 setup.py test
         fi
@@ -117,15 +117,15 @@ function unexport_test_environment_vars
 
 function security_test
 {
-    if [[ $have_riak_admin == 'true' ]]
+    if [[ $have_riak_admin == "true" ]]
     then
         export_host_environment_vars
         unexport_test_environment_vars
         export RUN_SECURITY=1
         $riak_admin security enable
-        run_tests 'pbc'
+        run_tests "pbc"
     else
-        echo '[ERROR] riak-admin must be in PATH, RIAK_ADMIN var set to path, or RIAK_DIR set.' 1>&2
+        echo "[ERROR] riak-admin must be in PATH, RIAK_ADMIN var set to path, or RIAK_DIR set." 1>&2
         exit 1
     fi
 }
@@ -146,17 +146,17 @@ function timeseries_test
 
 arg="${1:-lint}"
 case "$arg" in
-    'lint')
+    "lint")
         lint;;
-    'unit-test')
+    "unit-test")
         run_tests;;
-    'integration-test')
+    "integration-test")
         integration_test;;
-    'security-test')
+    "security-test")
         security_test;;
-    'timeseries-test')
+    "timeseries-test")
         timeseries_test;;
     *)
-        echo "[ERROR] unknown argument: '$arg'" 1>&2
+        echo "[ERROR] unknown argument: "$arg"" 1>&2
         exit 1;;
 esac

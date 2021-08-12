@@ -17,9 +17,10 @@
 
 
 from collections import Iterable, namedtuple
-from six import string_types, PY2
 
 import riak
+
+from six import PY2, string_types
 
 
 #: Links are just bucket/key/tag tuples, this class provides a
@@ -98,10 +99,10 @@ class RiakMapReduce(object):
         :type bucket_type: string, None
         :rtype: :class:`RiakMapReduce`
         """
-        if self._input_mode == 'bucket':
-            raise ValueError('Already added a bucket, can\'t add an object.')
-        elif self._input_mode == 'query':
-            raise ValueError('Already added a query, can\'t add an object.')
+        if self._input_mode == "bucket":
+            raise ValueError("Already added a bucket, can\"t add an object.")
+        elif self._input_mode == "query":
+            raise ValueError("Already added a query, can\"t add an object.")
         else:
             if isinstance(key, Iterable) and \
                     not isinstance(key, string_types):
@@ -130,17 +131,17 @@ class RiakMapReduce(object):
         """
         if not riak.disable_list_exceptions:
             raise riak.ListError()
-        self._input_mode = 'bucket'
+        self._input_mode = "bucket"
         if isinstance(bucket, riak.RiakBucket):
             if bucket.bucket_type.is_default():
-                self._inputs = {'bucket': bucket.name}
+                self._inputs = {"bucket": bucket.name}
             else:
-                self._inputs = {'bucket': [bucket.bucket_type.name,
+                self._inputs = {"bucket": [bucket.bucket_type.name,
                                            bucket.name]}
         elif bucket_type is not None and bucket_type != "default":
-            self._inputs = {'bucket': [bucket_type, bucket]}
+            self._inputs = {"bucket": [bucket_type, bucket]}
         else:
-            self._inputs = {'bucket': bucket}
+            self._inputs = {"bucket": bucket}
         return self
 
     def add_key_filters(self, key_filters):
@@ -151,8 +152,8 @@ class RiakMapReduce(object):
         :type key_filters: list
         :rtype: :class:`RiakMapReduce`
         """
-        if self._input_mode == 'query':
-            raise ValueError('Key filters are not supported in a query.')
+        if self._input_mode == "query":
+            raise ValueError("Key filters are not supported in a query.")
 
         self._key_filters.extend(key_filters)
         return self
@@ -165,8 +166,8 @@ class RiakMapReduce(object):
         :type args: list
         :rtype: :class:`RiakMapReduce`
         """
-        if self._input_mode == 'query':
-            raise ValueError('Key filters are not supported in a query.')
+        if self._input_mode == "query":
+            raise ValueError("Key filters are not supported in a query.")
 
         self._key_filters.append(args)
         return self
@@ -182,10 +183,10 @@ class RiakMapReduce(object):
         :type query: string
         :rtype: :class:`RiakMapReduce`
         """
-        self._input_mode = 'query'
-        self._inputs = {'bucket': index,
-                        'index': index,
-                        'query': query}
+        self._input_mode = "query"
+        self._inputs = {"bucket": index,
+                        "index": index,
+                        "query": query}
         return self
 
     def index(self, bucket, index, startkey, endkey=None, bucket_type=None):
@@ -206,29 +207,29 @@ class RiakMapReduce(object):
         :type bucket_type: string, None
         :rtype: :class:`RiakMapReduce`
         """
-        self._input_mode = 'query'
+        self._input_mode = "query"
 
         if endkey is None:
-            self._inputs = {'bucket': bucket,
-                            'index': index,
-                            'key': startkey}
+            self._inputs = {"bucket": bucket,
+                            "index": index,
+                            "key": startkey}
         else:
-            self._inputs = {'bucket': bucket,
-                            'index': index,
-                            'start': startkey,
-                            'end': endkey}
+            self._inputs = {"bucket": bucket,
+                            "index": index,
+                            "start": startkey,
+                            "end": endkey}
         if bucket_type is not None:
-            self._inputs['bucket'] = [bucket_type, bucket]
+            self._inputs["bucket"] = [bucket_type, bucket]
         return self
 
-    def link(self, bucket='_', tag='_', keep=False):
+    def link(self, bucket="_", tag="_", keep=False):
         """
         Add a link phase to the map/reduce operation.
 
-        :param bucket: Bucket name (default '_', which means all
+        :param bucket: Bucket name (default "_", which means all
             buckets)
         :type bucket: string
-        :param tag:  Tag (default '_', which means any tag)
+        :param tag:  Tag (default "_", which means any tag)
         :type tag: string
         :param keep: Flag whether to keep results from this stage in
           the map/reduce. (default False, unless this is the last step
@@ -244,27 +245,27 @@ class RiakMapReduce(object):
         Add a map phase to the map/reduce operation.
 
         :param function: Either a named Javascript function (ie:
-          'Riak.mapValues'), or an anonymous javascript function (ie:
-          'function(...) ... ' or an array ['erlang_module',
-          'function'].
+          "Riak.mapValues"), or an anonymous javascript function (ie:
+          "function(...) ... " or an array ["erlang_module",
+          "function"].
         :type function: string, list
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         :rtype: :class:`RiakMapReduce`
         """
         if options is None:
             options = dict()
         if isinstance(function, list):
-            language = 'erlang'
+            language = "erlang"
         else:
-            language = 'javascript'
+            language = "javascript"
 
-        mr = RiakMapReducePhase('map',
+        mr = RiakMapReducePhase("map",
                                 function,
-                                options.get('language', language),
-                                options.get('keep', False),
-                                options.get('arg', None))
+                                options.get("language", language),
+                                options.get("keep", False),
+                                options.get("arg", None))
         self._phases.append(mr)
         return self
 
@@ -273,26 +274,26 @@ class RiakMapReduce(object):
         Add a reduce phase to the map/reduce operation.
 
         :param function: Either a named Javascript function (ie.
-          'Riak.reduceSum'), or an anonymous javascript function(ie:
-          'function(...) { ... }' or an array ['erlang_module',
-          'function'].
+          "Riak.reduceSum"), or an anonymous javascript function(ie:
+          "function(...) { ... }" or an array ["erlang_module",
+          "function"].
         :type function: string, list
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :rtype: :class:`RiakMapReduce`
         """
         if options is None:
             options = dict()
         if isinstance(function, list):
-            language = 'erlang'
+            language = "erlang"
         else:
-            language = 'javascript'
+            language = "javascript"
 
-        mr = RiakMapReducePhase('reduce',
+        mr = RiakMapReducePhase("reduce",
                                 function,
-                                options.get('language', language),
-                                options.get('keep', False),
-                                options.get('arg', None))
+                                options.get("language", language),
+                                options.get("keep", False),
+                                options.get("arg", None))
         self._phases.append(mr)
         return self
 
@@ -311,19 +312,18 @@ class RiakMapReduce(object):
         try:
             result = self._client.mapred(self._inputs, query, timeout)
         except riak.RiakError as e:
-            if 'worker_startup_failed' in e.value:
+            if "worker_startup_failed" in e.value:
                 for phase in self._phases:
-                    if phase._language == 'erlang':
+                    if phase._language == "erlang":
                         if type(phase._function) is str:
                             raise riak.RiakError(
-                                    'May have tried erlang strfun '
-                                    'when not allowed\n'
-                                    'original error: ' + e.value)
+                                "May have tried erlang strfun when not allowed\n",
+                                f"original error: {e.value}",
+                            )
             raise e
 
         # If the last phase is NOT a link phase, then return the result.
-        if not (link_results_flag or
-                isinstance(self._phases[-1], RiakLinkPhase)):
+        if not (link_results_flag or isinstance(self._phases[-1], RiakLinkPhase)):
             return result
 
         # If there are no results, then return an empty list.
@@ -381,9 +381,9 @@ class RiakMapReduce(object):
         # Also add the key filter, if necessary
         if isinstance(self._inputs, dict) and len(self._inputs) == 1:
             if len(self._key_filters) > 0:
-                self._inputs['key_filters'] = self._key_filters
+                self._inputs["key_filters"] = self._key_filters
             else:
-                self._inputs = self._inputs['bucket']
+                self._inputs = self._inputs["bucket"]
 
         return query, link_results_flag
 
@@ -395,8 +395,8 @@ class RiakMapReduce(object):
         Adds the Javascript built-in ``Riak.mapValues`` to the query
         as a map phase.
 
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         return self.map("Riak.mapValues", options=options)
@@ -406,8 +406,8 @@ class RiakMapReduce(object):
         Adds the Javascript built-in ``Riak.mapValuesJson`` to the
         query as a map phase.
 
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         return self.map("Riak.mapValuesJson", options=options)
@@ -417,8 +417,8 @@ class RiakMapReduce(object):
         Adds the Javascript built-in ``Riak.reduceSum`` to the query
         as a reduce phase.
 
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         return self.reduce("Riak.reduceSum", options=options)
@@ -428,8 +428,8 @@ class RiakMapReduce(object):
         Adds the Javascript built-in ``Riak.reduceMin`` to the query
         as a reduce phase.
 
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         return self.reduce("Riak.reduceMin", options=options)
@@ -439,8 +439,8 @@ class RiakMapReduce(object):
         Adds the Javascript built-in ``Riak.reduceMax`` to the query
         as a reduce phase.
 
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         return self.reduce("Riak.reduceMax", options=options)
@@ -453,15 +453,15 @@ class RiakMapReduce(object):
         :param js_cmp: A Javascript comparator function as specified by
           Array.sort()
         :type js_cmp: string
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         if options is None:
             options = dict()
 
         if js_cmp:
-            options['arg'] = js_cmp
+            options["arg"] = js_cmp
 
         return self.reduce("Riak.reduceSort", options=options)
 
@@ -470,8 +470,8 @@ class RiakMapReduce(object):
         Adds the Javascript built-in ``Riak.reduceNumericSort`` to the
         query as a reduce phase.
 
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         return self.reduce("Riak.reduceNumericSort", options=options)
@@ -483,14 +483,14 @@ class RiakMapReduce(object):
 
         :param limit: the maximum number of results to return
         :type limit: integer
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         if options is None:
             options = dict()
 
-        options['arg'] = limit
+        options["arg"] = limit
         # reduceLimit is broken in riak_kv
         code = """function(value, arg) {
             return value.slice(0, arg);
@@ -506,14 +506,14 @@ class RiakMapReduce(object):
         :type start: integer
         :param end: the end of the slice
         :type end: integer
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         if options is None:
             options = dict()
 
-        options['arg'] = [start, end]
+        options["arg"] = [start, end]
         return self.reduce("Riak.reduceSlice", options=options)
 
     def filter_not_found(self, options=None):
@@ -521,8 +521,8 @@ class RiakMapReduce(object):
         Adds the Javascript built-in ``Riak.filterNotFound`` to the query
         as a reduce phase.
 
-        :param options: phase options, containing 'language', 'keep'
-          flag, and/or 'arg'.
+        :param options: phase options, containing "language", "keep"
+          flag, and/or "arg".
         :type options: dict
         """
         return self.reduce("Riak.filterNotFound", options=options)
@@ -533,7 +533,7 @@ class RiakMapReducePhase(object):
     The RiakMapReducePhase holds information about a Map or Reduce
     phase in a RiakMapReduce operation.
 
-    Normally you won't need to use this object directly, but instead
+    Normally you won"t need to use this object directly, but instead
     call methods on RiakMapReduce objects to add instances to the
     query.
     """
@@ -542,11 +542,11 @@ class RiakMapReducePhase(object):
         """
         Construct a RiakMapReducePhase object.
 
-        :param type: the phase type - 'map', 'reduce', 'link'
+        :param type: the phase type - "map", "reduce", "link"
         :type type: string
         :param function: the function to execute
         :type function: string, list
-        :param language: 'javascript' or 'erlang'
+        :param language: "javascript" or "erlang"
         :type language: string
         :param keep: whether to return the output of this phase in the results.
         :type keep: boolean
@@ -556,9 +556,9 @@ class RiakMapReducePhase(object):
         """
         try:
             if isinstance(function, string_types) and PY2:
-                function = function.encode('ascii')
+                function = function.encode("ascii")
         except UnicodeError:
-            raise TypeError('Unicode encoded functions are not supported.')
+            raise TypeError("Unicode encoded functions are not supported.")
 
         self._type = type
         self._language = language
@@ -573,27 +573,27 @@ class RiakMapReducePhase(object):
 
         :rtype: dict
         """
-        stepdef = {'keep': self._keep,
-                   'language': self._language,
-                   'arg': self._arg}
+        stepdef = {"keep": self._keep,
+                   "language": self._language,
+                   "arg": self._arg}
 
-        if self._language == 'javascript':
+        if self._language == "javascript":
             if isinstance(self._function, list):
-                stepdef['bucket'] = self._function[0]
-                stepdef['key'] = self._function[1]
+                stepdef["bucket"] = self._function[0]
+                stepdef["key"] = self._function[1]
             elif isinstance(self._function, string_types):
                 if ("{" in self._function):
-                    stepdef['source'] = self._function
+                    stepdef["source"] = self._function
                 else:
-                    stepdef['name'] = self._function
+                    stepdef["name"] = self._function
 
-        elif (self._language == 'erlang' and isinstance(self._function, list)):
-            stepdef['module'] = self._function[0]
-            stepdef['function'] = self._function[1]
+        elif (self._language == "erlang" and isinstance(self._function, list)):
+            stepdef["module"] = self._function[0]
+            stepdef["function"] = self._function[1]
 
-        elif (self._language == 'erlang' and
+        elif (self._language == "erlang" and
               isinstance(self._function, string_types)):
-            stepdef['source'] = self._function
+            stepdef["source"] = self._function
 
         return {self._type: stepdef}
 
@@ -628,10 +628,10 @@ class RiakLinkPhase(object):
         Convert the RiakLinkPhase to a format that can be output into
         JSON. Used internally.
         """
-        stepdef = {'bucket': self._bucket,
-                   'tag': self._tag,
-                   'keep': self._keep}
-        return {'link': stepdef}
+        stepdef = {"bucket": self._bucket,
+                   "tag": self._tag,
+                   "keep": self._keep}
+        return {"link": stepdef}
 
 
 class RiakKeyFilter(object):
@@ -642,11 +642,11 @@ class RiakKeyFilter(object):
 
     Example::
 
-        f1 = RiakKeyFilter().starts_with('2005')
-        f2 = RiakKeyFilter().ends_with('-01')
+        f1 = RiakKeyFilter().starts_with("2005")
+        f2 = RiakKeyFilter().ends_with("-01")
         f3 = f1 & f2
         print(f3)
-        # => [['and', [['starts_with', '2005']], [['ends_with', '-01']]]]
+        # => [["and", [["starts_with", "2005"]], [["ends_with", "-01"]]]]
     """
 
     def __init__(self, *args):
@@ -665,7 +665,7 @@ class RiakKeyFilter(object):
         return f
 
     def _bool_op(self, op, other):
-        # If the current filter is an and, append the other's
+        # If the current filter is an and, append the other"s
         # filters onto the filter
         if(self._filters and self._filters[0][0] == op):
             f = RiakKeyFilter()

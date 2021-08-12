@@ -14,10 +14,11 @@
 
 import six
 
-from .datatype import Datatype
 from riak.datatypes import TYPES
 
-__all__ = ['Hll']
+from .datatype import Datatype
+
+__all__ = ["Hll"]
 
 
 class Hll(Datatype):
@@ -25,13 +26,13 @@ class Hll(Datatype):
     Currently strings are the only supported value type.
     Example::
 
-        myhll.add('barista')
-        myhll.add('roaster')
-        myhll.add('brewer')
+        myhll.add("barista")
+        myhll.add("roaster")
+        myhll.add("brewer")
     """
 
-    type_name = 'hll'
-    _type_error_msg = 'Hlls can only be integers'
+    type_name = "hll"
+    _type_error_msg = "Hlls can only be integers"
 
     def _post_init(self):
         self._adds = set()
@@ -56,7 +57,7 @@ class Hll(Datatype):
             return None
         changes = {}
         if self._adds:
-            changes['adds'] = list(self._adds)
+            changes["adds"] = list(self._adds)
         return changes
 
     def add(self, element):
@@ -78,4 +79,4 @@ class Hll(Datatype):
         return isinstance(new_value, six.integer_types)
 
 
-TYPES['hll'] = Hll
+TYPES["hll"] = Hll

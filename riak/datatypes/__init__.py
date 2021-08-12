@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .types import TYPES
-from .datatype import Datatype
 from .counter import Counter
+from .datatype import Datatype
+from .errors import ContextRequired
 from .flag import Flag
+from .hll import Hll
+from .map import Map
 from .register import Register
 from .set import Set
-from .map import Map
-from .errors import ContextRequired
-from .hll import Hll
+from .types import TYPES
 
 
-__all__ = ['Datatype', 'TYPES', 'ContextRequired',
-           'Flag', 'Counter', 'Register', 'Set', 'Map', 'Hll']
+__all__ = [
+    "Datatype",
+    "TYPES",
+    "ContextRequired",
+    "Flag",
+    "Counter",
+    "Register",
+    "Set",
+    "Map",
+    "Hll",
+]

@@ -15,7 +15,7 @@
 
 class XMLSearchResult(object):
     # Match tags that are document fields
-    fieldtags = ['str', 'int', 'date']
+    fieldtags = ["str", "int", "date"]
 
     def __init__(self):
         # Results
@@ -29,20 +29,20 @@ class XMLSearchResult(object):
         self.currvalue = None
 
     def start(self, tag, attrib):
-        if tag == 'result':
-            self.num_found = int(attrib['numFound'])
-            self.max_score = float(attrib['maxScore'])
-        elif tag == 'doc':
+        if tag == "result":
+            self.num_found = int(attrib["numFound"])
+            self.max_score = float(attrib["maxScore"])
+        elif tag == "doc":
             self.currdoc = {}
         elif tag in self.fieldtags and self.currdoc is not None:
-            self.currfield = attrib['name']
+            self.currfield = attrib["name"]
 
     def end(self, tag):
-        if tag == 'doc' and self.currdoc is not None:
+        if tag == "doc" and self.currdoc is not None:
             self.docs.append(self.currdoc)
             self.currdoc = None
         elif tag in self.fieldtags and self.currdoc is not None:
-            if tag == 'int':
+            if tag == "int":
                 self.currvalue = int(self.currvalue)
             self.currdoc[self.currfield] = self.currvalue
             self.currfield = None
@@ -58,6 +58,6 @@ class XMLSearchResult(object):
                 self.currvalue = data
 
     def close(self):
-        return {'num_found': self.num_found,
-                'max_score': self.max_score,
-                'docs': self.docs}
+        return {"num_found": self.num_found,
+                "max_score": self.max_score,
+                "docs": self.docs}

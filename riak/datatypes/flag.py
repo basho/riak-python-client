@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from riak.datatypes.datatype import Datatype
 from riak.datatypes import TYPES
+from riak.datatypes.datatype import Datatype
 
 
 class Flag(Datatype):
@@ -23,7 +23,7 @@ class Flag(Datatype):
     instances.
     """
 
-    type_name = 'flag'
+    type_name = "flag"
     _type_error_msg = "Flags can only be booleans"
 
     def _post_init(self):
@@ -43,14 +43,14 @@ class Flag(Datatype):
         """
         Turns the flag on, effectively setting its value to ``True``.
         """
-        self._op = 'enable'
+        self._op = "enable"
 
     def disable(self):
         """
         Turns the flag off, effectively setting its value to ``False``.
         """
         self._require_context()
-        self._op = 'disable'
+        self._op = "disable"
 
     def to_op(self):
         """
@@ -64,4 +64,4 @@ class Flag(Datatype):
         return isinstance(new_value, bool)
 
 
-TYPES['flag'] = Flag
+TYPES["flag"] = Flag

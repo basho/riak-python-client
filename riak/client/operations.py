@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
 import riak.client.multi
+import six
 
 from riak import ListError
-from riak.client.transport import RiakClientTransport, \
-        retryable, retryableHttpOnly
 from riak.client.index_page import IndexPage
+from riak.client.transport import (
+    retryable,
+    retryableHttpOnly,
+    RiakClientTransport,
+)
 from riak.datatypes import TYPES
 from riak.table import Table
 from riak.util import bytes_to_str
@@ -742,8 +745,7 @@ class RiakClientOperations(RiakClientTransport):
         """
         _validate_timeout(timeout)
         if not isinstance(robj.key, six.string_types):
-            raise TypeError(
-                'key must be a string, instead got {0}'.format(repr(robj.key)))
+            raise TypeError(f"Key must be a string, instead got {repr(robj.key))}")
 
         return transport.get(robj, r=r, pr=pr, timeout=timeout,
                              basic_quorum=basic_quorum,

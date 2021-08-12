@@ -14,8 +14,8 @@
 
 import base64
 
-from six import PY2
 from riak.util import str_to_bytes
+from six import PY2
 
 if PY2:
     from http.client import NotConnected, HTTPConnection
@@ -28,15 +28,14 @@ class HttpConnection(object):
     Connection and low-level request methods for HttpTransport.
     """
 
-    def _request(self, method, uri, headers={}, body='', stream=False):
+    def _request(self, method, uri, headers={}, body="", stream=False):
         """
         Given a Method, URL, Headers, and Body, perform and HTTP
         request, and return a 3-tuple containing the response status,
         response headers (as httplib.HTTPMessage), and response body.
         """
         response = None
-        headers.setdefault('Accept',
-                           'multipart/mixed, application/json, */*;q=0.5')
+        headers.setdefault("Accept", "multipart/mixed, application/json, */*;q=0.5")
 
         if self._client._credentials:
             self._security_auth_headers(self._client._credentials.username,
@@ -67,20 +66,22 @@ class HttpConnection(object):
         Use the appropriate connection class; optionally with security.
         """
         timeout = None
-        if self._options is not None and 'timeout' in self._options:
-            timeout = self._options['timeout']
+        if self._options is not None and "timeout" in self._options:
+            timeout = self._options["timeout"]
 
         if self._client._credentials:
             self._connection = self._connection_class(
                 host=self._node.host,
                 port=self._node.http_port,
                 credentials=self._client._credentials,
-                timeout=timeout)
+                timeout=timeout,
+            )
         else:
             self._connection = self._connection_class(
-                    host=self._node.host,
-                    port=self._node.http_port,
-                    timeout=timeout)
+                host=self._node.host,
+                port=self._node.http_port,
+                timeout=timeout,
+            )
         # Forces the population of stats and resources before any
         # other requests are made.
         self.server_version
@@ -112,4 +113,4 @@ class HttpConnection(object):
         userColonPassword = username + ":" + password
         b64UserColonPassword = base64. \
             b64encode(str_to_bytes(userColonPassword)).decode("ascii")
-        headers['Authorization'] = 'Basic %s' % b64UserColonPassword
+        headers["Authorization"] = f"Basic {b64UserColonPassword}"

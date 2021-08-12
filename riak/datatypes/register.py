@@ -13,9 +13,10 @@
 # limitations under the License.
 
 from collections import Sized
+
+from riak.datatypes import TYPES
 from riak.datatypes.datatype import Datatype
 from six import string_types
-from riak.datatypes import TYPES
 
 
 class Register(Sized, Datatype):
@@ -25,7 +26,7 @@ class Register(Sized, Datatype):
     :class:`~riak.datatypes.Map` instances.
     """
 
-    type_name = 'register'
+    type_name = "register"
     _type_error_msg = "Registers can only be strings"
 
     def _post_init(self):
@@ -57,7 +58,7 @@ class Register(Sized, Datatype):
         :rtype: str, None
         """
         if self._new_value is not None:
-            return ('assign', self._new_value)
+            return ("assign", self._new_value)
 
     def assign(self, new_value):
         """
@@ -76,4 +77,4 @@ class Register(Sized, Datatype):
         return isinstance(new_value, string_types)
 
 
-TYPES['register'] = Register
+TYPES["register"] = Register

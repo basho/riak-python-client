@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+
 from riak import ConflictError
 from riak.content import RiakContent
-import base64
-from six import string_types, PY2
 from riak.mapreduce import RiakMapReduce
+from six import PY2, string_types
 
 
 def content_property(name, doc=None):
     """
-    Delegates a property to the first sibling in a RiakObject, raising
-    an error when the object is in conflict.
+    Delegates a property to the first sibling in a RiakObject, raising an error when the object is
+    in conflict.
     """
     def _setter(self, value):
         if len(self.siblings) == 0:
@@ -65,23 +66,23 @@ class VClock(object):
 
     if PY2:
         _decoders = {
-            'base64': base64.b64decode,
-            'binary': str
+            "base64": base64.b64decode,
+            "binary": str,
         }
 
         _encoders = {
-            'base64': base64.b64encode,
-            'binary': str
+            "base64": base64.b64encode,
+            "binary": str,
         }
     else:
         _decoders = {
-            'base64': base64.b64decode,
-            'binary': bytes
+            "base64": base64.b64decode,
+            "binary": bytes,
         }
 
         _encoders = {
-            'base64': base64.b64encode,
-            'binary': bytes
+            "base64": base64.b64encode,
+            "binary": bytes,
         }
 
     def __init__(self, value, encoding):
@@ -91,18 +92,16 @@ class VClock(object):
         if encoding in self._encoders:
             return self._encoders[encoding].__call__(self._vclock)
         else:
-            raise ValueError('{} is not a valid vector clock encoding'.
-                             format(encoding))
+            raise ValueError(f"{encoding} is not a valid vector clock encoding.")
 
     def __repr__(self):
-        return '<{} {}>'.format(self.__class__.__name__,
-                                self.encode('base64'))
+        return f"<{self.__class__.__name__} {self.encode('base64')}>"
 
 
 class RiakObject(object):
     """
     The RiakObject holds meta information about a Riak object, plus the
-    object's data.
+    object"s data.
     """
     def __init__(self, client, bucket, key=None):
         """
@@ -119,13 +118,12 @@ class RiakObject(object):
         if PY2:
             try:
                 if isinstance(key, string_types):
-                    key = key.encode('ascii')
+                    key = key.encode("ascii")
             except UnicodeError:
-                raise TypeError('Unicode keys are not supported.')
+                raise TypeError("Unicode keys are not supported.")
 
         if key is not None and len(key) == 0:
-            raise ValueError('Key name must either be "None"'
-                             ' or a non-empty string.')
+            raise ValueError("Key name must either be 'None' or a non-empty string.")
 
         self._resolver = None
         self.client = client
@@ -152,62 +150,62 @@ class RiakObject(object):
         else:
             return True
 
-    data = content_property('data', doc="""
+    data = content_property("data", doc="""
         The data stored in this object, as Python objects. For the raw
         data, use the `encoded_data` property. If unset, accessing
         this property will result in decoding the `encoded_data`
         property into Python values. The decoding is dependent on the
-        `content_type` property and the bucket's registered decoders.
+        `content_type` property and the bucket"s registered decoders.
         """)
 
-    encoded_data = content_property('encoded_data', doc="""
+    encoded_data = content_property("encoded_data", doc="""
         The raw data stored in this object, essentially the encoded
         form of the `data` property. If unset, accessing this property
         will result in encoding the `data` property into a string. The
         encoding is dependent on the `content_type` property and the
-        bucket's registered encoders.
+        bucket"s registered encoders.
         """)
 
-    charset = content_property('charset', doc="""
+    charset = content_property("charset", doc="""
         The character set of the encoded data as a string
         """)
 
-    content_type = content_property('content_type', doc="""
+    content_type = content_property("content_type", doc="""
         The MIME media type of the encoded data as a string
         """)
 
-    content_encoding = content_property('content_encoding', doc="""
+    content_encoding = content_property("content_encoding", doc="""
         The encoding (compression) of the encoded data. Valid values
         are identity, deflate, gzip
         """)
 
-    last_modified = content_property('last_modified', """
+    last_modified = content_property("last_modified", """
         The UNIX timestamp of the modification time of this value.
         """)
 
-    etag = content_property('etag', """
+    etag = content_property("etag", """
         A unique entity-tag for the value.
         """)
 
-    usermeta = content_property('usermeta', doc="""
+    usermeta = content_property("usermeta", doc="""
         Arbitrary user-defined metadata dict, mapping strings to strings.
         """)
 
-    links = content_property('links', doc="""
+    links = content_property("links", doc="""
         A set of bucket/key/tag 3-tuples representing links to other
         keys.
         """)
 
-    indexes = content_property('indexes', doc="""
+    indexes = content_property("indexes", doc="""
         The set of secondary index entries, consisting of
         index-name/value tuples
         """)
 
-    add_index = content_method('add_index')
-    remove_index = content_method('remove_index')
+    add_index = content_method("add_index")
+    remove_index = content_method("remove_index")
     remove_indexes = remove_index
-    set_index = content_method('set_index')
-    add_link = content_method('add_link')
+    set_index = content_method("set_index")
+    add_link = content_method("add_link")
 
     def _exists(self):
         if len(self.siblings) == 0:
@@ -242,14 +240,14 @@ class RiakObject(object):
     resolver = property(_get_resolver, _set_resolver,
                         doc="""The sibling-resolution function for this
                            object. If the resolver is not set, the
-                           bucket's resolver will be used.""")
+                           bucket"s resolver will be used.""")
 
     def store(self, w=None, dw=None, pw=None, return_body=True,
               if_none_match=False, timeout=None):
         """
         Store the object in Riak. When this operation completes, the
         object could contain new metadata and possibly new data if Riak
-        contains a newer version of the object according to the object's
+        contains a newer version of the object according to the object"s
         vector clock.
 
         :param w: W-value, wait for this many partitions to respond

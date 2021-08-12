@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
-
 import riak.pb.messages
+import six
 
 from riak import RiakError
 from riak.codecs import Codec, Msg
@@ -22,15 +21,16 @@ from riak.codecs.pbuf import PbufCodec
 from riak.codecs.ttb import TtbCodec
 from riak.pb.messages import MSG_CODE_TS_TTB_MSG
 from riak.transports.pool import BadResource
+from riak.transports.tcp.connection import TcpConnection
+from riak.transports.tcp.stream import (
+    PbufBucketStream,
+    PbufIndexStream,
+    PbufKeyStream,
+    PbufMapredStream,
+    PbufTsKeyStream,
+)
 from riak.transports.transport import Transport
 from riak.ts_object import TsObject
-
-from riak.transports.tcp.connection import TcpConnection
-from riak.transports.tcp.stream import (PbufKeyStream,
-                                        PbufMapredStream,
-                                        PbufBucketStream,
-                                        PbufIndexStream,
-                                        PbufTsKeyStream)
 
 
 class TcpTransport(Transport, TcpConnection):
@@ -53,19 +53,20 @@ class TcpTransport(Transport, TcpConnection):
         self._pbuf_c = None
         self._ttb_c = None
         self._socket_tcp_options = \
-            kwargs.get('socket_tcp_options', {})
+            kwargs.get("socket_tcp_options", {})
         self._socket_keepalive = \
-            kwargs.get('socket_keepalive', False)
+            kwargs.get("socket_keepalive", False)
         self._ts_convert_timestamp = \
-            kwargs.get('ts_convert_timestamp', False)
+            kwargs.get("ts_convert_timestamp", False)
         self._use_ttb = \
-            kwargs.get('use_ttb', True)
+            kwargs.get("use_ttb", True)
 
     def _get_pbuf_codec(self):
         if not self._pbuf_c:
             self._pbuf_c = PbufCodec(
-                    self.client_timeouts(), self.quorum_controls(),
-                    self.tombstone_vclocks(), self.bucket_types())
+                self.client_timeouts(), self.quorum_controls(),
+                self.tombstone_vclocks(), self.bucket_types(),
+            )
         return self._pbuf_c
 
     def _get_ttb_codec(self):
@@ -93,15 +94,15 @@ class TcpTransport(Transport, TcpConnection):
     # FeatureDetection API
     def _server_version(self):
         server_info = self.get_server_info()
-        ver = server_info['server_version']
-        (maj, min, patch) = [int(v) for v in ver.split('.')]
+        ver = server_info["server_version"]
+        (maj, min, patch) = [int(v) for v in ver.split(".")]
         if maj == 0:
             import datetime
             now = datetime.datetime.now()
             if now.year == 2016:
-                # GH-471 As of 20160509 Riak TS OSS 1.3.0 returns '0.8.0' as
+                # GH-471 As of 20160509 Riak TS OSS 1.3.0 returns "0.8.0" as
                 # the version string.
-                return '2.1.1'
+                return "2.1.1"
         return ver
 
     def ping(self):
@@ -121,7 +122,7 @@ class TcpTransport(Transport, TcpConnection):
         """
         Get information about the server
         """
-        # NB: can't do it this way due to recursion
+        # NB: can"t do it this way due to recursion
         # codec = self._get_codec(ttb_supported=False)
         codec = PbufCodec()
         msg = Msg(riak.pb.messages.MSG_CODE_GET_SERVER_INFO_REQ, None,
@@ -169,7 +170,7 @@ class TcpTransport(Transport, TcpConnection):
         return codec.decode_put(robj, resp)
 
     def ts_describe(self, table):
-        query = 'DESCRIBE {table}'.format(table=table.name)
+        query = "DESCRIBE {table}".format(table=table.name)
         return self.ts_query(table, query)
 
     def ts_get(self, table, key):
@@ -264,8 +265,8 @@ class TcpTransport(Transport, TcpConnection):
         Stream list of buckets through an iterator
         """
         if not self.bucket_stream():
-            raise NotImplementedError('Streaming list-buckets is not '
-                                      'supported')
+            raise NotImplementedError("Streaming list-buckets is not "
+                                      "supported")
         msg_code = riak.pb.messages.MSG_CODE_LIST_BUCKETS_REQ
         codec = self._get_codec(msg_code)
         msg = codec.encode_get_buckets(bucket_type,
@@ -289,9 +290,9 @@ class TcpTransport(Transport, TcpConnection):
         """
         if not self.pb_all_bucket_props():
             for key in props:
-                if key not in ('n_val', 'allow_mult'):
-                    raise NotImplementedError('Server only supports n_val and '
-                                              'allow_mult properties over PBC')
+                if key not in ("n_val", "allow_mult"):
+                    raise NotImplementedError("Server only supports n_val and "
+                                              "allow_mult properties over PBC")
         msg_code = riak.pb.messages.MSG_CODE_SET_BUCKET_REQ
         codec = self._get_codec(msg_code)
         msg = codec.encode_set_bucket_props(bucket, props)
@@ -420,7 +421,7 @@ class TcpTransport(Transport, TcpConnection):
         if len(resp.index) > 0:
             return codec.decode_search_index(resp.index[0])
         else:
-            raise RiakError('notfound')
+            raise RiakError("notfound")
 
     def list_search_indexes(self):
         if not self.pb_search_admin():
@@ -467,7 +468,7 @@ class TcpTransport(Transport, TcpConnection):
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
         if six.PY2 and isinstance(query, str):  # noqa
-            query = query.encode('utf8')
+            query = query.encode("utf8")
         msg_code = riak.pb.messages.MSG_CODE_SEARCH_QUERY_REQ
         codec = self._get_codec(msg_code)
         msg = codec.encode_search(index, query, **kwargs)
@@ -485,7 +486,7 @@ class TcpTransport(Transport, TcpConnection):
         codec = self._get_codec(msg_code)
         msg = codec.encode_get_counter(bucket, key, **kwargs)
         resp_code, resp = self._request(msg, codec)
-        if resp.HasField('value'):
+        if resp.HasField("value"):
             return resp.value
         else:
             return None
@@ -501,7 +502,7 @@ class TcpTransport(Transport, TcpConnection):
         codec = self._get_codec(msg_code)
         msg = codec.encode_update_counter(bucket, key, value, **kwargs)
         resp_code, resp = self._request(msg, codec)
-        if resp.HasField('value'):
+        if resp.HasField("value"):
             return resp.value
         else:
             return True
@@ -555,10 +556,10 @@ class TcpTransport(Transport, TcpConnection):
             data = msg.data
             expect = msg.resp_code
         else:
-            raise ValueError('expected a Msg argument')
+            raise ValueError("expected a Msg argument")
 
         if not isinstance(codec, Codec):
-            raise ValueError('expected a Codec argument')
+            raise ValueError("expected a Codec argument")
 
         resp_code, data = self._send_recv(msg_code, data)
         # NB: decodes errors with msg code 0
@@ -570,5 +571,5 @@ class TcpTransport(Transport, TcpConnection):
         else:
             # NB: raise a BadResource to ensure this connection is
             # closed and not re-used
-            raise BadResource('unknown msg code {}'.format(resp_code))
+            raise BadResource("unknown msg code {}".format(resp_code))
         return resp_code, msg

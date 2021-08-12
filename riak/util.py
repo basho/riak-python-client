@@ -13,13 +13,13 @@
 # limitations under the License.
 
 
-
 import datetime
 import sys
 import warnings
 
 from collections import Mapping
-from six import string_types, PY2
+
+from six import PY2, string_types
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 try:
@@ -42,9 +42,10 @@ def unix_time_millis(dt):
 
 def datetime_from_unix_time_millis(ut):
     if isinstance(ut, float):
-        raise ValueError('unix timestamp must not be a float, '
-                         'it must be total milliseconds since '
-                         'epoch as an integer')
+        raise ValueError((
+            "unix timestamp must not be a float",
+            "it must be total milliseconds since epoch as an integer",
+        ))
     utms = ut / 1000.0
     return datetime.datetime.utcfromtimestamp(utms)
 
@@ -65,11 +66,11 @@ def deep_merge(a, b):
 
     Uses a stack to avoid maximum recursion depth exceptions
 
-    >>> a = {'a': 1, 'b': {1: 1, 2: 2}, 'd': 6}
-    >>> b = {'c': 3, 'b': {2: 7}, 'd': {'z': [1, 2, 3]}}
+    >>> a = {"a": 1, "b": {1: 1, 2: 2}, "d": 6}
+    >>> b = {"c": 3, "b": {2: 7}, "d": {"z": [1, 2, 3]}}
     >>> c = deep_merge(a, b)
     >>> from pprint import pprint; pprint(c)
-    {'a': 1, 'b': {1: 1, 2: 7}, 'c': 3, 'd': {'z': [1, 2, 3]}}
+    {"a": 1, "b": {1: 1, 2: 7}, "c": 3, "d": {"z": [1, 2, 3]}}
     """
     assert quacks_like_dict(a), quacks_like_dict(b)
     dst = a.copy()
@@ -81,8 +82,7 @@ def deep_merge(a, b):
             if key not in current_dst:
                 current_dst[key] = current_src[key]
             else:
-                if (quacks_like_dict(current_src[key]) and
-                        quacks_like_dict(current_dst[key])):
+                if (quacks_like_dict(current_src[key]) and quacks_like_dict(current_dst[key])):
                     stack.append((current_dst[key], current_src[key]))
                 else:
                     current_dst[key] = current_src[key]
@@ -97,11 +97,11 @@ def deprecated(message, stacklevel=3):
 
 
 class lazy_property(object):
-    '''
+    """
     A method decorator meant to be used for lazy evaluation and
     memoization of an object attribute. The property should represent
     immutable data, as it replaces itself on first access.
-    '''
+    """
     def __init__(self, fget):
         self.fget = fget
         self.__name__ = fget.__name__
@@ -123,7 +123,7 @@ def decode_index_value(index, value):
         return bytes_to_str(value)
 
 
-def bytes_to_str(value, encoding='utf-8'):
+def bytes_to_str(value, encoding="utf-8"):
     if isinstance(value, string_types) or value is None:
         return value
     elif isinstance(value, list):
@@ -132,7 +132,7 @@ def bytes_to_str(value, encoding='utf-8'):
         return value.decode(encoding)
 
 
-def str_to_bytes(value, encoding='utf-8'):
+def str_to_bytes(value, encoding="utf-8"):
     if PY2 or value is None:
         return value
     elif isinstance(value, list):

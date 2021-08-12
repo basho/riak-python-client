@@ -13,14 +13,18 @@
 # limitations under the License.
 
 import unittest
-
-from six import PY2
 from threading import Thread
+
 from riak.riak_object import RiakObject
-from riak.transports.tcp import TcpTransport
-from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
-        RUN_POOL, RUN_CLIENT
+from riak.tests import (
+    DUMMY_HTTP_PORT,
+    DUMMY_PB_PORT,
+    RUN_CLIENT,
+    RUN_POOL,
+)
 from riak.tests.base import IntegrationTestBase
+from riak.transports.tcp import TcpTransport
+from six import PY2
 
 if PY2:
     from queue import Queue
@@ -28,11 +32,11 @@ else:
     from queue import Queue
 
 
-@unittest.skipUnless(RUN_CLIENT, 'RUN_CLIENT is 0')
+@unittest.skipUnless(RUN_CLIENT, "RUN_CLIENT is 0")
 class ClientTests(IntegrationTestBase, unittest.TestCase):
     def test_can_set_tcp_keepalive(self):
-        if self.protocol == 'pbc':
-            topts = {'socket_keepalive': True}
+        if self.protocol == "pbc":
+            topts = {"socket_keepalive": True}
             c = self.create_client(transport_options=topts)
             for i, r in enumerate(c._tcp_pool.resources):
                 self.assertIsInstance(r, TcpTransport)
@@ -42,7 +46,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
             pass
 
     def test_uses_client_id_if_given(self):
-        if self.protocol == 'pbc':
+        if self.protocol == "pbc":
             zero_client_id = "\0\0\0\0"
             c = self.create_client(client_id=zero_client_id)
             self.assertEqual(zero_client_id, c.client_id)
@@ -126,12 +130,12 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
                     pass
 
             with self.assertRaises(ValueError):
-                self.client.get_index(bucket, 'field1_bin', 'val1', 'val4',
-                                      timeout=bad)
+                self.client.get_index(bucket, "field1_bin", "val1", "val4", timeout=bad)
 
             with self.assertRaises(ValueError):
-                for i in self.client.stream_index(bucket, 'field1_bin', 'val1',
-                                                  'val4', timeout=bad):
+                for i in self.client.stream_index(
+                    bucket, "field1_bin", "val1", "val4", timeout=bad,
+                ):
                     pass
 
     def test_close_stops_operation_requests(self):
@@ -147,13 +151,13 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         keys = [self.key_name, self.randname(), self.randname()]
         for key in keys:
             if PY2:
-                self.client.bucket(self.bucket_name)\
-                    .new(key, encoded_data=key, content_type="text/plain")\
-                    .store()
+                self.client.bucket(self.bucket_name).new(
+                    key, encoded_data=key, content_type="text/plain",
+                ).store()
             else:
-                self.client.bucket(self.bucket_name)\
-                    .new(key, data=key,
-                         content_type="text/plain").store()
+                self.client.bucket(self.bucket_name).new(
+                    key, data=key, content_type="text/plain",
+                ).store()
         results = self.client.bucket(self.bucket_name).multiget(keys)
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
@@ -174,7 +178,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
         results = client.bucket(self.bucket_name).multiget(keys)
         for failure in results:
             self.assertIsInstance(failure, tuple)
-            self.assertEqual(failure[0], 'default')
+            self.assertEqual(failure[0], "default")
             self.assertEqual(failure[1], self.bucket_name)
             self.assertIn(failure[2], keys)
             if PY2:
@@ -205,7 +209,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
 
         objs = [o1, o2]
         for robj in objs:
-            robj.content_type = 'text/plain'
+            robj.content_type = "text/plain"
 
         results = client.multiput(objs, return_body=True)
         for failure in results:
@@ -280,13 +284,13 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
 
         objs = [o1, o2]
         for robj in objs:
-            robj.content_type = 'text/plain'
+            robj.content_type = "text/plain"
 
         results = client.multiput(objs, return_body=True)
         for obj in results:
             self.assertIsInstance(obj, RiakObject)
             self.assertTrue(obj.exists)
-            self.assertEqual(obj.content_type, 'text/plain')
+            self.assertEqual(obj.content_type, "text/plain")
             if PY2:
                 self.assertEqual(obj.key, obj.encoded_data)
             else:
@@ -313,26 +317,26 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
 
         objs = [o1, o2]
         for robj in objs:
-            robj.content_type = 'text/plain'
+            robj.content_type = "text/plain"
 
         results = client.multiput(objs, return_body=False)
         for obj in results:
-            if client.protocol == 'pbc':
+            if client.protocol == "pbc":
                 self.assertIsInstance(obj, RiakObject)
                 self.assertFalse(obj.exists)
-                self.assertEqual(obj.content_type, 'text/plain')
+                self.assertEqual(obj.content_type, "text/plain")
             else:
                 self.assertIsNone(obj)
         client.close()
 
-    @unittest.skipUnless(RUN_POOL, 'RUN_POOL is 0')
+    @unittest.skipUnless(RUN_POOL, "RUN_POOL is 0")
     def test_pool_close(self):
         """
         Iterate over the connection pool and close all connections.
         """
         # Do something to add to the connection pool
         self.test_multiget_bucket()
-        if self.client.protocol == 'pbc':
+        if self.client.protocol == "pbc":
             self.assertGreater(len(self.client._tcp_pool.resources), 1)
         else:
             self.assertGreater(len(self.client._http_pool.resources), 1)

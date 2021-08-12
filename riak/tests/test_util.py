@@ -15,9 +15,11 @@
 import datetime
 import unittest
 
-from riak.util import is_timeseries_supported, \
-    datetime_from_unix_time_millis, \
-    unix_time_millis
+from riak.util import (
+    datetime_from_unix_time_millis,
+    is_timeseries_supported,
+    unix_time_millis,
+)
 
 
 class UtilUnitTests(unittest.TestCase):

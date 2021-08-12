@@ -209,5 +209,5 @@ class FeatureDetectionTest(unittest.TestCase):
         self.assertTrue(t.write_once())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

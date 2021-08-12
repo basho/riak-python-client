@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import base64
+import json
+import os
+import platform
 import random
 import threading
-import os
-import json
-import platform
 
-from six import PY2
 from riak.transports.feature_detect import FeatureDetection
+from six import PY2
 
 
 class Transport(FeatureDetection):
@@ -35,8 +35,11 @@ class Transport(FeatureDetection):
     def _set_client_id(self, value):
         self._client_id = value
 
-    client_id = property(_get_client_id, _set_client_id,
-                         doc="""the client ID for this connection""")
+    client_id = property(
+        _get_client_id,
+        _set_client_id,
+        doc="""the client ID for this connection""",
+    )
 
     @classmethod
     def make_random_client_id(self):
@@ -44,12 +47,9 @@ class Transport(FeatureDetection):
         Returns a random client identifier
         """
         if PY2:
-            return ('py_%s' %
-                    base64.b64encode(str(random.randint(1, 0x40000000))))
+            return (f"py_{base64.b64encode(str(random.randint(1, 0x40000000)))}")
         else:
-            return ('py_%s' %
-                    base64.b64encode(bytes(str(random.randint(1, 0x40000000)),
-                                     'ascii')))
+            return (f"py_{base64.b64encode(bytes(str(random.randint(1, 0x40000000)),'ascii'))}")
 
     @classmethod
     def make_fixed_client_id(self):
@@ -59,7 +59,7 @@ class Transport(FeatureDetection):
         machine = platform.node()
         process = os.getpid()
         thread = threading.currentThread().getName()
-        return base64.b64encode('%s|%s|%s' % (machine, process, thread))
+        return base64.b64encode(f"{machine}|{process}|{thread}")
 
     def ping(self):
         """
@@ -81,8 +81,7 @@ class Transport(FeatureDetection):
         """
         raise NotImplementedError
 
-    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None,
-               pw=None, timeout=None):
+    def delete(self, robj, rw=None, r=None, w=None, dw=None, pr=None, pw=None, timeout=None):
         """
         Deletes an object.
         """
@@ -318,21 +317,21 @@ class Transport(FeatureDetection):
         """
         phases = []
         if not self.phaseless_mapred():
-            phases.append({'language': 'erlang',
-                           'module': 'riak_kv_mapreduce',
-                           'function': 'reduce_identity',
-                           'keep': True})
-        mr_result = self.mapred({'module': 'riak_search',
-                                 'function': 'mapred_search',
-                                 'arg': [index, query]},
+            phases.append({"language": "erlang",
+                           "module": "riak_kv_mapreduce",
+                           "function": "reduce_identity",
+                           "keep": True})
+        mr_result = self.mapred({"module": "riak_search",
+                                 "function": "mapred_search",
+                                 "arg": [index, query]},
                                 phases)
-        result = {'num_found': len(mr_result),
-                  'max_score': 0.0,
-                  'docs': []}
+        result = {"num_found": len(mr_result),
+                  "max_score": 0.0,
+                  "docs": []}
         for bucket, key, data in mr_result:
-            if 'score' in data and data['score'][0] > result['max_score']:
-                result['max_score'] = data['score'][0]
-            result['docs'].append({'id': key})
+            if "score" in data and data["score"][0] > result["max_score"]:
+                result["max_score"] = data["score"][0]
+            result["docs"].append({"id": key})
         return result
 
     # TODO FUTURE NUKE THIS MAPRED
@@ -344,37 +343,36 @@ class Transport(FeatureDetection):
         """
         phases = []
         if not self.phaseless_mapred():
-            phases.append({'language': 'erlang',
-                           'module': 'riak_kv_mapreduce',
-                           'function': 'reduce_identity',
-                           'keep': True})
+            phases.append({"language": "erlang",
+                           "module": "riak_kv_mapreduce",
+                           "function": "reduce_identity",
+                           "keep": True})
         if endkey:
-            result = self.mapred({'bucket': bucket,
-                                  'index': index,
-                                  'start': startkey,
-                                  'end': endkey},
+            result = self.mapred({"bucket": bucket,
+                                  "index": index,
+                                  "start": startkey,
+                                  "end": endkey},
                                  phases)
         else:
-            result = self.mapred({'bucket': bucket,
-                                  'index': index,
-                                  'key': startkey},
+            result = self.mapred({"bucket": bucket,
+                                  "index": index,
+                                  "key": startkey},
                                  phases)
         return [key for resultbucket, key in result]
 
     def _construct_mapred_json(self, inputs, query, timeout=None):
         if not self.phaseless_mapred() and (query is None or len(query) == 0):
-            raise Exception(
-                'Phase-less MapReduce is not supported by Riak node')
+            raise Exception("Phase-less MapReduce is not supported by Riak node")
 
-        job = {'inputs': inputs, 'query': query}
+        job = {"inputs": inputs, "query": query}
         if timeout is not None:
-            job['timeout'] = timeout
+            job["timeout"] = timeout
 
         content = json.dumps(job)
         return content
 
     def _check_bucket_types(self, bucket_type):
         if not self.bucket_types():
-            raise NotImplementedError('Server does not support bucket-types')
+            raise NotImplementedError("Server does not support bucket-types")
         if bucket_type.is_default():
-            raise ValueError('Cannot manipulate the default bucket-type')
+            raise ValueError("Cannot manipulate the default bucket-type")

@@ -13,26 +13,27 @@
 # limitations under the License.
 
 # -*- coding: utf-8 -*-
-from six import PY2, PY3
 import collections
 import warnings
 
+from six import PY2, PY3
+
 
 class Comparison(object):
-    '''
+    """
     Provide a cross-version object comparison operator
     since its name changed between Python 2.x and Python 3.x
-    '''
+    """
 
     if PY3:
-        # Stolen from Python 2.7.8's unittest
-        _Mismatch = collections.namedtuple('Mismatch', 'actual expected value')
+        # Stolen from Python 2.7.8"s unittest
+        _Mismatch = collections.namedtuple("Mismatch", "actual expected value")
 
         def _count_diff_all_purpose(self, actual, expected):
-            '''
+            """
             Returns list of (cnt_act, cnt_exp, elem)
             triples where the counts differ
-            '''
+            """
             # elements need not be hashable
             s, t = list(actual), list(expected)
             m, n = len(s), len(t)
@@ -67,10 +68,10 @@ class Comparison(object):
             return result
 
         def _count_diff_hashable(self, actual, expected):
-            '''
+            """
             Returns list of (cnt_act, cnt_exp, elem) triples
             where the counts differ
-            '''
+            """
             # elements must be hashable
             s, t = self._ordered_count(actual), self._ordered_count(expected)
             result = []
@@ -86,14 +87,17 @@ class Comparison(object):
             return result
 
         def _ordered_count(self, iterable):
-            'Return dict of element counts, in the order they were first seen'
+            """
+            Return dict of element counts, in the order they were first seen
+            """
             c = collections.OrderedDict()
             for elem in iterable:
                 c[elem] = c.get(elem, 0) + 1
             return c
 
         def assertItemsEqual(self, expected_seq, actual_seq, msg=None):
-            """An unordered sequence specific comparison. It asserts that
+            """
+            An unordered sequence specific comparison. It asserts that
             actual_seq and expected_seq have the same element counts.
             Equivalent to::
 
@@ -121,10 +125,10 @@ class Comparison(object):
                                                             second_seq)
 
             if differences:
-                standardMsg = 'Element counts were not equal:\n'
-                lines = ['First has %d, Second has %d:  %r' %
+                standardMsg = "Element counts were not equal:\n"
+                lines = ["First has %d, Second has %d:  %r" %
                          diff for diff in differences]
-                diffMsg = '\n'.join(lines)
+                diffMsg = "\n".join(lines)
                 standardMsg = self._truncateMessage(standardMsg, diffMsg)
 
     def assert_raises_regex(self, exception, regexp):

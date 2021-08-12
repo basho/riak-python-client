@@ -25,12 +25,17 @@ from riak import RiakError
 from riak.codecs import Codec, Msg
 from riak.codecs.util import parse_pbuf_msg
 from riak.content import RiakContent
+from riak.multidict import MultiDict
 from riak.pb.riak_ts_pb2 import TsColumnType
 from riak.riak_object import VClock
 from riak.ts_object import TsColumns
-from riak.util import decode_index_value, str_to_bytes, bytes_to_str, \
-    unix_time_millis, datetime_from_unix_time_millis
-from riak.multidict import MultiDict
+from riak.util import (
+    bytes_to_str,
+    datetime_from_unix_time_millis,
+    decode_index_value,
+    str_to_bytes,
+    unix_time_millis,
+)
 
 
 def _invert(d):
@@ -44,8 +49,8 @@ def _invert(d):
 REPL_TO_PY = {
     riak.pb.riak_pb2.RpbBucketProps.FALSE: False,
     riak.pb.riak_pb2.RpbBucketProps.TRUE: True,
-    riak.pb.riak_pb2.RpbBucketProps.REALTIME: 'realtime',
-    riak.pb.riak_pb2.RpbBucketProps.FULLSYNC: 'fullsync'
+    riak.pb.riak_pb2.RpbBucketProps.REALTIME: "realtime",
+    riak.pb.riak_pb2.RpbBucketProps.FULLSYNC: "fullsync",
 }
 
 REPL_TO_PB = _invert(REPL_TO_PY)
@@ -55,46 +60,48 @@ RIAKC_RW_QUORUM = 4294967293
 RIAKC_RW_ALL = 4294967292
 RIAKC_RW_DEFAULT = 4294967291
 
-QUORUM_TO_PB = {'default': RIAKC_RW_DEFAULT,
-                'all': RIAKC_RW_ALL,
-                'quorum': RIAKC_RW_QUORUM,
-                'one': RIAKC_RW_ONE}
+QUORUM_TO_PB = {
+    "default": RIAKC_RW_DEFAULT,
+    "all": RIAKC_RW_ALL,
+    "quorum": RIAKC_RW_QUORUM,
+    "one": RIAKC_RW_ONE,
+}
 
 QUORUM_TO_PY = _invert(QUORUM_TO_PB)
 
-NORMAL_PROPS = ['n_val', 'allow_mult', 'last_write_wins', 'old_vclock',
-                'young_vclock', 'big_vclock', 'small_vclock', 'basic_quorum',
-                'notfound_ok', 'search', 'backend', 'search_index', 'datatype',
-                'write_once', 'hll_precision']
-COMMIT_HOOK_PROPS = ['precommit', 'postcommit']
-MODFUN_PROPS = ['chash_keyfun', 'linkfun']
-QUORUM_PROPS = ['r', 'pr', 'w', 'pw', 'dw', 'rw']
+NORMAL_PROPS = ["n_val", "allow_mult", "last_write_wins", "old_vclock",
+                "young_vclock", "big_vclock", "small_vclock", "basic_quorum",
+                "notfound_ok", "search", "backend", "search_index", "datatype",
+                "write_once", "hll_precision"]
+COMMIT_HOOK_PROPS = ["precommit", "postcommit"]
+MODFUN_PROPS = ["chash_keyfun", "linkfun"]
+QUORUM_PROPS = ["r", "pr", "w", "pw", "dw", "rw"]
 
 MAP_FIELD_TYPES = {
-    riak.pb.riak_dt_pb2.MapField.COUNTER: 'counter',
-    riak.pb.riak_dt_pb2.MapField.SET: 'set',
-    riak.pb.riak_dt_pb2.MapField.REGISTER: 'register',
-    riak.pb.riak_dt_pb2.MapField.FLAG: 'flag',
-    riak.pb.riak_dt_pb2.MapField.MAP: 'map',
-    'counter': riak.pb.riak_dt_pb2.MapField.COUNTER,
-    'set': riak.pb.riak_dt_pb2.MapField.SET,
-    'register': riak.pb.riak_dt_pb2.MapField.REGISTER,
-    'flag': riak.pb.riak_dt_pb2.MapField.FLAG,
-    'map': riak.pb.riak_dt_pb2.MapField.MAP
+    riak.pb.riak_dt_pb2.MapField.COUNTER: "counter",
+    riak.pb.riak_dt_pb2.MapField.SET: "set",
+    riak.pb.riak_dt_pb2.MapField.REGISTER: "register",
+    riak.pb.riak_dt_pb2.MapField.FLAG: "flag",
+    riak.pb.riak_dt_pb2.MapField.MAP: "map",
+    "counter": riak.pb.riak_dt_pb2.MapField.COUNTER,
+    "set": riak.pb.riak_dt_pb2.MapField.SET,
+    "register": riak.pb.riak_dt_pb2.MapField.REGISTER,
+    "flag": riak.pb.riak_dt_pb2.MapField.FLAG,
+    "map": riak.pb.riak_dt_pb2.MapField.MAP,
 }
 
 DT_FETCH_TYPES = {
-    riak.pb.riak_dt_pb2.DtFetchResp.COUNTER: 'counter',
-    riak.pb.riak_dt_pb2.DtFetchResp.SET: 'set',
-    riak.pb.riak_dt_pb2.DtFetchResp.MAP: 'map',
-    riak.pb.riak_dt_pb2.DtFetchResp.HLL: 'hll'
+    riak.pb.riak_dt_pb2.DtFetchResp.COUNTER: "counter",
+    riak.pb.riak_dt_pb2.DtFetchResp.SET: "set",
+    riak.pb.riak_dt_pb2.DtFetchResp.MAP: "map",
+    riak.pb.riak_dt_pb2.DtFetchResp.HLL: "hll",
 }
 
 
 class PbufCodec(Codec):
-    '''
+    """
     Protobuffs Encoding and decoding methods for TcpTransport.
-    '''
+    """
 
     def __init__(self,
                  client_timeouts=False, quorum_controls=False,
@@ -244,7 +251,7 @@ class PbufCodec(Codec):
             if tag:
                 pb_link.tag = str_to_bytes(tag)
             else:
-                pb_link.tag = str_to_bytes('')
+                pb_link.tag = str_to_bytes("")
 
         for field, value in robj.indexes:
             pair = rpb_content.indexes.add()
@@ -312,21 +319,21 @@ class PbufCodec(Codec):
                     setattr(msg.props, prop, props[prop])
         for prop in COMMIT_HOOK_PROPS:
             if prop in props:
-                setattr(msg.props, 'has_' + prop, True)
+                setattr(msg.props, "has_" + prop, True)
                 self.encode_hooklist(props[prop], getattr(msg.props, prop))
         for prop in MODFUN_PROPS:
             if prop in props and props[prop] is not None:
                 self.encode_modfun(props[prop], getattr(msg.props, prop))
         for prop in QUORUM_PROPS:
-            if prop in props and props[prop] not in (None, 'default'):
+            if prop in props and props[prop] not in (None, "default"):
                 value = self.encode_quorum(props[prop])
                 if value is not None:
                     if isinstance(value, six.string_types):
                         setattr(msg.props, prop, str_to_bytes(value))
                     else:
                         setattr(msg.props, prop, value)
-        if 'repl' in props:
-            msg.props.repl = REPL_TO_PB[props['repl']]
+        if "repl" in props:
+            msg.props.repl = REPL_TO_PB[props["repl"]]
 
         return msg
 
@@ -345,7 +352,7 @@ class PbufCodec(Codec):
                 if isinstance(props[prop], bytes):
                     props[prop] = bytes_to_str(props[prop])
         for prop in COMMIT_HOOK_PROPS:
-            if getattr(msg, 'has_' + prop):
+            if getattr(msg, "has_" + prop):
                 props[prop] = self.decode_hooklist(getattr(msg, prop))
         for prop in MODFUN_PROPS:
             if msg.HasField(prop):
@@ -353,25 +360,27 @@ class PbufCodec(Codec):
         for prop in QUORUM_PROPS:
             if msg.HasField(prop):
                 props[prop] = self.decode_quorum(getattr(msg, prop))
-        if msg.HasField('repl'):
-            props['repl'] = REPL_TO_PY[msg.repl]
+        if msg.HasField("repl"):
+            props["repl"] = REPL_TO_PY[msg.repl]
         return props
 
     def decode_modfun(self, modfun):
         """
-        Decodes a protobuf modfun pair into a dict with 'mod' and
-        'fun' keys. Used in bucket properties.
+        Decodes a protobuf modfun pair into a dict with "mod" and
+        "fun" keys. Used in bucket properties.
 
         :param modfun: the protobuf message to decode
         :type modfun: riak.pb.riak_pb2.RpbModFun
         :rtype dict
         """
-        return {'mod': bytes_to_str(modfun.module),
-                'fun': bytes_to_str(modfun.function)}
+        return {
+            "mod": bytes_to_str(modfun.module),
+            "fun": bytes_to_str(modfun.function)
+        }
 
     def encode_modfun(self, props, msg=None):
         """
-        Encodes a dict with 'mod' and 'fun' keys into a protobuf
+        Encodes a dict with "mod" and "fun" keys into a protobuf
         modfun pair. Used in bucket properties.
 
         :param props: the module/function pair
@@ -382,8 +391,8 @@ class PbufCodec(Codec):
         """
         if msg is None:
             msg = riak.pb.riak_pb2.RpbModFun()
-        msg.module = str_to_bytes(props['mod'])
-        msg.function = str_to_bytes(props['fun'])
+        msg.module = str_to_bytes(props["mod"])
+        msg.function = str_to_bytes(props["fun"])
         return msg
 
     def decode_hooklist(self, hooklist):
@@ -419,10 +428,10 @@ class PbufCodec(Codec):
         :type hook: riak.pb.riak_pb2.RpbCommitHook
         :rtype dict
         """
-        if hook.HasField('modfun'):
+        if hook.HasField("modfun"):
             return self.decode_modfun(hook.modfun)
         else:
-            return {'name': bytes_to_str(hook.name)}
+            return {"name": bytes_to_str(hook.name)}
 
     def encode_hook(self, hook, msg):
         """
@@ -435,8 +444,8 @@ class PbufCodec(Codec):
         :type msg: riak.pb.riak_pb2.RpbCommitHook
         :rtype riak.pb.riak_pb2.RpbCommitHook
         """
-        if 'name' in hook:
-            msg.name = str_to_bytes(hook['name'])
+        if "name" in hook:
+            msg.name = str_to_bytes(hook["name"])
         else:
             self.encode_modfun(hook, msg.modfun)
         return msg
@@ -463,7 +472,7 @@ class PbufCodec(Codec):
         :param continuation: the opaque continuation returned from a
             previous paginated request
         :type continuation: string
-        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :param timeout: a timeout value in milliseconds, or "infinity"
         :type timeout: int
         :param term_regex: a regular expression used to filter index terms
         :type term_regex: string
@@ -489,7 +498,7 @@ class PbufCodec(Codec):
         if continuation:
             req.continuation = str_to_bytes(continuation)
         if timeout:
-            if timeout == 'infinity':
+            if timeout == "infinity":
                 req.timeout = 0
             else:
                 req.timeout = timeout
@@ -511,7 +520,7 @@ class PbufCodec(Codec):
             if six.PY3:
                 results = [bytes_to_str(key) for key in resp.keys]
 
-        if max_results is not None and resp.HasField('continuation'):
+        if max_results is not None and resp.HasField("continuation"):
             return (results, bytes_to_str(resp.continuation))
         else:
             return (results, None)
@@ -525,49 +534,48 @@ class PbufCodec(Codec):
         :rtype dict
         """
         result = {}
-        result['name'] = bytes_to_str(index.name)
-        if index.HasField('schema'):
-            result['schema'] = bytes_to_str(index.schema)
-        if index.HasField('n_val'):
-            result['n_val'] = index.n_val
+        result["name"] = bytes_to_str(index.name)
+        if index.HasField("schema"):
+            result["schema"] = bytes_to_str(index.schema)
+        if index.HasField("n_val"):
+            result["n_val"] = index.n_val
         return result
 
     def _add_bucket_type(self, req, bucket_type):
         if bucket_type and not bucket_type.is_default():
             if not self._bucket_types:
-                raise NotImplementedError(
-                    'Server does not support bucket-types')
+                raise NotImplementedError("Server does not support bucket-types")
             req.type = str_to_bytes(bucket_type.name)
 
     def encode_search_query(self, req, **kwargs):
-        if 'rows' in kwargs:
-            req.rows = kwargs['rows']
-        if 'start' in kwargs:
-            req.start = kwargs['start']
-        if 'sort' in kwargs:
-            req.sort = str_to_bytes(kwargs['sort'])
-        if 'filter' in kwargs:
-            req.filter = str_to_bytes(kwargs['filter'])
-        if 'df' in kwargs:
-            req.df = str_to_bytes(kwargs['df'])
-        if 'op' in kwargs:
-            req.op = str_to_bytes(kwargs['op'])
-        if 'q.op' in kwargs:
-            req.op = kwargs['q.op']
-        if 'fl' in kwargs:
-            if isinstance(kwargs['fl'], list):
-                req.fl.extend([str_to_bytes(fl) for fl in kwargs['fl']])
+        if "rows" in kwargs:
+            req.rows = kwargs["rows"]
+        if "start" in kwargs:
+            req.start = kwargs["start"]
+        if "sort" in kwargs:
+            req.sort = str_to_bytes(kwargs["sort"])
+        if "filter" in kwargs:
+            req.filter = str_to_bytes(kwargs["filter"])
+        if "df" in kwargs:
+            req.df = str_to_bytes(kwargs["df"])
+        if "op" in kwargs:
+            req.op = str_to_bytes(kwargs["op"])
+        if "q.op" in kwargs:
+            req.op = kwargs["q.op"]
+        if "fl" in kwargs:
+            if isinstance(kwargs["fl"], list):
+                req.fl.extend([str_to_bytes(fl) for fl in kwargs["fl"]])
             else:
-                req.fl.append(str_to_bytes(kwargs['fl']))
-        if 'presort' in kwargs:
-            req.presort = kwargs['presort']
+                req.fl.append(str_to_bytes(kwargs["fl"]))
+        if "presort" in kwargs:
+            req.presort = kwargs["presort"]
 
     def decode_search_doc(self, doc):
         resultdoc = MultiDict()
         for pair in doc.fields:
             if six.PY2:
-                ukey = str(pair.key, 'utf-8')    # noqa
-                uval = str(pair.value, 'utf-8')  # noqa
+                ukey = str(pair.key, "utf-8")    # noqa
+                uval = str(pair.value, "utf-8")  # noqa
             else:
                 ukey = bytes_to_str(pair.key)
                 uval = bytes_to_str(pair.value)
@@ -581,7 +589,7 @@ class PbufCodec(Codec):
 
         value = self.decode_dt_value(dtype, resp.value)
 
-        if resp.HasField('context'):
+        if resp.HasField("context"):
             context = resp.context[:]
         else:
             context = None
@@ -589,22 +597,21 @@ class PbufCodec(Codec):
         return dtype, value, context
 
     def decode_dt_value(self, dtype, msg):
-        if dtype == 'counter':
+        if dtype == "counter":
             return msg.counter_value
-        elif dtype == 'set':
+        elif dtype == "set":
             return self.decode_set_value(msg.set_value)
-        elif dtype == 'hll':
+        elif dtype == "hll":
             return self.decode_hll_value(msg.hll_value)
-        elif dtype == 'map':
+        elif dtype == "map":
             return self.decode_map_value(msg.map_value)
 
     def encode_dt_options(self, req, **kwargs):
-        for q in ['r', 'pr', 'w', 'dw', 'pw']:
+        for q in ["r", "pr", "w", "dw", "pw"]:
             if q in kwargs and kwargs[q] is not None:
                 setattr(req, q, self.encode_quorum(kwargs[q]))
 
-        for o in ['basic_quorum', 'notfound_ok', 'timeout', 'return_body',
-                  'include_context']:
+        for o in ["basic_quorum", "notfound_ok", "timeout", "return_body", "include_context"]:
             if o in kwargs and kwargs[o] is not None:
                 setattr(req, o, kwargs[o])
 
@@ -613,20 +620,18 @@ class PbufCodec(Codec):
         for entry in entries:
             name = bytes_to_str(entry.field.name[:])
             dtype = MAP_FIELD_TYPES[entry.field.type]
-            if dtype == 'counter':
+            if dtype == "counter":
                 value = entry.counter_value
-            elif dtype == 'set':
+            elif dtype == "set":
                 value = self.decode_set_value(entry.set_value)
-            elif dtype == 'register':
+            elif dtype == "register":
                 value = bytes_to_str(entry.register_value[:])
-            elif dtype == 'flag':
+            elif dtype == "flag":
                 value = entry.flag_value
-            elif dtype == 'map':
+            elif dtype == "map":
                 value = self.decode_map_value(entry.map_value)
             else:
-                raise ValueError(
-                    'Map may not contain datatype: {}'
-                    .format(dtype))
+                raise ValueError(f"Map may not contain datatype: {dtype}")
             out[(name, dtype)] = value
         return out
 
@@ -637,66 +642,64 @@ class PbufCodec(Codec):
         return int(hll_value)
 
     def encode_dt_op(self, dtype, req, op):
-        if dtype == 'counter':
+        if dtype == "counter":
             req.op.counter_op.increment = op[1]
-        elif dtype == 'set':
+        elif dtype == "set":
             self.encode_set_op(req.op, op)
-        elif dtype == 'hll':
+        elif dtype == "hll":
             self.encode_hll_op(req.op, op)
-        elif dtype == 'map':
+        elif dtype == "map":
             self.encode_map_op(req.op.map_op, op)
         else:
             raise TypeError("Cannot send operation on datatype {!r}".
                             format(dtype))
 
     def encode_set_op(self, msg, op):
-        if 'adds' in op:
-            msg.set_op.adds.extend(str_to_bytes(op['adds']))
-        if 'removes' in op:
-            msg.set_op.removes.extend(str_to_bytes(op['removes']))
+        if "adds" in op:
+            msg.set_op.adds.extend(str_to_bytes(op["adds"]))
+        if "removes" in op:
+            msg.set_op.removes.extend(str_to_bytes(op["removes"]))
 
     def encode_hll_op(self, msg, op):
-        if 'adds' in op:
-            msg.hll_op.adds.extend(str_to_bytes(op['adds']))
+        if "adds" in op:
+            msg.hll_op.adds.extend(str_to_bytes(op["adds"]))
 
     def encode_map_op(self, msg, ops):
         for op in ops:
             name, dtype = op[1]
             ftype = MAP_FIELD_TYPES[dtype]
-            if op[0] == 'add':
+            if op[0] == "add":
                 add = msg.adds.add()
                 add.name = str_to_bytes(name)
                 add.type = ftype
-            elif op[0] == 'remove':
+            elif op[0] == "remove":
                 remove = msg.removes.add()
                 remove.name = str_to_bytes(name)
                 remove.type = ftype
-            elif op[0] == 'update':
+            elif op[0] == "update":
                 update = msg.updates.add()
                 update.field.name = str_to_bytes(name)
                 update.field.type = ftype
                 self.encode_map_update(dtype, update, op[2])
 
     def encode_map_update(self, dtype, msg, op):
-        if dtype == 'counter':
-            # ('increment', some_int)
+        if dtype == "counter":
+            # ("increment", some_int)
             msg.counter_op.increment = op[1]
-        elif dtype == 'set':
+        elif dtype == "set":
             self.encode_set_op(msg, op)
-        elif dtype == 'map':
+        elif dtype == "map":
             self.encode_map_op(msg.map_op, op)
-        elif dtype == 'register':
-            # ('assign', some_str)
+        elif dtype == "register":
+            # ("assign", some_str)
             msg.register_op = str_to_bytes(op[1])
-        elif dtype == 'flag':
-            if op == 'enable':
+        elif dtype == "flag":
+            if op == "enable":
                 msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.ENABLE
             else:
                 msg.flag_op = riak.pb.riak_dt_pb2.MapUpdate.DISABLE
         else:
-            raise ValueError(
-                'Map may not contain datatype: {}'
-                .format(dtype))
+            raise ValueError(f"Map may not contain datatype: {dtype}")
 
     def encode_to_ts_cell(self, cell, ts_cell):
         if cell is not None:
@@ -716,8 +719,7 @@ class PbufCodec(Codec):
                 ts_cell.double_value = cell
             else:
                 t = type(cell)
-                raise RiakError("can't serialize type '{}', value '{}'"
-                                .format(t, cell))
+                raise RiakError(f"can't serialize type '{t}', value '{cell}'")
 
     def encode_timeseries_keyreq(self, table, key, is_delete=False):
         key_vals = None
@@ -789,7 +791,7 @@ class PbufCodec(Codec):
     def encode_timeseries_query(self, table, query, interpolations=None):
         req = riak.pb.riak_ts_pb2.TsQueryReq()
         q = query
-        if '{table}' in q:
+        if "{table}" in q:
             q = q.format(table=table.name)
         req.query.base = str_to_bytes(q)
         mc = riak.pb.messages.MSG_CODE_TS_QUERY_REQ
@@ -828,24 +830,23 @@ class PbufCodec(Codec):
 
     def decode_timeseries_col_type(self, col_type):
         # NB: these match the atom names for column types
-        if col_type == TsColumnType.Value('VARCHAR'):
-            return 'varchar'
-        elif col_type == TsColumnType.Value('SINT64'):
-            return 'sint64'
-        elif col_type == TsColumnType.Value('DOUBLE'):
-            return 'double'
-        elif col_type == TsColumnType.Value('TIMESTAMP'):
-            return 'timestamp'
-        elif col_type == TsColumnType.Value('BOOLEAN'):
-            return 'boolean'
-        elif col_type == TsColumnType.Value('BLOB'):
-            return 'blob'
+        if col_type == TsColumnType.Value("VARCHAR"):
+            return "varchar"
+        elif col_type == TsColumnType.Value("SINT64"):
+            return "sint64"
+        elif col_type == TsColumnType.Value("DOUBLE"):
+            return "double"
+        elif col_type == TsColumnType.Value("TIMESTAMP"):
+            return "timestamp"
+        elif col_type == TsColumnType.Value("BOOLEAN"):
+            return "boolean"
+        elif col_type == TsColumnType.Value("BLOB"):
+            return "blob"
         else:
-            msg = 'could not decode column type: {}'.format(col_type)
+            msg = f"could not decode column type: {col_type}"
             raise RiakError(msg)
 
-    def decode_timeseries_row(self, tsrow, tscols=None,
-                              convert_timestamp=False):
+    def decode_timeseries_row(self, tsrow, tscols=None, convert_timestamp=False):
         """
         Decodes a TsRow into a list
 
@@ -860,34 +861,35 @@ class PbufCodec(Codec):
             col = None
             if tscols is not None:
                 col = tscols[i]
-            if cell.HasField('varchar_value'):
-                if col and not (col.type == TsColumnType.Value('VARCHAR') or
-                                col.type == TsColumnType.Value('BLOB')):
-                    raise TypeError('expected VARCHAR or BLOB column')
+            if cell.HasField("varchar_value"):
+                col_is_varchar = col.type == TsColumnType.Value("VARCHAR")
+                col_is_blob = col.type == TsColumnType.Value("BLOB")
+                if col and not (col_is_varchar or col_is_blob):
+                    raise TypeError("expected VARCHAR or BLOB column")
                 else:
                     row.append(cell.varchar_value)
-            elif cell.HasField('sint64_value'):
-                if col and col.type != TsColumnType.Value('SINT64'):
-                    raise TypeError('expected SINT64 column')
+            elif cell.HasField("sint64_value"):
+                if col and col.type != TsColumnType.Value("SINT64"):
+                    raise TypeError("expected SINT64 column")
                 else:
                     row.append(cell.sint64_value)
-            elif cell.HasField('double_value'):
-                if col and col.type != TsColumnType.Value('DOUBLE'):
-                    raise TypeError('expected DOUBLE column')
+            elif cell.HasField("double_value"):
+                if col and col.type != TsColumnType.Value("DOUBLE"):
+                    raise TypeError("expected DOUBLE column")
                 else:
                     row.append(cell.double_value)
-            elif cell.HasField('timestamp_value'):
-                if col and col.type != TsColumnType.Value('TIMESTAMP'):
-                    raise TypeError('expected TIMESTAMP column')
+            elif cell.HasField("timestamp_value"):
+                if col and col.type != TsColumnType.Value("TIMESTAMP"):
+                    raise TypeError("expected TIMESTAMP column")
                 else:
                     dt = cell.timestamp_value
                     if convert_timestamp:
                         dt = datetime_from_unix_time_millis(
                             cell.timestamp_value)
                     row.append(dt)
-            elif cell.HasField('boolean_value'):
-                if col and col.type != TsColumnType.Value('BOOLEAN'):
-                    raise TypeError('expected BOOLEAN column')
+            elif cell.HasField("boolean_value"):
+                if col and col.type != TsColumnType.Value("BOOLEAN"):
+                    raise TypeError("expected BOOLEAN column")
                 else:
                     row.append(cell.boolean_value)
             else:
@@ -903,9 +905,9 @@ class PbufCodec(Codec):
                         riak.pb.riak_kv_pb2.RpbBucketKeyPreflistItem
         :rtype dict
         """
-        result = {'partition': item.partition,
-                  'node': bytes_to_str(item.node),
-                  'primary': item. primary}
+        result = {"partition": item.partition,
+                  "node": bytes_to_str(item.node),
+                  "primary": item. primary}
         return result
 
     def encode_get(self, robj, r=None, pr=None, timeout=None,
@@ -956,7 +958,7 @@ class PbufCodec(Codec):
         if robj.key:
             req.key = str_to_bytes(robj.key)
         if robj.vclock:
-            req.vclock = robj.vclock.encode('binary')
+            req.vclock = robj.vclock.encode("binary")
         self.encode_content(robj, req.content)
         mc = riak.pb.messages.MSG_CODE_PUT_REQ
         rc = riak.pb.messages.MSG_CODE_PUT_RESP
@@ -964,23 +966,23 @@ class PbufCodec(Codec):
 
     def decode_get(self, robj, resp):
         if resp is not None:
-            if resp.HasField('vclock'):
-                robj.vclock = VClock(resp.vclock, 'binary')
+            if resp.HasField("vclock"):
+                robj.vclock = VClock(resp.vclock, "binary")
             # We should do this even if there are no contents, i.e.
             # the object is tombstoned
             self.decode_contents(resp.content, robj)
         else:
             # "not found" returns an empty message,
-            # so let's make sure to clear the siblings
+            # so lets make sure to clear the siblings
             robj.siblings = []
         return robj
 
     def decode_put(self, robj, resp):
         if resp is not None:
-            if resp.HasField('key'):
+            if resp.HasField("key"):
                 robj.key = bytes_to_str(resp.key)
             if resp.HasField("vclock"):
-                robj.vclock = VClock(resp.vclock, 'binary')
+                robj.vclock = VClock(resp.vclock, "binary")
             if resp.content:
                 self.decode_contents(resp.content, robj)
         elif not robj.key:
@@ -1009,10 +1011,9 @@ class PbufCodec(Codec):
         if self._client_timeouts and timeout:
             req.timeout = timeout
 
-        use_vclocks = (self._tombstone_vclocks and
-                       hasattr(robj, 'vclock') and robj.vclock)
+        use_vclocks = (self._tombstone_vclocks and hasattr(robj, "vclock") and robj.vclock)
         if use_vclocks:
-            req.vclock = robj.vclock.encode('binary')
+            req.vclock = robj.vclock.encode("binary")
 
         bucket = robj.bucket
         req.bucket = str_to_bytes(bucket.name)
@@ -1040,8 +1041,8 @@ class PbufCodec(Codec):
         return keys
 
     def decode_get_server_info(self, resp):
-        return {'node': bytes_to_str(resp.node),
-                'server_version': bytes_to_str(resp.server_version)}
+        return {"node": bytes_to_str(resp.node),
+                "server_version": bytes_to_str(resp.server_version)}
 
     def encode_get_client_id(self):
         mc = riak.pb.messages.MSG_CODE_GET_CLIENT_ID_REQ
@@ -1061,7 +1062,7 @@ class PbufCodec(Codec):
     def encode_get_buckets(self, bucket_type,
                            timeout=None, streaming=False):
         # Bucket streaming landed in the same release as timeouts, so
-        # we don't need to check the capability.
+        # we don"t need to check the capability.
         req = riak.pb.riak_kv_pb2.RpbListBucketsReq()
         req.stream = streaming
         self._add_bucket_type(req, bucket_type)
@@ -1135,8 +1136,7 @@ class PbufCodec(Codec):
         return Msg(mc, req.SerializeToString(), rc)
 
     def encode_get_search_index(self, index):
-        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexGetReq(
-                name=str_to_bytes(index))
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexGetReq(name=str_to_bytes(index))
         mc = riak.pb.messages.MSG_CODE_YOKOZUNA_INDEX_GET_REQ
         rc = riak.pb.messages.MSG_CODE_YOKOZUNA_INDEX_GET_RESP
         return Msg(mc, req.SerializeToString(), rc)
@@ -1148,39 +1148,38 @@ class PbufCodec(Codec):
         return Msg(mc, req.SerializeToString(), rc)
 
     def encode_delete_search_index(self, index):
-        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexDeleteReq(
-                name=str_to_bytes(index))
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaIndexDeleteReq(name=str_to_bytes(index))
         mc = riak.pb.messages.MSG_CODE_YOKOZUNA_INDEX_DELETE_REQ
         rc = riak.pb.messages.MSG_CODE_DEL_RESP
         return Msg(mc, req.SerializeToString(), rc)
 
     def encode_create_search_schema(self, schema, content):
         scma = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchema(
-                name=str_to_bytes(schema),
-                content=str_to_bytes(content))
-        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchemaPutReq(
-                schema=scma)
+            name=str_to_bytes(schema),
+            content=str_to_bytes(content),
+        )
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchemaPutReq(schema=scma)
         mc = riak.pb.messages.MSG_CODE_YOKOZUNA_SCHEMA_PUT_REQ
         rc = riak.pb.messages.MSG_CODE_PUT_RESP
         return Msg(mc, req.SerializeToString(), rc)
 
     def encode_get_search_schema(self, schema):
-        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchemaGetReq(
-                name=str_to_bytes(schema))
+        req = riak.pb.riak_yokozuna_pb2.RpbYokozunaSchemaGetReq(name=str_to_bytes(schema))
         mc = riak.pb.messages.MSG_CODE_YOKOZUNA_SCHEMA_GET_REQ
         rc = riak.pb.messages.MSG_CODE_YOKOZUNA_SCHEMA_GET_RESP
         return Msg(mc, req.SerializeToString(), rc)
 
     def decode_get_search_schema(self, resp):
         result = {}
-        result['name'] = bytes_to_str(resp.schema.name)
-        result['content'] = bytes_to_str(resp.schema.content)
+        result["name"] = bytes_to_str(resp.schema.name)
+        result["content"] = bytes_to_str(resp.schema.content)
         return result
 
     def encode_search(self, index, query, **kwargs):
         req = riak.pb.riak_search_pb2.RpbSearchQueryReq(
-                index=str_to_bytes(index),
-                q=str_to_bytes(query))
+            index=str_to_bytes(index),
+            q=str_to_bytes(query),
+        )
         self.encode_search_query(req, **kwargs)
         mc = riak.pb.messages.MSG_CODE_SEARCH_QUERY_REQ
         rc = riak.pb.messages.MSG_CODE_SEARCH_QUERY_RESP
@@ -1188,25 +1187,25 @@ class PbufCodec(Codec):
 
     def decode_search(self, resp):
         result = {}
-        if resp.HasField('max_score'):
-            result['max_score'] = resp.max_score
-        if resp.HasField('num_found'):
-            result['num_found'] = resp.num_found
-        result['docs'] = [self.decode_search_doc(doc) for doc in resp.docs]
+        if resp.HasField("max_score"):
+            result["max_score"] = resp.max_score
+        if resp.HasField("num_found"):
+            result["num_found"] = resp.num_found
+        result["docs"] = [self.decode_search_doc(doc) for doc in resp.docs]
         return result
 
     def encode_get_counter(self, bucket, key, **kwargs):
         req = riak.pb.riak_kv_pb2.RpbCounterGetReq()
         req.bucket = str_to_bytes(bucket.name)
         req.key = str_to_bytes(key)
-        if kwargs.get('r') is not None:
-            req.r = self.encode_quorum(kwargs['r'])
-        if kwargs.get('pr') is not None:
-            req.pr = self.encode_quorum(kwargs['pr'])
-        if kwargs.get('basic_quorum') is not None:
-            req.basic_quorum = kwargs['basic_quorum']
-        if kwargs.get('notfound_ok') is not None:
-            req.notfound_ok = kwargs['notfound_ok']
+        if kwargs.get("r") is not None:
+            req.r = self.encode_quorum(kwargs["r"])
+        if kwargs.get("pr") is not None:
+            req.pr = self.encode_quorum(kwargs["pr"])
+        if kwargs.get("basic_quorum") is not None:
+            req.basic_quorum = kwargs["basic_quorum"]
+        if kwargs.get("notfound_ok") is not None:
+            req.notfound_ok = kwargs["notfound_ok"]
         mc = riak.pb.messages.MSG_CODE_COUNTER_GET_REQ
         rc = riak.pb.messages.MSG_CODE_COUNTER_GET_RESP
         return Msg(mc, req.SerializeToString(), rc)
@@ -1216,14 +1215,14 @@ class PbufCodec(Codec):
         req.bucket = str_to_bytes(bucket.name)
         req.key = str_to_bytes(key)
         req.amount = value
-        if kwargs.get('w') is not None:
-            req.w = self.encode_quorum(kwargs['w'])
-        if kwargs.get('dw') is not None:
-            req.dw = self.encode_quorum(kwargs['dw'])
-        if kwargs.get('pw') is not None:
-            req.pw = self.encode_quorum(kwargs['pw'])
-        if kwargs.get('returnvalue') is not None:
-            req.returnvalue = kwargs['returnvalue']
+        if kwargs.get("w") is not None:
+            req.w = self.encode_quorum(kwargs["w"])
+        if kwargs.get("dw") is not None:
+            req.dw = self.encode_quorum(kwargs["dw"])
+        if kwargs.get("pw") is not None:
+            req.pw = self.encode_quorum(kwargs["pw"])
+        if kwargs.get("returnvalue") is not None:
+            req.returnvalue = kwargs["returnvalue"]
         mc = riak.pb.messages.MSG_CODE_COUNTER_UPDATE_REQ
         rc = riak.pb.messages.MSG_CODE_COUNTER_UPDATE_RESP
         return Msg(mc, req.SerializeToString(), rc)
@@ -1242,8 +1241,7 @@ class PbufCodec(Codec):
         op = datatype.to_op()
         type_name = datatype.type_name
         if not op:
-            raise ValueError("No operation to send on datatype {!r}".
-                             format(datatype))
+            raise ValueError(f"No operation to send on datatype {datatype}")
         req = riak.pb.riak_dt_pb2.DtUpdateReq()
         req.bucket = str_to_bytes(datatype.bucket.name)
         req.type = str_to_bytes(datatype.bucket.bucket_type.name)
@@ -1259,11 +1257,11 @@ class PbufCodec(Codec):
 
     def decode_update_datatype(self, datatype, resp, **kwargs):
         type_name = datatype.type_name
-        if resp.HasField('key'):
+        if resp.HasField("key"):
             datatype.key = resp.key[:]
-        if resp.HasField('context'):
+        if resp.HasField("context"):
             datatype._context = resp.context[:]
-        if kwargs.get('return_body'):
+        if kwargs.get("return_body"):
             datatype._set_value(self.decode_dt_value(type_name, resp))
 
     def encode_get_preflist(self, bucket, key):

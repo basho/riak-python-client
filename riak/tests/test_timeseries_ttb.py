@@ -15,62 +15,65 @@
 
 import datetime
 import logging
-import six
 import unittest
+
+import six
 
 from erlastic import decode, encode
 from erlastic.types import Atom
-
 from riak import RiakError
+from riak.codecs.ttb import TtbCodec
 from riak.table import Table
 from riak.tests import RUN_TIMESERIES
-from riak.ts_object import TsObject
-from riak.codecs.ttb import TtbCodec
-from riak.util import str_to_bytes, bytes_to_str, \
-    unix_time_millis, is_timeseries_supported
 from riak.tests.base import IntegrationTestBase
+from riak.ts_object import TsObject
+from riak.util import (
+    bytes_to_str,
+    is_timeseries_supported,
+    str_to_bytes,
+    unix_time_millis,
+)
 
-rpberrorresp_a = Atom('rpberrorresp')
-tsgetreq_a = Atom('tsgetreq')
-tsgetresp_a = Atom('tsgetresp')
-tsputreq_a = Atom('tsputreq')
+rpberrorresp_a = Atom("rpberrorresp")
+tsgetreq_a = Atom("tsgetreq")
+tsgetresp_a = Atom("tsgetresp")
+tsputreq_a = Atom("tsputreq")
 
-udef_a = Atom('undefined')
-varchar_a = Atom('varchar')
-sint64_a = Atom('sint64')
-double_a = Atom('double')
-timestamp_a = Atom('timestamp')
-boolean_a = Atom('boolean')
+udef_a = Atom("undefined")
+varchar_a = Atom("varchar")
+sint64_a = Atom("sint64")
+double_a = Atom("double")
+timestamp_a = Atom("timestamp")
+boolean_a = Atom("boolean")
 
-table_name = 'GeoCheckin'
+table_name = "GeoCheckin"
 
-str0 = 'ascii-0'
-str1 = 'ascii-1'
+str0 = "ascii-0"
+str1 = "ascii-1"
 
-bd0 = six.u('时间序列')
-bd1 = six.u('временные ряды')
+bd0 = six.u("时间序列")
+bd1 = six.u("временные ряды")
 
-blob0 = b'\x00\x01\x02\x03\x04\x05\x06\x07'
+blob0 = b"\x00\x01\x02\x03\x04\x05\x06\x07"
 
 fiveMins = datetime.timedelta(0, 300)
 ts0 = datetime.datetime(2015, 1, 1, 12, 1, 2, 987000)
 ts1 = ts0 + fiveMins
 
 
-@unittest.skipUnless(is_timeseries_supported(),
-                     'Timeseries not supported by this Python version')
+@unittest.skipUnless(is_timeseries_supported(), "Timeseries not supported by this Python version")
 class TimeseriesTtbUnitTests(unittest.TestCase):
     def setUp(self):
         self.table = Table(None, table_name)
 
     def test_encode_data_for_get(self):
         keylist = [
-            str_to_bytes('hash1'), str_to_bytes('user2'), unix_time_millis(ts0)
+            str_to_bytes("hash1"), str_to_bytes("user2"), unix_time_millis(ts0),
         ]
         req = tsgetreq_a, str_to_bytes(table_name), keylist, udef_a
         req_test = encode(req)
 
-        test_key = ['hash1', 'user2', ts0]
+        test_key = ["hash1", "user2", ts0]
         c = TtbCodec()
         msg = c.encode_timeseries_keyreq(self.table, test_key)
         self.assertEqual(req_test, msg.data)
@@ -85,8 +88,9 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
     #   }
     # }
     def test_decode_data_from_get(self):
-        colnames = ["varchar", "sint64", "double", "timestamp",
-                    "boolean", "varchar", "varchar", "blob"]
+        colnames = [
+            "varchar", "sint64", "double", "timestamp", "boolean", "varchar", "varchar", "blob",
+        ]
         coltypes = [varchar_a, sint64_a, double_a, timestamp_a,
                     boolean_a, varchar_a, varchar_a]
         r0 = (bd0, 0, 1.2, unix_time_millis(ts0), True,
@@ -106,7 +110,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
         for i in range(0, 1):
             dr = rows[i]
             r = tsobj.rows[i]  # encoded
-            self.assertEqual(r[0], dr[0].encode('utf-8'))
+            self.assertEqual(r[0], dr[0].encode("utf-8"))
             self.assertEqual(r[1], dr[1])
             self.assertEqual(r[2], dr[2])
             # NB *not* decoding timestamps
@@ -117,7 +121,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
             else:
                 self.assertEqual(r[4], False)
             self.assertEqual(r[5], None)
-            self.assertEqual(r[6], dr[6].encode('ascii'))
+            self.assertEqual(r[6], dr[6].encode("ascii"))
             self.assertEqual(r[7], None)
             self.assertEqual(r[8], dr[8])
 
@@ -130,7 +134,7 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
         rows_to_encode = [
             [bd0, 0, 1.2, ts0, True, None],
-            [bd1, 3, 4.5, ts1, False, None]
+            [bd1, 3, 4.5, ts1, False, None],
         ]
 
         tsobj = TsObject(None, self.table, rows_to_encode, None)
@@ -140,17 +144,17 @@ class TimeseriesTtbUnitTests(unittest.TestCase):
 
 
 @unittest.skipUnless(is_timeseries_supported() and RUN_TIMESERIES,
-                     'Timeseries not supported by this Python version'
-                     ' or RUN_TIMESERIES is 0')
+                     "Timeseries not supported by this Python version"
+                     " or RUN_TIMESERIES is 0")
 class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
-    client_options = {'transport_options':
-                      {'use_ttb': True, 'ts_convert_timestamp': True}}
+    client_options = {"transport_options":
+                      {"use_ttb": True, "ts_convert_timestamp": True}}
 
     @classmethod
     def setUpClass(cls):
         super(TimeseriesTtbTests, cls).setUpClass()
         client = cls.create_client()
-        skey = 'test-key'
+        skey = "test-key"
         btype = client.bucket_type(table_name)
         bucket = btype.bucket(table_name)
         try:
@@ -175,9 +179,9 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
             INSERT INTO GeoCheckin_Wide
             (geohash, user, time, weather, temperature, uv_index, observed)
                 VALUES
-            ('hash3', 'user3', 1460203200000, 'tornado', 43.5, 128, True);
+            ("hash3", "user3", 1460203200000, "tornado", 43.5, 128, True);
         """
-        ts_obj = self.client.ts_query('GeoCheckin_Wide', query)
+        ts_obj = self.client.ts_query("GeoCheckin_Wide", query)
         self.assertIsNotNone(ts_obj)
         self.validate_len(ts_obj, 0)
 
@@ -194,11 +198,11 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         """
         ts_obj = self.client.ts_query(table, query)
         self.assertIsNotNone(ts_obj)
-        self.assertFalse(hasattr(ts_obj, 'ts_cols'))
+        self.assertFalse(hasattr(ts_obj, "ts_cols"))
         self.assertIsNone(ts_obj.rows)
 
     def test_query_that_returns_table_description(self):
-        fmt = 'DESCRIBE {table}'
+        fmt = "DESCRIBE {table}"
         query = fmt.format(table=table_name)
         ts_obj = self.client.ts_query(table_name, query)
         self.assertIsNotNone(ts_obj)
@@ -208,14 +212,14 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         now = datetime.datetime(2015, 1, 1, 12, 0, 0)
         table = self.client.table(table_name)
         rows = [
-            ['hash1', 'user2', now, 'frazzle', 12.3]
+            ["hash1", "user2", now, "frazzle", 12.3],
         ]
 
         ts_obj = table.new(rows)
         result = ts_obj.store()
         self.assertTrue(result)
 
-        k = ['hash1', 'user2', now]
+        k = ["hash1", "user2", now]
         ts_obj = self.client.ts_get(table_name, k)
         self.assertIsNotNone(ts_obj)
         ts_cols = ts_obj.columns
@@ -225,8 +229,8 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
 
         row = ts_obj.rows[0]
         self.assertEqual(len(row), 5)
-        exp = [six.b('hash1'), six.b('user2'), now,
-               six.b('frazzle'), 12.3]
+        exp = [six.b("hash1"), six.b("user2"), now,
+               six.b("frazzle"), 12.3]
         self.assertEqual(row, exp)
 
     def test_store_and_fetch_and_query(self):
@@ -239,24 +243,24 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
 
         table = self.client.table(table_name)
         rows = [
-            ['hash1', 'user2', twentyFiveMinsAgo, 'typhoon', 90.3],
-            ['hash1', 'user2', twentyMinsAgo, 'hurricane', 82.3],
-            ['hash1', 'user2', fifteenMinsAgo, 'rain', 79.0],
-            ['hash1', 'user2', fiveMinsAgo, 'wind', None],
-            ['hash1', 'user2', now, 'snow', 20.1]
+            ["hash1", "user2", twentyFiveMinsAgo, "typhoon", 90.3],
+            ["hash1", "user2", twentyMinsAgo, "hurricane", 82.3],
+            ["hash1", "user2", fifteenMinsAgo, "rain", 79.0],
+            ["hash1", "user2", fiveMinsAgo, "wind", None],
+            ["hash1", "user2", now, "snow", 20.1],
         ]
         # NB: response data is binary
         exp_rows = [
-            [six.b('hash1'), six.b('user2'), twentyFiveMinsAgo,
-                six.b('typhoon'), 90.3],
-            [six.b('hash1'), six.b('user2'), twentyMinsAgo,
-                six.b('hurricane'), 82.3],
-            [six.b('hash1'), six.b('user2'), fifteenMinsAgo,
-                six.b('rain'), 79.0],
-            [six.b('hash1'), six.b('user2'), fiveMinsAgo,
-                six.b('wind'), None],
-            [six.b('hash1'), six.b('user2'), now,
-                six.b('snow'), 20.1]
+            [six.b("hash1"), six.b("user2"), twentyFiveMinsAgo,
+                six.b("typhoon"), 90.3],
+            [six.b("hash1"), six.b("user2"), twentyMinsAgo,
+                six.b("hurricane"), 82.3],
+            [six.b("hash1"), six.b("user2"), fifteenMinsAgo,
+                six.b("rain"), 79.0],
+            [six.b("hash1"), six.b("user2"), fiveMinsAgo,
+                six.b("wind"), None],
+            [six.b("hash1"), six.b("user2"), now,
+                six.b("snow"), 20.1],
         ]
         ts_obj = table.new(rows)
         result = ts_obj.store()
@@ -278,24 +282,25 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         fmt = """
         select * from {table} where
             time > {t1} and time < {t2} and
-            geohash = 'hash1' and
-            user = 'user2'
+            geohash = "hash1" and
+            user = "user2"
         """
         query = fmt.format(
-                table=table_name,
-                t1=unix_time_millis(tenMinsAgo),
-                t2=unix_time_millis(now))
+            table=table_name,
+            t1=unix_time_millis(tenMinsAgo),
+            t2=unix_time_millis(now),
+        )
         ts_obj = self.client.ts_query(table_name, query)
         if ts_obj.columns is not None:
             self.assertEqual(len(ts_obj.columns.names), 5)
             self.assertEqual(len(ts_obj.columns.types), 5)
         self.assertEqual(len(ts_obj.rows), 1)
         row = ts_obj.rows[0]
-        self.assertEqual(bytes_to_str(row[0]), 'hash1')
-        self.assertEqual(bytes_to_str(row[1]), 'user2')
+        self.assertEqual(bytes_to_str(row[0]), "hash1")
+        self.assertEqual(bytes_to_str(row[1]), "user2")
         self.assertEqual(row[2], fiveMinsAgo)
         self.assertEqual(row[2].microsecond, 987000)
-        self.assertEqual(bytes_to_str(row[3]), 'wind')
+        self.assertEqual(bytes_to_str(row[3]), "wind")
         self.assertIsNone(row[4])
 
     def test_create_error_via_put(self):
@@ -303,6 +308,4 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         ts_obj = table.new([])
         with self.assertRaises(RiakError) as cm:
             ts_obj.store()
-        logging.debug(
-                "[test_timeseries_ttb] saw exception: {}"
-                .format(cm.exception))
+        logging.debug(f"[test_timeseries_ttb] saw exception: {cm.exception}")

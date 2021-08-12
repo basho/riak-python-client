@@ -14,15 +14,17 @@
 
 
 import os.path
-import threading
-import string
-import re
 import random
+import re
 import shutil
 import socket
-import time
 import stat
-from subprocess import Popen, PIPE
+import string
+import threading
+import time
+
+from subprocess import PIPE, Popen
+
 from riak.util import deep_merge
 from six import string_types
 
@@ -63,24 +65,22 @@ def erlang_config(hash, depth=1):
 
         return "{%s, %s}" % (k, p)
 
-    padding = '    ' * depth
-    parent_padding = '    ' * (depth - 1)
+    padding = "    " * depth
+    parent_padding = "    " * (depth - 1)
     values = (",\n%s" % padding).join(map(printable, list(hash.items())))
     return "[\n%s%s\n%s]" % (padding, values, parent_padding)
 
 
 class TestServer(object):
     VM_ARGS_DEFAULTS = {
-        "-name": "riaktest%d@127.0.0.1" % random.randint(0, 100000),
-        "-setcookie": "%d_%d" % (random.randint(0, 100000),
-                                 random.randint(0, 100000)),
+        "-name": f"riaktest{random.randint(0, 100000)}@127.0.0.1",
+        "-setcookie": f"{random.randint(0, 100000)}_{random.randint(0, 100000)}",
         "+K": "true",
         "+A": 64,
         "-smp": "enable",
         "-env ERL_MAX_PORTS": 4096,
         "-env ERL_FULLSWEEP_AFTER": 10,
-        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                            "erl_src"))
+        "-pa": os.path.abspath(os.path.join(os.path.dirname(__file__), "erl_src")),
     }
 
     APP_CONFIG_DEFAULTS = {
@@ -88,7 +88,7 @@ class TestServer(object):
             "web_ip": "127.0.0.1",
             "web_port": 9000,
             "handoff_port": 9001,
-            "ring_creation_size": 64
+            "ring_creation_size": 64,
         },
         "riak_kv": {
             "storage_backend": Atom("riak_kv_test_backend"),
@@ -107,7 +107,7 @@ class TestServer(object):
         },
         "riak_search": {
             "enabled": True,
-            "search_backend": Atom("riak_search_test_backend")
+            "search_backend": Atom("riak_search_test_backend"),
         },
     }
 
@@ -161,8 +161,9 @@ class TestServer(object):
     def start(self):
         if self._prepared and not self._started:
             with self._lock:
-                self._server = Popen([self._riak_script, "console"],
-                                     stdin=PIPE, stdout=PIPE, stderr=PIPE)
+                self._server = Popen(
+                    [self._riak_script, "console"], stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                )
                 self._server.stdin.write("\n")
                 self._server.stdin.flush()
                 self.wait_for_erlang_prompt()
@@ -229,32 +230,29 @@ class TestServer(object):
         with open(self._riak_script, "wb") as temp_bin_file:
             with open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
                 for line in riak_file.readlines():
-                    line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r'\1%s' %
-                                  self._temp_bin,
-                                  line)
-                    line = re.sub("(RUNNER_ETC_DIR=)(.*)", r'\1%s' %
-                                  self._temp_etc, line)
-                    line = re.sub("(RUNNER_USER=)(.*)", r'\1', line)
-                    line = re.sub("(RUNNER_LOG_DIR=)(.*)", r'\1%s' %
-                                  self._temp_log, line)
-                    line = re.sub("(PIPE_DIR=)(.*)", r'\1%s' %
-                                  self._temp_pipe, line)
-                    line = re.sub("(PLATFORM_DATA_DIR=)(.*)", r'\1%s' %
-                                  self.temp_dir, line)
+                    line = re.sub("(RUNNER_SCRIPT_DIR=)(.*)", r"\1%s" % self._temp_bin, line)
+                    line = re.sub("(RUNNER_ETC_DIR=)(.*)", r"\1%s" % self._temp_etc, line)
+                    line = re.sub("(RUNNER_USER=)(.*)", r"\1", line)
+                    line = re.sub("(RUNNER_LOG_DIR=)(.*)", r"\1%s" % self._temp_log, line)
+                    line = re.sub("(PIPE_DIR=)(.*)", r"\1%s" % self._temp_pipe, line)
+                    line = re.sub("(PLATFORM_DATA_DIR=)(.*)", r"\1%s" % self.temp_dir, line)
 
                     if (string.strip(line) == self.DEFAULT_BASE_DIR):
-                        line = ("RUNNER_BASE_DIR=%s\n" %
-                                os.path.normpath(os.path.join(self.bin_dir,
-                                                              "..")))
+                        line = (
+                            "RUNNER_BASE_DIR=%s\n" % os.path.normpath(
+                                os.path.join(self.bin_dir, ".."),
+                            )
+                        )
 
                     temp_bin_file.write(line)
 
-                os.fchmod(temp_bin_file.fileno(),
-                          stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP |
-                          stat.S_IROTH | stat.S_IXOTH)
+                os.fchmod(
+                    temp_bin_file.fileno(),
+                    stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH,
+                )
 
     def write_vm_args(self):
-        with open(self._vm_args_path(), 'wb') as vm_args:
+        with open(self._vm_args_path(), "wb") as vm_args:
             for arg, value in self.vm_args.items():
                 vm_args.write("%s %s\n" % (arg, value))
 

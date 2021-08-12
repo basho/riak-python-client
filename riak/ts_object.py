@@ -17,7 +17,7 @@ import collections
 from riak import RiakError
 from riak.table import Table
 
-TsColumns = collections.namedtuple('TsColumns', ['names', 'types'])
+TsColumns = collections.namedtuple("TsColumns", ["names", "types"])
 
 
 class TsObject(object):
@@ -40,7 +40,7 @@ class TsObject(object):
         """
 
         if not isinstance(table, Table):
-            raise ValueError('table must be an instance of Table.')
+            raise ValueError("table must be an instance of Table.")
 
         self.client = client
         self.table = table

@@ -14,12 +14,15 @@
 # limitations under the License.
 
 
-from six import PY2
-from threading import Thread
 import sys
-from pool import Pool
+
 from random import SystemRandom
+from threading import Thread
 from time import sleep
+
+from pool import Pool
+from six import PY2
+
 if PY2:
     from queue import Queue
 else:

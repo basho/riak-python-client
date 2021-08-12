@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from six import string_types, PY2
+from six import PY2, string_types
 
 
 class Table(object):
@@ -27,17 +27,17 @@ class Table(object):
         :param client: A :class:`RiakClient <riak.client.RiakClient>`
                instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
-        :param name: The table's name
+        :param name: The table"s name
         :type name: string
         """
         if not isinstance(name, string_types):
-            raise TypeError('Table name must be a string')
+            raise TypeError("Table name must be a string")
 
         if PY2:
             try:
-                name = name.encode('ascii')
+                name = name.encode("ascii")
             except UnicodeError:
-                raise TypeError('Unicode table names are not supported.')
+                raise TypeError("Unicode table names are not supported.")
 
         self._client = client
         self.name = name
@@ -65,7 +65,7 @@ class Table(object):
 
     def describe(self):
         """
-        Retrieves a timeseries table's description.
+        Retrieves a timeseries table"s description.
 
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
@@ -75,7 +75,7 @@ class Table(object):
         """
         Gets a value from a timeseries table.
 
-        :param key: The timeseries value's key.
+        :param key: The timeseries value"s key.
         :type key: list
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
@@ -85,7 +85,7 @@ class Table(object):
         """
         Deletes a value from a timeseries table.
 
-        :param key: The timeseries value's key.
+        :param key: The timeseries value"s key.
         :type key: list or dict
         :rtype: boolean
         """

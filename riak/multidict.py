@@ -30,9 +30,9 @@ class MultiDict(dict):
             raise TypeError(
                 "MultiDict can only be called with one positional argument")
         if args:
-            if hasattr(args[0], 'iteritems'):
+            if hasattr(args[0], "iteritems"):
                 items = list(args[0].items())
-            elif hasattr(args[0], 'items'):
+            elif hasattr(args[0], "items"):
                 items = list(args[0].items())
             else:
                 items = list(args[0])
@@ -77,9 +77,9 @@ class MultiDict(dict):
         """
         v = self.getall(key)
         if not v:
-            raise KeyError('Key not found: %r' % key)
+            raise KeyError("Key not found: %r" % key)
         if len(v) > 1:
-            raise KeyError('Multiple values match %r: %r' % (key, v))
+            raise KeyError("Multiple values match %r: %r" % (key, v))
         return v[0]
 
     def mixed(self):
@@ -169,9 +169,9 @@ class MultiDict(dict):
     def update(self, other=None, **kwargs):
         if other is None:
             pass
-        elif hasattr(other, 'items'):
+        elif hasattr(other, "items"):
             self._items.extend(other.items())
-        elif hasattr(other, 'keys'):
+        elif hasattr(other, "keys"):
             for k in other.keys():
                 self._items.append((k, other[k]))
         else:
@@ -181,8 +181,8 @@ class MultiDict(dict):
             self.update(kwargs)
 
     def __repr__(self):
-        items = ', '.join(['(%r, %r)' % v for v in self._items])
-        return '%s([%s])' % (self.__class__.__name__, items)
+        items = ", ".join(["(%r, %r)" % v for v in self._items])
+        return "%s([%s])" % (self.__class__.__name__, items)
 
     def __len__(self):
         return len(self._items)

@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import socket
 import select
+import socket
 
-from six import PY2
 from riak.security import SecurityError, USE_STDLIB_SSL
-from riak.transports.pool import Pool
 from riak.transports.http.transport import HttpTransport
+from riak.transports.pool import Pool
+from six import PY2
 
 if USE_STDLIB_SSL:
     import ssl
@@ -129,7 +129,7 @@ class RiakHTTPSConnection(HTTPSConnection):
                     select.select([sock], [], [])
                     continue
                 except OpenSSL.SSL.Error as e:
-                    raise SecurityError('bad handshake - ' + str(e))
+                    raise SecurityError(f"bad handshake - {str(e)}")
                 break
 
             self.sock = RiakWrappedSocket(cxn, sock)
@@ -176,7 +176,7 @@ CONN_CLOSED_ERRORS = (
     NotConnected,
     IncompleteRead,
     ImproperConnectionState,
-    BadStatusLine
+    BadStatusLine,
 )
 
 

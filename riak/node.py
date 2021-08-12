@@ -74,7 +74,7 @@ class RiakNode(object):
     error tracking used for node-selection.
     """
 
-    def __init__(self, host='127.0.0.1', http_port=8098, pb_port=8087,
+    def __init__(self, host="127.0.0.1", http_port=8098, pb_port=8087,
                  **unused_args):
         """
         Creates a node.
