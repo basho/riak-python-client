@@ -88,7 +88,7 @@ class PbufKeyStream(PbufStream):
     _expect = riak.pb.messages.MSG_CODE_LIST_KEYS_RESP
 
     def __next__(self):
-        response = next(super(PbufKeyStream, self))
+        response = super(PbufKeyStream, self).__next__()
 
         if response.done and len(response.keys) == 0:
             raise StopIteration
@@ -105,7 +105,7 @@ class PbufMapredStream(PbufStream):
     _expect = riak.pb.messages.MSG_CODE_MAP_RED_RESP
 
     def __next__(self):
-        response = next(super(PbufMapredStream, self))
+        response = super(PbufMapredStream, self).__next__()
 
         if response.done and not response.HasField("response"):
             raise StopIteration
@@ -121,7 +121,7 @@ class PbufBucketStream(PbufStream):
     _expect = riak.pb.messages.MSG_CODE_LIST_BUCKETS_RESP
 
     def __next__(self):
-        response = next(super(PbufBucketStream, self))
+        response = super(PbufBucketStream, self).__next__()
 
         if response.done and len(response.buckets) == 0:
             raise StopIteration
@@ -143,7 +143,7 @@ class PbufIndexStream(PbufStream):
         self.return_terms = return_terms
 
     def __next__(self):
-        response = next(super(PbufIndexStream, self))
+        response = super(PbufIndexStream, self).__next__()
 
         if response.done and not (response.keys or response.results or response.continuation):
             raise StopIteration
@@ -171,7 +171,7 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
         self._convert_timestamp = convert_timestamp
 
     def __next__(self):
-        response = next(super(PbufTsKeyStream, self))
+        response = super(PbufTsKeyStream, self).__next__()
 
         if response.done and len(response.keys) == 0:
             raise StopIteration

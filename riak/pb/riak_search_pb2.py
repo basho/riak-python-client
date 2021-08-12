@@ -199,25 +199,22 @@ DESCRIPTOR.message_types_by_name['RpbSearchDoc'] = _RPBSEARCHDOC
 DESCRIPTOR.message_types_by_name['RpbSearchQueryReq'] = _RPBSEARCHQUERYREQ
 DESCRIPTOR.message_types_by_name['RpbSearchQueryResp'] = _RPBSEARCHQUERYRESP
 
-class RpbSearchDoc(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbSearchDoc(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBSEARCHDOC
 
   # @@protoc_insertion_point(class_scope:RpbSearchDoc)
 
-class RpbSearchQueryReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbSearchQueryReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBSEARCHQUERYREQ
 
   # @@protoc_insertion_point(class_scope:RpbSearchQueryReq)
 
-class RpbSearchQueryResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbSearchQueryResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBSEARCHQUERYRESP
 
   # @@protoc_insertion_point(class_scope:RpbSearchQueryResp)
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), '\n\027com.basho.riak.protobufB\014RiakSearchPB')
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b'\n\027com.basho.riak.protobufB\014RiakSearchPB')
 # @@protoc_insertion_point(module_scope)

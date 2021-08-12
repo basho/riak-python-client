@@ -325,61 +325,52 @@ DESCRIPTOR.message_types_by_name['RpbYokozunaSchemaPutReq'] = _RPBYOKOZUNASCHEMA
 DESCRIPTOR.message_types_by_name['RpbYokozunaSchemaGetReq'] = _RPBYOKOZUNASCHEMAGETREQ
 DESCRIPTOR.message_types_by_name['RpbYokozunaSchemaGetResp'] = _RPBYOKOZUNASCHEMAGETRESP
 
-class RpbYokozunaIndex(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaIndex(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNAINDEX
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaIndex)
 
-class RpbYokozunaIndexGetReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaIndexGetReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNAINDEXGETREQ
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaIndexGetReq)
 
-class RpbYokozunaIndexGetResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaIndexGetResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNAINDEXGETRESP
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaIndexGetResp)
 
-class RpbYokozunaIndexPutReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaIndexPutReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNAINDEXPUTREQ
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaIndexPutReq)
 
-class RpbYokozunaIndexDeleteReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaIndexDeleteReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNAINDEXDELETEREQ
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaIndexDeleteReq)
 
-class RpbYokozunaSchema(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaSchema(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNASCHEMA
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaSchema)
 
-class RpbYokozunaSchemaPutReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaSchemaPutReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNASCHEMAPUTREQ
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaSchemaPutReq)
 
-class RpbYokozunaSchemaGetReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaSchemaGetReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNASCHEMAGETREQ
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaSchemaGetReq)
 
-class RpbYokozunaSchemaGetResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbYokozunaSchemaGetResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBYOKOZUNASCHEMAGETRESP
 
   # @@protoc_insertion_point(class_scope:RpbYokozunaSchemaGetResp)
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), '\n\027com.basho.riak.protobufB\016RiakYokozunaPB')
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b'\n\027com.basho.riak.protobufB\016RiakYokozunaPB')
 # @@protoc_insertion_point(module_scope)

@@ -819,115 +819,97 @@ DESCRIPTOR.message_types_by_name['TsCoverageResp'] = _TSCOVERAGERESP
 DESCRIPTOR.message_types_by_name['TsCoverageEntry'] = _TSCOVERAGEENTRY
 DESCRIPTOR.message_types_by_name['TsRange'] = _TSRANGE
 
-class TsQueryReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsQueryReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSQUERYREQ
 
   # @@protoc_insertion_point(class_scope:TsQueryReq)
 
-class TsQueryResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsQueryResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSQUERYRESP
 
   # @@protoc_insertion_point(class_scope:TsQueryResp)
 
-class TsGetReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsGetReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSGETREQ
 
   # @@protoc_insertion_point(class_scope:TsGetReq)
 
-class TsGetResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsGetResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSGETRESP
 
   # @@protoc_insertion_point(class_scope:TsGetResp)
 
-class TsPutReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsPutReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSPUTREQ
 
   # @@protoc_insertion_point(class_scope:TsPutReq)
 
-class TsPutResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsPutResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSPUTRESP
 
   # @@protoc_insertion_point(class_scope:TsPutResp)
 
-class TsDelReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsDelReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSDELREQ
 
   # @@protoc_insertion_point(class_scope:TsDelReq)
 
-class TsDelResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsDelResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSDELRESP
 
   # @@protoc_insertion_point(class_scope:TsDelResp)
 
-class TsInterpolation(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsInterpolation(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSINTERPOLATION
 
   # @@protoc_insertion_point(class_scope:TsInterpolation)
 
-class TsColumnDescription(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsColumnDescription(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSCOLUMNDESCRIPTION
 
   # @@protoc_insertion_point(class_scope:TsColumnDescription)
 
-class TsRow(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsRow(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSROW
 
   # @@protoc_insertion_point(class_scope:TsRow)
 
-class TsCell(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsCell(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSCELL
 
   # @@protoc_insertion_point(class_scope:TsCell)
 
-class TsListKeysReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsListKeysReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSLISTKEYSREQ
 
   # @@protoc_insertion_point(class_scope:TsListKeysReq)
 
-class TsListKeysResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsListKeysResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSLISTKEYSRESP
 
   # @@protoc_insertion_point(class_scope:TsListKeysResp)
 
-class TsCoverageReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsCoverageReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSCOVERAGEREQ
 
   # @@protoc_insertion_point(class_scope:TsCoverageReq)
 
-class TsCoverageResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsCoverageResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSCOVERAGERESP
 
   # @@protoc_insertion_point(class_scope:TsCoverageResp)
 
-class TsCoverageEntry(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsCoverageEntry(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSCOVERAGEENTRY
 
   # @@protoc_insertion_point(class_scope:TsCoverageEntry)
 
-class TsRange(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class TsRange(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _TSRANGE
 
   # @@protoc_insertion_point(class_scope:TsRange)
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), '\n\027com.basho.riak.protobufB\010RiakTsPB')
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b'\n\027com.basho.riak.protobufB\010RiakTsPB')
 # @@protoc_insertion_point(module_scope)

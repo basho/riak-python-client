@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .types import TYPES
 from .counter import Counter
 from .datatype import Datatype
 from .errors import ContextRequired
@@ -20,7 +21,6 @@ from .hll import Hll
 from .map import Map
 from .register import Register
 from .set import Set
-from .types import TYPES
 
 
 __all__ = [

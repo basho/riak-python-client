@@ -6,8 +6,8 @@ from setuptools import setup, find_packages
 from version import get_version
 from commands import setup_timeseries, build_messages
 
-install_requires = ["six >= 1.8.0", "basho_erlastic >= 2.1.1"]
-requires = ["six(>=1.8.0)", "basho_erlastic(>= 2.1.1)"]
+install_requires = ["basho_erlastic >= 2.1.1"]
+requires = ["basho_erlastic(>= 2.1.1)"]
 
 install_requires.append("python3_protobuf >=2.4.1, <2.6.0")
 requires.append("python3_protobuf(>=2.4.1, <2.6.0)")
@@ -17,7 +17,7 @@ with codecs.open("README.md", "r", "utf-8") as f:
 
 try:
     import pypandoc
-    long_description = pypandoc.convert("README.md", "rst")
+    long_description = pypandoc.convert_file("README.md", "rst")
     with codecs.open("README.rst", "w", "utf-8") as f:
         f.write(long_description)
 except(IOError, ImportError):

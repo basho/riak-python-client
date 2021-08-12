@@ -363,7 +363,7 @@ class build_messages(Command):
 
     def _update_pb_pathnames(self):
         """
-        Change the PB files to use full pathnames
+        Change the PB files for Python 3
         """
         pb_files = set()
         with open(self.source, "r", buffering=1) as csvfile:
@@ -377,6 +377,15 @@ class build_messages(Command):
                 contents = pbfile.read()
                 contents = re.sub(r"riak_pb2",
                                   r"riak.pb.riak_pb2",
+                                  contents)
+                contents = re.sub(r"serialized_pb='",
+                                  r"serialized_pb=b'",
+                                  contents)
+                contents = re.sub(r"\):\n  __metaclass__ = (.*)",
+                                  r", metaclass=\1):",
+                                  contents)
+                contents = re.sub(r"(_descriptor._ParseOptions\(descriptor_pb2.FileOptions\(\), )'",
+                                  r"\1b'",
                                   contents)
 
             with open(im, "w", buffering=1) as pbfile:

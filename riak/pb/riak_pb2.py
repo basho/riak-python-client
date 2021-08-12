@@ -722,85 +722,72 @@ DESCRIPTOR.message_types_by_name['RpbCommitHook'] = _RPBCOMMITHOOK
 DESCRIPTOR.message_types_by_name['RpbBucketProps'] = _RPBBUCKETPROPS
 DESCRIPTOR.message_types_by_name['RpbAuthReq'] = _RPBAUTHREQ
 
-class RpbErrorResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbErrorResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBERRORRESP
 
   # @@protoc_insertion_point(class_scope:RpbErrorResp)
 
-class RpbGetServerInfoResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbGetServerInfoResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBGETSERVERINFORESP
 
   # @@protoc_insertion_point(class_scope:RpbGetServerInfoResp)
 
-class RpbPair(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbPair(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBPAIR
 
   # @@protoc_insertion_point(class_scope:RpbPair)
 
-class RpbGetBucketReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbGetBucketReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBGETBUCKETREQ
 
   # @@protoc_insertion_point(class_scope:RpbGetBucketReq)
 
-class RpbGetBucketResp(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbGetBucketResp(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBGETBUCKETRESP
 
   # @@protoc_insertion_point(class_scope:RpbGetBucketResp)
 
-class RpbSetBucketReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbSetBucketReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBSETBUCKETREQ
 
   # @@protoc_insertion_point(class_scope:RpbSetBucketReq)
 
-class RpbResetBucketReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbResetBucketReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBRESETBUCKETREQ
 
   # @@protoc_insertion_point(class_scope:RpbResetBucketReq)
 
-class RpbGetBucketTypeReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbGetBucketTypeReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBGETBUCKETTYPEREQ
 
   # @@protoc_insertion_point(class_scope:RpbGetBucketTypeReq)
 
-class RpbSetBucketTypeReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbSetBucketTypeReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBSETBUCKETTYPEREQ
 
   # @@protoc_insertion_point(class_scope:RpbSetBucketTypeReq)
 
-class RpbModFun(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbModFun(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBMODFUN
 
   # @@protoc_insertion_point(class_scope:RpbModFun)
 
-class RpbCommitHook(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbCommitHook(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBCOMMITHOOK
 
   # @@protoc_insertion_point(class_scope:RpbCommitHook)
 
-class RpbBucketProps(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbBucketProps(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBBUCKETPROPS
 
   # @@protoc_insertion_point(class_scope:RpbBucketProps)
 
-class RpbAuthReq(_message.Message):
-  __metaclass__ = _reflection.GeneratedProtocolMessageType
+class RpbAuthReq(_message.Message, metaclass=_reflection.GeneratedProtocolMessageType):
   DESCRIPTOR = _RPBAUTHREQ
 
   # @@protoc_insertion_point(class_scope:RpbAuthReq)
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), '\n\027com.basho.riak.protobufB\006RiakPB')
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b'\n\027com.basho.riak.protobufB\006RiakPB')
 # @@protoc_insertion_point(module_scope)

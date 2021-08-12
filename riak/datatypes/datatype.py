@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import TYPES
 from .errors import ContextRequired
+from . import TYPES
 
 
 class Datatype(object):

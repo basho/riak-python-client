@@ -276,7 +276,6 @@ class PoolIterator(object):
         return self
 
     def __next__(self):
-        # Python 2.x version
         if len(self.targets) == 0:
             raise StopIteration
         if len(self.unlocked) == 0:

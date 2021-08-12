@@ -19,11 +19,12 @@ Riak objects, run Javascript (and Erlang) based Map/Reduce
 operations, and run Linkwalking operations.
 """
 
+from riak.riak_error import ConflictError, ListError, RiakError
+
 from riak.bucket import BucketType, RiakBucket
 from riak.client import RiakClient
 from riak.mapreduce import RiakKeyFilter, RiakLink, RiakMapReduce
 from riak.node import RiakNode
-from riak.riak_error import ConflictError, ListError, RiakError
 from riak.riak_object import RiakObject
 from riak.table import Table
 

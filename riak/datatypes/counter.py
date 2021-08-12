@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from riak.datatypes import TYPES
 from riak.datatypes.datatype import Datatype
+from riak.datatypes import TYPES
 
 
 class Counter(Datatype):
