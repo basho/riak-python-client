@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 
 import os
 import gc
@@ -87,13 +87,13 @@ class Benchmark(object):
         if self._report:
             return self._report.__exit__(exc_type, exc_val, exc_tb)
         else:
-            print
+            print()
             return True
 
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         """
         Runs the next iteration of the benchmark.
         """
@@ -113,7 +113,7 @@ class Benchmark(object):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
     def report(self, name):
         """
@@ -127,7 +127,7 @@ def print_rehearsal_header():
     """
     Prints the header for the rehearsal phase of a benchmark.
     """
-    print
+    print()
     print("Rehearsal -------------------------------------------------")
 
 

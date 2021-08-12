@@ -566,8 +566,8 @@ class PbufCodec(Codec):
         resultdoc = MultiDict()
         for pair in doc.fields:
             if six.PY2:
-                ukey = unicode(pair.key, 'utf-8')    # noqa
-                uval = unicode(pair.value, 'utf-8')  # noqa
+                ukey = str(pair.key, 'utf-8')    # noqa
+                uval = str(pair.value, 'utf-8')  # noqa
             else:
                 ukey = bytes_to_str(pair.key)
                 uval = bytes_to_str(pair.value)

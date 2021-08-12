@@ -40,7 +40,7 @@ class PbufStream(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.finished:
             raise StopIteration
 
@@ -64,7 +64,7 @@ class PbufStream(object):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
     def _is_done(self, response):
         # This could break if new messages don't name the field the
@@ -79,7 +79,7 @@ class PbufStream(object):
         # weird responses when some other request comes after a
         # failed/prematurely-terminated one.
         try:
-            while self.next():
+            while next(self):
                 pass
         except StopIteration:
             pass
@@ -93,8 +93,8 @@ class PbufKeyStream(PbufStream):
 
     _expect = riak.pb.messages.MSG_CODE_LIST_KEYS_RESP
 
-    def next(self):
-        response = super(PbufKeyStream, self).next()
+    def __next__(self):
+        response = next(super(PbufKeyStream, self))
 
         if response.done and len(response.keys) is 0:
             raise StopIteration
@@ -103,7 +103,7 @@ class PbufKeyStream(PbufStream):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
 
 class PbufMapredStream(PbufStream):
@@ -114,8 +114,8 @@ class PbufMapredStream(PbufStream):
 
     _expect = riak.pb.messages.MSG_CODE_MAP_RED_RESP
 
-    def next(self):
-        response = super(PbufMapredStream, self).next()
+    def __next__(self):
+        response = next(super(PbufMapredStream, self))
 
         if response.done and not response.HasField('response'):
             raise StopIteration
@@ -124,7 +124,7 @@ class PbufMapredStream(PbufStream):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
 
 class PbufBucketStream(PbufStream):
@@ -134,8 +134,8 @@ class PbufBucketStream(PbufStream):
 
     _expect = riak.pb.messages.MSG_CODE_LIST_BUCKETS_RESP
 
-    def next(self):
-        response = super(PbufBucketStream, self).next()
+    def __next__(self):
+        response = next(super(PbufBucketStream, self))
 
         if response.done and len(response.buckets) is 0:
             raise StopIteration
@@ -144,7 +144,7 @@ class PbufBucketStream(PbufStream):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
 
 class PbufIndexStream(PbufStream):
@@ -160,8 +160,8 @@ class PbufIndexStream(PbufStream):
         self.index = index
         self.return_terms = return_terms
 
-    def next(self):
-        response = super(PbufIndexStream, self).next()
+    def __next__(self):
+        response = next(super(PbufIndexStream, self))
 
         if response.done and not (response.keys or
                                   response.results or
@@ -182,7 +182,7 @@ class PbufIndexStream(PbufStream):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
 
 class PbufTsKeyStream(PbufStream, TtbCodec):
@@ -196,8 +196,8 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
         super(PbufTsKeyStream, self).__init__(transport, codec)
         self._convert_timestamp = convert_timestamp
 
-    def next(self):
-        response = super(PbufTsKeyStream, self).next()
+    def __next__(self):
+        response = next(super(PbufTsKeyStream, self))
 
         if response.done and len(response.keys) is 0:
             raise StopIteration
@@ -211,4 +211,4 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)

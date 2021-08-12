@@ -33,9 +33,9 @@ except ImportError:
     import json
 
 if PY2:
-    import cPickle
-    test_pickle_dumps = cPickle.dumps
-    test_pickle_loads = cPickle.loads
+    import pickle
+    test_pickle_dumps = pickle.dumps
+    test_pickle_loads = pickle.loads
 else:
     import pickle
     test_pickle_dumps = pickle.dumps
@@ -164,25 +164,25 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         # unicode objects are fine, as long as they don't
         # contain any non-ASCII chars
         if PY2:
-            self.client.bucket(unicode(self.bucket_name))  # noqa
+            self.client.bucket(str(self.bucket_name))  # noqa
         else:
             self.client.bucket(self.bucket_name)
         if PY2:
-            self.assertRaises(TypeError, self.client.bucket, u'búcket')
+            self.assertRaises(TypeError, self.client.bucket, 'búcket')
             self.assertRaises(TypeError, self.client.bucket, 'búcket')
         else:
             self.client.bucket(u'búcket')
             self.client.bucket('búcket')
 
-        bucket.get(u'foo')
+        bucket.get('foo')
         if PY2:
-            self.assertRaises(TypeError, bucket.get, u'føø')
+            self.assertRaises(TypeError, bucket.get, 'føø')
             self.assertRaises(TypeError, bucket.get, 'føø')
 
-            self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
-            self.assertRaises(TypeError, bucket.new, u'foo', 'éå')
-            self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
-            self.assertRaises(TypeError, bucket.new, 'foo', u'éå')
+            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
+            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
+            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
+            self.assertRaises(TypeError, bucket.new, 'foo', 'éå')
         else:
             bucket.get(u'føø')
             bucket.get('føø')
@@ -232,7 +232,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
             with self.assert_raises_regex(TypeError,
                                           'Unicode bucket names '
                                           'are not supported'):
-                self.client.bucket(u'føø')
+                self.client.bucket('føø')
         else:
             self.client.bucket(u'føø')
 

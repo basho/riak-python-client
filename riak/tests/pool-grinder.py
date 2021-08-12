@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 from six import PY2
 from threading import Thread
 import sys
@@ -21,7 +21,7 @@ from pool import Pool
 from random import SystemRandom
 from time import sleep
 if PY2:
-    from Queue import Queue
+    from queue import Queue
 else:
     from queue import Queue
 sys.path.append("../transports/")

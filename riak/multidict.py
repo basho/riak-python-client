@@ -31,7 +31,7 @@ class MultiDict(dict):
                 "MultiDict can only be called with one positional argument")
         if args:
             if hasattr(args[0], 'iteritems'):
-                items = list(args[0].iteritems())
+                items = list(args[0].items())
             elif hasattr(args[0], 'items'):
                 items = list(args[0].items())
             else:

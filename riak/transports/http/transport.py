@@ -34,7 +34,7 @@ from riak.security import SecurityError
 from riak.util import decode_index_value, bytes_to_str, str_to_long
 
 if PY2:
-    from httplib import HTTPConnection
+    from http.client import HTTPConnection
 else:
     from http.client import HTTPConnection
 
@@ -399,16 +399,16 @@ class HttpTransport(Transport,
         status, headers, body = self._request('GET', url)
         self.check_http_code(status, [200])
         json_data = json.loads(bytes_to_str(body))
-        if return_terms and u'results' in json_data:
+        if return_terms and 'results' in json_data:
             results = []
-            for result in json_data[u'results'][:]:
+            for result in json_data['results'][:]:
                 term, key = list(result.items())[0]
                 results.append((decode_index_value(index, term), key),)
         else:
-            results = json_data[u'keys'][:]
+            results = json_data['keys'][:]
 
-        if max_results and u'continuation' in json_data:
-            return (results, json_data[u'continuation'])
+        if max_results and 'continuation' in json_data:
+            return (results, json_data['continuation'])
         else:
             return (results, None)
 

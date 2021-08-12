@@ -129,6 +129,6 @@ class Comparison(object):
 
     def assert_raises_regex(self, exception, regexp):
         if PY2:
-            return self.assertRaisesRegexp(exception, regexp)
+            return self.assertRaisesRegex(exception, regexp)
         else:
             return self.assertRaisesRegex(exception, regexp)

@@ -23,7 +23,7 @@ from riak.tests import DUMMY_HTTP_PORT, DUMMY_PB_PORT, \
 from riak.tests.base import IntegrationTestBase
 
 if PY2:
-    from Queue import Queue
+    from queue import Queue
 else:
     from queue import Queue
 
@@ -178,7 +178,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
             self.assertEqual(failure[1], self.bucket_name)
             self.assertIn(failure[2], keys)
             if PY2:
-                self.assertIsInstance(failure[3], StandardError)  # noqa
+                self.assertIsInstance(failure[3], Exception)  # noqa
             else:
                 self.assertIsInstance(failure[3], Exception)
         client.close()
@@ -212,7 +212,7 @@ class ClientTests(IntegrationTestBase, unittest.TestCase):
             self.assertIsInstance(failure, tuple)
             self.assertIsInstance(failure[0], RiakObject)
             if PY2:
-                self.assertIsInstance(failure[1], StandardError)  # noqa
+                self.assertIsInstance(failure[1], Exception)  # noqa
             else:
                 self.assertIsInstance(failure[1], Exception)
         client.close()

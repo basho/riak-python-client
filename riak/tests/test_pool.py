@@ -26,7 +26,7 @@ from riak.tests.comparison import Comparison
 from riak.transports.pool import Pool, BadResource
 
 if PY2:
-    from Queue import Queue
+    from queue import Queue
 else:
     from queue import Queue
 

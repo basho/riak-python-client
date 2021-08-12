@@ -53,7 +53,7 @@ class HttpStream(object):
     def __next__(self):
         raise NotImplementedError
 
-    def next(self):
+    def __next__(self):
         raise NotImplementedError
 
     def attach(self, resource):
@@ -66,7 +66,7 @@ class HttpStream(object):
 class HttpJsonStream(HttpStream):
     _json_field = None
 
-    def next(self):
+    def __next__(self):
         # Python 2.x Version
         while '}' not in self.buffer and not self.response_done:
             self._read()
@@ -86,21 +86,21 @@ class HttpJsonStream(HttpStream):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
 
 class HttpKeyStream(HttpJsonStream):
     """
     Streaming iterator for list-keys over HTTP
     """
-    _json_field = u'keys'
+    _json_field = 'keys'
 
 
 class HttpBucketStream(HttpJsonStream):
     """
     Streaming iterator for list-buckets over HTTP
     """
-    _json_field = u'buckets'
+    _json_field = 'buckets'
 
 
 class HttpMultipartStream(HttpStream):
@@ -116,7 +116,7 @@ class HttpMultipartStream(HttpStream):
         self.next_boundary = None
         self.seen_first = False
 
-    def next(self):
+    def __next__(self):
         # multipart/mixed starts with a boundary, then the first part.
         if not self.seen_first:
             self.read_until_boundary()
@@ -134,7 +134,7 @@ class HttpMultipartStream(HttpStream):
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
     def try_match(self):
         self.next_boundary = self.boundary_re.search(self.buffer)
@@ -156,14 +156,14 @@ class HttpMapReduceStream(HttpMultipartStream):
     Streaming iterator for MapReduce over HTTP
     """
 
-    def next(self):
-        message = super(HttpMapReduceStream, self).next()
+    def __next__(self):
+        message = next(super(HttpMapReduceStream, self))
         payload = json.loads(message.get_payload())
         return payload['phase'], payload['data']
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
 
 class HttpIndexStream(HttpMultipartStream):
@@ -176,23 +176,23 @@ class HttpIndexStream(HttpMultipartStream):
         self.index = index
         self.return_terms = return_terms
 
-    def next(self):
-        message = super(HttpIndexStream, self).next()
+    def __next__(self):
+        message = next(super(HttpIndexStream, self))
         payload = json.loads(message.get_payload())
-        if u'error' in payload:
-            raise RiakError(payload[u'error'])
-        elif u'keys' in payload:
-            return payload[u'keys']
-        elif u'results' in payload:
-            structs = payload[u'results']
+        if 'error' in payload:
+            raise RiakError(payload['error'])
+        elif 'keys' in payload:
+            return payload['keys']
+        elif 'results' in payload:
+            structs = payload['results']
             # Format is {"results":[{"2ikey":"primarykey"}, ...]}
             return [self._decode_pair(list(d.items())[0]) for d in structs]
-        elif u'continuation' in payload:
-            return CONTINUATION(payload[u'continuation'])
+        elif 'continuation' in payload:
+            return CONTINUATION(payload['continuation'])
 
     def __next__(self):
         # Python 3.x Version
-        return self.next()
+        return next(self)
 
     def _decode_pair(self, pair):
         return (decode_index_value(self.index, pair[0]), pair[1])

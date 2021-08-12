@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 import os.path
 import threading
 import string
@@ -65,7 +65,7 @@ def erlang_config(hash, depth=1):
 
     padding = '    ' * depth
     parent_padding = '    ' * (depth - 1)
-    values = (",\n%s" % padding).join(map(printable, hash.items()))
+    values = (",\n%s" % padding).join(map(printable, list(hash.items())))
     return "[\n%s%s\n%s]" % (padding, values, parent_padding)
 
 

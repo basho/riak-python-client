@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 
 import datetime
 import sys
@@ -104,13 +104,13 @@ class lazy_property(object):
     '''
     def __init__(self, fget):
         self.fget = fget
-        self.func_name = fget.__name__
+        self.__name__ = fget.__name__
 
     def __get__(self, obj, cls):
         if obj is None:
             return None
         value = self.fget(obj)
-        setattr(obj, self.func_name, value)
+        setattr(obj, self.__name__, value)
         return value
 
 
@@ -145,6 +145,6 @@ def str_to_long(value, base=10):
     if value is None:
         return None
     elif PY2:
-        return long(value, base)  # noqa
+        return int(value, base)  # noqa
     else:
         return int(value, base)

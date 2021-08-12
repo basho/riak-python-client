@@ -330,9 +330,9 @@ class Transport(FeatureDetection):
                   'max_score': 0.0,
                   'docs': []}
         for bucket, key, data in mr_result:
-            if u'score' in data and data[u'score'][0] > result['max_score']:
-                result['max_score'] = data[u'score'][0]
-            result['docs'].append({u'id': key})
+            if 'score' in data and data['score'][0] > result['max_score']:
+                result['max_score'] = data['score'][0]
+            result['docs'].append({'id': key})
         return result
 
     # TODO FUTURE NUKE THIS MAPRED

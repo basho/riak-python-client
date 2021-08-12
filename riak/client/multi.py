@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 from collections import namedtuple
 from threading import Thread, Lock, Event
 from multiprocessing import cpu_count
@@ -22,7 +22,7 @@ from riak.riak_object import RiakObject
 from riak.ts_object import TsObject
 
 if PY2:
-    from Queue import Queue, Empty
+    from queue import Queue, Empty
 else:
     from queue import Queue, Empty
 

@@ -19,9 +19,9 @@ if USE_STDLIB_SSL:
 else:
     import OpenSSL.SSL
     try:
-        from cStringIO import StringIO
+        from io import StringIO
     except ImportError:
-        from StringIO import StringIO
+        from io import StringIO
 
 
 def verify_cb(conn, cert, errnum, depth, ok):

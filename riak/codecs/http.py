@@ -28,7 +28,7 @@ from riak.transports.http.search import XMLSearchResult
 from riak.util import decode_index_value, bytes_to_str
 
 if six.PY2:
-    from urllib import unquote_plus
+    from urllib.parse import unquote_plus
 else:
     from urllib.parse import unquote_plus
 
@@ -84,7 +84,7 @@ class HttpCodec(object):
                 parts = [message_from_string(p)
                          for p in re.split(boundary, data)[1:-1]]
                 robj.siblings = [self._parse_sibling(RiakContent(robj),
-                                                     part.items(),
+                                                     list(part.items()),
                                                      part.get_payload())
                                  for part in parts]
 
@@ -98,7 +98,7 @@ class HttpCodec(object):
                                 format(ctype))
 
         robj.siblings = [self._parse_sibling(RiakContent(robj),
-                                             headers.items(),
+                                             list(headers.items()),
                                              data)]
 
         return robj
@@ -227,25 +227,25 @@ class HttpCodec(object):
         """
         result = {}
         if 'facet_counts' in json:
-            result['facet_counts'] = json[u'facet_counts']
+            result['facet_counts'] = json['facet_counts']
         if 'grouped' in json:
-            result['grouped'] = json[u'grouped']
+            result['grouped'] = json['grouped']
         if 'stats' in json:
-            result['stats'] = json[u'stats']
-        if u'response' in json:
-            result['num_found'] = json[u'response'][u'numFound']
-            result['max_score'] = float(json[u'response'][u'maxScore'])
+            result['stats'] = json['stats']
+        if 'response' in json:
+            result['num_found'] = json['response']['numFound']
+            result['max_score'] = float(json['response']['maxScore'])
             docs = []
-            for doc in json[u'response'][u'docs']:
+            for doc in json['response']['docs']:
                 resdoc = {}
-                if u'_yz_rk' in doc:
+                if '_yz_rk' in doc:
                     # Is this a Riak 2.0 result?
                     resdoc = doc
                 else:
                     # Riak Search 1.0 Legacy assumptions about format
-                    resdoc[u'id'] = doc[u'id']
-                    if u'fields' in doc:
-                        for k, v in six.iteritems(doc[u'fields']):
+                    resdoc['id'] = doc['id']
+                    if 'fields' in doc:
+                        for k, v in six.iteritems(doc['fields']):
                             resdoc[k] = v
                 docs.append(resdoc)
             result['docs'] = docs

@@ -27,7 +27,7 @@ and use the results of get_version() as your package version::
     )
 """
 
-from __future__ import print_function
+
 from os.path import dirname, isdir, join
 import re
 from subprocess import CalledProcessError, Popen, PIPE

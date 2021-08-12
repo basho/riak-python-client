@@ -29,7 +29,7 @@ else:
         configure_pyopenssl_context
 
 if PY2:
-    from httplib import HTTPConnection, \
+    from http.client import HTTPConnection, \
         NotConnected, \
         IncompleteRead, \
         ImproperConnectionState, \

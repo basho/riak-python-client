@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 
 import unittest
 
@@ -238,12 +238,12 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(result, [2])
 
         # test ASCII-encodable unicode is accepted
-        mr.map(u"function (v) { return [JSON.parse(v.values[0].data)]; }")
+        mr.map("function (v) { return [JSON.parse(v.values[0].data)]; }")
 
         # test non-ASCII-encodable unicode is rejected in Python 2.x
         if PY2:
             self.assertRaises(TypeError, mr.map,
-                              u"""
+                              """
                               function (v) {
                               /* æ */
                                 return [JSON.parse(v.values[0].data)];
@@ -491,9 +491,9 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
         results = mr.map_values().run()
         results.sort()
         self.assertEqual(results,
-                         [u'"bazval2"',
-                          u'"bazval3"',
-                          u'"bazval4"'])
+                         ['"bazval2"',
+                          '"bazval3"',
+                          '"bazval4"'])
 
     def test_mr_list_add_two_buckets(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -514,10 +514,10 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
         results.sort()
 
         self.assertEqual(results,
-                         [u'"barval5"',
-                          u'"barval6"',
-                          u'"fooval2"',
-                          u'"fooval3"'])
+                         ['"barval5"',
+                          '"barval6"',
+                          '"fooval2"',
+                          '"fooval3"'])
 
     def test_mr_list_add_mix(self):
         bucket = self.client.bucket("bucket_a")
@@ -537,10 +537,10 @@ class JSMapReduceTests(IntegrationTestBase, unittest.TestCase):
         results.sort()
 
         self.assertEqual(results,
-                         [u'"barval2"',
-                          u'"barval9"',
-                          u'"fooval2"',
-                          u'"fooval3"'])
+                         ['"barval2"',
+                          '"barval9"',
+                          '"fooval2"',
+                          '"fooval3"'])
 
     @unittest.skipUnless(RUN_YZ, 'RUN_YZ is 0')
     def test_mr_search(self):

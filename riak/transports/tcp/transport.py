@@ -466,7 +466,7 @@ class TcpTransport(Transport, TcpConnection):
         # TODO FUTURE NUKE THIS MAPRED
         if not self.pb_search():
             return self._search_mapred_emu(index, query)
-        if six.PY2 and isinstance(query, unicode):  # noqa
+        if six.PY2 and isinstance(query, str):  # noqa
             query = query.encode('utf8')
         msg_code = riak.pb.messages.MSG_CODE_SEARCH_QUERY_REQ
         codec = self._get_codec(msg_code)

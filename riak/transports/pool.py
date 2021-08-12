@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 
 import threading
 
@@ -277,7 +277,7 @@ class PoolIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         # Python 2.x version
         if len(self.targets) == 0:
             raise StopIteration
@@ -287,7 +287,7 @@ class PoolIterator(object):
 
     def __next__(self):
         # Python 3.x version
-        return self.next()
+        return next(self)
 
     def __claim_resources(self):
         with self.lock:

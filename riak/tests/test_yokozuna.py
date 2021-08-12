@@ -61,12 +61,12 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
         # TODO: check that docs return useful info
         result = results['docs'][0]
         self.assertIn('_yz_rk', result)
-        self.assertEqual(u'user', result['_yz_rk'])
+        self.assertEqual('user', result['_yz_rk'])
         self.assertIn('_yz_rb', result)
         self.assertEqual(testrun_yz['bucket'], result['_yz_rb'])
         self.assertIn('score', result)
         self.assertIn('user_s', result)
-        self.assertEqual(u'Z', result['user_s'])
+        self.assertEqual('Z', result['user_s'])
 
     def test_yz_search_index_using_bucket(self):
         bucket = self.client.bucket(testrun_yz_index['bucket'])
@@ -198,10 +198,10 @@ class YZSearchTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
     def test_yz_search_utf8(self):
         bucket = self.client.bucket(testrun_yz['bucket'])
-        body = {"text_ja": u"私はハイビスカスを食べるのが 大好き"}
+        body = {"text_ja": "私はハイビスカスを食べるのが 大好き"}
         bucket.new(self.key_name, body).store()
         wait_for_yz_index(bucket, self.key_name)
-        results = bucket.search(u"text_ja:大好き AND  _yz_rk:{0}".
+        results = bucket.search("text_ja:大好き AND  _yz_rk:{0}".
                                 format(self.key_name))
         self.assertEqual(1, len(results['docs']))
 

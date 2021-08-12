@@ -21,7 +21,7 @@ from six import PY2
 import threading
 
 if PY2:
-    from httplib import HTTPException
+    from http.client import HTTPException
 else:
     from http.client import HTTPException
 
