@@ -16,8 +16,6 @@ import datetime
 import logging
 import unittest
 
-import six
-
 from erlastic import decode, encode
 from erlastic.types import Atom
 from riak import RiakError
@@ -50,8 +48,8 @@ table_name = "GeoCheckin"
 str0 = "ascii-0"
 str1 = "ascii-1"
 
-bd0 = six.u("时间序列")
-bd1 = six.u("временные ряды")
+bd0 = "时间序列"
+bd1 = "временные ряды"
 
 blob0 = b"\x00\x01\x02\x03\x04\x05\x06\x07"
 
@@ -228,8 +226,8 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
 
         row = ts_obj.rows[0]
         self.assertEqual(len(row), 5)
-        exp = [six.b("hash1"), six.b("user2"), now,
-               six.b("frazzle"), 12.3]
+        exp = [b"hash1", b"user2", now,
+               b"frazzle", 12.3]
         self.assertEqual(row, exp)
 
     def test_store_and_fetch_and_query(self):
@@ -250,16 +248,16 @@ class TimeseriesTtbTests(IntegrationTestBase, unittest.TestCase):
         ]
         # NB: response data is binary
         exp_rows = [
-            [six.b("hash1"), six.b("user2"), twentyFiveMinsAgo,
-                six.b("typhoon"), 90.3],
-            [six.b("hash1"), six.b("user2"), twentyMinsAgo,
-                six.b("hurricane"), 82.3],
-            [six.b("hash1"), six.b("user2"), fifteenMinsAgo,
-                six.b("rain"), 79.0],
-            [six.b("hash1"), six.b("user2"), fiveMinsAgo,
-                six.b("wind"), None],
-            [six.b("hash1"), six.b("user2"), now,
-                six.b("snow"), 20.1],
+            [b"hash1", b"user2", twentyFiveMinsAgo,
+                b"typhoon", 90.3],
+            [b"hash1", b"user2", twentyMinsAgo,
+                b"hurricane", 82.3],
+            [b"hash1", b"user2", fifteenMinsAgo,
+                b"rain", 79.0],
+            [b"hash1", b"user2", fiveMinsAgo,
+                b"wind", None],
+            [b"hash1", b"user2", now,
+                b"snow", 20.1],
         ]
         ts_obj = table.new(rows)
         result = ts_obj.store()

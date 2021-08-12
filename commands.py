@@ -248,7 +248,6 @@ class MessageCodeMapping(ComparableMixin):
 # NOTE: TO RUN THIS SUCCESSFULLY, YOU NEED TO HAVE THESE
 #       PACKAGES INSTALLED:
 #       protobuf or python3_protobuf
-#       six
 #
 #       Run the following command to install them:
 #       python setup.py install
