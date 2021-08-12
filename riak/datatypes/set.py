@@ -14,10 +14,10 @@
 
 import collections
 
-from .datatype import Datatype
 from riak.datatypes import TYPES
+from .datatype import Datatype
 
-__all__ = ['Set']
+__all__ = ["Set"]
 
 
 class Set(collections.Set, Datatype):
@@ -25,13 +25,13 @@ class Set(collections.Set, Datatype):
     semantics. Currently strings are the only supported value type.
     Example::
 
-        myset.add('barista')
-        myset.add('roaster')
-        myset.add('brewer')
+        myset.add("barista")
+        myset.add("roaster")
+        myset.add("brewer")
 
     Likewise they can simply be removed::
 
-        myset.discard('barista')
+        myset.discard("barista")
 
     This datatype also implements the `Set ABC
     <https://docs.python.org/2/library/collections.html>`_, meaning it
@@ -39,7 +39,7 @@ class Set(collections.Set, Datatype):
 
     """
 
-    type_name = 'set'
+    type_name = "set"
     _type_error_msg = "Sets can only be iterables of strings"
 
     def _post_init(self):
@@ -66,9 +66,9 @@ class Set(collections.Set, Datatype):
             return None
         changes = {}
         if self._adds:
-            changes['adds'] = list(self._adds)
+            changes["adds"] = list(self._adds)
         if self._removes:
-            changes['removes'] = list(self._removes)
+            changes["removes"] = list(self._removes)
         return changes
 
     # collections.Set API, operates only on the immutable version
@@ -128,4 +128,4 @@ def _check_element(element):
         raise TypeError("Set elements can only be strings")
 
 
-TYPES['set'] = Set
+TYPES["set"] = Set

@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import gc
+import os
 import sys
 import traceback
 
-__all__ = ['measure', 'measure_with_rehearsal']
+__all__ = ["measure", "measure_with_rehearsal"]
 
 
 def measure_with_rehearsal():
@@ -144,7 +144,7 @@ def print_header():
     Prints the header for the normal phase of a benchmark.
     """
     print("{:<12s} {:<12s} {:<12s} ( {:<12s} )"
-          .format('', 'user', 'system', 'real'))
+          .format("", "user", "system", "real"))
 
 
 class BenchmarkReport(object):
@@ -152,7 +152,7 @@ class BenchmarkReport(object):
     A labeled step in a benchmark. Acts as a context-manager, printing
     its timing results when the context exits.
     """
-    def __init__(self, name='benchmark'):
+    def __init__(self, name="benchmark"):
         self.name = name
         self.start = None
 
@@ -169,7 +169,7 @@ class BenchmarkReport(object):
         elif exc_type is KeyboardInterrupt:
             return False
         else:
-            msg = "EXCEPTION! type: %r val: %r" % (exc_type, exc_val)
+            msg = f"EXCEPTION! type: {exc_type} val: {exc_val}"
             print(msg, file=sys.stderr)
             traceback.print_tb(exc_tb)
         return True if exc_type is None else False

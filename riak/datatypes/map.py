@@ -13,9 +13,11 @@
 # limitations under the License.
 
 from collections import Mapping
-from riak.util import lazy_property
-from .datatype import Datatype
+
 from riak.datatypes import TYPES
+from riak.util import lazy_property
+
+from .datatype import Datatype
 
 
 class TypedMapView(Mapping):
@@ -99,7 +101,7 @@ class Map(Mapping, Datatype):
         del map.counters['likes']
     """
 
-    type_name = 'map'
+    type_name = "map"
     _type_error_msg = "Map must be a dict with (name, type) keys"
 
     def _default_value(self):
@@ -114,50 +116,50 @@ class Map(Mapping, Datatype):
         """
         Filters keys in the map to only those of counter types. Example::
 
-            map.counters['views'].increment()
-            del map.counters['points']
+            map.counters["views"].increment()
+            del map.counters["points"]
         """
-        return TypedMapView(self, 'counter')
+        return TypedMapView(self, "counter")
 
     @lazy_property
     def flags(self):
         """
         Filters keys in the map to only those of flag types. Example::
 
-            map.flags['confirmed'].enable()
-            del map.flags['attending']
+            map.flags["confirmed"].enable()
+            del map.flags["attending"]
         """
-        return TypedMapView(self, 'flag')
+        return TypedMapView(self, "flag")
 
     @lazy_property
     def maps(self):
         """
         Filters keys in the map to only those of map types. Example::
 
-            map.maps['emails'].registers['home'].set("user@example.com")
-            del map.maps['spam']
+            map.maps["emails"].registers["home"].set("user@example.com")
+            del map.maps["spam"]
         """
-        return TypedMapView(self, 'map')
+        return TypedMapView(self, "map")
 
     @lazy_property
     def registers(self):
         """
         Filters keys in the map to only those of register types. Example::
 
-            map.registers['username'].set_value("riak-user")
-            del map.registers['access_key']
+            map.registers["username"].set_value("riak-user")
+            del map.registers["access_key"]
         """
-        return TypedMapView(self, 'register')
+        return TypedMapView(self, "register")
 
     @lazy_property
     def sets(self):
         """
         Filters keys in the map to only those of set types. Example::
 
-            map.sets['friends'].add("brett")
-            del map.sets['favorites']
+            map.sets["friends"].add("brett")
+            del map.sets["favorites"]
         """
-        return TypedMapView(self, 'set')
+        return TypedMapView(self, "set")
 
     def __contains__(self, key):
         """
@@ -229,9 +231,9 @@ class Map(Mapping, Datatype):
         Ensures well-formedness of a key.
         """
         if not len(key) == 2:
-            raise TypeError('invalid key: %r' % key)
+            raise TypeError(f"invalid key: {key}")
         elif key[1] not in TYPES:
-            raise TypeError('invalid datatype: %s' % key[1])
+            raise TypeError(f"invalid datatype: {key[1]}")
 
     # Datatype API
     @Datatype.value.getter
@@ -269,7 +271,7 @@ class Map(Mapping, Datatype):
 
         :rtype: list, None
         """
-        removes = [('remove', r) for r in self._removes]
+        removes = [("remove", r) for r in self._removes]
         value_updates = list(self._extract_updates(self._value))
         new_updates = list(self._extract_updates(self._updates))
         all_updates = removes + value_updates + new_updates
@@ -289,14 +291,13 @@ class Map(Mapping, Datatype):
     def _coerce_value(self, new_value):
         cvalue = {}
         for key in new_value:
-            cvalue[key] = TYPES[key[1]](value=new_value[key],
-                                        context=self._context)
+            cvalue[key] = TYPES[key[1]](value=new_value[key], context=self._context)
         return cvalue
 
     def _extract_updates(self, d):
         for key in d:
             if d[key].modified:
-                yield ('update', key, d[key].to_op())
+                yield ("update", key, d[key].to_op())
 
 
-TYPES['map'] = Map
+TYPES["map"] = Map

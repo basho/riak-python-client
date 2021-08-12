@@ -14,10 +14,11 @@
 
 import ssl
 import warnings
+
 from riak import RiakError
 from riak.util import str_to_long
 
-if hasattr(ssl, 'SSLContext'):
+if hasattr(ssl, "SSLContext"):
     # For Python >= 2.7.9 and Python 3.x
     USE_STDLIB_SSL = True
 else:
@@ -29,21 +30,21 @@ if not USE_STDLIB_SSL:
     from OpenSSL import crypto
 
 OPENSSL_VERSION_101G = 268439679
-if hasattr(ssl, 'OPENSSL_VERSION_NUMBER'):
+if hasattr(ssl, "OPENSSL_VERSION_NUMBER"):
     # For Python 2.7 and Python 3.x
     sslver = ssl.OPENSSL_VERSION_NUMBER
     # Be sure to use at least OpenSSL 1.0.1g
-    tls_12 = hasattr(ssl, 'PROTOCOL_TLSv1_2')
+    tls_12 = hasattr(ssl, "PROTOCOL_TLSv1_2")
     if sslver < OPENSSL_VERSION_101G or not tls_12:
         verstring = ssl.OPENSSL_VERSION
         msg = "{0} (>= 1.0.1g required), TLS 1.2 support: {1}" \
             .format(verstring, tls_12)
         warnings.warn(msg, UserWarning)
-    if hasattr(ssl, 'PROTOCOL_TLSv1_2'):
+    if hasattr(ssl, "PROTOCOL_TLSv1_2"):
         DEFAULT_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
-    elif hasattr(ssl, 'PROTOCOL_TLSv1_1'):
+    elif hasattr(ssl, "PROTOCOL_TLSv1_1"):
         DEFAULT_TLS_VERSION = ssl.PROTOCOL_TLSv1_1
-    elif hasattr(ssl, 'PROTOCOL_TLSv1'):
+    elif hasattr(ssl, "PROTOCOL_TLSv1"):
         DEFAULT_TLS_VERSION = ssl.PROTOCOL_TLSv1
     else:
         DEFAULT_TLS_VERSION = ssl.PROTOCOL_SSLv23
@@ -52,17 +53,17 @@ else:
     # For Python 2.6
     sslver = OpenSSL.SSL.OPENSSL_VERSION_NUMBER
     # Be sure to use at least OpenSSL 1.0.1g
-    tls_12 = hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD')
+    tls_12 = hasattr(OpenSSL.SSL, "TLSv1_2_METHOD")
     if (sslver < OPENSSL_VERSION_101G) or tls_12:
         verstring = OpenSSL.SSL.SSLeay_version(OpenSSL.SSL.SSLEAY_VERSION)
         msg = "{0} (>= 1.0.1g required), TLS 1.2 support: {1}" \
             .format(verstring, tls_12)
         warnings.warn(msg, UserWarning)
-    if hasattr(OpenSSL.SSL, 'TLSv1_2_METHOD'):
+    if hasattr(OpenSSL.SSL, "TLSv1_2_METHOD"):
         DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_2_METHOD
-    elif hasattr(OpenSSL.SSL, 'TLSv1_1_METHOD'):
+    elif hasattr(OpenSSL.SSL, "TLSv1_1_METHOD"):
         DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_1_METHOD
-    elif hasattr(OpenSSL.SSL, 'TLSv1_METHOD'):
+    elif hasattr(OpenSSL.SSL, "TLSv1_METHOD"):
         DEFAULT_TLS_VERSION = OpenSSL.SSL.TLSv1_METHOD
     else:
         DEFAULT_TLS_VERSION = OpenSSL.SSL.SSLv23_METHOD
@@ -211,7 +212,7 @@ class SecurityCreds:
 
             :rtype: :class:`OpenSSL.crypto.PKey`
             """
-            return self._cached_cert('_pkey', crypto.load_privatekey)
+            return self._cached_cert("_pkey", crypto.load_privatekey)
 
         @property
         def cert(self):
@@ -220,7 +221,7 @@ class SecurityCreds:
 
             :rtype: :class:`OpenSSL.crypto.X509`
             """
-            return self._cached_cert('_cert', crypto.load_certificate)
+            return self._cached_cert("_cert", crypto.load_certificate)
 
         @property
         def cacert(self):
@@ -229,7 +230,7 @@ class SecurityCreds:
 
             :rtype: :class:`OpenSSL.crypto.X509`
             """
-            return self._cached_cert('_cacert', crypto.load_certificate)
+            return self._cached_cert("_cacert", crypto.load_certificate)
 
         @property
         def crl(self):
@@ -238,7 +239,7 @@ class SecurityCreds:
 
             :rtype: :class:`OpenSSL.crypto.CRL`
             """
-            return self._cached_cert('_crl', crypto.load_crl)
+            return self._cached_cert("_crl", crypto.load_crl)
 
         def _cached_cert(self, key, loader):
             # If the key is associated with a file,
@@ -250,7 +251,7 @@ class SecurityCreds:
                 if not isinstance(key_file, list):
                     key_file = [key_file]
                 for filename in key_file:
-                    with open(filename, 'rb') as f:
+                    with open(filename, "rb") as f:
                         cert_list.append(loader(OpenSSL.SSL.FILETYPE_PEM,
                                                 f.read()))
                 # If it is not a list, just store the first element
@@ -281,7 +282,7 @@ class SecurityCreds:
             :rtype: bool
             :raises SecurityError: when the certificate has been revoked
             """
-            if not self._has_credential('crl'):
+            if not self._has_credential("crl"):
                 return True
 
             servcert = ssl_socket.get_peer_certificate()

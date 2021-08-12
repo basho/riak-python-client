@@ -20,17 +20,18 @@ except ImportError:
 import random
 
 from weakref import WeakValueDictionary
+
+from riak.bucket import BucketType, RiakBucket
+from riak.client.multi import MultiGetPool, MultiPutPool
 from riak.client.operations import RiakClientOperations
-from riak.node import RiakNode
-from riak.bucket import RiakBucket, BucketType
 from riak.mapreduce import RiakMapReduceChain
+from riak.node import RiakNode
 from riak.resolver import default_resolver
+from riak.security import SecurityCreds
 from riak.table import Table
 from riak.transports.http import HttpPool
 from riak.transports.tcp import TcpPool
-from riak.security import SecurityCreds
-from riak.util import lazy_property, bytes_to_str, str_to_bytes
-from riak.client.multi import MultiGetPool, MultiPutPool
+from riak.util import bytes_to_str, lazy_property, str_to_bytes
 
 
 def default_encoder(obj):
@@ -79,20 +80,20 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     """
 
     #: The supported protocols
-    PROTOCOLS = ['http', 'pbc']
+    PROTOCOLS = ["http", "pbc"]
 
-    def __init__(self, protocol='pbc', transport_options={},
+    def __init__(self, protocol="pbc", transport_options={},
                  nodes=None, credentials=None,
                  multiget_pool_size=None, multiput_pool_size=None,
                  **kwargs):
         """
         Construct a new ``RiakClient`` object.
 
-        :param protocol: the preferred protocol, defaults to 'pbc'
+        :param protocol: the preferred protocol, defaults to "pbc"
         :type protocol: string
         :param nodes: a list of node configurations,
            where each configuration is a dict containing the keys
-           'host', 'http_port', and 'pb_port'
+           "host", "http_port", and "pb_port"
         :type nodes: list
         :param transport_options: Optional key-value args to pass to
                                   the transport constructor
@@ -111,26 +112,26 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         kwargs = kwargs.copy()
 
         if nodes is None:
-            self.nodes = [self._create_node(kwargs), ]
+            self.nodes = [self._create_node(kwargs)]
         else:
             self.nodes = [self._create_node(n) for n in nodes]
 
         self._multiget_pool_size = multiget_pool_size
         self._multiput_pool_size = multiput_pool_size
-        self.protocol = protocol or 'pbc'
+        self.protocol = protocol or "pbc"
         self._resolver = None
         self._credentials = self._create_credentials(credentials)
         self._http_pool = HttpPool(self, **transport_options)
         self._tcp_pool = TcpPool(self, **transport_options)
         self._closed = False
-        self._encoders = {'application/json': binary_json_encoder,
-                          'text/json': binary_json_encoder,
-                          'text/plain': str_to_bytes,
-                          'binary/octet-stream': binary_encoder_decoder}
-        self._decoders = {'application/json': binary_json_decoder,
-                          'text/json': binary_json_decoder,
-                          'text/plain': bytes_to_str,
-                          'binary/octet-stream': binary_encoder_decoder}
+        self._encoders = {"application/json": binary_json_encoder,
+                          "text/json": binary_json_encoder,
+                          "text/plain": str_to_bytes,
+                          "binary/octet-stream": binary_encoder_decoder}
+        self._decoders = {"application/json": binary_json_decoder,
+                          "text/json": binary_json_decoder,
+                          "text/plain": bytes_to_str,
+                          "binary/octet-stream": binary_encoder_decoder}
         self._buckets = WeakValueDictionary()
         self._bucket_types = WeakValueDictionary()
         self._tables = WeakValueDictionary()
@@ -157,7 +158,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
                         Changing to another protocol will cause a
                         connection on the next request.
 
-                        Some requests are only valid over ``'http'``,
+                        Some requests are only valid over ``"http"``,
                         and will always be sent via
                         those transports, regardless of which protocol
                         is preferred.
@@ -233,7 +234,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         """
         self._decoders[content_type] = decoder
 
-    def bucket(self, name, bucket_type='default'):
+    def bucket(self, name, bucket_type="default"):
         """
         Get the bucket by the specified name. Since buckets always exist,
         this will always return a
@@ -257,17 +258,15 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
         """
         if not isinstance(name, str):
-            raise TypeError('Bucket name must be a string')
+            raise TypeError("Bucket name must be a string")
 
         if isinstance(bucket_type, str):
             bucket_type = self.bucket_type(bucket_type)
         elif not isinstance(bucket_type, BucketType):
-            raise TypeError('bucket_type must be a string '
-                            'or riak.bucket.BucketType')
+            raise TypeError("bucket_type must be a string or riak.bucket.BucketType")
 
         b = RiakBucket(self, name, bucket_type)
-        return self._setdefault_handle_none(
-                self._buckets, (bucket_type, name), b)
+        return self._setdefault_handle_none(self._buckets, (bucket_type, name), b)
 
     def bucket_type(self, name):
         """
@@ -280,11 +279,10 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :rtype: :class:`BucketType <riak.bucket.BucketType>`
         """
         if not isinstance(name, str):
-            raise TypeError('BucketType name must be a string')
+            raise TypeError("BucketType name must be a string")
 
         btype = BucketType(self, name)
-        return self._setdefault_handle_none(
-                self._bucket_types, name, btype)
+        return self._setdefault_handle_none(self._bucket_types, name, btype)
 
     def table(self, name):
         """
@@ -297,7 +295,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         :rtype: :class:`Table <riak.table.Table>`
         """
         if not isinstance(name, str):
-            raise TypeError('Table name must be a string')
+            raise TypeError("Table name must be a string")
 
         if name in self._tables:
             return self._tables[name]
@@ -333,14 +331,11 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
             return n
         elif isinstance(n, tuple) and len(n) == 3:
             host, http_port, pb_port = n
-            return RiakNode(host=host,
-                            http_port=http_port,
-                            pb_port=pb_port)
+            return RiakNode(host=host, http_port=http_port, pb_port=pb_port)
         elif isinstance(n, dict):
             return RiakNode(**n)
         else:
-            raise TypeError("%s is not a valid node configuration"
-                            % repr(n))
+            raise TypeError(f"{repr(n)} is not a valid node configuration")
 
     def _create_credentials(self, n):
         """
@@ -353,13 +348,12 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
         elif isinstance(n, dict):
             return SecurityCreds(**n)
         else:
-            raise TypeError("%s is not a valid security configuration"
-                            % repr(n))
+            raise TypeError(f"{repr(n)} is not a valid security configuration")
 
     def _choose_node(self, nodes=None):
         """
         Chooses a random node from the list of nodes in the client,
-        taking into account each node's recent error rate.
+        taking into account each node"s recent error rate.
         :rtype RiakNode
         """
         if not nodes:

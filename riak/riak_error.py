@@ -22,7 +22,7 @@ class RiakError(Exception):
         if len(args) > 0:
             self.value = args[0]
         else:
-            self.value = 'unknown'
+            self.value = "unknown"
 
     def __str__(self):
         return repr(self.value)
@@ -34,7 +34,7 @@ class ConflictError(RiakError):
     :class:`~riak.riak_object.RiakObject` that has more than one
     sibling.
     """
-    def __init__(self, message='Object in conflict'):
+    def __init__(self, message="Object in conflict"):
         super(ConflictError, self).__init__(message)
 
 
@@ -43,7 +43,8 @@ class ListError(RiakError):
     Raised when a list operation is attempted and
     riak.disable_list_exceptions is false.
     """
-    def __init__(self, message='Bucket and key list operations '
-                               'are expensive and should not be '
-                               'used in production.'):
+    def __init__(
+        self,
+        message="Bucket & key list operations are expensive and should not be used in production.",
+    ):
         super(ListError, self).__init__(message)

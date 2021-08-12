@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import threading
 from contextlib import contextmanager
+
+from riak.transports.http import is_retryable as is_http_retryable
 from riak.transports.pool import BadResource, ConnectionClosed
 from riak.transports.tcp import is_retryable as is_tcp_retryable
-from riak.transports.http import is_retryable as is_http_retryable
 
-import threading
 
 from http.client import HTTPException
 
@@ -42,7 +43,7 @@ class RiakClientTransport(object):
     """
 
     # These will be set or redefined by the RiakClient initializer
-    protocol = 'pbc'
+    protocol = "pbc"
     _http_pool = None
     _tcp_pool = None
     _locals = _client_locals()
@@ -194,12 +195,12 @@ class RiakClientTransport(object):
         """
         if not protocol:
             protocol = self.protocol
-        if protocol == 'http':
+        if protocol == "http":
             pool = self._http_pool
-        elif protocol == 'tcp' or protocol == 'pbc':
+        elif protocol == "tcp" or protocol == "pbc":
             pool = self._tcp_pool
         else:
-            raise ValueError("invalid protocol %s" % protocol)
+            raise ValueError(f"invalid protocol {protocol}")
         if pool is None or self._closed:
             # NB: GH-500, this can happen if client is closed
             raise RuntimeError("Client is closed.")
@@ -243,4 +244,4 @@ def retryableHttpOnly(fn):
     Wraps a retryable client operation that is only valid over HTTP.
     Used internally.
     """
-    return retryable(fn, protocol='http')
+    return retryable(fn, protocol="http")

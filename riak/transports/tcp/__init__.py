@@ -15,7 +15,7 @@
 import errno
 import socket
 
-from riak.transports.pool import Pool, ConnectionClosed
+from riak.transports.pool import ConnectionClosed, Pool
 from riak.transports.tcp.transport import TcpTransport
 
 
@@ -50,7 +50,7 @@ CONN_CLOSED_ERRORS = (
     errno.ECONNABORTED,
     errno.ETIMEDOUT,
     errno.EBADF,
-    errno.EPIPE
+    errno.EPIPE,
 )
 
 

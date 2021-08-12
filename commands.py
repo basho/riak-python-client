@@ -17,14 +17,14 @@ import os
 import os.path
 import re
 
+from distutils import log
 from distutils.core import Command
 from distutils.errors import DistutilsOptionError
 from distutils.file_util import write_file
-from distutils import log
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 
-__all__ = ['build_messages', 'setup_timeseries']
+__all__ = ["build_messages", "setup_timeseries"]
 
 
 # Exception classes used by this module.
@@ -40,9 +40,7 @@ class CalledProcessError(Exception):
         self.output = output
 
     def __str__(self):
-        return "Command '%s' returned non-zero exit status %d" % (self.cmd,
-                                                                  self
-                                                                  .returncode)
+        return f"Command '{self.cmd}' returned non-zero exit status {self.returncode}"
 
 
 def check_output(*popenargs, **kwargs):
@@ -66,9 +64,8 @@ def check_output(*popenargs, **kwargs):
     ...              stderr=sys.stdout)
     'ls: non_existent_file: No such file or directory\n'
     """
-    if 'stdout' in kwargs:
-        raise ValueError('stdout argument not allowed, it will be '
-                         'overridden.')
+    if "stdout" in kwargs:
+        raise ValueError("stdout argument not allowed, it will be overridden.")
     process = Popen(stdout=PIPE, *popenargs, **kwargs)
     output, unused_err = process.communicate()
     retcode = process.poll()
@@ -101,7 +98,7 @@ class bucket_type_commands:
 
     def check_output(self, *args, **kwargs):
         if self.dry_run:
-            log.info(' '.join(args))
+            log.info(" ".join(args))
             return bytearray()
         else:
             return check_output(*args, **kwargs)
@@ -119,28 +116,26 @@ class bucket_type_commands:
         exists = False
         active = False
         try:
-            status = self.check_btype_command('status', name)
+            status = self.check_btype_command("status", name)
         except CalledProcessError as e:
             status = e.output
 
-        exists = ('not an existing bucket type' not in status.decode('ascii'))
-        active = ('is active' in status.decode('ascii'))
+        exists = ("not an existing bucket type" not in status.decode("ascii"))
+        active = ("is active" in status.decode("ascii"))
 
         if exists or active:
-            log.info("Updating {0} bucket-type with props {1}"
-                     .format(repr(name), repr(props)))
-            self.check_btype_command("update", name,
-                                     json.dumps({'props': props},
-                                                separators=(',', ':')))
+            log.info(f"Updating {repr(name)} bucket-type with props {repr(props)}")
+            self.check_btype_command(
+                "update", name, json.dumps({"props": props}, separators=(",", ":")),
+            )
         else:
-            log.info("Creating {0} bucket-type with props {1}"
-                     .format(repr(name), repr(props)))
-            self.check_btype_command("create", name,
-                                     json.dumps({'props': props},
-                                                separators=(',', ':')))
+            log.info(f"Creating {repr(name)} bucket-type with props {repr(props)}")
+            self.check_btype_command(
+                "create", name, json.dumps({"props": props}, separators=(",", ":")),
+            )
 
         if not active:
-            log.info('Activating {0} bucket-type'.format(repr(name)))
+            log.info(f"Activating {repr(name)} bucket-type")
             self.check_btype_command("activate", name)
 
     def check_btype_command(self, *args):
@@ -163,14 +158,12 @@ class setup_timeseries(bucket_type_commands, Command):
 
     description = "create bucket-types used in timeseries tests"
 
-    user_options = [
-        ('riak-admin=', None, 'path to the riak-admin script')
-    ]
+    user_options = [("riak-admin=", None, "path to the riak-admin script")]
 
     _props = {
-        'GeoCheckin': {
-            'n_val': 3,
-            'table_def': '''
+        "GeoCheckin": {
+            "n_val": 3,
+            "table_def": """
                 CREATE TABLE GeoCheckin (
                     geohash varchar not null,
                     user varchar not null,
@@ -181,8 +174,8 @@ class setup_timeseries(bucket_type_commands, Command):
                         (geohash, user, quantum(time, 15, m)),
                         geohash, user, time
                     )
-                )'''
-        }
+                )""",
+        },
     }
 
 
@@ -220,7 +213,7 @@ class MessageCodeMapping(ComparableMixin):
         self.message = message
         self.proto = proto
         self.message_code_name = self._message_code_name()
-        self.module_name = 'riak.pb.{0}_pb2'.format(self.proto)
+        self.module_name = f"riak.pb.{self.proto}_pb2"
         self.message_class = self._message_class()
 
     def _cmpkey(self):
@@ -231,8 +224,8 @@ class MessageCodeMapping(ComparableMixin):
 
     def _message_code_name(self):
         strip_rpb = re.sub(r"^Rpb", "", self.message)
-        word = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1_\2', strip_rpb)
-        word = re.sub(r"([a-z\d])([A-Z])", r'\1_\2', word)
+        word = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", strip_rpb)
+        word = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", word)
         word = word.replace("-", "_")
         return "MSG_CODE_" + word.upper()
 
@@ -272,24 +265,24 @@ class build_messages(Command):
     description = "generate protocol message code mappings"
 
     user_options = [
-        ('source=', None, 'source CSV file containing message code mappings'),
-        ('destination=', None, 'destination Python source file')
+        ("source=", None, "source CSV file containing message code mappings"),
+        ("destination=", None, "destination Python source file"),
     ]
 
     # Used in loading and generating
     _pb_imports = set()
     _messages = set()
     _linesep = os.linesep
-    _indented_item_sep = ',{0}    '.format(_linesep)
+    _indented_item_sep = f",{_linesep}    "
 
     _docstring = [
-        ''
-        '# This is a generated file. DO NOT EDIT.',
-        '',
+        ""
+        "# This is a generated file. DO NOT EDIT.",
+        "",
         '"""',
-        'Constants and mappings between Riak protocol codes and messages.',
+        "Constants and mappings between Riak protocol codes and messages.",
         '"""',
-        ''
+        "",
     ]
 
     def initialize_options(self):
@@ -299,9 +292,9 @@ class build_messages(Command):
 
     def finalize_options(self):
         if self.source is None:
-            self.source = 'riak_pb/src/riak_pb_messages.csv'
+            self.source = "riak_pb/src/riak_pb_messages.csv"
         if self.destination is None:
-            self.destination = 'riak/pb/messages.py'
+            self.destination = "riak/pb/messages.py"
 
     def run(self):
         self.force = True
@@ -314,7 +307,7 @@ class build_messages(Command):
         self._generate()
 
     def _load(self):
-        with open(self.source, 'r', buffering=1) as csvfile:
+        with open(self.source, "r", buffering=1) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 message = MessageCodeMapping(*row)
@@ -340,33 +333,32 @@ class build_messages(Command):
 
     def _generate_codes(self):
         # Write protocol code constants
-        self._contents.extend(['', "# Protocol codes"])
+        self._contents.extend(["", "# Protocol codes"])
         for message in sorted(self._messages):
-            self._contents.append("{0} = {1}".format(message.message_code_name,
-                                                     message.code))
+            self._contents.append(f"{message.message_code_name} = {message.code}")
 
     def _generate_classes(self):
         # Write message classes
-        classes = [self._generate_mapping(message)
-                   for message in sorted(self._messages)]
+        classes = [self._generate_mapping(message) for message in sorted(self._messages)]
 
         classes = self._indented_item_sep.join(classes)
-        self._contents.extend(['',
-                               "# Mapping from code to protobuf class",
-                               'MESSAGE_CLASSES = {',
-                               '    ' + classes,
-                               '}'])
+        self._contents.extend([
+            "",
+            "# Mapping from code to protobuf class",
+            "MESSAGE_CLASSES = {",
+            "    " + classes,
+            "}",
+        ])
 
     def _generate_mapping(self, m):
         if m.message_class is not None:
-            klass = "{0}.{1}".format(m.module_name,
-                                     m.message_class.__name__)
+            klass = f"{m.module_name}.{m.message_class.__name__}"
         else:
             klass = "None"
         pair = "{0}: {1}".format(m.message_code_name, klass)
         if len(pair) > 76:
             # Try to satisfy PEP8, lulz
-            pair = (self._linesep + '    ').join(pair.split(' '))
+            pair = (self._linesep + "    ").join(pair.split(" "))
         return pair
 
     def _update_pb_pathnames(self):
@@ -374,18 +366,18 @@ class build_messages(Command):
         Change the PB files to use full pathnames
         """
         pb_files = set()
-        with open(self.source, 'r', buffering=1) as csvfile:
+        with open(self.source, "r", buffering=1) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 _, _, proto = row
-                pb_files.add('riak/pb/{0}_pb2.py'.format(proto))
+                pb_files.add("riak/pb/{0}_pb2.py".format(proto))
 
         for im in sorted(pb_files):
-            with open(im, 'r', buffering=1) as pbfile:
+            with open(im, "r", buffering=1) as pbfile:
                 contents = pbfile.read()
-                contents = re.sub(r'riak_pb2',
-                                  r'riak.pb.riak_pb2',
+                contents = re.sub(r"riak_pb2",
+                                  r"riak.pb.riak_pb2",
                                   contents)
 
-            with open(im, 'w', buffering=1) as pbfile:
+            with open(im, "w", buffering=1) as pbfile:
                 pbfile.write(contents)

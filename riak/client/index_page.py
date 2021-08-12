@@ -15,7 +15,7 @@
 from collections import namedtuple, Sequence
 
 
-CONTINUATION = namedtuple('Continuation', ['c'])
+CONTINUATION = namedtuple("Continuation", ["c"])
 
 
 class IndexPage(Sequence, object):
@@ -125,7 +125,7 @@ class IndexPage(Sequence, object):
         :param stream: whether to enable streaming. `True` enables,
             `False` disables, `None` uses previous value.
         :type stream: boolean
-        :param timeout: a timeout value in milliseconds, or 'infinity'
+        :param timeout: a timeout value in milliseconds, or "infinity"
         :type timeout: int
         """
         if not self.continuation:
@@ -134,15 +134,15 @@ class IndexPage(Sequence, object):
         if stream is not None:
             self.stream = stream
 
-        args = {'bucket': self.bucket,
-                'index': self.index,
-                'startkey': self.startkey,
-                'endkey': self.endkey,
-                'return_terms': self.return_terms,
-                'max_results': self.max_results,
-                'continuation': self.continuation,
-                'timeout': timeout,
-                'term_regex': self.term_regex}
+        args = {"bucket": self.bucket,
+                "index": self.index,
+                "startkey": self.startkey,
+                "endkey": self.endkey,
+                "return_terms": self.return_terms,
+                "max_results": self.max_results,
+                "continuation": self.continuation,
+                "timeout": timeout,
+                "term_regex": self.term_regex}
 
         if self.stream:
             return self.client.stream_index(**args)

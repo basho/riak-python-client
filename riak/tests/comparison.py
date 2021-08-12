@@ -15,12 +15,14 @@
 import collections
 import warnings
 
+from six import PY2, PY3
+
 
 class Comparison(object):
-    '''
+    """
     Provide a cross-version object comparison operator
     since its name changed between Python 2.x and Python 3.x
-    '''
+    """
 
     # Stolen from Python 2.7.8's unittest
     _Mismatch = collections.namedtuple('Mismatch', 'actual expected value')
@@ -83,7 +85,7 @@ class Comparison(object):
         return result
 
     def _ordered_count(self, iterable):
-        'Return dict of element counts, in the order they were first seen'
+        """Return dict of element counts, in the order they were first seen"""
         c = collections.OrderedDict()
         for elem in iterable:
             c[elem] = c.get(elem, 0) + 1
@@ -118,10 +120,10 @@ class Comparison(object):
                                                         second_seq)
 
         if differences:
-            standardMsg = 'Element counts were not equal:\n'
-            lines = ['First has %d, Second has %d:  %r' %
+            standardMsg = "Element counts were not equal:\n"
+            lines = ["First has %d, Second has %d:  %r" %
                      diff for diff in differences]
-            diffMsg = '\n'.join(lines)
+            diffMsg = "\n".join(lines)
             standardMsg = self._truncateMessage(standardMsg, diffMsg)
 
     def assert_raises_regex(self, exception, regexp):

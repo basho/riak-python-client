@@ -13,18 +13,19 @@
 # limitations under the License.
 
 from distutils.version import LooseVersion
+
 from riak.util import lazy_property
 
 
 versions = {
-    1: LooseVersion('1.0.0'),
-    1.1: LooseVersion('1.1.0'),
-    1.2: LooseVersion('1.2.0'),
-    1.4: LooseVersion('1.4.0'),
-    1.44: LooseVersion('1.4.4'),
-    2.0: LooseVersion('2.0.0'),
-    2.1: LooseVersion('2.1.0'),
-    2.12: LooseVersion('2.1.2')
+    1: LooseVersion("1.0.0"),
+    1.1: LooseVersion("1.1.0"),
+    1.2: LooseVersion("1.2.0"),
+    1.4: LooseVersion("1.4.0"),
+    1.44: LooseVersion("1.4.4"),
+    2.0: LooseVersion("2.0.0"),
+    2.1: LooseVersion("2.1.0"),
+    2.12: LooseVersion("2.1.2"),
 }
 
 

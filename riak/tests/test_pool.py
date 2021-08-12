@@ -14,14 +14,15 @@
 
 import unittest
 
-from threading import Thread, currentThread
 from random import SystemRandom
+from threading import currentThread, Thread
 from time import sleep
 
 from riak import RiakError
 from riak.tests import RUN_POOL
 from riak.tests.comparison import Comparison
-from riak.transports.pool import Pool, BadResource
+from riak.transports.pool import BadResource, Pool
+from six import PY2
 
 from queue import Queue
 
@@ -44,18 +45,18 @@ class EmptyListPool(Pool):
         return []
 
 
-@unittest.skipUnless(RUN_POOL, 'RUN_POOL is 0')
+@unittest.skipUnless(RUN_POOL, "RUN_POOL is 0")
 class PoolTest(unittest.TestCase, Comparison):
 
     def test_can_raise_bad_resource(self):
-        ex_msg = 'exception-message!'
+        ex_msg = "exception-message!"
         with self.assertRaises(BadResource) as cm:
             raise BadResource(ex_msg)
         ex = cm.exception
         self.assertEqual(ex.args[0], ex_msg)
 
     def test_bad_resource_inner_exception(self):
-        ex_msg = 'exception-message!'
+        ex_msg = "exception-message!"
         ex = RiakError(ex_msg)
         with self.assertRaises(BadResource) as cm:
             raise BadResource(ex)
@@ -153,7 +154,7 @@ class PoolTest(unittest.TestCase, Comparison):
         The _filter parameter should be required to be a callable, or
         None.
         """
-        badfilter = 'foo'
+        badfilter = "foo"
         pool = SimplePool()
 
         with self.assertRaises(TypeError):
@@ -166,8 +167,8 @@ class PoolTest(unittest.TestCase, Comparison):
         resources are free.
         """
         pool = SimplePool()
-        with pool.transaction(default='default') as x:
-            self.assertEqual('default', x)
+        with pool.transaction(default="default") as x:
+            self.assertEqual("default", x)
 
     def test_manual_release(self):
         """
@@ -359,5 +360,5 @@ class PoolTest(unittest.TestCase, Comparison):
             th.join()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

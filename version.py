@@ -28,9 +28,9 @@ and use the results of get_version() as your package version::
 """
 
 
-from os.path import dirname, isdir, join
 import re
-from subprocess import CalledProcessError, Popen, PIPE
+from os.path import dirname, isdir, join
+from subprocess import CalledProcessError, PIPE, Popen
 
 try:
     from subprocess import check_output
@@ -45,7 +45,7 @@ except ImportError:
         The arguments are the same as for the Popen constructor.  Example:
 
         >>> check_output(["ls", "-l", "/dev/null"])
-        'crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\n'
+        "crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\n"
 
         The stdout argument is not allowed as it is used internally.
         To capture standard error in the result, use stderr=STDOUT.
@@ -54,11 +54,11 @@ except ImportError:
         >>> check_output(["/bin/sh", "-c",
         ...               "ls -l non_existent_file ; exit 0"],
         ...              stderr=sys.stdout)
-        'ls: non_existent_file: No such file or directory\n'
+        "ls: non_existent_file: No such file or directory\n"
         """
-        if 'stdout' in kwargs:
-            raise ValueError('stdout argument not allowed, it will be '
-                             'overridden.')
+        if "stdout" in kwargs:
+            raise ValueError("stdout argument not allowed, it will be "
+                             "overridden.")
         process = Popen(stdout=PIPE, *popenargs, **kwargs)
         output, unused_err = process.communicate()
         retcode = process.poll()
@@ -69,35 +69,35 @@ except ImportError:
             raise CalledProcessError(retcode, cmd)
         return output
 
-version_re = re.compile('^Version: (.+)$', re.M)
+version_re = re.compile("^Version: (.+)$", re.M)
 
-__all__ = ['get_version']
+__all__ = ["get_version"]
 
 
 def get_version():
     d = dirname(__file__)
 
-    if isdir(join(d, '.git')):
+    if isdir(join(d, ".git")):
         # Get the version using "git describe".
-        cmd = 'git describe --tags --match [0-9]*'.split()
+        cmd = "git describe --tags --match [0-9]*".split()
         try:
             version = check_output(cmd).decode().strip()
         except CalledProcessError:
-            print('Unable to get version number from git tags')
+            print("Unable to get version number from git tags")
             exit(1)
 
         # PEP 386 compatibility
-        if '-' in version:
-            version = '.post'.join(version.split('-')[:2])
+        if "-" in version:
+            version = ".post".join(version.split("-")[:2])
 
     else:
         # Extract the version from the PKG-INFO file.
         import codecs
-        with codecs.open(join(d, 'PKG-INFO'), 'r', 'utf-8') as f:
+        with codecs.open(join(d, "PKG-INFO"), "r", "utf-8") as f:
             version = version_re.search(f.read()).group(1)
 
     return version
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(get_version())

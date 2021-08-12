@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 import threading
 
 from contextlib import contextmanager
@@ -284,10 +282,6 @@ class PoolIterator(object):
         if len(self.unlocked) == 0:
             self.__claim_resources()
         return self.unlocked.pop(0)
-
-    def __next__(self):
-        # Python 3.x version
-        return next(self)
 
     def __claim_resources(self):
         with self.lock:

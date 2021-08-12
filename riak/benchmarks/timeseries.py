@@ -16,9 +16,9 @@ import datetime
 import random
 import sys
 
-import riak.benchmark as benchmark
-
 from multiprocessing import cpu_count
+
+import riak.benchmark as benchmark
 from riak import RiakClient
 
 # logger = logging.getLogger()
@@ -27,28 +27,26 @@ from riak import RiakClient
 
 # batch sizes 8, 16, 32, 64, 128, 256
 if len(sys.argv) != 3:
-    raise AssertionError(
-            'first arg is batch size, second arg is true / false'
-            'for use_ttb')
+    raise AssertionError("first arg is batch size, second arg is true / false for use_ttb")
 
 rowcount = 32768
 batchsz = int(sys.argv[1])
 if rowcount % batchsz != 0:
-    raise AssertionError('rowcount must be divisible by batchsz')
-use_ttb = sys.argv[2].lower() == 'true'
+    raise AssertionError("rowcount must be divisible by batchsz")
+use_ttb = sys.argv[2].lower() == "true"
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 onesec = datetime.timedelta(0, 1)
 
-weather = ['typhoon', 'hurricane', 'rain', 'wind', 'snow']
+weather = ["typhoon", "hurricane", "rain", "wind", "snow"]
 rows = []
 for i in range(rowcount):
     ts = datetime.datetime(2016, 1, 1, 12, 0, 0) + \
         datetime.timedelta(seconds=i)
     family_idx = i % batchsz
     series_idx = i % batchsz
-    family = 'hash{:d}'.format(family_idx)
-    series = 'user{:d}'.format(series_idx)
+    family = "hash{:d}".format(family_idx)
+    series = "user{:d}".format(series_idx)
     w = weather[i % len(weather)]
     temp = (i % 100) + random.random()
     row = [family, series, ts, w, temp]
@@ -56,28 +54,27 @@ for i in range(rowcount):
     rows.append(row)
 
 print("Benchmarking timeseries:")
-print("   Use TTB: {}".format(use_ttb))
-print("Batch Size: {}".format(batchsz))
-print("      CPUs: {}".format(cpu_count()))
-print("      Rows: {}".format(len(rows)))
+print(f"   Use TTB: {use_ttb}")
+print(f"Batch Size: {batchsz}")
+print(f"      CPUs: {cpu_count()}")
+print(f"      Rows: {len(rows)}")
 print()
 
-tbl = 'GeoCheckin'
-h = 'riak-test'
+tbl = "GeoCheckin"
+h = "riak-test"
 n = [
-    {'host': h, 'pb_port': 10017},
-    {'host': h, 'pb_port': 10027},
-    {'host': h, 'pb_port': 10037},
-    {'host': h, 'pb_port': 10047},
-    {'host': h, 'pb_port': 10057}
+    {"host": h, "pb_port": 10017},
+    {"host": h, "pb_port": 10027},
+    {"host": h, "pb_port": 10037},
+    {"host": h, "pb_port": 10047},
+    {"host": h, "pb_port": 10057},
 ]
-client = RiakClient(nodes=n, protocol='pbc',
-                    transport_options={'use_ttb': use_ttb})
+client = RiakClient(nodes=n, protocol="pbc", transport_options={"use_ttb": use_ttb})
 table = client.table(tbl)
 
 with benchmark.measure() as b:
     for i in (1, 2, 3):
-        with b.report('populate-%d' % i):
+        with b.report("populate-%d" % i):
             for i in range(0, rowcount, batchsz):
                 x = i
                 y = i + batchsz

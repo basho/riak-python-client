@@ -16,8 +16,8 @@ import errno
 import logging
 import socket
 import struct
-import riak.pb.riak_pb2
 import riak.pb.messages
+import riak.pb.riak_pb2
 
 from riak import RiakError
 from riak.codecs.pbuf import PbufCodec
@@ -112,7 +112,7 @@ class TcpConnection(object):
         username = self._client._credentials.username
         password = self._client._credentials.password
         if not password:
-            password = ''
+            password = ""
         msg = codec.encode_auth(username, password)
         resp_code, _ = self._non_connect_send_recv_msg(msg)
         if resp_code == riak.pb.messages.MSG_CODE_AUTH_RESP:
@@ -213,11 +213,11 @@ class TcpConnection(object):
         if self.bytes_required:
             msglen_buf = bytes(msglen_buf)
         try:
-            msglen, = struct.unpack('!I', msglen_buf)
+            msglen, = struct.unpack("!I", msglen_buf)
         except struct.error:
             # NB: Python 2.7.3 requires this
             # http://bugs.python.org/issue10212
-            msglen, = struct.unpack('!I', bytes(msglen_buf))
+            msglen, = struct.unpack("!I", bytes(msglen_buf))
             self.bytes_required = True
         return self._recv(msglen)
 
@@ -233,9 +233,7 @@ class TcpConnection(object):
             # https://docs.python.org/2/howto/sockets.html#using-a-socket
             # https://github.com/basho/riak-python-client/issues/399
             if nbytes == 0:
-                msg = 'socket recv returned zero bytes unexpectedly, ' \
-                      'expected {}'.format(toread)
-                ex = RiakError(msg)
+                ex = RiakError(f"socket recv returned zero bytes unexpectedly, expected {toread}")
                 raise ConnectionClosed(ex)
             view = view[nbytes:]  # slicing views is cheap
             toread -= nbytes
@@ -276,7 +274,6 @@ class TcpConnection(object):
                     # NB: sometimes these exceptions are raised if the initial
                     # connection didn't succeed correctly, or if shutdown() is
                     # called after the connection dies
-                    logging.debug('Exception occurred while shutting '
-                                  'down socket.', exc_info=True)
+                    logging.debug("Exception occurred while shutting down socket.", exc_info=True)
             self._socket.close()
             del self._socket

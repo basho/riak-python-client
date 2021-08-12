@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import socket
+
 from riak.security import SecurityError, USE_STDLIB_SSL
+
 if USE_STDLIB_SSL:
     import ssl
 else:
@@ -29,8 +31,8 @@ def verify_cb(conn, cert, errnum, depth, ok):
     The default OpenSSL certificate verification callback.
     """
     if not ok:
-        raise SecurityError("Could not verify CA certificate {0}"
-                            .format(cert.get_subject()))
+        raise SecurityError(f"Could not verify CA certificate {cert.get_subject()}")
+
     return ok
 
 
@@ -49,7 +51,7 @@ if USE_STDLIB_SSL:
 
         ssl_ctx = ssl.SSLContext(credentials.ssl_version)
         ssl_ctx.verify_mode = ssl.CERT_REQUIRED
-        if hasattr(ssl_ctx, 'check_hostname'):
+        if hasattr(ssl_ctx, "check_hostname"):
             ssl_ctx.check_hostname = True
         if credentials.cacert_file is None:
             raise SecurityError("cacert_file is required in SecurityCreds")
@@ -96,11 +98,11 @@ else:
         """
 
         ssl_ctx = OpenSSL.SSL.Context(credentials.ssl_version)
-        if credentials._has_credential('pkey'):
+        if credentials._has_credential("pkey"):
             ssl_ctx.use_privatekey(credentials.pkey)
-        if credentials._has_credential('cert'):
+        if credentials._has_credential("cert"):
             ssl_ctx.use_certificate(credentials.cert)
-        if credentials._has_credential('cacert'):
+        if credentials._has_credential("cacert"):
             store = ssl_ctx.get_cert_store()
             cacerts = credentials.cacert
             if not isinstance(cacerts, list):
@@ -113,9 +115,9 @@ else:
         if ciphers is not None:
             ssl_ctx.set_cipher_list(ciphers)
         # Demand a certificate
-        ssl_ctx.set_verify(OpenSSL.SSL.VERIFY_PEER |
-                           OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT,
-                           verify_cb)
+        ssl_ctx.set_verify(
+            OpenSSL.SSL.VERIFY_PEER | OpenSSL.SSL.VERIFY_FAIL_IF_NO_PEER_CERT, verify_cb,
+        )
         return ssl_ctx
 
     # Inspired by
@@ -123,7 +125,7 @@ else:
     class RiakWrappedSocket(socket.socket):
         def __init__(self, connection, socket):
             """
-            API-compatibility wrapper for Python OpenSSL's Connection-class.
+            API-compatibility wrapper for Python OpenSSL"s Connection-class.
 
             :param connection: OpenSSL connection
             :type connection: OpenSSL.SSL.Connection
@@ -160,7 +162,7 @@ else:
     # which is basically a port of the `socket._fileobject` class
     class fileobject(socket._fileobject):
         """
-        Extension of the socket module's fileobject to use PyOpenSSL.
+        Extension of the socket module"s fileobject to use PyOpenSSL.
         """
 
         def read(self, size=-1):
@@ -242,7 +244,7 @@ else:
                 # check if we already have it in our buffer
                 buf.seek(0)
                 bline = buf.readline(size)
-                if bline.endswith('\n') or len(bline) == size:
+                if bline.endswith("\n") or len(bline) == size:
                     self._rbuf = StringIO()
                     self._rbuf.write(buf.read())
                     return bline
@@ -278,7 +280,7 @@ else:
                         continue
                     if not data:
                         break
-                    nl = data.find('\n')
+                    nl = data.find("\n")
                     if nl >= 0:
                         nl += 1
                         buf.write(data[:nl])
@@ -310,7 +312,7 @@ else:
                         break
                     left = size - buf_len
                     # did we just receive a newline?
-                    nl = data.find('\n', 0, left)
+                    nl = data.find("\n", 0, left)
                     if nl >= 0:
                         nl += 1
                         # save the excess data to _rbuf

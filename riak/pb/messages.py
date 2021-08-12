@@ -183,5 +183,5 @@ MESSAGE_CLASSES = {
     MSG_CODE_TS_TTB_MSG: None,
     MSG_CODE_AUTH_REQ: riak.pb.riak_pb2.RpbAuthReq,
     MSG_CODE_AUTH_RESP: None,
-    MSG_CODE_START_TLS: None
+    MSG_CODE_START_TLS: None,
 }

@@ -36,5 +36,4 @@ def last_written_resolver(riak_object):
     :param riak_object: an object-in-conflict that will be resolved
     :type riak_object: :class:`RiakObject <riak.riak_object.RiakObject>`
     """
-    riak_object.siblings = [max(riak_object.siblings,
-                                key=lambda x: x.last_modified), ]
+    riak_object.siblings = [max(riak_object.siblings, key=lambda x: x.last_modified)]

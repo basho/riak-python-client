@@ -18,7 +18,7 @@ import unittest
 from riak.test_server import TestServer
 
 
-@unittest.skipIf(sys.platform == 'win32', 'Windows is not supported')
+@unittest.skipIf(sys.platform == "win32", "Windows is not supported")
 class TestServerTestCase(unittest.TestCase):
     def setUp(self):
         self.test_server = TestServer()
@@ -46,8 +46,7 @@ class TestServerTestCase(unittest.TestCase):
 
     def test_merge_riak_kv_options(self):
         self.test_server = TestServer(riak_kv={"pb_ip": "192.168.2.1"})
-        self.assertEqual(self.test_server.app_config["riak_kv"]["pb_ip"],
-                         "192.168.2.1")
+        self.assertEqual(self.test_server.app_config["riak_kv"]["pb_ip"], "192.168.2.1")
 
     def test_merge_vmargs(self):
         self.test_server = TestServer(vm_args={"-P": 65000})
@@ -62,7 +61,7 @@ class TestServerTestCase(unittest.TestCase):
         self.assertEqual(self.test_server.temp_dir, "/tmp/riak/test_server")
 
     def test_set_non_default_tmp_dir(self):
-        tmp_dir = '/not/the/default/dir'
+        tmp_dir = "/not/the/default/dir"
         server = TestServer(tmp_dir=tmp_dir)
         self.assertEqual(server.temp_dir, tmp_dir)
 

@@ -25,11 +25,11 @@ class Table(object):
         :param client: A :class:`RiakClient <riak.client.RiakClient>`
                instance
         :type client: :class:`RiakClient <riak.client.RiakClient>`
-        :param name: The table's name
+        :param name: The table"s name
         :type name: string
         """
         if not isinstance(name, str):
-            raise TypeError('Table name must be a string')
+            raise TypeError("Table name must be a string")
 
         self._client = client
         self.name = name
@@ -57,7 +57,7 @@ class Table(object):
 
     def describe(self):
         """
-        Retrieves a timeseries table's description.
+        Retrieves a timeseries table"s description.
 
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
@@ -67,7 +67,7 @@ class Table(object):
         """
         Gets a value from a timeseries table.
 
-        :param key: The timeseries value's key.
+        :param key: The timeseries value"s key.
         :type key: list
         :rtype: :class:`TsObject <riak.ts_object.TsObject>`
         """
@@ -77,7 +77,7 @@ class Table(object):
         """
         Deletes a value from a timeseries table.
 
-        :param key: The timeseries value's key.
+        :param key: The timeseries value"s key.
         :type key: list or dict
         :rtype: boolean
         """

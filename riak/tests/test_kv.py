@@ -18,12 +18,20 @@ import sys
 import unittest
 
 from time import sleep
-from riak import ConflictError, RiakError, ListError
-from riak import RiakClient, RiakBucket, BucketType
+
+from riak import (
+    BucketType,
+    ConflictError,
+    ListError,
+    RiakBucket,
+    RiakClient,
+    RiakError,
+)
 from riak.resolver import default_resolver, last_written_resolver
-from riak.tests import RUN_KV, RUN_RESOLVE, PROTOCOL
+from riak.tests import PROTOCOL, RUN_KV, RUN_RESOLVE
 from riak.tests.base import IntegrationTestBase
 from riak.tests.comparison import Comparison
+from six import PY2, PY3, string_types
 
 try:
     import simplejson as json # todo: remove this, supports < p3.3
@@ -35,8 +43,8 @@ test_pickle_dumps = pickle.dumps
 test_pickle_loads = pickle.loads
 
 
-testrun_sibs_bucket = 'sibsbucket'
-testrun_props_bucket = 'propsbucket'
+testrun_sibs_bucket = "sibsbucket"
+testrun_props_bucket = "propsbucket"
 
 
 def setUpModule():
@@ -82,8 +90,8 @@ class NotJsonSerializable(object):
 class KVUnitTests(unittest.TestCase):
     def test_list_keys_exception(self):
         c = RiakClient()
-        bt = BucketType(c, 'test')
-        b = RiakBucket(c, 'test', bt)
+        bt = BucketType(c, "test")
+        b = RiakBucket(c, "test", bt)
         with self.assertRaises(ListError):
             b.get_keys()
 
@@ -98,25 +106,25 @@ class KVUnitTests(unittest.TestCase):
         c = RiakClient()
         with self.assertRaises(ListError):
             ks = []
-            for kl in c.stream_keys('test'):
+            for kl in c.stream_keys("test"):
                 ks.extend(kl)
 
     def test_ts_stream_keys_exception(self):
         c = RiakClient()
         with self.assertRaises(ListError):
             ks = []
-            for kl in c.ts_stream_keys('test'):
+            for kl in c.ts_stream_keys("test"):
                 ks.extend(kl)
 
 
-@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
+@unittest.skipUnless(RUN_KV, "RUN_KV is 0")
 class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
     def test_no_returnbody(self):
         bucket = self.client.bucket(self.bucket_name)
         o = bucket.new(self.key_name, "bar").store(return_body=False)
         self.assertEqual(o.vclock, None)
 
-    @unittest.skipUnless(PROTOCOL == 'pbc', 'Only available on pbc')
+    @unittest.skipUnless(PROTOCOL == "pbc", "Only available on pbc")
     def test_get_no_returnbody(self):
         bucket = self.client.bucket(self.bucket_name)
         o = bucket.new(self.key_name, "Ain't no body")
@@ -146,61 +154,61 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
     def test_store_and_get(self):
         bucket = self.client.bucket(self.bucket_name)
         rand = self.randint()
-        obj = bucket.new('foo', rand)
+        obj = bucket.new("foo", rand)
         obj.store()
-        obj = bucket.get('foo')
+        obj = bucket.get("foo")
         self.assertTrue(obj.exists)
         self.assertEqual(obj.bucket.name, self.bucket_name)
-        self.assertEqual(obj.key, 'foo')
+        self.assertEqual(obj.key, "foo")
         self.assertEqual(obj.data, rand)
 
-        # unicode objects are fine, as long as they don't
+        # unicode objects are fine, as long as they don"t
         # contain any non-ASCII chars
         self.client.bucket(self.bucket_name)
-        self.client.bucket('búcket')
+        self.client.bucket("búcket")
 
-        bucket.get('foo')
-        bucket.get('føø')
+        bucket.get("foo")
+        bucket.get("føø")
 
-        bucket.new(u'foo', 'éå')
+        bucket.new(u"foo", "éå")
 
-        obj2 = bucket.new('baz', rand, 'application/json')
-        obj2.charset = 'UTF-8'
+        obj2 = bucket.new("baz", rand, "application/json")
+        obj2.charset = "UTF-8"
         obj2.store()
-        obj2 = bucket.get('baz')
+        obj2 = bucket.get("baz")
         self.assertEqual(obj2.data, rand)
 
     def test_store_obj_with_unicode(self):
         bucket = self.client.bucket(self.bucket_name)
-        data = {u'føø': u'éå'}
-        obj = bucket.new('foo', data)
+        data = {u"føø": u"éå"}
+        obj = bucket.new("foo", data)
         obj.store()
-        obj = bucket.get('foo')
+        obj = bucket.get("foo")
         self.assertEqual(obj.data, data)
 
     def test_store_unicode_string(self):
         bucket = self.client.bucket(self.bucket_name)
         data = u"some unicode data: \u00c6"
-        obj = bucket.new(self.key_name, encoded_data=data.encode('utf-8'),
-                         content_type='text/plain')
-        obj.charset = 'utf-8'
+        obj = bucket.new(self.key_name, encoded_data=data.encode("utf-8"),
+                         content_type="text/plain")
+        obj.charset = "utf-8"
         obj.store()
         obj2 = bucket.get(self.key_name)
-        self.assertEqual(data, obj2.encoded_data.decode('utf-8'))
+        self.assertEqual(data, obj2.encoded_data.decode("utf-8"))
 
     def test_string_bucket_name(self):
         # Things that are not strings cannot be bucket names
         for bad in (12345, True, None, {}, []):
-            with self.assert_raises_regex(TypeError, 'must be a string'):
+            with self.assert_raises_regex(TypeError, "must be a string"):
                 self.client.bucket(bad)
 
-            with self.assert_raises_regex(TypeError, 'must be a string'):
+            with self.assert_raises_regex(TypeError, "must be a string"):
                 RiakBucket(self.client, bad, None)
 
-        self.client.bucket('føø')
+        self.client.bucket("føø")
 
-        # This is fine, since it's already ASCII
-        self.client.bucket('ASCII')
+        # This is fine, since it"s already ASCII
+        self.client.bucket("ASCII")
 
     def test_generate_key(self):
         # Ensure that Riak generates a random key when
@@ -210,13 +218,13 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         self.assertIsNone(o.key)
         o.store()
         self.assertIsNotNone(o.key)
-        self.assertNotIn('/', o.key)
+        self.assertNotIn("/", o.key)
         existing_keys = bucket.get_keys()
         self.assertEqual(len(existing_keys), 1)
 
     def maybe_store_keys(self):
-        skey = 'rkb-init'
-        bucket = self.client.bucket('random_key_bucket')
+        skey = "rkb-init"
+        bucket = self.client.bucket("random_key_bucket")
         sobj = bucket.get(skey)
         if sobj.exists:
             return
@@ -228,7 +236,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
     def test_stream_keys(self):
         self.maybe_store_keys()
-        bucket = self.client.bucket('random_key_bucket')
+        bucket = self.client.bucket("random_key_bucket")
         regular_keys = bucket.get_keys()
         self.assertNotEqual(len(regular_keys), 0)
         streamed_keys = []
@@ -241,7 +249,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
     def test_stream_keys_timeout(self):
         self.maybe_store_keys()
-        bucket = self.client.bucket('random_key_bucket')
+        bucket = self.client.bucket("random_key_bucket")
         streamed_keys = []
         with self.assertRaises(RiakError):
             for keylist in self.client.stream_keys(bucket, timeout=1):
@@ -252,7 +260,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
     def test_stream_keys_abort(self):
         self.maybe_store_keys()
-        bucket = self.client.bucket('random_key_bucket')
+        bucket = self.client.bucket("random_key_bucket")
         regular_keys = bucket.get_keys()
         self.assertNotEqual(len(regular_keys), 0)
         try:
@@ -282,9 +290,9 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         bucket = self.client.bucket(self.bucket_name)
         # Store as binary, retrieve as binary, then compare...
         rand = str(self.randint())
-        rand = bytes(rand, 'utf-8')
+        rand = bytes(rand, "utf-8")
         obj = bucket.new(self.key_name, encoded_data=rand,
-                         content_type='text/plain')
+                         content_type="text/plain")
         obj.store()
         obj = bucket.get(self.key_name)
         self.assertTrue(obj.exists)
@@ -302,20 +310,20 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
         # this should *not* raise an error
         empty = ""
-        empty = bytes(empty, 'utf-8')
-        obj = bucket.new('foo2', encoded_data=empty, content_type='text/plain')
+        empty = bytes(empty, "utf-8")
+        obj = bucket.new("foo2", encoded_data=empty, content_type="text/plain")
         obj.store()
-        obj = bucket.get('foo2')
+        obj = bucket.get("foo2")
         self.assertTrue(obj.exists)
         self.assertEqual(obj.encoded_data, empty)
 
     def test_custom_bucket_encoder_decoder(self):
         bucket = self.client.bucket(self.bucket_name)
         # Teach the bucket how to pickle
-        bucket.set_encoder('application/x-pickle', test_pickle_dumps)
-        bucket.set_decoder('application/x-pickle', test_pickle_loads)
-        data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
-        obj = bucket.new(self.key_name, data, 'application/x-pickle')
+        bucket.set_encoder("application/x-pickle", test_pickle_dumps)
+        bucket.set_decoder("application/x-pickle", test_pickle_loads)
+        data = {"array": [1, 2, 3], "badforjson": NotJsonSerializable(1, 3)}
+        obj = bucket.new(self.key_name, data, "application/x-pickle")
         obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.data)
@@ -323,10 +331,10 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
     def test_custom_client_encoder_decoder(self):
         bucket = self.client.bucket(self.bucket_name)
         # Teach the client how to pickle
-        self.client.set_encoder('application/x-pickle', test_pickle_dumps)
-        self.client.set_decoder('application/x-pickle', test_pickle_loads)
-        data = {'array': [1, 2, 3], 'badforjson': NotJsonSerializable(1, 3)}
-        obj = bucket.new(self.key_name, data, 'application/x-pickle')
+        self.client.set_encoder("application/x-pickle", test_pickle_dumps)
+        self.client.set_decoder("application/x-pickle", test_pickle_loads)
+        data = {"array": [1, 2, 3], "badforjson": NotJsonSerializable(1, 3)}
+        obj = bucket.new(self.key_name, data, "application/x-pickle")
         obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.data)
@@ -338,7 +346,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         data = data.encode()
         obj = bucket.new(self.key_name,
                          encoded_data=data,
-                         content_type='application/x-frobnicator')
+                         content_type="application/x-frobnicator")
         obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.encoded_data)
@@ -346,7 +354,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
     def test_text_plain_encoder_decoder(self):
         bucket = self.client.bucket(self.bucket_name)
         data = "some funny data"
-        obj = bucket.new(self.key_name, data, content_type='text/plain')
+        obj = bucket.new(self.key_name, data, content_type="text/plain")
         obj.store()
         obj2 = bucket.get(self.key_name)
         self.assertEqual(data, obj2.data)
@@ -411,7 +419,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         obj.reload()
         self.assertFalse(obj.exists)
         obj.data = ["first store"]
-        obj.content_type = 'application/json'
+        obj.content_type = "application/json"
         obj.store()
 
         obj.data = ["second store"]
@@ -424,10 +432,10 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
-        # Even if it previously existed, let's store a base resolved version
+        # Even if it previously existed, let"s store a base resolved version
         # from which we can diverge by sending a stale vclock.
-        obj.data = 'start'
-        obj.content_type = 'text/plain'
+        obj.data = "start"
+        obj.content_type = "text/plain"
         obj.store()
 
         vals = set(self.generate_siblings(obj, count=5))
@@ -461,10 +469,10 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
-        # Even if it previously existed, let's store a base resolved version
+        # Even if it previously existed, let"s store a base resolved version
         # from which we can diverge by sending a stale vclock.
-        obj.data = 'start'
-        obj.content_type = 'text/plain'
+        obj.data = "start"
+        obj.content_type = "text/plain"
         obj.store()
 
         vals = self.generate_siblings(obj, count=5, delay=1.01)
@@ -524,8 +532,8 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         obj = bucket.get(self.key_name)
         bucket.allow_mult = True
 
-        obj.data = 'start'
-        obj.content_type = 'text/plain'
+        obj.data = "start"
+        obj.content_type = "text/plain"
         obj.store(return_body=True)
 
         obj.delete()
@@ -551,7 +559,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         o = bucket.get(self.key_name)
         self.assertEqual(o.exists, False)
         o.data = {"foo": "bar"}
-        o.content_type = 'application/json'
+        o.content_type = "application/json"
 
         o = o.store()
         self.assertEqual(o.data, {"foo": "bar"})
@@ -561,7 +569,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         o = bucket.get(self.randname())
         self.assertEqual(o.exists, False)
         o.encoded_data = "1234567890".encode()
-        o.content_type = 'application/octet-stream'
+        o.content_type = "application/octet-stream"
 
         o = o.store()
         self.assertEqual(o.encoded_data, "1234567890".encode())
@@ -572,10 +580,10 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         bucket = self.client.bucket(self.bucket_name)
         rand = self.randint()
         obj = bucket.new(self.key_name, rand)
-        obj.usermeta = {'custom': 'some metadata'}
+        obj.usermeta = {"custom": "some metadata"}
         obj.store()
         obj = bucket.get(self.key_name)
-        self.assertEqual('some metadata', obj.usermeta['custom'])
+        self.assertEqual("some metadata", obj.usermeta["custom"])
 
     def test_list_buckets(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -617,12 +625,12 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         bucket.get(self.key_name, notfound_ok=True)
         bucket.get(self.key_name, notfound_ok=False)
 
-        missing = bucket.get('missing-key', notfound_ok=True,
+        missing = bucket.get("missing-key", notfound_ok=True,
                              basic_quorum=True)
         self.assertFalse(missing.exists)
 
     def test_preflist(self):
-        nodes = ['riak@127.0.0.1', 'dev1@127.0.0.1']
+        nodes = ["riak@127.0.0.1", "dev1@127.0.0.1"]
         bucket = self.client.bucket(self.bucket_name)
         bucket.new(self.key_name, data={"foo": "one",
                                         "bar": "baz"}).store()
@@ -631,8 +639,8 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
             preflist2 = self.client.get_preflist(bucket, self.key_name)
             for pref in (preflist, preflist2):
                 self.assertEqual(len(pref), 3)
-                self.assertIn(pref[0]['node'], nodes)
-                [self.assertTrue(node['primary']) for node in pref]
+                self.assertIn(pref[0]["node"], nodes)
+                [self.assertTrue(node["primary"]) for node in pref]
         except NotImplementedError as e:
             raise unittest.SkipTest(e)
 
@@ -646,7 +654,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
 
             other_obj = original.bucket.new(key=original.key,
                                             data=randval,
-                                            content_type='text/plain')
+                                            content_type="text/plain")
             other_obj.vclock = original.vclock
             other_obj.store()
             vals.append(randval)
@@ -655,7 +663,7 @@ class BasicKVTests(IntegrationTestBase, unittest.TestCase, Comparison):
         return vals
 
 
-@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
+@unittest.skipUnless(RUN_KV, "RUN_KV is 0")
 class BucketPropsTest(IntegrationTestBase, unittest.TestCase):
     def test_rw_settings(self):
         bucket = self.client.bucket(testrun_props_bucket)
@@ -676,10 +684,10 @@ class BucketPropsTest(IntegrationTestBase, unittest.TestCase):
         bucket.rw = "one"
         self.assertEqual(bucket.rw, "one")
 
-        bucket.set_properties({'w': 'quorum',
-                               'r': 'quorum',
-                               'dw': 'quorum',
-                               'rw': 'quorum'})
+        bucket.set_properties({"w": "quorum",
+                               "r": "quorum",
+                               "dw": "quorum",
+                               "rw": "quorum"})
         bucket.clear_properties()
 
     def test_primary_quora(self):
@@ -693,7 +701,7 @@ class BucketPropsTest(IntegrationTestBase, unittest.TestCase):
         bucket.pw = "quorum"
         self.assertEqual(bucket.pw, "quorum")
 
-        bucket.set_properties({'pr': 0, 'pw': 0})
+        bucket.set_properties({"pr": 0, "pw": 0})
         bucket.clear_properties()
 
     def test_clear_bucket_properties(self):
@@ -709,7 +717,7 @@ class BucketPropsTest(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(bucket.n_val, 3)
 
 
-@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
+@unittest.skipUnless(RUN_KV, "RUN_KV is 0")
 class KVFileTests(IntegrationTestBase, unittest.TestCase):
     def test_store_binary_object_from_file(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -717,30 +725,32 @@ class KVFileTests(IntegrationTestBase, unittest.TestCase):
         obj.store()
         obj = bucket.get(self.key_name)
         self.assertNotEqual(obj.encoded_data, None)
-        is_win32 = sys.platform == 'win32'
-        self.assertTrue(obj.content_type == 'text/x-python' or
-                        (is_win32 and obj.content_type == 'text/plain') or
-                        obj.content_type == 'application/x-python-code')
+        is_win32 = sys.platform == "win32"
+        self.assertTrue(
+            obj.content_type == "text/x-python" or (
+                is_win32 and obj.content_type == "text/plain"
+            ) or (obj.content_type == "application/x-python-code"),
+        )
 
     def test_store_binary_object_from_file_should_use_default_mimetype(self):
         bucket = self.client.bucket(self.bucket_name)
         filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                os.pardir, os.pardir, 'README.md')
+                                os.pardir, os.pardir, "README.md")
         obj = bucket.new_from_file(self.key_name, filepath)
         obj.store()
         obj = bucket.get(self.key_name)
-        self.assertEqual(obj.content_type, 'application/octet-stream')
+        self.assertEqual(obj.content_type, "application/octet-stream")
 
     def test_store_binary_object_from_file_should_fail_if_file_not_found(self):
         bucket = self.client.bucket(self.bucket_name)
         with self.assertRaises(IOError):
-            bucket.new_from_file(self.key_name, 'FILE_NOT_FOUND')
+            bucket.new_from_file(self.key_name, "FILE_NOT_FOUND")
         obj = bucket.get(self.key_name)
         # self.assertEqual(obj.encoded_data, None)
         self.assertFalse(obj.exists)
 
 
-@unittest.skipUnless(RUN_KV, 'RUN_KV is 0')
+@unittest.skipUnless(RUN_KV, "RUN_KV is 0")
 class CounterTests(IntegrationTestBase, unittest.TestCase):
     def test_counter_requires_allow_mult(self):
         bucket = self.client.bucket(self.bucket_name)
@@ -763,9 +773,7 @@ class CounterTests(IntegrationTestBase, unittest.TestCase):
         self.assertEqual(10, bucket.get_counter(self.key_name))
 
         # Update with returning the value
-        self.assertEqual(15, bucket.update_counter(self.key_name, 5,
-                                                   returnvalue=True))
+        self.assertEqual(15, bucket.update_counter(self.key_name, 5, returnvalue=True))
 
         # Now try decrementing
-        self.assertEqual(10, bucket.update_counter(self.key_name, -5,
-                                                   returnvalue=True))
+        self.assertEqual(10, bucket.update_counter(self.key_name, -5, returnvalue=True))

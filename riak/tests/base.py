@@ -14,10 +14,17 @@
 
 import logging
 import random
+
 import riak
 
 from riak.client import RiakClient
-from riak.tests import HOST, PROTOCOL, PB_PORT, HTTP_PORT, SECURITY_CREDS
+from riak.tests import (
+    HOST,
+    HTTP_PORT,
+    PB_PORT,
+    PROTOCOL,
+    SECURITY_CREDS,
+)
 
 
 class IntegrationTestBase(object):
@@ -32,7 +39,7 @@ class IntegrationTestBase(object):
 
     @staticmethod
     def randname(length=12):
-        out = ''
+        out = ""
         for i in range(length):
             out += chr(random.randint(ord('a'), ord('z')))
         return out
@@ -58,16 +65,19 @@ class IntegrationTestBase(object):
             kwargs.update(cls.client_options)
 
         logger = logging.getLogger()
-        logger.debug("RiakClient(protocol='%s', host='%s', pb_port='%d', "
-                     "http_port='%d', credentials='%s', kwargs='%s')",
-                     protocol, host, pb_port, http_port, credentials, kwargs)
+        logger.debug(
+            f"RiakClient(protocol='{protocol}', host='{host}', pb_port='{pb_port}', ",
+            f"http_port='{http_port}', credentials='{credentials}', kwargs='{kwargs}')",
+        )
 
-        return RiakClient(protocol=protocol,
-                          host=host,
-                          http_port=http_port,
-                          credentials=credentials,
-                          pb_port=pb_port,
-                          **kwargs)
+        return RiakClient(
+            protocol=protocol,
+            host=host,
+            http_port=http_port,
+            credentials=credentials,
+            pb_port=pb_port,
+            **kwargs,
+        )
 
     def setUp(self):
         riak.disable_list_exceptions = True

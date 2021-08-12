@@ -14,8 +14,8 @@
 
 import unittest
 
-from riak.mapreduce import RiakKeyFilter
 from riak import key_filter
+from riak.mapreduce import RiakKeyFilter
 
 
 class FilterTests(unittest.TestCase):
@@ -73,5 +73,5 @@ class FilterTests(unittest.TestCase):
         f3 = f1 & f2
         self.assertEqual(list(f3), [["and",
                                      [["tokenize", "-", 1], ["eq", "2005"]],
-                                     [["tokenize", "-", 2], ["eq", "05"]]
+                                     [["tokenize", "-", 2], ["eq", "05"]],
                                      ]])

@@ -14,10 +14,10 @@
 # limitations under the License.
 
 
-from threading import Thread
 import sys
 from multiprocessing import Pool
 from random import SystemRandom
+from threading import Thread
 from time import sleep
 from queue import Queue
 sys.path.append("../transports/")
