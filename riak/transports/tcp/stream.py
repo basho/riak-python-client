@@ -51,7 +51,7 @@ class PbufStream(object):
             expect = self._expect
             self.codec.maybe_incorrect_code(resp_code, expect)
             resp = self.codec.parse_msg(expect, data)
-        except:
+        except Exception:
             self.finished = True
             raise
         finally:
@@ -96,7 +96,7 @@ class PbufKeyStream(PbufStream):
     def __next__(self):
         response = next(super(PbufKeyStream, self))
 
-        if response.done and len(response.keys) is 0:
+        if response.done and len(response.keys) == 0:
             raise StopIteration
 
         return response.keys
@@ -137,7 +137,7 @@ class PbufBucketStream(PbufStream):
     def __next__(self):
         response = next(super(PbufBucketStream, self))
 
-        if response.done and len(response.buckets) is 0:
+        if response.done and len(response.buckets) == 0:
             raise StopIteration
 
         return response.buckets
@@ -199,7 +199,7 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
     def __next__(self):
         response = next(super(PbufTsKeyStream, self))
 
-        if response.done and len(response.keys) is 0:
+        if response.done and len(response.keys) == 0:
             raise StopIteration
 
         keys = []

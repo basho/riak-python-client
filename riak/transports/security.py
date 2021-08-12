@@ -305,7 +305,7 @@ else:
                     try:
                         data = self._sock.recv(self._rbufsize)
                     except OpenSSL.SSL.WantReadError:
-                            continue
+                        continue
                     if not data:
                         break
                     left = size - buf_len

@@ -362,7 +362,7 @@ class Transport(FeatureDetection):
         return [key for resultbucket, key in result]
 
     def _construct_mapred_json(self, inputs, query, timeout=None):
-        if not self.phaseless_mapred() and (query is None or len(query) is 0):
+        if not self.phaseless_mapred() and (query is None or len(query) == 0):
             raise Exception(
                 'Phase-less MapReduce is not supported by Riak node')
 

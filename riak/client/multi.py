@@ -211,7 +211,7 @@ class MultiPutPool(MultiPool):
                 elif isinstance(obj, TsObject):
                     rv = task.client.ts_put(obj, **task.options)
                 else:
-                    raise ValueError('unknown obj type: %s'.format(type(obj)))
+                    raise ValueError('unknown obj type: {0}'.format(type(obj)))
                 task.outq.put(rv)
             except KeyboardInterrupt:
                 raise
