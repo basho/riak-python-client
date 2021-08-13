@@ -141,7 +141,7 @@ class HttpMapReduceStream(HttpMultipartStream):
     """
 
     def __next__(self):
-        message = next(super(HttpMapReduceStream, self))
+        message = super(HttpMapReduceStream, self).__next__()
         payload = json.loads(message.get_payload())
         return payload["phase"], payload["data"]
 
@@ -157,7 +157,7 @@ class HttpIndexStream(HttpMultipartStream):
         self.return_terms = return_terms
 
     def __next__(self):
-        message = next(super(HttpIndexStream, self))
+        message = super(HttpIndexStream, self).__next__()
         payload = json.loads(message.get_payload())
         if "error" in payload:
             raise RiakError(payload["error"])
