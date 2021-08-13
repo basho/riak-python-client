@@ -96,10 +96,10 @@ function export_test_environment_vars
     export RUN_DATATYPES=1
     export RUN_INDEXES=1
     export RUN_KV=1
-    export RUN_MAPREDUCE=1
+    export RUN_MAPREDUCE=0
     export RUN_RESOLVE=1
     export RUN_TIMESERIES=1
-    export RUN_YZ=1
+    export RUN_YZ=0
 }
 
 function unexport_test_environment_vars
