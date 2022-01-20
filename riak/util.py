@@ -18,7 +18,7 @@ import datetime
 import sys
 import warnings
 
-from collections import Mapping
+from collections.abc import Mapping
 from six import string_types, PY2
 
 epoch = datetime.datetime.utcfromtimestamp(0)
