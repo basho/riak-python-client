@@ -28,7 +28,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='riak_yokozuna.proto',
   package='',
-  serialized_pb='\n\x13riak_yokozuna.proto\"?\n\x10RpbYokozunaIndex\x12\x0c\n\x04name\x18\x01 \x02(\x0c\x12\x0e\n\x06schema\x18\x02 \x01(\x0c\x12\r\n\x05n_val\x18\x03 \x01(\r\"&\n\x16RpbYokozunaIndexGetReq\x12\x0c\n\x04name\x18\x01 \x01(\x0c\";\n\x17RpbYokozunaIndexGetResp\x12 \n\x05index\x18\x01 \x03(\x0b\x32\x11.RpbYokozunaIndex\"K\n\x16RpbYokozunaIndexPutReq\x12 \n\x05index\x18\x01 \x02(\x0b\x32\x11.RpbYokozunaIndex\x12\x0f\n\x07timeout\x18\x02 \x01(\r\")\n\x19RpbYokozunaIndexDeleteReq\x12\x0c\n\x04name\x18\x01 \x02(\x0c\"2\n\x11RpbYokozunaSchema\x12\x0c\n\x04name\x18\x01 \x02(\x0c\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\"=\n\x17RpbYokozunaSchemaPutReq\x12\"\n\x06schema\x18\x01 \x02(\x0b\x32\x12.RpbYokozunaSchema\"\'\n\x17RpbYokozunaSchemaGetReq\x12\x0c\n\x04name\x18\x01 \x02(\x0c\">\n\x18RpbYokozunaSchemaGetResp\x12\"\n\x06schema\x18\x01 \x02(\x0b\x32\x12.RpbYokozunaSchemaB)\n\x17\x63om.basho.riak.protobufB\x0eRiakYokozunaPB')
+  serialized_pb=b'\n\x13riak_yokozuna.proto\"?\n\x10RpbYokozunaIndex\x12\x0c\n\x04name\x18\x01 \x02(\x0c\x12\x0e\n\x06schema\x18\x02 \x01(\x0c\x12\r\n\x05n_val\x18\x03 \x01(\r\"&\n\x16RpbYokozunaIndexGetReq\x12\x0c\n\x04name\x18\x01 \x01(\x0c\";\n\x17RpbYokozunaIndexGetResp\x12 \n\x05index\x18\x01 \x03(\x0b\x32\x11.RpbYokozunaIndex\"K\n\x16RpbYokozunaIndexPutReq\x12 \n\x05index\x18\x01 \x02(\x0b\x32\x11.RpbYokozunaIndex\x12\x0f\n\x07timeout\x18\x02 \x01(\r\")\n\x19RpbYokozunaIndexDeleteReq\x12\x0c\n\x04name\x18\x01 \x02(\x0c\"2\n\x11RpbYokozunaSchema\x12\x0c\n\x04name\x18\x01 \x02(\x0c\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\"=\n\x17RpbYokozunaSchemaPutReq\x12\"\n\x06schema\x18\x01 \x02(\x0b\x32\x12.RpbYokozunaSchema\"\'\n\x17RpbYokozunaSchemaGetReq\x12\x0c\n\x04name\x18\x01 \x02(\x0c\">\n\x18RpbYokozunaSchemaGetResp\x12\"\n\x06schema\x18\x01 \x02(\x0b\x32\x12.RpbYokozunaSchemaB)\n\x17\x63om.basho.riak.protobufB\x0eRiakYokozunaPB')
 
 
 
@@ -382,5 +382,5 @@ class RpbYokozunaSchemaGetResp(_message.Message):
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), '\n\027com.basho.riak.protobufB\016RiakYokozunaPB')
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), b'\n\027com.basho.riak.protobufB\016RiakYokozunaPB')
 # @@protoc_insertion_point(module_scope)
