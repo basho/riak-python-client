@@ -39,7 +39,7 @@ class Counter(Datatype):
         """
         Whether this counter has staged increments.
         """
-        return self._increment is not 0
+        return self._increment != 0
 
     def to_op(self):
         """

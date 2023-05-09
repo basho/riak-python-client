@@ -341,7 +341,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
     def _create_node(self, n):
         if isinstance(n, RiakNode):
             return n
-        elif isinstance(n, tuple) and len(n) is 3:
+        elif isinstance(n, tuple) and len(n) == 3:
             host, http_port, pb_port = n
             return RiakNode(host=host,
                             http_port=http_port,
@@ -382,7 +382,7 @@ class RiakClient(RiakMapReduceChain, RiakClientOperations):
 
         good = [n for n in nodes if _error_rate(n) < 0.1]
 
-        if len(good) is 0:
+        if len(good) == 0:
             # Fall back to a minimally broken node
             return min(nodes, key=_error_rate)
         else:

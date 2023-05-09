@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import Sized
+from collections.abc import Sized
 from riak.datatypes.datatype import Datatype
 from six import string_types
 from riak.datatypes import TYPES

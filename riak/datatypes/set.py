@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import collections
+from collections.abc import Set as BaseSet, Iterable
 
 from .datatype import Datatype
 from six import string_types
@@ -21,7 +21,7 @@ from riak.datatypes import TYPES
 __all__ = ['Set']
 
 
-class Set(collections.Set, Datatype):
+class Set(BaseSet, Datatype):
     """A convergent datatype representing a Set with observed-remove
     semantics. Currently strings are the only supported value type.
     Example::

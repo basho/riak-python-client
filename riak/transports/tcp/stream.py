@@ -96,7 +96,7 @@ class PbufKeyStream(PbufStream):
     def next(self):
         response = super(PbufKeyStream, self).next()
 
-        if response.done and len(response.keys) is 0:
+        if response.done and len(response.keys) == 0:
             raise StopIteration
 
         return response.keys
@@ -137,7 +137,7 @@ class PbufBucketStream(PbufStream):
     def next(self):
         response = super(PbufBucketStream, self).next()
 
-        if response.done and len(response.buckets) is 0:
+        if response.done and len(response.buckets) == 0:
             raise StopIteration
 
         return response.buckets
@@ -199,7 +199,7 @@ class PbufTsKeyStream(PbufStream, TtbCodec):
     def next(self):
         response = super(PbufTsKeyStream, self).next()
 
-        if response.done and len(response.keys) is 0:
+        if response.done and len(response.keys) == 0:
             raise StopIteration
 
         keys = []
